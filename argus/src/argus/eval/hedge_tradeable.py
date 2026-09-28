@@ -1577,7 +1577,8 @@ def main() -> int:  # pragma: no cover - CLI
     report = build_report()
     print(render(report))
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    REPORT_PATH.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
+    REPORT_PATH.write_text(json.dumps(report, indent=2, default=str),
+                           encoding="utf-8", newline="\n")
     print(f"\nwritten to {REPORT_PATH}")
     return 0
 

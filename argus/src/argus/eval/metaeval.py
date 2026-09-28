@@ -136,6 +136,12 @@ JUDGES: tuple[Judge, ...] = (
           "right reason / wrong reason / answered with figures, per row",
           "audits the pattern grader, which decides every grade; agreement 71 of 73 offline rows "
           "(97.3%) and 20 of 20 on the model path, data/infeasibility_bench.json; no human labels"),
+    Judge("document_entailment", "argus/research/document_qa.py",
+          "argus/research/document_qa.py:750",
+          "whether a filing passage entails an answer sentence, for the ALCE citation-precision "
+          "check behind ARGUS_DOC_ENTAILMENT=1",
+          "verdict in {1, 0} per (passage, sentence)",
+          "added 2026-09-28, off by default; no labelled set, and no run has been recorded"),
 )
 """Every LLM judge in ARGUS. Found by listing every ``complete_json`` call site in ``src/argus``
 (2026-09-25) and keeping the ones whose output is a verdict about something else. Three were added
@@ -290,7 +296,7 @@ def router_labels_from_bench(path: Path = DATA / "router_bench.json") -> list[di
 def write_labels(rows: Sequence[Mapping[str, str]], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("".join(json.dumps(dict(r), ensure_ascii=False) + "\n" for r in rows),
-                    encoding="utf-8")
+                    encoding="utf-8", newline="\n")
 
 
 def run(labels_dir: Path = LABELS) -> dict[str, Any]:

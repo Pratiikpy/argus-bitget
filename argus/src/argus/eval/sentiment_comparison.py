@@ -692,7 +692,7 @@ def _rerun_reproducibility(path: Path, *, k: int, budget: int) -> int:  # pragma
     report["out_of_sample_holdout_reproducibility"] = reproducibility
     report["costs"]["argus_real_calls"] = report["costs"]["argus_real_calls"] + fresh.calls
     report["costs"]["tokens_spent"] = report["costs"]["tokens_spent"] + spend.spent
-    path.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
+    path.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8", newline="\n")
     print(f"reproducibility (uncached): {reproducibility['stable']}/{reproducibility['of']}; "
           f"{fresh.calls} calls, {spend.spent} tokens")
     return 0
@@ -782,7 +782,7 @@ def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - CLI, r
     print(f"costs: {report['costs']}")
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
+    args.out.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8", newline="\n")
     print(f"\nsaved -> {args.out}")
     return 0
 

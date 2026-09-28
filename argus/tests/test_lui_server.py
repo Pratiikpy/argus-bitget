@@ -31,6 +31,13 @@ import pytest
 from argus.lui.server import PAGE, Handler, handle_ask
 
 
+def finished(body: str) -> str:
+    """The page a reader is left with: a streamed research page carries each card three times
+    (waiting, its template, then swapped in), and its finished content is the last template."""
+    marker = "<template id='st-done'>"
+    return body.split(marker, 1)[1].split("</template>", 1)[0] if marker in body else body
+
+
 @pytest.fixture(scope="module")
 def base_url() -> Iterator[str]:
     """A real server on an ephemeral port.
@@ -412,7 +419,7 @@ class TestTheResearchTaskIsReachable:
         assert "text/html" in headers.get("Content-Type", "")
         assert "should I add 15% TSLA?" in body
         assert "What to do" in body
-        assert body.count("<article") == 8
+        assert finished(body).count("<article") == 8
 
     @pytest.mark.network
     def test_every_step_names_its_engine_and_answers(self, base_url: str) -> None:

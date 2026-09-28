@@ -144,7 +144,7 @@ def migrate(path: Path = DEFAULT_PATH, *, dry_run: bool = False) -> Migration:
         backup = path.with_suffix(path.suffix + ".schema1.bak")
         shutil.copy2(path, backup)
         path.write_text(
-            "".join(json.dumps(r, default=str) + "\n" for r in out), encoding="utf-8",
+            "".join(json.dumps(r, default=str) + "\n" for r in out), encoding="utf-8", newline="\n",
         )
 
     return Migration(

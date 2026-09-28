@@ -540,7 +540,8 @@ def main(argv: list[str] | None = None) -> int:
         blob = {**rpt, "quantisation": qrpt}
         if oos_rpt is not None:
             blob["out_of_sample"] = oos_rpt
-        Path(args.save).write_text(json.dumps(blob, indent=2, default=str), encoding="utf-8")
+        Path(args.save).write_text(json.dumps(blob, indent=2, default=str),
+                                   encoding="utf-8", newline="\n")
         print(f"saved -> {args.save}")
     ok = rpt["ac_never_loses"] and qrpt["all_totals_preserved"]
     if oos_rpt is not None:

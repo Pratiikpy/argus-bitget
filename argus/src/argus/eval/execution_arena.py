@@ -284,7 +284,7 @@ def main() -> int:  # pragma: no cover - CLI
         ],
         "rows_sample": rows[:16],
     }
-    REPORT_PATH.write_text(json.dumps(report, indent=1), encoding="utf-8")
+    REPORT_PATH.write_text(json.dumps(report, indent=1), encoding="utf-8", newline="\n")
     print(json.dumps(scored, indent=1))
     return 0
 

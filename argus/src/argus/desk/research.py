@@ -576,7 +576,10 @@ def portfolio_step(impact: Any) -> Finding:
     )
 
 
-def stress_step(report: Any) -> Finding:
+def stress_step(report: Any, searched: Any = None) -> Finding:
+    """The preset scenarios, and — when the symbol has recorded order books — the probability of
+    breaching the loss tolerance over a day with the most likely way it happens, searched over
+    every observed 24-hour move against every recorded book (`desk/stress_search.py`)."""
     if report is None or not getattr(report, "results", ()):
         return _absent("stress", "no stress scenarios could be built for this instrument")
     failures = getattr(report, "failures", [])
@@ -586,6 +589,9 @@ def stress_step(report: Any) -> Finding:
     )
     concern = ""
     detail: dict[str, Any] = {"scenarios": len(report.results), "failures": len(failures)}
+    if searched is not None:
+        headline += ". " + searched.sentence()
+        detail["searched"] = searched.as_dict()
     if unexitable:
         concern = (
             f"{len(unexitable)} scenario(s) leave a position that cannot be fully liquidated — "
@@ -643,6 +649,7 @@ def research(
     attempted_allocation: bool = True,
     impact: Any = None,
     stress: Any = None,
+    searched: Any = None,
     cost_bps: Decimal | None = None,
     expected_edge_bps: Decimal | None = None,
     now: datetime | None = None,
@@ -664,7 +671,7 @@ def research(
         beta_step(impact),
         portfolio_step(impact),
         diversification_step(diversification, hedges),
-        stress_step(stress),
+        stress_step(stress, searched),
         execution_step(cost_bps, expected_edge_bps),
     ]
     verdict, rationale = decide(findings, minimum=minimum)
@@ -713,7 +720,7 @@ def main(argv: list[str] | None = None) -> int:
     now = datetime.now(UTC)
 
     evidence: list[Any] = []
-    gap = analogue = impact = stress = shape = pairs = allocation = None
+    gap = analogue = impact = stress = shape = pairs = allocation = searched = None
     diversification = None
     hedges: Any = None
     cost_bps: Decimal | None = None
@@ -747,6 +754,17 @@ def main(argv: list[str] | None = None) -> int:
             symbol=args.symbol, quantity=Decimal("1"), entry_price=price,
             loss_tolerance_pct=Decimal("5"), moves=moves, phase="rth", horizon_bars=2,
         )
+        # The day-long view at the size the desk may hold: every observed 24-hour move against
+        # every recorded book, at the per-position cap (`risk/constitution`), 5% tolerance.
+        from argus.desk.stress_search import search as search_stress
+        from argus.desk.stress_search import tape_books
+
+        books = tape_books(args.symbol)
+        if books:
+            searched = search_stress(
+                args.symbol, horizon_moves([(c.ts, c.close) for c in candles], bars=24),
+                books, quantity=(Decimal("50000") / price).quantize(Decimal("0.001")),
+                tolerance_pct=Decimal("5"))
     except Exception:
         stress = None
 
@@ -926,7 +944,7 @@ def main(argv: list[str] | None = None) -> int:
     report = research(
         question=question, symbol=args.symbol, evidence=evidence, gap=gap,
         analogue=analogue, shape=shape, pairs=pairs, allocation=allocation, impact=impact,
-        stress=stress,
+        stress=stress, searched=searched,
         cost_bps=cost_bps, now=now,
         attempted_gap=attempted_gap, attempted_analogue=attempted_analogue,
         attempted_shape=attempted_shape, attempted_pairs=attempted_pairs,
@@ -938,7 +956,7 @@ def main(argv: list[str] | None = None) -> int:
         from pathlib import Path
 
         Path(args.save).write_text(
-            json.dumps(report.as_dict(), indent=2, default=str), encoding="utf-8"
+            json.dumps(report.as_dict(), indent=2, default=str), encoding="utf-8", newline="\n"
         )
         print(f"\nsaved -> {args.save}")
     return 0

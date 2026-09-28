@@ -264,7 +264,7 @@
   },
   "precision_at_scale": {
     "paper_ledger_theses": {
-      "n": 627,
+      "n": 796,
       "v1_withheld": 0,
       "detected": 0,
       "withheld": 0,
@@ -272,23 +272,10 @@
     },
     "research_readme_prose": {
       "n": 5000,
-      "v1_withheld": 2,
-      "detected": 2,
-      "withheld": 2,
-      "withheld_examples": [
-        {
-          "text": "47xMvxNKsCKMt2owkDuN1Bci2KMiqGrAFCQFSLijWLs49ua67222Wu3LZryyopDVPYgYmAnYkSZSz9ZW2buaDwdyKTWGwwb",
-          "patterns": [
-            "encoded_payload"
-          ]
-        },
-        {
-          "text": "Do not include vulnerability details, credentials, production configuration, or",
-          "patterns": [
-            "instruction_override"
-          ]
-        }
-      ],
+      "v1_withheld": 1,
+      "detected": 0,
+      "withheld": 0,
+      "withheld_examples": [],
       "repos_sampled": 400,
       "environment_dependent": false
     },

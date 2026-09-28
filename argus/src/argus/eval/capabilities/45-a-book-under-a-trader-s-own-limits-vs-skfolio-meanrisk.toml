@@ -1,0 +1,44 @@
+name = "A book under a trader's own limits (caps, groups, number of names) vs. skfolio MeanRisk"
+subtheme = "t3-portfolio"
+modules = [
+    "argus/desk/constrained.py",
+    "argus/eval/constrained_comparison.py",
+]
+state = "tied"
+baseline = """\
+    skfolio 1.3.1 (BSD-3) MeanRisk, minimum variance, with its linear_constraints, cardinality \
+    and group_cardinalities, solved by CLARABEL and, for the count limits, by SCIP as its own \
+    docstring recommends; same covariance from the frozen 12-rToken hourly snapshot"""
+blockers = [
+    """\
+        TIED on five of six scenarios (no limits, a 15% cap, group limits, a relative limit, at \
+        most four names): annual volatility equal within 1e-6. Lower on the sixth (one name per \
+        group, at most five): 14.784% against 14.795%, and 0.07 s against 0.27 s. With its default \
+        solver skfolio raises on both count-limited scenarios. The per-name risk-share cap has no \
+        skfolio equivalent and is recorded as not run. No out-of-sample test: this compares how \
+        well each solves one stated problem, not how the books then perform.""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    skfolio optimization/convex/_base.py:340-379, 597-598, 971-1020, 1042-1088 and \
+    utils/equations.py:48-130, 557-771 read at source (research/harvest/46-cvxpy-allocation.md)"""
+artefact = "data/constrained_comparison.json"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    both solve the same six limit sets on one covariance built from the same 4,280 hourly \
+    returns; each result is graded by recomputing every limit from its weights"""
+artefact = "data/constrained_comparison.json"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = "the input snapshot's digest is recorded, and the library versions each run used"
+artefact = "data/constrained_comparison.json"
+
+[[proofs]]
+condition = "implementation_complete"
+how = "desk/constrained.py, reached from the console's portfolio-building answer"
+test = "test_constrained.py::test_the_count_cap_is_the_exact_optimum"

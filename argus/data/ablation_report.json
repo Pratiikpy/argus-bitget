@@ -1,0 +1,105 @@
+{
+  "rows": [
+    {
+      "study": "pipeline",
+      "component": "analyst selection (agents/selection.py)",
+      "frames": 12,
+      "changed": 12,
+      "risk_violations": null,
+      "status": "CHANGES DECISIONS"
+    },
+    {
+      "study": "pipeline",
+      "component": "as-of evidence gate",
+      "frames": 12,
+      "changed": 0,
+      "risk_violations": null,
+      "status": "INERT"
+    },
+    {
+      "study": "risk gates",
+      "component": "order_size",
+      "frames": 565,
+      "changed": 0,
+      "risk_violations": 0,
+      "status": "INERT"
+    },
+    {
+      "study": "risk gates",
+      "component": "gross_exposure",
+      "frames": 565,
+      "changed": 0,
+      "risk_violations": 0,
+      "status": "INERT"
+    },
+    {
+      "study": "risk gates",
+      "component": "signed_exposure",
+      "frames": 565,
+      "changed": 0,
+      "risk_violations": 0,
+      "status": "INERT"
+    },
+    {
+      "study": "risk gates",
+      "component": "hedge_integrity",
+      "frames": 565,
+      "changed": 0,
+      "risk_violations": 0,
+      "status": "INERT"
+    },
+    {
+      "study": "risk gates",
+      "component": "margin_usage",
+      "frames": 565,
+      "changed": 0,
+      "risk_violations": 0,
+      "status": "INERT"
+    },
+    {
+      "study": "risk gates",
+      "component": "factor_exposure",
+      "frames": 565,
+      "changed": 0,
+      "risk_violations": 0,
+      "status": "INERT"
+    },
+    {
+      "study": "risk gates",
+      "component": "scenario_loss",
+      "frames": 565,
+      "changed": 0,
+      "risk_violations": 0,
+      "status": "INERT"
+    },
+    {
+      "study": "risk gates",
+      "component": "liquidation_cost",
+      "frames": 565,
+      "changed": 0,
+      "risk_violations": 0,
+      "status": "INERT"
+    },
+    {
+      "study": "risk gates",
+      "component": "per_symbol_underperformance",
+      "frames": 564,
+      "changed": 0,
+      "risk_violations": 0,
+      "status": "INERT"
+    }
+  ],
+  "not_run": [
+    {
+      "component": "analyst panel promotion gate (agents/analysts.py)",
+      "why": "specified as a paired comparison and never executed on recorded chains"
+    }
+  ],
+  "unreadable": [],
+  "by_status": {
+    "CHANGES DECISIONS": 1,
+    "INERT": 10
+  },
+  "min_frames": 10,
+  "reading": "1 component(s) change decisions on at least 10 frames; 10 are inert on that many; 0 have too little evidence to say; 1 specified and never run."
+}

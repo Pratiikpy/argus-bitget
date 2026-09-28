@@ -718,7 +718,7 @@ def freeze_snapshot(raw: Mapping[str, Sequence[tuple[str, float]]], meta: Mappin
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(sanitise(blob), allow_nan=False, separators=(",", ":")) + "\n",
-        encoding="utf-8",
+        encoding="utf-8", newline="\n",
     )
     return blob
 

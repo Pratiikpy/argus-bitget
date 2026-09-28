@@ -383,7 +383,7 @@ if __name__ == "__main__":  # pragma: no cover - CLI
     result = main()
     print(render(result))
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    REPORT_PATH.write_text(json.dumps(result, indent=2), encoding="utf-8")
+    REPORT_PATH.write_text(json.dumps(result, indent=2), encoding="utf-8", newline="\n")
     print(f"\nsaved -> {REPORT_PATH}")
 
 

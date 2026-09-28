@@ -35,6 +35,7 @@ from dataclasses import replace
 from datetime import UTC, datetime
 
 from argus.lui.answer import Answer, Source, answer
+from argus.lui.plural import resolve_plurals
 from argus.lui.question import Conversation, Speed, classify
 from argus.lui.router import Router, build_router, route
 from argus.paper.ledger import PaperLedger
@@ -76,7 +77,7 @@ def render(result: Answer, *, elapsed_ms: float) -> str:
         # Reaching here is a defect: an assertion with nothing behind it.
         body.append("  WARNING: answer carries no source — this is a bug, not a style choice")
 
-    return head + "\n" + "\n".join(body)
+    return resolve_plurals(head + "\n" + "\n".join(body))
 
 
 def ask(ledger: PaperLedger, text: str, *, conversation: Conversation,
@@ -111,7 +112,7 @@ def _emit(result: Answer, elapsed: float, *, mode: str) -> None:
     if mode == "json":
         print(as_json(result, elapsed_ms=elapsed))
     elif mode == "quiet":
-        print("\n".join(result.lines))
+        print(resolve_plurals("\n".join(result.lines)))
     else:
         print(render(result, elapsed_ms=elapsed))
 

@@ -565,7 +565,7 @@ def _atomic_write(path: Path, text: str) -> None:
     """Write-then-rename: a kill mid-write leaves the old file or the new one, never half of one."""
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name(path.name + ".tmp")
-    with tmp.open("w", encoding="utf-8") as handle:
+    with tmp.open("w", encoding="utf-8", newline="\n") as handle:
         handle.write(text)
         handle.flush()
         os.fsync(handle.fileno())
@@ -623,7 +623,7 @@ class PauseStore:
         event = {"event": kind, "at": at.isoformat(), **fields}
         line = canonical(event)
         self.root.mkdir(parents=True, exist_ok=True)
-        with self.events_path.open("a", encoding="utf-8") as handle:
+        with self.events_path.open("a", encoding="utf-8", newline="\n") as handle:
             handle.write(line + "\n")
             handle.flush()
             os.fsync(handle.fileno())

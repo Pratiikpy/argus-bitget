@@ -3743,3 +3743,55 @@ def leveraged_fund_asked(text: str) -> str | None:
 
 # Every engine here is a traced step from import on (lui/trace.py, trace_module).
 trace_module(globals())
+
+
+_COUNT_WORDS = {"two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8,
+                "nine": 9, "ten": 10}
+_HOLDING = r"(?:names?|stocks?|holdings?|positions?|assets?|coins?|tickers?|tokens?)"
+_NAME_CAP = re.compile(
+    r"\b(?:no\s+more\s+than|not\s+more\s+than|at\s+most|max(?:imum)?(?:\s+of)?|capped\s+at|"
+    r"cap(?:\s+(?:it|each|every\s+\w+))?\s+at|up\s+to|under|below)\s+(\d{1,2}(?:\.\d+)?)\s*%"
+    r"(?:\s+(?:in|on|per|for|of)\s+(?:any|each|every|one|a)(?:\s+(?:single|one))?(?:\s+"
+    + _HOLDING + r")?|\s+each|\s+(?:per|a)\s+" + _HOLDING + r")"
+    r"|\b(\d{1,2}(?:\.\d+)?)\s*%\s+(?:max(?:imum)?|cap|limit)\s+(?:per|each|a|on\s+(?:any|each))"
+    r"(?:\s+" + _HOLDING + r")?"
+    r"|\bcap(?:ped)?\s+(?:each|every\s+\w+|them|all|every\s+one)\s+at\s+(\d{1,2}(?:\.\d+)?)\s*%",
+    re.I,
+)
+_COUNT_CAP = re.compile(
+    r"\b(?:at\s+most|no\s+more\s+than|not\s+more\s+than|max(?:imum)?(?:\s+of)?|only|up\s+to|"
+    r"just)\s+(\d{1,2}|two|three|four|five|six|seven|eight|nine|ten)\s+" + _HOLDING + r"\b",
+    re.I,
+)
+_RISK_CAP = re.compile(
+    r"\b(?:no\s+(?:single\s+|one\s+)?" + _HOLDING + r"|nothing|none)\s+"
+    r"(?:(?:is|should\s+be|can\s+be|to\s+be)\s+)?"
+    r"(?:above|over|more\s+than|carrying\s+more\s+than|with\s+more\s+than)\s+(\d{1,2})\s*%\s+of\s+"
+    r"(?:the\s+|my\s+|its\s+)?risk"
+    r"|\b(?:at\s+most|max(?:imum)?|cap(?:ped)?(?:\s+at)?)\s+(\d{1,2})\s*%\s+of\s+(?:the\s+)?risk"
+    r"\s+(?:in|per|from|on)\s+(?:any|each|one|a)",
+    re.I,
+)
+
+
+def stated_limits(text: str) -> tuple[float | None, int | None, float | None]:
+    """The limits a trader states when asking for a book: a per-name weight cap, a cap on the
+    number of names, and a cap on any one name's share of risk (`desk/constrained.py`). Each is
+    ``None`` when not stated; "at most 4 names, no more than 35% in any one" reads as
+    ``(0.35, 4, None)``. The risk cap is read first so its percentage is never taken for a
+    weight."""
+    risk: float | None = None
+    match = _RISK_CAP.search(text)
+    if match:
+        risk = float(match.group(1) or match.group(2)) / 100
+        text = text[:match.start()] + text[match.end():]
+    weight: float | None = None
+    match = _NAME_CAP.search(text)
+    if match:
+        weight = float(match.group(1) or match.group(2) or match.group(3)) / 100
+    count: int | None = None
+    match = _COUNT_CAP.search(text)
+    if match:
+        word = match.group(1).lower()
+        count = _COUNT_WORDS.get(word) or int(word)
+    return weight, count, risk

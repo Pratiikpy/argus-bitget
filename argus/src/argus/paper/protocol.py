@@ -347,7 +347,8 @@ def attach_anchors(
 
     if linked:
         target.write_text(
-            "".join(json.dumps(r, sort_keys=True) + "\n" for r in rows), encoding="utf-8",
+            "".join(json.dumps(r, sort_keys=True) + "\n" for r in rows),
+            encoding="utf-8", newline="\n",
         )
     return linked
 
@@ -413,7 +414,7 @@ def commit(
                 f"body ({old.protocol_digest}); an amendment needs a new version number"
             )
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a", encoding="utf-8") as fh:
+    with path.open("a", encoding="utf-8", newline="\n") as fh:
         fh.write(json.dumps(commitment.as_dict(), default=str) + "\n")
     return commitment
 

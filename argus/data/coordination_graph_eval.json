@@ -1,0 +1,122 @@
+{
+  "generated_at": "2026-09-28T05:29:20+00:00",
+  "input": {
+    "record": "public",
+    "snapshots": 808,
+    "crowd_items": 5003,
+    "stories": 3948,
+    "accounts": 2958,
+    "stories_flagged_per_story": 35
+  },
+  "graph": {
+    "edges": 380,
+    "percentile_cut": 1,
+    "strong_edges": 139,
+    "groups": [
+      [
+        "x:1a11fe9814",
+        "x:1c36b52d2f",
+        "x:20c1f9fc5b",
+        "x:31c2dc3710",
+        "x:33dec1a332",
+        "x:6595982295",
+        "x:68494c58c3",
+        "x:88bc7a1fd5",
+        "x:977f09bc85",
+        "x:c579c4c2a7",
+        "x:dd73690c6a",
+        "x:e0dcf0b29a",
+        "x:fb763b8faf"
+      ],
+      [
+        "x:0d39b29d92",
+        "x:1f799b81cf",
+        "x:65a86ada8e",
+        "x:6fd9d5e664",
+        "x:855b49175f",
+        "x:891908bcdd",
+        "x:a4ec1bbfe4",
+        "x:ab20c5003a",
+        "x:d106fb42a7",
+        "x:e6c48f5a9e"
+      ],
+      [
+        "x:28bf5fef1f",
+        "x:3b0897123a",
+        "x:4c91e0cbbc",
+        "x:776723656c",
+        "x:81508cf714",
+        "x:98ab09ecd9",
+        "x:a6c8a29b67",
+        "x:e58c801be6"
+      ],
+      [
+        "x:057e930dc4",
+        "x:3cb2e13ba3",
+        "x:707cbf9c4a"
+      ],
+      [
+        "x:10477af321",
+        "x:6e0b8f5bde",
+        "x:a9129b3907"
+      ],
+      [
+        "x:2bc6abb023",
+        "x:d4c4702855",
+        "x:da2c524057"
+      ],
+      [
+        "reddit:298e311aff",
+        "reddit:d2157ea8ef",
+        "reddit:d86df4ce48"
+      ],
+      [
+        "x:ad335abd51",
+        "x:e4a9772101"
+      ],
+      [
+        "x:90d14d0531",
+        "x:e0f12bf106"
+      ],
+      [
+        "x:5c78df58d1",
+        "x:ee9b52bb7a"
+      ]
+    ],
+    "group_sizes": [
+      13,
+      10,
+      8,
+      3,
+      3,
+      3,
+      3,
+      2,
+      2,
+      2
+    ]
+  },
+  "incremental": {
+    "strong_edges_on_no_flagged_story": 1,
+    "examples": [
+      {
+        "left": "x:e0f12bf106",
+        "right": "x:90d14d0531",
+        "weight": 5,
+        "symmetry": 1.0,
+        "stories": [
+          "story-4d09b129507ad8c5",
+          "story-6850dbc3e25f4ba8",
+          "story-9e273bf4bc3aa69e",
+          "story-b6d53cd20de46aa4",
+          "story-ff01989706ffba82"
+        ]
+      }
+    ]
+  },
+  "verdict": "the graph finds account pairs repeating together on stories the per-story screen never flagged",
+  "caveats": [
+    "share counts per account are not recorded in the snapshots, so symmetry is 1 for every edge and is not used",
+    "stories carried by more than 60 accounts add no pairs (edges(): max_story_accounts)"
+  ]
+}

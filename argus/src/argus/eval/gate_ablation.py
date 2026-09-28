@@ -228,7 +228,7 @@ def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - CLI
         },
     }
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    REPORT_PATH.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    REPORT_PATH.write_text(json.dumps(payload, indent=2), encoding="utf-8", newline="\n")
 
     if args.json:
         print(json.dumps(payload, indent=2))

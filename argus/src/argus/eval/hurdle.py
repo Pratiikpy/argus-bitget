@@ -346,7 +346,7 @@ def build(
 def main() -> int:  # pragma: no cover - CLI
     frontier = build()
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    REPORT_PATH.write_text(json.dumps(frontier.as_dict(), indent=2), encoding="utf-8")
+    REPORT_PATH.write_text(json.dumps(frontier.as_dict(), indent=2), encoding="utf-8", newline="\n")
     print(frontier.render())
     print(f"\nwritten to {REPORT_PATH}")
     return 0

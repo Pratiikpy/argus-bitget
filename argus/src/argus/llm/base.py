@@ -17,7 +17,11 @@ from argus.llm.qwen import Completion, Thinking
 class ChatModel(Protocol):
     """What a decision-maker needs from a model. Nothing more."""
 
-    budget: Any
+    @property
+    def budget(self) -> Any:
+        """Read only: a caller reads the spend, it never swaps the budget. Declared as a property
+        so :class:`~argus.llm.provider.FallbackClient`, whose budget is whichever provider last
+        answered, satisfies the protocol too."""
 
     def complete(
         self,

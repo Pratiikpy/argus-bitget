@@ -9,7 +9,7 @@
     "system": "argus_paper_ledger",
     "disk_bytes_contain_crlf": true,
     "verify_reports_clean": true,
-    "detail": "{'entries': 2, 'chain_intact': True, 'links_intact': True, 'first_break_at': None, 'truncated': False, 'anchor': 'anchor agrees with the log', 'head_hash': 'f8f43ca93b1184ee'}"
+    "detail": "{'entries': 2, 'chain_intact': True, 'links_intact': True, 'first_break_at': None, 'truncated': False, 'anchor': 'anchor agrees with the log', 'head_hash': 'fc861670d631eb71', 'tampered_settlements': [], 'unsealed_settlements': []}"
   },
   "tamper_comparison": {
     "serenity_detects_it": true,
@@ -62,7 +62,7 @@
   "swept_argus_always_clean": true,
   "out_of_sample": {
     "ledger_path": "argus\\data\\paper_ledger.jsonl",
-    "entries": 519,
+    "entries": 796,
     "chain_intact": true,
     "checked": true
   },
@@ -71,9 +71,9 @@
     "argus_detects_truncation": true
   },
   "costs": {
-    "write_seconds_per_250_entries": 2.436566899996251,
-    "write_ms_per_entry": 9.746267599985003,
-    "verify_seconds_for_250_entries": 0.020879499963484704
+    "write_seconds_per_250_entries": 2.4407098999945447,
+    "write_ms_per_entry": 9.762839599978179,
+    "verify_seconds_for_250_entries": 0.01597619999665767
   },
-  "scope_statement": "Claimed: on genuine tampering (a real content edit to a stored entry), both systems' real code correctly detects it \u2014 verified by running both, not assumed from either design. On a completely UNTAMPERED write/verify cycle on this real platform (Windows), serenity-guardrails' real ChainedJournal reports its own head anchor as mismatched due to a genuine, platform-specific bug (hashing raw disk bytes that Python's own default text-mode I/O silently altered via universal-newline translation); ARGUS's real PaperLedger, writing the identical CRLF-containing bytes to disk under the same conditions, verifies clean \u2014 because it hashes canonically re-serialized PARSED content, never raw disk bytes, a design property confirmed both by reading the source and by running it.\n\nNOT claimed: that serenity-guardrails' journal is broken on every platform \u2014 this is a Windows- specific defect (POSIX text-mode I/O does not perform CRLF translation, so the same code likely verifies cleanly there); not re-tested on a non-Windows platform here, stated as NOT VERIFIED rather than assumed either way. Also NOT claimed: that ARGUS's hash-chain is otherwise richer than serenity's \u2014 both implement the same core idea (per-entry link + head-anchor sidecar for truncation detection) equally completely for what each is scoped to do.\n"
+  "scope_statement": "Claimed: on genuine tampering (a real content edit to a stored entry), both systems' real code correctly detects it \u2014 verified by running both, not assumed from either design. On a completely UNTAMPERED write/verify cycle on this real platform (Windows), serenity-guardrails' real ChainedJournal reports its own head anchor as mismatched due to a genuine, platform-specific bug (hashing raw disk bytes that Python's own default text-mode I/O silently altered via universal-newline translation); ARGUS's real PaperLedger, with its file rewritten to the same CRLF-containing bytes, verifies clean \u2014 because it hashes canonically re-serialized PARSED content, never raw disk bytes, a design property confirmed both by reading the source and by running it.\n\nNOT claimed: that serenity-guardrails' journal is broken on every platform \u2014 this is a Windows- specific defect (POSIX text-mode I/O does not perform CRLF translation, so the same code likely verifies cleanly there); not re-tested on a non-Windows platform here, stated as NOT VERIFIED rather than assumed either way. Also NOT claimed: that ARGUS's hash-chain is otherwise richer than serenity's \u2014 both implement the same core idea (per-entry link + head-anchor sidecar for truncation detection) equally completely for what each is scoped to do.\n"
 }

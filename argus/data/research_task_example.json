@@ -1,5 +1,5 @@
 {
- "measured_at": "2026-09-27T05:21:01+00:00",
+ "measured_at": "2026-09-28T02:29:55+00:00",
  "written_by": "python -m argus.eval.research_task_record",
  "task": {
   "question": "I hold 40% NVDA, 30% MSFT, 30% AAPL — should I add 15% TSLA?",
@@ -10,7 +10,7 @@
    "MSFTUSDT": 0.3,
    "AAPLUSDT": 0.3
   },
-  "seconds": 9.18,
+  "seconds": 9.28,
   "read_as": {
    "summary": "add 15% TSLA to 40% NVDA / 30% MSFT / 30% AAPL",
    "notes": [],
@@ -19,16 +19,45 @@
   "verdict": {
    "call": "Add, at 15%",
    "lines": [
-    "At 15%, TSLA would carry 18% of the book's risk, inside the 25% budget; 19% is the most that stays inside.",
-    "The book's concentration is NVDA, not TSLA: after the trade NVDA carries 47% of the risk at 34% of the money. If that is the worry, trimming NVDA to 21% brings it inside the 25% budget.",
-    "Fill it as 60% near-touch limit then 40% market for $15,000, about 7.1 bps all in on the live book (one market order: 7.6 bps).",
-    "What would change the call: if TSLA outruns the rest of the book by 33%, it drifts past 19% of the book and back over the budget; trim it to 15% then. A jump in its correlation with the book lowers that ceiling, so re-ask after a large move."
+    "At 15%, TSLA would carry 19% of the book's risk, inside the 25% budget; 18% is the most that stays inside.",
+    "The book's concentration is NVDA, not TSLA: after the trade NVDA carries 43% of the risk at 34% of the money. If that is the worry, trimming NVDA to 23% brings it inside the 25% budget.",
+    "Fill it as 60% near-touch limit then 40% market for $15,000, about 8.8 bps all in on the live book (one market order: 10.0 bps).",
+    "What would change the call: if TSLA outruns the rest of the book by 24%, it drifts past 18% of the book and back over the budget; trim it to 15% then. A jump in its correlation with the book lowers that ceiling, so re-ask after a large move."
    ]
+  },
+  "weighing": {
+   "call": "No measured edge: enter only on your own view",
+   "reason": "Nothing the engines measured favours entering over waiting: from states like today's TSLA rose 74% of the time over 24 hours, median +35 bps, but 13 independent episodes cannot tell 74% from an even chance (±28% at two standard errors); the long-run daily base rate does not move either. Entering is a view you hold, not one the data gives.",
+   "disagreements": [
+    "The tape says momentum is turning down (MACD histogram -0.277, 4h); the past says states like this rose — median +35 bps over 24 hours, up 74% of the time. Which to weigh: neither — the technical signals tested on these names did not clear costs, and the base rate is within chance."
+   ],
+   "triggers": [
+    "The report on 2026-10-21 (23 days): every figure above is from before it and must be read again after."
+   ],
+   "questions": [
+    "How long will you hold it? The call above reads the next 24 hours; over 20 trading days states like this rose 57% of the time, against 55% for any day — the horizon changes the answer.",
+    "What loss on this position would you accept? The sizing assumed the default 25% risk budget.",
+    "Where would you be wrong? Its worst 24 hours in the data was -2.0% — an exit decided now is one a move cannot talk you out of."
+   ],
+   "figures": {
+    "round_trip_bps": 12.27,
+    "earnings_days": 23,
+    "base_rate": {
+     "up": 0.74,
+     "median_bps": 34.88,
+     "episodes": 13,
+     "z": 1.731,
+     "p25_bps": -0.19,
+     "p75_bps": 162.45,
+     "clears_cost": true,
+     "significant": false
+    }
+   }
   },
   "conclusion": [
    {
     "step": "What the trade does to your book",
-    "actionable": "to keep TSLA under 25% of book risk, size it at no more than 19% — the 15% proposed is inside that budget."
+    "actionable": "to keep TSLA under 25% of book risk, size it at no more than 18% — the 15% proposed is inside that budget."
    },
    {
     "step": "Sector and factor exposure, before and after",
@@ -36,19 +65,19 @@
    },
    {
     "step": "How to execute the size",
-    "actionable": "in one market order this costs about 7.6bps (6.0bps fee + 1.6bps book impact) — the book absorbs it, so splitting saves little beyond the passive fills."
+    "actionable": "in one market order this costs about 10.0bps (6.0bps fee + 4.0bps book impact) — enough book impact that splitting on the schedule below is worth doing."
    },
    {
     "step": "Earnings, analysts and the surprise",
-    "actionable": "TSLA reports in 24 day(s), on 21 Oct — no earnings gap inside 7 days for a position opened now."
+    "actionable": "TSLA reports in 23 day(s), on 21 Oct — no earnings gap inside 7 days for a position opened now."
    },
    {
     "step": "News, filings and today's move",
-    "actionable": "13 headlines name TSLA in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact."
+    "actionable": "11 headlines name TSLA in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact."
    },
    {
     "step": "Has it been here before?",
-    "actionable": "treat this as thin — the 50 past states that resemble now come from only 4 independent episodes in the last 89 days, too few for a base rate. For what it is worth, the next 24h median was -51bps and it rose 20% of the time."
+    "actionable": "in 50 comparable past states (13 independent episodes over 89 days), the next 24h median was +35bps and it rose 74% of the time — against a ~12bps round trip."
    },
    {
     "step": "The technical picture",
@@ -56,7 +85,7 @@
    },
    {
     "step": "Where it trades and what a trade costs",
-    "actionable": "a round trip in TSLA costs about 12.5bps (12bps taker fees + the 0.5bps spread) — a trade needs a move bigger than that just to break even."
+    "actionable": "a round trip in TSLA costs about 12.3bps (12bps taker fees + the 0.3bps spread) — a trade needs a move bigger than that just to break even."
    }
   ],
   "steps": [
@@ -64,82 +93,84 @@
     "title": "Where it trades and what a trade costs",
     "engine": "Bitget live ticker, funding and the stock's close",
     "lines": [
-     "Bottom line: a round trip in TSLA costs about 12.5bps (12bps taker fees + the 0.5bps spread) — a trade needs a move bigger than that just to break even.",
-     "TSLA last 372.83 USDT on Bitget (+0.16% over 24h); bid 372.74 / ask 372.76, spread 0.5bps; 24h range 371.95 to 372.99; funding +0.0000% per interval; 24h volume about $1,349,536.",
-     "Funding: flat, so holding TSLA costs nothing beyond fees.",
+     "Bottom line: a round trip in TSLA costs about 12.3bps (12bps taker fees + the 0.3bps spread) — a trade needs a move bigger than that just to break even.",
+     "TSLA last 370.85 USDT on Bitget (-0.54% over 24h); bid 370.83 / ask 370.84, spread 0.3bps; 24h range 370.46 to 375.09; funding -0.0049% per interval; 24h volume about $1,665,231.",
+     "Funding means shorts pay longs every 8h: 0.015% of the position a day, about 5.4% a year if it held — no crowding either way.",
      "The US anchor market is shut: this stock perpetual is trading without its anchor, so its price is being discovered on a thinner book and can gap at the open.",
-     "Versus the stock: TSLA closed at 372.11 → the perpetual traded at a 15.6bps premium at that close; it has moved +0.04% since, which is the overnight move, not a premium.",
-     "Implied open: TSLA's perpetual has moved +0.04% since the Fri 20:00 UTC close, which puts the stock near 372.25 at the next open (last close 372.11). Read this way on TSLA on 113 nights, the open was missed by 35bps on average, with the direction right 95% of the time; gloaming, an S2 desk that estimates overnight fair value from index futures, crypto and the dollar, missed by 84bps, and assuming no gap by 102bps.",
-     "Quoted 2026-09-27 05:20:52 UTC.",
+     "Versus the stock: TSLA closed at 372.11 → the perpetual traded at a 15.6bps premium at that close; it has moved -0.49% since, which is the overnight move, not a premium.",
+     "Implied open: TSLA's perpetual has moved -0.49% since the Fri 20:00 UTC close, which puts the stock near 370.27 at the next open (last close 372.11). Read this way on TSLA on 113 nights, the open was missed by 35bps on average, with the direction right 95% of the time; gloaming, an S2 desk that estimates overnight fair value from index futures, crypto and the dollar, missed by 84bps, and assuming no gap by 102bps.",
+     "Quoted 2026-09-28 02:29:46 UTC.",
      "Sources reached: 3 of 3 answered.",
      "Data: Bitget live ticker, plus the stock's quote from bitget-mcp-server."
     ],
     "refused": false,
-    "seconds": 3.68
+    "seconds": 3.75
    },
    {
     "title": "The technical picture",
     "engine": "bitget-signal, checked against Bitget 4h",
     "lines": [
      "Bottom line: momentum turning down.",
-     "RSI(14, 4h) 42.4 — neutral.",
-     "MACD -0.830 vs signal -0.186 (histogram -0.644).",
+     "RSI(14, 4h) 37.5 — neutral.",
+     "MACD -0.826 vs signal -0.550 (histogram -0.277).",
      "Corrected: bitget-signal returns MACD's signal line and histogram in each other's fields; recomputed from Bitget's 4h candles, the figures above are the right way round and its cross flag is replaced.",
-     "Price 372.45: nearest support 371.86 (0.2% below).",
-     "ATR 2.556 (4h).",
+     "Price 370.47: no support or resistance level within range.",
+     "ATR 2.409 (4h).",
      "Caveat: technicals describe the tape, not an edge — the systematic signals this desk tested on these names did not clear costs.",
      "Sources reached: 2 of 2 answered.",
      "Data: Bitget's bitget-signal technical-analysis Skill, live."
     ],
     "refused": false,
-    "seconds": 3.45
+    "seconds": 4.03
    },
    {
     "title": "News, filings and today's move",
     "engine": "news feeds and SEC EDGAR; the move split by beta",
     "lines": [
-     "Bottom line: 13 headlines name TSLA in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
-     "TSLA is +0.16% over 24 hours on Bitget. QQQ moved +0.05%, which at TSLA's beta of 1.39 explains +0.07%; the other +0.09% is TSLA's own.",
-     "9h ago — Ross Gerber Asks Why Tesla Isn't Advertising With Gas at $6.50 a Gallon in LA. 'It's Just Infuriating to Me How Poorly Run Tesla Is' (Yahoo Finance) https://finance.yahoo.com/markets/stocks/articles/ross-gerber-asks-why-tesla-200015696.html?.tsrc=rss",
-     "12h ago — Dow Jones Futures: Growth Shrugs Off Surging Yields, But Trump Rejects Iran Deal; Micron, SpaceX, Tesla Eye Buy Points (Yahoo Finance) https://finance.yahoo.com/m/473106f6-6763-38d5-b898-3f7ff08d4b61/dow-jones-futures%3A-growth.html?.tsrc=rss",
-     "15h ago — What Musk’s Tesla and SpaceX Stocks Are Doing After That White House State Dinner (Yahoo Finance) https://finance.yahoo.com/m/6d48c29e-1367-39b5-99b4-a628243d31c9/what-musk%E2%80%99s-tesla-and-spacex.html?.tsrc=rss",
-     "15h ago — Move Over, Tesla: This $140 Billion Company Looks Like a Superior Robotaxi Investment (Yahoo Finance) https://www.fool.com/investing/2026/09/26/move-over-tesla-this-140-billion-robotaxi-company/?.tsrc=rss",
-     "16h ago — Groundbreaking Developments Every Tesla Investor Needs to Know (Yahoo Finance) https://www.fool.com/investing/2026/09/26/groundbreaking-developments-every-tesla-investor-n/?.tsrc=rss",
-     "Prediction market on TSLA (Polymarket): \"Tesla and SpaceX merger officially announced by December 31?\" priced at 18% — $192,095 traded, closes 2027-01-01.",
-     "Prediction market on TSLA (Polymarket): \"Will Tesla release Optimus by December 31, 2026?\" priced at 11% — $31,986 traded, closes 2027-01-01.",
+     "Bottom line: 11 headlines name TSLA in 48h and no 8-K was filed this week — no company event on the record, so the move is sentiment or the market, not a disclosed fact.",
+     "TSLA is -0.54% over 24 hours on Bitget. QQQ moved -0.53%, which at TSLA's beta of 1.39 explains -0.74%; the other +0.20% is TSLA's own.",
+     "0h ago — Dow Jones Futures Fall, Oil Prices Rise Amid Trump Iran Comments; Micron, SpaceX, Tesla Eye Buy Points (Yahoo Finance) https://finance.yahoo.com/m/473106f6-6763-38d5-b898-3f7ff08d4b61/dow-jones-futures-fall%2C-oil.html?.tsrc=rss",
+     "5h ago — SpaceX vs. Tesla: Which Will Be the Largest Company at the End of 2027? (Yahoo Finance) https://www.fool.com/investing/2026/09/27/spacex-vs-tesla-which-will-be-the-largest-company/?.tsrc=rss",
+     "8h ago — Ford Motor vs. Tesla: What Revenue Trends Reveal About These Automotive Titans (Yahoo Finance) https://www.fool.com/coverage/charts/2026/09/27/ford-motor-vs-tesla-what-revenue-trends-reveal-about-these-automotive-titans/?.tsrc=rss",
+     "13h ago — Tesla Reports Q3 Deliveries in Early October. Here's the Number That Would Send the Stock Soaring. (Yahoo Finance) https://www.fool.com/investing/2026/09/27/tesla-reports-q3-deliveries-in-3-weeks-heres-the-n/?.tsrc=rss",
+     "15h ago — Elon Musk Says Optimus Could Make Tesla a $25 Trillion Company. Here's What the Math Actually Requires. (Yahoo Finance) https://www.fool.com/investing/2026/09/27/elon-musk-says-optimus-could-be-worth-25-trillion/?.tsrc=rss",
+     "Prediction market on TSLA (Polymarket): \"Tesla and SpaceX merger officially announced by December 31?\" priced at 18% — $192,157 traded, closes 2027-01-01.",
+     "Prediction market on TSLA (Polymarket): \"Will Tesla release Optimus by December 31, 2026?\" priced at 10% — $32,072 traded, closes 2027-01-01.",
      "Prediction market on TSLA (Polymarket): \"Tesla and SpaceX merger officially announced by December 31, 2027?\" priced at 64% — $28,711 traded, closes 2028-01-01.",
      "Sources reached: 11 of 12 answered. Did not answer: bitget-signal — everything above is built without it.",
      "Data: Bitget live tickers and hourly candles, headlines from Yahoo Finance and eight outlet feeds, SEC EDGAR filings, live."
     ],
     "refused": false,
-    "seconds": 6.2
+    "seconds": 6.54
    },
    {
     "title": "Earnings, analysts and the surprise",
     "engine": "bitget-mcp-server and SEC XBRL filings",
     "lines": [
-     "Bottom line: TSLA reports in 24 day(s), on 21 Oct — no earnings gap inside 7 days for a position opened now.",
-     "Next report: 2026-10-21 (an estimated date) — 24 day(s) away (Yahoo Finance's earnings calendar, read as the second source).",
+     "Bottom line: TSLA reports in 23 day(s), on 21 Oct — no earnings gap inside 7 days for a position opened now.",
+     "Next report: 2026-10-21 (an estimated date) — 23 day(s) away (Yahoo Finance's earnings calendar, read as the second source).",
      "Analyst price targets (38 analysts, Yahoo Finance): mean $396.62, median $415.00, range $125.00 to $600.00, 7% above the last close of $372.11; the consensus rating is buy. A target is an analyst's opinion, not a forecast this desk makes.",
      "Analyst consensus for the next report (Yahoo Finance): EPS 0.45 (range 0.30 to 0.60), revenue $27.4bn.",
      "Earnings surprise: the quarter ending 2026-06-30 was a small beat — SUE +0.83, i.e. diluted EPS changed +0.20 year over year against a usual swing of 0.24 (SEC filing, filed 2026-07-23).",
-     "Prediction market on TSLA (Polymarket): \"Tesla and SpaceX merger officially announced by December 31?\" priced at 18% — $192,095 traded, closes 2027-01-01.",
-     "Prediction market on TSLA (Polymarket): \"Will Tesla release Optimus by December 31, 2026?\" priced at 11% — $31,986 traded, closes 2027-01-01.",
+     "Prediction market on TSLA (Polymarket): \"Tesla and SpaceX merger officially announced by December 31?\" priced at 18% — $192,157 traded, closes 2027-01-01.",
+     "Prediction market on TSLA (Polymarket): \"Will Tesla release Optimus by December 31, 2026?\" priced at 10% — $32,072 traded, closes 2027-01-01.",
      "Prediction market on TSLA (Polymarket): \"Tesla and SpaceX merger officially announced by December 31, 2027?\" priced at 64% — $28,711 traded, closes 2028-01-01.",
      "Sources reached: 3 of 12 answered. Did not answer: bitget-mcp-server (9 tools: upstream 5xx) — everything above is built without it.",
      "Data: SEC EDGAR, SEC XBRL, Polymarket, Yahoo Finance, live; bitget-mcp-server did not answer this time, so nothing above comes from it."
     ],
     "refused": false,
-    "seconds": 5.82
+    "seconds": 5.58
    },
    {
     "title": "Has it been here before?",
     "engine": "similar past hours in up to 90 days of Bitget candles",
     "lines": [
-     "Bottom line: treat this as thin — the 50 past states that resemble now come from only 4 independent episodes in the last 89 days, too few for a base rate. For what it is worth, the next 24h median was -51bps and it rose 20% of the time.",
-     "Path match (the shape of the last 24 hours, not only its size): the closest past stretch ended 03 Sep 20:00 UTC and looks alike, but shuffling TSLA's own returns produced a match that close in 72% of 50 tries. The shape is not distinguishable from chance, so what followed it says nothing about what comes next.",
-     "Next 5 sessions, 80% band: -5.8% to +5.8% — TSLA's own 399 past 5-session moves, widened or narrowed by its current volatility. On AnalogDesk's own 2,698-query test this band scored best of every method tried, AnalogDesk's included, though not by a significant margin.",
-     "Now: TSLA is +14bps over the last 24h with hourly volatility of 5bps.",
+     "Bottom line: in 50 comparable past states (13 independent episodes over 89 days), the next 24h median was +35bps and it rose 74% of the time — against a ~12bps round trip.",
+     "Path match (the shape of the last 24 hours, not only its size): the closest past stretch ended 27 Jul 15:00 UTC and looks alike, but shuffling TSLA's own returns produced a match that close in 44% of 50 tries. The shape is not distinguishable from chance, so what followed it says nothing about what comes next.",
+     "Next 5 sessions, 80% band: -5.8% to +5.8% — TSLA's own 400 past 5-session moves, widened or narrowed by its current volatility. On AnalogDesk's own 2,698-query test this band scored best of every method tried, AnalogDesk's included, though not by a significant margin.",
+     "Now: TSLA is -56bps over the last 24h with hourly volatility of 13bps.",
+     "Spread of outcomes: 25th percentile -0bps, 75th +162bps — the range, not the median, is the risk.",
+     "Closest past states: 04 Jul 13:00 UTC, 04 Jul 14:00 UTC, 07 Sep 11:00 UTC — matched mostly on hourly volatility (distance 0.02, where 2 is the cut-off for 'comparable').",
      "Over 10 years of daily closes: TSLA is +4.9% over the last 20 trading days. In the past states most like that, then against every day in the same span:",
      "  next 1 trading day: median -0.1%, up 47% of the time (100 states, 53 independent episodes) — every day: median +0.1%, up 52%",
      "  next 5 trading days: median +0.9%, up 57% of the time (100 states, 31 independent episodes) — every day: median +0.6%, up 54%",
@@ -149,22 +180,22 @@
      "Data: live Bitget hourly candles for the last 41 days, extended back to 90 days with closed candles recorded on 2026-09-23."
     ],
     "refused": false,
-    "seconds": 5.81
+    "seconds": 5.57
    },
    {
     "title": "What the trade does to your book",
     "engine": "your book's risk on 30 days of hourly returns",
     "lines": [
-     "Bottom line: to keep TSLA under 25% of book risk, size it at no more than 19% — the 15% proposed is inside that budget.",
-     "At 15% of the book, TSLA would carry 18% of your total risk.",
-     "Open-session beta 0.94 → 1.01",
-     "Risk spread across 2.5 → 3.2 effective position(s)",
-     "Most correlated with NVDA at +0.36; partly the same trade; the diversification is real but smaller than the position count suggests",
-     "Hedge: short QQQ worth about 101% of the book's value neutralises its market exposure (book beta 1.01); it does nothing for single-name news risk.",
-     "After the trade: NVDA 34% weight / 47% risk; AAPL 26% weight / 20% risk; TSLA 15% weight / 18% risk; MSFT 26% weight / 16% risk.",
-     "In the book's worst 5% of hours (an average loss of 0.40% an hour), TSLA would carry 16% of the loss, against 18% of the ordinary swing.",
-     "If QQQ falls 5%, the book moves about -5.0% through beta alone.",
-     "If QQQ falls 10%, the book moves about -10.1% through beta alone.",
+     "Bottom line: to keep TSLA under 25% of book risk, size it at no more than 18% — the 15% proposed is inside that budget.",
+     "At 15% of the book, TSLA would carry 19% of your total risk.",
+     "Open-session beta 0.86 → 0.94",
+     "Risk spread across 2.6 → 3.4 effective position(s)",
+     "Most correlated with NVDA at +0.28; largely a different bet from what you already own",
+     "Hedge: short QQQ worth about 94% of the book's value neutralises its market exposure (book beta 0.94); it does nothing for single-name news risk.",
+     "After the trade: NVDA 34% weight / 43% risk; AAPL 26% weight / 22% risk; TSLA 15% weight / 19% risk; MSFT 26% weight / 16% risk.",
+     "In the book's worst 5% of hours (an average loss of 0.38% an hour), TSLA would carry 15% of the loss, against 19% of the ordinary swing.",
+     "If QQQ falls 5%, the book moves about -4.7% through beta alone.",
+     "If QQQ falls 10%, the book moves about -9.4% through beta alone.",
      "Realised worst case: the worst 24-bar window in the observed history would have moved this book -2.05% — driven by TSLA -7.83%, MSFT -1.94%, AAPL -1.81%",
      "Sectors after the trade (Yahoo's classification, GICS names): Information Technology 100% → 85%, Consumer Discretionary 0% → 15%.",
      "Factor loadings before → after (daily regression on SPY, IWM minus SPY, MTUM minus SPY, VLUE minus SPY, QUAL minus SPY, USMV minus SPY, IEF and BTC): market 1.08 → 1.15, size -0.22 → -0.16, momentum -0.20 → -0.17, value -0.28 → -0.28, quality -0.18 → -0.41, low vol -0.57 → -0.57, rates -0.28 → -0.27, crypto 0.01 → 0.03. Ask \"what are my exposures\" for the t-statistics.",
@@ -173,7 +204,7 @@
      "Data: live Bitget hourly candles, last 30 days, fetched just now."
     ],
     "refused": false,
-    "seconds": 9.18
+    "seconds": 9.28
    },
    {
     "title": "Sector and factor exposure, before and after",
@@ -198,27 +229,28 @@
      "Method: one least-squares regression per holding of its daily returns on SPY, IWM minus SPY, MTUM minus SPY, VLUE minus SPY, QUAL minus SPY, USMV minus SPY, IEF and BTC together; the book's loading is the weight-sum of its holdings' (argus.lui.exposures)."
     ],
     "refused": false,
-    "seconds": 8.61
+    "seconds": 8.82
    },
    {
     "title": "How to execute the size",
     "engine": "Bitget live order book",
     "lines": [
-     "Bottom line: in one market order this costs about 7.6bps (6.0bps fee + 1.6bps book impact) — the book absorbs it, so splitting saves little beyond the passive fills.",
-     "A $15,000 order is 1.11% of TSLA's 24h volume ($1,349,536); the fees come to about 6.0bps, and the square-root impact law — calibrated on Bitget's own books, at TSLA's own 251bps daily volatility — puts this size's market impact near 9.1bps; the live book below shows what taking it at once costs.",
+     "Bottom line: in one market order this costs about 10.0bps (6.0bps fee + 4.0bps book impact) — enough book impact that splitting on the schedule below is worth doing.",
+     "A $15,000 order is 0.90% of TSLA's 24h volume ($1,665,231); the fees come to about 6.0bps, and the square-root impact law — calibrated on Bitget's own books, at TSLA's own 252bps daily volatility — puts this size's market impact near 8.2bps; the live book below shows what taking it at once costs.",
      "Plan: the stock's own market is shut, so this book is thin and resting orders tend to fill only when the price moves against them — passive orders get less of the size, not more.",
-     "Order book (buy side, live): taking all $15,000 at once walks 8 level(s) for 1.6bps of slippage on top of the fee.",
-     "Slice 1: 60% ($9,000) as near-touch limit — about 6.0bps fee plus 1.1bps book impact.",
-     "Slice 2: 40% ($6,000) as market — about 6.0bps fee plus 1.1bps book impact.",
-     "Schedule (Almgren-Chriss optimum, inventory decaying e-fold over 3 hour(s)): trade 39%, 32%, 29% of $15,000 hour by hour — expected cost 8.1bps with a one-standard-deviation risk of ±23.1bps, against 8.1bps ± 25.5bps for an even split, with the slice styles above applied inside each hour. Impact is priced from sweeping one hour's share of the order on the live book.",
+     "Order book (buy side, live): taking all $15,000 at once walks 18 level(s) for 4.0bps of slippage on top of the fee.",
+     "Slice 1: 60% ($9,000) as near-touch limit — about 6.0bps fee plus 3.1bps book impact.",
+     "Slice 2: 40% ($6,000) as market — about 6.0bps fee plus 2.4bps book impact.",
+     "Schedule (Almgren-Chriss optimum, inventory decaying e-fold over 3 hour(s)): trade 39%, 32%, 29% of $15,000 hour by hour — expected cost 8.2bps with a one-standard-deviation risk of ±6.8bps, against 8.2bps ± 7.5bps for an even split, with the slice styles above applied inside each hour. Impact is priced from sweeping one hour's share of the order on the live book.",
+     "Worst case: at 95% confidence, the schedule that keeps the cost lowest does 99% of the order in the first half, and its 95% worst case is 11.8bps against 20.5bps for an even split — read off 41 optimal schedules, cost against risk.",
      "Cadence: send each hour's share as one-minute children, as Bitget's own TWAP does at a 60-second interval. Replaying a full day of Bitget's NVDA order book, $5,000 orders cost 6.3bps with fees in one-minute children against 7.6bps in hourly ones (Bitget's TWAP: 6.3bps; all at once: 9.4bps).",
-     "Waiting costs too: at this volatility the price drifts an expected 4.4bps in the minute between deciding and the first order landing, 13.9bps in ten — a cost of deliberating, separate from the impact above.",
-     "Agent Hub preview of the first child, which sends nothing: `bgc order --action place --category USDT-FUTURES --symbol TSLAUSDT --side buy --orderType market --qty 24.13 --paper-trading --dry-run` — bgc answers with the request it would POST to /api/v3/trade/place-order on Bitget's Demo account: {\"category\":\"USDT-FUTURES\",\"symbol\":\"TSLAUSDT\",\"side\":\"buy\",\"orderType\":\"market\",\"qty\":\"24.13\"}. This mapping matched bgc 3.0.0's own dry-run on 2026-09-27 (data/agenthub_preview.json).",
+     "Waiting costs too: at this volatility the price drifts an expected 1.3bps in the minute between deciding and the first order landing, 4.1bps in ten — a cost of deliberating, separate from the impact above.",
+     "Agent Hub preview of the first child, which sends nothing: `bgc order --action place --category USDT-FUTURES --symbol TSLAUSDT --side buy --orderType market --qty 24.26 --paper-trading --dry-run` — bgc answers with the request it would POST to /api/v3/trade/place-order on Bitget's Demo account: {\"category\":\"USDT-FUTURES\",\"symbol\":\"TSLAUSDT\",\"side\":\"buy\",\"orderType\":\"market\",\"qty\":\"24.26\"}. This mapping matched bgc 3.0.0's own dry-run on 2026-09-27 (data/agenthub_preview.json).",
      "Sources reached: 3 of 3 answered.",
      "Data: Bitget live 24h ticker and order book (50 levels)."
     ],
     "refused": false,
-    "seconds": 3.57
+    "seconds": 3.75
    }
   ]
  },
@@ -252,14 +284,15 @@
     "level": null
    },
    "live_data": true,
+   "round_trip_bps": 12.27,
    "quotes": {
     "TSLAUSDT": {
-     "last": "372.83",
-     "bid": "372.74",
-     "ask": "372.76",
-     "change_24h": "0.00156",
-     "funding_rate": "0",
-     "fetched_at": "2026-09-27T05:20:52.519593+00:00"
+     "last": "370.85",
+     "bid": "370.83",
+     "ask": "370.84",
+     "change_24h": "-0.00542",
+     "funding_rate": "-0.000049",
+     "fetched_at": "2026-09-28T02:29:46.379962+00:00"
     }
    },
    "coverage": {
@@ -301,6 +334,13 @@
     "level": null
    },
    "live_data": true,
+   "technicals": {
+    "rsi": 37.46,
+    "timeframe": "4h",
+    "macd_histogram": -0.276535,
+    "price": 370.47,
+    "atr": 2.4093
+   },
    "coverage": {
     "reached": [
      "Bitget candles",
@@ -340,19 +380,43 @@
    },
    "live_data": true,
    "news": {
-    "change_24h_pct": 0.156,
+    "change_24h_pct": -0.542,
     "headlines": [
+     {
+      "title": "Dow Jones Futures Fall, Oil Prices Rise Amid Trump Iran Comments; Micron, SpaceX, Tesla Eye Buy Points",
+      "feed": "yahoo-tsla",
+      "link": "https://finance.yahoo.com/m/473106f6-6763-38d5-b898-3f7ff08d4b61/dow-jones-futures-fall%2C-oil.html?.tsrc=rss",
+      "published": "2026-09-28T02:09:18+00:00"
+     },
+     {
+      "title": "SpaceX vs. Tesla: Which Will Be the Largest Company at the End of 2027?",
+      "feed": "yahoo-tsla",
+      "link": "https://www.fool.com/investing/2026/09/27/spacex-vs-tesla-which-will-be-the-largest-company/?.tsrc=rss",
+      "published": "2026-09-27T21:05:00+00:00"
+     },
+     {
+      "title": "Ford Motor vs. Tesla: What Revenue Trends Reveal About These Automotive Titans",
+      "feed": "yahoo-tsla",
+      "link": "https://www.fool.com/coverage/charts/2026/09/27/ford-motor-vs-tesla-what-revenue-trends-reveal-about-these-automotive-titans/?.tsrc=rss",
+      "published": "2026-09-27T18:42:56+00:00"
+     },
+     {
+      "title": "Tesla Reports Q3 Deliveries in Early October. Here's the Number That Would Send the Stock Soaring.",
+      "feed": "yahoo-tsla",
+      "link": "https://www.fool.com/investing/2026/09/27/tesla-reports-q3-deliveries-in-3-weeks-heres-the-n/?.tsrc=rss",
+      "published": "2026-09-27T13:44:00+00:00"
+     },
+     {
+      "title": "Elon Musk Says Optimus Could Make Tesla a $25 Trillion Company. Here's What the Math Actually Requires.",
+      "feed": "yahoo-tsla",
+      "link": "https://www.fool.com/investing/2026/09/27/elon-musk-says-optimus-could-be-worth-25-trillion/?.tsrc=rss",
+      "published": "2026-09-27T11:29:00+00:00"
+     },
      {
       "title": "Ross Gerber Asks Why Tesla Isn't Advertising With Gas at $6.50 a Gallon in LA. 'It's Just Infuriating to Me How Poorly Run Tesla Is'",
       "feed": "yahoo-tsla",
       "link": "https://finance.yahoo.com/markets/stocks/articles/ross-gerber-asks-why-tesla-200015696.html?.tsrc=rss",
       "published": "2026-09-26T20:00:15+00:00"
-     },
-     {
-      "title": "Dow Jones Futures: Growth Shrugs Off Surging Yields, But Trump Rejects Iran Deal; Micron, SpaceX, Tesla Eye Buy Points",
-      "feed": "yahoo-tsla",
-      "link": "https://finance.yahoo.com/m/473106f6-6763-38d5-b898-3f7ff08d4b61/dow-jones-futures%3A-growth.html?.tsrc=rss",
-      "published": "2026-09-26T17:43:58+00:00"
      },
      {
       "title": "What Musk’s Tesla and SpaceX Stocks Are Doing After That White House State Dinner",
@@ -373,34 +437,10 @@
       "published": "2026-09-26T13:05:00+00:00"
      },
      {
-      "title": "In 2018, He Was Sleeping On The Factory Floor As His Company Kept Missing Production Targets. Less Than 3 Years Later, Tesla Shareholders Had Made Over 13 Times Their Money, And Elon Musk Was The Richest Man In The World.",
+      "title": "Tesla Says Its Semi Is Finally in Volume Production. So, Why Did the Stock Fall?",
       "feed": "yahoo-tsla",
-      "link": "https://247wallst.com/investing/2026/09/26/in-2018-he-was-sleeping-on-the-factory-floor-as-his-company-kept-missing-production-targets-less-than-3-years-later-tesla-shareholders-had-made-over-13-times-their-money-and-elon-musk-was-the-rich/?.tsrc=rss",
-      "published": "2026-09-26T10:25:37+00:00"
-     },
-     {
-      "title": "What Do Tesla (TSLA) Tunnel And Grid Plans Mean For Investors?",
-      "feed": "yahoo-tsla",
-      "link": "https://finance.yahoo.com/energy/articles/tesla-tsla-tunnel-grid-plans-100952965.html?.tsrc=rss",
-      "published": "2026-09-26T10:09:52+00:00"
-     },
-     {
-      "title": "Ross Gerber Asks Why There Are Starlink Ads On TV But Not Tesla EVs As Gas Prices Soar — 'Doesn't The CEO Know?'",
-      "feed": "yahoo-tsla",
-      "link": "https://stocktwits.com/news-articles/markets/equity/ross-gerber-starlink-ads-tesla-ev-ads-not-on-tv-gas-prices-soar/cZMgBTdRBOt?.tsrc=rss",
-      "published": "2026-09-26T08:43:30+00:00"
-     },
-     {
-      "title": "Is Tesla’s (TSLA) Stock Really Priced Like a Car Company?",
-      "feed": "yahoo-tsla",
-      "link": "https://finance.yahoo.com/markets/stocks/articles/tesla-tsla-stock-really-priced-050301615.html?.tsrc=rss",
-      "published": "2026-09-26T05:03:01+00:00"
-     },
-     {
-      "title": "Tesla (TSLA) Sets an October 1 Roadster Unveiling. Can the Long-Delayed Car Restore Confidence?",
-      "feed": "yahoo-tsla",
-      "link": "https://finance.yahoo.com/markets/stocks/articles/tesla-tsla-sets-october-1-031844844.html?.tsrc=rss",
-      "published": "2026-09-26T03:18:44+00:00"
+      "link": "https://www.tikr.com/blog/tesla-says-its-semi-is-finally-in-volume-production-so-why-did-the-stock-fall?ref=yahoofinance&.tsrc=rss",
+      "published": "2026-09-26T12:23:36+00:00"
      }
     ],
     "filings": []
@@ -456,6 +496,13 @@
     "level": null
    },
    "live_data": true,
+   "fundamentals": {
+    "earnings_days": 23,
+    "earnings_date": "2026-10-21",
+    "target_mean": 396.62158,
+    "price": 372.11,
+    "analysts": 38
+   },
    "coverage": {
     "reached": [
      "Polymarket",
@@ -520,1109 +567,1109 @@
     "refused": "",
     "distribution": {
      "analogues": 50,
-     "effective_n": 4,
-     "median_bps": -50.95,
-     "mean_bps": -25.3,
-     "p25_bps": -85.8,
-     "p75_bps": -5.9,
-     "worst_bps": -235.89,
-     "best_bps": 471.12,
-     "iqr_bps": 79.9,
-     "hit_rate": 0.2
+     "effective_n": 13,
+     "median_bps": 34.88,
+     "mean_bps": 77.88,
+     "p25_bps": -0.19,
+     "p75_bps": 162.45,
+     "worst_bps": -322.41,
+     "best_bps": 564.5,
+     "iqr_bps": 162.64,
+     "hit_rate": 0.74
     },
     "matches": [
      {
-      "as_of": "2026-09-20T01:00:00+00:00",
+      "as_of": "2026-07-04T13:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.0227,
-      "forward_return_bps": 34.77,
+      "distance": 0.0204,
+      "forward_return_bps": 44.06,
       "dominant_feature": "volatility_bps",
       "contributions": {
-       "trailing_return": 0.2772,
-       "volatility_bps": 0.7228
+       "trailing_return": 0.2888,
+       "volatility_bps": 0.7112
       },
       "why": {
-       "relevance": 0.9851,
-       "distance": 0.0227,
-       "bandwidth": 0.131,
+       "relevance": 0.9947,
+       "distance": 0.0204,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.9851,
+       "final_score": 0.9947,
        "selection_rank": 1,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-09-20T00:00:00+00:00",
+      "as_of": "2026-07-04T14:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.0242,
-      "forward_return_bps": 49.83,
-      "dominant_feature": "volatility_bps",
+      "distance": 0.0313,
+      "forward_return_bps": 9.52,
+      "dominant_feature": "trailing_return",
       "contributions": {
-       "trailing_return": 0.394,
-       "volatility_bps": 0.606
+       "trailing_return": 0.5796,
+       "volatility_bps": 0.4204
       },
       "why": {
-       "relevance": 0.983,
-       "distance": 0.0242,
-       "bandwidth": 0.131,
+       "relevance": 0.9875,
+       "distance": 0.0313,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.983,
+       "final_score": 0.9875,
        "selection_rank": 2,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-09-12T17:00:00+00:00",
+      "as_of": "2026-09-07T11:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.0288,
-      "forward_return_bps": -80.56,
-      "dominant_feature": "trailing_return",
+      "distance": 0.0506,
+      "forward_return_bps": 39.74,
+      "dominant_feature": "volatility_bps",
       "contributions": {
-       "trailing_return": 0.7567,
-       "volatility_bps": 0.2433
+       "trailing_return": 0.0176,
+       "volatility_bps": 0.9824
       },
       "why": {
-       "relevance": 0.9761,
-       "distance": 0.0288,
-       "bandwidth": 0.131,
+       "relevance": 0.9677,
+       "distance": 0.0506,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.9761,
+       "final_score": 0.9677,
        "selection_rank": 3,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-08-15T19:00:00+00:00",
+      "as_of": "2026-09-07T12:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.0459,
-      "forward_return_bps": -11.36,
+      "distance": 0.0534,
+      "forward_return_bps": 28.73,
       "dominant_feature": "volatility_bps",
       "contributions": {
-       "trailing_return": 0.0616,
-       "volatility_bps": 0.9384
+       "trailing_return": 0.3547,
+       "volatility_bps": 0.6453
       },
       "why": {
-       "relevance": 0.9404,
-       "distance": 0.0459,
-       "bandwidth": 0.131,
+       "relevance": 0.9641,
+       "distance": 0.0534,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.9404,
+       "final_score": 0.9641,
        "selection_rank": 4,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-09-19T23:00:00+00:00",
+      "as_of": "2026-08-09T23:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.0522,
-      "forward_return_bps": 6.02,
-      "dominant_feature": "trailing_return",
+      "distance": 0.0584,
+      "forward_return_bps": 13.32,
+      "dominant_feature": "volatility_bps",
       "contributions": {
-       "trailing_return": 0.9752,
-       "volatility_bps": 0.0248
+       "trailing_return": 0.202,
+       "volatility_bps": 0.798
       },
       "why": {
-       "relevance": 0.9238,
-       "distance": 0.0522,
-       "bandwidth": 0.131,
+       "relevance": 0.9572,
+       "distance": 0.0584,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.9238,
+       "final_score": 0.9572,
        "selection_rank": 5,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-08-15T20:00:00+00:00",
+      "as_of": "2026-07-12T23:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.0595,
-      "forward_return_bps": -14.56,
-      "dominant_feature": "trailing_return",
+      "distance": 0.0774,
+      "forward_return_bps": -299.35,
+      "dominant_feature": "volatility_bps",
       "contributions": {
-       "trailing_return": 0.9647,
-       "volatility_bps": 0.0353
+       "trailing_return": 0.0003,
+       "volatility_bps": 0.9997
       },
       "why": {
-       "relevance": 0.9019,
-       "distance": 0.0595,
-       "bandwidth": 0.131,
+       "relevance": 0.926,
+       "distance": 0.0774,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.9019,
+       "final_score": 0.926,
        "selection_rank": 6,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-08-15T22:00:00+00:00",
+      "as_of": "2026-08-17T11:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.0639,
-      "forward_return_bps": -4.95,
-      "dominant_feature": "trailing_return",
+      "distance": 0.0784,
+      "forward_return_bps": -187.02,
+      "dominant_feature": "volatility_bps",
       "contributions": {
-       "trailing_return": 0.9775,
-       "volatility_bps": 0.0225
+       "trailing_return": 0.0958,
+       "volatility_bps": 0.9042
       },
       "why": {
-       "relevance": 0.8879,
-       "distance": 0.0639,
-       "bandwidth": 0.131,
+       "relevance": 0.9243,
+       "distance": 0.0784,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.8879,
+       "final_score": 0.9243,
        "selection_rank": 7,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-08-16T13:00:00+00:00",
+      "as_of": "2026-09-07T13:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.0672,
-      "forward_return_bps": -89.51,
-      "dominant_feature": "volatility_bps",
+      "distance": 0.0812,
+      "forward_return_bps": 146.07,
+      "dominant_feature": "trailing_return",
       "contributions": {
-       "trailing_return": 0.0002,
-       "volatility_bps": 0.9998
+       "trailing_return": 0.7721,
+       "volatility_bps": 0.2279
       },
       "why": {
-       "relevance": 0.8767,
-       "distance": 0.0672,
-       "bandwidth": 0.131,
+       "relevance": 0.9188,
+       "distance": 0.0812,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.8767,
+       "final_score": 0.9188,
        "selection_rank": 8,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-08-16T12:00:00+00:00",
+      "as_of": "2026-08-22T22:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.073,
-      "forward_return_bps": -65.86,
-      "dominant_feature": "volatility_bps",
+      "distance": 0.0876,
+      "forward_return_bps": 35.56,
+      "dominant_feature": "trailing_return",
       "contributions": {
-       "trailing_return": 0.2327,
-       "volatility_bps": 0.7673
+       "trailing_return": 0.6614,
+       "volatility_bps": 0.3386
       },
       "why": {
-       "relevance": 0.8562,
-       "distance": 0.073,
-       "bandwidth": 0.131,
+       "relevance": 0.9064,
+       "distance": 0.0876,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.8562,
+       "final_score": 0.9064,
        "selection_rank": 9,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-09-12T15:00:00+00:00",
+      "as_of": "2026-07-12T22:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.0759,
-      "forward_return_bps": -83.86,
+      "distance": 0.0927,
+      "forward_return_bps": -302.58,
       "dominant_feature": "volatility_bps",
       "contributions": {
-       "trailing_return": 0.0296,
-       "volatility_bps": 0.9704
+       "trailing_return": 0.0931,
+       "volatility_bps": 0.9069
       },
       "why": {
-       "relevance": 0.8455,
-       "distance": 0.0759,
-       "bandwidth": 0.131,
+       "relevance": 0.8956,
+       "distance": 0.0927,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.8455,
+       "final_score": 0.8956,
        "selection_rank": 10,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-08-15T21:00:00+00:00",
+      "as_of": "2026-07-18T16:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.0762,
-      "forward_return_bps": -13.39,
+      "distance": 0.0929,
+      "forward_return_bps": 1.05,
       "dominant_feature": "trailing_return",
       "contributions": {
-       "trailing_return": 0.9929,
-       "volatility_bps": 0.0071
+       "trailing_return": 0.6383,
+       "volatility_bps": 0.3617
       },
       "why": {
-       "relevance": 0.8442,
-       "distance": 0.0762,
-       "bandwidth": 0.131,
+       "relevance": 0.8953,
+       "distance": 0.0929,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.8442,
+       "final_score": 0.8953,
        "selection_rank": 11,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-09-19T20:00:00+00:00",
+      "as_of": "2026-08-01T16:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.077,
-      "forward_return_bps": -11.77,
+      "distance": 0.0948,
+      "forward_return_bps": 149.48,
       "dominant_feature": "volatility_bps",
       "contributions": {
-       "trailing_return": 0.0814,
-       "volatility_bps": 0.9186
+       "trailing_return": 0.0813,
+       "volatility_bps": 0.9187
       },
       "why": {
-       "relevance": 0.8414,
-       "distance": 0.077,
-       "bandwidth": 0.131,
+       "relevance": 0.8912,
+       "distance": 0.0948,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.8414,
+       "final_score": 0.8912,
        "selection_rank": 12,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-08-16T10:00:00+00:00",
+      "as_of": "2026-09-07T09:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.0771,
-      "forward_return_bps": 8.45,
-      "dominant_feature": "trailing_return",
+      "distance": 0.0993,
+      "forward_return_bps": -11.55,
+      "dominant_feature": "volatility_bps",
       "contributions": {
-       "trailing_return": 0.5301,
-       "volatility_bps": 0.4699
+       "trailing_return": 0.0518,
+       "volatility_bps": 0.9482
       },
       "why": {
-       "relevance": 0.8408,
-       "distance": 0.0771,
-       "bandwidth": 0.131,
+       "relevance": 0.8811,
+       "distance": 0.0993,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.8408,
+       "final_score": 0.8811,
        "selection_rank": 13,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-08-30T01:00:00+00:00",
+      "as_of": "2026-08-22T21:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.0773,
-      "forward_return_bps": -101.78,
+      "distance": 0.0999,
+      "forward_return_bps": 50.49,
       "dominant_feature": "trailing_return",
       "contributions": {
-       "trailing_return": 0.9239,
-       "volatility_bps": 0.0761
+       "trailing_return": 0.695,
+       "volatility_bps": 0.305
       },
       "why": {
-       "relevance": 0.8401,
-       "distance": 0.0773,
-       "bandwidth": 0.131,
+       "relevance": 0.8799,
+       "distance": 0.0999,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.8401,
+       "final_score": 0.8799,
        "selection_rank": 14,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-08-16T01:00:00+00:00",
+      "as_of": "2026-09-07T10:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.0792,
-      "forward_return_bps": 3.21,
-      "dominant_feature": "trailing_return",
+      "distance": 0.1048,
+      "forward_return_bps": 24.56,
+      "dominant_feature": "volatility_bps",
       "contributions": {
-       "trailing_return": 0.8383,
-       "volatility_bps": 0.1617
+       "trailing_return": 0.4067,
+       "volatility_bps": 0.5933
       },
       "why": {
-       "relevance": 0.8329,
-       "distance": 0.0792,
-       "bandwidth": 0.131,
+       "relevance": 0.8686,
+       "distance": 0.1048,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.8329,
+       "final_score": 0.8686,
        "selection_rank": 15,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-09-12T14:00:00+00:00",
+      "as_of": "2026-09-07T08:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.0798,
-      "forward_return_bps": -57.4,
+      "distance": 0.1079,
+      "forward_return_bps": -57.74,
       "dominant_feature": "volatility_bps",
       "contributions": {
-       "trailing_return": 0.0542,
-       "volatility_bps": 0.9458
+       "trailing_return": 0.185,
+       "volatility_bps": 0.815
       },
       "why": {
-       "relevance": 0.8308,
-       "distance": 0.0798,
-       "bandwidth": 0.131,
+       "relevance": 0.8612,
+       "distance": 0.1079,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.8308,
+       "final_score": 0.8612,
        "selection_rank": 16,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-08-16T15:00:00+00:00",
+      "as_of": "2026-08-17T12:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.0819,
-      "forward_return_bps": -27.12,
+      "distance": 0.109,
+      "forward_return_bps": -181.01,
       "dominant_feature": "volatility_bps",
       "contributions": {
-       "trailing_return": 0.1667,
-       "volatility_bps": 0.8333
+       "trailing_return": 0.1476,
+       "volatility_bps": 0.8524
       },
       "why": {
-       "relevance": 0.8223,
-       "distance": 0.0819,
-       "bandwidth": 0.131,
+       "relevance": 0.8587,
+       "distance": 0.109,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.8223,
+       "final_score": 0.8587,
        "selection_rank": 17,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-08-16T14:00:00+00:00",
+      "as_of": "2026-08-01T22:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.0824,
-      "forward_return_bps": -8.75,
+      "distance": 0.1096,
+      "forward_return_bps": 167.29,
       "dominant_feature": "volatility_bps",
       "contributions": {
-       "trailing_return": 0.1886,
-       "volatility_bps": 0.8114
+       "trailing_return": 0.0207,
+       "volatility_bps": 0.9793
       },
       "why": {
-       "relevance": 0.8206,
-       "distance": 0.0824,
-       "bandwidth": 0.131,
+       "relevance": 0.8572,
+       "distance": 0.1096,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.8206,
+       "final_score": 0.8572,
        "selection_rank": 18,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-09-19T19:00:00+00:00",
+      "as_of": "2026-07-04T15:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.084,
-      "forward_return_bps": -23.53,
-      "dominant_feature": "volatility_bps",
+      "distance": 0.1109,
+      "forward_return_bps": 21.81,
+      "dominant_feature": "trailing_return",
       "contributions": {
-       "trailing_return": 0.3294,
-       "volatility_bps": 0.6706
+       "trailing_return": 0.7191,
+       "volatility_bps": 0.2809
       },
       "why": {
-       "relevance": 0.8141,
-       "distance": 0.084,
-       "bandwidth": 0.131,
+       "relevance": 0.854,
+       "distance": 0.1109,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.8141,
+       "final_score": 0.854,
        "selection_rank": 19,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-09-19T18:00:00+00:00",
+      "as_of": "2026-08-01T21:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.084,
-      "forward_return_bps": -28.47,
-      "dominant_feature": "volatility_bps",
-      "contributions": {
-       "trailing_return": 0.3296,
-       "volatility_bps": 0.6704
-      },
-      "why": {
-       "relevance": 0.8141,
-       "distance": 0.084,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.8141,
-       "selection_rank": 20,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-16T11:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.0844,
-      "forward_return_bps": -49.51,
-      "dominant_feature": "trailing_return",
-      "contributions": {
-       "trailing_return": 0.6018,
-       "volatility_bps": 0.3982
-      },
-      "why": {
-       "relevance": 0.8126,
-       "distance": 0.0844,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.8126,
-       "selection_rank": 21,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-30T02:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.0849,
-      "forward_return_bps": -101.47,
-      "dominant_feature": "trailing_return",
-      "contributions": {
-       "trailing_return": 0.9391,
-       "volatility_bps": 0.0609
-      },
-      "why": {
-       "relevance": 0.8105,
-       "distance": 0.0849,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.8105,
-       "selection_rank": 22,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-09-12T16:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.0851,
-      "forward_return_bps": -70.19,
-      "dominant_feature": "trailing_return",
-      "contributions": {
-       "trailing_return": 0.7614,
-       "volatility_bps": 0.2386
-      },
-      "why": {
-       "relevance": 0.8097,
-       "distance": 0.0851,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.8097,
-       "selection_rank": 23,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-17T01:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.086,
-      "forward_return_bps": -120.88,
-      "dominant_feature": "volatility_bps",
-      "contributions": {
-       "trailing_return": 0.2613,
-       "volatility_bps": 0.7387
-      },
-      "why": {
-       "relevance": 0.8063,
-       "distance": 0.086,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.8063,
-       "selection_rank": 24,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-17T02:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.0863,
-      "forward_return_bps": -197.01,
-      "dominant_feature": "volatility_bps",
-      "contributions": {
-       "trailing_return": 0.1508,
-       "volatility_bps": 0.8492
-      },
-      "why": {
-       "relevance": 0.8049,
-       "distance": 0.0863,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.8049,
-       "selection_rank": 25,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-16T09:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.087,
-      "forward_return_bps": 9.61,
-      "dominant_feature": "trailing_return",
-      "contributions": {
-       "trailing_return": 0.6086,
-       "volatility_bps": 0.3914
-      },
-      "why": {
-       "relevance": 0.8022,
-       "distance": 0.087,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.8022,
-       "selection_rank": 26,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-30T08:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.0907,
-      "forward_return_bps": -90.84,
-      "dominant_feature": "trailing_return",
-      "contributions": {
-       "trailing_return": 0.7314,
-       "volatility_bps": 0.2686
-      },
-      "why": {
-       "relevance": 0.7868,
-       "distance": 0.0907,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.7868,
-       "selection_rank": 27,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-09-19T17:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.0921,
-      "forward_return_bps": -13.14,
-      "dominant_feature": "volatility_bps",
-      "contributions": {
-       "trailing_return": 0.3837,
-       "volatility_bps": 0.6163
-      },
-      "why": {
-       "relevance": 0.7809,
-       "distance": 0.0921,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.7809,
-       "selection_rank": 28,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-09-19T21:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.0922,
-      "forward_return_bps": -15.59,
-      "dominant_feature": "volatility_bps",
-      "contributions": {
-       "trailing_return": 0.2611,
-       "volatility_bps": 0.7389
-      },
-      "why": {
-       "relevance": 0.7807,
-       "distance": 0.0922,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.7807,
-       "selection_rank": 29,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-16T23:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.0941,
-      "forward_return_bps": -92.89,
-      "dominant_feature": "volatility_bps",
-      "contributions": {
-       "trailing_return": 0.4743,
-       "volatility_bps": 0.5257
-      },
-      "why": {
-       "relevance": 0.7725,
-       "distance": 0.0941,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.7725,
-       "selection_rank": 30,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-30T00:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.0947,
-      "forward_return_bps": -80.68,
-      "dominant_feature": "trailing_return",
-      "contributions": {
-       "trailing_return": 0.9567,
-       "volatility_bps": 0.0433
-      },
-      "why": {
-       "relevance": 0.7701,
-       "distance": 0.0947,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.7701,
-       "selection_rank": 31,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-16T22:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.0988,
-      "forward_return_bps": -93.25,
-      "dominant_feature": "trailing_return",
-      "contributions": {
-       "trailing_return": 0.599,
-       "volatility_bps": 0.401
-      },
-      "why": {
-       "relevance": 0.7526,
-       "distance": 0.0988,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.7526,
-       "selection_rank": 32,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-30T09:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.103,
-      "forward_return_bps": -116.97,
-      "dominant_feature": "trailing_return",
-      "contributions": {
-       "trailing_return": 0.8243,
-       "volatility_bps": 0.1757
-      },
-      "why": {
-       "relevance": 0.7341,
-       "distance": 0.103,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.7341,
-       "selection_rank": 33,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-17T00:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.1068,
-      "forward_return_bps": -85.09,
-      "dominant_feature": "trailing_return",
-      "contributions": {
-       "trailing_return": 0.5276,
-       "volatility_bps": 0.4724
-      },
-      "why": {
-       "relevance": 0.7171,
-       "distance": 0.1068,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.7171,
-       "selection_rank": 34,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-30T16:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.1094,
-      "forward_return_bps": 408.55,
-      "dominant_feature": "trailing_return",
-      "contributions": {
-       "trailing_return": 0.9757,
-       "volatility_bps": 0.0243
-      },
-      "why": {
-       "relevance": 0.7056,
-       "distance": 0.1094,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.7056,
-       "selection_rank": 35,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-30T17:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.1094,
-      "forward_return_bps": 471.12,
-      "dominant_feature": "trailing_return",
-      "contributions": {
-       "trailing_return": 0.9758,
-       "volatility_bps": 0.0242
-      },
-      "why": {
-       "relevance": 0.7055,
-       "distance": 0.1094,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.7055,
-       "selection_rank": 36,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-09-19T22:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.1127,
-      "forward_return_bps": -1.92,
-      "dominant_feature": "trailing_return",
-      "contributions": {
-       "trailing_return": 0.9467,
-       "volatility_bps": 0.0533
-      },
-      "why": {
-       "relevance": 0.6906,
-       "distance": 0.1127,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.6906,
-       "selection_rank": 37,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-16T16:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.1134,
-      "forward_return_bps": -70.91,
-      "dominant_feature": "trailing_return",
-      "contributions": {
-       "trailing_return": 0.7028,
-       "volatility_bps": 0.2972
-      },
-      "why": {
-       "relevance": 0.6877,
-       "distance": 0.1134,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.6877,
-       "selection_rank": 38,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-15T23:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.1134,
-      "forward_return_bps": -2.04,
-      "dominant_feature": "trailing_return",
-      "contributions": {
-       "trailing_return": 0.9986,
-       "volatility_bps": 0.0014
-      },
-      "why": {
-       "relevance": 0.6875,
-       "distance": 0.1134,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.6875,
-       "selection_rank": 39,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-30T07:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.1143,
-      "forward_return_bps": -52.38,
-      "dominant_feature": "trailing_return",
-      "contributions": {
-       "trailing_return": 0.8248,
-       "volatility_bps": 0.1752
-      },
-      "why": {
-       "relevance": 0.6832,
-       "distance": 0.1143,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.6832,
-       "selection_rank": 40,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-30T15:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.1158,
-      "forward_return_bps": 385.42,
-      "dominant_feature": "trailing_return",
-      "contributions": {
-       "trailing_return": 0.9838,
-       "volatility_bps": 0.0162
-      },
-      "why": {
-       "relevance": 0.6765,
-       "distance": 0.1158,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.6765,
-       "selection_rank": 41,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-30T06:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.1169,
-      "forward_return_bps": -47.81,
-      "dominant_feature": "trailing_return",
-      "contributions": {
-       "trailing_return": 0.8232,
-       "volatility_bps": 0.1768
-      },
-      "why": {
-       "relevance": 0.6715,
-       "distance": 0.1169,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.6715,
-       "selection_rank": 42,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-16T19:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.1186,
-      "forward_return_bps": -86.04,
-      "dominant_feature": "trailing_return",
-      "contributions": {
-       "trailing_return": 0.7395,
-       "volatility_bps": 0.2605
-      },
-      "why": {
-       "relevance": 0.6639,
-       "distance": 0.1186,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.6639,
-       "selection_rank": 43,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-16T21:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.1245,
-      "forward_return_bps": -74.64,
-      "dominant_feature": "trailing_return",
-      "contributions": {
-       "trailing_return": 0.7815,
-       "volatility_bps": 0.2185
-      },
-      "why": {
-       "relevance": 0.6366,
-       "distance": 0.1245,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.6366,
-       "selection_rank": 44,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-16T20:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.1283,
-      "forward_return_bps": -81.66,
-      "dominant_feature": "trailing_return",
-      "contributions": {
-       "trailing_return": 0.7988,
-       "volatility_bps": 0.2012
-      },
-      "why": {
-       "relevance": 0.6188,
-       "distance": 0.1283,
-       "bandwidth": 0.131,
-       "max_distance": 2.0,
-       "diversity_penalty": 0.0,
-       "mmr_lambda": 1.0,
-       "final_score": 0.6188,
-       "selection_rank": 45,
-       "pool": 50
-      }
-     },
-     {
-      "as_of": "2026-08-17T05:00:00+00:00",
-      "symbol": "TSLAUSDT",
-      "distance": 0.1287,
-      "forward_return_bps": -235.89,
+      "distance": 0.1121,
+      "forward_return_bps": 194.59,
       "dominant_feature": "volatility_bps",
       "contributions": {
        "trailing_return": 0.0159,
        "volatility_bps": 0.9841
       },
       "why": {
-       "relevance": 0.6173,
-       "distance": 0.1287,
-       "bandwidth": 0.131,
+       "relevance": 0.8511,
+       "distance": 0.1121,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.6173,
+       "final_score": 0.8511,
+       "selection_rank": 20,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-08-22T23:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1141,
+      "forward_return_bps": 80.99,
+      "dominant_feature": "trailing_return",
+      "contributions": {
+       "trailing_return": 0.7694,
+       "volatility_bps": 0.2306
+      },
+      "why": {
+       "relevance": 0.8463,
+       "distance": 0.1141,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.8463,
+       "selection_rank": 21,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-09-13T22:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.119,
+      "forward_return_bps": -120.69,
+      "dominant_feature": "trailing_return",
+      "contributions": {
+       "trailing_return": 0.7229,
+       "volatility_bps": 0.2771
+      },
+      "why": {
+       "relevance": 0.8338,
+       "distance": 0.119,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.8338,
+       "selection_rank": 22,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-08-30T22:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1193,
+      "forward_return_bps": 501.07,
+      "dominant_feature": "trailing_return",
+      "contributions": {
+       "trailing_return": 0.9642,
+       "volatility_bps": 0.0358
+      },
+      "why": {
+       "relevance": 0.8331,
+       "distance": 0.1193,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.8331,
+       "selection_rank": 23,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-09-07T07:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1203,
+      "forward_return_bps": 11.56,
+      "dominant_feature": "volatility_bps",
+      "contributions": {
+       "trailing_return": 0.0044,
+       "volatility_bps": 0.9956
+      },
+      "why": {
+       "relevance": 0.8306,
+       "distance": 0.1203,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.8306,
+       "selection_rank": 24,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-08-10T00:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1253,
+      "forward_return_bps": 63.43,
+      "dominant_feature": "trailing_return",
+      "contributions": {
+       "trailing_return": 0.6598,
+       "volatility_bps": 0.3402
+      },
+      "why": {
+       "relevance": 0.8176,
+       "distance": 0.1253,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.8176,
+       "selection_rank": 25,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-08-09T22:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1265,
+      "forward_return_bps": -0.61,
+      "dominant_feature": "trailing_return",
+      "contributions": {
+       "trailing_return": 0.523,
+       "volatility_bps": 0.477
+      },
+      "why": {
+       "relevance": 0.8144,
+       "distance": 0.1265,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.8144,
+       "selection_rank": 26,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-08-01T23:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1293,
+      "forward_return_bps": 206.92,
+      "dominant_feature": "volatility_bps",
+      "contributions": {
+       "trailing_return": 0.4708,
+       "volatility_bps": 0.5292
+      },
+      "why": {
+       "relevance": 0.807,
+       "distance": 0.1293,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.807,
+       "selection_rank": 27,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-08-02T00:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1294,
+      "forward_return_bps": 154.57,
+      "dominant_feature": "volatility_bps",
+      "contributions": {
+       "trailing_return": 0.4725,
+       "volatility_bps": 0.5275
+      },
+      "why": {
+       "relevance": 0.8068,
+       "distance": 0.1294,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.8068,
+       "selection_rank": 28,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-09-26T15:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1326,
+      "forward_return_bps": 24.98,
+      "dominant_feature": "volatility_bps",
+      "contributions": {
+       "trailing_return": 0.4742,
+       "volatility_bps": 0.5258
+      },
+      "why": {
+       "relevance": 0.7981,
+       "distance": 0.1326,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.7981,
+       "selection_rank": 29,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-07-13T00:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1355,
+      "forward_return_bps": -226.6,
+      "dominant_feature": "trailing_return",
+      "contributions": {
+       "trailing_return": 0.8008,
+       "volatility_bps": 0.1992
+      },
+      "why": {
+       "relevance": 0.7901,
+       "distance": 0.1355,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.7901,
+       "selection_rank": 30,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-07-25T19:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1414,
+      "forward_return_bps": 39.31,
+      "dominant_feature": "trailing_return",
+      "contributions": {
+       "trailing_return": 0.9714,
+       "volatility_bps": 0.0286
+      },
+      "why": {
+       "relevance": 0.7739,
+       "distance": 0.1414,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.7739,
+       "selection_rank": 31,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-08-23T04:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1457,
+      "forward_return_bps": -17.67,
+      "dominant_feature": "trailing_return",
+      "contributions": {
+       "trailing_return": 0.9498,
+       "volatility_bps": 0.0502
+      },
+      "why": {
+       "relevance": 0.7616,
+       "distance": 0.1457,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.7616,
+       "selection_rank": 32,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-08-30T23:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.15,
+      "forward_return_bps": 564.5,
+      "dominant_feature": "volatility_bps",
+      "contributions": {
+       "trailing_return": 0.3539,
+       "volatility_bps": 0.6461
+      },
+      "why": {
+       "relevance": 0.7494,
+       "distance": 0.15,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.7494,
+       "selection_rank": 33,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-07-05T23:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1506,
+      "forward_return_bps": 439.4,
+      "dominant_feature": "trailing_return",
+      "contributions": {
+       "trailing_return": 0.909,
+       "volatility_bps": 0.091
+      },
+      "why": {
+       "relevance": 0.7475,
+       "distance": 0.1506,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.7475,
+       "selection_rank": 34,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-08-31T00:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1564,
+      "forward_return_bps": 551.28,
+      "dominant_feature": "volatility_bps",
+      "contributions": {
+       "trailing_return": 0.4234,
+       "volatility_bps": 0.5766
+      },
+      "why": {
+       "relevance": 0.7306,
+       "distance": 0.1564,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.7306,
+       "selection_rank": 35,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-07-04T16:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1585,
+      "forward_return_bps": 4.0,
+      "dominant_feature": "trailing_return",
+      "contributions": {
+       "trailing_return": 0.9535,
+       "volatility_bps": 0.0465
+      },
+      "why": {
+       "relevance": 0.7247,
+       "distance": 0.1585,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.7247,
+       "selection_rank": 36,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-07-06T00:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1608,
+      "forward_return_bps": 457.47,
+      "dominant_feature": "volatility_bps",
+      "contributions": {
+       "trailing_return": 0.069,
+       "volatility_bps": 0.931
+      },
+      "why": {
+       "relevance": 0.7177,
+       "distance": 0.1608,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.7177,
+       "selection_rank": 37,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-09-26T13:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1639,
+      "forward_return_bps": 32.49,
+      "dominant_feature": "trailing_return",
+      "contributions": {
+       "trailing_return": 0.7514,
+       "volatility_bps": 0.2486
+      },
+      "why": {
+       "relevance": 0.7085,
+       "distance": 0.1639,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.7085,
+       "selection_rank": 38,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-07-12T21:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1762,
+      "forward_return_bps": -322.41,
+      "dominant_feature": "volatility_bps",
+      "contributions": {
+       "trailing_return": 0.2494,
+       "volatility_bps": 0.7506
+      },
+      "why": {
+       "relevance": 0.6716,
+       "distance": 0.1762,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.6716,
+       "selection_rank": 39,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-08-23T02:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.178,
+      "forward_return_bps": 43.52,
+      "dominant_feature": "trailing_return",
+      "contributions": {
+       "trailing_return": 0.9234,
+       "volatility_bps": 0.0766
+      },
+      "why": {
+       "relevance": 0.666,
+       "distance": 0.178,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.666,
+       "selection_rank": 40,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-07-18T17:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1792,
+      "forward_return_bps": -1.05,
+      "dominant_feature": "trailing_return",
+      "contributions": {
+       "trailing_return": 0.7152,
+       "volatility_bps": 0.2848
+      },
+      "why": {
+       "relevance": 0.6625,
+       "distance": 0.1792,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.6625,
+       "selection_rank": 41,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-07-04T19:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1859,
+      "forward_return_bps": 19.29,
+      "dominant_feature": "trailing_return",
+      "contributions": {
+       "trailing_return": 0.8644,
+       "volatility_bps": 0.1356
+      },
+      "why": {
+       "relevance": 0.6419,
+       "distance": 0.1859,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.6419,
+       "selection_rank": 42,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-09-07T15:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1864,
+      "forward_return_bps": 362.05,
+      "dominant_feature": "trailing_return",
+      "contributions": {
+       "trailing_return": 0.6426,
+       "volatility_bps": 0.3574
+      },
+      "why": {
+       "relevance": 0.6403,
+       "distance": 0.1864,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.6403,
+       "selection_rank": 43,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-08-22T18:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1866,
+      "forward_return_bps": 55.21,
+      "dominant_feature": "volatility_bps",
+      "contributions": {
+       "trailing_return": 0.0581,
+       "volatility_bps": 0.9419
+      },
+      "why": {
+       "relevance": 0.6396,
+       "distance": 0.1866,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.6396,
+       "selection_rank": 44,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-08-02T01:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1869,
+      "forward_return_bps": 165.07,
+      "dominant_feature": "trailing_return",
+      "contributions": {
+       "trailing_return": 0.7742,
+       "volatility_bps": 0.2258
+      },
+      "why": {
+       "relevance": 0.6389,
+       "distance": 0.1869,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.6389,
+       "selection_rank": 45,
+       "pool": 50
+      }
+     },
+     {
+      "as_of": "2026-09-08T08:00:00+00:00",
+      "symbol": "TSLAUSDT",
+      "distance": 0.1886,
+      "forward_return_bps": 405.41,
+      "dominant_feature": "volatility_bps",
+      "contributions": {
+       "trailing_return": 0.0023,
+       "volatility_bps": 0.9977
+      },
+      "why": {
+       "relevance": 0.6338,
+       "distance": 0.1886,
+       "bandwidth": 0.1974,
+       "max_distance": 2.0,
+       "diversity_penalty": 0.0,
+       "mmr_lambda": 1.0,
+       "final_score": 0.6338,
        "selection_rank": 46,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-08-17T03:00:00+00:00",
+      "as_of": "2026-08-01T17:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.1299,
-      "forward_return_bps": -214.0,
-      "dominant_feature": "volatility_bps",
+      "distance": 0.1904,
+      "forward_return_bps": 165.75,
+      "dominant_feature": "trailing_return",
       "contributions": {
-       "trailing_return": 0.0136,
-       "volatility_bps": 0.9864
+       "trailing_return": 0.9923,
+       "volatility_bps": 0.0077
       },
       "why": {
-       "relevance": 0.6116,
-       "distance": 0.1299,
-       "bandwidth": 0.131,
+       "relevance": 0.6282,
+       "distance": 0.1904,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.6116,
+       "final_score": 0.6282,
        "selection_rank": 47,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-08-17T04:00:00+00:00",
+      "as_of": "2026-09-20T18:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.13,
-      "forward_return_bps": -193.1,
+      "distance": 0.1933,
+      "forward_return_bps": 318.13,
       "dominant_feature": "volatility_bps",
       "contributions": {
-       "trailing_return": 0.0205,
-       "volatility_bps": 0.9795
+       "trailing_return": 0.32,
+       "volatility_bps": 0.68
       },
       "why": {
-       "relevance": 0.6109,
-       "distance": 0.13,
-       "bandwidth": 0.131,
+       "relevance": 0.6193,
+       "distance": 0.1933,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.6109,
+       "final_score": 0.6193,
        "selection_rank": 48,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-08-16T17:00:00+00:00",
+      "as_of": "2026-08-17T13:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.1303,
-      "forward_return_bps": -75.0,
-      "dominant_feature": "trailing_return",
+      "distance": 0.1949,
+      "forward_return_bps": -4.71,
+      "dominant_feature": "volatility_bps",
       "contributions": {
-       "trailing_return": 0.8071,
-       "volatility_bps": 0.1929
+       "trailing_return": 0.4977,
+       "volatility_bps": 0.5023
       },
       "why": {
-       "relevance": 0.6098,
-       "distance": 0.1303,
-       "bandwidth": 0.131,
+       "relevance": 0.6143,
+       "distance": 0.1949,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
-       "final_score": 0.6098,
+       "final_score": 0.6143,
        "selection_rank": 49,
        "pool": 50
       }
      },
      {
-      "as_of": "2026-08-30T13:00:00+00:00",
+      "as_of": "2026-08-22T19:00:00+00:00",
       "symbol": "TSLAUSDT",
-      "distance": 0.131,
-      "forward_return_bps": 243.92,
+      "distance": 0.1974,
+      "forward_return_bps": 34.19,
       "dominant_feature": "trailing_return",
       "contributions": {
-       "trailing_return": 0.983,
-       "volatility_bps": 0.017
+       "trailing_return": 0.7896,
+       "volatility_bps": 0.2104
       },
       "why": {
        "relevance": 0.6065,
-       "distance": 0.131,
-       "bandwidth": 0.131,
+       "distance": 0.1974,
+       "bandwidth": 0.1974,
        "max_distance": 2.0,
        "diversity_penalty": 0.0,
        "mmr_lambda": 1.0,
@@ -1633,45 +1680,45 @@
      }
     ],
     "shape": {
-     "generated_at": "2026-09-27T05:20:57.915972+00:00",
+     "generated_at": "2026-09-28T02:29:51.502466+00:00",
      "symbol": "TSLA",
      "window": 24,
      "horizon": 24,
      "searched": 2089,
      "has_precedent": false,
      "null_trials": 50,
-     "null_p": 0.72,
-     "null_median_distance": 0.3899,
-     "median_outcome_pct": -1.8465,
-     "upside_share": 0.2,
+     "null_p": 0.44,
+     "null_median_distance": 0.3983,
+     "median_outcome_pct": 0.8663,
+     "upside_share": 0.8,
      "analogues": [
       {
-       "ends_at": "2026-09-03T20:00:00+00:00",
-       "distance": 0.4992,
-       "forward_pct": -6.3286
+       "ends_at": "2026-07-27T15:00:00+00:00",
+       "distance": 0.3594,
+       "forward_pct": 0.3202
       },
       {
-       "ends_at": "2026-07-01T20:00:00+00:00",
-       "distance": 0.5034,
-       "forward_pct": -7.2802
+       "ends_at": "2026-07-24T15:00:00+00:00",
+       "distance": 0.3762,
+       "forward_pct": -0.0096
       },
       {
-       "ends_at": "2026-08-07T20:00:00+00:00",
-       "distance": 0.5124,
-       "forward_pct": 0.7779
+       "ends_at": "2026-08-12T15:00:00+00:00",
+       "distance": 0.4327,
+       "forward_pct": 2.138
       },
       {
-       "ends_at": "2026-08-21T21:00:00+00:00",
-       "distance": 0.5142,
-       "forward_pct": -0.3492
+       "ends_at": "2026-08-31T00:00:00+00:00",
+       "distance": 0.4349,
+       "forward_pct": 5.5128
       },
       {
-       "ends_at": "2026-08-27T20:00:00+00:00",
-       "distance": 0.5203,
-       "forward_pct": -1.8465
+       "ends_at": "2026-08-28T17:00:00+00:00",
+       "distance": 0.4404,
+       "forward_pct": 0.8663
       }
      ],
-     "verdict": "No precedent: the nearest match is at distance 0.50, but reordering this series' own returns produces a match at least that close in 72% of 50 scans (median 0.39). The shape is not distinguishable from chance, so what followed these 5 window(s) is not evidence about what follows now"
+     "verdict": "No precedent: the nearest match is at distance 0.36, but reordering this series' own returns produces a match at least that close in 44% of 50 scans (median 0.40). The shape is not distinguishable from chance, so what followed these 5 window(s) is not evidence about what follows now"
     }
    },
    "long_run": {
@@ -1769,86 +1816,86 @@
      "TSLAUSDT": 0.15
     },
     "bars_aligned": 719,
-    "bars_open_session": 120,
+    "bars_open_session": 114,
     "impact": {
      "symbol": "TSLAUSDT",
      "session": "open",
-     "beta_before": 0.9376,
-     "beta_after": 1.0053,
+     "beta_before": 0.8611,
+     "beta_after": 0.9402,
      "risk_share_before": null,
-     "risk_share_after": 0.1777,
-     "effective_positions_before": 2.4554,
-     "effective_positions_after": 3.1767,
+     "risk_share_after": 0.1867,
+     "effective_positions_before": 2.5607,
+     "effective_positions_after": 3.378,
      "max_correlation": {
       "symbol": "NVDAUSDT",
-      "rho": 0.3593
+      "rho": 0.2833
      },
      "notes": []
     },
     "risk_after": {
-     "volatility": 0.00287938,
-     "effective_positions": 3.177,
+     "volatility": 0.00264728,
+     "effective_positions": 3.378,
      "contributions": [
       {
        "symbol": "AAPLUSDT",
        "weight": 0.255,
-       "marginal": 0.00222117,
-       "contribution": 0.0005664
+       "marginal": 0.00224976,
+       "contribution": 0.00057369
       },
       {
        "symbol": "MSFTUSDT",
        "weight": 0.255,
-       "marginal": 0.00176742,
-       "contribution": 0.00045069
+       "marginal": 0.00169893,
+       "contribution": 0.00043323
       },
       {
        "symbol": "NVDAUSDT",
        "weight": 0.34,
-       "marginal": 0.00397242,
-       "contribution": 0.00135062
+       "marginal": 0.00337085,
+       "contribution": 0.00114609
       },
       {
        "symbol": "TSLAUSDT",
        "weight": 0.15,
-       "marginal": 0.00341111,
-       "contribution": 0.00051167
+       "marginal": 0.00329517,
+       "contribution": 0.00049428
       }
      ]
     },
     "stress_by_beta": [
      {
       "shock": "benchmark -2%",
-      "portfolio_move_pct": -2.011,
+      "portfolio_move_pct": -1.88,
       "worst_position": {
-       "symbol": "NVDAUSDT",
-       "move_pct": -2.813
+       "symbol": "TSLAUSDT",
+       "move_pct": -2.778
       },
       "reason": ""
      },
      {
       "shock": "benchmark -5%",
-      "portfolio_move_pct": -5.026,
+      "portfolio_move_pct": -4.701,
       "worst_position": {
-       "symbol": "NVDAUSDT",
-       "move_pct": -7.032
+       "symbol": "TSLAUSDT",
+       "move_pct": -6.944
       },
       "reason": ""
      },
      {
       "shock": "benchmark -10%",
-      "portfolio_move_pct": -10.053,
+      "portfolio_move_pct": -9.402,
       "worst_position": {
-       "symbol": "NVDAUSDT",
-       "move_pct": -14.064
+       "symbol": "TSLAUSDT",
+       "move_pct": -13.888
       },
       "reason": ""
      },
      {
       "shock": "benchmark +5%",
-      "portfolio_move_pct": 5.026,
+      "portfolio_move_pct": 4.701,
       "worst_position": {
        "symbol": "MSFTUSDT",
-       "move_pct": 2.77
+       "move_pct": 2.714
       },
       "reason": ""
      }
@@ -1856,7 +1903,7 @@
     "worst_window": {
      "bars": 24,
      "move_pct": -2.048,
-     "start_index": 155,
+     "start_index": 134,
      "contributors": [
       {
        "symbol": "TSLAUSDT",
@@ -1880,37 +1927,37 @@
     "factor_exposures": [
      {
       "factor": "equal-weight market",
-      "exposure": 1.008,
+      "exposure": 0.9963,
       "observations": 719,
       "reason": ""
      },
      {
       "factor": "open session only",
-      "exposure": 1.0338,
+      "exposure": 1.0139,
       "observations": 719,
       "reason": ""
      },
      {
       "factor": "shut session only",
-      "exposure": 0.9873,
+      "exposure": 0.9841,
       "observations": 719,
       "reason": ""
      }
     ],
     "session_beta": {
-     "open": 1.3885,
-     "shut": 0.8896,
-     "blended": 1.0719
+     "open": 1.3888,
+     "shut": 0.8876,
+     "blended": 1.0485
     },
     "tail": {
      "confidence": 0.95,
-     "cvar": 0.00404248,
+     "cvar": 0.00377373,
      "bars": 719,
      "contributions": {
-      "AAPLUSDT": 0.00062708,
-      "MSFTUSDT": 0.00091319,
-      "NVDAUSDT": 0.00185381,
-      "TSLAUSDT": 0.0006484
+      "AAPLUSDT": 0.00067042,
+      "MSFTUSDT": 0.000902,
+      "NVDAUSDT": 0.00161929,
+      "TSLAUSDT": 0.00058203
      }
     }
    },
@@ -1923,15 +1970,15 @@
     "alone": false,
     "held": 0.0,
     "final": 0.15,
-    "share_after": 0.17769999710651127,
+    "share_after": 0.1867107044600933,
     "share_before": null,
-    "ceiling": 0.19,
+    "ceiling": 0.18,
     "trim_to": null,
     "crowded": {
      "symbol": "NVDAUSDT",
      "weight": 0.34,
-     "share": 0.4690675690622689,
-     "trim_to": 0.21
+     "share": 0.4329309362104196,
+     "trim_to": 0.23
     },
     "worst_24h_pct": -2.0479440641652245
    },
@@ -1963,24 +2010,24 @@
     "Consumer Discretionary": 0.15
    },
    "loadings_before": {
-    "market": 1.0783631620011935,
-    "size": -0.2159647955120167,
-    "momentum": -0.2000024081221053,
-    "value": -0.2839886670588547,
-    "quality": -0.1843132998266902,
-    "low_vol": -0.572005574351827,
-    "rates": -0.28237334749943477,
-    "crypto": 0.013710392253667825
+    "market": 1.0783676632291361,
+    "size": -0.21596005350121347,
+    "momentum": -0.19999976679515125,
+    "value": -0.28398998548457155,
+    "quality": -0.1843081817088143,
+    "low_vol": -0.5719973932052067,
+    "rates": -0.2823759155264823,
+    "crypto": 0.013709960204605104
    },
    "loadings_after": {
-    "market": 1.1488937377829977,
-    "size": -0.16107304478381604,
-    "momentum": -0.17062129680156563,
-    "value": -0.27806021812252635,
-    "quality": -0.4102245095887697,
-    "low_vol": -0.574780989488403,
-    "rates": -0.27046697355595456,
-    "crypto": 0.030539300074150396
+    "market": 1.148897595902348,
+    "size": -0.1610689404871165,
+    "momentum": -0.1706185534298495,
+    "value": -0.27806166830641915,
+    "quality": -0.41022187736836174,
+    "low_vol": -0.5747726464050625,
+    "rates": -0.2704627642506562,
+    "crypto": 0.030538809367109336
    },
    "coverage_before": 1.0,
    "coverage_after": 1.0,
@@ -1995,104 +2042,104 @@
    "fits": {
     "NVDAUSDT": {
      "loadings": {
-      "market": 1.0627733543600453,
-      "size": -0.3166363145652609,
-      "momentum": 0.170895680798017,
-      "value": -0.40004887945820616,
-      "quality": -0.554247931788216,
-      "low_vol": -1.3168202704717358,
-      "rates": -0.15928586768283887,
-      "crypto": -0.02489576570668189
+      "market": 1.0627799768441877,
+      "size": -0.316629736756174,
+      "momentum": 0.17089993900275896,
+      "value": -0.4000516496476247,
+      "quality": -0.5542448087527929,
+      "low_vol": -1.31680816152335,
+      "rates": -0.15928845698035632,
+      "crypto": -0.02489690342572632
      },
      "t": {
-      "market": 5.001158020195705,
-      "size": -1.8552631011491225,
-      "momentum": 1.2350884461551912,
-      "value": -2.5188516356006043,
-      "quality": -1.2319976327927376,
-      "low_vol": -4.678158448954736,
-      "rates": -0.4395591768519435,
-      "crypto": -0.6380103825116711
+      "market": 5.001180805876538,
+      "size": -1.8552259348026396,
+      "momentum": 1.2351187429920982,
+      "value": -2.518866751659552,
+      "quality": -1.231987036156539,
+      "low_vol": -4.678102014450424,
+      "rates": -0.4395660699848547,
+      "crypto": -0.638038964510792
      },
-     "r2": 0.5595051791250034,
+     "r2": 0.5595044427385049,
      "n": 252,
      "start": "2025-09-25",
      "end": "2026-09-25"
     },
     "MSFTUSDT": {
      "loadings": {
-      "market": 1.3682687104047093,
-      "size": -0.4098540156163485,
-      "momentum": -0.26614282202993306,
-      "value": -0.5156710765872244,
-      "quality": -0.36195896092113966,
-      "low_vol": 0.2618404456246156,
-      "rates": -0.5473189565548784,
-      "crypto": 0.09794388761451815
+      "market": 1.3682712270424342,
+      "size": -0.4098505860918464,
+      "momentum": -0.26613810498932866,
+      "value": -0.5156727805406607,
+      "quality": -0.3619318258357697,
+      "low_vol": 0.26184706503482885,
+      "rates": -0.5473143150902872,
+      "crypto": 0.09794375115751093
      },
      "t": {
-      "market": 6.018723159887936,
-      "size": -2.2447967868488647,
-      "momentum": -1.7979796937226118,
-      "value": -3.0350465381576663,
-      "quality": -0.7520871654610074,
-      "low_vol": 0.8695372829305552,
-      "rates": -1.4118340394493558,
-      "crypto": 2.3462951806455177
+      "market": 6.018721311096254,
+      "size": -2.2447786089551323,
+      "momentum": -1.797946284011719,
+      "value": -3.035052334072644,
+      "quality": -0.7520281982649825,
+      "low_vol": 0.8695563616054048,
+      "rates": -1.4118205912885047,
+      "crypto": 2.3462886930128484
      },
-     "r2": 0.32894111274491744,
+     "r2": 0.3289393331564969,
      "n": 252,
      "start": "2025-09-25",
      "end": "2026-09-25"
     },
     "AAPLUSDT": {
      "loadings": {
-      "market": 0.8092440237858756,
-      "size": 0.11215311666330735,
-      "momentum": -0.6283927794411073,
-      "value": 0.10244069233531693,
-      "quality": 0.4865785372164602,
-      "low_vol": -0.41276533283505795,
-      "rates": -0.18154437819945246,
-      "crypto": -0.01904822582671621
+      "market": 0.8092476812624361,
+      "size": 0.11215672342936683,
+      "momentum": -0.6283943696648541,
+      "value": 0.10244169512225525,
+      "quality": 0.4865642984767792,
+      "low_vol": -0.4127608270210509,
+      "rates": -0.18155412735751206,
+      "crypto": -0.01904801257452548
      },
      "t": {
-      "market": 4.537974867679616,
-      "size": 0.7830848063200778,
-      "momentum": -5.411913224246515,
-      "value": 0.768625343323352,
-      "quality": 1.2888768000418624,
-      "low_vol": -1.747448175354228,
-      "rates": -0.5970017118691825,
-      "crypto": -0.5817139182283311
+      "market": 4.537989983256732,
+      "size": 0.7831109511550679,
+      "momentum": -5.41192745902404,
+      "value": 0.7686325315236554,
+      "quality": 1.2888358874055845,
+      "low_vol": -1.747424938756882,
+      "rates": -0.5970337195348786,
+      "crypto": -0.5817071648380935
      },
-     "r2": 0.2644203218163984,
+     "r2": 0.2644207361673665,
      "n": 252,
      "start": "2025-09-25",
      "end": "2026-09-25"
     },
     "TSLAUSDT": {
      "loadings": {
-      "market": 1.548567000546554,
-      "size": 0.14998020934265452,
-      "momentum": -0.004128332651840842,
-      "value": -0.2444656741499987,
-      "quality": -1.690388031573887,
-      "low_vol": -0.5905083419289999,
-      "rates": -0.2029975212095665,
-      "crypto": 0.12590311105688495
+      "market": 1.5485672143838816,
+      "size": 0.14998069992609958,
+      "momentum": -0.004125011026472974,
+      "value": -0.24446787096355577,
+      "quality": -1.6903994861057972,
+      "low_vol": -0.5904990812042455,
+      "rates": -0.2029549070209751,
+      "crypto": 0.1259022879546333
      },
      "t": {
-      "market": 5.316764101252536,
-      "size": 0.641159692691482,
-      "momentum": -0.02176853129558096,
-      "value": -1.1230391297937405,
-      "quality": -2.7414458553667904,
-      "low_vol": -1.5306007883450976,
-      "rates": -0.4087128687492998,
-      "crypto": 2.3541069588216734
+      "market": 5.316760748436961,
+      "size": 0.6411628463240701,
+      "momentum": -0.021751027802239243,
+      "value": -1.1230492026315468,
+      "quality": -2.7414587848983296,
+      "low_vol": -1.530573782577097,
+      "rates": -0.4086272058249799,
+      "crypto": 2.354091582579219
      },
-     "r2": 0.4475316693041318,
+     "r2": 0.44753184411642655,
      "n": 252,
      "start": "2025-09-25",
      "end": "2026-09-25"
@@ -2130,10 +2177,10 @@
    },
    "live_data": true,
    "execution": {
-    "participation": "0.01111492740661626959845604820",
-    "expected_cost_bps": "13.32593611816561957952412318",
-    "single_order_bps": 7.63,
-    "sliced_bps": 7.09,
+    "participation": "0.009007756776630229698995835722",
+    "expected_cost_bps": "12.59505068434896287986344246",
+    "single_order_bps": 9.99,
+    "sliced_bps": 8.84,
     "slices": [
      {
       "fraction": "0.6",

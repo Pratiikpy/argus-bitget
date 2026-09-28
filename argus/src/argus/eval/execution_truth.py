@@ -934,7 +934,7 @@ def _pre_settlement(raw: Sequence[Mapping[str, Any]]) -> list[Entry]:
 
 
 def _write_rows(path: Path, entries: Sequence[Entry]) -> None:
-    with path.open("w", encoding="utf-8") as fh:
+    with path.open("w", encoding="utf-8", newline="\n") as fh:
         for e in entries:
             fh.write(json.dumps(asdict(e), default=str) + "\n")
 

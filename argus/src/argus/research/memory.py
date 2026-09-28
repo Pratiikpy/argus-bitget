@@ -363,7 +363,7 @@ class FactorMemory:
         """Persist, counting this as one completed run."""
         self.runs += 1
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(self.as_dict(), indent=2), encoding="utf-8")
+        path.write_text(json.dumps(self.as_dict(), indent=2), encoding="utf-8", newline="\n")
         return path
 
     @staticmethod

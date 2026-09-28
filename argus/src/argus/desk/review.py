@@ -1254,7 +1254,7 @@ def main(argv: list[str] | None = None) -> int:
         print(line)
     if args.save:
         Path(args.save).write_text(
-            json.dumps(report.as_dict(), indent=2, default=str), encoding="utf-8"
+            json.dumps(report.as_dict(), indent=2, default=str), encoding="utf-8", newline="\n"
         )
         print(f"saved -> {args.save}")
     return 0

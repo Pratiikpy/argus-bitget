@@ -274,7 +274,7 @@ def main() -> int:  # pragma: no cover - CLI
     vectorizer, classifier = fit(texts, labels)
     blob = export(vectorizer, classifier, rows=len(texts))
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(blob, ensure_ascii=False) + "\n", encoding="utf-8")
+    args.out.write_text(json.dumps(blob, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
 
     size = args.out.stat().st_size / 1024
     print(f"trained on {len(texts)} rows, {len(blob['classes'])} intents")

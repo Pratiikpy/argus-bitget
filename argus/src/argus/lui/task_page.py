@@ -97,36 +97,19 @@ def _line_class(line: str) -> str:
     return "fine" if line.startswith(("Data:", "Assumed:")) else "l"
 
 
-def render_task(task: Task, favicon: str) -> str:
-    """The task as a page: the question, the conclusion, then every step with its engine."""
+
+def _card(n: int, step: Step, chart: str = "") -> str:
     esc = html.escape
-    conclusion = "".join(
-        f"<li><b>{esc(title.rstrip('?'))}:</b> {esc(text[:1].upper() + text[1:])}</li>"
-        for title, text in task.conclusion) or (
-        "<li>Nothing to act on: " + esc(task.steps[0].lines[0] if task.steps and task.steps[0].lines
-                                         else "no engine answered") + "</li>")
-    cards = []
-    for n, step in enumerate(task.steps, 1):
-        body = "".join(f"<p class='{_line_class(line)}'>{esc(line)}</p>" for line in step.lines)
-        classes = "s" + (" r" if step.refused else "") + ("" if step.applicable else " na")
-        cards.append(
-            f"<article class='{classes}'><div class='h'><span class='n'>{n}"
+    body = "".join(f"<p class='{_line_class(line)}'>{esc(line)}</p>" for line in step.lines)
+    classes = "s" + (" r" if step.refused else "") + ("" if step.applicable else " na")
+    return (f"<article class='{classes}'><div class='h'><span class='n'>{n}"
             f"</span><h2>{esc(step.title)}</h2><span class='e'>{esc(step.engine)} · "
-            f"{step.seconds:.1f}s</span></div>{_chart(task, step)}{body}</article>")
-    book_text = ", ".join(f"{w:.0%} {s.removesuffix('USDT')}" for s, w in task.book.items())
-    asked = task.asked or task.question
-    call = task.verdict
-    called = "" if call is None else (
-        f"<section class='verdict'><h2>Conclusion</h2><p class='call'>{esc(call.call)}</p>"
-        + "".join(f"<p>{esc(line)}</p>" for line in call.lines) + "</section>")
-    json_link = ("/research?" + urlencode({"q": task.asked, "format": "json"})
-                 if task.asked else "/research?format=json")
-    read = ""
-    if task.reading is not None:
-        notes = "".join(f"<li>{esc(n)}</li>" for n in task.reading.notes)
-        read = (f"<p class='read'><b>Read as:</b> {esc(task.reading.summary)}</p>"
-                + (f"<ul class='notes'>{notes}</ul>" if notes else ""))
-    del favicon  # the head carries the mark itself (design.head)
+            f"{step.seconds:.1f}s</span></div>{chart}{body}</article>")
+
+
+def _top(asked: str, name: str, size_pct: float, book_text: str) -> str:
+    """Everything above the task itself: head, navigation, introduction and the form."""
+    esc = html.escape
     head = design.head("ARGUS — one research task, live",
                        "Ask a question about adding a name to your book; eight engines answer "
                        "from live data and the page ends in one verdict.", "/research")
@@ -167,10 +150,19 @@ def render_task(task: Task, favicon: str) -> str:
    color:var(--accent); margin:0 0 6px }}
  .verdict .call {{ font-size:19px; font-weight:700; margin:0 0 6px }}
  .verdict p {{ margin:4px 0 }}
+ .verdict h3 {{ font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--dim);
+   margin:14px 0 4px }}
+ .verdict .call2 {{ font-size:16px; font-weight:700; margin:0 0 4px }}
+ .verdict ul {{ margin:4px 0; padding-left:20px }}
+ .verdict li {{ margin:3px 0 }}
+ .verdict .r {{ font-weight:700 }} .verdict .r.supported {{ color:var(--good) }}
+ .verdict .r.contradicted {{ color:var(--bad) }}
+ .verdict .r.not_measurable, .verdict .r.not_tested {{ color:var(--dim) }}
  .s {{ background:var(--panel); border:1px solid var(--line); border-radius:10px;
    padding:14px 16px; margin-bottom:12px }}
  .s.r {{ border-left:3px solid var(--warn) }}
  .s.na {{ color:var(--dim) }}
+ .s.wait {{ color:var(--dim); border-style:dashed }}
  .h {{ display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; margin-bottom:6px }}
  .n {{ font:12px var(--mono); color:var(--dim) }}
  .h h2 {{ font-size:15.5px; margin:0 }}
@@ -203,51 +195,166 @@ nothing on this page is written by a language model, and your question is read w
  <p class="running" role="status" aria-live="polite" hidden></p>
  <details><summary>Or set the name, size and book yourself</summary>
   <div class="edit">
-   <label>Name<input class="name" name="name" value="{esc(task.name)}"></label>
-   <label>Size, %<input class="size" name="size" value="{task.size_pct:g}"></label>
+   <label>Name<input class="name" name="name" value="{esc(name)}"></label>
+   <label>Size, %<input class="size" name="size" value="{size_pct:g}"></label>
    <label class="wide">Your book<input class="book" name="book" value="{esc(book_text)}"></label>
   </div>
   <p class="fine">A question in the box above wins; clear it to run these fields.</p>
  </details>
 </form>
-<p class="q">{esc(task.question)}</p>
+"""
+
+
+def _conclusion(task: Task) -> str:
+    """Whether to enter (`lui/weigh.py`), then how much (`lui/task.verdict`), then where the
+    engines disagree, what would change the call and what only the trader can answer."""
+    esc = html.escape
+    call, weighed = task.verdict, task.weighing
+    if call is None and weighed is None and not task.tested:
+        return ""
+
+    def listed(title: str, items: tuple[str, ...]) -> str:
+        return (f"<h3>{title}</h3><ul>" + "".join(f"<li>{esc(i)}</li>" for i in items)
+                + "</ul>") if items else ""
+
+    parts = ["<section class='verdict'><h2>Conclusion</h2>"]
+    if weighed is not None:
+        parts.append(f"<p class='call'>{esc(weighed.call)}</p><p>{esc(weighed.reason)}</p>")
+    if task.tested:
+        parts.append("<h3>Your reasons, tested</h3><ul class='reasons'>" + "".join(
+            f"<li><b>“{esc(t.reason)}”</b> — <span class='r {t.result.name.lower()}'>"
+            f"{esc(t.result.value)}</span>. {esc(t.line)}</li>" for t in task.tested) + "</ul>")
+    if call is not None:
+        lead = (f"<h3>How much</h3><p class='call2'>{esc(call.call)}</p>" if weighed is not None
+                else f"<p class='call'>{esc(call.call)}</p>")
+        parts.append(lead + "".join(f"<p>{esc(line)}</p>" for line in call.lines))
+    if weighed is not None:
+        parts += [listed("Where the engines disagree", weighed.disagreements),
+                  listed("What would change the call", weighed.triggers),
+                  listed("Questions only you can answer", weighed.questions)]
+    return "".join(parts) + "</section>"
+
+
+def _main(task: Task) -> str:
+    """The task itself: what the question was read as, the verdict, each engine's bottom line and
+    every step's card."""
+    esc = html.escape
+    conclusion = "".join(
+        f"<li><b>{esc(title.rstrip('?'))}:</b> {esc(text[:1].upper() + text[1:])}</li>"
+        for title, text in task.conclusion) or (
+        "<li>Nothing to act on: " + esc(task.steps[0].lines[0] if task.steps and task.steps[0].lines
+                                         else "no engine answered") + "</li>")
+    cards = "".join(_card(n, step, _chart(task, step)) for n, step in enumerate(task.steps, 1))
+    called = _conclusion(task)
+    json_link = ("/research?" + urlencode({"q": task.asked, "format": "json"})
+                 if task.asked else "/research?format=json")
+    read = ""
+    if task.reading is not None:
+        notes = "".join(f"<li>{esc(n)}</li>" for n in task.reading.notes)
+        read = (f"<p class='read'><b>Read as:</b> {esc(task.reading.summary)}</p>"
+                + (f"<ul class='notes'>{notes}</ul>" if notes else ""))
+    return f"""<p class="q">{esc(task.question)}</p>
 {read}
 {called}<section class="concl"><h2>What to do, engine by engine</h2><ol>{conclusion}</ol>
 </section>
-{''.join(cards)}
+{cards}
 <p class="sub">Ran in {task.seconds:.1f}s. Execution is sized on a ${DEFAULT_BOOK_VALUE:,.0f} book.
 This is analysis, not advice — you make the call. <a href="{esc(json_link)}">JSON</a></p>
-</div>{design.footer()}
+"""
+
+
+_SCRIPT = """
 <script>
 // The page is one blocking POST: the engines run before a byte comes back, so without this the
 // Run button looked dead for as long as the slowest engine took (audit, 2026-09-26).
-(() => {{
+(() => {
   const form = document.querySelector('form'), box = form.querySelector('textarea');
   // The trader's saved book and memory, kept by the console in this browser, travel with the
   // question; the server keeps neither.
-  try {{
+  try {
     form.elements.saved.value = localStorage.getItem('argus.book') || '';
     form.elements.memory.value = localStorage.getItem('argus.memory') || '';
-  }} catch (e) {{}}
+  } catch (e) {}
   const run = form.querySelector('button'), note = form.querySelector('.running');
   let timer = 0;
-  form.addEventListener('submit', () => {{
+  form.addEventListener('submit', () => {
     const started = Date.now();
     run.disabled = true; run.textContent = 'Running';
     note.hidden = false;
-    const tick = () => {{ note.textContent = 'Eight engines are reading live data: '
-      + Math.round((Date.now() - started) / 1000) + ' s'; }};
+    const tick = () => { note.textContent = 'Eight engines are reading live data: '
+      + Math.round((Date.now() - started) / 1000) + ' s'; };
     tick(); timer = setInterval(tick, 1000);
-  }});
+  });
   // Enter asks and Shift+Enter starts a new line, as in the console; never mid-composition.
-  box.addEventListener('keydown', (e) => {{
-    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && box.value.trim()) {{
+  box.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && box.value.trim()) {
       e.preventDefault(); form.requestSubmit();
-    }}
-  }});
+    }
+  });
   // Coming back with the browser's Back button restores this page from its cache as it was.
-  addEventListener('pageshow', () => {{
+  addEventListener('pageshow', () => {
     clearInterval(timer); run.disabled = false; run.textContent = 'Run'; note.hidden = true;
-  }});
-}})();
-</script></body></html>"""
+  });
+})();
+</script>"""
+
+
+def _bottom() -> str:
+    return f"</div>{design.footer()}{_SCRIPT}</body></html>"
+
+
+def _book_text(book: dict[str, float]) -> str:
+    return ", ".join(f"{w:.0%} {s.removesuffix('USDT')}" for s, w in book.items())
+
+
+def render_task(task: Task, favicon: str) -> str:
+    """The task as a page: the question, the conclusion, then every step with its engine."""
+    del favicon  # the head carries the mark itself (design.head)
+    return (_top(task.asked or task.question, task.name, task.size_pct, _book_text(task.book))
+            + _main(task) + _bottom())
+
+
+# --- the same page, sent as the steps finish -----------------------------------------------------
+
+_SWAP = """<script>
+function argusStep(n) {
+  const t = document.getElementById('st-' + n), slot = document.getElementById('slot-' + n);
+  if (t && slot) slot.replaceWith(t.content.cloneNode(true));
+}
+function argusDone() {
+  const t = document.getElementById('st-done'), live = document.getElementById('live');
+  if (t && live) live.replaceWith(t.content.cloneNode(true));
+}
+</script>"""
+
+
+def stream_start(asked: str, name: str, size_pct: float, book: dict[str, float],
+                 titles: list[tuple[str, str]]) -> str:
+    """The page before any engine has answered: the form, the question, and one waiting card per
+    step. Sent at once, so the reader sees what is running instead of a blank tab
+    (research/harvest/48-open-webui.md)."""
+    esc = html.escape
+    waiting = "".join(
+        f"<article class='s wait' id='slot-{n}'><div class='h'><span class='n'>{n}</span>"
+        f"<h2>{esc(title)}</h2><span class='e'>{esc(engine)} · running</span></div></article>"
+        for n, (title, engine) in enumerate(titles, 1))
+    return (_top(asked, name, size_pct, _book_text(book)) + _SWAP
+            + f"<div id='live'><p class='q'>{esc(asked)}</p><p class='sub'>The verdict appears "
+              f"once every engine has answered; each card fills in as its engine does.</p>"
+              f"{waiting}</div>")
+
+
+def stream_step(n: int, step: Step) -> str:
+    """One finished step, swapped into its waiting card. Charts wait for the full page."""
+    return f"<template id='st-{n}'>{_card(n, step)}</template><script>argusStep({n})</script>"
+
+
+def stream_end(task: Task) -> str:
+    """The finished task, replacing everything shown while it ran: the page a reader is left with
+    is exactly the one :func:`render_task` draws."""
+    return (f"<template id='st-done'>{_main(task)}</template><script>argusDone()</script>"
+            + _bottom())
+
+
+__all__ = ["price_chart", "render_task", "risk_chart", "stream_end", "stream_start",
+           "stream_step"]

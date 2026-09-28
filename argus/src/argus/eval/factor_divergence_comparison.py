@@ -218,9 +218,26 @@ def _paired_diffs(market_ic: pd.Series, index_ic: pd.Series) -> list[float]:
     two real `asfreq`-collapsed indices need not line up — on a real, smaller real OOS half-
     window they diverged enough that `pandas.Index.intersection` found entries `.loc[]` then
     could not locate (a real `KeyError`, not a `MetricError` this project's own guards would
-    catch). Plain dict lookups on the raw timestamp VALUES sidestep the whole class of issue."""
-    market_map = dict(zip(market_ic.index, market_ic.to_numpy(), strict=True))
-    index_map = dict(zip(index_ic.index, index_ic.to_numpy(), strict=True))
+    catch). Plain dict lookups on the raw timestamp VALUES sidestep the whole class of issue.
+
+    **A second bug of the same family, found 2026-09-28 by the full suite on live data.** The
+    collapsed daily grid is anchored at each panel's own first hour, so two panels whose first
+    bars fall an hour apart produce two daily series whose every timestamp differs by that hour
+    (05:00 against 04:00): not one exact match, zero pairs, and a mean of None — while the same
+    data fetched a little later, starting on the same hour, paired all 28. When both series hold
+    at most one reading per UTC day, they are therefore paired by the day, which is what the
+    collapse left them measuring; finer series still pair by exact timestamp."""
+    def daily(series: pd.Series) -> bool:
+        stamps = [pd.Timestamp(ts) for ts in series.index]
+        return len({ts.date() for ts in stamps}) == len(stamps)
+
+    by_day = daily(market_ic) and daily(index_ic)
+
+    def key(ts: Any) -> Any:
+        return pd.Timestamp(ts).date() if by_day else ts
+
+    market_map = {key(ts): v for ts, v in zip(market_ic.index, market_ic.to_numpy(), strict=True)}
+    index_map = {key(ts): v for ts, v in zip(index_ic.index, index_ic.to_numpy(), strict=True)}
     diffs: list[float] = []
     for ts, m_val in market_map.items():
         if m_val is None or (isinstance(m_val, float) and m_val != m_val):
@@ -605,7 +622,7 @@ def main() -> int:  # pragma: no cover - CLI
     print(render(report))
     out = DATA_DIR / "factor_divergence_comparison.json"
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
+    out.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8", newline="\n")
     print(f"\nwritten to {out}")
     return 0
 

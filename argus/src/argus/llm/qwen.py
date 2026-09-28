@@ -47,7 +47,14 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any
 
-from argus.llm.ledger import CallShape, CostLedger, Outcome, new_entry
+from argus.llm.ledger import (
+    CallShape,
+    CostLedger,
+    Outcome,
+    cost_step,
+    current_step,
+    new_entry,
+)
 
 
 class Thinking(StrEnum):
@@ -217,6 +224,19 @@ is a prompt problem, and the honest report is that the decision could not be obt
 larger bill and a quieter failure."""
 
 
+def _retry_kind(last: str) -> str:
+    """The reason a JSON call is being paid for again, in one word, for the cost ledger."""
+    if "retrying at max_tokens" in last:
+        return "truncated"
+    if last.startswith("invalid JSON"):
+        return "invalid_json"
+    if last.startswith("expected a JSON object"):
+        return "not_an_object"
+    if last.startswith("missing required keys"):
+        return "missing_keys"
+    return "invalid_value"
+
+
 class QwenClient:
     """Minimal, dependency-free client for the Bitget hackathon Qwen endpoint.
 
@@ -378,15 +398,22 @@ class QwenClient:
         convo = list(messages)
         last: str = ""
         for attempt in range(attempts):
-            got = self.complete(
-                convo,
-                json_mode=True,
-                max_tokens=max_tokens,
-                thinking=thinking,
-                # Vary the seed per attempt: an identical request would otherwise be served from
-                # cache and every retry would reproduce the same failure.
-                seed=attempt if attempt else None,
-            )
+            # A retry is recorded in the cost ledger under the reason for it, so how often a call
+            # is paid for twice, and why, is a count rather than a guess — the number the
+            # json_repair decision waits on (research/harvest/01-gpt-researcher.md §5.3).
+            step = current_step()
+            label = (f"{step or 'complete_json'} · retry {attempt}: {_retry_kind(last)}"
+                     if attempt else step)
+            with cost_step(label):
+                got = self.complete(
+                    convo,
+                    json_mode=True,
+                    max_tokens=max_tokens,
+                    thinking=thinking,
+                    # Vary the seed per attempt: an identical request would otherwise be served
+                    # from cache and every retry would reproduce the same failure.
+                    seed=attempt if attempt else None,
+                )
             # --- 1. Truncation, established from the wire and not inferred from a parse error.
             #
             # `finish_reason == "length"` is the provider saying it stopped because the cap was

@@ -568,8 +568,18 @@ def _ownership_flow(ticker: str, positions: Any) -> tuple[list[str], list[Source
     return lines, sources
 
 
-def _fundamentals(symbol: str, raw_text: str = "") -> tuple[list[str], list[Source]]:
+def _fundamentals(symbol: str, raw_text: str = "", *,
+                  found: dict[str, Any] | None = None) -> tuple[list[str], list[Source]]:
+    """The earnings calendar, analysts' targets and consensus, and the last surprise.
+
+    ``found``, when given, receives the figures the lines state that a caller reasons with —
+    ``earnings_days`` and ``earnings_date`` for the next report, ``target_mean`` and ``price``
+    for the analysts' mean target against the last close — so the research task's verdict reads
+    numbers, never its own prose (research/h2h/RESULTS.md)."""
     from datetime import date
+
+    if found is None:
+        found = {}
 
     from argus.market import universe
     from argus.market.bitget_mcp import shared_service
@@ -633,6 +643,7 @@ def _fundamentals(symbol: str, raw_text: str = "") -> tuple[list[str], list[Sour
             str(earnings.get("is_trading_time") or ""), "")
         if when >= today:
             days = (when - today).days
+            found.update(earnings_days=days, earnings_date=when.isoformat())
             lines.append(f"Next report: {when.isoformat()}{', ' + session if session else ''} — "
                          f"{days} day(s) away (period ending {period}).")
             if days <= EARNINGS_NEAR_DAYS:
@@ -706,7 +717,7 @@ def _fundamentals(symbol: str, raw_text: str = "") -> tuple[list[str], list[Sour
                               for line in lines),
             need_targets=target_line is None,
             need_consensus=not any(line.startswith(("Analyst consensus", "The analyst consensus"))
-                                   for line in lines))
+                                   for line in lines), found=found)
         for line in backup:
             if bool(LEAD.match(line)):
                 lines.insert(0, line)
@@ -833,12 +844,16 @@ def raw_number(node: Any) -> float | None:
 
 def _yahoo_fundamental_lines(ticker: str, result: dict[str, Any], today: Any, *,
                              need_date: bool, need_targets: bool,
-                             need_consensus: bool) -> tuple[list[str], list[Source]]:
+                             need_consensus: bool, found: dict[str, Any] | None = None,
+                             ) -> tuple[list[str], list[Source]]:
     """The earnings date, the analysts' price targets and the next-quarter consensus from Yahoo's
     quoteSummary, for whichever of them Bitget's data service did not return. Each line names
-    Yahoo, so a reader can tell the second source from the first."""
+    Yahoo, so a reader can tell the second source from the first. ``found`` as in
+    :func:`_fundamentals`."""
     from datetime import date
 
+    if found is None:
+        found = {}
     lines: list[str] = []
     sources: list[Source] = []
     calendar = (result.get("calendarEvents") or {}).get("earnings") or {}
@@ -850,6 +865,7 @@ def _yahoo_fundamental_lines(ticker: str, result: dict[str, Any], today: Any, *,
             estimated = bool(calendar.get("isEarningsDateEstimate"))
             if when >= today:
                 days = (when - today).days
+                found.update(earnings_days=days, earnings_date=when.isoformat())
                 lines.append(f"Next report: {when.isoformat()}"
                              + (" (an estimated date)" if estimated else "")
                              + f" — {days} day(s) away (Yahoo Finance's earnings calendar, read "
@@ -871,6 +887,8 @@ def _yahoo_fundamental_lines(ticker: str, result: dict[str, Any], today: Any, *,
         count = raw_number(finance.get("numberOfAnalystOpinions"))
         price = raw_number(finance.get("currentPrice"))
         if mean and count:
+            if price:
+                found.update(target_mean=mean, price=price, analysts=int(count))
             rating = str(finance.get("recommendationKey") or "").replace("_", " ")
             gap = f", {abs(mean / price - 1):.0%} {'above' if mean >= price else 'below'} the " \
                 f"last close of ${price:,.2f}" if price else ""

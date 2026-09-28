@@ -467,7 +467,8 @@ def _trigger_reachability() -> dict[str, Any]:  # pragma: no cover - reads the l
 
 
 def _write_takeover(payload: dict[str, Any]) -> dict[str, Any]:  # pragma: no cover - CLI
-    (DATA / "takeover.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    (DATA / "takeover.json").write_text(json.dumps(payload, indent=2),
+                                        encoding="utf-8", newline="\n")
     return payload
 
 
@@ -475,7 +476,7 @@ def main() -> int:  # pragma: no cover - CLI
     write_takeover()
     report = run()
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    REPORT_PATH.write_text(json.dumps(report.as_dict(), indent=2), encoding="utf-8")
+    REPORT_PATH.write_text(json.dumps(report.as_dict(), indent=2), encoding="utf-8", newline="\n")
     print(report.render())
     print(f"\nwritten to {REPORT_PATH}")
     return 0

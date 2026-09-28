@@ -1,10 +1,19 @@
 {
-  "generated_at": "2026-09-27T04:40:00.493360+00:00",
-  "modules": 496,
-  "internal_imports": 1745,
+  "generated_at": "2026-09-28T00:42:33.873488+00:00",
+  "modules": 546,
+  "internal_imports": 2258,
   "sound": true,
   "violations": [],
   "cycles": [
+    {
+      "members": [
+        "argus.desk.postmortem",
+        "argus.execution.modes",
+        "argus.paper.protocol",
+        "argus.paper.runner"
+      ],
+      "import_time": false
+    },
     {
       "members": [
         "argus.eval.collect",
@@ -14,29 +23,16 @@
     },
     {
       "members": [
-        "argus.execution.modes",
-        "argus.paper.protocol",
-        "argus.paper.runner"
-      ],
-      "import_time": false
-    },
-    {
-      "members": [
-        "argus.lui",
-        "argus.lui.answer",
-        "argus.lui.corrections_page",
-        "argus.lui.exposures",
-        "argus.lui.proof_page",
-        "argus.lui.research",
-        "argus.lui.skillroute",
-        "argus.lui.trace"
-      ],
-      "import_time": false
-    },
-    {
-      "members": [
         "argus.lui.phrasebook",
         "argus.lui.question"
+      ],
+      "import_time": false
+    },
+    {
+      "members": [
+        "argus.lui.research.kinds",
+        "argus.lui.research.text",
+        "argus.lui.trace"
       ],
       "import_time": false
     },
@@ -74,23 +70,23 @@
     {
       "package": "backtest",
       "modules": 7,
-      "afferent": 35,
+      "afferent": 36,
       "efferent": 2,
-      "instability": 0.054
+      "instability": 0.053
     },
     {
       "package": "cost",
       "modules": 2,
-      "afferent": 30,
+      "afferent": 35,
       "efferent": 0,
       "instability": 0.0
     },
     {
       "package": "decision",
       "modules": 5,
-      "afferent": 26,
-      "efferent": 1,
-      "instability": 0.037
+      "afferent": 28,
+      "efferent": 2,
+      "instability": 0.067
     },
     {
       "package": "demo",
@@ -101,21 +97,21 @@
     },
     {
       "package": "desk",
-      "modules": 28,
-      "afferent": 46,
+      "modules": 31,
+      "afferent": 60,
       "efferent": 12,
-      "instability": 0.207
+      "instability": 0.167
     },
     {
       "package": "eval",
-      "modules": 250,
-      "afferent": 7,
+      "modules": 255,
+      "afferent": 5,
       "efferent": 17,
-      "instability": 0.708
+      "instability": 0.773
     },
     {
       "package": "execution",
-      "modules": 17,
+      "modules": 19,
       "afferent": 25,
       "efferent": 6,
       "instability": 0.194
@@ -124,29 +120,29 @@
       "package": "llm",
       "modules": 8,
       "afferent": 30,
-      "efferent": 0,
-      "instability": 0.0
+      "efferent": 1,
+      "instability": 0.032
     },
     {
       "package": "lui",
-      "modules": 38,
-      "afferent": 31,
-      "efferent": 10,
-      "instability": 0.244
+      "modules": 71,
+      "afferent": 32,
+      "efferent": 11,
+      "instability": 0.256
     },
     {
       "package": "market",
-      "modules": 38,
-      "afferent": 119,
+      "modules": 39,
+      "afferent": 138,
       "efferent": 3,
-      "instability": 0.025
+      "instability": 0.021
     },
     {
       "package": "paper",
       "modules": 13,
-      "afferent": 40,
-      "efferent": 9,
-      "instability": 0.184
+      "afferent": 43,
+      "efferent": 10,
+      "instability": 0.189
     },
     {
       "package": "proof",
@@ -159,22 +155,22 @@
       "package": "register",
       "modules": 6,
       "afferent": 0,
-      "efferent": 2,
+      "efferent": 3,
       "instability": 1.0
     },
     {
       "package": "research",
       "modules": 28,
-      "afferent": 24,
-      "efferent": 9,
-      "instability": 0.273
+      "afferent": 26,
+      "efferent": 8,
+      "instability": 0.235
     },
     {
       "package": "risk",
-      "modules": 10,
-      "afferent": 28,
+      "modules": 12,
+      "afferent": 36,
       "efferent": 3,
-      "instability": 0.097
+      "instability": 0.077
     },
     {
       "package": "sim",
@@ -187,8 +183,8 @@
       "package": "status",
       "modules": 1,
       "afferent": 1,
-      "efferent": 2,
-      "instability": 0.667
+      "efferent": 3,
+      "instability": 0.75
     },
     {
       "package": "strategies",
@@ -199,8 +195,8 @@
     },
     {
       "package": "truth",
-      "modules": 11,
-      "afferent": 146,
+      "modules": 15,
+      "afferent": 288,
       "efferent": 0,
       "instability": 0.0
     },
@@ -212,5 +208,5 @@
       "instability": null
     }
   ],
-  "verdict": "496 modules, 1745 internal imports. every declared contract holds: the deterministic core reaches no model-facing module at any depth, every package has a layer, and no module imports from a layer above its own, deferred imports included, outside a main() entry point. 7 dependency cycle(s), each broken at load by a deferred import in one direction \u2014 real coupling, safe ordering, and reported rather than scored as clean."
+  "verdict": "546 modules, 2258 internal imports. every declared contract holds: the deterministic core reaches no model-facing module at any depth, every package has a layer, and no module imports from a layer above its own, deferred imports included, outside a main() entry point. 7 dependency cycle(s), each broken at load by a deferred import in one direction \u2014 real coupling, safe ordering, and reported rather than scored as clean."
 }

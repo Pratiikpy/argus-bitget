@@ -686,7 +686,7 @@ def study(*, days: int = 90, out: Path = OUT_PATH) -> dict[str, Any]:
         "results": rows,
     }
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    out.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8", newline="\n")
     return report
 
 

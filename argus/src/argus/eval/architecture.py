@@ -517,7 +517,7 @@ def authorisation_chokepoints(paths: Sequence[Path] | None = None) -> tuple[str,
 def main() -> int:  # pragma: no cover - CLI
     report = audit()
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    REPORT_PATH.write_text(json.dumps(report.as_dict(), indent=2), encoding="utf-8")
+    REPORT_PATH.write_text(json.dumps(report.as_dict(), indent=2), encoding="utf-8", newline="\n")
     print(report.render())
     print("\nwritten to " + str(REPORT_PATH))
     return 0 if report.sound else 1

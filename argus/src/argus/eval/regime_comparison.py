@@ -379,7 +379,7 @@ def freeze_regime_candles(
         "symbols_failed": failures,
         "series": series_out,
     }
-    fixture_path.write_text(json.dumps(fixture, indent=2), encoding="utf-8")
+    fixture_path.write_text(json.dumps(fixture, indent=2), encoding="utf-8", newline="\n")
     return fixture
 
 
@@ -1794,7 +1794,8 @@ def main() -> int:  # pragma: no cover - CLI
     # own regression pin going red again after this file's CLI was re-run for unrelated text
     # fixes earlier in the session.
     flattened = json.loads(json.dumps(report, default=str))
-    out.write_text(json.dumps(sanitise(flattened), indent=2, allow_nan=False), encoding="utf-8")
+    out.write_text(json.dumps(sanitise(flattened), indent=2, allow_nan=False),
+                   encoding="utf-8", newline="\n")
     print(f"\nwritten to {out}")
     return 0
 

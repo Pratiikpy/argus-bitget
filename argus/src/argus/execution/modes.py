@@ -434,7 +434,8 @@ def persisted_notice(stack: ModeStack, path: Path = NOTICE_STATE) -> str | None:
     notice = notifier.notice(stack)
     path.parent.mkdir(parents=True, exist_ok=True)
     staged = path.with_name(f"{path.name}.tmp")
-    staged.write_text(json.dumps(notifier.as_dict(), indent=2) + "\n", encoding="utf-8")
+    staged.write_text(json.dumps(notifier.as_dict(), indent=2) + "\n",
+                      encoding="utf-8", newline="\n")
     os.replace(staged, path)
     return notice
 

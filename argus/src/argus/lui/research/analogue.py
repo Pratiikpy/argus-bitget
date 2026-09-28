@@ -374,7 +374,9 @@ def _long_run(symbol: str) -> tuple[list[str], list[Source], dict[str, Any]]:
                       detail=f"daily state = {LONG_RUN_WINDOW}-day return + volatility over "
                              f"{label}; outcomes at {', '.join(map(str, LONG_RUN_HORIZONS))} "
                              f"trading days; episodes collapsed over each horizon")]
-    return lines, sources, {"years": round(years, 1), "source": label, "horizons": rows}
+    return lines, sources, {"years": round(years, 1), "source": label, "horizons": rows,
+                            "window": LONG_RUN_WINDOW,
+                            "trailing_return_pct": round(query["trailing_return"] / 100, 2)}
 
 
 STRESS_HORIZON = 5

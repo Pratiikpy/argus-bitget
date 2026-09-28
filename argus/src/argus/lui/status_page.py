@@ -263,8 +263,40 @@ def sweep_lines(data: Path) -> list[tuple[str, str]]:
     return out
 
 
+def _uptime_rows(history: list[dict[str, Any]] | None, now: float) -> str:
+    """The uptime table from `lui/status_history.py`'s recorded rounds, or a line saying there
+    are none yet — never a figure invented from the live check alone."""
+    from datetime import UTC, datetime
+
+    from argus.lui.status_history import WINDOWS, uptime, verify
+
+    if not history:
+        return ("<p class='sub'>No probe rounds recorded yet: the local cycle records one each "
+                "time it runs (<code>python -m argus.lui.status_page --record</code>).</p>")
+    esc = html.escape
+    broken = verify(history)
+    rows = "".join(
+        f"<tr><td data-label='Surface'>{esc(u['surface'])}</td>"
+        f"<td data-label='Checked'>{esc(u['what'])}</td>"
+        + "".join(
+            f"<td data-label='{esc(label)}' class='n'>"
+            + ("—" if u[label]['uptime'] is None
+               else f"{u[label]['uptime']}% of {u[label]['probes']}") + "</td>"
+            for label, _ in WINDOWS) + "</tr>"
+        for u in uptime(history, now=datetime.fromtimestamp(now, UTC)))
+    heads = "".join(f"<th scope='col'>{esc(label)}</th>" for label, _ in WINDOWS)
+    newest = esc(str(history[-1].get("at", ""))[:16].replace("T", " "))
+    chain = ("the history's hash chain holds" if broken is None
+             else f"the history's hash chain is BROKEN ({esc(broken)})")
+    return (f"<div class='tbl'><table><thead><tr><th scope='col'>Surface</th>"
+            f"<th scope='col'>Checked</th>{heads}</tr></thead><tbody>{rows}</tbody></table></div>"
+            f"<p class='sub' style='margin-top:10px'>Share of recorded probes that answered; the "
+            f"newest round was {newest} UTC, and {chain}.</p>")
+
+
 def render(status: dict[str, Any], checks: list[Check], checked_at: float,
-           sweeps: list[tuple[str, str]], favicon: str) -> str:
+           sweeps: list[tuple[str, str]], favicon: str,
+           history: list[dict[str, Any]] | None = None) -> str:
     esc = html.escape
     live = sum(1 for c in checks if c.ok)
     rows = "".join(
@@ -336,6 +368,8 @@ sweeps say when they ran. <a href="/">Console</a> · <a href="/research">Researc
 <div class="tbl"><table><thead><tr><th scope="col">Surface</th><th scope="col">Checked</th>
 <th scope="col">Result</th><th scope="col">Detail</th><th scope="col">Time</th></tr></thead>
 <tbody>{rows}</tbody></table></div>
+<h2>Over time</h2>
+{_uptime_rows(history, checked_at)}
 <h2>Last full sweep</h2>
 <div class="tbl"><table><thead><tr><th scope="col">Sweep</th><th scope="col">Result</th></tr>
 </thead><tbody>{sweep_rows}</tbody></table></div>
@@ -344,4 +378,32 @@ the next cycle is due {esc(due)}.</p>
 </div>{design.footer()}</body></html>"""
 
 
-__all__ = ["CHECKS", "Check", "live_checks", "render", "sweep_lines"]
+def record_round() -> int:  # pragma: no cover - CLI, live network
+    """Run every live check once and append the round to the status history
+    (`lui/status_history.py`); the scheduled local cycle calls this."""
+    from datetime import UTC, datetime
+
+    from argus.lui.status_history import read, record, verify
+
+    checks, _ = live_checks(force=True)
+    at = datetime.now(UTC)
+    written = record(checks, at=at)
+    answered = sum(1 for c in checks if c.ok)
+    print(f"recorded {written} probe(s) at {at:%Y-%m-%d %H:%M} UTC: {answered} answered")
+    broken = verify(read())
+    if broken:
+        print(f"history chain broken: {broken}")
+        return 1
+    return 0
+
+
+if __name__ == "__main__":  # pragma: no cover - CLI
+    import sys
+
+    if sys.argv[1:] != ["--record"]:
+        print("usage: python -m argus.lui.status_page --record")
+        raise SystemExit(2)
+    raise SystemExit(record_round())
+
+
+__all__ = ["CHECKS", "Check", "live_checks", "record_round", "render", "sweep_lines"]

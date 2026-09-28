@@ -291,3 +291,55 @@ class TestTheNewestEnginesAreReachable:
                             lambda text, **k: (["2 trades reviewed"], [], {}))
         text, error = mcp.call_tool("argus_review_trades", {"fills": "2026-09-02,NVDA,buy,10,180"})
         assert not error and text == "2 trades reviewed"
+
+
+class TestAFailedCallSaysWhetherToRetry:
+    """Each failed tools/call carries a category and a retryable flag in ``_meta``, Bitget's
+    agent-SDK shape (research/harvest/50-bitget-agent-sdk.md)."""
+
+    @staticmethod
+    def _meta(tool: Any, arguments: Mapping[str, Any] | None = None) -> dict[str, Any]:
+        reply = _rpc("tools/call", {"name": "argus_quote",
+                                    "arguments": arguments or {"symbols": ["NVDA"]}}, tool=tool)
+        assert reply["result"]["isError"] is True
+        meta: dict[str, Any] = reply["result"]["_meta"][mcp.ERROR_META]
+        return meta
+
+    def test_a_refused_argument_is_not_retryable(self) -> None:
+        def refuse(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
+            raise mcp.ToolError("not a contract")
+
+        assert self._meta(refuse) == {"category": "param", "retryable": False}
+
+    def test_a_schema_violation_is_a_param_error(self) -> None:
+        assert self._meta(lambda n, a: ("", False), {"symbols": 7}) == {
+            "category": "param", "retryable": False}
+
+    def test_a_rate_limit_is_retryable_with_the_wait(self) -> None:
+        from argus.truth.failures import ErrorKind, RpcError
+
+        def limited(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
+            raise RpcError(ErrorKind.RATE_LIMIT, "HTTP 429", http_status=429, retry_after=3.0)
+
+        assert self._meta(limited) == {"category": "rate", "retryable": True,
+                                       "kind": "rate_limit", "retry_after_seconds": 3.0}
+
+    def test_an_upstream_outage_is_a_retryable_network_error(self) -> None:
+        from argus.truth.failures import ErrorKind, RpcError
+
+        def down(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
+            raise RpcError(ErrorKind.UPSTREAM_5XX, "HTTP 503", http_status=503)
+
+        meta = self._meta(down)
+        assert meta["category"] == "network" and meta["retryable"] is True
+
+    def test_an_unexpected_failure_is_unknown_and_not_retried(self) -> None:
+        def crash(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
+            raise KeyError("x")
+
+        assert self._meta(crash) == {"category": "unknown", "retryable": False}
+
+    def test_a_success_carries_no_error_meta(self) -> None:
+        reply = _rpc("tools/call", {"name": "argus_quote", "arguments": {"symbols": ["NVDA"]}},
+                     tool=lambda n, a: ("ok", False))
+        assert "_meta" not in reply["result"]

@@ -135,7 +135,7 @@ def freeze() -> dict[str, Any]:  # pragma: no cover - network
                 "source": "Bitget public v2 mix history-candles, USDT-FUTURES, 1H, MARKET",
                 "sha256": hashlib.sha256(body.encode()).hexdigest(), "series": series}
     SNAPSHOT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    SNAPSHOT_PATH.write_text(json.dumps(snapshot), encoding="utf-8")
+    SNAPSHOT_PATH.write_text(json.dumps(snapshot), encoding="utf-8", newline="\n")
     return snapshot
 
 
@@ -557,7 +557,7 @@ def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - CLI
         ],
         "rows": rows,
     }
-    REPORT_PATH.write_text(json.dumps(report, indent=1), encoding="utf-8")
+    REPORT_PATH.write_text(json.dumps(report, indent=1), encoding="utf-8", newline="\n")
     print(report["verdict"])
     print(json.dumps({k: scored[k] for k in ("beta_error", "partner_hit_rate")}, indent=1)[:4000])
     return 0

@@ -392,7 +392,7 @@ def main() -> int:  # pragma: no cover - CLI
                      "mae_pp": {a: round(m[a], 6) for a in m}}
                     for day, m in sorted(_per_day_each(rows, arms).items())],
     }
-    REPORT_PATH.write_text(json.dumps(report, indent=1), encoding="utf-8")
+    REPORT_PATH.write_text(json.dumps(report, indent=1), encoding="utf-8", newline="\n")
     print(report["verdict"])
     print(json.dumps(scored, indent=1)[:3500])
     return 0

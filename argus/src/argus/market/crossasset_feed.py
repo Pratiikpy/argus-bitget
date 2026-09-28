@@ -24,7 +24,7 @@ import json
 import time
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
@@ -35,6 +35,20 @@ from argus.truth.paths import DATA_DIR
 
 BASE = BITGET_API
 SNAPSHOT_PATH = DATA_DIR / "crossasset_snapshot.json"
+HISTORY_DIR = DATA_DIR / "crossasset_history"
+"""Every snapshot written, one compressed file per version, and ``versions.jsonl`` listing them.
+
+**Why.** ``write_snapshot`` replaced the one file on every run, so nothing could answer "what did
+the router see an hour before this decision" (research/harvest/43-iceberg-deltalake.md). The study
+picked delta-rs for its ``DeltaTable.load_as_version`` time travel (``table.py:558-596``). What is
+kept here is that interface — read the version current at an instant, earlier reads unaffected by
+later writes — without the dependency: a compiled table engine for one feed that writes a few
+hundred kilobytes an hour is more machinery than the question needs. Each version is the exact
+bytes ``write_snapshot`` produced, gzipped, named by its SHA-256 so a changed file is caught on
+read; :data:`KEEP_DAYS` bounds the disk it takes."""
+
+KEEP_DAYS = 30
+"""Versions older than this are pruned when a new one is written; the newest is never pruned."""
 HOUR_MS = 3_600_000
 PAGE = 200
 LOOKBACK_DAYS = 62
@@ -120,7 +134,8 @@ def fetch_slippage(symbol: str) -> list[tuple[float, float]]:
     return curve
 
 
-def write_snapshot(path: Path = SNAPSHOT_PATH, *, now: datetime | None = None) -> dict[str, Any]:
+def write_snapshot(path: Path = SNAPSHOT_PATH, *, now: datetime | None = None,
+                   history: Path | None = None) -> dict[str, Any]:
     """Read every input the router needs and write the snapshot. Returns what was written."""
     at = now or datetime.now(UTC)
     end_ms = int(at.timestamp() // 3600) * HOUR_MS
@@ -161,8 +176,57 @@ def write_snapshot(path: Path = SNAPSHOT_PATH, *, now: datetime | None = None) -
             "fees_bps": fees,
             "slippage": {k: [[n, s] for n, s in v] for k, v in slippage.items()},
             "missing": missing}
-    path.write_text(json.dumps(blob, separators=(",", ":")) + "\n", encoding="utf-8")
+    text = json.dumps(blob, separators=(",", ":")) + "\n"
+    path.write_text(text, encoding="utf-8", newline="\n")
+    if path == SNAPSHOT_PATH or history is not None:
+        keep_version(text, at=at, history=history or HISTORY_DIR)
     return blob
+
+
+def keep_version(text: str, *, at: datetime, history: Path = HISTORY_DIR) -> str:
+    """Store one snapshot as a version and prune what has aged out. Returns the version's digest."""
+    import gzip
+    import hashlib
+
+    digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
+    history.mkdir(parents=True, exist_ok=True)
+    (history / f"{digest[:16]}.json.gz").write_bytes(gzip.compress(text.encode("utf-8"), 9))
+    rows = versions(history)
+    rows.append({"written_at": at.isoformat(), "sha256": digest})
+    cutoff = at - timedelta(days=KEEP_DAYS)
+    kept = [r for r in rows if datetime.fromisoformat(r["written_at"]) >= cutoff] or rows[-1:]
+    live = {r["sha256"][:16] for r in kept}
+    for stale in history.glob("*.json.gz"):
+        if stale.name.split(".")[0] not in live:
+            stale.unlink()
+    (history / "versions.jsonl").write_text(
+        "".join(json.dumps(r) + "\n" for r in kept), encoding="utf-8", newline="\n")
+    return digest
+
+
+def versions(history: Path = HISTORY_DIR) -> list[dict[str, Any]]:
+    """Every kept version, oldest first."""
+    index = history / "versions.jsonl"
+    if not index.exists():
+        return []
+    return [json.loads(line) for line in index.read_text(encoding="utf-8").splitlines()
+            if line.strip()]
+
+
+def load_as_of(at: datetime, history: Path = HISTORY_DIR) -> Snapshot:
+    """The snapshot the router would have read at ``at``: the newest version written at or before
+    it. Refuses rather than substituting a later one, which would be reading the future."""
+    import gzip
+    import hashlib
+
+    earlier = [r for r in versions(history) if datetime.fromisoformat(r["written_at"]) <= at]
+    if not earlier:
+        raise FeedError(f"no cross-asset snapshot was written at or before {at.isoformat()}")
+    chosen = earlier[-1]
+    raw_text = gzip.decompress((history / f"{chosen['sha256'][:16]}.json.gz").read_bytes())
+    if hashlib.sha256(raw_text).hexdigest() != chosen["sha256"]:
+        raise FeedError(f"the version written {chosen['written_at']} does not match its digest")
+    return from_blob(json.loads(raw_text.decode("utf-8")))
 
 
 @dataclass(frozen=True)

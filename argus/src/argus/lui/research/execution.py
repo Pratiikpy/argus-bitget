@@ -185,6 +185,9 @@ def _optimal_schedule(symbol: str, notional: Decimal, adv: Decimal, book: Any, f
         f"sweeping one hour's share of the order on the live book"
         + ("" if swept.complete else " (deeper than the visible 50 levels, so at least this)")
         + "."]
+    worst = _worst_case_line(shares, hours, impact, bps)
+    if worst:
+        lines.append(worst)
     cadence = _cadence_line(float(part))
     if cadence:
         lines.append(cadence)
@@ -200,6 +203,30 @@ def _optimal_schedule(symbol: str, notional: Decimal, adv: Decimal, book: Any, f
         lines.append(f"Session: the stock's own market {change[1]} in about {change[0]} "
                      f"hour(s); the whole order fits before then.")
     return lines
+
+
+WORST_CASE_CONFIDENCE = 0.95
+
+
+def _worst_case_line(shares: Decimal, hours: int, impact: Any,
+                     bps: Any) -> str | None:
+    """The schedule that keeps the 95% worst-case execution cost lowest, read off the swept
+    cost-risk frontier (`execution/frontier.py`, Almgren and Chriss 2000 eq. 22), beside an even
+    split's: a trader can set execution risk as a loss they will tolerate, not as a decay rate."""
+    from argus.execution.frontier import choose_by_confidence, efficient_frontier
+    from argus.execution.schedule import ScheduleError
+
+    try:
+        frontier = efficient_frontier(quantity=shares, horizon=Decimal(hours), intervals=hours,
+                                      impact=impact)
+        choice = choose_by_confidence(frontier, WORST_CASE_CONFIDENCE)
+    except (ScheduleError, ArithmeticError, ValueError):
+        return None
+    return (f"Worst case: at {WORST_CASE_CONFIDENCE:.0%} confidence, the schedule that keeps the "
+            f"cost lowest does {float(choice.point.front_loading):.0%} of the order in the first "
+            f"half, and its {WORST_CASE_CONFIDENCE:.0%} worst case is "
+            f"{bps(choice.value_at_risk):.1f}bps against {bps(choice.twap_value_at_risk):.1f}bps "
+            f"for an even split — read off {len(frontier)} optimal schedules, cost against risk.")
 
 
 def _cadence_line(notional: float) -> str | None:

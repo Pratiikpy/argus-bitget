@@ -557,7 +557,7 @@ def main() -> int:  # pragma: no cover - CLI
     flow = run_scenario(symbol=args.symbol, send=args.send) if args.scenario else from_ledger()
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     path = REPORT_PATH if not args.scenario else REPORT_PATH.with_name("flow_trace_scenario.json")
-    path.write_text(json.dumps(flow.as_dict(), indent=2), encoding="utf-8")
+    path.write_text(json.dumps(flow.as_dict(), indent=2), encoding="utf-8", newline="\n")
     print(flow.render())
     print()
     print("written to " + str(path))

@@ -685,7 +685,7 @@ def history_row(matrix: Mapping[str, Any]) -> dict[str, Any]:
 
 def record_history(matrix: Mapping[str, Any], path: Path | None = None) -> None:
     target = path or HISTORY_PATH
-    with target.open("a", encoding="utf-8") as handle:
+    with target.open("a", encoding="utf-8", newline="\n") as handle:
         handle.write(json.dumps(history_row(matrix), separators=(",", ":")) + "\n")
 
 

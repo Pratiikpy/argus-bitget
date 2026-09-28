@@ -113,7 +113,7 @@ def store(new: list[dict[str, Any]]) -> int:
             fresh.append(event)
     if fresh:
         STORE.parent.mkdir(parents=True, exist_ok=True)
-        with STORE.open("a", encoding="utf-8") as handle:
+        with STORE.open("a", encoding="utf-8", newline="\n") as handle:
             for event in sorted(fresh, key=lambda e: str(e.get("at"))):
                 handle.write(json.dumps(event, separators=(",", ":")) + "\n")
     return len(fresh)

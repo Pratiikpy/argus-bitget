@@ -254,7 +254,7 @@ def _store(result: Anchor, *, directory: Path) -> None:
         name = f"{result.digest_hex[:16]}-{index}.ots"
         (directory / name).write_bytes(_detached_file_bytes(digest, receipt.proof_bytes))
     (directory / f"{result.digest_hex[:16]}.json").write_text(
-        json.dumps(result.as_dict(), indent=2) + "\n", encoding="utf-8"
+        json.dumps(result.as_dict(), indent=2) + "\n", encoding="utf-8", newline="\n"
     )
 
 

@@ -367,8 +367,9 @@ def main(argv: list[str] | None = None) -> int:
         out = Path(args.out)
         out.mkdir(parents=True, exist_ok=True)
         for card in cards:
-            (out / f"decision-{card.seq}.md").write_text(card.render(), encoding="utf-8")
-        (out / "index.md").write_text(index(cards), encoding="utf-8")
+            (out / f"decision-{card.seq}.md").write_text(card.render(),
+                                                         encoding="utf-8", newline="\n")
+        (out / "index.md").write_text(index(cards), encoding="utf-8", newline="\n")
         print(f"wrote {len(cards)} card(s) -> {out}")
         return 0
 

@@ -793,7 +793,7 @@ with the artefacts, so a stale cockpit cannot be committed.
 
 def main() -> int:  # pragma: no cover - CLI
     cockpit = build()
-    OUTPUT_PATH.write_text(render(cockpit), encoding="utf-8")
+    OUTPUT_PATH.write_text(render(cockpit), encoding="utf-8", newline="\n")
     print(f"{len(cockpit.panels)} panel(s); {len(cockpit.undefined)} figure(s) not yet measurable")
     for name in cockpit.undefined:
         print(f"  unavailable: {name}")

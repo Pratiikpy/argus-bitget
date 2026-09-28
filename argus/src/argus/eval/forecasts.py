@@ -445,7 +445,7 @@ def card_and_payload(
         **card.as_dict(),
     }
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    out.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8", newline="\n")
     return payload
 
 

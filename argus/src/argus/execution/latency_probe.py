@@ -204,7 +204,7 @@ def main() -> int:
     out = DATA_DIR / "latency_probe.json"
     report = probe()
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    out.write_text(json.dumps(report, indent=2), encoding="utf-8", newline="\n")
 
     print(report["verdict"])
     if "round_trip_ms" in report:

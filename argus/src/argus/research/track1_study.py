@@ -363,7 +363,7 @@ def main() -> int:
     result = study()
     out = DATA_DIR / "track1_study.json"
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(result, indent=2), encoding="utf-8")
+    out.write_text(json.dumps(result, indent=2), encoding="utf-8", newline="\n")
 
     h = result["headline"]
     print(json.dumps({"headline": h, "symbols": result["symbols_tested"]}, indent=2))

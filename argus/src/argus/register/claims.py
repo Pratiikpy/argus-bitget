@@ -244,7 +244,7 @@ def register(
         written.append(chained)
         prev = chained.entry_hash
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a", encoding="utf-8") as handle:
+    with path.open("a", encoding="utf-8", newline="\n") as handle:
         for claim in written:
             blob = asdict(claim)
             blob["predicate"] = str(claim.predicate)

@@ -450,12 +450,26 @@ class Report:
             )
         return "\n".join(lines)
 
+    def unproven(self, name: str) -> tuple[str, ...]:
+        """Conditions a capability claims that this audit could not find evidence for."""
+        return tuple(dict.fromkeys(v.condition for v in self.verifications
+                                   if v.capability == name and v.status == "UNPROVEN"))
+
     def as_dict(self) -> dict[str, Any]:
+        """The register as published. ``conditions_met`` holds only what survived the audit: until
+        2026-09-28 it listed every condition a row claimed, so `/proof` counted "statistically
+        valid" and "out of sample" for capabilities whose own headline interval includes zero
+        while ``findings`` said the opposite. The claim is kept as ``conditions_claimed``."""
+        rows = []
+        for c in self.capabilities:
+            row = {**c.as_dict(), "measured_outcomes": list(self.outcomes.get(c.name, ()))}
+            refuted = self.unproven(c.name)
+            row["conditions_claimed"] = list(c.conditions_met)
+            row["conditions_met"] = [x for x in c.conditions_met if x not in refuted]
+            row["conditions_unproven"] = list(refuted)
+            rows.append(row)
         return {
-            "capabilities": [
-                {**c.as_dict(), "measured_outcomes": list(self.outcomes.get(c.name, ()))}
-                for c in self.capabilities
-            ],
+            "capabilities": rows,
             "by_state": self.by_state,
             "findings": [
                 {"capability": f.capability, "problem": f.problem, "detail": f.detail}
@@ -1019,7 +1033,7 @@ def write_report(path: Path = REPORT_PATH, *, report: Report | None = None) -> R
     log = [*previous_blob.get("transition_log", []), *({**c, "at": stamp} for c in changes)]
     blob = {**report.as_dict(), "transitions_this_write": changes, "transition_log": log}
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(blob, indent=2) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(blob, indent=2) + "\n", encoding="utf-8", newline="\n")
     return report
 
 
@@ -1077,7 +1091,7 @@ def anchor_register(report: Report, *, path: Path = ANCHOR_RECORD,
     }
     history.append(row)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(history, indent=2) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(history, indent=2) + "\n", encoding="utf-8", newline="\n")
     return row
 
 

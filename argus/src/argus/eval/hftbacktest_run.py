@@ -254,7 +254,7 @@ def main(hbt_npz: Path, *, out: Path = ARTEFACT) -> dict[str, Any]:  # pragma: n
             for label, _m, _n in RIVAL_ENGINE_MODELS
         },
     }
-    out.write_text(json.dumps(report, indent=1), encoding="utf-8")
+    out.write_text(json.dumps(report, indent=1), encoding="utf-8", newline="\n")
     return report
 
 

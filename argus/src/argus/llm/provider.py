@@ -154,17 +154,30 @@ def build(provider: Provider, *, budget_limit: int = 200_000, **kwargs: Any) -> 
 SEAT_ENV = "ARGUS_LLM_PROVIDER"
 """The one line that swaps the model: ``ARGUS_LLM_PROVIDER=og_qwen`` (or ``deepseek_nim``) puts a
 different provider in every seat the product has — the desk, the console's question reader, the
-filing reader, the adversary and the replay. Unset, it is Qwen on the Bitget hackathon key."""
+filing reader, the adversary and the replay. ``fallback`` seats the whole chain instead, in the
+submission order (``fallback:testing`` for the testing order). Unset, it is Qwen on the Bitget
+hackathon key."""
 
 
-def seat(*, budget_limit: int, **kwargs: Any) -> QwenClient:
+def seat(*, budget_limit: int, **kwargs: Any) -> QwenClient | FallbackClient:
     """The model for one of the product's seats, from :data:`SEAT_ENV`.
 
     Until 2026-09-27 six product modules built ``QwenClient`` directly, so this module's
     "swapping the model is a one-line change" was true only for the evaluation harness (audit
-    finding 164). All three providers share Qwen's OpenAI-compatible client, which is why the
-    return type is that client rather than the narrower :class:`ChatModel`."""
+    finding 164). One provider by name returns its client; ``fallback`` (or ``fallback:testing``)
+    returns the :class:`FallbackClient` chain in the project owner's order for that mode
+    (:data:`FALLBACK_ORDER`), which had no caller until 2026-09-28 (audit finding 190)."""
     name = os.environ.get(SEAT_ENV, Provider.QWEN.value).strip().lower()
+    if name.split(":")[0] == "fallback":
+        chosen = name.partition(":")[2] or Mode.SUBMISSION.value
+        try:
+            mode = Mode(chosen)
+        except ValueError:
+            raise ValueError(f"{SEAT_ENV}={name!r}: the fallback mode must be one of "
+                             f"{', '.join(m.value for m in Mode)}") from None
+        return build_fallback(mode, budget_limit=budget_limit,
+                              client_kwargs={p: dict(kwargs) for p in FALLBACK_ORDER[mode]}
+                              if kwargs else None)
     try:
         provider = Provider(name)
     except ValueError:

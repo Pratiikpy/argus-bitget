@@ -239,7 +239,7 @@ def announce(store: PauseStore, approvals: Approvals,
             sent.append(request.request_id)
     if sent:
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(sorted(done)), encoding="utf-8")
+        path.write_text(json.dumps(sorted(done)), encoding="utf-8", newline="\n")
     return sent
 
 

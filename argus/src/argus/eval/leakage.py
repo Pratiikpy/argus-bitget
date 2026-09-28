@@ -722,7 +722,7 @@ def main() -> int:  # pragma: no cover - CLI
         was = str(blob.get("verdict", ""))
         blob["verdict"] = refreshed
         blob["verdict_replayed_at"] = datetime.now(UTC).isoformat()
-        path.write_text(json.dumps(blob, indent=2), encoding="utf-8")
+        path.write_text(json.dumps(blob, indent=2), encoding="utf-8", newline="\n")
         print("arithmetic re-derived from the stored counts: consistent")
         print(f"\nWAS: {was[:220]}")
         print(f"\nNOW: {refreshed[:220]}")
@@ -786,7 +786,7 @@ def main() -> int:  # pragma: no cover - CLI
     print(report.render())
     out = REPORT_PATH
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(report.as_dict(), indent=2), encoding="utf-8")
+    out.write_text(json.dumps(report.as_dict(), indent=2), encoding="utf-8", newline="\n")
     print(f"\nwritten to {out}")
     return 0
 

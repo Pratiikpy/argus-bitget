@@ -592,10 +592,16 @@ def handle_ask(
         if checks:
             facts = mem.merge_checks(facts, checks)
     if new and (payload.get("refused") or by.startswith("declined") or by == "ngram"):
-        payload.update(lines=mem.acknowledgement(new), refused=False, reason="",
+        noted = {f.key() for f in new}
+        payload.update(lines=mem.acknowledgement([f for f in facts if f.key() in noted]),
+                       refused=False, reason="",
                        classified_by="memory", sources=[])
     payload["memory"] = mem.dumps(facts)
     payload["remembered"] = [f.text for f in new]
+    # "1 trade(s)" resolved against its count, here where every answer leaves (`lui/plural.py`).
+    from argus.lui.plural import resolve_plurals
+
+    payload["lines"] = [resolve_plurals(str(line)) for line in payload.get("lines") or []]
     return payload
 
 
@@ -1371,6 +1377,13 @@ def _status() -> dict[str, Any]:
     }
 
 
+CSP = ("default-src 'self'; script-src 'unsafe-inline'; "
+       "style-src 'unsafe-inline' https://fonts.googleapis.com; "
+       "font-src https://fonts.gstatic.com; img-src 'self' data:")
+"""The Content-Security-Policy every page is sent with; why each allowance exists is in
+:meth:`Handler._send`."""
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "argus-lui"
 
@@ -1393,14 +1406,40 @@ class Handler(BaseHTTPRequestHandler):
         # `default-src`'s actual job of refusing every external one.
         # The brand's two typefaces load from Google Fonts: its stylesheet host and its font-file
         # host are the only external origins allowed, and only for styles and fonts.
-        self.send_header(
-            "Content-Security-Policy",
-            "default-src 'self'; script-src 'unsafe-inline'; "
-            "style-src 'unsafe-inline' https://fonts.googleapis.com; "
-            "font-src https://fonts.gstatic.com; img-src 'self' data:",
-        )
+        self.send_header("Content-Security-Policy", CSP)
         self.end_headers()
         self.wfile.write(body)
+
+    def _stream_task(self, asked: str, reading: Any, memory: str) -> None:
+        """The research task sent as it runs: the page and a waiting card per step at once, each
+        step's card as its engine answers, then the finished page in place of all of it
+        (research/harvest/48-open-webui.md). No ``Content-Length``: the response ends when the
+        connection closes, which HTTP/1.0 allows and every browser renders as it arrives. Where a
+        proxy buffers the whole response, the reader gets the finished page at the end, the same
+        as before."""
+        from argus.lui.task import STEPS, research_task
+        from argus.lui.task_page import stream_end, stream_start, stream_step
+
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Accel-Buffering", "no")
+        self.send_header("Content-Security-Policy", CSP)
+        self.end_headers()
+        self.close_connection = True
+
+        def write(text: str) -> None:
+            try:
+                self.wfile.write(text.encode("utf-8"))
+                self.wfile.flush()
+            except OSError:  # the reader left; the task still finishes and is discarded
+                pass
+
+        write(stream_start(asked, reading.name.removesuffix("USDT"), reading.size_pct,
+                           dict(reading.book), [(title, engine) for title, _, engine in STEPS]))
+        task = research_task(reading=reading, asked=asked, memory=memory,
+                             on_step=lambda index, step: write(stream_step(index + 1, step)))
+        write(stream_end(task))
 
     def _visitor(self) -> str:
         return (self.headers.get("x-forwarded-for") or "").split(",")[0].strip() \
@@ -1502,6 +1541,10 @@ class Handler(BaseHTTPRequestHandler):
             if "saved" in params:
                 saved = repair_mojibake(params["saved"][0])[:300]
             reading = read_question(asked, saved)
+            if (not isinstance(reading, str) and (params.get("format") or [""])[0] != "json"
+                    and (params.get("stream") or ["1"])[0] != "0"):
+                self._stream_task(asked, reading, memory)
+                return
             task = (unread_task(asked, reading) if isinstance(reading, str)
                     else research_task(reading=reading, asked=asked, memory=memory))
         else:
@@ -1679,9 +1722,39 @@ class Handler(BaseHTTPRequestHandler):
                 from argus.lui.status_page import render as render_status
 
                 checks, checked_at = live_checks()
+                from argus.lui.status_history import read as read_history
+
                 page = render_status(_status(), checks, checked_at,
-                                     sweep_lines(_ledger_path().parent), FAVICON)
+                                     sweep_lines(_ledger_path().parent), FAVICON,
+                                     read_history(_ledger_path().parent / "status_history.jsonl"))
                 self._send(page.encode(), "text/html; charset=utf-8")
+                return
+            if path == "/factors":
+                # The factor lab's verdicts, drawn: 8 proposed, each gate named, failures shown
+                # (harvest study 36).
+                from argus.lui.factors_page import load as load_factors
+                from argus.lui.factors_page import render as render_factors
+
+                self._send(render_factors(load_factors(_ledger_path().parent)).encode(),
+                           "text/html; charset=utf-8")
+                return
+            if path == "/policy":
+                # The risk limits as the file that sets them, and which could fire in the last
+                # cycle (harvest study 26).
+                from argus.lui.policy_page import load as load_policy
+                from argus.lui.policy_page import render as render_policy
+
+                self._send(render_policy(*load_policy(_ledger_path().parent)).encode(),
+                           "text/html; charset=utf-8")
+                return
+            if path == "/architecture":
+                # The structure `eval/architecture.py` proves on every push, drawn: Track 2 judges
+                # "Agent architecture quality", and the report had no page (harvest study 57).
+                from argus.lui.architecture_page import load as load_architecture
+                from argus.lui.architecture_page import render as render_architecture
+
+                self._send(render_architecture(load_architecture(_ledger_path().parent)).encode(),
+                           "text/html; charset=utf-8")
                 return
             if path == "/wrong":
                 # **The losses, reachable.** Bitget's own S1 showcase led with a negative result;

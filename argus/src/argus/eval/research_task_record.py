@@ -53,7 +53,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     del argv
     blob = record()
     REPORT_PATH.write_text(json.dumps(blob, ensure_ascii=False, indent=1) + "\n",
-                           encoding="utf-8")
+                           encoding="utf-8", newline="\n")
     verdict = blob["task"]["verdict"] or {}
     print(f"{verdict.get('call')} — {blob['task']['seconds']} s")
     for line in verdict.get("lines", []):

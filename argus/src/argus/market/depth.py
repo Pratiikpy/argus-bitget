@@ -391,7 +391,7 @@ def main() -> int:  # pragma: no cover - CLI
         json.dumps(
             {"generated_at": datetime.now(UTC).isoformat(), "books": rows}, indent=2,
         ),
-        encoding="utf-8",
+        encoding="utf-8", newline="\n",
     )
     print(f"\n{len(rows)} book(s) written to {out}")
     return 0

@@ -57,7 +57,7 @@ def grade(*, now: datetime | None = None, fetch: Any = None) -> dict[str, Any]:
            "graded_at": clock.isoformat(), "rows": rows,
            "rook_touched": sum(r["rook_touched"] for r in graded),
            "argus_touched": sum(r["argus_touched"] for r in graded), "names": len(graded)}
-    REPORT.write_text(json.dumps(out, indent=1), encoding="utf-8")
+    REPORT.write_text(json.dumps(out, indent=1), encoding="utf-8", newline="\n")
     return out
 
 

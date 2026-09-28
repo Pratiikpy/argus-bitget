@@ -300,7 +300,8 @@ def sync(*, dry_run: bool = False, data_only: bool = False) -> SyncResult:
     )
 
     if not dry_run:
-        MANIFEST_PATH.write_text(json.dumps(result.as_dict(), indent=2), encoding="utf-8")
+        MANIFEST_PATH.write_text(json.dumps(result.as_dict(), indent=2),
+                                 encoding="utf-8", newline="\n")
     return result
 
 

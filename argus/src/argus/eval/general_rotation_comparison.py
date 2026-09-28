@@ -478,7 +478,7 @@ def write_wire(cases: Sequence[Case], path: Path) -> str:
     """The case file the rival runner reads. Returns its SHA-256."""
     text = json.dumps({"cases": [c.wire() for c in cases]}, sort_keys=True)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text, encoding="utf-8")
+    path.write_text(text, encoding="utf-8", newline="\n")
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 

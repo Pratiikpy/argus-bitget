@@ -230,7 +230,7 @@ def repair(path: Path, *, reason: str, at: datetime | None = None) -> dict[str, 
     # PaperLedger's own class docstring) — assigning to it doesn't exist any more, and rewriting
     # the file from it alone would silently drop every settlement seal ever written.
     ledger._raw_entries = _relinked(ledger._raw_entries)
-    with path.open("w", encoding="utf-8") as fh:
+    with path.open("w", encoding="utf-8", newline="\n") as fh:
         for entry in ledger._raw_entries:
             fh.write(json.dumps(asdict(entry), default=str) + "\n")
     ledger._write_anchor()
@@ -257,7 +257,7 @@ def repair(path: Path, *, reason: str, at: datetime | None = None) -> dict[str, 
         loaded = json.loads(incidents_path.read_text(encoding="utf-8"))
         history = loaded if isinstance(loaded, list) else [loaded]
     history.append(record)
-    incidents_path.write_text(json.dumps(history, indent=2), encoding="utf-8")
+    incidents_path.write_text(json.dumps(history, indent=2), encoding="utf-8", newline="\n")
 
     return {"repaired": True, "incident": record, "verification": verified}
 

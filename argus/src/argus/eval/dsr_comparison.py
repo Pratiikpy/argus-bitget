@@ -426,7 +426,7 @@ if __name__ == "__main__":
     print(render(result))
     out_path = DATA_DIR / "dsr_comparison.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
+    out_path.write_text(json.dumps(result, indent=2), encoding="utf-8", newline="\n")
     print(f"\nsaved -> {out_path}")
 
 

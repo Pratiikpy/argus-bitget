@@ -387,7 +387,7 @@ def run_rivals(corpus: dict[str, Any], python: str) -> dict[str, Any]:
     with tempfile.TemporaryDirectory() as tmp:
         corpus_path = Path(tmp) / "corpus.json"
         out_path = Path(tmp) / "out.json"
-        corpus_path.write_text(json.dumps(corpus), encoding="utf-8")
+        corpus_path.write_text(json.dumps(corpus), encoding="utf-8", newline="\n")
         subprocess.run([python, str(RUNNER), str(corpus_path), str(out_path)], check=True,
                        timeout=900)
         result: dict[str, Any] = json.loads(out_path.read_text(encoding="utf-8"))

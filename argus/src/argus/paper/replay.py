@@ -309,7 +309,7 @@ def write(result: ReplayResult, *, path: Path = REPLAY_PATH) -> None:
     lines = [x for x in path.read_text(encoding="utf-8").splitlines() if x.strip()] \
         if path.exists() else []
     prev = _sha256(lines[-1]) if lines else GENESIS
-    with path.open("a", encoding="utf-8") as handle:
+    with path.open("a", encoding="utf-8", newline="\n") as handle:
         for outcome in result.outcomes:
             row: dict[str, Any] = {"kind": "replay", **outcome.as_dict(), "prev_hash": prev}
             row["row_hash"] = _row_hash(row)

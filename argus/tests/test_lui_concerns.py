@@ -24,7 +24,8 @@ from pathlib import Path
 LUI = Path(__file__).resolve().parents[1] / "src" / "argus" / "lui"
 CHANNELS = {"server", "cli", "mcp_server", "telegram_bot", "selfhost", "__main__"}
 PAGES = {"design", "task_page", "status_page", "proof_page", "corrections_page", "agent_page",
-         "brand_page", "materials_page"}
+         "brand_page", "materials_page", "architecture_page", "factors_page",
+         "policy_page"}
 READERS = {"question", "normalise", "phrasebook", "ngram", "kindmodel", "router", "arbiter"}
 
 

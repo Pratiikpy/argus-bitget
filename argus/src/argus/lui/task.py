@@ -30,12 +30,16 @@ engine's own bottom line, in the order a trader would act on them.
 
 from __future__ import annotations
 
+import contextlib
 import time
-from concurrent.futures import Future, ThreadPoolExecutor, wait
+from collections.abc import Callable
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
+from concurrent.futures import TimeoutError as FuturesTimeout
 from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Any
 
+from argus.lui import thesis
 from argus.lui.answer import LEAD
 from argus.lui.research import (
     ANALOGUE_DAYS,
@@ -48,6 +52,8 @@ from argus.lui.research import (
     run,
     with_book,
 )
+from argus.lui.thesis import Tested
+from argus.lui.weigh import Weighing, weigh
 from argus.market.universe import contracts, is_equity
 from argus.truth.paths import DATA_DIR
 
@@ -246,10 +252,19 @@ class Task:
     """The trader's own words, when the task was run from a typed question."""
     reading: Reading | None = None
     """What those words were read as, shown above the answer so a misreading is visible."""
+    tested: tuple[Tested, ...] = ()
+    """The reasons the trader's own words gave, each tested (`lui/thesis.py`); empty when the
+    question stated none."""
 
     @property
     def verdict(self) -> Verdict | None:
         return verdict(self)
+
+    @property
+    def weighing(self) -> Weighing | None:
+        """Whether to enter, from the engines' figures set against each other
+        (`lui/weigh.py`): the verdict above says how much, this says whether."""
+        return weighing(self)
 
     @property
     def conclusion(self) -> list[tuple[str, str]]:
@@ -265,9 +280,14 @@ class Task:
 
 def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
                   book_text: str = DEFAULT_BOOK, *, ledger: Any = None,
-                  reading: Reading | None = None, asked: str = "", memory: str = "") -> Task:
+                  reading: Reading | None = None, asked: str = "", memory: str = "",
+                  on_step: Callable[[int, Step], None] | None = None) -> Task:
     """Run every step for ``name`` at ``size_pct`` of a book described by ``book_text``, or for
     what a typed question was read as (``reading``, from :func:`read_question`).
+
+    ``on_step(index, step)`` is called as each step finishes, in the order they finish, so a page
+    can show a step while slower ones still run (research/harvest/48-open-webui.md). The Task
+    returned is the same with or without it; a failing callback never costs a step.
 
     ``memory`` is what the trader told the console before (`lui/memory.py`, kept in their
     browser): a risk budget, a loss limit, a style, an account size. Each step applies it exactly
@@ -350,12 +370,28 @@ def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
 
     # Not a `with` block: leaving one waits for every thread, which is exactly the hang the
     # deadline exists to cut. A step still running is abandoned; its thread ends on its own.
-    pool = ThreadPoolExecutor(max_workers=len(STEPS) + 1)
+    stated = thesis.reasons(asked) if asked.strip() else ()
+    kinds = {r.kind for r in stated}
+    pool = ThreadPoolExecutor(max_workers=len(STEPS) + 3)
     try:
         path = pool.submit(_price_path, symbol)
+        # The reads only a stated reason needs run beside the engines, not after them.
+        activity = (pool.submit(thesis.chain_activity, symbol)
+                    if thesis.Kind.ACTIVITY in kinds else None)
+        mood = pool.submit(thesis.fear_greed_now) if thesis.Kind.SENTIMENT in kinds else None
         futures = [pool.submit(one, step) for step in STEPS]
         pending: list[Future[Any]] = [*futures, path]
-        done, _ = wait(pending, timeout=STEP_DEADLINE_S)
+        done: set[Future[Any]] = set()
+        index = {future: i for i, future in enumerate(futures)}
+        try:
+            for future in as_completed(pending, timeout=STEP_DEADLINE_S):
+                done.add(future)
+                if on_step is not None and future in index:
+                    # A failing callback is the page's problem, never the task's.
+                    with contextlib.suppress(Exception):
+                        on_step(index[future], future.result())
+        except FuturesTimeout:
+            pass
         steps = [future.result() if future in done else Step(
                      title=title, engine=engine, refused=True, seconds=STEP_DEADLINE_S,
                      lines=[f"This step did not answer within {STEP_DEADLINE_S:.0f} seconds, so "
@@ -365,11 +401,25 @@ def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
             steps[0].path = tuple(path.result()) if path in done else ()
         except Exception:
             steps[0].path = ()  # the quote step stands without its chart
+        tested: tuple[Tested, ...] = ()
+        if stated:
+            def extra(future: Future[Any] | None) -> Any:
+                if future is None:
+                    return None
+                try:
+                    return future.result(timeout=max(1.0, STEP_DEADLINE_S
+                                                     - (time.perf_counter() - started)))
+                except Exception:
+                    return None  # the reason is then reported as not tested, and why
+
+            tested = thesis.check(stated, name=symbol.removesuffix("USDT"),
+                                 data=_data_by_kind(steps), activity=extra(activity),
+                                 fear_greed=extra(mood))
     finally:
         pool.shutdown(wait=False, cancel_futures=True)
     return Task(question=question, name=symbol.removesuffix("USDT"), size_pct=size * 100,
                 book=book, steps=steps, seconds=time.perf_counter() - started, asked=asked,
-                reading=reading)
+                reading=reading, tested=tested)
 
 
 @dataclass(frozen=True)
@@ -382,6 +432,25 @@ class Verdict:
 
 def _t(symbol: str) -> str:
     return symbol.removesuffix("USDT")
+
+
+def _data_by_kind(steps: list[Step]) -> dict[str, dict[str, Any]]:
+    """Each answered step's figures under its research kind (``quote``, ``analogue``, ...)."""
+    by_title = {s.title: s for s in steps if not s.refused and s.applicable}
+    return {kind.value: by_title[title].data for title, kind, _ in STEPS
+            if kind is not None and title in by_title}
+
+
+def weighing(task: Task) -> Weighing | None:
+    """The task's steps handed to :func:`argus.lui.weigh.weigh` by kind, with what the trader
+    stated (horizon, book, budget, side) read from the request the engines answered."""
+    data = _data_by_kind(task.steps)
+    request = next((d.get("request") for d in (data.get("impact"), data.get("quote"))
+                    if d and d.get("request")), None) or {}
+    return weigh(data, name=task.name, side=str(request.get("side") or "long"),
+                 horizon_hours=request.get("horizon_hours"), book_given=bool(task.book),
+                 budget_stated=bool(request.get("budget_stated")),
+                 budget=request.get("budget"))
 
 
 def verdict(task: Task) -> Verdict | None:
@@ -551,6 +620,8 @@ def as_dict(task: Task) -> dict[str, Any]:
             "cash": task.reading.cash},
         "verdict": None if task.verdict is None else {
             "call": task.verdict.call, "lines": list(task.verdict.lines)},
+        "weighing": None if task.weighing is None else task.weighing.as_dict(),
+        "reasons_tested": [t.as_dict() for t in task.tested],
         "conclusion": [{"step": t, "actionable": a} for t, a in task.conclusion],
         "steps": [{"title": s.title, "engine": s.engine, "lines": s.lines,
                    "refused": s.refused, "seconds": round(s.seconds, 2)} for s in task.steps],

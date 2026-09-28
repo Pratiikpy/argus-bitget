@@ -191,3 +191,22 @@ def test_a_module_run_with_dash_m_is_named_by_its_spec_not_main(
     exec("def go():\n    client.complete([{'role': 'user', 'content': 'x'}])", caller)
     caller["go"]()
     assert client.ledger.entries[0].module == "argus.eval.some_study"
+
+
+def test_a_json_retry_is_recorded_under_its_reason(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+) -> None:
+    """How often a JSON call is paid for twice, and why, is read off the ledger
+    (research/harvest/01-gpt-researcher.md §5.3, the json_repair decision)."""
+    path = tmp_path / "ledger.jsonl"
+    usage = Usage(10, 10, 0, 20)
+    client = _client(monkeypatch, path, script=[
+        Completion("{'verdict': 'buy',}", "", usage, "stop"),
+        Completion('{"verdict": "buy"}', "", usage, "stop"),
+    ])
+    with cost_step("decide"):
+        got = client.complete_json([{"role": "user", "content": "q"}],
+                                   required_keys=("verdict",))
+    assert got == {"verdict": "buy"}
+    entries, _ = read(path)
+    assert [e.step for e in entries] == ["decide", "decide · retry 1: invalid_json"]

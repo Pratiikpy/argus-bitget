@@ -396,7 +396,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         grades = grade()
         grades["weekend"] = grade_weekend()
         GRADES_PATH.write_text(json.dumps(grades, ensure_ascii=False, indent=1) + "\n",
-                               encoding="utf-8")
+                               encoding="utf-8", newline="\n")
         print(f"{grades['calls']} calls, {grades['risk_graded']} risk-graded, "
               f"{grades['direction_graded']} direction-graded")
     return 0

@@ -154,7 +154,7 @@ def collect() -> dict[str, Any]:
             inputs["sessions"][stock] = _sessions(stock)
         except Exception as exc:  # one name's failure is recorded, not fatal
             inputs["failures"][stock] = f"{type(exc).__name__}: {exc}"[:160]
-    (DATA / "inputs.json").write_text(json.dumps(inputs), "utf-8")
+    (DATA / "inputs.json").write_text(json.dumps(inputs), "utf-8", newline="\n")
     return inputs
 
 

@@ -944,7 +944,7 @@ def _trim(payload: Mapping[str, Any]) -> dict[str, Any]:
 
 def _append(path: Path, row: Mapping[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a", encoding="utf-8") as handle:
+    with path.open("a", encoding="utf-8", newline="\n") as handle:
         handle.write(json.dumps(row, ensure_ascii=False) + "\n")
         handle.flush()
 

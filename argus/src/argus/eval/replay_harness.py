@@ -553,7 +553,8 @@ def replay(name: str, decisions: Mapping[str, Decision], market: Market,
         if first is not None and f'"entry_price": "{first.entry_price}"' in text:
             forged = str(Decimal(first.entry_price) + Decimal("0.01"))
             copy.write_text(text.replace(f'"entry_price": "{first.entry_price}"',
-                                         f'"entry_price": "{forged}"', 1), encoding="utf-8")
+                                         f'"entry_price": "{forged}"', 1),
+                            encoding="utf-8", newline="\n")
             result.tamper_detected = not bool(PaperLedger(path=copy).verify()["chain_intact"])
     finally:
         shutil.rmtree(work, ignore_errors=True)

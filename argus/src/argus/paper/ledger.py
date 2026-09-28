@@ -523,7 +523,7 @@ class PaperLedger:
                     f"seq {entry.seq} already exists; refusing to append a duplicate sequence "
                     f"number, which is what a concurrent writer produces"
                 )
-            with self.path.open("a", encoding="utf-8") as fh:
+            with self.path.open("a", encoding="utf-8", newline="\n") as fh:
                 fh.write(json.dumps(asdict(entry), default=str) + "\n")
             self._raw_entries.append(entry)
             self._write_anchor()
@@ -547,7 +547,7 @@ class PaperLedger:
             if self.path.exists():
                 self._load()
             self._raw_entries[self._index_of(settled.seq)] = settled
-            with self.path.open("w", encoding="utf-8") as fh:
+            with self.path.open("w", encoding="utf-8", newline="\n") as fh:
                 for e in self._raw_entries:
                     fh.write(json.dumps(asdict(e), default=str) + "\n")
             self._write_anchor()
@@ -763,7 +763,7 @@ class PaperLedger:
                     )
                     done[request.seq] = new
                 if done:
-                    with self.path.open("w", encoding="utf-8") as fh:
+                    with self.path.open("w", encoding="utf-8", newline="\n") as fh:
                         for e in staged:
                             fh.write(json.dumps(asdict(e), default=str) + "\n")
                     self._raw_entries = staged
@@ -846,7 +846,7 @@ class PaperLedger:
         )
         tmp = self._anchor_path.with_suffix(self._anchor_path.suffix + ".tmp")
         tmp.parent.mkdir(parents=True, exist_ok=True)
-        tmp.write_text(payload + "\n", encoding="utf-8")
+        tmp.write_text(payload + "\n", encoding="utf-8", newline="\n")
         os.replace(tmp, self._anchor_path)
 
     def read_anchor(self) -> dict[str, Any] | None:

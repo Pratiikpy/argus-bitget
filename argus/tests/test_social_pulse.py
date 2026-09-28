@@ -276,3 +276,39 @@ def test_the_real_vader_scores_the_crowd() -> None:
     row = sp.pulse("NVDAUSDT", posts, [], NOW)
     assert row["tone"]["counts"] == {"positive": 1, "neutral": 0, "negative": 1}
     assert "VADER" in row["tone"]["scorer"] and "0.05" in row["tone"]["scorer"]
+
+
+def test_accounts_that_keep_posting_together_are_named_a_network(tmp_path: object) -> None:
+    """Two accounts carrying story after story, never enough of them at once for the per-sweep
+    coordination rule, surface as a repeat pair (`truth/coordination_graph.py`, study 11)."""
+    from pathlib import Path
+
+    path = Path(str(tmp_path)) / "shares.jsonl"
+    stories = ["NVDA breakout confirmed, loading calls before earnings",
+               "NVDA shorts are trapped, squeeze starts at the open",
+               "NVDA to 300 is the easiest trade of the quarter"]
+    for day, text in enumerate(stories):
+        when = NOW + timedelta(days=day)
+        posts = [_post(1, "@mannuelkings", text, 5), _post(2, "@mannuelkinggs", text, 6),
+                 _post(3, f"@someone{day}", "Nvidia capex commentary from the call", 40)]
+        row = sp.pulse("NVDAUSDT", posts, [], when)
+        assert row["coordinated_stories"] == 0
+        assert sp.record_shares({"generated_at": when.isoformat(), "symbols": [row]}, path) > 0
+    pairs = sp.repeat_pairs(path)
+    assert [(sorted(p["accounts"]), p["stories"], p["symbols"]) for p in pairs] == [
+        (["@mannuelkinggs", "@mannuelkings"], 3, ["NVDAUSDT"])]
+    snapshot = {"generated_at": NOW.isoformat(), "coordination_rule": "3 accounts in 2h",
+                "symbols": [row], "repeat_pairs": pairs}
+    lines = sp.lines_for("NVDAUSDT", snapshot, NOW + timedelta(hours=1))
+    assert any("posted together on as many as 3 stories" in line for line in lines)
+
+
+def test_the_share_history_forgets_after_thirty_days(tmp_path: object) -> None:
+    from pathlib import Path
+
+    path = Path(str(tmp_path)) / "shares.jsonl"
+    row = {"symbol": "NVDAUSDT", "shares": [["@a", "s-1", False]]}
+    sp.record_shares({"generated_at": NOW.isoformat(), "symbols": [row]}, path)
+    later = NOW + sp.SHARES_KEPT + timedelta(hours=1)
+    sp.record_shares({"generated_at": later.isoformat(), "symbols": [row]}, path)
+    assert len(path.read_text(encoding="utf-8").strip().split(sp.NEWLINE)) == 1

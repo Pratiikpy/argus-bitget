@@ -267,8 +267,22 @@ def aligned(symbol: str, closes: dict[str, dict[datetime, float]],
 def build(now: datetime | None = None) -> dict[str, Any]:
     """Every name against every event type, from live candles and the issuers' own records."""
     stamp = now or datetime.now(UTC)
+    unavailable: dict[str, str] = {}
+
+    def hourly_or_reason(symbol: str) -> dict[datetime, float]:
+        # One name whose history cannot be read is reported and left out; until 2026-09-28 it
+        # raised through pool.map and the whole study was lost for the other eleven (the
+        # 2026-09-27 19:00 cycle, COINUSDT and TQQQUSDT with no history).
+        from argus.market.history import HistoryError
+
+        try:
+            return _hourly(symbol)
+        except HistoryError as exc:
+            unavailable[symbol] = str(exc)[:200]
+            return {}
+
     with ThreadPoolExecutor(max_workers=2) as pool:
-        closes = dict(zip(SYMBOLS, pool.map(_hourly, SYMBOLS), strict=True))
+        closes = dict(zip(SYMBOLS, pool.map(hourly_or_reason, SYMBOLS), strict=True))
         earnings_jobs = {s: pool.submit(earnings_releases, s.removesuffix("USDT"))
                          for s in SYMBOLS if s not in FUNDS}
         cpi, cpi_route = cpi_releases()
@@ -296,7 +310,7 @@ def build(now: datetime | None = None) -> dict[str, Any]:
                                  own_events=own if kind != "earnings" else ()).as_dict())
     return {
         "generated_at": stamp.isoformat(),
-        "history": {"interval": "1H", "per_symbol": spans},
+        "history": {"interval": "1H", "per_symbol": spans, "unavailable": unavailable},
         "window": {"event_bars": EVENT_BARS, "estimation_bars": ESTIMATION_BARS,
                    "gap_bars": GAP_BARS, "min_events": MIN_EVENTS},
         "sources": {"cpi": f"BLS CPI release archive ({cpi_route})",
@@ -316,7 +330,7 @@ def lookup(symbol: str, kind: str, report: dict[str, Any]) -> dict[str, Any] | N
 
 def write(path: Path = REPORT_PATH) -> dict[str, Any]:
     report = build()
-    path.write_text(json.dumps(report, indent=1), encoding="utf-8")
+    path.write_text(json.dumps(report, indent=1), encoding="utf-8", newline="\n")
     return report
 
 

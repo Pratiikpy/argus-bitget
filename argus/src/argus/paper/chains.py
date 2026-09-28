@@ -160,7 +160,7 @@ def write(
         grades=tuple(str(g) for g in chain.grades),
     )
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a", encoding="utf-8") as handle:
+    with path.open("a", encoding="utf-8", newline="\n") as handle:
         handle.write(json.dumps(record.as_dict()) + "\n")
     return record
 
@@ -253,7 +253,7 @@ def grade_pending(
     if changed:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(
-            "".join(json.dumps(r.as_dict()) + "\n" for r in updated), encoding="utf-8"
+            "".join(json.dumps(r.as_dict()) + "\n" for r in updated), encoding="utf-8", newline="\n"
         )
     return updated
 

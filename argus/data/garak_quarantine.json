@@ -1,0 +1,85 @@
+{
+  "generated_at": "2026-09-28T02:28:49+00:00",
+  "source": {
+    "repository": "NVIDIA/garak",
+    "commit": "8d1259ef310e4803cf5a4cc77267fdfdc24434ec",
+    "licence": "Apache-2.0 (licenses/garak-APACHE-2.0.txt)"
+  },
+  "split": "development = latent injection (rules written from its misses); held out = promptinject (scored once, after the rules were fixed)",
+  "adversarial": {
+    "argus": {
+      "development": {
+        "caught": 3582,
+        "injected": 3652,
+        "recall": 0.9808,
+        "by_family": {
+          "LatentInjectionFactSnippetEiffelFull": "800/800",
+          "LatentInjectionFactSnippetLegalFull": "360/360",
+          "LatentInjectionReportFull": "324/324",
+          "LatentInjectionResumeFull": "440/480",
+          "LatentInjectionTranslationEnFrFull": "54/54",
+          "LatentInjectionTranslationEnZhFull": "90/90",
+          "LatentJailbreakFull": "1344/1344",
+          "LatentWhoisSnippetFull": "170/200"
+        },
+        "clean_withheld": 0,
+        "clean": 74
+      },
+      "held_out": {
+        "caught": 2100,
+        "injected": 2100,
+        "recall": 1.0,
+        "by_family": {
+          "promptinject/hate-humans": "700/700",
+          "promptinject/kill-humans": "700/700",
+          "promptinject/long-prompt": "700/700"
+        },
+        "clean_withheld": 0,
+        "clean": 35
+      }
+    },
+    "argus_before_2026_09_28": {
+      "development": {
+        "caught": 1116,
+        "injected": 3652,
+        "recall": 0.3056,
+        "by_family": {
+          "LatentInjectionFactSnippetEiffelFull": "500/800",
+          "LatentInjectionFactSnippetLegalFull": "240/360",
+          "LatentInjectionReportFull": "216/324",
+          "LatentInjectionResumeFull": "0/480",
+          "LatentInjectionTranslationEnFrFull": "30/54",
+          "LatentInjectionTranslationEnZhFull": "50/90",
+          "LatentJailbreakFull": "0/1344",
+          "LatentWhoisSnippetFull": "80/200"
+        },
+        "clean_withheld": 0,
+        "clean": 74
+      },
+      "held_out": {
+        "caught": 1680,
+        "injected": 2100,
+        "recall": 0.8,
+        "by_family": {
+          "promptinject/hate-humans": "560/700",
+          "promptinject/kill-humans": "560/700",
+          "promptinject/long-prompt": "560/700"
+        },
+        "clean_withheld": 0,
+        "clean": 35
+      }
+    }
+  },
+  "real_prose": {
+    "paper_ledger_theses": {
+      "n": 796,
+      "withheld": 0
+    },
+    "readme_lines": {
+      "n": 5000,
+      "repos": 400,
+      "withheld": 0,
+      "environment_dependent": true
+    }
+  }
+}

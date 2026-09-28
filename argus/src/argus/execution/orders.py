@@ -46,6 +46,7 @@ from decimal import Decimal
 from enum import StrEnum
 
 from argus.decision.verdicts import Authorised
+from argus.execution.kill import check as kill_check
 
 
 class OrderState(StrEnum):
@@ -415,6 +416,7 @@ class OrderBook:
         order = authorised.order
         if not isinstance(order, Order):  # pragma: no cover - structural guard
             raise TypeError(f"an Authorised must carry an Order, not {type(order).__name__}")
+        kill_check()  # a person's stop, outside the pipeline (`execution/kill.py`)
         authorised.verify()  # the order still says what was approved, not what it says now
         if order.client_order_id in self._orders:
             raise DuplicateOrder(

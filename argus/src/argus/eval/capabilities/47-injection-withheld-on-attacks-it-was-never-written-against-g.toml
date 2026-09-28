@@ -1,0 +1,46 @@
+name = "Prompt injection withheld on attacks it was never written against (NVIDIA garak)"
+subtheme = "t2-riskcontrol"
+modules = [
+    "argus/agents/quarantine.py",
+    "argus/eval/garak_quarantine.py",
+]
+state = "implemented"
+baseline = """\
+    NVIDIA garak @8d1259ef (Apache-2.0): its latent-injection probes as development and its \
+    promptinject probes, built by its own resources/promptinject, as a held-out set scored once; \
+    the quarantine's own rules as they stood before 2026-09-28 as the second arm"""
+blockers = [
+    """\
+        Development 3,582 of 3,652 withheld (before: 1,116), held out 2,100 of 2,100 (before: \
+        1,680), with 0 of 109 clean garak documents, 0 of 796 real theses and 0 of 5,000 README \
+        lines withheld. The held-out families are prompt hijacks, closer in form to the \
+        development set than an attacker writing fresh text would be, and a persuasion paragraph \
+        that states no instruction is still passed. No model-based detector was run beside it.""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    garak probes/latentinjection.py and promptinject.py and resources/promptinject read at \
+    source (research/harvest/06-garak.md)"""
+artefact = "data/garak_quarantine.json"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = "the current rules and the frozen earlier rules score the same generated documents"
+artefact = "data/garak_quarantine.json"
+
+[[proofs]]
+condition = "adversarial_test"
+how = "5,752 attack documents from an independent red-teaming tool, split before any rule changed"
+artefact = "data/garak_quarantine.json"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = "the corpus is committed and regenerable from garak's source at a pinned commit"
+artefact = "data/garak_quarantine.json"
+
+[[proofs]]
+condition = "implementation_complete"
+how = "agents/quarantine.py screens every evidence item before a model reads it"
+test = "test_garak_quarantine.py::test_every_held_out_injection_is_withheld_and_no_clean_text_is"

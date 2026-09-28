@@ -224,7 +224,7 @@ def main() -> int:  # pragma: no cover - CLI
             "gross taker cost; Ballast's funding credit (0.7 bp a night on average) not applied",
         ],
     }
-    REPORT_PATH.write_text(json.dumps(report, indent=1), encoding="utf-8")
+    REPORT_PATH.write_text(json.dumps(report, indent=1), encoding="utf-8", newline="\n")
     print(report["verdict"])
     return 0
 

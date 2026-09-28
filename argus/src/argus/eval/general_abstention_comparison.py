@@ -871,7 +871,8 @@ def main(argv: list[str] | None = None) -> int:  # pragma: no cover - CLI
     args = parser.parse_args(argv)
     if args.write_rival_input is not None:
         blob = rival_input(frozen_extraction())
-        args.write_rival_input.write_text(json.dumps(blob, allow_nan=False), encoding="utf-8")
+        args.write_rival_input.write_text(json.dumps(blob, allow_nan=False),
+                                          encoding="utf-8", newline="\n")
         print(f"{len(blob['calls'])} calls -> {args.write_rival_input}")
         return 0
     result = run()

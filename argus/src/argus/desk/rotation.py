@@ -659,7 +659,7 @@ def main() -> int:  # pragma: no cover - CLI
     print(f"\n  {plan.verdict}")
     out = DATA_DIR / "rotation.json"
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(plan.as_dict(), indent=2), encoding="utf-8")
+    out.write_text(json.dumps(plan.as_dict(), indent=2), encoding="utf-8", newline="\n")
     print(f"\nwritten to {out}")
     return 0
 

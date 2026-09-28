@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "digest": "68ceeadb52fc4ce0721006d8016744de7bc4d135ae75eb0aaca20e68f6460712",
+  "thresholds": {
+    "max_position_notional": {
+      "value": "50000",
+      "unit": "USD",
+      "meaning": "largest notional one order may carry"
+    },
+    "max_unhedged_notional": {
+      "value": "20000",
+      "unit": "USD",
+      "meaning": "largest exposure carried while no hedge is available"
+    },
+    "min_confidence_to_trade": {
+      "value": 0.55,
+      "unit": "probability",
+      "meaning": "stated confidence below which no order is sent"
+    },
+    "max_gross_exposure_notional": {
+      "value": "150000",
+      "unit": "USD",
+      "meaning": "total gross notional across the book, order included"
+    },
+    "max_signed_exposure_notional": {
+      "value": "100000",
+      "unit": "USD",
+      "meaning": "net long-minus-short notional across the book"
+    },
+    "max_margin_usage_ratio": {
+      "value": "0.5",
+      "unit": "fraction",
+      "meaning": "venue margin ratio cap; 1.0 is the liquidation line"
+    },
+    "factor_exposure_limits": {
+      "value": {},
+      "unit": "per factor",
+      "meaning": "cap on the book's exposure to each named factor"
+    },
+    "max_scenario_loss_pct": {
+      "value": null,
+      "unit": "percent",
+      "meaning": "floor on the book's move in the worst benchmark shock"
+    },
+    "max_liquidation_cost_bps": {
+      "value": null,
+      "unit": "bps",
+      "meaning": "ceiling on the worst position's forced-exit slippage"
+    },
+    "assumed_payoff": {
+      "value": "1",
+      "unit": "ratio",
+      "meaning": "win/loss ratio used by Kelly sizing once calibration passes"
+    },
+    "session_horizon_bars": {
+      "value": 24,
+      "unit": "hours",
+      "meaning": "assumed holding period for the volatility throttle"
+    },
+    "min_symbol_realized_pnl": {
+      "value": null,
+      "unit": "USD",
+      "meaning": "floor on one symbol's realised PnL over the window"
+    },
+    "symbol_underperformance_window_minutes": {
+      "value": 1440,
+      "unit": "minutes",
+      "meaning": "window for the per-symbol PnL floor"
+    }
+  }
+}

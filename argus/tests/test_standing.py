@@ -1022,3 +1022,15 @@ class TestAnIntervalThatIncludesZeroIsNotAValidEvaluation:
     def test_no_interval_is_judged_as_before(self, monkeypatch: pytest.MonkeyPatch) -> None:
         ok, _ = self._verdict(None, monkeypatch)
         assert ok
+
+
+def test_the_published_register_counts_only_conditions_that_survived_the_audit() -> None:
+    """`/proof` reads ``conditions_met``; a condition the audit found no evidence for must not be
+    in it, whatever the row claims (tracker 215)."""
+    report = standing.audit()
+    blob = report.as_dict()
+    for row in blob["capabilities"]:
+        unproven = set(report.unproven(row["name"]))
+        assert not unproven & set(row["conditions_met"])
+        assert set(row["conditions_met"]) <= set(row["conditions_claimed"])
+        assert sorted(unproven) == sorted(row["conditions_unproven"])

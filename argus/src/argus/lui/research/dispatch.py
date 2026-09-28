@@ -49,6 +49,7 @@ from argus.lui.research.book import (
     _hedge_line,
     _hedge_plan,
     _impact_lines,
+    _within_limits,
     impact_sizing,
 )
 from argus.lui.research.claims import (
@@ -111,6 +112,7 @@ from argus.lui.research.parse import (
     is_us_equity,
     leveraged_fund_asked,
     parse_notional,
+    stated_limits,
     unread_holdings,
     without_hedges,
 )
@@ -693,19 +695,36 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                               lines=["Not enough shared hourly history across those names to "
                                      "balance their risk. Try names that trade on Bitget every "
                                      "hour, or fewer of them."])
+            cap, count, risk_cap = stated_limits(raw_text)
+            equal: dict[str, float] = weights
+            headline = (
+                "Bottom line: an equal-risk book of these names holds "
+                + ", ".join(f"{_t(s)} {equal[s]:.0%}"
+                            for s in sorted(equal, key=lambda s: -equal[s]))
+                + f" — each carries about {1 / len(equal):.0%} of the risk, the quieter names "
+                  f"held larger so no single one dominates.")
+            limited: dict[str, Any] | None = None
+            if cap is not None or count is not None or risk_cap is not None:
+                fitted = _within_limits(equal, columns, cap, count, risk_cap)
+                if fitted["status"] == "infeasible":
+                    return Answer(question=question, refused=True, reason=fitted["reason"],
+                                  lines=[f"Those limits cannot all hold for "
+                                         f"{', '.join(_t(s) for s in names)}: "
+                                         f"{fitted['plain']}. Loosen one and ask again."])
+                weights, headline, limited = fitted["weights"], fitted["headline"], fitted
+                sources.append(Source(kind="computation", ref="argus.desk.constrained.allocate",
+                                      detail="the equal-risk book, bent as little as possible "
+                                             "to meet the stated limits"))
             built = replace(request, kind=ResearchKind.BOOK, book=weights, budget_stated=True,
                             budget=1.0)
             book_lines, extra, book_payload = _book_report(built, data, is_open)
-            lines = [
-                "Bottom line: an equal-risk book of these names holds "
-                + ", ".join(f"{_t(s)} {weights[s]:.0%}"
-                            for s in sorted(weights, key=lambda s: -weights[s]))
-                + f" — each carries about {1 / len(weights):.0%} of the risk, the quieter names "
-                  f"held larger so no single one dominates.",
-                *[line for line in book_lines if not bool(LEAD.match(line))],
-            ]
+            lines = [headline, *([limited["limits_line"]] if limited else []),
+                     *[line for line in book_lines if not bool(LEAD.match(line))]]
             sources.extend(extra)
             payload["construct"] = {"weights": weights, **book_payload}
+            if limited:
+                payload["construct"]["limits"] = {k: v for k, v in limited.items()
+                                                  if k not in ("headline", "limits_line")}
 
         elif request.kind is ResearchKind.LEVERAGE:
             lines, extra, lever_payload = _leverage(
@@ -1040,6 +1059,7 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             if quoted:
                 symbol, ticker = quoted[0]
                 all_in = fee + ticker.spread_bps
+                payload["round_trip_bps"] = round(float(all_in), 2)
                 lines.insert(0, (
                     f"Bottom line: a round trip in {_t(symbol)} costs about {all_in:.1f}bps "
                     f"({fee:.0f}bps taker fees + the {ticker.spread_bps:.1f}bps spread) — a trade "
@@ -1108,6 +1128,7 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             payload["quotes"] = {
                 s: {"last": str(t.last), "bid": str(t.bid), "ask": str(t.ask),
                     "change_24h": str(t.change_24h), "funding_rate": str(t.funding_rate),
+                    "low_24h": str(t.low_24h), "high_24h": str(t.high_24h),
                     "fetched_at": t.fetched_at.isoformat()}
                 for s, t in quoted
             }
@@ -1115,8 +1136,11 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                                   detail="round-trip taker fee"))
 
         elif request.kind is ResearchKind.TECHNICALS:
-            lines, extra = _technicals(request.symbols[0])
+            levels: dict[str, Any] = {}
+            lines, extra = _technicals(request.symbols[0], found=levels)
             sources.extend(extra)
+            if levels:
+                payload["technicals"] = levels
             if daily_technicals_asked(raw_text):
                 daily, daily_sources = _daily_technicals(request.symbols[0], raw_text)
                 if daily:
@@ -1161,7 +1185,10 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                                  for line in part_lines)
                     extra.extend(part_sources)
             else:
-                lines, extra = _fundamentals(request.symbols[0], raw_text)
+                figures: dict[str, Any] = {}
+                lines, extra = _fundamentals(request.symbols[0], raw_text, found=figures)
+                if figures:
+                    payload["fundamentals"] = figures
             lines = _lead_with_what_was_asked(lines, raw_text)
             if len(request.symbols) > 1 and _VALUATION.search(raw_text):
                 try:

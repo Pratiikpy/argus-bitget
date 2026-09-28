@@ -23,7 +23,7 @@ be argued about rather than merely quoted.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal
 from random import Random
 
@@ -34,7 +34,7 @@ from argus.sim.agents import (
     NoiseAgent,
     ValueAgent,
 )
-from argus.sim.book import BookError, Liquidity, Order, OrderBook, Side
+from argus.sim.book import BookError, Execution, Liquidity, Order, OrderBook, Side, TimeInForce
 
 _ZERO = Decimal("0")
 _BPS = Decimal("10000")
@@ -61,8 +61,19 @@ class SessionConfig:
     base_ladder_size: Decimal = Decimal("200")
     warmup_wakeups: int = 30
     seed: int = 20260912
+    entry_latency_steps: int = 0
+    """Wakeups between an agent sending an order and the book receiving it — hftbacktest's
+    ``ConstantLatency.entry_latency`` (``backtest/models/latency.rs:28-42``, MIT), counted in
+    wakeups because this session has no clock finer than one."""
+    response_latency_steps: int = 0
+    """Wakeups between a fill and the agent hearing of it (``response_latency``, same source)."""
+    price_protection_ticks: int | None = None
+    """How far any agent's aggressive order may walk (`book.OrderBook.submit`); ``None`` unbounded,
+    as before. `measure_exit` is never bounded: see its docstring."""
 
     def __post_init__(self) -> None:
+        if self.entry_latency_steps < 0 or self.response_latency_steps < 0:
+            raise MarketError("a latency is a number of wakeups and cannot be negative")
         if self.depth_multiplier <= 0:
             raise MarketError(f"depth_multiplier={self.depth_multiplier} must be positive")
         if self.reference_price <= 0:
@@ -77,6 +88,13 @@ class SimulatedSession:
     agents: list[Agent]
     config: SessionConfig
     rng: Random
+    clock: int = 0
+    in_flight: list[tuple[int, Order]] = field(default_factory=list)
+    """Orders sent and not yet at the book, with the wakeup they arrive on."""
+    unheard: list[tuple[int, Execution]] = field(default_factory=list)
+    """Fills made and not yet reported to their agent, with the wakeup they are heard on."""
+    stops: list[StopOrder] = field(default_factory=list)
+    """Stop orders waiting for their trigger price to trade."""
 
     @property
     def depth(self) -> Decimal:
@@ -94,19 +112,83 @@ class SimulatedSession:
         bus; with no bus, the session does it directly.
         """
         by_id = {a.agent_id: a for a in self.agents}
+        cfg = self.config
         for _ in range(wakeups):
+            self.clock += 1
+            arrived = [o for due, o in self.in_flight if due <= self.clock]
+            self.in_flight = [(due, o) for due, o in self.in_flight if due > self.clock]
+            for order in arrived:
+                self._route(self._submit(order), by_id)
+            heard = [e for due, e in self.unheard if due <= self.clock]
+            self.unheard = [(due, e) for due, e in self.unheard if due > self.clock]
+            for execution in heard:
+                counterparty = by_id.get(execution.agent_id)
+                if counterparty is not None:
+                    counterparty.on_fill(execution)
             for agent in self.agents:
                 for order in agent.wakeup(self.book, self.rng):
-                    # A wash trade or an off-tick price is refused by the book, as designed; an
-                    # agent proposing one is a modelling artefact, not a market event.
-                    try:
-                        executions = self.book.submit(order)
-                    except BookError:
-                        continue
-                    for execution in executions:
-                        counterparty = by_id.get(execution.agent_id)
-                        if counterparty is not None:
-                            counterparty.on_fill(execution)
+                    if cfg.entry_latency_steps:
+                        self.in_flight.append((self.clock + cfg.entry_latency_steps, order))
+                    else:
+                        self._route(self._submit(order), by_id)
+
+    def submit_stop(self, stop: StopOrder) -> None:
+        """Hold ``stop`` until the last trade reaches its trigger, then send its order."""
+        self.stops.append(stop)
+        self._route(self._fire_stops(), {a.agent_id: a for a in self.agents})
+
+    def _submit(self, order: Order) -> list[Execution]:
+        """One order to the book under the session's protection, then any stop it triggered.
+        A wash trade or an off-tick price is refused by the book, as designed; an agent proposing
+        one is a modelling artefact, not a market event."""
+        try:
+            executions = self.book.submit(
+                order, price_protection_ticks=self.config.price_protection_ticks)
+        except BookError:
+            return []
+        return executions + self._fire_stops() if executions else executions
+
+    def _fire_stops(self) -> list[Execution]:
+        """Send every stop whose trigger the last trade reached; a triggered order can move the
+        price through another trigger, so this repeats until none fires."""
+        out: list[Execution] = []
+        while True:
+            last = self.book.last_trade
+            ready = [s for s in self.stops if last is not None and s.triggered_by(last)]
+            if not ready:
+                return out
+            self.stops = [s for s in self.stops if s not in ready]
+            for stop in ready:
+                try:
+                    out.extend(self.book.submit(
+                        stop.order, price_protection_ticks=self.config.price_protection_ticks))
+                except BookError:
+                    continue
+
+    def _route(self, executions: list[Execution], by_id: dict[str, Agent]) -> None:
+        """Tell each counterparty of its fill now, or after the response latency."""
+        for execution in executions:
+            if self.config.response_latency_steps:
+                self.unheard.append((self.clock + self.config.response_latency_steps, execution))
+                continue
+            counterparty = by_id.get(execution.agent_id)
+            if counterparty is not None:
+                counterparty.on_fill(execution)
+
+
+@dataclass
+class StopOrder:
+    """An order sent only once the last trade reaches ``trigger``: at or above it for a buy stop,
+    at or below it for a sell stop. Nautilus's ``STOP_MARKET``/``STOP_LIMIT`` rule
+    (``docs/concepts/backtesting/fill-prices-and-matching.md``; LGPL-3.0, described and rebuilt):
+    the trigger releases an ordinary order, so matching is the book's and nothing else's. A market
+    stop is a limit far through the book, the same way this engine expresses any market order."""
+
+    trigger: Decimal
+    order: Order
+
+    def triggered_by(self, last: Decimal) -> bool:
+        return last >= self.trigger if self.order.side is Side.BUY else last <= self.trigger
 
 
 def build_session(config: SessionConfig | None = None) -> SimulatedSession:
@@ -249,8 +331,11 @@ def measure_exit(
     price = (mid + through) if side is Side.BUY else max(session.book.tick_size, mid - through)
     price = (price / session.book.tick_size).to_integral_value() * session.book.tick_size
 
+    # IOC, so an exit that cannot complete leaves no order resting at an absurd price behind it
+    # to distort whatever is measured on the same book next; unbounded, see the docstring.
     executions = session.book.submit(
-        Order(agent_id="liquidator", side=side, price=price, quantity=quantity)
+        Order(agent_id="liquidator", side=side, price=price, quantity=quantity,
+              time_in_force=TimeInForce.IOC)
     )
     ours = [e for e in executions if e.agent_id == "liquidator"]
     filled = sum((e.quantity for e in ours), _ZERO)

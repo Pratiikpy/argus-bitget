@@ -185,9 +185,11 @@ def export(vectorizer: Any, classifier: Any, *, threshold: float, rows: int,
         "idf": [round(float(v), 6) for v in vectorizer.idf_],
         "coef": [[round(float(v), 6) for v in row] for row in classifier.coef_],
         "intercept": [round(float(v), 6) for v in classifier.intercept_],
-        "provenance": ("Trained on data/lui_kind_train_{A,B,C,D}.jsonl and the 2026-09-25 dev "
-                       "corpus. data/lui_heldout_corpus_2026-09-25.jsonl was not read in "
-                       "training, CV or threshold selection."),
+        # Written from TRAIN_FILES, so it cannot fall behind the files it names: it said
+        # "{A,B,C,D}" long after E-H and the scored-once dev corpus had joined (2026-09-28).
+        "provenance": ("Trained on " + ", ".join(f"data/{f.name}" for f in TRAIN_FILES)
+                       + f". Never read in training, CV or threshold selection: "
+                         f"data/{FINAL_HELDOUT.name} and data/{NEW_KINDS_HELDOUT.name}."),
     }
 
 
@@ -208,14 +210,14 @@ def train() -> dict[str, Any]:
     vectorizer, classifier = _fit(texts, labels, c, ngrams)
     MODEL_PATH.write_text(json.dumps(export(vectorizer, classifier, threshold=threshold,
                                             rows=len(texts), ngrams=ngrams, c=c)),
-                          encoding="utf-8")
+                          encoding="utf-8", newline="\n")
     per_label = Counter(labels)
     report = {
         "training_rows": len(texts), "per_label": dict(sorted(per_label.items())),
         "grid": grid, "chosen": {"ngrams": list(ngrams), "C": c, "cv_accuracy": accuracy},
         "threshold": at, "error_cost": ERROR_COST,
     }
-    REPORT_PATH.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    REPORT_PATH.write_text(json.dumps(report, indent=2), encoding="utf-8", newline="\n")
     return report
 
 

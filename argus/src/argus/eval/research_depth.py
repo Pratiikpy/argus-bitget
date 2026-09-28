@@ -463,7 +463,7 @@ def _append(path: Path, row: Mapping[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     line = json.dumps(artefact.sanitise(dict(row)), allow_nan=False, default=str,
                       ensure_ascii=False)
-    with path.open("a", encoding="utf-8") as handle:
+    with path.open("a", encoding="utf-8", newline="\n") as handle:
         handle.write(line + "\n")
         handle.flush()
         os.fsync(handle.fileno())

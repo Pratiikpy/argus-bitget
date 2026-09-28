@@ -160,7 +160,7 @@ def record(symbols: tuple[str, ...], *, path: Path = TAPE_PATH) -> dict[str, Any
     """Append one snapshot per symbol. Append-only: the tape is the measurement."""
     path.parent.mkdir(parents=True, exist_ok=True)
     written, failed = 0, []
-    with path.open("a", encoding="utf-8") as handle:
+    with path.open("a", encoding="utf-8", newline="\n") as handle:
         for symbol in symbols:
             try:
                 snapshot = fetch_book(symbol)
@@ -418,7 +418,7 @@ def main() -> int:  # pragma: no cover - CLI
 
     report = calibrate()
     CALIBRATION_PATH.parent.mkdir(parents=True, exist_ok=True)
-    CALIBRATION_PATH.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    CALIBRATION_PATH.write_text(json.dumps(report, indent=2), encoding="utf-8", newline="\n")
     print(f"\n  {report['verdict']}")
     print(f"\nwritten to {CALIBRATION_PATH}")
     return 0

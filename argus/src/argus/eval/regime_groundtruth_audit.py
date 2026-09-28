@@ -878,7 +878,7 @@ def render(report: dict[str, Any]) -> str:
 def main() -> int:  # pragma: no cover - CLI
     report = build_report()
     ARTEFACT.parent.mkdir(parents=True, exist_ok=True)
-    ARTEFACT.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
+    ARTEFACT.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8", newline="\n")
     print(render(report))
     print(f"\nwrote {ARTEFACT}")
     return 0

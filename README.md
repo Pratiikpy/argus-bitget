@@ -105,7 +105,7 @@ deflation gate, and the console says so.
 Every capability is graded against the specialist that leads its sub-theme, by a register that
 opens the evidence rather than trusting a filename (`python -m argus.eval.standing`), and may claim
 OWNED only after that rival has been run on the same input and beaten.
-**2 of 44 capabilities are OWNED, 13 are TIED, 28 are IMPLEMENTED, and 1 is LOST (crowd sentiment classification, to RoB-RT on TweetEval: 0.544 against 0.729 macro-recall on the same 12,284 tweets).** OWNED needs
+**2 of 47 capabilities are OWNED, 14 are TIED, 30 are IMPLEMENTED, and 1 is LOST (crowd sentiment classification, to RoB-RT on TweetEval: 0.544 against 0.729 macro-recall on the same 12,284 tweets).** OWNED needs
 all thirteen conditions: the rival's best implementation read and reproduced, a same-input
 comparison with costs, out-of-sample, ablation, an adversarial test, documented failure cases and
 reproducibility.
@@ -173,7 +173,7 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 9,740 tests collected
+pytest -q                       # 9,933 tests collected
 ```
 
 Nothing above needs a credential. On 2026-09-27, with every outbound connection refused, 9,109
@@ -196,11 +196,11 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **9,740 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 525 source files** |
+| Tests | **9,933 tests collected** — `pytest -q` |
+| Types | **`mypy --strict` clean on 543 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
-| Sub-themes | **18/18 sub-themes** each resolve to an importable module and a test file (`python -m argus.status`). That is coverage, not a claim to lead them: 2 of 44 capabilities are OWNED against a named rival, and `/proof` says which |
+| Sub-themes | **18/18 sub-themes** each resolve to an importable module and a test file (`python -m argus.status`). That is coverage, not a claim to lead them: 2 of 47 capabilities are OWNED against a named rival, and `/proof` says which |
 | Understanding | **81.7%** of 240 questions in 12 languages, written blind by an agent that never saw this repository and scored once, were read correctly by the console with no language model (52.1% before the 2026-09-25 fixes); with Qwen reading first, as on the live site, 85.0% — `data/lui_final_heldout_report.json`. Which engine each question reaches is re-scored on every change by `eval/kind_routing.py` |
 | Quoted figures | Every figure these documents quote is re-checked against its artefact by `python -m argus.eval.docclaims --tests`, which fails if one has drifted |
 
@@ -235,8 +235,8 @@ a test that reaches the network shows itself.
 
 ARGUS 是面向 Bitget 美股代币（rToken）的研究工作台（Track 3 · AI Trading Desk）。用自然语言提问，
 七个引擎基于 Bitget 行情、SEC 文件、FRED 与新闻实时计算，每个数字都注明来源；语言模型只理解问题，
-从不编写数字。44 项能力中 42 项已与各子赛道领先的专业系统在相同输入上对比：2 项领先（OWNED）、13 项
-持平、28 项已实现、1 项落后（LOST：人群情绪分类在 TweetEval 上不及 RoB-RT），所有落败记录公开在 `/wrong`。本团队的 Track 2 参赛作品是另一个独立项目
+从不编写数字。47 项能力中 45 项已与各子赛道领先的专业系统在相同输入上对比：2 项领先（OWNED）、14 项
+持平、30 项已实现、1 项落后（LOST：人群情绪分类在 TweetEval 上不及 RoB-RT），所有落败记录公开在 `/wrong`。本团队的 Track 2 参赛作品是另一个独立项目
 （t2-sentiment-agent，独立的代码库、交易日志与演示），不属于本仓库。
 
 ---

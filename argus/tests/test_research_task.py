@@ -27,6 +27,13 @@ from argus.lui.research import ResearchKind, ResearchRequest
 from argus.lui.server import Handler
 from argus.lui.task import Reading, as_dict, read_question, research_task
 
+
+def finished(body: str) -> str:
+    """The page a reader is left with: a streamed research page carries each card three times
+    (waiting, its template, then swapped in), and its finished content is the last template."""
+    marker = "<template id='st-done'>"
+    return body.split(marker, 1)[1].split("</template>", 1)[0] if marker in body else body
+
 LISTED = (
     "TSLAUSDT", "NVDAUSDT", "AAPLUSDT", "MSFTUSDT", "BTCUSDT", "XAUUSDT", "AMDUSDT", "MSTRUSDT",
 )
@@ -301,7 +308,7 @@ class TestThePageTakesAQuestion:
         status, body = _post(f"{base_url}/research", {"q": ASKED, "book": ""})
         assert status == 200
         assert "Read as:</b> add 15% TSLA to 40% NVDA / 30% MSFT / 30% AAPL" in body
-        assert body.count("<article") == 8
+        assert finished(body).count("<article") == 8
         assert '<form method="post" action="/research">' in body
         assert '<textarea name="q"' in body
 

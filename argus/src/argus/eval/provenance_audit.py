@@ -62,7 +62,7 @@ def main() -> int:  # pragma: no cover - CLI
     report = audit()
     report["later_samples"] = [coverage(SAMPLE.parent / name) for name in
                                ("provenance_fresh.json", "provenance_unseen.json")]
-    REPORT.write_text(json.dumps(report, indent=2), "utf-8")
+    REPORT.write_text(json.dumps(report, indent=2), "utf-8", newline="\n")
     print(json.dumps(report, indent=2))
     return 0
 

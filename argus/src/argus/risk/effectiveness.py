@@ -362,7 +362,7 @@ def main() -> int:  # pragma: no cover - CLI
             },
             indent=2,
         ),
-        encoding="utf-8",
+        encoding="utf-8", newline="\n",
     )
     print(f"\n{len(rows)} measurement(s) written to {REPORT_PATH}")
     return 0

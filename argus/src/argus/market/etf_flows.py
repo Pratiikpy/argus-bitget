@@ -184,7 +184,7 @@ def lines_for(symbol: str, snapshot: dict[str, Any] | None,
 
 def main(argv: list[str] | None = None) -> int:  # pragma: no cover - CLI, live network
     snapshot = sweep()
-    FLOWS_PATH.write_text(json.dumps(snapshot, indent=2), encoding="utf-8")
+    FLOWS_PATH.write_text(json.dumps(snapshot, indent=2), encoding="utf-8", newline="\n")
     for symbol in LINKED:
         for line in lines_for(symbol, snapshot):
             print(f"{symbol}: {line}")

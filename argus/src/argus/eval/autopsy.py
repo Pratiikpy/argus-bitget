@@ -139,7 +139,7 @@ def main() -> int:  # pragma: no cover - CLI
         ),
     )
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    REPORT_PATH.write_text(json.dumps(report.as_dict(), indent=2), encoding="utf-8")
+    REPORT_PATH.write_text(json.dumps(report.as_dict(), indent=2), encoding="utf-8", newline="\n")
     print(report.render())
     print(f"\nwritten to {REPORT_PATH}")
     return 0

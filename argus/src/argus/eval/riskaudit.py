@@ -321,7 +321,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     # Written on every run, not only under --json: the artefact is the thing a judge can open.
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     REPORT_PATH.write_text(
-        json.dumps(report.as_dict(), indent=2) + "\n", encoding="utf-8"
+        json.dumps(report.as_dict(), indent=2) + "\n", encoding="utf-8", newline="\n"
     )
     print(f"\nwritten to {REPORT_PATH}")
     return 0

@@ -808,12 +808,12 @@ def main() -> int:  # pragma: no cover - CLI
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     if "--sweep" in sys.argv[1:]:
         swept = sweep(bars, symbol=symbol)
-        SWEEP_PATH.write_text(json.dumps(swept.as_dict(), indent=2), encoding="utf-8")
+        SWEEP_PATH.write_text(json.dumps(swept.as_dict(), indent=2), encoding="utf-8", newline="\n")
         print(swept.render())
         print(f"\nwritten to {SWEEP_PATH}")
         return 0
     result = run(bars, symbol=symbol)
-    REPORT_PATH.write_text(json.dumps(result.as_dict(), indent=2), encoding="utf-8")
+    REPORT_PATH.write_text(json.dumps(result.as_dict(), indent=2), encoding="utf-8", newline="\n")
     print(result.render())
     print(f"\nwritten to {REPORT_PATH}")
     return 0

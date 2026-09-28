@@ -313,7 +313,7 @@ def main() -> int:  # pragma: no cover - CLI
     break_even = point.break_even_accuracy or 0.5
     record = grade(ledger.entries, break_even=break_even)
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    REPORT_PATH.write_text(json.dumps(record.as_dict(), indent=2), encoding="utf-8")
+    REPORT_PATH.write_text(json.dumps(record.as_dict(), indent=2), encoding="utf-8", newline="\n")
     print(record.render())
     print(f"\nwritten to {REPORT_PATH}")
     return 0

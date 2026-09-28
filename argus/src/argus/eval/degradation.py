@@ -399,7 +399,7 @@ def main(*, rebuild: bool = False) -> int:  # pragma: no cover - CLI
         ece_out=ece_out,
     )
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    REPORT_PATH.write_text(json.dumps(result.as_dict(), indent=2), encoding="utf-8")
+    REPORT_PATH.write_text(json.dumps(result.as_dict(), indent=2), encoding="utf-8", newline="\n")
     print(result.render())
     print(f"\ngenerated {datetime.now(UTC).isoformat()} -> {REPORT_PATH}")
     return 0

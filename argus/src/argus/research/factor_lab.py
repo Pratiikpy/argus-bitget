@@ -827,7 +827,7 @@ def main() -> int:
         print(f"\nevery proposal was already evaluated; {out.name} left as it was")
         return 0
 
-    out.write_text(json.dumps(payload, indent=2, default=str), encoding="utf-8")
+    out.write_text(json.dumps(payload, indent=2, default=str), encoding="utf-8", newline="\n")
     print("\ncemetery:")
     for row in payload["cemetery"]:
         print(f"  {row['name']:<22} died at {row['died_at']:<14} {row['reason'][:70]}")

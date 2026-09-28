@@ -431,7 +431,7 @@ def main() -> int:  # pragma: no cover - CLI
     rival_file = clone_path() / "research" / "validation-results.json"
     rival = json.loads(rival_file.read_text(encoding="utf-8")) if rival_file.exists() else None
     report = compare(grid, rival)
-    REPORT_PATH.write_text(json.dumps(report, indent=1), encoding="utf-8")
+    REPORT_PATH.write_text(json.dumps(report, indent=1), encoding="utf-8", newline="\n")
     for key, row in report["predictors"].items():
         print(f"{key:18} cov {row['coverage_pct']:5.1f}%  width {row['width_pct']:6.2f}%  "
               f"matched {row['matched_width_pct']:6.2f}%  Winkler {row['winkler_pct']:7.3f}%")

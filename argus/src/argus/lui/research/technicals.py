@@ -63,9 +63,16 @@ def _answer_the_state_asked(question: str, symbol: str, lines: list[str]) -> lis
     return [*lines[:lead], merged, *lines[lead + 1:]]
 
 
-def _technicals(symbol: str) -> tuple[list[str], list[Source]]:
+def _technicals(symbol: str, *, found: dict[str, Any] | None = None,
+                ) -> tuple[list[str], list[Source]]:
     """RSI, MACD, support/resistance and ATR as `bitget-signal` reports them, and what they say
-    together. Nothing here is recomputed: the figures are the Skill's, and each is sourced to it."""
+    together. Nothing here is recomputed: the figures are the Skill's, and each is sourced to it.
+
+    ``found``, when given, receives the figures stated — ``rsi``, ``macd_histogram``, ``price``,
+    ``support`` and ``resistance`` (the nearest of each, when in range), ``atr`` and ``timeframe``
+    — for a caller that reasons with them rather than with the sentences."""
+    if found is None:
+        found = {}
     calls = [("technical_analysis", {"action": a, "symbol": symbol})
              for a in ("rsi", "macd", "support_resistance", "atr")]
     results = dict(zip(("rsi", "macd", "sr", "atr"), _skill_calls(calls), strict=True))
@@ -76,6 +83,7 @@ def _technicals(symbol: str) -> tuple[list[str], list[Source]]:
     rsi, status = results["rsi"]
     if isinstance(rsi, dict) and rsi.get("rsi") is not None:
         value = float(rsi["rsi"])
+        found.update(rsi=value, timeframe=str(rsi.get("timeframe") or ""))
         state = ("overbought" if value >= 70 else "oversold" if value <= 30 else "neutral")
         lines.append(f"RSI({rsi.get('period', 14)}, {rsi.get('timeframe', '')}) {value:.1f} — "
                      f"{state}.")
@@ -94,6 +102,7 @@ def _technicals(symbol: str) -> tuple[list[str], list[Source]]:
                          f"checked against Bitget's candles just now, so it is not quoted.")
         else:
             line, hist, swapped = checked
+            found["macd_histogram"] = float(hist)
             cross = (str(mine["cross"]) if swapped and mine is not None else
                      str(macd.get("cross") or "").replace("_", " "))
             lines.append(f"MACD {float(macd['macd']):.3f} vs signal {line:.3f} (histogram "
@@ -112,16 +121,19 @@ def _technicals(symbol: str) -> tuple[list[str], list[Source]]:
     sr, status = results["sr"]
     if isinstance(sr, dict) and sr.get("current_price") is not None:
         price = float(sr["current_price"])
+        found["price"] = price
         above = [float(x) for x in sr.get("resistances") or [] if float(x) > price]
         below = [float(x) for x in sr.get("supports") or [] if float(x) < price]
         parts = []
         if above:
             r = min(above)
+            found["resistance"] = r
             parts.append(f"nearest resistance {r:g} ({(r / price - 1) * 100:.1f}% above)")
             if (r / price - 1) * 100 < 1.0:
                 reading.append(f"price is within 1% of resistance at {r:g}")
         if below:
             sp = max(below)
+            found["support"] = sp
             parts.append(f"nearest support {sp:g} ({(1 - sp / price) * 100:.1f}% below)")
         lines.append(f"Price {price:g}: " + ("; ".join(parts) if parts else
                                               "no support or resistance level within range") + ".")
@@ -130,6 +142,7 @@ def _technicals(symbol: str) -> tuple[list[str], list[Source]]:
                               detail=status))
     atr, status = results["atr"]
     if isinstance(atr, dict) and atr.get("atr") is not None:
+        found["atr"] = float(atr["atr"])
         extra = f"; suggested stop distance {atr['stop_distance']}" if atr.get(
             "stop_distance") is not None else ""
         lines.append(f"ATR {float(atr['atr']):.3f} ({atr.get('timeframe', '')}){extra}.")

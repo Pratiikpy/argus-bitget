@@ -86,9 +86,10 @@ from __future__ import annotations
 import hashlib
 import html
 import math
+import os
 import re
 from collections import Counter
-from collections.abc import Iterable, Sequence
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass, field
 from datetime import date
 from typing import Any
@@ -633,7 +634,8 @@ def figure_supported(fig: Figure, passage: str) -> bool:
 class Dropped:
     sentence: str
     reason: str
-    """``uncited`` | ``unresolved_citation`` | ``figure_not_in_citation`` | ``truncated``."""
+    """``uncited`` | ``unresolved_citation`` | ``figure_not_in_citation`` | ``not_entailed`` |
+    ``truncated``."""
     ids: tuple[str, ...] = ()
 
 
@@ -655,6 +657,11 @@ class DocumentAnswer:
     refused: bool = False
     reason: str = ""
     raw: str = ""
+    entail_calls: int = 0
+    unverified: list[str] = field(default_factory=list)
+    """Claims kept without an entailment check because :data:`MAX_ENTAIL_CALLS` was reached."""
+    uncited_by_precision: list[str] = field(default_factory=list)
+    """Citations removed because the claim was supported without them (ALCE precision)."""
 
     @property
     def cited_ids(self) -> list[str]:
@@ -700,6 +707,9 @@ class DocumentAnswer:
             "dropped": [{"sentence": d.sentence, "reason": d.reason, "ids": list(d.ids)}
                         for d in self.dropped],
             "hallucinated_ids": list(self.hallucinated_ids),
+            "entail_calls": self.entail_calls,
+            "unverified": list(self.unverified),
+            "uncited_by_precision": list(self.uncited_by_precision),
             "cited": [c.id for c in self.cited],
             "merely_retrieved": [c.id for c in self.merely_retrieved],
             "sources": [s.as_dict() for s in self.sources],
@@ -714,9 +724,69 @@ def _source(c: Chunk, n: int, *, cited: bool) -> Source:
                   detail=f"{marker}{c.doc.label} · {c.id} · “{snippet}…”")
 
 
+ENTAILMENT_ENV = "ARGUS_DOC_ENTAILMENT"
+Entailer = Callable[[str, str], bool]
+"""``entail(premise, hypothesis)``: does the premise (cited passages) support the whole claim?"""
+
+MAX_ENTAIL_CALLS = 24
+"""Entailment calls allowed for one answer. A claim not reached is kept and marked unverified,
+never silently counted as verified."""
+
+ENTAILMENT_PROMPT = (
+    "You judge whether a statement can be directly inferred from a context. Answer only from the "
+    "context: background knowledge does not count, and a statement that goes beyond the context "
+    "in any part is not inferred. Return JSON {\"verdict\": 1 or 0, \"reason\": \"one sentence\"}."
+)
+"""The shape of RAGAS's ``NLIStatementPrompt`` (`ragas/metrics/_faithfulness.py`, `util.py:82-124`,
+Apache-2.0): one statement against one context, a binary verdict with a stated reason."""
+
+
+def model_entailer(model: ChatModel) -> Entailer:
+    """An entailment check made of one small JSON call (research/harvest/07-alce.md). ALCE uses
+    an 11-billion-parameter NLI model for the same judgement (`eval.py:267-287`), which this
+    desk cannot serve; the definition — premise is the full cited text, hypothesis is the claim
+    with its citations stripped — is ALCE's."""
+    def entail(premise: str, hypothesis: str) -> bool:
+        got = model.complete_json(
+            [{"role": "system", "content": ENTAILMENT_PROMPT},
+             {"role": "user", "content": f"Context:\n{premise[:6000]}\n\nStatement:\n"
+                                         f"{hypothesis[:600]}"}],
+            required_keys=("verdict",), max_tokens=120, thinking=Thinking.LOW)
+        return str(got.get("verdict")).strip() in ("1", "true", "True", "yes")
+    return entail
+
+
+def necessary_citations(ids: Sequence[str], text_of: Callable[[str], str], body: str,
+                        entail: Entailer) -> tuple[tuple[str, ...], int]:
+    """ALCE's citation precision (`eval.py:388-407`, MIT) for a sentence whose joint citations
+    entail it: a citation is needed if it alone entails the sentence, or if the sentence stops
+    being entailed without it. Returns the needed ids (never empty: when each is individually
+    redundant the first is kept, since the set is jointly sufficient) and the calls spent."""
+    if len(ids) < 2:
+        return tuple(ids), 0
+    needed: list[str] = []
+    calls = 0
+    for cid in ids:
+        calls += 1
+        if entail(text_of(cid), body):
+            needed.append(cid)
+            continue
+        rest = [i for i in ids if i != cid]
+        calls += 1
+        if not entail("\n".join(text_of(i) for i in rest), body):
+            needed.append(cid)
+    return (tuple(needed) or (ids[0],)), calls
+
+
 def enforce(question: str, raw: str, retrieved: Sequence[Chunk], *,
-            require_figures: bool = True, truncated: bool = False) -> DocumentAnswer:
-    """Parse a model's answer and keep only what its citations carry. See the module docstring."""
+            require_figures: bool = True, truncated: bool = False,
+            entail: Entailer | None = None) -> DocumentAnswer:
+    """Parse a model's answer and keep only what its citations carry. See the module docstring.
+
+    With ``entail``, a sentence whose figures check out must also be supported as a whole by the
+    passages it cites, or it is dropped as ``not_entailed``; and a sentence citing several
+    passages keeps only those it needs (:func:`necessary_citations`). Figures alone let "revenue
+    rose 12% because of AI demand" through on a passage that carries the 12% and no cause."""
     by_id = {c.id: c for c in retrieved}
     out = DocumentAnswer(question=question, retrieved=list(retrieved), raw=raw)
     text = raw.strip()
@@ -751,6 +821,18 @@ def enforce(question: str, raw: str, retrieved: Sequence[Chunk], *,
             if missing:
                 out.dropped.append(Dropped(body, "figure_not_in_citation", good))
                 continue
+        if entail is not None:
+            if out.entail_calls >= MAX_ENTAIL_CALLS:
+                out.unverified.append(body)
+            else:
+                out.entail_calls += 1
+                if not entail("\n".join(by_id[i].text for i in good), body):
+                    out.dropped.append(Dropped(body, "not_entailed", good))
+                    continue
+                needed, spent = necessary_citations(good, lambda i: by_id[i].text, body, entail)
+                out.entail_calls += spent
+                out.uncited_by_precision.extend(i for i in good if i not in needed)
+                good = needed
         out.claims.append(Claim(body, good))
     if not out.claims:
         out.refused = True
@@ -761,8 +843,10 @@ def enforce(question: str, raw: str, retrieved: Sequence[Chunk], *,
 
 def answer(question: str, chunks: Sequence[Chunk], model: ChatModel, *, k: int = TOP_K,
            mmr_lambda: float = MMR_LAMBDA, require_figures: bool = True,
-           max_tokens: int = MAX_TOKENS, index: Index | None = None) -> DocumentAnswer:
-    """Retrieve, ask, enforce. One model call."""
+           max_tokens: int = MAX_TOKENS, index: Index | None = None,
+           entail: Entailer | None = None) -> DocumentAnswer:
+    """Retrieve, ask, enforce. One model call, plus the entailment calls when ``entail`` is set
+    (at most :data:`MAX_ENTAIL_CALLS`)."""
     idx = index or Index(chunks)
     retrieved = [c for c, _ in idx.search(question, k=k, mmr_lambda=mmr_lambda)]
     if not retrieved:
@@ -771,7 +855,7 @@ def answer(question: str, chunks: Sequence[Chunk], model: ChatModel, *, k: int =
     completion = model.complete(build_prompt(question, retrieved), temperature=0.0,
                                 max_tokens=max_tokens, thinking=Thinking.LOW)
     return enforce(question, completion.content, retrieved, require_figures=require_figures,
-                   truncated=completion.finish_reason == "length")
+                   truncated=completion.finish_reason == "length", entail=entail)
 
 
 def research_answer(question: str, ticker: str, model: ChatModel, *,
@@ -790,7 +874,10 @@ def research_answer(question: str, ticker: str, model: ChatModel, *,
         return ([f"No 10-K, 10-Q or 8-K could be read for {ticker.upper()} on EDGAR."], [],
                 {"refused": True})
     chunks = [c for d in docs for c in chunk(d)]
-    result = answer(question, chunks, model)
+    # The entailment check costs one small call per claim on the metered key, so it runs only
+    # where ARGUS_DOC_ENTAILMENT=1 is set; its absence is stated in the payload, not implied.
+    checked = os.environ.get(ENTAILMENT_ENV) == "1"
+    result = answer(question, chunks, model, entail=model_entailer(model) if checked else None)
     header = ("From " + ", ".join(d.label for d in docs if d.form != "headline")
               + " — each sentence below is backed by the passage it cites; sentences that were "
                 "not were removed.")

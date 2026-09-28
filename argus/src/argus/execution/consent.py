@@ -176,7 +176,7 @@ def grant_live_consent(
             f"so start a new run and consent to that one"
         )
     ledger.parent.mkdir(parents=True, exist_ok=True)
-    with ledger.open("a", encoding="utf-8") as handle:
+    with ledger.open("a", encoding="utf-8", newline="\n") as handle:
         handle.write(json.dumps({
             "run_id": run_id, "granted_at": at.isoformat(), "pid": os.getpid(),
         }) + "\n")

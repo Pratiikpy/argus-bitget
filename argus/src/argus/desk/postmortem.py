@@ -260,7 +260,7 @@ def run(entries: Sequence[Any], risk_records: Sequence[dict[str, Any]], *, root:
     summary["diagnosis"] = {"sample": report.sample, "refused": report.refused,
                             "causes": [d.cause for d in report.diagnoses],
                             "adopted_remedies_that_fired_again": recurred}
-    with paths["log"].open("a", encoding="utf-8") as handle:
+    with paths["log"].open("a", encoding="utf-8", newline="\n") as handle:
         handle.write(json.dumps(summary, default=str) + "\n")
     return summary
 
@@ -295,7 +295,7 @@ def after_cycle(entries: Sequence[Any], risk_records: Sequence[dict[str, Any]], 
     except Exception as exc:
         summary = {"at": when.isoformat(), "triggers": reasons,
                    "failed": f"{type(exc).__name__}: {exc}"}
-        with paths["log"].open("a", encoding="utf-8") as handle:
+        with paths["log"].open("a", encoding="utf-8", newline="\n") as handle:
             handle.write(json.dumps(summary, default=str) + "\n")
     if reasons or previous is None:
         _write_json(paths["state"], {

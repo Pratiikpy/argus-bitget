@@ -179,9 +179,11 @@ class ConstitutionPolicy:
     """Floor on the worst position's forced-exit ``slippage_bps``. ``None`` means the gate does
     not fire.
 
-    **500 bps (5%), our own conservative policy default, stated rather than hidden** — the same
-    "stated, revisable default" honesty as ``max_gross_exposure_notional``. Roughly 40x this
-    venue's own measured round-trip taker cost (~12 bps, `cost/model.py`'s calibrated figure): a
+    **The default is ``None``: the gate is off.** The live cycle computes no forced-exit estimate,
+    so a threshold here could not fire there (`data/risk_policy_live.json` records which gates can).
+    500 bps (5%) is the value `eval/riskproof.py` exercises the gate at — until 2026-09-28 this
+    docstring called it "our own conservative policy default", which the field never was. That
+    value is roughly 40x this venue's measured round-trip taker cost (~12 bps, `cost/model.py`): a
     position that would cost forty times its normal exit to unwind by force is a severity signal
     worth blocking on, however exactly Bitget's own bankruptcy-price math would price it.
     """

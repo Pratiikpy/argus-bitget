@@ -68,6 +68,19 @@ SUBTHEMES: dict[str, tuple[str, str]] = {
 
 TRACK_ORDER = ("Track 3", "Track 2", "Track 1")
 """ARGUS is entered in Track 3, so its sub-themes lead (readiness backlog L61)."""
+THEME_LINKS = {
+    "Factor Discovery Agent": (
+        "<p class='sub'><a href='/factors'>Every factor the lab tested, and the gate each one "
+        "stopped at &rarr;</a></p>"),
+    "Judged: risk control layer effectiveness": (
+        "<p class='sub'><a href='/policy'>Every risk limit, its value, and whether it could fire "
+        "in the last cycle &rarr;</a></p>"),
+    "Judged: Agent architecture quality": (
+        "<p class='sub'><a href='/architecture'>The checked architecture, drawn: layers, "
+        "contracts and every dependency cycle &rarr;</a></p>"),
+}
+"""A page that answers a judged line as a whole, linked under that line's heading."""
+
 TRACK_NOTE = {
     "Track 2": "Not entered with ARGUS: these are the desk's own engines — the decision-maker, "
                "the risk layer, the explanations — measured against Track 2's sub-themes because "
@@ -317,7 +330,8 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
             for win in sorted(mine, key=lambda w: rank.get(w.subtheme, len(rank))):
                 by_theme.setdefault(win.subtheme, []).append(win)
             themes = "".join(
-                f"<h3 class='theme'>{esc(theme)}</h3>" + "".join(_card(w) for w in items)
+                f"<h3 class='theme'>{esc(theme)}</h3>" + THEME_LINKS.get(theme, "")
+                + "".join(_card(w) for w in items)
                 for theme, items in by_theme.items())
             sections.append(f"<section><h2>{esc(track)}</h2>"
                             f"<p class='sub'>{esc(TRACK_NOTE[track])}</p>{themes}</section>")

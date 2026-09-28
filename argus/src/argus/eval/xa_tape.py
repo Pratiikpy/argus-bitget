@@ -224,12 +224,13 @@ def freeze_extra(*, days: int = TAPE_DAYS, end: datetime = TAPE_END,
     blobs["reality.json"] = _fetch_reality()
     for name, blob in blobs.items():
         text = json.dumps(blob, separators=(",", ":"), allow_nan=False)
-        (out_dir / name).write_text(text, encoding="utf-8")
+        (out_dir / name).write_text(text, encoding="utf-8", newline="\n")
         manifest["files"][name] = {"sha256": hashlib.sha256(text.encode()).hexdigest(),
                                    "bytes": len(text.encode()),
                                    "rows": len(blob) if isinstance(blob, list) else None}
     manifest["extra_frozen_at"] = datetime.now(UTC).isoformat()
-    (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2),
+                                           encoding="utf-8", newline="\n")
     return dict(manifest)
 
 
@@ -256,7 +257,7 @@ def freeze(*, days: int = TAPE_DAYS, end: datetime = TAPE_END,
     files: dict[str, Any] = {}
     for name, blob in blobs.items():
         text = json.dumps(blob, separators=(",", ":"), allow_nan=False)
-        (out_dir / name).write_text(text, encoding="utf-8")
+        (out_dir / name).write_text(text, encoding="utf-8", newline="\n")
         rows = len(blob) if isinstance(blob, list) else None
         files[name] = {"sha256": hashlib.sha256(text.encode()).hexdigest(),
                        "bytes": len(text.encode()), "rows": rows}
@@ -267,7 +268,8 @@ def freeze(*, days: int = TAPE_DAYS, end: datetime = TAPE_END,
         "licence_of_data": "Bitget public market data and alternative.me Fear & Greed; "
                            "recorded for evaluation, not redistributed as a product",
     }
-    (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2),
+                                           encoding="utf-8", newline="\n")
     return manifest
 
 

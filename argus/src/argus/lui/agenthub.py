@@ -126,7 +126,7 @@ def main(argv: list[str] | None = None) -> int:  # pragma: no cover - CLI
     args = sys.argv[1:] if argv is None else argv
     if "--record" in args:
         report = record()
-        RECORD_PATH.write_text(json.dumps(report, indent=1) + "\n", encoding="utf-8")
+        RECORD_PATH.write_text(json.dumps(report, indent=1) + "\n", encoding="utf-8", newline="\n")
         print(f"{sum(r['match'] for r in report['orders'])} of {len(report['orders'])} match")
         return 0 if report["all_match"] else 1
     return 0

@@ -190,7 +190,7 @@ def mark(
         lean=(lean or "none").lower(),
     )
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a", encoding="utf-8") as handle:
+    with path.open("a", encoding="utf-8", newline="\n") as handle:
         handle.write(json.dumps(row.as_dict()) + "\n")
     return row
 

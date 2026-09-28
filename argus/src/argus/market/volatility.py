@@ -246,7 +246,7 @@ def history(*, path: Path = CACHE_PATH, timeout: int = 40, refresh: bool = False
             return parse_history(path.read_text(encoding="utf-8"))
         raise
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text, encoding="utf-8")
+    path.write_text(text, encoding="utf-8", newline="\n")
     return parse_history(text)
 
 

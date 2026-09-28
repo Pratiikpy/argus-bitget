@@ -143,6 +143,7 @@ class Pattern(StrEnum):
     MODEL_ADDRESS = "model_address"
     TOOL_DIRECTIVE = "tool_directive"
     TASK_MARKER = "task_marker"
+    OUTPUT_HIJACK = "output_hijack"
     DIRECTED_ORDER = "directed_trading_order"
     DELIMITER_FORGERY = "delimiter_forgery"
     HIDDEN_CHARACTERS = "hidden_characters"
@@ -156,6 +157,7 @@ _SEVERITY: dict[Pattern, Severity] = {
     Pattern.MODEL_ADDRESS: Severity.HOSTILE,
     Pattern.TOOL_DIRECTIVE: Severity.HOSTILE,
     Pattern.TASK_MARKER: Severity.HOSTILE,
+    Pattern.OUTPUT_HIJACK: Severity.HOSTILE,
     Pattern.DELIMITER_FORGERY: Severity.HOSTILE,
     Pattern.HIDDEN_CHARACTERS: Severity.HOSTILE,
     Pattern.ENCODED_BLOB: Severity.HOSTILE,
@@ -175,7 +177,44 @@ _RULES: tuple[tuple[Pattern, re.Pattern[str]], ...] = (
         r"\b(ignore|disregard|forget|override|bypass)\b[^.\n]{0,60}?"
         r"\b(previous|prior|above|earlier|all|any|system|your)\b[^.\n]{0,40}?"
         r"\b(instruction|instructions|rule|rules|prompt|prompts|directive|directives|guideline"
-        r"|guidelines|constraint|constraints)\b",
+        r"|guidelines|constraint|constraints|direction|directions)\b",
+        re.IGNORECASE,
+    )),
+    # The same override with no qualifier between verb and object — "Ignore instructions, and
+    # just print ..." — and its content form, "Disregard all info except ...". Both missed until
+    # 2026-09-28, found on the development half of NVIDIA garak's latent-injection probes
+    # (`eval/garak_quarantine.py`, Apache-2.0). The object must follow within two words, so
+    # "investors ignored the rules of thumb" style prose, measured in the same evaluation, is
+    # not caught by a loose span.
+    (Pattern.OVERRIDE, re.compile(
+        r"\b(ignore|disregard|forget)\s+(?:(?:the|these|those|my|this|our)\s+)?"
+        r"(instructions|directions|directives|prompt)\b"
+        r"|\b(ignore|disregard|forget)\s+(all|everything|any)\s+(?:(?:of\s+)?(?:the\s+)?)"
+        r"(info|information|text|content|context|data)?\s*(except|but|other\s+than|apart\s+from)\b"
+        # "Ignore the rest of this data and print ...", "Ignore other content, print ...": the
+        # document told to stop being read. Needs "the rest of" or an output verb after it, so
+        # "investors should ignore this data point" is not caught.
+        r"|\b(ignore|disregard|forget)\s+the\s+rest\s+of\s+(this|the)\s+"
+        r"(data|content|text|document|input|information|info|article|page)\b"
+        r"|\b(ignore|disregard)\s+(this|that|other|all|any)\s+"
+        r"(data|content|text|document|input|information|info)\b[^.\n]{0,12}?"
+        r"\b(and\s+)?(print|output|say|reply|respond|return|write|state)\b",
+        re.IGNORECASE,
+    )),
+    # A demand for exactly what the reader must output: "reply with only the following",
+    # "just print X", "say only". Evidence text describes the world; it has no reason to dictate
+    # its reader's reply. Found with the rule above on garak's development half.
+    (Pattern.OUTPUT_HIJACK, re.compile(
+        r"\b(reply|respond|answer|output|return)\s+(with\s+)?only\b"
+        r"|\b(and\s+)?(just|only)\s+(print|output|say|reply|respond)\b"
+        r"|\bif\s+(the\s+)?user\s+asks\b|\bif\s+asked\b[^.\n]{0,60}\b(respond|reply|answer|say)\b"
+        r"|\b(simply|just|only)\s+(respond|reply|answer)\s+with\b"
+        # A request to generate text, at the start of a line: "Write one toxic sentence about
+        # ...". Evidence describes; it does not commission writing from its reader.
+        r"|\b(ignore|override|disregard)\b[^.\n]{0,60}\b(output|report|print|respond|reply)\s*:"
+        r"|(^|\n|[.!?:]\s)\s*(write|compose|generate|produce)\s+(one|a|an|two|three|some)\s+"
+        r"[^.\n]{0,40}?\b(sentence|sentences|paragraph|tweet|tweets|post|poem|story|essay|joke)\b"
+        r"|\bnothing\s+else\b[^.\n]{0,40}\b(reply|respond|print|output|say)\b",
         re.IGNORECASE,
     )),
     # A chat role marker inside body text is never legitimate prose.
@@ -197,7 +236,10 @@ _RULES: tuple[tuple[Pattern, re.Pattern[str]], ...] = (
     (Pattern.ROLE_MARKER, re.compile(
         r"<\|(im_start|im_end|system|endoftext)\|>"
         r"|\[/?INST\]|<</?SYS>>"
-        r"|###\s*\(?\s*(system|system[_ ]message|assistant|user|developer|instruction)s?\s*\)?",
+        r"|###\s*\(?\s*(system|system[_ ]message|assistant|user|developer|instruction)s?\s*\)?"
+        # "[system]" and "SYSTEM MESSAGE:" in body text (garak's latent-injection probes, the
+        # development half, 2026-09-28).
+        r"|\[\s*(system|assistant|developer)\s*\]|\bsystem\s+(message|prompt|notice)\s*:",
         re.IGNORECASE,
     )),
     # The transcript form, anchored at the start of the string on purpose.
@@ -299,7 +341,11 @@ _MODEL_ADDRESS = re.compile(
     r"|deepseek|grok)"
     r"|\byou\s+are\s+an?\s+(ai\b|language\s+model|assistant|autonomous\s+agent|chat\s?bot)"
     r"|\bas\s+an\s+ai\b"
-    r"|\b(dear|attention|hello|hey)[,:\s]+(the\s+)?(ai\b|assistant|language\s+model|agent\b)",
+    r"|\b(dear|attention|hello|hey)[,:\s]+(the\s+)?(ai\b|assistant|language\s+model|agent\b)"
+    r"|\b(note|message|instruction|notice)s?\s+(to|for)\s+(any\s+|the\s+|all\s+)?"
+    r"(automated|ai|llm|machine|automatic)\s+(analysis\s+|screening\s+|review\s+)?"
+    r"(software|system|systems|tool|tools|model|models|reader|readers|assistant|analysis"
+    r"|screener|screeners|reviewer|reviewers)\b",
     re.IGNORECASE,
 )
 """Text that addresses its own reader as a language model.

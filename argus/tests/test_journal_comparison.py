@@ -68,9 +68,11 @@ class TestCrlfCase:
         else:
             assert case.verify_reports_clean is True
 
-    def test_argus_paper_ledger_also_writes_crlf_on_this_platform(self) -> None:
+    def test_argus_paper_ledger_is_given_crlf_bytes_on_every_platform(self) -> None:
+        # ARGUS writes LF everywhere now (tests/test_line_endings.py), so the case rewrites the
+        # file to CRLF itself; the condition under test no longer depends on the platform.
         case = run_argus_crlf_case()
-        assert case.disk_bytes_contain_crlf is IS_WINDOWS
+        assert case.disk_bytes_contain_crlf is True
 
     def test_argus_paper_ledger_verifies_clean_under_the_identical_condition(self) -> None:
         case = run_argus_crlf_case()

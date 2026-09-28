@@ -268,7 +268,7 @@ def main() -> int:
     result = study()
     out = DATA_DIR / "gap_study.json"
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(result, indent=2), encoding="utf-8")
+    out.write_text(json.dumps(result, indent=2), encoding="utf-8", newline="\n")
     print(json.dumps(result, indent=2))
     print(f"\nfull report -> {out}")
     return 0

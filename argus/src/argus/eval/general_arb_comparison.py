@@ -161,7 +161,7 @@ def capture(*, rounds: int = 3, levels: int = 25, workers: int = 3,
             "snapshots": snaps, "failures": failures,
         }
         out.write_text(json.dumps(blob, allow_nan=False, separators=(",", ":")),
-                       encoding="utf-8")
+                       encoding="utf-8", newline="\n")
         return blob
 
     blob: dict[str, Any] = {}

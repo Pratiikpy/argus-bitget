@@ -28,7 +28,7 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from datetime import UTC, datetime
 from typing import Any
 
@@ -59,6 +59,11 @@ class Fact:
     """The date it was stated, ISO."""
     price_at: float | None = None
     """For a thesis: the instrument's price when it was stated."""
+    replaces: str = ""
+    """What this fact replaced, as "“the earlier words” (its date)", or empty. One step of
+    history, kept with the fact: mem0 keeps every version (``history()``, Apache-2.0); a trader's
+    browser-held memory keeps the step that matters, the one being overridden, so a changed mind
+    is shown rather than silently applied (research/harvest/04-mem0.md, decision 1)."""
 
     def key(self) -> tuple[str, str]:
         return self.kind, self.subject
@@ -93,7 +98,10 @@ _CAPITAL = re.compile(
     r"\b(?:trading|investing)\s+(?:with\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\b", re.I)
 _THESIS = re.compile(
     r"\bi\s+(?:think|believe|expect|reckon|bet)\s+(?:that\s+)?(.{2,40}?)\s+(?:will|is\s+going\s+to|"
-    r"gonna|should|can|to)\s+(.{3,120})", re.I)
+    r"gonna|should|can|to)\s+(.{3,120}?)(?=\s*(?:[,.;!?]|\b(?:and|but|while)\s+i\s|$))", re.I)
+"""One view per match, ending at the clause's end, so "I think NVDA will rise and I think BTC will
+crash" is two theses. Until 2026-09-28 the claim ran to the end of the message and only the first
+view was kept (research/harvest/04-mem0.md, the multi-topic case mem0 is built for)."""
 _ASKING = re.compile(r"^\s*(?:what|how|should|is|are|does|do|can|could|why|when|which|will|would|"
                      r"where|who)\b|\?\s*$", re.I)
 """A question states nothing about the trader: "what if I can't lose more than 10%?" and "should
@@ -144,7 +152,7 @@ def extract(question: str, now: datetime | None = None,
         amount *= 1_000 if unit == "k" else 1_000_000 if unit == "m" else 1
         if amount >= 100:
             add("capital", "", f"{amount:.0f}", m.group(0))
-    if (m := _THESIS.search(text)) is not None:
+    for m in _THESIS.finditer(text):
         named = research_symbols(m.group(1))[0]
         if named:
             claim = m.group(2)
@@ -157,7 +165,7 @@ def extract(question: str, now: datetime | None = None,
                 except Exception:
                     price = None
             add("thesis", named[0], lean, m.group(0), price)
-    if (m := _AVOID.search(text)) is not None:
+    for m in _AVOID.finditer(text):
         named = research_symbols(m.group(1))[0]
         if named:
             add("avoid", named[0], "avoid", m.group(0))
@@ -201,17 +209,28 @@ def parse(raw: str | None) -> list[Fact]:
                 kind=str(row["kind"]), subject=str(row.get("subject", ""))[:24],
                 value=str(row.get("value", ""))[:40], text=str(row.get("text", ""))[:MAX_TEXT],
                 at=str(row.get("at", ""))[:10],
-                price_at=float(price) if isinstance(price, (int, float)) else None))
+                price_at=float(price) if isinstance(price, (int, float)) else None,
+                replaces=str(row.get("replaces", ""))[:MAX_TEXT + 20]))
         except (KeyError, TypeError, ValueError):
             continue
     return out
 
 
 def merge(old: list[Fact], new: list[Fact]) -> list[Fact]:
-    """A newer fact of the same kind and subject replaces the older; the rest are kept, newest
+    """A newer fact of the same kind and subject replaces the older, and records what it replaced
+    (a repeat of the same statement keeps the record it already had); the rest are kept, newest
     first, up to :data:`MAX_FACTS`."""
-    replaced = {f.key() for f in new}
-    kept = [*new, *(f for f in old if f.key() not in replaced)]
+    prior = {f.key(): f for f in old}
+    stamped: list[Fact] = []
+    for fact in new:
+        was = prior.get(fact.key())
+        if was is not None and (was.value, was.text) != (fact.value, fact.text):
+            fact = replace(fact, replaces=f"“{was.text[:120]}” ({was.at})")
+        elif was is not None and was.replaces and not fact.replaces:
+            fact = replace(fact, replaces=was.replaces)
+        stamped.append(fact)
+    replaced = {f.key() for f in stamped}
+    kept = [*stamped, *(f for f in old if f.key() not in replaced)]
     return kept[:MAX_FACTS]
 
 
@@ -225,7 +244,8 @@ def get(facts: list[Fact], kind: str, subject: str = "") -> Fact | None:
 
 def remembered_line(fact: Fact, use: str) -> str:
     """How a remembered fact is shown when it shapes an answer."""
-    return f"Remembered: you said “{fact.text}” on {fact.at} — {use}."
+    earlier = f" (replacing {fact.replaces})" if fact.replaces else ""
+    return f"Remembered: you said “{fact.text}” on {fact.at}{earlier} — {use}."
 
 
 def thesis_line(fact: Fact, name: str, price_now: float | None) -> str:
@@ -399,7 +419,8 @@ def _span(hours: int) -> str:
 
 def acknowledgement(new: list[Fact]) -> list[str]:
     """The reply to a message that only tells the console something about the trader."""
-    said = "; ".join(f"“{f.text}”" for f in new)
+    said = "; ".join(f"“{f.text}”" + (f", replacing {f.replaces}" if f.replaces else "")
+                     for f in new)
     return [f"Bottom line: noted — {said}. It is kept in this browser only and shapes every later "
             f"answer it applies to, each time with a Remembered: line saying so; forget it from "
             f"the list under your book."]

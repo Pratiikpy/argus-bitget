@@ -166,3 +166,19 @@ def test_scope_statement_is_honest_about_what_is_not_claimed() -> None:
     assert "NOT claimed" in SCOPE_STATEMENT
     assert "Froot" in SCOPE_STATEMENT
     assert "arbitrage" in SCOPE_STATEMENT.lower()
+
+
+def test_daily_series_anchored_an_hour_apart_still_pair_by_day() -> None:
+    """The collapsed daily grids of two panels that start an hour apart share no exact
+    timestamp; they must still pair (the 2026-09-28 live failure, zero pairs out of 28)."""
+    import pandas as pd
+
+    from argus.eval.factor_divergence_comparison import _paired_diffs
+
+    days = pd.date_range("2026-07-31 05:00", periods=5, freq="D", tz="UTC")
+    market = pd.Series([0.1, 0.2, 0.3, 0.4, 0.5], index=days)
+    index = pd.Series([0.0, 0.1, 0.1, 0.2, float("nan")], index=days - pd.Timedelta(hours=1))
+    assert _paired_diffs(market, index) == pytest.approx([0.1, 0.1, 0.2, 0.2])
+    hourly = pd.date_range("2026-07-31 05:00", periods=3, freq="h", tz="UTC")
+    same = pd.Series([0.1, 0.2, 0.3], index=hourly)
+    assert _paired_diffs(same, same) == pytest.approx([0.0, 0.0, 0.0])

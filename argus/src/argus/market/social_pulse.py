@@ -57,7 +57,9 @@ encoding bugs those CLIs have.
 
 from __future__ import annotations
 
+import hashlib
 import json
+import re
 from collections import Counter
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
@@ -78,6 +80,12 @@ from argus.truth.paths import DATA_DIR
 
 DATA = DATA_DIR
 PULSE_PATH = DATA / "social_pulse.json"
+SHARES_PATH = DATA / "social_shares.jsonl"
+"""Who carried which story, one line per account and story per sweep, kept for
+:data:`SHARES_KEPT`: the history the account graph (`truth/coordination_graph.py`) is built on."""
+SHARES_KEPT = timedelta(days=30)
+NEWLINE = "\n"
+"""Lines split on this only: `str.splitlines` also breaks on U+2028, which posts contain."""
 PER_CHANNEL = 30
 """Posts asked of each platform per name. Enough for a story to repeat, few enough that a sweep
 of twelve names finishes in minutes."""
@@ -278,6 +286,9 @@ def pulse(symbol: str, posts: Sequence[Post], status: Sequence[str],
         by_channel[post.channel] = by_channel.get(post.channel, 0) + 1
     tone_summary, post_tone = _tone(kept, report, tone)
     tone_summary["withheld_not_scored"] = sum(withheld.values())
+    shares = [[author, story_key(story.representative), story.coordinated]
+              for story in report.clusters for author in sorted(set(story.sources))
+              if shown(author) != WITHHELD_HANDLE]
     return {
         "symbol": symbol,
         "posts": len(kept),
@@ -292,6 +303,7 @@ def pulse(symbol: str, posts: Sequence[Post], status: Sequence[str],
         "top_stories": stories,
         "tone": tone_summary,
         "post_tone": post_tone,
+        "shares": shares,
         "status": list(status),
         "checked_at": now.isoformat(),
     }
@@ -316,6 +328,81 @@ def sweep(symbols: Sequence[str], *, fetch: Fetch = fetch_live,
         "tone_weighting": TONE_WEIGHTING,
         "symbols": rows,
     }
+
+
+def story_key(text: str) -> str:
+    """A story's id across sweeps: the first 40 words of its earliest post, lowercased, hashed. Two
+    sweeps that see the same line give the same key; a rewrite is a different story, as it is to
+    the per-sweep detector."""
+    words = re.findall(r"[a-z0-9]+", text.lower())[:40]
+    return "s-" + hashlib.sha256(" ".join(words).encode("utf-8")).hexdigest()[:16]
+
+
+def record_shares(snapshot: dict[str, Any], path: Path = SHARES_PATH) -> int:
+    """Append this sweep's (account, story) pairs to the history and drop lines older than
+    :data:`SHARES_KEPT`. Returns the lines written."""
+    try:
+        taken = datetime.fromisoformat(str(snapshot["generated_at"]))
+    except (KeyError, ValueError):
+        return 0
+    keep: list[str] = []
+    try:
+        for line in path.read_text(encoding="utf-8").split(NEWLINE):
+            if not line.strip():
+                continue
+            try:
+                at = datetime.fromisoformat(json.loads(line)["at"])
+            except (ValueError, KeyError, TypeError):
+                continue
+            if taken - at <= SHARES_KEPT:
+                keep.append(line)
+    except OSError:
+        pass
+    new = [json.dumps({"at": taken.isoformat(), "symbol": row["symbol"], "account": account,
+                       "story": story, "coordinated": bool(flag)}, ensure_ascii=False)
+           for row in snapshot.get("symbols", [])
+           for account, story, flag in row.get("shares", [])]
+    body = NEWLINE.join([*keep, *new])
+    path.write_text(body + (NEWLINE if body else ""), encoding="utf-8", newline="\n")
+    return len(new)
+
+
+def repeat_pairs(path: Path = SHARES_PATH) -> list[dict[str, Any]]:
+    """Account pairs that carried several stories together in the kept history, on stories the
+    per-sweep screen never called coordinated — the network the stateless screen cannot see
+    (`truth/coordination_graph.py`; measured on the sentiment agent's first run in
+    `data/coordination_graph_eval.json`)."""
+    from argus.truth.coordination_graph import Share, edges, strong
+
+    flagged: dict[str, bool] = {}
+    symbols: dict[str, set[str]] = {}
+    seen: set[tuple[str, str]] = set()
+    shares: list[Share] = []
+    try:
+        lines = path.read_text(encoding="utf-8").split(NEWLINE)
+    except OSError:
+        return []
+    for line in lines:
+        if not line.strip():
+            continue
+        try:
+            row = json.loads(line)
+            account, story = str(row["account"]), str(row["story"])
+        except (ValueError, KeyError, TypeError):
+            continue
+        flagged[story] = flagged.get(story, False) or bool(row.get("coordinated"))
+        symbols.setdefault(account, set()).add(str(row.get("symbol", "")))
+        if (account, story) not in seen:
+            seen.add((account, story))
+            shares.append(Share(account, story))
+    out = []
+    for edge in strong(edges(shares)):
+        if any(flagged.get(s) for s in edge.stories):
+            continue
+        out.append({"accounts": [edge.left, edge.right], "stories": edge.weight,
+                    "symbols": sorted(symbols.get(edge.left, set())
+                                      & symbols.get(edge.right, set()))})
+    return out
 
 
 def load(path: Path = PULSE_PATH) -> dict[str, Any] | None:
@@ -406,6 +493,14 @@ def lines_for(symbol: str, snapshot: dict[str, Any] | None,
     else:
         out.append("No story is carried by more than one account — the talk is scattered, not "
                    "converging on a single narrative.")
+    authors = {a for s in row.get("top_stories", []) for a in s.get("authors", [])}
+    pairs = [p for p in snapshot.get("repeat_pairs", []) if symbol in p.get("symbols", [])
+             and authors & set(p.get("accounts", []))]
+    if pairs:
+        most = max(p["stories"] for p in pairs)
+        out.append(f"{len(pairs)} pair{'s' if len(pairs) != 1 else ''} of accounts on {ticker} "
+                   f"have posted together on as many as {most} stories in the last 30 days, none "
+                   "of them flagged story by story: a network, not independent voices.")
     tone = tone_line(ticker, row)
     if tone:
         out.append(tone)
@@ -453,7 +548,10 @@ def main(argv: list[str] | None = None) -> int:  # pragma: no cover - CLI, live 
     parser.add_argument("--out", type=Path, default=PULSE_PATH)
     args = parser.parse_args(argv)
     snapshot = sweep(TRADED_SYMBOLS)
-    args.out.write_text(json.dumps(snapshot, indent=2, ensure_ascii=False), encoding="utf-8")
+    record_shares(snapshot)
+    snapshot["repeat_pairs"] = repeat_pairs()
+    args.out.write_text(json.dumps(snapshot, indent=2, ensure_ascii=False),
+                        encoding="utf-8", newline="\n")
     for row in snapshot["symbols"]:
         share = row["tone"].get("share") or {}
         tone = " ".join(f"{k[:3]} {share.get(k, 0):.0%}" for k in TONES) if share else "-"

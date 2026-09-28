@@ -620,7 +620,7 @@ def run(snapshot: Path = SNAPSHOT, outputs: Path = OUTPUTS) -> dict[str, Any]:
 def main(argv: Sequence[str] | None = None) -> int:
     del argv
     report = run()
-    ARTEFACT.write_text(json.dumps(report, indent=1, default=str), encoding="utf-8")
+    ARTEFACT.write_text(json.dumps(report, indent=1, default=str), encoding="utf-8", newline="\n")
     a = report["argus"]
     print(f"{'argus':24s} latest {a['latest_quarter']['right']}/{a['latest_quarter']['questions']}"
           f" leak {a['latest_quarter']['leak']} late {a['latest_quarter']['late']} | restated "

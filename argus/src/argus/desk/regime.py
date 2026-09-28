@@ -522,7 +522,7 @@ def main() -> int:  # pragma: no cover - CLI
     print(report.render())
     out = DATA_DIR / "regimes.json"
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(report.as_dict(), indent=2), encoding="utf-8")
+    out.write_text(json.dumps(report.as_dict(), indent=2), encoding="utf-8", newline="\n")
     print(f"\nwritten to {out}")
     return 0
 

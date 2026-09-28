@@ -169,7 +169,7 @@ def resolve_all(
 
     if fresh:
         resolution_path.parent.mkdir(parents=True, exist_ok=True)
-        with resolution_path.open("a", encoding="utf-8") as handle:
+        with resolution_path.open("a", encoding="utf-8", newline="\n") as handle:
             for claim in fresh:
                 blob = asdict(claim)
                 blob["predicate"] = str(claim.predicate)
@@ -332,7 +332,7 @@ def main() -> int:  # pragma: no cover - CLI
             print(f"    {miss['claim']}  observed {miss['observed_shown']}")
 
     out = REGISTER_PATH.parent / "register_scoreboard.json"
-    out.write_text(json.dumps(board, indent=2), encoding="utf-8")
+    out.write_text(json.dumps(board, indent=2), encoding="utf-8", newline="\n")
     print(f"\nwritten to {out}")
     return 0
 

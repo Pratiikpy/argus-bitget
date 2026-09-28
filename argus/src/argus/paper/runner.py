@@ -39,6 +39,7 @@ from collections.abc import Collection, Sequence
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
+from typing import Any
 
 from argus.agents.desk import DeskRun, TradingDesk
 from argus.cost.model import CostModel
@@ -200,7 +201,7 @@ def _write_notes(
     """
     try:
         NOTES_PATH.parent.mkdir(parents=True, exist_ok=True)
-        with NOTES_PATH.open("a", encoding="utf-8") as fh:
+        with NOTES_PATH.open("a", encoding="utf-8", newline="\n") as fh:
             fh.write(json.dumps({
                 "seq": seq,
                 "symbol": symbol,
@@ -247,8 +248,51 @@ def current_book_state(ledger: PaperLedger) -> object:
     return BookState(
         equity=equity, peak_equity=peak, session_open_equity=equity,
         consecutive_losses=consecutive,
-        open_positions=len([e for e in ledger.entries if not e.is_settled]),
+        # A position is a decision that took one. Until 2026-09-28 every unsettled row counted,
+        # refusals included — 56 on that day, none holding anything — so a halted breaker would
+        # have ruled REDUCE, reducing positions that did not exist, where NO_TRADE is right.
+        open_positions=len([e for e in ledger.entries
+                            if not e.is_settled and not e.is_abstention]),
     )
+
+
+def current_book(ledger: PaperLedger) -> object:
+    """The positions the ledger's decisions took, as the Constitution's book gates read them
+    (:class:`argus.desk.book.Book`): every decision that took a position opens a lot at its entry
+    price, and a settled one closes it at its exit price, so gross and net notional and each
+    symbol's realised PnL are the ledger's own.
+
+    Until 2026-09-28 the cycle handed the Constitution no book, and the gross-exposure,
+    net-exposure, hedge-integrity, margin and per-symbol-loss gates skipped on every decision
+    (`data/risk_policy_live.json` now records which gates could fire). An empty book is a
+    measurement — nothing is held — not an absence, so those gates now have their input."""
+    from argus.decision.verdicts import PositionSide
+    from argus.desk.book import Book, Lot
+
+    book = Book()
+    for entry in ledger.entries:
+        if entry.kind != "decision" or entry.is_abstention:
+            continue
+        quantity, price = Decimal(entry.quantity), Decimal(entry.entry_price)
+        if quantity <= 0 or price <= 0:
+            continue
+        buying = entry.side.upper() == "BUY"
+        slot = PositionSide.LONG if buying else PositionSide.SHORT
+        opened_at = datetime.fromisoformat(entry.decided_at)
+        book.apply_fill(symbol=entry.symbol, side=slot, lot=Lot(
+            order_id=f"paper-{entry.seq}", approved_intent_hash=entry.approved_intent_hash,
+            side="buy" if buying else "sell", quantity=quantity, price=price,
+            commission=quantity * price * Decimal(entry.entry_cost_bps or "0") / 10_000,
+            ts_filled=opened_at))
+        if entry.is_settled and entry.exit_price and entry.settled_at:
+            exit_price = Decimal(entry.exit_price)
+            if exit_price > 0:
+                book.apply_fill(symbol=entry.symbol, side=slot, lot=Lot(
+                    order_id=f"paper-{entry.seq}-exit",
+                    approved_intent_hash=entry.approved_intent_hash,
+                    side="sell" if buying else "buy", quantity=quantity, price=exit_price,
+                    commission=Decimal("0"), ts_filled=datetime.fromisoformat(entry.settled_at)))
+    return book
 
 
 def _graded_predictions(ledger: PaperLedger) -> list[object]:
@@ -362,7 +406,7 @@ def _write_risk_record(seq: int, symbol: str, at: datetime, run: DeskRun) -> Non
     )
     try:
         RISK_PATH.parent.mkdir(parents=True, exist_ok=True)
-        with RISK_PATH.open("a", encoding="utf-8") as fh:
+        with RISK_PATH.open("a", encoding="utf-8", newline="\n") as fh:
             fh.write(json.dumps({
                 "seq": seq,
                 "symbol": symbol,
@@ -834,6 +878,25 @@ def _resume_answered(
     return runs, log
 
 
+def cycle_policy(path: Path) -> tuple[dict[str, Any], str, str]:
+    """The risk thresholds one cycle runs under, from the policy file (`risk/policy_manifest`):
+    ``(keyword arguments, version, refusal)``.
+
+    The limits the desk runs under are a file a reader can open, and editing it (then sealing it)
+    is how they change. No file means the code defaults, recorded as such. A file that does not
+    load — unsealed edit, missing threshold, wrong type — returns a refusal and the cycle decides
+    nothing new: a policy that cannot be read is not replaced by a guess at what it meant."""
+    from argus.risk import policy_manifest
+
+    if not path.exists():
+        return {}, "code defaults", ""
+    try:
+        kwargs, version = policy_manifest.load(path)
+    except policy_manifest.PolicyError as exc:
+        return {}, "", str(exc)
+    return kwargs, version, ""
+
+
 def run_once(
     *,
     symbols: tuple[str, ...] = ("NVDAUSDT",),
@@ -978,7 +1041,13 @@ def run_once(
     # held for a human rather than ended; and before anything new is decided, every hold a human
     # has answered is resumed from its paused point and booked exactly like a fresh decision.
     store = pause_store if pause_store is not None else PauseStore(pause_root(ledger_path))
-    resumed_runs, resumed_log = _resume_answered(desk, store, now=now, priced=tickers.keys())
+    # A person's kill switch (`execution/kill.py`) stops new decisions and resumed ones alike;
+    # settling what was already decided, above, is bookkeeping and carries on.
+    from argus.execution.kill import engaged as kill_engaged
+
+    killed = kill_engaged()
+    resumed_runs, resumed_log = ([], []) if killed else _resume_answered(
+        desk, store, now=now, priced=tickers.keys())
     for resumed in resumed_runs:
         resumed_ticker = tickers[resumed.symbol]
         written.append(_record_run(
@@ -998,7 +1067,17 @@ def run_once(
         ))
 
     stopped_early = ""
-    for index, symbol in enumerate(symbols):
+    if killed:
+        stopped_early = (f"kill switch engaged by {killed.get('by', 'unknown')} at "
+                         f"{killed.get('at', '?')}: {killed.get('why', '')}; nothing was decided")
+    from argus.risk import policy_manifest
+
+    policy_path = ledger_path.with_name(policy_manifest.POLICY_PATH.name)
+    policy_kwargs, policy_version, policy_refused = cycle_policy(policy_path)
+    if policy_refused and not stopped_early:
+        stopped_early = f"risk policy refused: {policy_refused}; nothing new was decided"
+    policy_live: dict[str, dict[str, Any]] = {}
+    for index, symbol in enumerate(() if killed or policy_refused else symbols):
         if symbol not in tickers:
             continue
         # Stop cleanly with what has been written rather than dying with nothing. A cycle that
@@ -1116,10 +1195,13 @@ def run_once(
         # open. An unmeasured symbol leaves the gate inert and the autopsy records it as
         # UNREACHED rather than as passed.
         active_policy = ConstitutionPolicy(
+            **policy_kwargs,
             session_risk=session_lookup(symbol),
             book_state=current_book_state(ledger),
+            book=current_book(ledger),
             graded_predictions=_graded_predictions(ledger),
         )
+        policy_live[symbol] = policy_manifest.live_record(active_policy, policy_version, at=now)
         # Enough left for this symbol's debate AND for every symbol still to come at its base cost.
         still_to_decide = len(symbols) - index
         debate_affordable = client.budget is None or (
@@ -1167,8 +1249,22 @@ def run_once(
             open_positions=open_positions,
         ))
 
+    if policy_live:
+        # What this cycle actually ran under: the thresholds, their digest, and per symbol which
+        # gates had the input they need. A threshold whose input the cycle never supplies cannot
+        # fire, and this file is where that is said rather than assumed.
+        first = next(iter(policy_live.values()))
+        ledger_path.with_name(policy_manifest.LIVE_PATH.name).write_text(json.dumps({
+            "at": now.isoformat(timespec="seconds"), "digest": policy_version,
+            "source": policy_path.name if policy_kwargs else "code defaults",
+            "thresholds": first["thresholds"],
+            "per_symbol": {s: {"can_fire": r["can_fire"], "cannot_fire": r["cannot_fire"]}
+                           for s, r in policy_live.items()},
+        }, indent=1) + "\n", encoding="utf-8", newline="\n")
+
     return {
         "ran_at": now.isoformat(),
+        "risk_policy": policy_refused or policy_version,
         "decisions_written": written,
         "settled_this_cycle": settled,
         # The self-review this cycle triggered, if any (`desk/postmortem.py`): why it ran, what the

@@ -145,7 +145,7 @@ def _remember(report: Report) -> None:
         if finding.status in {"OK", "LAGGING", "STALE"} and finding.line is not None:
             seen[f"{finding.claim}|{finding.doc}"] = finding.line
     payload = json.dumps(dict(sorted(seen.items())), indent=2) + chr(10)
-    SEEN_PATH.write_text(payload, encoding="utf-8")
+    SEEN_PATH.write_text(payload, encoding="utf-8", newline="\n")
 
 
 def parse_number(text: str) -> Number:
@@ -1355,7 +1355,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"FIXED     {line}")
         if repaired:
             report = audit(include_expensive=include_expensive)
-    REPORT_PATH.write_text(json.dumps(report.as_dict(), indent=2), encoding="utf-8")
+    REPORT_PATH.write_text(json.dumps(report.as_dict(), indent=2), encoding="utf-8", newline="\n")
     _remember(report)
     for finding in report.findings:
         if finding.status == "ABSENT":

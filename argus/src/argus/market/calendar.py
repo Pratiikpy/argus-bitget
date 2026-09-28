@@ -108,7 +108,7 @@ def refresh(out: Path = SNAPSHOT) -> dict[str, Any]:
             record[key] = previous[key]  # keep the last good schedule rather than an empty one
             record[f"{key}_source"] = previous.get(f"{key}_source", "") + " (previous snapshot)"
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+    out.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8", newline="\n")
     return record
 
 

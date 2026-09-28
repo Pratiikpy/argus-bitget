@@ -263,6 +263,40 @@ class TestEverySeatSwapsOnOneLine:
         with pytest.raises(ValueError, match="og_qwen"):
             provider.seat(budget_limit=10)
 
+    def test_the_fallback_chain_takes_the_seat_in_the_owners_order(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.llm import provider
+
+        monkeypatch.setenv(provider.SEAT_ENV, "fallback")
+        chain = provider.seat(budget_limit=10, timeout=5.0)
+        assert isinstance(chain, FallbackClient)
+        assert chain._order == FALLBACK_ORDER[Mode.SUBMISSION]
+        assert chain._client_kwargs[Provider.QWEN] == {"timeout": 5.0}
+        monkeypatch.setenv(provider.SEAT_ENV, "fallback:testing")
+        testing = provider.seat(budget_limit=10)
+        assert isinstance(testing, FallbackClient)
+        assert testing._order == FALLBACK_ORDER[Mode.TESTING]
+        monkeypatch.setenv(provider.SEAT_ENV, "fallback:prod")
+        with pytest.raises(ValueError, match="submission"):
+            provider.seat(budget_limit=10)
+
+    def test_the_chain_seated_falls_through_like_the_chain_built(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.llm import provider
+
+        monkeypatch.setenv(provider.SEAT_ENV, "fallback")
+        monkeypatch.setenv("BITGET_QWEN_API_KEY", "k")
+        monkeypatch.setenv("OG_QWEN_API_KEY", "k")
+        monkeypatch.delenv("NVIDIA_API_KEY", raising=False)
+        fakes = {Provider.QWEN: _FakeClient(fails=True, detail="balance"),
+                 Provider.OG_QWEN: _FakeClient(fails=False)}
+        chain = provider.seat(budget_limit=10)
+        assert isinstance(chain, FallbackClient)
+        monkeypatch.setattr(chain, "_client_for", lambda p: fakes[p])
+        chain.complete([{"role": "user", "content": "x"}])
+        assert chain.last_used is Provider.OG_QWEN
+        assert next(a.provider for a in chain.attempts if not a.ok) is Provider.QWEN
+
     def test_no_product_module_builds_the_client_itself(self) -> None:
         import re
         from pathlib import Path

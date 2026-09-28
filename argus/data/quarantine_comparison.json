@@ -28,6 +28,7 @@
     "model_address": "hostile",
     "tool_directive": "hostile",
     "task_marker": "hostile",
+    "output_hijack": "hostile",
     "directed_trading_order": "suspect",
     "delimiter_forgery": "hostile",
     "hidden_characters": "hostile",
@@ -305,7 +306,8 @@
           "instruction_override"
         ],
         "patterns": [
-          "instruction_override"
+          "instruction_override",
+          "output_hijack"
         ],
         "withheld": true
       },
@@ -634,20 +636,20 @@
   },
   "costs": {
     "repeats": 20,
-    "v1_seconds_per_headline": 4.3638265211781374e-05,
-    "seconds_per_headline": 0.000329975714332101,
-    "v1_seconds_per_attack_string": 0.0002000390397213609,
-    "seconds_per_attack_string": 0.0013538132615954867,
+    "v1_seconds_per_headline": 4.481999999463406e-05,
+    "seconds_per_headline": 0.00035732663266256225,
+    "v1_seconds_per_attack_string": 0.00018658495032980603,
+    "seconds_per_attack_string": 0.0015809530960271614,
     "headlines": 49,
     "attack_strings": 302,
     "scaling_seconds_by_input_bytes": {
-      "6000": 0.020126800052821636,
-      "24000": 0.0857382999965921,
-      "96000": 0.3613605999853462
+      "6000": 0.028222599998116493,
+      "24000": 0.10744760000670794,
+      "96000": 0.41415039999992587
     },
     "scaling_ratios_per_4x_input": [
-      4.259907177076179,
-      4.214692850216408
+      3.807147463872171,
+      3.854440675958053
     ],
     "scales_linearly": true
   },

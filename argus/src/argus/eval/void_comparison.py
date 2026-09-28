@@ -151,7 +151,7 @@ def freeze() -> dict[str, Any]:
             "observations": [{**r, "fri": r["fri"].isoformat()} for r in core.observations()],
             "rtoken_closes": closes}
     DATA.mkdir(parents=True, exist_ok=True)
-    FROZEN.write_text(json.dumps(blob, separators=(",", ":")), "utf-8")
+    FROZEN.write_text(json.dumps(blob, separators=(",", ":")), "utf-8", newline="\n")
     return blob
 
 
@@ -175,11 +175,11 @@ def collect(symbols: set[str]) -> dict[str, Any]:
             continue
         rows = [[int(b.ts.timestamp() * 1000), str(b.open), str(b.high), str(b.low),
                  str(b.close), str(b.volume), "0"] for b in bars]
-        (DATA / f"{perp}.json").write_text(json.dumps(rows), "utf-8")
+        (DATA / f"{perp}.json").write_text(json.dumps(rows), "utf-8", newline="\n")
         found.append(perp)
     manifest = {"fetched": dt.datetime.now(dt.UTC).isoformat(timespec="seconds"),
                 "perpetuals": found, "failures": failures}
-    (DATA / "manifest.json").write_text(json.dumps(manifest, indent=1), "utf-8")
+    (DATA / "manifest.json").write_text(json.dumps(manifest, indent=1), "utf-8", newline="\n")
     return manifest
 
 

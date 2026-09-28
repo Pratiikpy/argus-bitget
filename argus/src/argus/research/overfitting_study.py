@@ -312,7 +312,7 @@ def render(payload: dict[str, Any]) -> str:
 def main() -> None:
     payload = study()
     STUDY_PATH.parent.mkdir(parents=True, exist_ok=True)
-    STUDY_PATH.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    STUDY_PATH.write_text(json.dumps(payload, indent=2), encoding="utf-8", newline="\n")
     print(render(payload))
     print(f"\nwritten to {STUDY_PATH}")
 

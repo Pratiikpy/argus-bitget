@@ -272,6 +272,65 @@ def _equal_risk_weights(names: Sequence[str], columns: Mapping[str, Sequence[flo
     return weights if worst <= 0.01 else None
 
 
+def _within_limits(weights: Mapping[str, float], columns: Mapping[str, Sequence[float]],
+                   cap: float | None, count: int | None, risk_cap: float | None
+                   ) -> dict[str, Any]:
+    """The equal-risk book bent as little as possible to meet the limits the trader stated — a
+    per-name cap, a number of names, a cap on any name's share of risk (`desk/constrained.py`).
+
+    Returns ``status``, and either the new ``weights`` with a ``headline`` and a ``limits_line``
+    saying what the limits cost, or, when they cannot all hold, a ``plain`` reason. The distance
+    is measured in risk, so a 1-point move in a volatile name counts for more than in a quiet one.
+    """
+    from argus.desk.constrained import ConstraintError, Limits, allocate
+    from argus.desk.portfolio import covariance_matrix
+
+    stated = [*([f"at most {count} names"] if count is not None else []),
+              *([f"no more than {cap:.0%} in any one"] if cap is not None else []),
+              *([f"no name above {risk_cap:.0%} of the risk"] if risk_cap is not None else [])]
+    said = ", ".join(stated)
+    built = covariance_matrix({n: columns[n] for n in weights})
+    if built is None:
+        return {"status": "infeasible", "reason": "too little shared history for a covariance",
+                "plain": "the names share too little history to measure their risk together",
+                "stated": said}
+    names, cov = built
+    limits = Limits(max_weight=1.0 if cap is None else cap, max_names=count,
+                    max_risk_share=risk_cap)
+    try:
+        book = allocate(names, cov, limits, target=weights)
+    except ConstraintError as exc:
+        return {"status": "infeasible", "reason": str(exc), "plain": str(exc), "stated": said}
+    if book.status == "infeasible":
+        plain = "; ".join(book.conflict) or book.reason
+        return {"status": "infeasible", "reason": book.reason, "plain": plain, "stated": said}
+    held = {k: v for k, v in book.weights.items() if v > 5e-4}
+    total = sum(held.values())
+    held = {k: v / total for k, v in held.items()}
+    before = math.sqrt(max(book.target_variance, 0.0) * 24 * 365)
+    after = math.sqrt(max(book.variance or 0.0, 0.0) * 24 * 365)
+    headline = (
+        f"Bottom line: within your limits ({said}), the book holds "
+        + ", ".join(f"{_t(s)} {held[s]:.0%}" for s in sorted(held, key=lambda s: -held[s]))
+        + " — the closest to an equal-risk book of "
+        + ", ".join(_t(s) for s in names) + " those limits allow.")
+    shaped = [b for b in book.binding]
+    change = (after / before - 1) if before > 0 else 0.0
+    limits_line = (
+        f"What the limits cost: volatility about {after:.0%} a year against {before:.0%} for the "
+        f"unlimited equal-risk book ({change:+.0%})"
+        + (f"; the limits that shaped it: {', '.join(shaped)}" if shaped else
+           "; none of them had to bend the book")
+        + (". The risk cap is not convex, so this is the best of several local solutions."
+           if risk_cap is not None else
+           f". Found by an exact search over {book.supports_searched} candidate books."
+           if count is not None else "."))
+    return {"status": book.status, "weights": held, "headline": headline,
+            "limits_line": limits_line, "stated": said, "binding": shaped,
+            "volatility_before": before, "volatility_after": after,
+            "nodes": book.supports_searched}
+
+
 def _trim_to_budget(symbol: str, weights: Mapping[str, float],
                     columns: Mapping[str, Sequence[float]], budget: float) -> float | None:
     """The largest weight for ``symbol`` — the rest unchanged, the difference held as cash — at

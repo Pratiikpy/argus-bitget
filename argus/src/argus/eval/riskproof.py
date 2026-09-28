@@ -998,7 +998,7 @@ def main(argv: list[str] | None = None) -> int:
         print(line)
     if args.save:
         Path(args.save).write_text(
-            json.dumps(proof.as_dict(), indent=2, default=str), encoding="utf-8"
+            json.dumps(proof.as_dict(), indent=2, default=str), encoding="utf-8", newline="\n"
         )
         print(f"saved -> {args.save}")
     return 0 if proof.sound else 1

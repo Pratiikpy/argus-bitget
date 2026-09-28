@@ -190,7 +190,7 @@ def run(rows: Sequence[dict[str, Any]], *, offline: bool,
     if not offline:
         (SNAPSHOT_DIR / "companies.json").write_text(
             json.dumps(resolver.snapshot(), sort_keys=True, separators=(",", ":")),
-            encoding="utf-8")
+            encoding="utf-8", newline="\n")
     return out
 
 

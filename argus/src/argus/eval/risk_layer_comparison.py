@@ -545,7 +545,7 @@ def freeze_candles(
         "symbols_failed": failures,
         "candles": candles_out,
     }
-    fixture_path.write_text(json.dumps(fixture, indent=2), encoding="utf-8")
+    fixture_path.write_text(json.dumps(fixture, indent=2), encoding="utf-8", newline="\n")
     return fixture
 
 

@@ -175,7 +175,7 @@ def main() -> int:
     result = run(replays=args.replays)
     out = DATA_DIR / "bakeoff.json"
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(result, indent=2, default=str), encoding="utf-8")
+    out.write_text(json.dumps(result, indent=2, default=str), encoding="utf-8", newline="\n")
 
     print(f"frame {result['market_state_hash']} · {result['replays_per_model']} replays each")
     if result["providers_unreachable"]:

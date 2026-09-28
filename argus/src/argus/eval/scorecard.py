@@ -292,7 +292,7 @@ def main() -> int:
 
     out = DATA_DIR / "scorecard.json"
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(result, indent=2, default=str), encoding="utf-8")
+    out.write_text(json.dumps(result, indent=2, default=str), encoding="utf-8", newline="\n")
 
     led = result["ledger"]
     # **Both counts are subsets of `entries`, and the old labels did not say so.** This printed

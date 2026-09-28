@@ -465,7 +465,7 @@ class ScanSensitivityAblation:
 def run_scan_sensitivity_ablation(tmp_dir: Path) -> ScanSensitivityAblation:
     real_scan = scan_argus_grammar()
     ablated_path = tmp_dir / "_ablated_eval_dispatch.py"
-    ablated_path.write_text(_ABLATED_EVAL_DISPATCH_SOURCE, encoding="utf-8")
+    ablated_path.write_text(_ABLATED_EVAL_DISPATCH_SOURCE, encoding="utf-8", newline="\n")
     ablated_scan = _scan_for_forbidden_calls(ablated_path)
     return ScanSensitivityAblation(
         real_grammar_scan_clean=not real_scan.has_execution_surface,
@@ -676,7 +676,7 @@ if __name__ == "__main__":
     print(render(result))
     out_path = DATA_DIR / "grammar_comparison.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
+    out_path.write_text(json.dumps(result, indent=2), encoding="utf-8", newline="\n")
     print(f"\nsaved -> {out_path}")
 
 

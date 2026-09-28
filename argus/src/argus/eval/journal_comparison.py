@@ -29,8 +29,9 @@ ARGUS's ``PaperLedger`` cannot exhibit this defect, structurally, not by luck:
 values), never the raw bytes a line happened to occupy on disk — and ``_load()`` reads via
 ``Path.read_text()`` (text mode, which normalizes ``\\r\\n`` back to ``\\n`` on the way in) rather
 than binary mode. Confirmed empirically here, not just reasoned from the source: a real
-``PaperLedger`` on this same Windows machine writes the identical CRLF-containing bytes to disk and
-``verify()`` still reports ``chain_intact: True``.
+``PaperLedger`` whose file holds CRLF line endings still verifies with ``chain_intact: True``. (The
+ledger wrote those bytes itself on Windows until every ARGUS writer was given ``newline="\\n"`` on
+2026-09-28; the case now rewrites the file to CRLF on purpose, so it holds on every platform.)
 """
 
 from __future__ import annotations
@@ -100,7 +101,15 @@ def run_serenity_crlf_case(chained_journal_class: type) -> CrlfCase:
 
 
 def run_argus_crlf_case() -> CrlfCase:
-    """The same platform, the same zero-tampering sequence, ARGUS's real PaperLedger."""
+    """The same zero-tampering sequence on ARGUS's real PaperLedger, with its file then rewritten
+    to CRLF line endings.
+
+    Until 2026-09-28 the ledger was written in text mode and so carried CRLF on Windows by itself.
+    Every ARGUS writer now names ``newline="\\n"`` (tracker 222, `tests/test_line_endings.py`), so
+    the ledger no longer produces the condition on any platform. The condition still reaches a
+    file by other doors — a checkout with ``core.autocrlf``, an editor, a copy through a Windows
+    tool — so the case now creates it on purpose, on every platform, instead of relying on the one
+    it happened to run on."""
     with tempfile.TemporaryDirectory() as tmp:
         path = Path(tmp) / "ledger.jsonl"
         ledger = PaperLedger(path=path)
@@ -111,9 +120,11 @@ def run_argus_crlf_case() -> CrlfCase:
                 invalidation=(), market_state_hash="abc", approved_intent_hash="def",
                 session_phase="rth", hours_to_discovery=2.0,
             )
+        written = path.read_bytes()
+        path.write_bytes(written.replace(b"\r\n", b"\n").replace(b"\n", b"\r\n"))
         disk_bytes = path.read_bytes()
         contains_crlf = b"\r\n" in disk_bytes
-        result = ledger.verify()
+        result = PaperLedger(path=path).verify()
         clean = bool(result.get("chain_intact"))
         return CrlfCase(
             system="argus_paper_ledger",
@@ -160,7 +171,7 @@ def run_serenity_tamper_case(chained_journal_class: type) -> bool:
         tampered = json.loads(lines[0])
         tampered["note"] = "TAMPERED"
         lines[0] = json.dumps(tampered, sort_keys=True)
-        path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
 
         try:
             journal.verify()
@@ -187,7 +198,7 @@ def run_argus_tamper_case() -> bool:
         tampered = json.loads(lines[0])
         tampered["thesis"] = "TAMPERED"
         lines[0] = json.dumps(tampered, sort_keys=True)
-        path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
 
         result = PaperLedger(path=path).verify()
         return not result.get("chain_intact", True)
@@ -352,7 +363,7 @@ def run_truncation_comparison(chained_journal_class: type) -> dict[str, bool]:
         journal.append({"seq": 2})
         journal.append({"seq": 3})
         s_lines = s_path.read_text(encoding="utf-8").splitlines()
-        s_path.write_text("\n".join(s_lines[:-1]) + "\n", encoding="utf-8")
+        s_path.write_text("\n".join(s_lines[:-1]) + "\n", encoding="utf-8", newline="\n")
         try:
             journal.verify()
             serenity_detects = False
@@ -370,7 +381,7 @@ def run_truncation_comparison(chained_journal_class: type) -> dict[str, bool]:
                 session_phase="rth", hours_to_discovery=2.0,
             )
         a_lines = a_path.read_text(encoding="utf-8").splitlines()
-        a_path.write_text("\n".join(a_lines[:-1]) + "\n", encoding="utf-8")
+        a_path.write_text("\n".join(a_lines[:-1]) + "\n", encoding="utf-8", newline="\n")
         argus_result = PaperLedger(path=a_path).verify()
         argus_detects = bool(argus_result.get("truncated"))
 
@@ -423,8 +434,8 @@ correctly detects it — verified by running both, not assumed from either desig
 UNTAMPERED write/verify cycle on this real platform (Windows), serenity-guardrails' real \
 ChainedJournal reports its own head anchor as mismatched due to a genuine, platform-specific bug \
 (hashing raw disk bytes that Python's own default text-mode I/O silently altered via \
-universal-newline translation); ARGUS's real PaperLedger, writing the identical CRLF-containing \
-bytes to disk under the same conditions, verifies clean — because it hashes canonically \
+universal-newline translation); ARGUS's real PaperLedger, with its file rewritten to the same \
+CRLF-containing bytes, verifies clean — because it hashes canonically \
 re-serialized PARSED content, never raw disk bytes, a design property confirmed both by reading \
 the source and by running it.
 
@@ -520,7 +531,7 @@ if __name__ == "__main__":
     print(render(result))
     out_path = DATA_DIR / "journal_comparison.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
+    out_path.write_text(json.dumps(result, indent=2), encoding="utf-8", newline="\n")
     print(f"\nsaved -> {out_path}")
 
 

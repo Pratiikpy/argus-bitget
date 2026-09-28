@@ -1064,7 +1064,8 @@ def main(argv: list[str] | None = None) -> int:
     blob = report.as_dict()
     if args.save:
         REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
-        REPORT_PATH.write_text(json.dumps(blob, indent=2, default=str), encoding="utf-8")
+        REPORT_PATH.write_text(json.dumps(blob, indent=2, default=str),
+                               encoding="utf-8", newline="\n")
         print(f"\nwritten to {REPORT_PATH}")
     else:
         print(json.dumps(blob, indent=2, default=str))

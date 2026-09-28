@@ -208,7 +208,7 @@ def main() -> int:  # pragma: no cover - CLI
     report = check()
     for line in report.render():
         print(line)
-    REPORT_PATH.write_text(json.dumps(report.as_dict(), indent=2), encoding="utf-8")
+    REPORT_PATH.write_text(json.dumps(report.as_dict(), indent=2), encoding="utf-8", newline="\n")
     print(f"\nwritten to {REPORT_PATH}")
     return 0 if report.sound else 1
 

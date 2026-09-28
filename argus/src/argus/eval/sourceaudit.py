@@ -329,7 +329,7 @@ def main() -> int:  # pragma: no cover - CLI
 
     if args.save:
         REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
-        REPORT_PATH.write_text(json.dumps(blob, indent=2), encoding="utf-8")
+        REPORT_PATH.write_text(json.dumps(blob, indent=2), encoding="utf-8", newline="\n")
         print(f"\n  written to {REPORT_PATH}")
     else:
         print("\n  (not saved — pass --save)")

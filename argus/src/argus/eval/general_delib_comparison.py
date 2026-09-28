@@ -540,7 +540,7 @@ def export_contexts(data: Dataset, directory: Path) -> dict[str, Any]:  # pragma
         "horizons_s": list(HORIZONS_S),
         "keys": [i.key for i in data.instants],
     }
-    (directory / "index.json").write_text(json.dumps(index), encoding="utf-8")
+    (directory / "index.json").write_text(json.dumps(index), encoding="utf-8", newline="\n")
     return {k: v for k, v in index.items() if k != "keys"} | {"n": len(data.instants)}
 
 

@@ -1,10 +1,10 @@
 {
   "generated_from": "argus\\data\\risk_records.jsonl",
-  "rows_read": 150,
+  "rows_read": 714,
   "dimensions": {
     "order_size": {
       "component": "order_size",
-      "frames": 1,
+      "frames": 565,
       "changed": 0,
       "share_changed": 0.0,
       "inert": true,
@@ -15,7 +15,7 @@
     },
     "gross_exposure": {
       "component": "gross_exposure",
-      "frames": 1,
+      "frames": 565,
       "changed": 0,
       "share_changed": 0.0,
       "inert": true,
@@ -26,7 +26,7 @@
     },
     "signed_exposure": {
       "component": "signed_exposure",
-      "frames": 1,
+      "frames": 565,
       "changed": 0,
       "share_changed": 0.0,
       "inert": true,
@@ -37,7 +37,7 @@
     },
     "hedge_integrity": {
       "component": "hedge_integrity",
-      "frames": 1,
+      "frames": 565,
       "changed": 0,
       "share_changed": 0.0,
       "inert": true,
@@ -48,7 +48,7 @@
     },
     "margin_usage": {
       "component": "margin_usage",
-      "frames": 1,
+      "frames": 565,
       "changed": 0,
       "share_changed": 0.0,
       "inert": true,
@@ -59,7 +59,7 @@
     },
     "factor_exposure": {
       "component": "factor_exposure",
-      "frames": 1,
+      "frames": 565,
       "changed": 0,
       "share_changed": 0.0,
       "inert": true,
@@ -70,7 +70,7 @@
     },
     "scenario_loss": {
       "component": "scenario_loss",
-      "frames": 1,
+      "frames": 565,
       "changed": 0,
       "share_changed": 0.0,
       "inert": true,
@@ -81,7 +81,7 @@
     },
     "liquidation_cost": {
       "component": "liquidation_cost",
-      "frames": 1,
+      "frames": 565,
       "changed": 0,
       "share_changed": 0.0,
       "inert": true,
@@ -92,14 +92,14 @@
     },
     "per_symbol_underperformance": {
       "component": "per_symbol_underperformance",
-      "frames": 0,
+      "frames": 564,
       "changed": 0,
       "share_changed": 0.0,
       "inert": true,
       "changes": [],
       "risk_violations": 0,
       "violation_rate": 0.0,
-      "status": "UNTESTED"
+      "status": "INERT"
     }
   }
 }

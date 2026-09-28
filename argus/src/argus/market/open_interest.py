@@ -164,7 +164,7 @@ def record(path: Path | None = None, *, fetch: Any = None,
            # for names nobody asks about.
            "holding": {s: v["holding"] for s, v in sorted(book.items())
                        if v["volume"] >= MIN_VOLUME_USDT}}
-    with path.open("a", encoding="utf-8") as handle:
+    with path.open("a", encoding="utf-8", newline="\n") as handle:
         handle.write(json.dumps(row) + "\n")
     return len(row["holding"])
 

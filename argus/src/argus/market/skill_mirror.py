@@ -559,7 +559,7 @@ def save(rows: Sequence[MirrorRow], path: Path, *, symbol: str, checked_at: str)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps({"symbol": symbol, "checked_at": checked_at, **summary(rows),
                                 "results": [r.as_dict() for r in rows]}, indent=2),
-                    encoding="utf-8")
+                    encoding="utf-8", newline="\n")
     return path
 
 

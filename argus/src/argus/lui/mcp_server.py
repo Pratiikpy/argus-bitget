@@ -68,6 +68,8 @@ import re
 from collections.abc import Callable, Mapping, Sequence
 from typing import Any
 
+from argus.lui.plural import resolve_plurals
+
 PROTOCOL_VERSIONS = ("2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05")
 """Versions of the MCP specification this server speaks, newest first. A client asking for one of
 these gets it back; anything else gets the newest, as the spec's version negotiation says."""
@@ -190,6 +192,39 @@ TOOLS: tuple[dict[str, Any], ...] = (
 
 class ToolError(ValueError):
     """A tool call that cannot run as asked. Returned to the agent as ``isError``, never raised."""
+
+
+ERROR_META = "argus/error"
+"""The ``_meta`` key a failed ``tools/call`` result carries its classification under."""
+
+
+def error_meta(exc: BaseException | None) -> dict[str, Any]:
+    """What kind of failure this was and whether asking again can help, for the calling agent.
+
+    Bitget's own agent SDK returns every tool failure as a typed payload — a category from a closed
+    set and a ``retryable`` flag (``agent-sdk/src/utils/errors.ts:16-27``,
+    ``utils/error-catalog.ts:14-33``, MIT) — so an agent can back off on a rate limit and stop on a
+    bad argument without parsing prose (research/harvest/50-bitget-agent-sdk.md). This takes its
+    categories, and fills them from the taxonomy the network layer already raises
+    (`truth/failures.ErrorKind`), so nothing is classified twice. ``None`` is a refused argument:
+    the caller's to fix, never worth repeating unchanged. It goes in ``_meta``, the MCP result's
+    extension field, beside the text the model reads, so a client that knows nothing of it loses
+    nothing."""
+    from argus.truth.failures import ErrorKind, RpcError
+
+    if exc is None or isinstance(exc, ToolError):
+        return {"category": "param", "retryable": False}
+    if isinstance(exc, RpcError):
+        category = {ErrorKind.RATE_LIMIT: "rate", ErrorKind.AUTH: "auth",
+                    ErrorKind.NOT_FOUND: "param", ErrorKind.TIMEOUT: "network",
+                    ErrorKind.TRANSPORT: "network",
+                    ErrorKind.UPSTREAM_5XX: "network"}.get(exc.kind, "unknown")
+        meta: dict[str, Any] = {"category": category, "retryable": exc.retryable,
+                                "kind": exc.kind.value}
+        if exc.retry_after is not None:
+            meta["retry_after_seconds"] = exc.retry_after
+        return meta
+    return {"category": "unknown", "retryable": False}
 
 
 TOOL_NAME = re.compile(r"^[A-Za-z0-9._-]{1,128}$")
@@ -515,15 +550,19 @@ def handle(message: Any, *, tool: Callable[[str, Mapping[str, Any]], tuple[str, 
             # (SEP-1303) asks for input validation to come back where the model will read it.
             text = f"invalid arguments for {name}: " + "; ".join(invalid[:5])
             return _result(message_id, {"content": [{"type": "text", "text": text}],
-                                        "isError": True})
+                                        "isError": True, "_meta": {ERROR_META: error_meta(None)}})
+        failure: BaseException | None = None
         try:
             text, is_error = tool(name, arguments)
+            text = resolve_plurals(text)
         except ToolError as exc:
-            text, is_error = str(exc), True
+            text, is_error, failure = str(exc), True, exc
         except Exception as exc:  # an engine failure is the tool's error, not the transport's
-            text, is_error = f"the desk could not answer: {type(exc).__name__}", True
-        return _result(message_id, {"content": [{"type": "text", "text": text}],
-                                    "isError": is_error})
+            text, is_error, failure = f"the desk could not answer: {type(exc).__name__}", True, exc
+        body: dict[str, Any] = {"content": [{"type": "text", "text": text}], "isError": is_error}
+        if is_error:
+            body["_meta"] = {ERROR_META: error_meta(failure)}
+        return _result(message_id, body)
     return _error(message_id, -32601, f"method {_echo(method)} not found")
 
 

@@ -110,6 +110,10 @@ python -m argus.eval.refusal 2>&1 | ForEach-Object { $_ | Out-String -Stream } |
 "refusal_exit=$LASTEXITCODE" | Add-Content -Path $log -Encoding utf8
 python -m argus.demo.cockpit 2>&1 | ForEach-Object { $_ | Out-String -Stream } | Add-Content -Path $log -Encoding utf8
 "cockpit_exit=$LASTEXITCODE" | Add-Content -Path $log -Encoding utf8
+# One round of the public status probes, appended to the hash-chained history /status reads its
+# uptime from (lui/status_history.py). A failed probe is a recorded outage, not a cycle failure.
+python -m argus.lui.status_page --record 2>&1 | ForEach-Object { $_ | Out-String -Stream } | Add-Content -Path $log -Encoding utf8
+"status_record_exit=$LASTEXITCODE" | Add-Content -Path $log -Encoding utf8
 
 if ($checkExit -eq 0) {
   python -m argus.demo.deploysync 2>&1 | ForEach-Object { $_ | Out-String -Stream } | Add-Content -Path $log -Encoding utf8

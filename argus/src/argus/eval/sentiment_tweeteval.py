@@ -576,7 +576,7 @@ def finbert_predictions(split: Split, *, batch_size: int = 32, check_batching: i
         elapsed += time.perf_counter() - started
         if cache is not None:
             cache.write_text(json.dumps({"text_blob": text_blob, "labels": labels,
-                                         "seconds": elapsed}), encoding="utf-8")
+                                         "seconds": elapsed}), encoding="utf-8", newline="\n")
     sample = list(split.texts[:check_batching])
     single = [by_name[FINBERT_TO_TWEETEVAL[str(o["label"])]] for o in loaded(sample)]
     model = getattr(loaded, "model", None)

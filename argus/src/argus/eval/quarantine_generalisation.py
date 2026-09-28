@@ -494,7 +494,7 @@ def main() -> int:  # pragma: no cover - CLI
     print(render(report))
     out = _ARGUS_ROOT / "data" / "quarantine_generalisation.json"
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
+    out.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8", newline="\n")
     print(f"\nwritten to {out}")
     return 0
 

@@ -215,3 +215,42 @@ def test_a_caller_can_opt_out(monkeypatch: pytest.MonkeyPatch, waits: list[float
     with pytest.raises(http.RpcError):
         http.fetch("https://x.test", timeout=1, retries=0)
     assert len(calls) == 1
+
+
+NETWORK_CLIENTS = ("requests", "httpx", "aiohttp", "http.client", "urllib3", "websocket",
+                   "websockets")
+
+
+def _other_clients(root: Path) -> list[str]:
+    """Every import of a network client under ``root``, outside the declared exceptions."""
+    import ast
+
+    found = []
+    for path in sorted(root.rglob("*.py")):
+        rel = path.relative_to(root).as_posix()
+        if rel.startswith(("eval/", "vendor/")) or rel in http.OWN_TRANSPORT:
+            continue
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+            names = ([a.name for a in node.names] if isinstance(node, ast.Import)
+                     else [node.module or ""] if isinstance(node, ast.ImportFrom) else [])
+            found += [f"{rel}:{node.lineno} {n}" for n in names
+                      if any(n == c or n.startswith(c + ".") for c in NETWORK_CLIENTS)]
+    return found
+
+
+def test_no_product_module_brings_in_another_http_client() -> None:
+    """The ``urlopen`` check above misses a second door: a module importing requests, httpx,
+    aiohttp or http.client reads the network without ever calling ``urlopen``. import-linter's
+    ``protected`` contract (``docs/contract_types/protected.md``, BSD-2-Clause, the idea only)
+    restricts a package to named importers; this is that contract for network clients, checked
+    on the parsed imports rather than on text (research/harvest/57-import-linter.md)."""
+    assert _other_clients(SRC) == []
+
+
+def test_the_client_check_fires(tmp_path: Path) -> None:
+    (tmp_path / "risk").mkdir()
+    (tmp_path / "risk" / "leak.py").write_text(
+        "import httpx\nfrom http.client import HTTPConnection\n", encoding="utf-8")
+    (tmp_path / "eval").mkdir()
+    (tmp_path / "eval" / "harness.py").write_text("import requests\n", encoding="utf-8")
+    assert _other_clients(tmp_path) == ["risk/leak.py:1 httpx", "risk/leak.py:2 http.client"]

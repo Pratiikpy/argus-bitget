@@ -128,7 +128,8 @@ def run() -> dict[str, Any]:
               "note": "a detector: every flag is listed for reading; some dropped numbers are "
                       "rightly ignored",
               "flagged": flagged}
-    REPORT.write_text(json.dumps(report, indent=1, ensure_ascii=False), encoding="utf-8")
+    REPORT.write_text(json.dumps(report, indent=1, ensure_ascii=False),
+                      encoding="utf-8", newline="\n")
     return report
 
 

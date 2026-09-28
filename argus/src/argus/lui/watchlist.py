@@ -283,7 +283,7 @@ def refresh(out: Path = MACRO_CALENDAR, *,
     payload = {"retrieved_at": now, "timezone": "America/New_York", "sources": sources,
                "releases": releases}
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(payload, indent=1) + "\n", encoding="utf-8")
+    out.write_text(json.dumps(payload, indent=1) + "\n", encoding="utf-8", newline="\n")
     return payload
 
 

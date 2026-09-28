@@ -53,6 +53,7 @@ from typing import Any
 from argus.decision.verdicts import Authorised
 from argus.execution.confirm import StatusReading
 from argus.execution.consent import ConsentRefused, LiveOrderConsent, require_live_consent
+from argus.execution.kill import check as kill_check
 from argus.execution.orders import Order, OrderState
 from argus.truth.endpoints import BITGET_API
 
@@ -421,6 +422,8 @@ class BitgetTradingClient:
         order = authorised.order
         if not isinstance(order, Order):  # pragma: no cover - structural guard
             raise BitgetOrderError(f"an Authorised must carry an Order, not {type(order).__name__}")
+        # A person's kill switch first: it does not depend on the pipeline (`execution/kill.py`).
+        kill_check()
         # Edited since the ruling? Refused before the payload is built (`Authorised.verify`).
         authorised.verify()
         if self.trades_real_money:

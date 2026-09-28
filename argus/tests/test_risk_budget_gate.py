@@ -15,7 +15,13 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from decimal import Decimal
 
-from argus.decision.verdicts import ConstitutionVerdict, Intent, Side, Verdict
+from argus.decision.verdicts import (
+    ConstitutionRuling,
+    ConstitutionVerdict,
+    Intent,
+    Side,
+    Verdict,
+)
 from argus.risk.calibration import Prediction
 from argus.risk.circuit import BookState
 from argus.risk.constitution import ConstitutionPolicy
@@ -197,6 +203,67 @@ class TestAbsentStateIsNotZeroRisk:
         state = current_book_state(ledger)
         assert state.equity == STARTING_EQUITY
         assert state.open_positions == 1
+
+    def test_an_unsettled_refusal_is_not_an_open_position(self, tmp_path) -> None:
+        """A refusal holds nothing. Counted as a position, a halted breaker would rule REDUCE on a
+        book with nothing to reduce instead of NO_TRADE (`risk/circuit.apply`)."""
+        from argus.paper.ledger import PaperLedger
+        from argus.paper.runner import current_book_state
+
+        ledger = PaperLedger(path=tmp_path / "l.jsonl")
+        ledger.record(
+            symbol="NVDAUSDT", verdict="no_trade", side="BUY", quantity=Decimal("0"),
+            entry_price=Decimal("100"), stated_confidence=0.6, thesis="t",
+            invalidation=("x",), market_state_hash="a" * 8, approved_intent_hash="b" * 8,
+            session_phase="rth", hours_to_discovery=0.0, decided_at=NOW,
+        )
+        assert current_book_state(ledger).open_positions == 0
+
+    def test_the_book_the_constitution_reads_is_the_ledgers(self, tmp_path) -> None:
+        """Positions from the decisions that took them; refusals hold nothing; the gross cap now
+        binds against what is already held."""
+        from argus.decision.verdicts import Intent, Side, Verdict
+        from argus.paper.ledger import PaperLedger
+        from argus.paper.runner import current_book
+        from argus.risk.constitution import ConstitutionPolicy
+        from argus.risk.policy_manifest import live_record
+
+        ledger = PaperLedger(path=tmp_path / "l.jsonl")
+        common = dict(stated_confidence=0.6, thesis="t", invalidation=("x",),
+                      market_state_hash="a" * 8, approved_intent_hash="b" * 8,
+                      session_phase="rth", hours_to_discovery=0.0, decided_at=NOW)
+        ledger.record(symbol="NVDAUSDT", verdict="trade", side="BUY", quantity=Decimal("700"),
+                      entry_price=Decimal("200"), **common)
+        ledger.record(symbol="AAPLUSDT", verdict="no_trade", side="BUY", quantity=Decimal("0"),
+                      entry_price=Decimal("250"), **common)
+        book = current_book(ledger)
+        assert book.total_gross_notional() == Decimal("140000")
+        assert [p.symbol for p in book.open_positions()] == ["NVDAUSDT"]
+        policy = ConstitutionPolicy(reference_price=Decimal("100"), book=book)
+        assert "max_gross_exposure_notional" in live_record(policy, "v")["can_fire"]
+        from argus.truth.clocks import SessionPhase, SessionState
+
+        class NoHedge:
+            is_empty = True
+            menu: tuple[object, ...] = ()
+
+        session = SessionState(phase=SessionPhase.WEEKEND, as_of=NOW,
+                               hours_to_next_discovery=40.0, nav_age_seconds=10.0)
+        def order(side: Side) -> ConstitutionRuling:
+            return policy.rule(Intent(symbol="TSLAUSDT", side=side, quantity=Decimal("400"),
+                                      verdict=Verdict.TRADE, stated_confidence=0.9, thesis="t",
+                                      invalidation=("a close below 90",)),
+                               session=session, hedges=NoHedge())  # type: ignore[arg-type]
+
+        # The book is $140,000 net long, past the $100,000 net cap: no further buy.
+        buy = order(Side.BUY)
+        assert buy.binding_constraint == "signed_exposure"
+        assert buy.resulting_intent.quantity == Decimal("0")
+        # A short moves net toward zero, so only gross binds: $10,000 of the $150,000 cap is left,
+        # 100 units at $100 — tighter than the 200 the $20,000 unhedged cap allows.
+        sell = order(Side.SELL)
+        assert sell.binding_constraint == "gross_exposure"
+        assert sell.resulting_intent.quantity == Decimal("100")
 
     def test_an_empty_ledger_grades_nothing(self, tmp_path) -> None:
         from argus.paper.ledger import PaperLedger

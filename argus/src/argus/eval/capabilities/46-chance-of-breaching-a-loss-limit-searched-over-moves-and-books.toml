@@ -1,0 +1,45 @@
+name = """\
+    The chance a position breaks its loss limit, searched over observed moves and recorded \
+    order books, vs. a normal-shock Monte Carlo"""
+subtheme = "t3-decisionstress"
+modules = [
+    "argus/desk/stress_search.py",
+    "argus/eval/stress_search_comparison.py",
+]
+state = "implemented"
+baseline = """\
+    the normal-shock method of Open-Finance-Lab/AgenticTrading's run_monte_carlo_stress \
+    (stress_testing.py:335-441, NOASSERTION, rebuilt from its description), taken in closed \
+    form; and its run_reverse_stress_test's uniform random search"""
+blockers = [
+    """\
+        Out of sample on 12 rTokens (first half of each symbol's 24-hour windows fits, second \
+        half is scored): mean absolute error of the breach probability 1.49 against 3.31 points \
+        at a 5% limit, 0.37 against 2.16 at 10%, 3.58 against 4.27 at 3% where ARGUS is closer \
+        on only 5 of 12 names. Windows overlap, so this is descriptive, not a significance test, \
+        and no groupwise check has been run on it. The move and the book are treated as \
+        independent, which is not measured. Random search found the exact most likely failure in \
+        4.2% of runs at 10,000 draws.""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    sisl/AdaptiveStressTestingToolbox (MIT) ast_reward.py, example_av_reward.py:40-117 and its \
+    MCTS solvers read at source (research/harvest/16-adaptive-stress-testing.md)"""
+artefact = "data/stress_search_comparison.json"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = "both estimate from the same fitted windows and the same recorded books, scored on the same test windows"
+artefact = "data/stress_search_comparison.json"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = "the snapshot digest is recorded; the search is exhaustive and deterministic"
+artefact = "data/stress_search_comparison.json"
+
+[[proofs]]
+condition = "implementation_complete"
+how = "desk/stress_search.py, shown in the research task's stress step"
+test = "test_stress_search.py::test_the_failure_probability_counts_failing_pairs"

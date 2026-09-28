@@ -143,7 +143,7 @@ def measure() -> dict[str, Any]:  # pragma: no cover - live
 
 def main() -> int:  # pragma: no cover - CLI
     report = measure()
-    REPORT_PATH.write_text(json.dumps(report, indent=1), encoding="utf-8")
+    REPORT_PATH.write_text(json.dumps(report, indent=1), encoding="utf-8", newline="\n")
     print(f"{report['points']} sweeps: b = {_shown(report['b'], '.3f')}, "
           f"R^2 = {_shown(report['r_squared'], '.2f')}, "
           f"free exponent {_shown(report['free_exponent'], '.2f')}, median sigma "

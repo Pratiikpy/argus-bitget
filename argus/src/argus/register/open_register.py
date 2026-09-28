@@ -202,7 +202,7 @@ def main() -> int:  # pragma: no cover - CLI
         print(f"    failed: {failure}")
 
     out = REGISTER_PATH.parent / "register_opened.json"
-    out.write_text(json.dumps(result, indent=2), encoding="utf-8")
+    out.write_text(json.dumps(result, indent=2), encoding="utf-8", newline="\n")
     print(f"\nwritten to {out}")
     print("\nthe clock is running. resolve with: python -m argus.register.resolve")
     return 0

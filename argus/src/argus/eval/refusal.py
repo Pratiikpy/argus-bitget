@@ -919,7 +919,7 @@ def run(*, out: Path = REPORT_PATH, now: datetime | None = None) -> dict[str, An
         )
     report = score(loaded, now=now)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(report.as_dict(), indent=2) + "\n", encoding="utf-8")
+    out.write_text(json.dumps(report.as_dict(), indent=2) + "\n", encoding="utf-8", newline="\n")
     return report.as_dict()
 
 
@@ -927,7 +927,8 @@ def main() -> int:  # pragma: no cover - CLI
     report = score(read_marks())
     print(report.render())
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    REPORT_PATH.write_text(json.dumps(report.as_dict(), indent=2) + "\n", encoding="utf-8")
+    REPORT_PATH.write_text(json.dumps(report.as_dict(), indent=2) + "\n",
+                           encoding="utf-8", newline="\n")
     print(f"\nwritten to {REPORT_PATH}")
     reasons = run_reasons()
     print(f"\nREASON AGAINST RECORD — {reasons['verdict']}\nwritten to {REASONS_PATH}")

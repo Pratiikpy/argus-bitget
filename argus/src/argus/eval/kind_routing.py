@@ -118,7 +118,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     del argv
     report = run()
     REPORT_PATH.write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n",
-                           encoding="utf-8")
+                           encoding="utf-8", newline="\n")
     for name, blob in report.items():
         print(f"{name:8s} {blob['correct']} / {blob['rows']}  {blob['corpus']}")
     print(f"wrote {REPORT_PATH.relative_to(PACKAGE)}")

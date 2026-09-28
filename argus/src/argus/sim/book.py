@@ -87,6 +87,21 @@ class Execution:
         return self.price * self.quantity
 
 
+class TimeInForce(StrEnum):
+    """How long an order may live, hftbacktest's four (``types.rs:412-420``, MIT).
+
+    ``GTC`` rests whatever does not fill. ``GTX`` is post-only: an order that would take liquidity
+    is refused whole, not filled. ``IOC`` fills what it can at once and cancels the rest. ``FOK``
+    fills entirely at once or not at all. Nautilus adds ``GTD`` and ``DAY``; this book has no
+    session close to expire them against, so they are not modelled.
+    """
+
+    GTC = "gtc"
+    GTX = "gtx"
+    IOC = "ioc"
+    FOK = "fok"
+
+
 @dataclass
 class Order:
     """A limit order. A market order is expressed as a limit at an unreachable price."""
@@ -97,6 +112,11 @@ class Order:
     quantity: Decimal
     order_id: int = 0
     filled: Decimal = _ZERO
+    time_in_force: TimeInForce = TimeInForce.GTC
+    cancelled: str = ""
+    """Why the unfilled remainder did not rest, when it did not: an IOC's leftover, a FOK or GTX
+    refused whole, or a walk stopped by price protection. Empty for an order that rested or
+    filled."""
 
     @property
     def leaves(self) -> Decimal:
@@ -189,8 +209,17 @@ class OrderBook:
 
     # --- the matching engine ------------------------------------------------------------------
 
-    def submit(self, order: Order) -> list[Execution]:
+    def submit(self, order: Order, *, price_protection_ticks: int | None = None
+               ) -> list[Execution]:
         """Match what can be matched, rest the remainder. ``order_book.py:109-134``.
+
+        ``order.time_in_force`` decides what happens to the remainder (:class:`TimeInForce`).
+        ``price_protection_ticks`` bounds how far an aggressive order may walk: no fill further than
+        that many ticks beyond the best opposing price when the order arrived, and a remainder that
+        would still cross is cancelled rather than rested — nautilus's
+        ``price_protection_points`` (``BacktestVenueConfig``; LGPL-3.0, described and rebuilt, not
+        copied). ``None`` is unbounded, which `market.measure_exit` needs: its whole question is
+        what leaving costs when the book is walked as far as it goes.
 
         Returns every execution the match produced, for **both** counterparties, so the caller can
         settle fees on each side. ABIDES notifies each agent separately over its message bus; here
@@ -212,8 +241,21 @@ class OrderBook:
         order.order_id = next(self._ids)
         executions: list[Execution] = []
         opposing = self._side(order.side.opposite)
+        band = self._band(order, opposing, price_protection_ticks)
 
-        while not order.is_complete and opposing and self._crosses(order, opposing[0].price):
+        if order.time_in_force is TimeInForce.GTX and opposing and self._crosses(
+                order, opposing[0].price):
+            order.cancelled = "post-only (GTX) would have taken liquidity; refused whole"
+            return executions
+        if order.time_in_force is TimeInForce.FOK:
+            available = self._fillable(order, opposing, band)
+            if available < order.quantity:
+                order.cancelled = (f"fill-or-kill: {available} available of {order.quantity}; "
+                                   f"refused whole")
+                return executions
+
+        while (not order.is_complete and opposing and self._crosses(order, opposing[0].price)
+               and self._within(order, opposing[0].price, band)):
             level = opposing[0]
             while not order.is_complete and level.orders:
                 resting = level.orders[0]
@@ -254,8 +296,46 @@ class OrderBook:
                 opposing.pop(0)
 
         if not order.is_complete:
-            self._rest(order)
+            if order.time_in_force is TimeInForce.IOC:
+                order.cancelled = f"immediate-or-cancel: {order.leaves} unfilled, cancelled"
+            elif opposing and self._crosses(order, opposing[0].price):
+                # Only price protection stops a walk while the order still crosses; resting it
+                # would leave a crossed book.
+                order.cancelled = (f"price protection: {order.leaves} would have filled beyond "
+                                   f"{band}; cancelled")
+            else:
+                self._rest(order)
         return executions
+
+    def _band(self, order: Order, opposing: list[PriceLevel], ticks: int | None
+              ) -> Decimal | None:
+        """The worst price an aggressive order may fill at, fixed at arrival."""
+        if ticks is None or not opposing:
+            return None
+        if ticks < 0:
+            raise BookError(f"price_protection_ticks={ticks} must not be negative")
+        step = self.tick_size * ticks
+        best = opposing[0].price
+        return best + step if order.side is Side.BUY else best - step
+
+    @staticmethod
+    def _within(order: Order, price: Decimal, band: Decimal | None) -> bool:
+        if band is None:
+            return True
+        return price <= band if order.side is Side.BUY else price >= band
+
+    def _fillable(self, order: Order, opposing: list[PriceLevel], band: Decimal | None
+                  ) -> Decimal:
+        """How much a FOK could fill now: crossing levels within the band, own orders excluded
+        (a wash is refused by the matching loop, so it is not liquidity)."""
+        total = _ZERO
+        for level in opposing:
+            if not (self._crosses(order, level.price) and self._within(order, level.price, band)):
+                break
+            total += sum((o.leaves for o in level.orders if o.agent_id != order.agent_id), _ZERO)
+            if total >= order.quantity:
+                break
+        return total
 
     def cancel(self, order_id: int) -> bool:
         """Pull a resting order. Returns whether it was there to pull."""
