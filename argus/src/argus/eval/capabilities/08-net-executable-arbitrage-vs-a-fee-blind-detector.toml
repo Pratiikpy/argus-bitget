@@ -12,9 +12,19 @@ modules = [
 # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
 # proof now needs a groupwise check on the capability's own artefact, and this
 # row's does not pass it. The reason and the route back are its first blocker.
-state = "implemented"
+state = "tied"
 baseline = "maxme/bitcoin-arbitrage real profit-detection core (get_profit_for)"
 blockers = [
+    """\
+        RE-GRADED 2026-09-28 from IMPLEMENTED to TIED (Activity/27_CAPABILITY_CLOSE_PLAN.md §3). \
+        The console now answers an arbitrage question on the live books with the exact two-book \
+        walk (lui/arbitrage.py); the flat-constant decompose() that lost (precision 5.8%) is on \
+        no answer path. On 640 real Bitget book snapshots (regular hours, a later held-out \
+        capture, a weekend) the walk makes the same verdicts as HiGHS and NetworkX's cycle test \
+        and matches HiGHS's optimum to 4e-14 USDT, while maxme's fee-blind detector makes 111 \
+        false accepts on the first capture. Why it cannot be won: against the general solvers \
+        both sides are exact, so correctness cannot separate them; only latency does (tens of \
+        microseconds against milliseconds), which a 65ms median leg skew makes immaterial.""",
     """\
         RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate \
         (data/groupwise_audit.json): data/arbitrage_comparison.json holds three designed spreads \
@@ -78,24 +88,18 @@ test = """\
 
 [[proofs]]
 condition = "implementation_complete"
-how = "decompose()/Decomposition evaluate real basis observations end to end"
-test = "test_arbitrage_comparison.py"
-
+how = """    the console answers a live spot-versus-perpetual arbitrage question with the exact two-book     walk (lui/arbitrage.py -> research/executable_arb.best_arbitrage), fetching both books and     each venue's published taker fee; decompose() is no longer on any answer path"""
+test = "test_arbitrage_answer.py"
 [[proofs]]
 condition = "same_input_comparison"
-how = """\
-    both real systems scored on order-book depth constructed to match ARGUS's own measured \
-    real basis distribution (median/p95/max from 2,159 real NVDAUSDT hourly observations) — \
-    the same spread, two verdicts"""
-test = "test_arbitrage_comparison.py::TestDesignedCases"
-
+how = """    the exact walk, HiGHS, NetworkX's cycle test, maxme's fee-blind detector and the old     decomposition all scored on the same real, simultaneous Bitget spot-rToken and perpetual     books: 240 regular-hours snapshots"""
+artefact = "data/general_arb_comparison.json"
+test = "test_general_arb_comparison.py::TestSameInputComparison"
 [[proofs]]
 condition = "statistically_valid_evaluation"
-how = """\
-    swept across 60 constructed spreads shaped like the real distribution, not one convenient \
-    case"""
-test = "test_arbitrage_comparison.py::TestSweptCases"
-
+how = """    verdicts compared snapshot by snapshot, with a ticker-bootstrap interval on precision;     groupwise-checked (data/groupwise_audit.json)"""
+artefact = "data/general_arb_comparison.json"
+test = "test_general_arb_comparison.py::TestStatisticallyValid"
 [[proofs]]
 condition = "costs_included"
 how = """\
@@ -105,13 +109,9 @@ test = "test_arbitrage_comparison.py::TestCosts"
 
 [[proofs]]
 condition = "out_of_sample_test"
-how = """\
-    the largest observed real spread (27.01bps) is reported as a genuine agreement, not folded \
-    into the disagreement count — the honest result of running the comparison across the real \
-    distribution's own range, not selected to make the finding look more sweeping than it is"""
-test = """\
-    test_arbitrage_comparison.py::TestDesignedCases::test_the_largest_observed_spread_genuinely_clears_costs_on_both_sides"""
-
+how = """    a 160-snapshot capture taken after the code was frozen and a 240-snapshot weekend capture,     both scored without change: the exact walk ties the optimum on each"""
+artefact = "data/general_arb_comparison.json"
+test = "test_general_arb_comparison.py::TestOutOfSample"
 [[proofs]]
 condition = "ablation"
 how = """\

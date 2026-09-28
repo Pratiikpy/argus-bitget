@@ -898,6 +898,51 @@ def _rule_proposals(path: str) -> Entry:
     return Entry(path, CHECKED, "per-kind held-out precision against the base rate", tuple(heads))
 
 
+def _review_rivals(path: str) -> Entry:
+    """`eval/review_rivals.py`'s real-record rows: one per (decision, defect kind) in the held-out
+    half, oriented so the excess-catch difference between ARGUS's deployed lifecycle and
+    QuantDinger's low-win-rate diagnostic (the best rival on the aggregate, `22-*.toml`'s own
+    blocker) sums exactly per group. The decomposition and the parity it is checked against are
+    derived in `review_rivals._excess_diff`."""
+    blob = _load(path)
+    rows = blob["real_record"]["rows"]
+    published = blob["real_record"].get("excess_diff") or {}
+    argus = str(published.get("argus", "argus_lifecycle"))
+    rival = str(published.get("rival", "quantdinger_low_win_rate"))
+    missing = [r for r in rows if argus not in r["flags"] or rival not in r["flags"]]
+    if missing:
+        raise AuditError(f"{path}: {len(missing)} row(s) carry no {argus!r} or {rival!r} flag; "
+                         "was the real-record run missing a gate?")
+    base_of: dict[str, float] = {}
+    counts: dict[str, int] = {}
+    for r in rows:
+        k = str(r["kind"])
+        counts[k] = counts.get(k, 0) + 1
+        base_of[k] = base_of.get(k, 0.0) + (1.0 if r["real"] else 0.0)
+    base_of = {k: v / counts[k] for k, v in base_of.items()}
+
+    def value(r: dict[str, Any]) -> float:
+        return ((float(r["flags"][argus]) - float(r["flags"][rival]))
+                * ((1.0 if r["real"] else 0.0) - base_of[str(r["kind"])]))
+
+    items = [Item(value=value(r), groups={"kind": str(r["kind"]), "day": f"{int(r['day']):04d}"},
+                  order=f"{int(r['day']):04d}") for r in rows]
+    for kind, agg in published.get("by_kind", {}).items():
+        regenerated = round(sum(value(r) for r in rows if str(r["kind"]) == kind), 3)
+        _parity(f"{path} {kind} excess diff", regenerated, _f(agg["sum"]))
+    return Entry(path, CHECKED, "one row per (decision, defect kind) in the real-record held-out "
+                 "half, from review_rivals.py's own recorded rows", (
+        _headline(
+            f"excess catches: {argus} minus {rival}", items, ("kind", "day"),
+            headline="(ARGUS flagged - rival flagged) x (real defect - held-out base rate), per "
+            "decision-kind pair",
+            orientation="positive = ARGUS's flag pattern caught more excess than the rival's on "
+            "this decision", role=VS_RIVAL,
+            role_reason="the real-record primary 22-self-evolving-review-rules.toml's blocker "
+            "names: the deployed lifecycle against the best rival on the aggregate",
+            source="real_record.rows"),))
+
+
 def _factor_split_half(path: str) -> Entry:
     libraries = _load(path)["libraries"]
     items = [Item(value=1.0 if f["split_half"]["outcome"] == "pass" else 0.0,
@@ -1267,9 +1312,7 @@ ADAPTERS: dict[str, Callable[[str], Entry]] = {
     "data/general_coint_comparison.json": _not_checkable(
         WITHOUT_ROWS, "160 simulated universes reduced to FDR, FWER and power per pipeline; "
         "eval/general_coint_comparison.py would need to record each universe's discoveries"),
-    "data/review_rivals.json": _not_checkable(
-        WITHOUT_ROWS, "40 seeds a cell reduced to false-admission and power rates per rule "
-        "learner; eval/review_rivals.py would need to record each seed's outcome"),
+    "data/review_rivals.json": _review_rivals,
     "data/xa_arena.json": _not_checkable(
         WITHOUT_ROWS, "hourly net asset values reduced to per-period scores per arm; "
         "eval/xa_arena.py would need to record each arm's hourly return path"),

@@ -1,34 +1,86 @@
 {
- "graded_at": "2026-09-27T19:55:09+00:00",
- "calls": 4,
+ "graded_at": "2026-09-28T19:55:04+00:00",
+ "calls": 8,
  "first_call": "2026-09-27T02:28:00+00:00",
  "risk_graded": 0,
  "mean_beta_error": null,
  "mean_risk_share_error": null,
- "direction_graded": 0,
- "brier": null,
- "brier_base_rate": null,
+ "direction_graded": 4,
+ "brier": 0.24782500000000002,
+ "brier_base_rate": 0.2557742239575327,
  "calls_graded": [
   {
    "recorded_at": "2026-09-27T02:28:00+00:00",
    "question": "I hold 40% NVDA, 30% MSFT, 30% AAPL — should I add 15% TSLA?",
    "risk": null,
-   "direction": []
+   "direction": [
+    {
+     "days": 1,
+     "up": false,
+     "brier": 0.22089999999999999,
+     "brier_base": 0.26900013177691756
+    }
+   ]
   },
   {
    "recorded_at": "2026-09-27T02:28:00+00:00",
    "question": "I hold 50% NVDA, 50% AAPL — should I add 20% COIN?",
    "risk": null,
-   "direction": []
+   "direction": [
+    {
+     "days": 1,
+     "up": false,
+     "brier": 0.27040000000000003,
+     "brier_base": 0.22157642511461417
+    }
+   ]
   },
   {
    "recorded_at": "2026-09-27T02:28:00+00:00",
    "question": "I hold 60% QQQ, 40% MSFT — should I add 10% MSTR?",
    "risk": null,
-   "direction": []
+   "direction": [
+    {
+     "days": 1,
+     "up": false,
+     "brier": 0.25,
+     "brier_base": 0.25301747419851395
+    }
+   ]
   },
   {
    "recorded_at": "2026-09-27T02:28:00+00:00",
+   "question": "I hold 40% TSLA, 30% META, 30% GOOGL — should I add 15% AMZN?",
+   "risk": null,
+   "direction": [
+    {
+     "days": 1,
+     "up": false,
+     "brier": 0.25,
+     "brier_base": 0.27950286474008496
+    }
+   ]
+  },
+  {
+   "recorded_at": "2026-09-28T13:55:04+00:00",
+   "question": "I hold 40% NVDA, 30% MSFT, 30% AAPL — should I add 15% TSLA?",
+   "risk": null,
+   "direction": []
+  },
+  {
+   "recorded_at": "2026-09-28T13:55:04+00:00",
+   "question": "I hold 50% NVDA, 50% AAPL — should I add 20% COIN?",
+   "risk": null,
+   "direction": []
+  },
+  {
+   "recorded_at": "2026-09-28T13:55:04+00:00",
+   "question": "I hold 60% QQQ, 40% MSFT — should I add 10% MSTR?",
+   "risk": null,
+   "direction": []
+  },
+  {
+   "recorded_at": "2026-09-28T13:55:04+00:00",
    "question": "I hold 40% TSLA, 30% META, 30% GOOGL — should I add 15% AMZN?",
    "risk": null,
    "direction": []
@@ -36,10 +88,51 @@
  ],
  "weekend": {
   "recorded": 5,
-  "graded": 0,
-  "pending": 5,
-  "covered": null,
-  "mean_pinball_bps": null,
-  "bands": []
+  "graded": 5,
+  "pending": 0,
+  "covered": 0.6,
+  "mean_pinball_bps": 40.83027039312882,
+  "bands": [
+   {
+    "ticker": "NVDA",
+    "friday": "2026-09-25",
+    "reopened": "2026-09-28",
+    "move": 0.0205713310230351,
+    "inside": false,
+    "pinball_bps": 57.02717076776686
+   },
+   {
+    "ticker": "TSLA",
+    "friday": "2026-09-25",
+    "reopened": "2026-09-28",
+    "move": -0.01088384604659931,
+    "inside": true,
+    "pinball_bps": 35.06532393898789
+   },
+   {
+    "ticker": "AAPL",
+    "friday": "2026-09-25",
+    "reopened": "2026-09-28",
+    "move": -0.002052400363558915,
+    "inside": true,
+    "pinball_bps": 10.84278337485922
+   },
+   {
+    "ticker": "MSFT",
+    "friday": "2026-09-25",
+    "reopened": "2026-09-28",
+    "move": -0.020816776397200476,
+    "inside": false,
+    "pinball_bps": 69.66416483887846
+   },
+   {
+    "ticker": "COIN",
+    "friday": "2026-09-25",
+    "reopened": "2026-09-28",
+    "move": 0.004561526251162462,
+    "inside": true,
+    "pinball_bps": 31.551909045151646
+   }
+  ]
  }
 }

@@ -105,7 +105,7 @@ deflation gate, and the console says so.
 Every capability is graded against the specialist that leads its sub-theme, by a register that
 opens the evidence rather than trusting a filename (`python -m argus.eval.standing`), and may claim
 OWNED only after that rival has been run on the same input and beaten.
-**2 of 47 capabilities are OWNED, 17 are TIED, 27 are IMPLEMENTED, and 1 is LOST (crowd sentiment classification, to RoB-RT on TweetEval: 0.544 against 0.729 macro-recall on the same 12,284 tweets).** OWNED needs
+**2 of 47 capabilities are OWNED, 19 are TIED, 24 are IMPLEMENTED, and 2 are LOST: crowd sentiment classification, to RoB-RT on TweetEval (0.544 against 0.729 macro-recall on the same 12,284 tweets), and session-aware execution, to Bitget's own TWAP on replayed order books (0.62 bps dearer on boundary-crossing orders, interval [0.01, 1.53]).** OWNED needs
 all thirteen conditions: the rival's best implementation read and reproduced, a same-input
 comparison with costs, out-of-sample, ablation, an adversarial test, documented failure cases and
 reproducibility.
@@ -173,7 +173,7 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 9,974 tests collected
+pytest -q                       # 10,003 tests collected
 ```
 
 Nothing above needs a credential. On 2026-09-27, with every outbound connection refused, 9,109
@@ -196,8 +196,8 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **9,974 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 543 source files** |
+| Tests | **10,003 tests collected** — `pytest -q` |
+| Types | **`mypy --strict` clean on 545 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
 | Sub-themes | **18/18 sub-themes** each resolve to an importable module and a test file (`python -m argus.status`). That is coverage, not a claim to lead them: 2 of 47 capabilities are OWNED against a named rival, and `/proof` says which |
@@ -217,11 +217,12 @@ a test that reaches the network shows itself.
 
 ## Honest limits
 
-- **ARGUS's own paper desk has no settled trades.** Every decision on its ledger is a refusal, so
-  its Sharpe, drawdown and win rate are undefined and printed as such. Each refusal carried a
-  direction, hashed before the outcome existed: at about two hours, **243 of 414 directional calls
-  were right**, which barely clears a coin flip and does not beat calling "up" every time. The
-  median refusal **forgave -7.0bps of net edge** after the 12bps round trip — the trades it passed
+- **ARGUS's own paper desk has no settled trades.** One position is open (BUY 1 NVDAUSDT, opened
+  2026-09-28) and every other decision on its ledger is a refusal, so its Sharpe, drawdown and win
+  rate are undefined and printed as such. Each refusal carried a direction, hashed before the
+  outcome existed: at about two hours, **257 of 443 directional calls were right**, which clears a
+  coin flip and does not beat calling "up" every time. The median refusal **forgave -7.15bps of
+  net edge** after the 12bps round trip — the trades it passed
   on were mostly unprofitable. This workbench does not trade; trading is the separate Track 2
   project's job.
 - **No certified alpha.** 0 of 8 factors and 0 of 12 strategies cleared the deflation gate.
@@ -235,8 +236,8 @@ a test that reaches the network shows itself.
 
 ARGUS 是面向 Bitget 美股代币（rToken）的研究工作台（Track 3 · AI Trading Desk）。用自然语言提问，
 七个引擎基于 Bitget 行情、SEC 文件、FRED 与新闻实时计算，每个数字都注明来源；语言模型只理解问题，
-从不编写数字。47 项能力中 45 项已与各子赛道领先的专业系统在相同输入上对比：2 项领先（OWNED）、17 项
-持平、27 项已实现、1 项落后（LOST：人群情绪分类在 TweetEval 上不及 RoB-RT），所有落败记录公开在 `/wrong`。本团队的 Track 2 参赛作品是另一个独立项目
+从不编写数字。47 项能力中 45 项已与各子赛道领先的专业系统在相同输入上对比：2 项领先（OWNED）、19 项
+持平、24 项已实现、2 项落后（LOST：人群情绪分类在 TweetEval 上不及 RoB-RT；跨时段执行在回放订单簿上不及 Bitget 自带的 TWAP），所有落败记录公开在 `/wrong`。本团队的 Track 2 参赛作品是另一个独立项目
 （t2-sentiment-agent，独立的代码库、交易日志与演示），不属于本仓库。
 
 ---

@@ -164,9 +164,9 @@ NOT_JUDGES: Mapping[str, str] = {
                                "(eval/research_depth.py), so it is off by default",
     "argus/eval/decision_primitives.py:483,491": "the prompt-cache replay of recorded calls; the "
                                                  "cache is measured, the model is not graded",
-    "argus/eval/session_arena.py:678": "the rival execution desk (PACE) run as the subject of a "
-                                       "comparison, not a grader — held back from publication, "
-                                       "unreviewed (the readiness backlog)",
+    "argus/eval/session_arena.py:712": "the rival execution desk (PACE) run as the subject of a "
+                                       "comparison, not a grader; its ten pre-registered calls "
+                                       "have not been spent, so the arm is recorded as not run",
 }
 """``complete_json`` call sites that are not judges, with the reason: the register is complete."""
 

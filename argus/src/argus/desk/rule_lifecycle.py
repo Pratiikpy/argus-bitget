@@ -47,6 +47,14 @@ become observable:
 ``RETIRED`` → ``PROBATION``
     Re-admission is possible, on evidence observed after retirement only.
 
+**Tried and reverted, 2026-09-28: a rolling local base rate for admission and probation too**
+(S3's real-rule retention through a falling base rate was 32%, against 0% for every rival that
+never retires anything). :func:`local_grade` and :func:`_local_measure` carry the full pre-
+registration, the measurement, and why it fell short — not a temporal-dilution bug like the CUSUM's
+own 2026-09-26 correction above, but a confound from several real rules firing at once that a
+rolling-but-still-univariate base rate does not separate. `CANDIDATE` → `PROBATION` and
+`PROBATION` → `ACTIVE`/`RETIRED` above still read as built: :func:`grade` and a pooled Fisher test.
+
 **What was read, and what was taken.** The two rival lifecycles that exist for trading lessons:
 
 * ``cholhwanjung/trading-agent`` (no licence file — behaviour read, nothing copied):
@@ -136,6 +144,173 @@ class Stage(StrEnum):
     @property
     def warns(self) -> bool:
         return self in {Stage.PROBATION, Stage.ACTIVE}
+
+
+def _local_rate(
+    window: list[int], marked: frozenset[int], index: int, half: int, local_min: int,
+) -> float | None:
+    """The base rate in the ``half``-decision neighbourhood of ``window[index]``, excluding it —
+    the centred estimate the CUSUM monitor (below) already used from the 2026-09-26 correction.
+    Shared here so admission and probation grade a rule against the same rolling reference the
+    retirement check does, rather than the pooled rate over the whole graded window. ``None`` when
+    fewer than ``local_min`` decisions surround the index (too close to the edge of what has been
+    observed) or the local rate is degenerate (0 or 1: nothing to compare a firing against)."""
+    around = window[max(0, index - half):index] + window[index + 1:index + 1 + half]
+    if len(around) < local_min:
+        return None
+    base = sum(1 for s in around if s in marked) / len(around)
+    return base if 0.0 < base < 1.0 else None
+
+
+def _sir_upper_tail(observed: float, expected: float, variance: float) -> float | None:
+    """One-sided p-value that ``observed`` catches exceed what heterogeneous local base rates
+    predict: a continuity-corrected normal approximation to a Poisson-binomial upper tail, exactly
+    the significance test behind a standardised incidence ratio (``observed / expected``) — the
+    generalisation of :func:`argus.desk.review._upper_tail`'s hypergeometric test to trials whose
+    success probability is not the same for every trial, which a rolling local base rate is not.
+    ``None`` when ``variance`` is non-positive (no scoreable firing, or every one had a degenerate
+    local rate)."""
+    if variance <= 0.0:
+        return None
+    z = (observed - 0.5 - expected) / math.sqrt(variance)
+    return 0.5 * math.erfc(z / math.sqrt(2.0))
+
+
+def _local_measure(
+    candidate: Candidate, window: list[int], marked: frozenset[int], *,
+    only: frozenset[int] | None, base_window: int, local_min: int,
+) -> RulePerformance:
+    """The rolling-base-rate measurement itself, with no status decision attached: ``fired`` and
+    ``caught`` restricted to firings that have a valid :func:`_local_rate` (the ones this record
+    can actually judge yet), ``base_rate`` their mean local rate, ``lift`` therefore exactly the
+    standardised incidence ratio ``caught / expected``, and ``p_value`` :func:`_sir_upper_tail` on
+    the same. ``window`` must be sorted ascending. ``only`` restricts which firings count as
+    evidence — ``None`` scores every firing in ``window`` (admission); probation passes the
+    post-admission decisions only, so a rule cannot be confirmed on the firings that admitted it."""
+    half = base_window // 2
+    window_set = frozenset(window)
+    scope = only if only is not None else window_set
+    fires = candidate.fires & scope
+    hits = marked & scope
+    scored: list[int] = []
+    expected = 0.0
+    variance = 0.0
+    for seq in sorted(fires):
+        i = bisect.bisect_left(window, seq)
+        if i >= len(window) or window[i] != seq:
+            continue  # defensive: fires ⊆ scope ⊆ window_set always holds by construction
+        p_local = _local_rate(window, marked, i, half, local_min)
+        if p_local is None:
+            continue
+        scored.append(seq)
+        expected += p_local
+        variance += p_local * (1.0 - p_local)
+    caught = sum(1 for s in scored if s in marked)
+    fired = len(scored)
+    return RulePerformance(
+        rule=candidate.name, prompt="", decisions=len(scope), fired=fired, caught=caught,
+        false_alarms=fired - caught, missed=len(hits - fires), status=Status.PROPOSED,
+        base_rate=(expected / fired if fired else None),
+        p_value=(_sir_upper_tail(float(caught), expected, variance) if fired else None),
+    )
+
+
+def local_grade(
+    candidate: Candidate, eligible: frozenset[int], marked: frozenset[int], *,
+    floor: int = -1, min_decisions: int = MIN_DECISIONS, base_window: int = BASE_WINDOW,
+) -> RulePerformance:
+    """As :func:`grade`, but a rule's lift and its significance are computed against a rolling,
+    centred ``base_window``-decision local base rate around each firing (:func:`_local_rate`)
+    instead of the single rate pooled over the whole graded window.
+
+    **NOT WIRED IN. Tried 2026-09-28, measured, and reverted — kept here as a tested, documented
+    negative result, not a live code path.** :class:`Lifecycle` calls :func:`grade` and the pooled
+    Fisher test again (`_grade`, `_judge_probation`); this function and :func:`_local_measure`
+    exist only so the attempt and its measurement stay reproducible.
+
+    **Why it was tried.** Admission graded every candidate's lift against ``|hits| / |eligible|``
+    pooled over the *entire* graded window. On `eval/review_rivals.py::suite_base_shift` (S3: 20
+    null and 10 real rules at lift 1.8, one defect kind, base rate 50%→20% at the midpoint,
+    1200 decisions), a real rule's pooled base rate measured 71% — not 50%, not 20%, and not a
+    weighted average of the two either, because *several* real rules can fire on the same decision
+    and their lifts compound (``p *= rule.lift`` per firing rule in
+    :func:`~argus.eval.review_rivals.synthetic_stream`). Against that pooled 71%, a rule with a true
+    local lift of 1.8x measured a pooled lift of about 1.19-1.23 — under
+    :data:`~argus.desk.review.MIN_LIFT` (1.2) — and 93 of 120 real-rule instances (12 seeds x 10
+    real rules) were never admitted at all, stuck ``CANDIDATE`` for the whole stream. The CUSUM
+    monitor was not the defect: it already compared a firing's outcome with a rolling local base
+    rate, corrected 2026-09-26. Admission and probation were still pooled, which this was meant to
+    fix by making them local too.
+
+    **What was read and taken.** No published rival implements this: cholhwanjung's admission test
+    (`memory/admission.py:34-39`) is a fixed-null (p=0.5) sign test with no base-rate concept at
+    all; tradememory's induction (`owm/induction.py:7-56`) counts episodes with no significance
+    test whatsoever. The standardised-incidence-ratio idea — compare observed events with what
+    heterogeneous local rates predict, not one pooled rate — is standard practice for a
+    non-stationary hazard (epidemiology's SIR, and the same principle a Bernoulli CUSUM already
+    applies firing by firing); there is no single canonical implementation to vendor, so this was
+    built from the definition and checked against the known non-central case in
+    `tests/test_rule_lifecycle.py`.
+
+    **PRE-REGISTERED 2026-09-28, before this was wired in or re-run.** The rule: retire (and admit,
+    and confirm) a candidate on its lift *relative to a rolling, centred local base rate*
+    (:func:`_local_rate`, ``base_window=100`` — the CUSUM's own reference, unchanged), never on the
+    single rate pooled over the whole window. Pass criterion, against the same 40-seed harness run
+    before and after the change:
+
+    * **S3** (`suite_base_shift`): ``argus_lifecycle``'s mean real-rule retention
+      (``1 - real_rules_lost_by_end.rate``) must at least double the pre-fix baseline (32%), and its
+      ``null_rules_warning_after_shift.rate`` must not rise by more than 5 points, and its
+      ``mean_excess_catches`` must stay positive.
+    * **S1/S2 not worse**: at every S1 base-rate cell, ``false_admission.rate`` must not rise by
+      more than 0.03 and ``power.rate`` must not fall by more than 0.03 versus the pre-fix baseline;
+      S2's ``dead_rules_still_warning_at_end.rate`` and ``live_rules_lost_by_end.rate`` must not
+      rise by more than 0.05, and ``mean_excess_catches`` must not fall by more than 10% relative.
+
+    If the criterion is not met, the fix is reverted rather than tuned to pass it — a threshold
+    chosen after seeing the result it needs to produce is not evidence.
+
+    **RESULT, measured 2026-09-28, 40 seeds each side (`REVIEW_REPORT.md` carries the full table).**
+    S3 retention moved from 32.25% (271/400 real-rule-instances lost) to 33.75% (265/400) —
+    nowhere near double. ``null_rules_warning_after_shift`` held near zero on both sides (0.50% pre,
+    0.37% post) and ``mean_excess_catches`` stayed positive (14.27 pre, 13.69 post), so those two
+    S3 sub-conditions passed; the primary one — the doubling — failed outright. **S1 and S2 were
+    each within their own stated tolerances** (S1 power fell 1.5-2.5 points at the two base rates
+    that admit anything, under the 3-point bar; S2 ``live_rules_lost_by_end`` rose 4 points, under
+    the 5-point bar, and ``mean_excess_catches`` fell 8.7% at S2 and 10.8% at S1's 25% cell — S1 had
+    no stated excess tolerance) — but a pass on the two conditions that were never the point does
+    not offset a clear failure on the one that was. **Reverted, per the pre-registration.**
+
+    **Why doubling failed when the isolated mechanism works.** :func:`_local_rate` does correctly
+    separate the two regimes — on a single-rule, no-co-firing fixture it turns a pooled MISLEADING
+    verdict into a correct ACTIVE one (`tests/test_rule_lifecycle.py::
+    test_local_grade_admits_a_rule_a_pooled_grade_refuses`). What it does not do is separate *this*
+    rule's own effect from the other nine real rules also firing nearby: a firing's local
+    neighbourhood is nearby *decisions*, regardless of which other candidate rules fired on them, so
+    when ten real rules are simultaneously live the neighbourhood average stays close to the pooled
+    figure in both regimes (measured: local base rate 70-82% pre-shift, against a pooled 71-72%),
+    and a rule's own marginal lift over that neighbourhood still sits near the same 1.2x boundary —
+    confirmed directly: every "admitted" transition in the S3 diagnostic reads "lift 1.2x" almost
+    verbatim, local and pooled alike. This is a confounding-variable problem (other correlated
+    signals inflate the reference rate a *conditional* estimate would need to exclude), which a
+    rolling-but-still-univariate base rate does not reach; separating one rule's marginal
+    contribution from nine simultaneously-firing others would need a multivariate design (e.g.
+    scoring a firing only against decisions where no other admitted or candidate rule also fired, or
+    a regression adjustment) — out of scope for the change this docstring pre-registered, and not
+    built speculatively per the same pre-registration's own rule against tuning after the fact.
+    """
+    window = sorted(s for s in eligible if s > floor)
+    window_set = frozenset(window)
+    perf = _local_measure(candidate, window, marked, only=None, base_window=base_window,
+                          local_min=min_decisions)
+    raw_fired = len(candidate.fires & window_set)
+    if raw_fired and not perf.fired:
+        return replace(perf, status=Status.PROPOSED, note=(
+            f"fired {raw_fired} time(s), but none with {base_window} decisions of local history "
+            f"on both sides observed yet; cannot be judged against a rolling base rate"))
+    status, note = _status_for(perf, min_decisions=min_decisions,
+                               targeted_total=len(marked & window_set))
+    return replace(perf, status=status, note=note)
 
 
 @dataclass(frozen=True, slots=True)
@@ -307,6 +482,9 @@ class Lifecycle:
     def _grade(
         self, track: _Track, eligible: frozenset[int], marked: frozenset[int]
     ) -> RulePerformance:
+        # NOT `local_grade`: reverted 2026-09-28, see that function's docstring — pre-registered,
+        # measured against 40 seeds, and it did not clear its own bar (S3 retention moved from
+        # 32.25% to 33.75%, not the pre-registered doubling).
         return grade(track.candidate, eligible, marked, floor=track.floor,
                      min_decisions=self.min_decisions)
 
@@ -359,6 +537,7 @@ class Lifecycle:
         seen: Callable[[frozenset[DefectKind]], tuple[frozenset[int], frozenset[int]]],
         at: str,
     ) -> None:
+        # NOT the rolling-base-rate test: reverted 2026-09-28 alongside `_grade`, same reason.
         eligible, marked = seen(track.candidate.targets)
         post = {s for s in eligible if s > track.floor} - track.admitted_on
         hits = marked & post
@@ -396,11 +575,8 @@ class Lifecycle:
                 # Left unmonitored until a later step observes them.
                 break
             track.monitored.add(seq)
-            around = window[max(0, i - half):i] + window[i + 1:i + 1 + half]
-            if len(around) < self.min_decisions:
-                continue
-            base = sum(1 for s in around if s in marked) / len(around)
-            if not 0.0 < base < 1.0:
+            base = _local_rate(window, marked, i, half, self.min_decisions)
+            if base is None:
                 continue
             p_work = min(self.reference_lift * base, (1.0 + base) / 2.0)
             hit = seq in marked
@@ -511,5 +687,6 @@ __all__ = [
     "Transition",
     "candidates_from",
     "grade",
+    "local_grade",
     "parameters",
 ]

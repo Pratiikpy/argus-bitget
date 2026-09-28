@@ -15,59 +15,59 @@ blockers = [
         repository. Run on the same 619 questions since (2026-09-26, eval/pit_rivals.py, \
         data/pit_rivals.json, each scored from its own output): OpenBB's ODP (openbb_core, 7/493 \
         right), HKUDS/Vibe-Trading's point-in-time series (343/619, 236 leaks) and research tool \
-        (9/619), ginlix-ai/LangAlpha (10/619) and TraderAlice/OpenAlice (10/619); ARGUS 619/619, 0 \
-        leaks. The S2 entry Abd00lmalik/Lumen-Terminal cannot be asked: its only fundamentals path \
-        returns a trailing-twelve-month total with no period.
-
+        (9/619), ginlix-ai/LangAlpha (10/619) and TraderAlice/OpenAlice (10/619); ARGUS 619/619, \
+        0 leaks. The S2 entry Abd00lmalik/Lumen-Terminal cannot be asked: its only fundamentals \
+        path returns a trailing-twelve-month total with no period.""",
+    """\
         UPDATED 2026-09-28: two more real, cloned, MIT-licensed point-in-time specialists added \
         and run on the identical 619 questions, scored from their own real code \
-        (scripts/pit_runners/qlib_pit_runner.py, edgartools_asof_runner.py; data/pit_rivals_report.md has the \
-        full breakdown). microsoft/qlib's real PIT store (scripts/dump_pit.py + \
-        qlib/utils.py::read_period_data, a real on-disk build from the snapshot): 51/619 exact \
-        right, but its own get_source_data (line 123) float32-casts every value before storage, \
-        so 283 of the remaining 568 are right-period/rounded-value, not wrong-period — \
-        period-selection accuracy alone is 334/619; still 285/619 wrong-period (179 leak + 106 \
-        late), all on the day-granular filed-date gate this project's own filed-date ablation \
-        already names as the failure mode. dgunning/edgartools's real FactQuery.as_of \
-        (day-granular, filing_date-gated): 369/619 right, 198 leak, 52 late, 0 stale. Both lose \
-        to ARGUS paired and significantly on the full set and on the nine-ticker held-out set \
-        (rival_only_right 0 for both; p < 1e-65). Day-granularity genuinely disadvantages both on \
-        the "before" side specifically (day_granular_fairness in data/pit_rivals.json: Qlib \
-        right-rate 0.0065 before / 0.1581 after; edgartools 0.3592 before / 0.8323 after) — \
-        reported separately per the fairness caveat this row itself raised, not pooled into one \
-        number. A real, sourced defect found along the way, not scored (kept out of the measured \
-        path so it doesn't inflate the loss): edgartools' free-text fuzzy by_concept("revenue", \
-        exact=False) — the form an agent unfamiliar with ARGUS's tag list would actually call — \
-        also matches us-gaap:CostOfRevenue by substring; the runner uses exact tag matching \
-        instead so the score is of the as-of mechanism, not this separate search defect \
-        (recorded in edgartools.json's fuzzy_concept_defect for the record).
-
+        (scripts/pit_runners/qlib_pit_runner.py, edgartools_asof_runner.py; \
+        data/pit_rivals_report.md has the full breakdown). microsoft/qlib's real PIT store \
+        (scripts/dump_pit.py + qlib/utils.py::read_period_data, a real on-disk build from the \
+        snapshot): 51/619 exact right, but its own get_source_data (line 123) float32-casts \
+        every value before storage, so 283 of the remaining 568 are right-period/rounded-value, \
+        not wrong-period — period-selection accuracy alone is 334/619; still 285/619 \
+        wrong-period (179 leak + 106 late), all on the day-granular filed-date gate this \
+        project's own filed-date ablation already names as the failure mode. \
+        dgunning/edgartools's real FactQuery.as_of (day-granular, filing_date-gated): 369/619 \
+        right, 198 leak, 52 late, 0 stale. Both lose to ARGUS paired and significantly on the \
+        full set and on the nine-ticker held-out set (rival_only_right 0 for both; p < 1e-65). \
+        Day-granularity genuinely disadvantages both on the "before" side specifically \
+        (day_granular_fairness in data/pit_rivals.json: Qlib right-rate 0.0065 before / 0.1581 \
+        after; edgartools 0.3592 before / 0.8323 after) — reported separately per the fairness \
+        caveat this row itself raised, not pooled into one number. A real, sourced defect found \
+        along the way, not scored (kept out of the measured path so it doesn't inflate the \
+        loss): edgartools' free-text fuzzy by_concept("revenue", exact=False) — the form an \
+        agent unfamiliar with ARGUS's tag list would actually call — also matches \
+        us-gaap:CostOfRevenue by substring; the runner uses exact tag matching instead so the \
+        score is of the as-of mechanism, not this separate search defect (recorded in \
+        edgartools.json's fuzzy_concept_defect for the record).""",
+    """\
         openbb-mcp-server: now actually run, not just read. Its own module import \
         (openbb_mcp_server/app/app.py, `from openbb_core.api.rest_api import app`, line 348) and \
-        the bare FastAPI app import both failed before this session with \
-        AttributeError: '_IncludedRouter' object has no attribute 'path' \
-        (openbb_core/app/router.py:429) — root cause: the shared research/_venvs/pit-rivals venv \
-        is --system-site-packages and inherited fastapi 0.139.0/starlette 1.3.1 from the global \
-        site-packages (installed there for unrelated tools) against openbb_core's own pin of \
-        fastapi ^0.136.3; a local `pip install fastapi==0.136.3` inside that venv (this session, \
-        shadowing the global copy only, confirmed by pip refusing to touch the outside-venv copy) \
-        fixed both imports without touching anything outside the venv. \
-        scripts/pit_runners/openbb_mcp_verify.py then calls the real \
-        GET /api/v1/equity/fundamental/income route on openbb_core.api.rest_api.app — the literal \
-        object that file imports and wraps as MCP tools — for all ten tickers, both pit_mode \
-        values, in the same monkeypatched-transport environment openbb_sec_runner.py already \
-        serves ODP from. Result: row-for-row identical to the already-recorded ODP output for \
-        16/20 ticker/mode pairs (within float64 last-bit JSON round-trip precision, ~1e-15 \
-        relative, checked with a 1e-9 tolerance — every non-float field byte-identical); the \
-        other 4 (GOOGL, MSTR, both modes) fail identically on both paths, same exception, same \
-        cause (GOOGL/GOOG/GOOGM/GOOGN and MSTR/STRD share one SEC CIK; company_tickers.json's \
-        last entry for that CIK wins the reverse lookup in both the route and the direct fetcher, \
-        and the snapshot has no file for that ticker) — the identical failure is itself further \
-        confirmation the two paths are the same code, not weaker evidence. \
-        research/pit_rivals/outputs/openbb_mcp_verify.json has the full row-for-row record. \
-        Agent Rita: still not run — no fetcher of its own, it reads OpenBB Workspace widgets and \
-        needs a Workspace account. Whether to supply one or to drop it from the OWNED \
-        condition is an open scope decision, not something to guess at \
+        the bare FastAPI app import both failed before 2026-09-28 with AttributeError: \
+        '_IncludedRouter' object has no attribute 'path' (openbb_core/app/router.py:429) — root \
+        cause: the shared research/_venvs/pit-rivals venv is --system-site-packages and \
+        inherited fastapi 0.139.0/starlette 1.3.1 from the global site-packages (installed there \
+        for unrelated tools) against openbb_core's own pin of fastapi ^0.136.3; a local `pip \
+        install fastapi==0.136.3` inside that venv (2026-09-28, shadowing the global copy \
+        only, confirmed by pip refusing to touch the outside-venv copy) fixed both imports \
+        without touching anything outside the venv. scripts/pit_runners/openbb_mcp_verify.py \
+        then calls the real GET /api/v1/equity/fundamental/income route on \
+        openbb_core.api.rest_api.app — the literal object that file imports and wraps as MCP \
+        tools — for all ten tickers, both pit_mode values, in the same monkeypatched-transport \
+        environment openbb_sec_runner.py already serves ODP from. Result: row-for-row identical \
+        to the already-recorded ODP output for 16/20 ticker/mode pairs (within float64 last-bit \
+        JSON round-trip precision, ~1e-15 relative, checked with a 1e-9 tolerance — every \
+        non-float field byte-identical); the other 4 (GOOGL, MSTR, both modes) fail identically \
+        on both paths, same exception, same cause (GOOGL/GOOG/GOOGM/GOOGN and MSTR/STRD share \
+        one SEC CIK; company_tickers.json's last entry for that CIK wins the reverse lookup in \
+        both the route and the direct fetcher, and the snapshot has no file for that ticker) — \
+        the identical failure is itself further confirmation the two paths are the same code, \
+        not weaker evidence. research/pit_rivals/outputs/openbb_mcp_verify.json has the full \
+        row-for-row record. Agent Rita: still not run — no fetcher of its own, it reads OpenBB \
+        Workspace widgets and needs a Workspace account. Whether to supply one or to drop it \
+        from the OWNED condition is an open scope decision, not something to guess at \
         (Activity/27_CAPABILITY_CLOSE_PLAN.md §4).""",
     """\
         OpenBB genuinely wins on raw data-source breadth (32 real providers, 21 keyless, vs \

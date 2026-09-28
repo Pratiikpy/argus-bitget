@@ -114,16 +114,27 @@ def _checks() -> list[Agreement]:
     # 1. Trades. **The one that was wrong.** The console counted two refused positions as trades
     #    while every other consumer excluded them.
     listed = _ask("show me every decision")
-    console_trades = int(listed.data.get("verdicts", {}).get("trade", 0))
+    #    Settled is compared with settled: an open position is a trade, but not yet one the
+    #    scorecard can grade, and the two counts are checked separately below.
     out.append(Agreement(
         fact="settled trades",
-        console=console_trades, artefact=int(perf.trades),
-        console_says="lui.answer:answer_decision_list verdict breakdown",
+        console=int(listed.data.get("settled_trades", -1)), artefact=int(perf.trades),
+        console_says="lui.answer:answer_decision_list settled_trades",
         artefact_says="eval.performance:evaluate_ledger.trades",
         why_it_matters=(
-            "the submission, the README and the cockpit all state zero trades; a console saying "
-            "otherwise makes our own record contradict our own claim on the surface built to "
-            "show the record can be trusted"
+            "the submission, the README and the cockpit state the settled-trade count; a console "
+            "saying otherwise makes our own record contradict our own claim on the surface built "
+            "to show the record can be trusted"
+        ),
+    ))
+    out.append(Agreement(
+        fact="open positions",
+        console=int(listed.data.get("open_trades", -1)), artefact=int(perf.open_positions),
+        console_says="lui.answer:answer_decision_list open_trades",
+        artefact_says="eval.performance:evaluate_ledger.open_positions",
+        why_it_matters=(
+            "an open position is the desk's live exposure; the console and the scorecard must name "
+            "the same number, or a reader cannot tell whether the desk is in the market"
         ),
     ))
 

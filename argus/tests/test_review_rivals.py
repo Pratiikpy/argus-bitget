@@ -91,3 +91,51 @@ def test_a_missing_clone_is_reported_without_a_home_path(monkeypatch: pytest.Mon
 
 def test_typescript_is_never_assumed(tmp_path: Path) -> None:
     assert rr.find_typescript(tmp_path) in (None, rr.ROOT / "node_modules" / "typescript")
+
+
+# --- per-decision rows and the excess-catch difference --------------------------------------------
+
+
+def test_score_records_flagged_kinds_only_when_asked() -> None:
+    stream = _stream()
+    plain = rr.score(stream, rr.Unconditional(stream))
+    assert plain.flagged_kinds_by_seq == {}
+    rows = rr.score(stream, rr.Unconditional(stream), record_rows=True)
+    # Every scored decision the unconditional gate flagged (4, 5, 8, 9 — see the fixture) carries
+    # the kind it was scored under, matching `by_kind[kind]["flagged"]` exactly.
+    assert set(rows.flagged_kinds_by_seq) == {4, 5, 8, 9}
+    assert all(k == {str(KIND)} for k in rows.flagged_kinds_by_seq.values())
+
+
+def test_real_record_rows_carry_ground_truth_and_every_gates_flag() -> None:
+    stream = _stream()
+    scores = {g.name: rr.score(stream, g, record_rows=True)
+              for g in (rr.Unconditional(stream), rr.ArgusReview(stream))}
+    rows = rr._real_record_rows(stream, scores)
+    by_seq = {r["seq"]: r for r in rows}
+    assert set(by_seq) == set(range(4, 12))  # exactly the scored decisions
+    assert by_seq[5]["real"] is True and by_seq[6]["real"] is False
+    assert by_seq[5]["flags"] == {"tradingagents_unconditional": True, "argus_review": False}
+    assert by_seq[6]["flags"] == {"tradingagents_unconditional": False, "argus_review": False}
+
+
+def test_excess_diff_sums_exactly_to_the_published_excess_difference() -> None:
+    """The algebraic identity `_excess_diff`'s docstring claims: a row's value, summed, equals
+    `by_kind[kind]["excess"]` for the argus gate minus the rival's — checked here against the
+    real `score` output rather than asserted."""
+    stream = _stream()
+    scores = {g.name: rr.score(stream, g, record_rows=True)
+              for g in (rr.Unconditional(stream), rr.ArgusReview(stream))}
+    rows = rr._real_record_rows(stream, scores)
+    diff = rr._excess_diff(rows, argus="tradingagents_unconditional", rival="argus_review")
+    published = (scores["tradingagents_unconditional"].by_kind[str(KIND)]["excess"]
+                 - scores["argus_review"].by_kind[str(KIND)]["excess"])
+    assert diff["by_kind"][str(KIND)]["sum"] == pytest.approx(published)
+    assert diff["overall"]["sum"] == pytest.approx(published)
+
+
+def test_excess_diff_skips_rows_missing_either_named_gate() -> None:
+    rows = [{"seq": 0, "day": 0, "kind": "conflict", "real": True, "flags": {"a": True}}]
+    diff = rr._excess_diff(rows, argus="a", rival="b")
+    assert diff["overall"] == {"decisions": 0, "sum": 0.0, "interval": None}
+    assert diff["by_kind"] == {}

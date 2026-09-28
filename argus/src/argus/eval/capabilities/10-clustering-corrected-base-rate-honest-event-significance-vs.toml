@@ -14,7 +14,17 @@ modules = [
 state = "tied"
 baseline = "whale-signals real fixed-null hit-rate test (compute_hit_rates/compute_base_rate)"
 blockers = [
-    """        RE-GRADED 2026-09-28 from IMPLEMENTED to TIED (Activity/27_CAPABILITY_CLOSE_PLAN.md §1),         after fixing a defect the comparison had hidden: ARGUS's Corrado rank test ranked tied         returns by position, so on tokenised equities' flat off-hours bars it rejected 63.5% of         placebo draws at 5% (tracker 242). Ties now share their average rank; re-run on the same         panel (data/eventdriven_rivals.json) its size is 0.5-6.5% across the seven null shapes.         The trade-off that remains is real and both sides are published: under clustered nulls         ARGUS's four-test verdict rejects 0-3% where Vibe-Trading's Cowan sign test rejects         11-18%, but on size-adjusted power Vibe's test detects more (clustered_9, 50bps: 0.81         against 0.58; 100bps: 1.00 against 0.67). On the real event stream both abstain. Neither         dominates; winning needs a verdict that keeps ARGUS's size and reaches Vibe's power.""",
+    """\
+        RE-GRADED 2026-09-28 from IMPLEMENTED to TIED (Activity/27_CAPABILITY_CLOSE_PLAN.md §1), \
+        after fixing a defect the comparison had hidden: ARGUS's Corrado rank test ranked tied \
+        returns by position, so on tokenised equities' flat off-hours bars it rejected 63.5% of \
+        placebo draws at 5% (tracker 242). Ties now share their average rank; re-run on the same \
+        panel (data/eventdriven_rivals.json) its size is 0.5-6.5% across the seven null shapes. \
+        The trade-off that remains is real and both sides are published: under clustered nulls \
+        ARGUS's four-test verdict rejects 0-3% where Vibe-Trading's Cowan sign test rejects \
+        11-18%, but on size-adjusted power Vibe's test detects more (clustered_9, 50bps: 0.81 \
+        against 0.58; 100bps: 1.00 against 0.67). On the real event stream both abstain. Neither \
+        dominates; winning needs a verdict that keeps ARGUS's size and reaches Vibe's power.""",
     """\
         RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: whale-signals tests one significance \
         method; the Event-Driven Agent sub-theme asks for event -> decision -> trade, and the \

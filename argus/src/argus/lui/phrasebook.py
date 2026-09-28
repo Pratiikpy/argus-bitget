@@ -216,6 +216,13 @@ PHRASES: dict[str, dict[Language, str]] = {
         Language.EN: "  seq {seq} {symbol} {verdict} (confidence {confidence:.2f}) {at}",
         Language.ZH: "  序号 {seq} {symbol} {verdict}（置信度 {confidence:.2f}）{at}",
     },
+    "list.open": {
+        Language.EN: (
+            "  {open} of these trade(s) still open: not settled, so not yet in Sharpe, drawdown "
+            "or win rate."
+        ),
+        Language.ZH: "  其中 {open} 笔交易仍未平仓：尚未结算，因此未计入夏普比率、回撤或胜率。",
+    },
     # Voided rows are excluded from the count and said to be, never silently dropped. A total
     # that quietly shrinks is the same defect as one that quietly includes a refused position.
     "list.voided": {

@@ -896,9 +896,18 @@ class TestVoidedRowsAreNotCountedAsTrades:
 
             pytest.skip("no live ledger on this machine")
         result = answer(ledger, classify("show me every decision", now=datetime.now(UTC)))
-        assert "trade" not in result.data.get("verdicts", {}), (
+        # Written when the desk had no trades at all, this asserted that "trade" was absent. The
+        # desk opened its first real position on 2026-09-28 (seq 797), so the claim is now the one
+        # that was always meant: the count is every trade row except the voided ones.
+        voided = [e for e in ledger.entries if e.is_void]
+        assert voided, "the live chain carries the two voided rows (seq 264, 265)"
+        real = [e for e in ledger.entries if e.verdict == "trade" and not e.is_void]
+        assert result.data["verdicts"].get("trade", 0) == len(real), (
             "a position the risk layer refused must not be counted as a trade"
         )
+        opened = sum(1 for e in real if not e.is_settled)
+        assert result.data["open_trades"] == opened
+        assert result.data["settled_trades"] == len(real) - opened
 
     def test_the_excluded_rows_are_named_not_silently_dropped(self) -> None:
         """A total that quietly shrinks is the same defect as one that quietly includes."""

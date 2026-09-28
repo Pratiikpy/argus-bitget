@@ -11,8 +11,10 @@ import random
 
 import pytest
 
-from argus.desk.review import DefectKind
+from argus.desk import rule_lifecycle as rl
+from argus.desk.review import DefectKind, Status
 from argus.desk.rule_lifecycle import (
+    BASE_WINDOW,
     PROBATION_FIRINGS,
     Candidate,
     Lifecycle,
@@ -20,6 +22,7 @@ from argus.desk.rule_lifecycle import (
     Stage,
     candidates_from,
     grade,
+    local_grade,
     parameters,
 )
 
@@ -200,3 +203,97 @@ def test_set_evidence_grades_a_multi_kind_rule_on_everything() -> None:
     assert ev.eligible(both) == frozenset({1, 2, 3})
     assert ev.marked(both) == frozenset({1, 2})
     assert ev.eligible(TARGETS) == frozenset({1})
+
+
+# --- local_grade: rolling base rate, not the one pooled over the whole window ---------------------
+
+
+def _diluted_fixture() -> tuple[Candidate, frozenset[int], frozenset[int]]:
+    """A rule that only ever fires in a rare-defect regime (base 5%, its own local lift 3x), whose
+    graded window also covers a later, unrelated common-defect regime (base 60%) it never touches.
+    Pooling the base rate over the whole window buries the rule's real local lift under the second
+    regime's; a rolling local rate does not. Numbers pinned 2026-09-28."""
+    rng = random.Random(7)
+    n = 1000
+    fires: set[int] = set()
+    marked: set[int] = set()
+    for i in range(n):
+        if i < 500:
+            base = 0.05
+            if rng.random() < 0.4:
+                fires.add(i)
+                base = 0.05 * 3.0
+        else:
+            base = 0.6
+        if rng.random() < min(0.95, base):
+            marked.add(i)
+    return Candidate("r", TARGETS, frozenset(fires)), frozenset(range(n)), frozenset(marked)
+
+
+def test_local_grade_admits_a_rule_a_pooled_grade_refuses() -> None:
+    """The defect this fix targets, measured 2026-09-28: admission's own note reads a pooled 71%
+    base rate and a 1.2x lift on the real S3 fixture (`eval/review_rivals.py::suite_base_shift`);
+    this is the same failure in miniature, with a hand-checked cause and a hand-checked cure."""
+    cand, eligible, marked = _diluted_fixture()
+    pooled = grade(cand, eligible, marked)
+    local = local_grade(cand, eligible, marked)
+    assert pooled.status in (Status.MISLEADING, Status.NO_DISCRIMINATION), pooled.note
+    assert local.status is Status.ACTIVE, local.note
+    assert (local.lift or 0.0) > (pooled.lift or 0.0)
+    assert local.base_rate is not None and local.base_rate < 0.2  # tracks the 5% regime, not 71%
+
+
+def test_local_rate_needs_local_min_decisions_on_both_sides() -> None:
+    wide = list(range(0, 200, 2))  # 100 decisions: plenty of history and future either side.
+    marked = frozenset(wide[::4])
+    assert rl._local_rate(wide, marked, 50, half=20, local_min=20) is not None
+    narrow = list(range(0, 30, 2))  # 15 decisions: even the middle can't find 20 neighbours.
+    assert rl._local_rate(narrow, frozenset(narrow[::4]), 7, half=20, local_min=20) is None
+
+
+def test_local_rate_refuses_a_degenerate_neighbourhood() -> None:
+    window = list(range(100))
+    assert rl._local_rate(window, frozenset(), 50, half=20, local_min=5) is None  # base 0
+    assert rl._local_rate(window, frozenset(window), 50, half=20, local_min=5) is None  # base 1
+
+
+def test_sir_upper_tail_is_none_without_variance() -> None:
+    assert rl._sir_upper_tail(5.0, 5.0, 0.0) is None
+
+
+def test_sir_upper_tail_rewards_more_catches_than_expected() -> None:
+    small = rl._sir_upper_tail(9.0, 5.0, 2.5)
+    big = rl._sir_upper_tail(5.0, 5.0, 2.5)
+    assert small is not None and big is not None
+    assert small < 0.05 < big
+
+
+def test_local_grade_respects_its_own_base_window_argument() -> None:
+    """``local_grade`` is not wired into :class:`Lifecycle` (see its docstring: pre-registered,
+    measured, reverted 2026-09-28) but is kept, tested and documented on its own — pinned here by
+    showing two window sizes disagree on the diluted fixture."""
+    cand, eligible, marked = _diluted_fixture()
+    narrow = local_grade(cand, eligible, marked, base_window=20)
+    wide = local_grade(cand, eligible, marked, base_window=BASE_WINDOW)
+    assert narrow.status is not Status.ACTIVE
+    assert wide.status is Status.ACTIVE
+
+
+def test_lifecycle_does_not_call_local_grade(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The revert, pinned directly: `Lifecycle._grade` calls `grade`, never `local_grade`."""
+    calls: list[str] = []
+    real_grade = rl.grade
+
+    def spy(*args: object, **kwargs: object) -> object:
+        calls.append("grade")
+        return real_grade(*args, **kwargs)  # type: ignore[arg-type]
+
+    def boom(*args: object, **kwargs: object) -> object:
+        raise AssertionError("Lifecycle must not call local_grade")
+
+    monkeypatch.setattr(rl, "grade", spy)
+    monkeypatch.setattr(rl, "local_grade", boom)
+    fires, marked = _planted(200, seed=1, base=0.3, lift=2.0, fire=0.2)
+    life = Lifecycle([Candidate("r", TARGETS, frozenset(fires))])
+    _run(life, 200, marked)
+    assert calls  # grade() was actually exercised, not just imported

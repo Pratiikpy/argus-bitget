@@ -671,6 +671,12 @@ def _answer(
 
     if onchain.asks_for_tvl(text):
         return engine_payload(*onchain.tvl(text), by="defi-tvl")
+    from argus.lui import arbitrage
+
+    if arbitrage.asks_for_arbitrage(text):
+        # Spot rToken against its perpetual on the live books, by the exact two-book walk
+        # (`lui/arbitrage.py`); the console answered no arbitrage question before 2026-09-28.
+        return engine_payload(*arbitrage.answer(text), by="arbitrage")
     if onchain.asks_for_gas(text):
         return engine_payload(*onchain.gas(text), by="eth-gas")
     from argus.lui import rotation as rotation_answer

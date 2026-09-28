@@ -150,6 +150,63 @@ class TestRefusals:
         assert blob["flagged"] and json.dumps(blob)
 
 
+class TestReviewRivalsAdapter:
+    """`data/review_rivals.json` used to be `_not_checkable` (WITHOUT_ROWS); since 2026-09-28
+    `eval/review_rivals.py` records per-decision rows and this module has a real adapter over
+    them (`groupwise_audit._review_rivals`)."""
+
+    @staticmethod
+    def _rows() -> list[dict[str, Any]]:
+        rows = []
+        for i in range(20):
+            rows.append({
+                "seq": i, "day": i // 3, "kind": "conflict", "real": i % 3 == 0,
+                "flags": {"argus_lifecycle": i % 2 == 0, "quantdinger_low_win_rate": i % 5 == 0},
+            })
+        return rows
+
+    def _write(self, tmp_path: Any, rows: list[dict[str, Any]]) -> Any:
+        from argus.eval.review_rivals import _excess_diff
+
+        blob = {"real_record": {"rows": rows, "excess_diff": _excess_diff(rows)}}
+        (tmp_path / "data").mkdir()
+        (tmp_path / "data" / "review_rivals.json").write_text(json.dumps(blob), encoding="utf-8")
+        return blob
+
+    def test_the_adapter_is_registered_and_checked(self, tmp_path: Any,
+                                                    monkeypatch: pytest.MonkeyPatch) -> None:
+        assert groupwise_audit.ADAPTERS["data/review_rivals.json"] is groupwise_audit._review_rivals
+        self._write(tmp_path, self._rows())
+        monkeypatch.setattr(groupwise_audit, "PACKAGE", tmp_path)
+        entry = groupwise_audit._review_rivals("data/review_rivals.json")
+        assert entry.status == groupwise_audit.CHECKED
+        assert len(entry.headlines) == 1
+        headline = entry.headlines[0]
+        assert headline.role == groupwise_audit.VS_RIVAL
+        assert headline.report.items == 20
+
+    def test_a_row_missing_the_rival_flag_is_refused(self, tmp_path: Any,
+                                                      monkeypatch: pytest.MonkeyPatch) -> None:
+        rows = [{"seq": 0, "day": 0, "kind": "conflict", "real": True,
+                 "flags": {"argus_lifecycle": True}}]
+        blob = {"real_record": {"rows": rows, "excess_diff": None}}
+        (tmp_path / "data").mkdir()
+        (tmp_path / "data" / "review_rivals.json").write_text(json.dumps(blob), encoding="utf-8")
+        monkeypatch.setattr(groupwise_audit, "PACKAGE", tmp_path)
+        with pytest.raises(groupwise_audit.AuditError, match="quantdinger_low_win_rate"):
+            groupwise_audit._review_rivals("data/review_rivals.json")
+
+    def test_a_published_excess_diff_that_does_not_match_the_rows_is_refused(
+            self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch) -> None:
+        rows = self._rows()
+        blob = self._write(tmp_path, rows)
+        blob["real_record"]["excess_diff"]["by_kind"]["conflict"]["sum"] += 100.0  # corrupt it
+        (tmp_path / "data" / "review_rivals.json").write_text(json.dumps(blob), encoding="utf-8")
+        monkeypatch.setattr(groupwise_audit, "PACKAGE", tmp_path)
+        with pytest.raises(groupwise_audit.AuditError, match="conflict excess diff"):
+            groupwise_audit._review_rivals("data/review_rivals.json")
+
+
 class TestTheAuditArtefact:
     """``data/groupwise_audit.json`` is what the standing register's gate reads."""
 

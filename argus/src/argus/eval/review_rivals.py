@@ -63,6 +63,7 @@ import bisect
 import contextlib
 import hashlib
 import json
+import os
 import random
 import subprocess
 import sys
@@ -100,11 +101,18 @@ REPORT_PATH = DATA / "review_rivals.json"
 PROPOSALS_PATH = DATA / "rule_proposals.json"
 RUNNER = Path(__file__).resolve().parent / "baselines" / "tradepilot_review_runner.mjs"
 
+RESEARCH = (Path(os.environ["ARGUS_RESEARCH_DIR"]) if os.environ.get("ARGUS_RESEARCH_DIR")
+            else ROOT / "research")
+"""Where the four rivals' clones live. ``ARGUS_RESEARCH_DIR`` wins — the same override
+`eval/baselines/xa_rivals/__init__.py::research_dir` uses — because ``ROOT`` is derived from this
+file's own location (``parents[3]``), which is wrong the moment the ``argus`` package is copied
+anywhere that is not a sibling of ``research/`` (a scratch checkout for one)."""
+
 CLONES: dict[str, Path] = {
-    "tradememory": ROOT / "research" / "repos-themed" / "mnemox-ai~tradememory-protocol",
-    "cholhwanjung": ROOT / "research" / "repos-owned" / "cholhwanjung~trading-agent",
-    "quantdinger": ROOT / "research" / "corpus" / "repos" / "QuantDinger",
-    "tradepilot": ROOT / "research" / "repos-owned" / "Azedfx~TradePilot-AI",
+    "tradememory": RESEARCH / "repos-themed" / "mnemox-ai~tradememory-protocol",
+    "cholhwanjung": RESEARCH / "repos-owned" / "cholhwanjung~trading-agent",
+    "quantdinger": RESEARCH / "corpus" / "repos" / "QuantDinger",
+    "tradepilot": RESEARCH / "repos-owned" / "Azedfx~TradePilot-AI",
 }
 FILES_RUN: dict[str, tuple[str, ...]] = {
     "tradememory": ("src/tradememory/owm/induction.py", "src/tradememory/owm/changepoint.py",
@@ -311,12 +319,19 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _display(path: Path) -> str:
+    """``path`` relative to the workspace when it is one of ours; the absolute path when
+    ``ARGUS_RESEARCH_DIR`` points somewhere else entirely (``relative_to`` would raise)."""
+    try:
+        return str(path.relative_to(ROOT)).replace("\\", "/")
+    except ValueError:
+        return str(path).replace("\\", "/")
+
+
 def provenance(name: str) -> dict[str, Any]:
     clone = CLONES[name]
     if not clone.exists():
-        # Relative to the workspace: this text lands in the artefact's "not_run" field.
-        where = clone.relative_to(ROOT).as_posix()
-        raise RivalUnavailable(f"{name}: clone not found at {where}")
+        raise RivalUnavailable(f"{name}: clone not found at {_display(clone)}")
     commit = ""
     with contextlib.suppress(OSError, subprocess.SubprocessError):
         commit = subprocess.run(
@@ -324,8 +339,7 @@ def provenance(name: str) -> dict[str, Any]:
             timeout=30, check=False,
         ).stdout.strip()
     return {
-        "clone": str(clone.relative_to(ROOT)).replace("\\", "/"), "commit": commit,
-        "licence": LICENCES[name],
+        "clone": _display(clone), "commit": commit, "licence": LICENCES[name],
         "files": {f: _sha256(clone / f) for f in FILES_RUN[name]},
     }
 
@@ -565,6 +579,11 @@ class Score:
     warned_rules: set[str] = field(default_factory=set)
     last_warned: dict[str, int] = field(default_factory=dict)
     warnings_by_rule: dict[str, int] = field(default_factory=dict)
+    flagged_kinds_by_seq: dict[int, frozenset[str]] = field(default_factory=dict)
+    """Populated only when ``score`` is called with ``record_rows=True`` (the real-record run, not
+    the synthetic suites, which would pay the memory for nothing): the same kinds
+    `by_kind[kind]["flagged"]` counts this decision toward, keyed by decision — the exact union of
+    targeted kinds any warning shown on that decision covers."""
 
     @property
     def excess(self) -> float:
@@ -584,8 +603,12 @@ class Score:
         }
 
 
-def score(stream: Stream, gate: Gate) -> Score:
-    """Run ``gate`` over every day of ``stream`` and score its warnings on the scored decisions."""
+def score(stream: Stream, gate: Gate, *, record_rows: bool = False) -> Score:
+    """Run ``gate`` over every day of ``stream`` and score its warnings on the scored decisions.
+
+    ``record_rows=True`` additionally fills :attr:`Score.flagged_kinds_by_seq`, one entry per
+    scored decision that at least one warning covered — the real-record run wants this (to build
+    per-decision rows); the synthetic suites, called tens of thousands of times, do not."""
     result = Score(gate=gate.name)
     targets = {c.name: c.targets for c in stream.candidates}
     flagged: dict[DefectKind, set[int]] = {k: set() for k in stream.kinds}
@@ -598,6 +621,7 @@ def score(stream: Stream, gate: Gate) -> Score:
             result.scored_decisions += 1
             shown = gate.warnings(seq)
             result.attention += len(shown)
+            seq_kinds: set[str] = set()
             for rule in shown:
                 result.warned_rules.add(rule)
                 result.last_warned[rule] = seq
@@ -605,6 +629,10 @@ def score(stream: Stream, gate: Gate) -> Score:
                 for kind in targets[rule]:
                     if kind in flagged and seq in stream.eligible.get(kind, frozenset()):
                         flagged[kind].add(seq)
+                        if record_rows:
+                            seq_kinds.add(str(kind))
+            if record_rows and seq_kinds:
+                result.flagged_kinds_by_seq[seq] = frozenset(seq_kinds)
     for kind in stream.kinds:
         pool = stream.scored & stream.eligible.get(kind, frozenset())
         hits = pool & stream.marked.get(kind, frozenset())
@@ -996,6 +1024,82 @@ def suite_base_shift(rivals: Rivals, *, seeds: int) -> dict[str, Any]:
     }
 
 
+# --- the real record's per-decision rows ---------------------------------------------------------
+
+EXCESS_DIFF_ARGUS = "argus_lifecycle"
+EXCESS_DIFF_RIVAL = "quantdinger_low_win_rate"
+"""The pair `27_CAPABILITY_CLOSE_PLAN.md` §5(c)1 names: the deployed lifecycle against QuantDinger's
+most specific diagnostic, the best rival by excess catches on the real record."""
+
+
+def _real_record_rows(stream: Stream, scores: dict[str, Score]) -> list[dict[str, Any]]:
+    """One row per (scored decision, defect kind) in the held-out half: whether the decision
+    carried the kind's defect and which of ``scores`` flagged it — the exact same union
+    ``score``'s own ``by_kind[kind]["flagged"]`` counts, so a row's flags and the published
+    aggregate agree by construction (checked in :func:`_excess_diff` below)."""
+    rows: list[dict[str, Any]] = []
+    for kind in stream.kinds:
+        kstr = str(kind)
+        pool = sorted(stream.scored & stream.eligible.get(kind, frozenset()))
+        hits = stream.marked.get(kind, frozenset())
+        for seq in pool:
+            rows.append({
+                "seq": seq, "day": stream.day_of[seq], "kind": kstr, "real": seq in hits,
+                "flags": {name: kstr in s.flagged_kinds_by_seq.get(seq, frozenset())
+                          for name, s in scores.items()},
+            })
+    return rows
+
+
+def _excess_diff(
+    rows: Sequence[dict[str, Any]], *, argus: str = EXCESS_DIFF_ARGUS,
+    rival: str = EXCESS_DIFF_RIVAL,
+) -> dict[str, Any]:
+    """A day-block bootstrap interval on ARGUS's excess catches minus the rival's, overall and per
+    defect kind, from rows alone.
+
+    ``by_kind[kind]["excess"]`` (``score``) is ``caught - flagged x base_rate`` where ``base_rate
+    = |hits| / |pool|``. Because ``caught = sum(flagged(s) and hit(s) for s in pool)`` and
+    ``flagged x base_rate = sum(flagged(s) x base_rate for s in pool)``, that is exactly
+    ``sum(flagged(s) x (hit(s) - base_rate) for s in pool)`` — a genuine per-decision quantity.
+    Subtracting two gates' excess on the same kind (same ``pool``, same ``base_rate``) gives
+    ``sum((argus_flagged(s) - rival_flagged(s)) x (hit(s) - base_rate) for s in pool)``, so each
+    row's value sums exactly to the published excess difference;
+    :func:`~argus.eval.groupwise_audit._review_rivals` checks this parity before trusting rows."""
+    from argus.eval.groupwise import Item, headline_interval
+
+    by_kind: dict[str, list[dict[str, Any]]] = {}
+    for r in rows:
+        if argus not in r["flags"] or rival not in r["flags"]:
+            continue
+        by_kind.setdefault(str(r["kind"]), []).append(r)
+    out_by_kind: dict[str, Any] = {}
+    all_items: list[Item] = []
+    for kind, kind_rows in sorted(by_kind.items()):
+        base = sum(1 for r in kind_rows if r["real"]) / len(kind_rows)
+        items = [Item(
+            value=(float(r["flags"][argus]) - float(r["flags"][rival]))
+                  * (float(r["real"]) - base),
+            groups={"kind": kind}, order=f"{int(r['day']):04d}",
+        ) for r in kind_rows]
+        all_items.extend(items)
+        iv = headline_interval(items)
+        out_by_kind[kind] = {
+            "decisions": len(kind_rows), "base_rate": round(base, 4),
+            "sum": round(sum(i.value for i in items), 3),
+            "interval": iv.as_dict() if iv is not None else None,
+        }
+    overall_iv = headline_interval(all_items)
+    return {
+        "argus": argus, "rival": rival,
+        "overall": {
+            "decisions": len(all_items), "sum": round(sum(i.value for i in all_items), 3),
+            "interval": overall_iv.as_dict() if overall_iv is not None else None,
+        },
+        "by_kind": out_by_kind,
+    }
+
+
 # --- the run -------------------------------------------------------------------------------------
 
 
@@ -1004,14 +1108,18 @@ def run(*, typescript: Path | None, seeds: int = 40) -> dict[str, Any]:
     stream, facts = real_stream()
     real: dict[str, Any] = {}
     detail: dict[str, Any] = {}
+    scores: dict[str, Score] = {}
     for gate in gates_for(stream, rivals):
-        real[gate.name] = score(stream, gate).as_dict()
+        s = score(stream, gate, record_rows=True)
+        scores[gate.name] = s
+        real[gate.name] = s.as_dict()
         if isinstance(gate, ArgusLifecycle) and gate.include_probation:
             detail["argus_lifecycle"] = gate.lifecycle.as_dict()
         if isinstance(gate, Cholhwanjung) and not gate.include_probation:
             detail["cholhwanjung_lessons"] = gate.lessons()
         if isinstance(gate, QuantDinger) and not gate.strict:
             detail["quantdinger_diagnostic_counts"] = gate.codes
+    rows = _real_record_rows(stream, scores)
     report: dict[str, Any] = {
         "generated_at": datetime.now(UTC).isoformat(),
         "protocol": {
@@ -1027,7 +1135,10 @@ def run(*, typescript: Path | None, seeds: int = 40) -> dict[str, Any]:
         "rivals": {name: (provenance(name) if name not in rivals.unavailable
                           else {"not_run": rivals.unavailable[name]}) for name in CLONES},
         "mappings": MAPPINGS,
-        "real_record": {"facts": facts, "gates": real, "detail": detail},
+        "real_record": {
+            "facts": facts, "gates": real, "detail": detail, "rows": rows,
+            "excess_diff": _excess_diff(rows) if rows else None,
+        },
         "synthetic": {
             "S1_stationary": suite_stationary(rivals, seeds=seeds,
                                               bases=(0.05, 0.25, 0.60, 0.75)),
@@ -1046,6 +1157,18 @@ def verdict(report: dict[str, Any]) -> dict[str, Any]:
     lines = ["real record, excess catches: " + ", ".join(
         f"{name} {row['excess_catches']:+.1f} ({row['attention']} warnings)"
         for name, row in ranked)]
+    diff = report["real_record"].get("excess_diff")
+    if diff:
+        ov = diff["overall"]
+        iv = ov.get("interval")
+        span = f"[{iv['low']:+.2f}, {iv['high']:+.2f}]" if iv else "no interval (too few days)"
+        lines.append(f"real record, excess-catch diff {diff['argus']} - {diff['rival']}, "
+                     f"day-block bootstrap: {span} (sum {ov['sum']:+.2f})")
+        for kind, row in sorted(diff["by_kind"].items()):
+            kiv = row.get("interval")
+            kspan = f"[{kiv['low']:+.2f}, {kiv['high']:+.2f}]" if kiv else "no interval"
+            lines.append(f"  by kind {kind}: {kspan} (sum {row['sum']:+.2f}, "
+                         f"n={row['decisions']})")
     s1 = report["synthetic"]["S1_stationary"]
     for base, rows in s1.items():
         lines.append(f"S1 {base}: " + ", ".join(
@@ -1083,8 +1206,11 @@ def main(argv: list[str] | None = None) -> int:  # pragma: no cover - CLI
 
 __all__ = [
     "CLONES",
+    "EXCESS_DIFF_ARGUS",
+    "EXCESS_DIFF_RIVAL",
     "MAPPINGS",
     "REPORT_PATH",
+    "RESEARCH",
     "ArgusLifecycle",
     "ArgusReview",
     "Planted",

@@ -17,9 +17,20 @@ modules = [
 # of every rejected rule's own measured failure mode (status, precision, why), not a
 # rename of the existing `rejected` field — to `desk/review.py::as_dict()`. All thirteen
 # conditions now VERIFIED or ATTESTED; restored to OWNED.
-state = "implemented"
+state = "tied"
 baseline = "TauricResearch/TradingAgents reflection memory"
 blockers = [
+    """\
+        RE-GRADED 2026-09-28 from IMPLEMENTED to TIED (Activity/27_CAPABILITY_CLOSE_PLAN.md §5). \
+        eval/review_rivals.py now records every real decision with each gate's flag, and the \
+        excess-catch lead over QuantDinger's low-win-rate diagnostic has a day-block interval: \
+        overall [+0.0004, +0.0154] per decision, above zero, but carried by one defect kind — \
+        conflict [+0.020, +0.057]; grounding [-0.013, +0.009] and lean [-0.024, +0.007] favour \
+        QuantDinger slightly and not significantly. The retention loss through a falling base \
+        rate (S3: 32% of real rules kept) was attacked with a pre-registered fix — retire on \
+        lift against a local rolling base rate — which kept 33.75% at 40 seeds, short of its \
+        pre-registered bar (double), so it was reverted and kept as a tested negative result in \
+        desk/rule_lifecycle.py. Winning needs the lead outside one kind and S3 fixed.""",
     """\
         RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: TradingAgents' reflection memory is not \
         the specialist for Review & Self-Evolution; mnemox-ai/tradememory-protocol, \

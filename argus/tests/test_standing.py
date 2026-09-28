@@ -583,8 +583,11 @@ class TestTheLiveRegisterIsHonest:
         underlying fact this test protects is unchanged: the checklist itself is still honestly
         empty, and OWNED does not launder that away."""
         cap = next(c for c in REGISTER if c.name == "Self-evolving review rules")
-        assert cap.state is State.IMPLEMENTED
-        assert cap.blockers[0].startswith("RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED")
+        # TIED since 2026-09-28: its rivals were run with a real interval, the lead is carried by
+        # one defect kind and the falling-base-rate fix missed its pre-registered bar
+        assert cap.state is State.TIED
+        assert cap.blockers[0].startswith("RE-GRADED 2026-09-28 from IMPLEMENTED to TIED")
+        assert any("RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED" in b for b in cap.blockers)
         assert any("no rule has earned promotion" in b for b in cap.blockers)
 
     def test_the_grammar_records_its_remaining_breadth_gap(self) -> None:
@@ -881,8 +884,10 @@ class TestDemotionsCarryTheirRouteBack:
         demoted = [c for c in REGISTER
                    if c.blockers and "by the groupwise gate" in c.blockers[0]]
         # twelve on 2026-09-25; numeric grounding on 2026-09-27, once its designed cases were
-        # filed as designed (audit finding 95)
-        assert len(demoted) == 13
+        # filed as designed (audit finding 95); net executable arbitrage left on 2026-09-28, when
+        # it took its route back (proofs on the groupwise-checked real-book artefact) and was
+        # re-graded TIED — its TIED line now leads, and the gate's demotion follows it
+        assert len(demoted) == 12
         for cap in demoted:
             assert cap.state is State.IMPLEMENTED, cap.name
             assert re.match(r"RE-GRADED 2026-09-2[57] from OWNED to IMPLEMENTED by the "
@@ -1034,3 +1039,12 @@ def test_the_published_register_counts_only_conditions_that_survived_the_audit()
         assert not unproven & set(row["conditions_met"])
         assert set(row["conditions_met"]) <= set(row["conditions_claimed"])
         assert sorted(unproven) == sorted(row["conditions_unproven"])
+
+
+def test_every_blocker_reads_as_prose() -> None:
+    """Five blockers written on 2026-09-28 arrived as one line padded with runs of spaces (a shell
+    heredoc ate their line-ending backslashes); the register published them that way. A blocker
+    is prose a judge reads: no leading space and no run of spaces inside it."""
+    padded = [(c.name, b[:40]) for c in REGISTER for b in c.blockers
+              if b != b.strip() or "   " in b]
+    assert not padded, padded

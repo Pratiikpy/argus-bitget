@@ -13,12 +13,29 @@ modules = [
 # that independently re-ran `verify()` on every proof rather than trusting
 # `conditions_missing` (which only checks a Proof exists per condition, not that it
 # verifies): all thirteen are VERIFIED or ATTESTED, zero UNPROVEN. Restored to OWNED.
-state = "implemented"
+state = "lost"
 baseline = """\
     nkaz001/hftbacktest queue model; Bitget's own instrument rules; Almgren & Chriss (2000) \
     closed-form optimum vs nautechsystems/nautilus_trader's real TwapAlgorithm as the field's \
     stated default"""
 blockers = [
+    """\
+        RE-GRADED 2026-09-28 from IMPLEMENTED to LOST (Activity/27_CAPABILITY_CLOSE_PLAN.md §6). \
+        eval/session_arena.py ran for the first time on real Bitget order books replayed from \
+        Tardis (19,440 parents over 11 perpetual and 4 spot first-of-month days; 384 cross a \
+        session boundary; three 2025-09-01 days are empty files at the source and are named, not \
+        replaced). On the pre-registered primary, the boundary-crossing parents on test days, \
+        Bitget's own TWAP with one-minute children costs 0.62 bps less than ARGUS's \
+        session-aware schedule (symbol-day block bootstrap [0.01, 1.53]): LOSS. Against zz-0816 \
+        the cost gap is inside the interval but ARGUS's shortfall is more dispersed (ratio \
+        1.015, [1.006, 1.031]): LOSS. ARGUS is cheaper than immediate execution (-8.2 bps, \
+        [-11.6, -3.2]), an eight-slice TWAP (-2.4, [-4.1, -0.3]) and Egress (-3.5, [-6.0, \
+        -0.03]) but with wider shortfall: trade-offs. Its own session-blind ablation does as \
+        well as the session-aware schedule (+0.54 bps, [-0.14, 1.43]), so on these parents the \
+        session model is not what pays; where it does pay is against a UTC-clock schedule across \
+        the daylight-saving change (2.03 bps cheaper, [0.85, 3.54], data/session_arena.json \
+        out_of_sample.dst). PACE (needs 10 Qwen calls) and TradeMaster ETEO/PD were not run and \
+        are named in the artefact's not_run.""",
     """\
         RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: Almgren-Chriss minimises its own \
         mean-variance objective by construction, so beating TWAP on that objective proves the \

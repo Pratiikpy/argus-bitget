@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-09-27T23:52:59.855058+00:00",
-  "facts_checked": 5,
-  "agree": 5,
+  "generated_at": "2026-09-28T20:24:37.733662+00:00",
+  "facts_checked": 6,
+  "agree": 6,
   "disagree": 0,
   "clean": true,
   "checks": [
@@ -9,15 +9,24 @@
       "fact": "settled trades",
       "console": 0,
       "artefact": 0,
-      "console_source": "lui.answer:answer_decision_list verdict breakdown",
+      "console_source": "lui.answer:answer_decision_list settled_trades",
       "artefact_source": "eval.performance:evaluate_ledger.trades",
       "agrees": true,
-      "why_it_matters": "the submission, the README and the cockpit all state zero trades; a console saying otherwise makes our own record contradict our own claim on the surface built to show the record can be trusted"
+      "why_it_matters": "the submission, the README and the cockpit state the settled-trade count; a console saying otherwise makes our own record contradict our own claim on the surface built to show the record can be trusted"
+    },
+    {
+      "fact": "open positions",
+      "console": 1,
+      "artefact": 1,
+      "console_source": "lui.answer:answer_decision_list open_trades",
+      "artefact_source": "eval.performance:evaluate_ledger.open_positions",
+      "agrees": true,
+      "why_it_matters": "an open position is the desk's live exposure; the console and the scorecard must name the same number, or a reader cannot tell whether the desk is in the market"
     },
     {
       "fact": "decisions on record",
-      "console": 796,
-      "artefact": 796,
+      "console": 836,
+      "artefact": 836,
       "console_source": "lui.answer:answer_decision_list count",
       "artefact_source": "paper.ledger entries",
       "agrees": true,
@@ -34,8 +43,8 @@
     },
     {
       "fact": "abstentions",
-      "console": 794,
-      "artefact": 794,
+      "console": 833,
+      "artefact": 833,
       "console_source": "lui.answer:answer_decision_list verdict breakdown",
       "artefact_source": "eval.performance abstentions, less the voided rows",
       "agrees": true,
@@ -43,8 +52,8 @@
     },
     {
       "fact": "count: page header vs list",
-      "console": 796,
-      "artefact": 796,
+      "console": 836,
+      "artefact": 836,
       "console_source": "lui.server:_status (the page header)",
       "artefact_source": "lui.answer:answer_decision_list (the list itself)",
       "agrees": true,

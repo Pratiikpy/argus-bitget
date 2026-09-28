@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-28T02:05:35+00:00",
+  "generated": "2026-09-28T17:47:35+00:00",
   "method": "openai/evals modelgraded metaeval (classify.py:95-98, 123-125): mean of judge == reference, plus Cohen's kappa; MEASURED needs >= 50 human labels",
   "judges": [
     {
@@ -217,7 +217,7 @@
     "argus/lui/kindmodel.py:74": "a local trained classifier behind the same interface, not an LLM; it is scored on held-out corpora by eval/kindtrain.py",
     "argus/lui/fanout.py:366": "a planner choosing which researchers run; every finding is computed by an engine, and against the fixed plan table it lost (eval/research_depth.py), so it is off by default",
     "argus/eval/decision_primitives.py:483,491": "the prompt-cache replay of recorded calls; the cache is measured, the model is not graded",
-    "argus/eval/session_arena.py:678": "the rival execution desk (PACE) run as the subject of a comparison, not a grader \u2014 held back from publication, unreviewed (the readiness backlog)"
+    "argus/eval/session_arena.py:712": "the rival execution desk (PACE) run as the subject of a comparison, not a grader; its ten pre-registered calls have not been spent, so the arm is recorded as not run"
   },
   "measured": [],
   "qwen_calls": 0

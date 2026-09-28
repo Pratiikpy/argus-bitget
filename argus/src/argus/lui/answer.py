@@ -503,17 +503,26 @@ def answer_decision_list(ledger: PaperLedger, question: Question) -> Answer:
     # they are counted as what they were, not as what they claimed.
     verdicts: dict[str, int] = {}
     voided = 0
+    open_trades = 0
     for entry in rows:
         if entry.is_void:
             voided += 1
             continue
         verdicts[entry.verdict] = verdicts.get(entry.verdict, 0) + 1
+        # An open position is a trade the desk has taken and not yet closed. It is counted as a
+        # trade but named as open, because Sharpe, drawdown and win rate are computed over settled
+        # trades only (`paper/performance.py`), and a bare "1 trade" beside "0 settled trades" on
+        # the scorecard read as a contradiction when the desk opened its first position (seq 797).
+        if not entry.is_abstention and not entry.is_settled:
+            open_trades += 1
     lang = question.language
     lines = [
         t("list.header", lang, count=len(rows),
           window=_window_phrase(question),
           breakdown=", ".join(f"{n} {v}" for v, n in sorted(verdicts.items()))),
     ]
+    if open_trades:
+        lines.append(t("list.open", lang, open=open_trades))
     if voided:
         lines.append(t("list.voided", lang, voided=voided))
     for entry in rows[-5:]:
@@ -522,7 +531,9 @@ def answer_decision_list(ledger: PaperLedger, question: Question) -> Answer:
               confidence=entry.stated_confidence, at=entry.decided_at)
         )
     return Answer(question=question, lines=lines, sources=[_src(e) for e in rows[-5:]],
-                  data={"count": len(rows), "verdicts": verdicts, "voided": voided})
+                  data={"count": len(rows), "verdicts": verdicts, "voided": voided,
+                        "open_trades": open_trades,
+                        "settled_trades": verdicts.get("trade", 0) - open_trades})
 
 
 def answer_integrity(ledger: PaperLedger, question: Question) -> Answer:

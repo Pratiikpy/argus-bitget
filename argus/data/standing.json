@@ -893,7 +893,7 @@
       "name": "Net executable arbitrage vs. a fee-blind detector",
       "subtheme": "t1-arbitrage",
       "module": "argus/research/arbitrage_study.py,argus/cost/model.py,argus/eval/arbitrage_comparison.py,argus/eval/baselines/maxme_arbitrer.py,argus/eval/baselines/maxme_arbitrer_loader.py,argus/research/executable_arb.py,argus/eval/general_arb_comparison.py",
-      "state": "implemented",
+      "state": "tied",
       "baseline": "maxme/bitcoin-arbitrage real profit-detection core (get_profit_for)",
       "conditions_met": [
         "best_implementation_studied",
@@ -932,21 +932,21 @@
         },
         {
           "condition": "implementation_complete",
-          "how": "decompose()/Decomposition evaluate real basis observations end to end",
+          "how": "    the console answers a live spot-versus-perpetual arbitrage question with the exact two-book     walk (lui/arbitrage.py -> research/executable_arb.best_arbitrage), fetching both books and     each venue's published taker fee; decompose() is no longer on any answer path",
           "artefact": "",
-          "test": "test_arbitrage_comparison.py"
+          "test": "test_arbitrage_answer.py"
         },
         {
           "condition": "same_input_comparison",
-          "how": "both real systems scored on order-book depth constructed to match ARGUS's own measured real basis distribution (median/p95/max from 2,159 real NVDAUSDT hourly observations) \u2014 the same spread, two verdicts",
-          "artefact": "",
-          "test": "test_arbitrage_comparison.py::TestDesignedCases"
+          "how": "    the exact walk, HiGHS, NetworkX's cycle test, maxme's fee-blind detector and the old     decomposition all scored on the same real, simultaneous Bitget spot-rToken and perpetual     books: 240 regular-hours snapshots",
+          "artefact": "data/general_arb_comparison.json",
+          "test": "test_general_arb_comparison.py::TestSameInputComparison"
         },
         {
           "condition": "statistically_valid_evaluation",
-          "how": "swept across 60 constructed spreads shaped like the real distribution, not one convenient case",
-          "artefact": "",
-          "test": "test_arbitrage_comparison.py::TestSweptCases"
+          "how": "    verdicts compared snapshot by snapshot, with a ticker-bootstrap interval on precision;     groupwise-checked (data/groupwise_audit.json)",
+          "artefact": "data/general_arb_comparison.json",
+          "test": "test_general_arb_comparison.py::TestStatisticallyValid"
         },
         {
           "condition": "costs_included",
@@ -956,9 +956,9 @@
         },
         {
           "condition": "out_of_sample_test",
-          "how": "the largest observed real spread (27.01bps) is reported as a genuine agreement, not folded into the disagreement count \u2014 the honest result of running the comparison across the real distribution's own range, not selected to make the finding look more sweeping than it is",
-          "artefact": "",
-          "test": "test_arbitrage_comparison.py::TestDesignedCases::test_the_largest_observed_spread_genuinely_clears_costs_on_both_sides"
+          "how": "    a 160-snapshot capture taken after the code was frozen and a 240-snapshot weekend capture,     both scored without change: the exact walk ties the optimum on each",
+          "artefact": "data/general_arb_comparison.json",
+          "test": "test_general_arb_comparison.py::TestOutOfSample"
         },
         {
           "condition": "ablation",
@@ -992,6 +992,7 @@
         }
       ],
       "blockers": [
+        "RE-GRADED 2026-09-28 from IMPLEMENTED to TIED (Activity/27_CAPABILITY_CLOSE_PLAN.md \u00a73). The console now answers an arbitrage question on the live books with the exact two-book walk (lui/arbitrage.py); the flat-constant decompose() that lost (precision 5.8%) is on no answer path. On 640 real Bitget book snapshots (regular hours, a later held-out capture, a weekend) the walk makes the same verdicts as HiGHS and NetworkX's cycle test and matches HiGHS's optimum to 4e-14 USDT, while maxme's fee-blind detector makes 111 false accepts on the first capture. Why it cannot be won: against the general solvers both sides are exact, so correctness cannot separate them; only latency does (tens of microseconds against milliseconds), which a 65ms median leg skew makes immaterial.",
         "RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate (data/groupwise_audit.json): data/arbitrage_comparison.json holds three designed spreads and 60 constructed spreads reduced to counts; no population of real observations is recorded for the comparison. Route back: score both detectors on the real basis series behind data/arbitrage_study.json (23,749 hourly observations on 11 symbols) and record each observation's two verdicts with its symbol and session phase.",
         "The swept disagreement rate (100% at n=60) is measured on a Gaussian-shaped construction matched to ARGUS's own real distribution's mean/spread, not on the real historical series bar-for-bar \u2014 research/arbitrage_study.py's own real study() already runs the full decomposition against the live index series; this comparison adds the maxme side, not a new live measurement",
         "General-purpose rival run 2026-09-26 on real books (data/general_arb_comparison.json): 400 two-sided Bitget spot-rToken/perpetual snapshots (240 + 160 from a second capture ten minutes later, 80 tickers, taker fees 10bps spot and 6bps perpetual) scored against the HiGHS linear-programming optimum, one verdict per snapshot. LOSS for the deployed decompose(): 49 of its 52 accepts lose money on the first capture (precision 0.058, ticker-bootstrap interval 0 to 0.156) and 24 of 25 on the second. The cause is the flat 0.6bps spread constant: the measured touch alone takes 49 false accepts to 1. research/executable_arb.py ties HiGHS on every snapshot (largest difference 3.4e-14 USDT) in about 16us against 4-6ms. That is a tie with the general tool, not a win, and the deployed path still uses decompose().",
@@ -1244,7 +1245,7 @@
         }
       ],
       "blockers": [
-        "        RE-GRADED 2026-09-28 from IMPLEMENTED to TIED (Activity/27_CAPABILITY_CLOSE_PLAN.md \u00a71),         after fixing a defect the comparison had hidden: ARGUS's Corrado rank test ranked tied         returns by position, so on tokenised equities' flat off-hours bars it rejected 63.5% of         placebo draws at 5% (tracker 242). Ties now share their average rank; re-run on the same         panel (data/eventdriven_rivals.json) its size is 0.5-6.5% across the seven null shapes.         The trade-off that remains is real and both sides are published: under clustered nulls         ARGUS's four-test verdict rejects 0-3% where Vibe-Trading's Cowan sign test rejects         11-18%, but on size-adjusted power Vibe's test detects more (clustered_9, 50bps: 0.81         against 0.58; 100bps: 1.00 against 0.67). On the real event stream both abstain. Neither         dominates; winning needs a verdict that keeps ARGUS's size and reaches Vibe's power.",
+        "RE-GRADED 2026-09-28 from IMPLEMENTED to TIED (Activity/27_CAPABILITY_CLOSE_PLAN.md \u00a71), after fixing a defect the comparison had hidden: ARGUS's Corrado rank test ranked tied returns by position, so on tokenised equities' flat off-hours bars it rejected 63.5% of placebo draws at 5% (tracker 242). Ties now share their average rank; re-run on the same panel (data/eventdriven_rivals.json) its size is 0.5-6.5% across the seven null shapes. The trade-off that remains is real and both sides are published: under clustered nulls ARGUS's four-test verdict rejects 0-3% where Vibe-Trading's Cowan sign test rejects 11-18%, but on size-adjusted power Vibe's test detects more (clustered_9, 50bps: 0.81 against 0.58; 100bps: 1.00 against 0.67). On the real event stream both abstain. Neither dominates; winning needs a verdict that keeps ARGUS's size and reaches Vibe's power.",
         "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: whale-signals tests one significance method; the Event-Driven Agent sub-theme asks for event -> decision -> trade, and the rivals that do that (JohnboscoE/slimon and Ritapossible/Ballast, both S2 entries with executed demo orders; HKUDS/Vibe-Trading's event skill; TauricResearch/TradingAgents; Nicholas-03/trading-bot) had not been run on the same input; all but TradingAgents were on 2026-09-26 (the last blocker). Two defects found in the same review: the EventAnalyst prompt never asked for `chain_falsifiers`, so 0 of 138 recorded chains carried one and every link graded UNSUPPORTED, and the chain's event field held the price line in 138 of 138 (rival review of 2026-09-24). Both are fixed in code (agents/analysts.py asks for the falsifiers and takes the event from news, a filing or a print, never the price line); re-measuring them on newly recorded chains is still to do.",
         "The placebo events are constructed (real timestamps, zero true edge by construction), not whale-signals' own real 646,442-transaction Dune dataset, which needs a paid API key this project does not have \u2014 their own already-published real results (results/published_yearly_edges.csv in the cloned repo) independently show the same qualitative pattern (tiny, sign-flipping year-over-year edges) but were not re-run here. The false-positive rate measured is specific to this real 90-day ETHUSDT window's own drift and will vary with the window and period tested",
         "Run 2026-09-26 (eval/eventdriven_agents.py, data/eventdriven_agents.json): slimon's own perception replayed unmodified reproduces 1,690 of the 1,739 events its agent logged (recall 0.972). On its 95-day, 12-name event stream, gated on one half and traded on the other at a 12bps hurdle, ARGUS, Vibe-Trading's BMP and whale-signals all abstain (0 trades). Ballast's pooled t trades 795 times for -14,483bps (day-clustered t -1.87); follow-all and fade-all lose 30,174 and 40,002bps. ARGUS beats Ballast and the no-gate baselines and TIES Vibe-Trading and whale-signals. slimon's own LLM opens average -6.24bps (14 scored). Nicholas-03's hard-catalyst gate passes 33 of 1,448 headlines with no measurable separation in move size (1.72x +/- 0.29 against 1.58x +/- 0.06). Under clustered placebo events (eval/eventdriven_rivals.py, data/eventdriven_rivals.json) ARGUS's four-test verdict rejects 0.5-3%, Vibe BMP 10.5-15% and Ballast 14.5-33.5%. TradingAgents was not run."
@@ -1371,7 +1372,7 @@
         }
       ],
       "blockers": [
-        "        RE-GRADED 2026-09-28 from IMPLEMENTED to TIED (Activity/27_CAPABILITY_CLOSE_PLAN.md \u00a72):         the rivals this row waited on have been run on one shared, pre-registered tape         (data/xa_arena.json, seven rival configurations and four naive baselines). Under the         pre-registered primary (certainty equivalent at gamma 5, stationary bootstrap, Holm) every         comparison is a TIE in both periods, holding the book included. Two things against it are         recorded, not hidden: on the secondary guard Triad's hourly CVaR is significantly better         than ARGUS's in both periods, and removing the funding term \u2014 the mechanism this row is         named for \u2014 changed nothing (only removing costs from the objective did, in period B). Why         it cannot be won as built: at gamma 5 over 90-day windows hedging this book adds nothing         measurable over holding it.",
+        "RE-GRADED 2026-09-28 from IMPLEMENTED to TIED (Activity/27_CAPABILITY_CLOSE_PLAN.md \u00a72): the rivals this row waited on have been run on one shared, pre-registered tape (data/xa_arena.json, seven rival configurations and four naive baselines). Under the pre-registered primary (certainty equivalent at gamma 5, stationary bootstrap, Holm) every comparison is a TIE in both periods, holding the book included. Two things against it are recorded, not hidden: on the secondary guard Triad's hourly CVaR is significantly better than ARGUS's in both periods, and removing the funding term \u2014 the mechanism this row is named for \u2014 changed nothing (only removing costs from the objective did, in period B). Why it cannot be won as built: at gamma 5 over 90-day windows hedging this book adds nothing measurable over holding it.",
         "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: crypto_sor is a same-instrument, cross-venue router, and this entry's own scope says the leg is not claimed to be a validated hedge. The rivals that lead Cross-Asset Execution (HedgeAgents via the JansenAnalytics replication; CryptoCT01/Crossfire, Jayanng/Omni, norbert351/vigil and danielamodu/Triad from S2) have not been run on the same input (rival review of 2026-09-24). OWNED returns only when they are.",
         "crypto_sor's real multi-exchange feed handlers (Binance/Coinbase/Kraken/OKX/Mango) were not exercised \u2014 this comparison drives its real composite-book/newOrder() core directly with constructed-from-real-data levels, since ARGUS has live access to only one venue (Bitget) and the sub-theme this closes is a cross-ASSET-CLASS question, not a cross-exchange one. The Node/ts-node subprocess adds a real, external-process dependency (Node 22, npm packages pinned in crypto_sor_shim/package.json) that the rest of this pure-Python project does not otherwise carry",
         "Cross-asset arena, 2026-09-26 (eval/xa_arena.py, data/xa_arena.json, tape digest cb1f49f19d9b43cd, reproducibility checked: two runs, identical NAV path): the router desk/crossasset.py against seven rival configurations run from their pinned clones (Triad and Triad x10, Omni, Crossfire, VIGIL, HedgeAgents and its optimizer) and four naive baselines, on one book, in two periods. Pre-registered primary (certainty equivalent at gamma 5, stationary bootstrap, Holm): TIE with every rival and every baseline in both. It does not beat holding the book: in period B (2026-06-28 to 2026-09-25, funding observed) CE 0.784 against 0.844 for holding; in period A (2026-03-29 to 2026-06-28, the holdout, funding not yet observed) -0.134 against -0.138. In period A VIGIL (CE 0.176, max drawdown 11%) and Triad (0.108, 5%) are ahead of ARGUS (-0.134, 20%) on the point estimates, not significantly. Of nine ablations only removing costs from the objective changes the verdict (a WIN for the full router in period B: -0.380 without them); the other eight TIE, so funding, regime, phase and the stability gate are not shown to matter. All six constructed cases pass (normal risk and carry places no order; a risk shock, a funding spike, prohibitive costs, a calm forecast and thin history each behave as stated)."
@@ -1496,7 +1497,7 @@
         }
       ],
       "blockers": [
-        "\n        RE-GRADED 2026-09-28 from OWNED to IMPLEMENTED (tracker 195). The register now reads \n        the bootstrap interval the groupwise audit puts on each headline, and this capability's \n        own claim against the general tool (data/general_sue_comparison.json: dated alignment \n        answers where pandas' lenient period index refuses) is +0.22 per anchor with a 95% \n        interval of [0.0, 0.56] over 9 real filers: ARGUS answers on 2, ties on 7, loses on none. \n        An exact sign test on 2 wins and 0 losses gives p = 0.5. The mechanism is real and ahead; \n        the sample does not establish it. Route back: extend the alignment comparison to enough \n        filers that the interval clears zero, or show it does not.\n    ",
+        "RE-GRADED 2026-09-28 from OWNED to IMPLEMENTED (tracker 195). The register now reads the bootstrap interval the groupwise audit puts on each headline, and this capability's own claim against the general tool (data/general_sue_comparison.json: dated alignment answers where pandas' lenient period index refuses) is +0.22 per anchor with a 95% interval of [0.0, 0.56] over 9 real filers: ARGUS answers on 2, ties on 7, loses on none. An exact sign test on 2 wins and 0 losses gives p = 0.5. The mechanism is real and ahead; the sample does not establish it. Route back: extend the alignment comparison to enough filers that the interval clears zero, or show it does not.",
         "The real reference's exact `months_count`/`months_eps_change` defaults are not published in the tutorial page's own inline code (only the surrounding prose states a '36-month warm-up' and 'four quarters ago') \u2014 read from the real code's own slicing structure rather than a literal Initialize() block, and real quarterly EPS is reshaped into the monthly-cadence-with-repeats form the real RollingWindow expects rather than fed directly. The nine-anchor universe is ARGUS's own tradable set, not a broad-market cross-sectional universe of the kind SUE was originally published against",
         "General-purpose rivals run 2026-09-26 (data/general_sue_comparison.json): pandas beat the ARGUS of before 2026-09-25 on quarter pairing, since fixed and matched. On degenerate scale ARGUS refuses 15 of 15 constant-step windows at real EPS levels, against SciPy 7, sklearn's VarianceThreshold 6 and StandardScaler 0, which return finite SUEs of 3.2e7 to 9.0e15. On the 68 real degenerate SEC filers VarianceThreshold, SciPy and ARGUS all refuse every one, so the margin over general tools rests on constructed windows."
       ],
@@ -2639,7 +2640,7 @@
       "name": "Self-evolving review rules",
       "subtheme": "t3-review",
       "module": "argus/desk/review.py,argus/eval/review_comparison.py,argus/eval/baselines/tradingagents_loader.py,argus/eval/baselines/tradingagents_memory.py,argus/eval/baselines/tradingagents_rating.py,argus/desk/rule_lifecycle.py,argus/eval/review_rivals.py",
-      "state": "implemented",
+      "state": "tied",
       "baseline": "TauricResearch/TradingAgents reflection memory",
       "conditions_met": [
         "best_implementation_studied",
@@ -2647,7 +2648,6 @@
         "baseline_reproduced",
         "implementation_complete",
         "same_input_comparison",
-        "statistically_valid_evaluation",
         "costs_included",
         "out_of_sample_test",
         "ablation",
@@ -2738,6 +2738,7 @@
         }
       ],
       "blockers": [
+        "RE-GRADED 2026-09-28 from IMPLEMENTED to TIED (Activity/27_CAPABILITY_CLOSE_PLAN.md \u00a75). eval/review_rivals.py now records every real decision with each gate's flag, and the excess-catch lead over QuantDinger's low-win-rate diagnostic has a day-block interval: overall [+0.0004, +0.0154] per decision, above zero, but carried by one defect kind \u2014 conflict [+0.020, +0.057]; grounding [-0.013, +0.009] and lean [-0.024, +0.007] favour QuantDinger slightly and not significantly. The retention loss through a falling base rate (S3: 32% of real rules kept) was attacked with a pre-registered fix \u2014 retire on lift against a local rolling base rate \u2014 which kept 33.75% at 40 seeds, short of its pre-registered bar (double), so it was reverted and kept as a tested negative result in desk/rule_lifecycle.py. Winning needs the lead outside one kind and S3 fixed.",
         "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: TradingAgents' reflection memory is not the specialist for Review & Self-Evolution; mnemox-ai/tradememory-protocol, cholhwanjung/trading-agent (a statistical rule lifecycle), OpenByteInc/QuantDinger and the S2 entry Azedfx/TradePilot-AI have not been run on the same input (rival review of 2026-09-24). OWNED returns only when they are. The same review's base-rate defect - a coin-flip rule graded ACTIVE - is fixed in desk/review.py: regenerated 2026-09-25 over 622 decisions, narrow-evidence-base is graded NO_DISCRIMINATION at lift 0.9x against its 41% base rate (p = 0.21), not ACTIVE",
         "The checklist is honest and currently empty: no rule has earned promotion, so this is a mechanism for learning rules rather than a set of learned rules, and it is described that way everywhere it appears.",
         "sequential-agreement fixed 2026-09-25: it read 'contagion' anywhere in the panel note, and the concurrent panel's own note says 'consensus rather than contagion', so it fired on 299 of 311 in-sample and 311 of 311 held-out decisions; it now fires on the sequential wording only (30 and 0). Its verdict is unchanged - PROPOSED, since no OUTCOME defect exists yet to grade it against - and so is every other rule's on the regenerated data/review_oos.json (3 of 3 gradeable rules keep their verdict on the held-out half)",
@@ -2761,7 +2762,9 @@
         "reproducibility_proven",
         "no_specialist_capability_superior"
       ],
-      "conditions_unproven": []
+      "conditions_unproven": [
+        "statistically_valid_evaluation"
+      ]
     },
     {
       "name": "Path-shape matching with a calibrated null",
@@ -2894,7 +2897,7 @@
       "name": "Session-aware execution that refuses to solve through a boundary",
       "subtheme": "t3-execution",
       "module": "argus/execution/schedule.py,argus/execution/guard.py,argus/eval/schedule_comparison.py,argus/desk/session_schedule.py",
-      "state": "implemented",
+      "state": "lost",
       "baseline": "nkaz001/hftbacktest queue model; Bitget's own instrument rules; Almgren & Chriss (2000) closed-form optimum vs nautechsystems/nautilus_trader's real TwapAlgorithm as the field's stated default",
       "conditions_met": [
         "best_implementation_studied",
@@ -2993,6 +2996,7 @@
         }
       ],
       "blockers": [
+        "RE-GRADED 2026-09-28 from IMPLEMENTED to LOST (Activity/27_CAPABILITY_CLOSE_PLAN.md \u00a76). eval/session_arena.py ran for the first time on real Bitget order books replayed from Tardis (19,440 parents over 11 perpetual and 4 spot first-of-month days; 384 cross a session boundary; three 2025-09-01 days are empty files at the source and are named, not replaced). On the pre-registered primary, the boundary-crossing parents on test days, Bitget's own TWAP with one-minute children costs 0.62 bps less than ARGUS's session-aware schedule (symbol-day block bootstrap [0.01, 1.53]): LOSS. Against zz-0816 the cost gap is inside the interval but ARGUS's shortfall is more dispersed (ratio 1.015, [1.006, 1.031]): LOSS. ARGUS is cheaper than immediate execution (-8.2 bps, [-11.6, -3.2]), an eight-slice TWAP (-2.4, [-4.1, -0.3]) and Egress (-3.5, [-6.0, -0.03]) but with wider shortfall: trade-offs. Its own session-blind ablation does as well as the session-aware schedule (+0.54 bps, [-0.14, 1.43]), so on these parents the session model is not what pays; where it does pay is against a UTC-clock schedule across the daylight-saving change (2.03 bps cheaper, [0.85, 3.54], data/session_arena.json out_of_sample.dst). PACE (needs 10 Qwen calls) and TradeMaster ETEO/PD were not run and are named in the artefact's not_run.",
         "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: Almgren-Chriss minimises its own mean-variance objective by construction, so beating TWAP on that objective proves the algebra, not execution quality. The rivals that lead Execution Assistance (PACE; TradeMaster's order-execution agents; the S2 entries zz-0816/bitget-s2-execution-aware-alpha and Ritapossible/Egress; Bitget's native TWAP/Iceberg) have not been run on the same fills (rival review of 2026-09-24). OWNED returns only when they are.",
         "no live fills exist to compare against, so execution realism is argued from the venue's rules rather than measured against our own fills \u2014 the thirteen conditions are about a valid experiment, and a live-fills comparison remains a further, separate strengthening this capability does not yet have, named here so OWNED is not read as 'nothing more could ever be measured'",
         "guard self-check, 2026-09-25 (data/guard_selfcheck.json, mle-bench's same-code-path validation): over 190,944 swept orders the read-only would_pass() agreed with validate().allowed on every one and never consumed a rate-limit slot, where a check that records as it checks would have spent the window's last slot. A constructed sweep, not live orders",
@@ -3630,7 +3634,7 @@
         }
       ],
       "blockers": [
-        "        RE-GRADED 2026-09-28 from IMPLEMENTED to TIED (Activity/27_CAPABILITY_CLOSE_PLAN.md \u00a77):         on FinanceBench's 50 metrics-generated questions ARGUS answers 50/50 with none wrong and         the best published configuration 46/50; with ARGUS at 50/50 the paired test cannot fall         below p = 0.125 (four discordant questions), so the set cannot separate them. On all 150         questions ARGUS LOSES on coverage \u2014 55 correct, 0 wrong, 92 abstained, against 134 correct         and 14 wrong for GPT-4-Turbo oracle-reverse and 75 correct for the deployable singleStore         \u2014 while winning on precision. Winning outright needs a held-out question set graded from         the filings by hand and the LLM arms re-run on it.",
+        "RE-GRADED 2026-09-28 from IMPLEMENTED to TIED (Activity/27_CAPABILITY_CLOSE_PLAN.md \u00a77): on FinanceBench's 50 metrics-generated questions ARGUS answers 50/50 with none wrong and the best published configuration 46/50; with ARGUS at 50/50 the paired test cannot fall below p = 0.125 (four discordant questions), so the set cannot separate them. On all 150 questions ARGUS LOSES on coverage \u2014 55 correct, 0 wrong, 92 abstained, against 134 correct and 14 wrong for GPT-4-Turbo oracle-reverse and 75 correct for the deployable singleStore \u2014 while winning on precision. Winning outright needs a held-out question set graded from the filings by hand and the LLM arms re-run on it.",
         "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: the comparison set ARGUS's lookups on its own case set against FinanceBench's published numbers on a different question set, and the capability ledger already carried it as IMPLEMENTED. The rivals that lead Information Extraction (anthropics/financial-services earnings-reviewer, CAMEF, GeoRisk, the S2 entries RESIDUAL, optic-bitget and postbell) have not been run on the same input (rival review of 2026-09-24). OWNED returns only when they are.",
         "FinanceBench's own 150-question open-source set and its results/*.jsonl transcripts carry no LICENSE file, so the exact questions and gold answers are cited and recomputed from rather than vendored into this repo or run against ARGUS directly \u2014 the comparison is same-task-class on freshly-designed real cases, not the identical question set. ARGUS's five supported concepts (revenue, net_income, operating_income, eps_diluted, gross_profit) do not cover FinanceBench's harder derived-ratio questions (fixed-asset turnover, operating cash flow ratio) or its prose-reasoning questions (domain-relevant, novel-generated) at all",
         "filing question answering, 2026-09-25 (data/document_qa_eval.json, paper-qa's citation scheme in research/document_qa.py): 25 of 27 answerable questions over 18 filings from five issuers answered correctly with citations enforced, 3 of 3 unanswerable ones refused, 0 fabricated citation ids, and the groupwise audit finds no issuer carries the result. One run of 30 questions; the support audit is judged by Qwen (54 calls, served from cache on the recorded run)",
@@ -3758,7 +3762,9 @@
         }
       ],
       "blockers": [
-        "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: openbb-agents is an archived 2024 repository. Run on the same 619 questions since (2026-09-26, eval/pit_rivals.py, data/pit_rivals.json, each scored from its own output): OpenBB's ODP (openbb_core, 7/493 right), HKUDS/Vibe-Trading's point-in-time series (343/619, 236 leaks) and research tool (9/619), ginlix-ai/LangAlpha (10/619) and TraderAlice/OpenAlice (10/619); ARGUS 619/619, 0 leaks. The S2 entry Abd00lmalik/Lumen-Terminal cannot be asked: its only fundamentals path returns a trailing-twelve-month total with no period.\n\n        UPDATED 2026-09-28: two more real, cloned, MIT-licensed point-in-time specialists added and run on the identical 619 questions, scored from their own real code (scripts/pit_runners/qlib_pit_runner.py, edgartools_asof_runner.py; data/pit_rivals_report.md has the full breakdown). microsoft/qlib's real PIT store (scripts/dump_pit.py + qlib/utils.py::read_period_data, a real on-disk build from the snapshot): 51/619 exact right, but its own get_source_data (line 123) float32-casts every value before storage, so 283 of the remaining 568 are right-period/rounded-value, not wrong-period \u2014 period-selection accuracy alone is 334/619; still 285/619 wrong-period (179 leak + 106 late), all on the day-granular filed-date gate this project's own filed-date ablation already names as the failure mode. dgunning/edgartools's real FactQuery.as_of (day-granular, filing_date-gated): 369/619 right, 198 leak, 52 late, 0 stale. Both lose to ARGUS paired and significantly on the full set and on the nine-ticker held-out set (rival_only_right 0 for both; p < 1e-65). Day-granularity genuinely disadvantages both on the \"before\" side specifically (day_granular_fairness in data/pit_rivals.json: Qlib right-rate 0.0065 before / 0.1581 after; edgartools 0.3592 before / 0.8323 after) \u2014 reported separately per the fairness caveat this row itself raised, not pooled into one number. A real, sourced defect found along the way, not scored (kept out of the measured path so it doesn't inflate the loss): edgartools' free-text fuzzy by_concept(\"revenue\", exact=False) \u2014 the form an agent unfamiliar with ARGUS's tag list would actually call \u2014 also matches us-gaap:CostOfRevenue by substring; the runner uses exact tag matching instead so the score is of the as-of mechanism, not this separate search defect (recorded in edgartools.json's fuzzy_concept_defect for the record).\n\n        openbb-mcp-server: now actually run, not just read. Its own module import (openbb_mcp_server/app/app.py, `from openbb_core.api.rest_api import app`, line 348) and the bare FastAPI app import both failed before this session with AttributeError: '_IncludedRouter' object has no attribute 'path' (openbb_core/app/router.py:429) \u2014 root cause: the shared research/_venvs/pit-rivals venv is --system-site-packages and inherited fastapi 0.139.0/starlette 1.3.1 from the global site-packages (installed there for unrelated tools) against openbb_core's own pin of fastapi ^0.136.3; a local `pip install fastapi==0.136.3` inside that venv (this session, shadowing the global copy only, confirmed by pip refusing to touch the outside-venv copy) fixed both imports without touching anything outside the venv. scripts/pit_runners/openbb_mcp_verify.py then calls the real GET /api/v1/equity/fundamental/income route on openbb_core.api.rest_api.app \u2014 the literal object that file imports and wraps as MCP tools \u2014 for all ten tickers, both pit_mode values, in the same monkeypatched-transport environment openbb_sec_runner.py already serves ODP from. Result: row-for-row identical to the already-recorded ODP output for 16/20 ticker/mode pairs (within float64 last-bit JSON round-trip precision, ~1e-15 relative, checked with a 1e-9 tolerance \u2014 every non-float field byte-identical); the other 4 (GOOGL, MSTR, both modes) fail identically on both paths, same exception, same cause (GOOGL/GOOG/GOOGM/GOOGN and MSTR/STRD share one SEC CIK; company_tickers.json's last entry for that CIK wins the reverse lookup in both the route and the direct fetcher, and the snapshot has no file for that ticker) \u2014 the identical failure is itself further confirmation the two paths are the same code, not weaker evidence. research/pit_rivals/outputs/openbb_mcp_verify.json has the full row-for-row record. Agent Rita: still not run \u2014 no fetcher of its own, it reads OpenBB Workspace widgets and needs a Workspace account. Whether to supply one or to drop it from the OWNED condition is an open scope decision, not something to guess at (Activity/27_CAPABILITY_CLOSE_PLAN.md \u00a74).",
+        "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: openbb-agents is an archived 2024 repository. Run on the same 619 questions since (2026-09-26, eval/pit_rivals.py, data/pit_rivals.json, each scored from its own output): OpenBB's ODP (openbb_core, 7/493 right), HKUDS/Vibe-Trading's point-in-time series (343/619, 236 leaks) and research tool (9/619), ginlix-ai/LangAlpha (10/619) and TraderAlice/OpenAlice (10/619); ARGUS 619/619, 0 leaks. The S2 entry Abd00lmalik/Lumen-Terminal cannot be asked: its only fundamentals path returns a trailing-twelve-month total with no period.",
+        "UPDATED 2026-09-28: two more real, cloned, MIT-licensed point-in-time specialists added and run on the identical 619 questions, scored from their own real code (scripts/pit_runners/qlib_pit_runner.py, edgartools_asof_runner.py; data/pit_rivals_report.md has the full breakdown). microsoft/qlib's real PIT store (scripts/dump_pit.py + qlib/utils.py::read_period_data, a real on-disk build from the snapshot): 51/619 exact right, but its own get_source_data (line 123) float32-casts every value before storage, so 283 of the remaining 568 are right-period/rounded-value, not wrong-period \u2014 period-selection accuracy alone is 334/619; still 285/619 wrong-period (179 leak + 106 late), all on the day-granular filed-date gate this project's own filed-date ablation already names as the failure mode. dgunning/edgartools's real FactQuery.as_of (day-granular, filing_date-gated): 369/619 right, 198 leak, 52 late, 0 stale. Both lose to ARGUS paired and significantly on the full set and on the nine-ticker held-out set (rival_only_right 0 for both; p < 1e-65). Day-granularity genuinely disadvantages both on the \"before\" side specifically (day_granular_fairness in data/pit_rivals.json: Qlib right-rate 0.0065 before / 0.1581 after; edgartools 0.3592 before / 0.8323 after) \u2014 reported separately per the fairness caveat this row itself raised, not pooled into one number. A real, sourced defect found along the way, not scored (kept out of the measured path so it doesn't inflate the loss): edgartools' free-text fuzzy by_concept(\"revenue\", exact=False) \u2014 the form an agent unfamiliar with ARGUS's tag list would actually call \u2014 also matches us-gaap:CostOfRevenue by substring; the runner uses exact tag matching instead so the score is of the as-of mechanism, not this separate search defect (recorded in edgartools.json's fuzzy_concept_defect for the record).",
+        "openbb-mcp-server: now actually run, not just read. Its own module import (openbb_mcp_server/app/app.py, `from openbb_core.api.rest_api import app`, line 348) and the bare FastAPI app import both failed before 2026-09-28 with AttributeError: '_IncludedRouter' object has no attribute 'path' (openbb_core/app/router.py:429) \u2014 root cause: the shared research/_venvs/pit-rivals venv is --system-site-packages and inherited fastapi 0.139.0/starlette 1.3.1 from the global site-packages (installed there for unrelated tools) against openbb_core's own pin of fastapi ^0.136.3; a local `pip install fastapi==0.136.3` inside that venv (2026-09-28, shadowing the global copy only, confirmed by pip refusing to touch the outside-venv copy) fixed both imports without touching anything outside the venv. scripts/pit_runners/openbb_mcp_verify.py then calls the real GET /api/v1/equity/fundamental/income route on openbb_core.api.rest_api.app \u2014 the literal object that file imports and wraps as MCP tools \u2014 for all ten tickers, both pit_mode values, in the same monkeypatched-transport environment openbb_sec_runner.py already serves ODP from. Result: row-for-row identical to the already-recorded ODP output for 16/20 ticker/mode pairs (within float64 last-bit JSON round-trip precision, ~1e-15 relative, checked with a 1e-9 tolerance \u2014 every non-float field byte-identical); the other 4 (GOOGL, MSTR, both modes) fail identically on both paths, same exception, same cause (GOOGL/GOOG/GOOGM/GOOGN and MSTR/STRD share one SEC CIK; company_tickers.json's last entry for that CIK wins the reverse lookup in both the route and the direct fetcher, and the snapshot has no file for that ticker) \u2014 the identical failure is itself further confirmation the two paths are the same code, not weaker evidence. research/pit_rivals/outputs/openbb_mcp_verify.json has the full row-for-row record. Agent Rita: still not run \u2014 no fetcher of its own, it reads OpenBB Workspace widgets and needs a Workspace account. Whether to supply one or to drop it from the OWNED condition is an open scope decision, not something to guess at (Activity/27_CAPABILITY_CLOSE_PLAN.md \u00a74).",
         "OpenBB genuinely wins on raw data-source breadth (32 real providers, 21 keyless, vs ARGUS's 12 live-verified) \u2014 closing that gap is a separate, already-named, unimplemented improvement (BLS employment data, Fama-French factors, CFTC positioning \u2014 research/audit/a2-openbb.md's own prior recommendation), not addressed by this capability. Neither OpenBB repository was run end to end (the Platform's real fetchers mostly need paid API keys this project does not have, and the Agents repo needs an OpenAI key for its LLM calls) \u2014 this comparison instead reads both real repos' source directly, which is sufficient to establish the structural absence of point-in-time gating without needing either live run",
         "RESOLVED 2026-09-28: the out-of-sample claim's dating. The acceptance-second gate and the 619-question held-out run both landed the same session (2026-09-26 afternoon, Activity/PROGRESS.md), and the 22:00-New-York fallback bound's own docstring example cites MSFT \u2014 one of the nine held-out tickers \u2014 so the claim did not provably predate the holdout set read as an empirical fit. It is not one: re-verified 2026-09-28 against SEC.gov's own filer-support page (market/pit.py's docstring now cites it) that EDGAR's daily operating window (6:00 a.m.-10:00 p.m. ET) is fixed and universal, independent of ticker or form, so MSFT/NVDA are illustrations of it, not its derivation. Separately: in this benchmark's 2,647 revenue facts across all ten tickers, zero ever resolve through that fallback (every accession's acceptanceDateTime is present in the index, checked directly), so the bound's value cannot change data/pit_rivals.json's score either way. Re-deriving it from NVDA alone (as the smallest-complete-work note proposed) was tried and rejected with the reason recorded in market/pit.py: NVDA's own latest same-day acceptance is 17:30 ET, the weakest of the ten tickers, and narrowing the bound to it would only create real leak risk for filers like MSFT (20:44 ET) without changing any measured result."
       ],
@@ -5086,9 +5092,9 @@
     }
   ],
   "by_state": {
-    "lost": 1,
-    "tied": 17,
-    "implemented": 27,
+    "lost": 2,
+    "tied": 19,
+    "implemented": 24,
     "owned": 2
   },
   "findings": [
@@ -5216,6 +5222,11 @@
       "capability": "Crowd sentiment classification, vs. RoB-RT on TweetEval",
       "problem": "out_of_sample_test is claimed but not evidenced",
       "detail": "no groupwise check has run on its artefacts: data/sentiment_tweeteval.json: aggregate_without_rows - 12,284 TweetEval test tweets scored, but only per-class recall, confusion counts and paired-bootstrap differences are kept: TweetEval publishes no licence, so no per-tweet row is written (eval/sentiment_tweeteval.py would need to keep per-tweet labels by id to allow a breakdown by class and by topic)"
+    },
+    {
+      "capability": "Self-evolving review rules",
+      "problem": "statistically_valid_evaluation is claimed but not evidenced",
+      "detail": "the groupwise audit flags data/review_rivals.json :: excess catches: argus_lifecycle minus quantdinger_low_win_rate [carried_by_one_group:kind=conflict]"
     },
     {
       "capability": "Path-shape matching with a calibrated null",
@@ -5480,6 +5491,24 @@
       "from": "implemented",
       "to": "tied",
       "at": "2026-09-28T11:58:47+00:00"
+    },
+    {
+      "capability": "Net executable arbitrage vs. a fee-blind detector",
+      "from": "implemented",
+      "to": "tied",
+      "at": "2026-09-28T14:38:06+00:00"
+    },
+    {
+      "capability": "Self-evolving review rules",
+      "from": "implemented",
+      "to": "tied",
+      "at": "2026-09-28T17:34:03+00:00"
+    },
+    {
+      "capability": "Session-aware execution that refuses to solve through a boundary",
+      "from": "implemented",
+      "to": "lost",
+      "at": "2026-09-28T17:45:02+00:00"
     }
   ]
 }

@@ -13,7 +13,15 @@ baseline = """\
     2311.11944, 16 real model/retrieval-condition combinations graded \
     Correct/Incorrect/Refusal by human review)"""
 blockers = [
-    """        RE-GRADED 2026-09-28 from IMPLEMENTED to TIED (Activity/27_CAPABILITY_CLOSE_PLAN.md §7):         on FinanceBench's 50 metrics-generated questions ARGUS answers 50/50 with none wrong and         the best published configuration 46/50; with ARGUS at 50/50 the paired test cannot fall         below p = 0.125 (four discordant questions), so the set cannot separate them. On all 150         questions ARGUS LOSES on coverage — 55 correct, 0 wrong, 92 abstained, against 134 correct         and 14 wrong for GPT-4-Turbo oracle-reverse and 75 correct for the deployable singleStore         — while winning on precision. Winning outright needs a held-out question set graded from         the filings by hand and the LLM arms re-run on it.""",
+    """\
+        RE-GRADED 2026-09-28 from IMPLEMENTED to TIED (Activity/27_CAPABILITY_CLOSE_PLAN.md §7): \
+        on FinanceBench's 50 metrics-generated questions ARGUS answers 50/50 with none wrong and \
+        the best published configuration 46/50; with ARGUS at 50/50 the paired test cannot fall \
+        below p = 0.125 (four discordant questions), so the set cannot separate them. On all 150 \
+        questions ARGUS LOSES on coverage — 55 correct, 0 wrong, 92 abstained, against 134 \
+        correct and 14 wrong for GPT-4-Turbo oracle-reverse and 75 correct for the deployable \
+        singleStore — while winning on precision. Winning outright needs a held-out question set \
+        graded from the filings by hand and the LLM arms re-run on it.""",
     """\
         RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: the comparison set ARGUS's lookups on its \
         own case set against FinanceBench's published numbers on a different question set, and the \
