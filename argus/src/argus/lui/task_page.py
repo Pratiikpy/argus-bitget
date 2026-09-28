@@ -15,6 +15,7 @@ from urllib.parse import urlencode
 from argus.lui import design
 from argus.lui.answer import LEAD
 from argus.lui.task import DEFAULT_BOOK_VALUE, IMPACT_TITLE, Step, Task
+from argus.lui.thesis import Tested
 
 
 def _chart(task: Task, step: Step) -> str:
@@ -158,6 +159,9 @@ def _top(asked: str, name: str, size_pct: float, book_text: str) -> str:
  .verdict .r {{ font-weight:700 }} .verdict .r.supported {{ color:var(--good) }}
  .verdict .r.contradicted {{ color:var(--bad) }}
  .verdict .r.not_measurable, .verdict .r.not_tested {{ color:var(--dim) }}
+ .verdict ul.ev {{ margin:4px 0 6px; font-size:13.5px; color:var(--dim) }}
+ .verdict .src {{ white-space:nowrap }} .verdict .src::before {{ content:"· " }}
+ .verdict .imp {{ font-weight:400; color:var(--dim); font-size:13px }}
  .s {{ background:var(--panel); border:1px solid var(--line); border-radius:10px;
    padding:14px 16px; margin-bottom:12px }}
  .s.r {{ border-left:3px solid var(--warn) }}
@@ -205,6 +209,22 @@ nothing on this page is written by a language model, and your question is read w
 """
 
 
+def _reason_item(tested: Tested) -> str:
+    """One reason: its verdict and the test behind it, then each other figure with its source
+    and a link a reader can open to check it."""
+    esc = html.escape
+    said = ("<b>" + esc(tested.reason) + "</b> <span class='imp'>(implied, not stated)</span>"
+            if tested.implied else f"<b>“{esc(tested.reason)}”</b>")
+    found = "".join(
+        f"<li>{esc(f.text)} <span class='src'>"
+        + (f"<a href='{esc(f.url)}' rel='noopener' target='_blank'>{esc(f.source)}</a>"
+           if f.url else esc(f.source))
+        + "</span></li>" for f in tested.evidence)
+    return (f"<li>{said} — <span class='r {tested.result.name.lower()}'>"
+            f"{esc(tested.result.value)}</span>. {esc(tested.line)}"
+            + (f"<ul class='ev'>{found}</ul>" if found else "") + "</li>")
+
+
 def _conclusion(task: Task) -> str:
     """Whether to enter (`lui/weigh.py`), then how much (`lui/task.verdict`), then where the
     engines disagree, what would change the call and what only the trader can answer."""
@@ -222,8 +242,7 @@ def _conclusion(task: Task) -> str:
         parts.append(f"<p class='call'>{esc(weighed.call)}</p><p>{esc(weighed.reason)}</p>")
     if task.tested:
         parts.append("<h3>Your reasons, tested</h3><ul class='reasons'>" + "".join(
-            f"<li><b>“{esc(t.reason)}”</b> — <span class='r {t.result.name.lower()}'>"
-            f"{esc(t.result.value)}</span>. {esc(t.line)}</li>" for t in task.tested) + "</ul>")
+            _reason_item(t) for t in task.tested) + "</ul>")
     if call is not None:
         lead = (f"<h3>How much</h3><p class='call2'>{esc(call.call)}</p>" if weighed is not None
                 else f"<p class='call'>{esc(call.call)}</p>")

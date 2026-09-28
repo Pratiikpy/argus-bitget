@@ -31,6 +31,7 @@ engine's own bottom line, in the order a trader would act on them.
 from __future__ import annotations
 
 import contextlib
+import re
 import time
 from collections.abc import Callable
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
@@ -168,6 +169,14 @@ def read_question(text: str, saved_book: str = "") -> Reading | str:
     if request is None or not request.symbols:
         named, _ = research_symbols(text)
         if not named:
+            asked_about = _named_but_unlisted(text)
+            if asked_about is not None:
+                listed = contracts()
+                return (f"{asked_about} is not a name Bitget lists"
+                        + (f" — none of its {len(listed)} contracts tracks it" if listed else "")
+                        + ", so there is no price, order book or filing feed to research. Try a "
+                          "listed name: NVDA, TSLA, gold (XAU), BTC — for example: I hold 40% "
+                          "NVDA, 30% MSFT, 30% AAPL — should I add 15% TSLA?")
             return ("I could not find a name Bitget lists in that question. Name one, and if you "
                     "like a size and what you hold — for example: I hold 40% NVDA, 30% MSFT, 30% "
                     "AAPL — should I add 15% TSLA?")
@@ -199,6 +208,24 @@ def read_question(text: str, saved_book: str = "") -> Reading | str:
     notes.extend(_held_note(name, book))
     return Reading(name=name, size_pct=size_pct, book=book, cash=cash, notes=tuple(notes),
                    notional=request.notional)
+
+
+_ASKED_NAME = re.compile(
+    r"\b(?:buy|sell|add|enter|short|long|research|about|into|on|in|hold|own)\s+"
+    r"(?:some\s+|more\s+)?(?P<name>[A-Z][\w&.-]*(?:\s+[A-Z][\w&.-]*){0,2})", re.I)
+_NOT_NAMES = frozenset({"I", "A", "The", "It", "My", "Me", "This", "That", "Now", "Today", "Bitget",
+                        "Some", "More", "Risk", "Book"})
+
+
+def _named_but_unlisted(text: str) -> str | None:
+    """A capitalised name the question asks about that Bitget does not list ("should I buy
+    Reliance"), else None. "should I buy Reliance" and "hello there" read the same sentence until
+    2026-09-28 (QA screen pass): one named a real company, the other nothing."""
+    for found in _ASKED_NAME.finditer(text):
+        name = found.group("name").strip(" .?!")
+        if name and name[0].isupper() and name.split()[0] not in _NOT_NAMES:
+            return name
+    return None
 
 
 def _held_note(name: str, book: dict[str, float]) -> list[str]:
@@ -372,13 +399,14 @@ def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
     # deadline exists to cut. A step still running is abandoned; its thread ends on its own.
     stated = thesis.reasons(asked) if asked.strip() else ()
     kinds = {r.kind for r in stated}
-    pool = ThreadPoolExecutor(max_workers=len(STEPS) + 3)
+    pool = ThreadPoolExecutor(max_workers=len(STEPS) + 4)
     try:
         path = pool.submit(_price_path, symbol)
         # The reads only a stated reason needs run beside the engines, not after them.
         activity = (pool.submit(thesis.chain_activity, symbol)
                     if thesis.Kind.ACTIVITY in kinds else None)
         mood = pool.submit(thesis.fear_greed_now) if thesis.Kind.SENTIMENT in kinds else None
+        around = pool.submit(thesis.context, symbol) if stated else None
         futures = [pool.submit(one, step) for step in STEPS]
         pending: list[Future[Any]] = [*futures, path]
         done: set[Future[Any]] = set()
@@ -413,8 +441,9 @@ def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
                     return None  # the reason is then reported as not tested, and why
 
             tested = thesis.check(stated, name=symbol.removesuffix("USDT"),
-                                 data=_data_by_kind(steps), activity=extra(activity),
-                                 fear_greed=extra(mood))
+                                  data=_data_by_kind(steps), activity=extra(activity),
+                                  fear_greed=extra(mood), ctx=extra(around),
+                                  side=thesis.stated_side(asked))
     finally:
         pool.shutdown(wait=False, cancel_futures=True)
     return Task(question=question, name=symbol.removesuffix("USDT"), size_pct=size * 100,

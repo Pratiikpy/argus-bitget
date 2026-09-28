@@ -445,7 +445,7 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
         fills = str(args.get("fills") or "").strip()
         if not fills:
             raise ToolError("fills is required")
-        reviewed = review_trades(fills[:20000])
+        reviewed = review_trades(fills[:20000], explicit=True)
         if reviewed is None:
             raise ToolError("no trades could be read from fills; paste a table with date, "
                             "symbol, side, quantity and price, or write them out")

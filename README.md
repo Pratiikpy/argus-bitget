@@ -173,7 +173,7 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 9,933 tests collected
+pytest -q                       # 9,963 tests collected
 ```
 
 Nothing above needs a credential. On 2026-09-27, with every outbound connection refused, 9,109
@@ -196,7 +196,7 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **9,933 tests collected** — `pytest -q` |
+| Tests | **9,963 tests collected** — `pytest -q` |
 | Types | **`mypy --strict` clean on 543 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |

@@ -689,6 +689,32 @@ _TAKE_PROFIT = re.compile(r"\btake[\s-]?profits?\b|\bprofit\s+target\b|\btp\s+(?
                           re.I)
 _THE_DESK = re.compile(r"\b(?:your|the\s+desk'?s?|argus'?s?|our)\b", re.I)
 
+_SOMEONE_ELSES = re.compile(
+    r"\b(?P<who>[A-Z][\w.&-]*(?:\s+[A-Z][\w.&-]*){0,3})(?:'s|\u2019s|s')\s+"
+    r"(?:\w+\s+){0,2}(?:positions?|holdings?|stakes?|exposure|portfolio|book|trades?)\b"
+    r"|\b(?i:does|did|is|are|has)\s+(?P<who2>[A-Z][\w.&-]*(?:\s+[A-Z][\w.&-]*){0,3})\s+"
+    r"(?:still\s+)?(?:hold|own|long|short|holding|owning|buying|selling)\b")
+"""A named person's or fund's holdings: "What is Elon Musk's position in TSLA?", "does Berkshire
+still own AAPL". Case-sensitive on purpose: the name is what marks it."""
+
+_NOT_A_NAME = frozenset({
+    "What", "Where", "Who", "Whose", "How", "Why", "When", "Which", "It", "That", "This", "Today",
+    "Tomorrow", "Yesterday", "Bitget", "Argus", "ARGUS", "The", "Your", "Our", "My", "I", "We",
+    "Desk", "Market", "Everyone", "Anyone", "Nobody", "NVDA", "TSLA", "AAPL", "MSFT", "GOOGL",
+    "AMZN", "META", "BTC", "ETH", "SOL",
+})
+"""Capitalised words that open a question or name this desk or a contract, not a holder."""
+
+
+def someone_elses_holdings(raw: str) -> str | None:
+    """The holder named when a question asks about someone else's positions, else None."""
+    for found in _SOMEONE_ELSES.finditer(raw):
+        who = (found.group("who") or found.group("who2") or "").strip()
+        words = who.split()
+        if words and words[0] not in _NOT_A_NAME and who.upper() not in _NOT_A_NAME:
+            return who
+    return None
+
 
 _PATTERNS: tuple[tuple[str, Intent], ...] = (
     # A track-record question is a performance question whatever else it asks: "What is your
@@ -1203,6 +1229,20 @@ def classify(
             if pattern.search(raw):
                 intent, matched = candidate, pattern.pattern
                 break
+
+    holder = someone_elses_holdings(raw) if intent in (Intent.POSITION, Intent.PERFORMANCE) \
+        else None
+    if holder is not None:
+        # "What is Elon Musk's position in TSLA?" was answered "No open positions" from this
+        # desk's own ledger (QA inventory, 2026-09-28): a question about another person's book
+        # answered as if it were about ours.
+        return Question(
+            raw=raw, intent=Intent.UNSUPPORTED, speed=Speed.FAST, tense=tense, symbols=symbols,
+            window=window,
+            reason=(f"this console reads this desk's own record, not {holder}'s positions; no "
+                    f"one's private holdings are public, and a fund's quarterly 13F is filed "
+                    f"weeks after the quarter it describes"),
+        )
 
     if intent is Intent.PERFORMANCE and (_MY_HOLDINGS.search(raw) or _TAKE_PROFIT.search(raw)) \
             and not _THE_DESK.search(raw):

@@ -21,25 +21,35 @@ test —
   often than an ordinary day, by two standard errors on independent episodes (`research/analogue.
   _long_run`); inside that band the reason is *not measurable*, which is the usual answer;
 * **network activity** ("ecosystem activity strengthening", "adoption growing"): the chain's
-  daily fees and TVL on DeFiLlama, the last 30 days against the 30 before, placed in the
-  distribution of every such 30-day change over the past three years;
+  daily fees, DEX volume and TVL on DeFiLlama, the last 30 days against the 30 before, placed in
+  the distribution of every such 30-day change over the past three years;
 * **momentum**, **positioning** (funding), **sentiment** (Fear & Greed) and **valuation**
   (analysts' mean target) read the figure the task already holds and say whether it agrees — and
   where agreeing is not an edge (technicals, a target), the line says so.
 
 A reason no engine reads is listed as *not tested*, with what would test it.
+
+**Evidence beside each verdict** (the second pass against killmythesis, which showed 21 findings to
+our two): every reason also carries the other figures that bear on it — returns at 7, 30 and ~90
+days, the place in the 90-day range, the gap to BTC and the week's volume against the month's
+from Bitget's daily candles; Bitget's account and position long/short split and 24 hours of taker
+buy/sell flow — each with a link a reader can open. They inform; they do
+not vote. And one assumption no trader states is tested whenever a direction is given: that the
+crowd is not already in the trade (:func:`implied_crowding`).
 """
 
 from __future__ import annotations
 
 import re
+import urllib.parse
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 
 from argus.truth import http
+from argus.truth.endpoints import BITGET_API
 from argus.truth.failures import RpcError
 
 
@@ -116,15 +126,33 @@ class Reason:
 
 
 @dataclass(frozen=True)
+class Finding:
+    """One figure behind a verdict, where it came from, and where a reader can check it."""
+
+    text: str
+    source: str
+    url: str = ""
+
+    def as_dict(self) -> dict[str, str]:
+        return {"text": self.text, "source": self.source, "url": self.url}
+
+
+@dataclass(frozen=True)
 class Tested:
     reason: str
     kind: Kind
     result: Result
     line: str
+    evidence: tuple[Finding, ...] = ()
+    """What else bears on the reason. Shown beside the verdict, never deciding it: the verdict is
+    the one test in :attr:`line`."""
+    implied: bool = False
+    """True for an assumption the trader did not state but every such position carries."""
 
-    def as_dict(self) -> dict[str, str]:
+    def as_dict(self) -> dict[str, Any]:
         return {"reason": self.reason, "kind": self.kind.value, "result": self.result.value,
-                "line": self.line}
+                "line": self.line, "implied": self.implied,
+                "evidence": [f.as_dict() for f in self.evidence]}
 
 
 def reasons(text: str) -> tuple[Reason, ...]:
@@ -201,11 +229,200 @@ def chain_activity(symbol: str, *, timeout: float = 15.0) -> dict[str, Any] | No
     except RpcError as exc:
         out["fees_error"] = exc.kind.value
     try:
+        dex = http.fetch_json(f"{LLAMA}/overview/dexs/{chain.lower()}",
+                              params={"excludeTotalDataChart": "false",
+                                      "excludeTotalDataChartBreakdown": "true"},
+                              timeout=timeout)
+        out["dex"] = month_change(_daily((dex or {}).get("totalDataChart") or []))
+    except RpcError as exc:
+        out["dex_error"] = exc.kind.value
+    try:
         tvl = http.fetch_json(f"{LLAMA}/v2/historicalChainTvl/{chain}", timeout=timeout)
         out["tvl"] = month_change(_daily(tvl if isinstance(tvl, list) else []))
     except RpcError as exc:
         out["tvl_error"] = exc.kind.value
     return out
+
+
+# --- context read once for every reason -------------------------------------------------------
+
+CANDLES = "/api/v2/mix/market/candles"
+TAKER = "/api/v2/mix/market/taker-buy-sell"
+CROWDED_LONG = 0.70
+"""A share of Bitget accounts long at or above this is a crowd already in the trade."""
+UNCROWDED = 0.50
+
+
+def _closes(symbol: str) -> list[tuple[float, float, float, float]]:
+    """Up to 90 daily (high, low, close, quote volume) rows for ``symbol``'s perpetual, oldest
+    first (Bitget serves 90 at most for this granularity, checked 2026-09-28)."""
+    from argus.market.bitget import public_get
+
+    rows = public_get(CANDLES, {"productType": "USDT-FUTURES", "symbol": symbol,
+                                "granularity": "1D", "limit": "100"}) or []
+    ordered = sorted(rows, key=lambda r: int(r[0]))
+    return [(float(r[2]), float(r[3]), float(r[4]), float(r[6])) for r in ordered]
+
+
+def _taker_flow(symbol: str) -> float | None:
+    """Taker buy volume over taker sell volume on Bitget's perpetual across the last 24 hours
+    (six 4-hour rows of ``/api/v2/mix/market/taker-buy-sell``)."""
+    from argus.market.bitget import public_get
+
+    rows = public_get(TAKER, {"symbol": symbol, "period": "4h"}) or []
+    recent = sorted(rows, key=lambda r: int(r["ts"]))[-6:]
+    sold = sum(float(r["sellVolume"]) for r in recent)
+    return sum(float(r["buyVolume"]) for r in recent) / sold if recent and sold > 0 else None
+
+
+def context(symbol: str) -> dict[str, Any]:
+    """The figures several reasons draw on: 7/30/90-day returns and the place in the 90-day
+    range (Bitget daily candles), the same 30 days for BTC, and Bitget's account long/short
+    split. Each part is left out when its source does not answer."""
+    from argus.market import long_short
+
+    out: dict[str, Any] = {"symbol": symbol}
+    try:
+        rows = _closes(symbol)
+        if len(rows) >= 31:
+            last = rows[-1][2]
+            # Bitget serves at most 90 daily rows, so the longest return is over what it gave.
+            out["returns"] = {n: last / rows[-1 - n][2] - 1
+                              for n in (7, 30, len(rows) - 1) if len(rows) > n}
+            window = rows[-90:]
+            high, low = max(r[0] for r in window), min(r[1] for r in window)
+            out["range"] = {"high": high, "low": low, "days": len(window),
+                            "place": (last - low) / (high - low) if high > low else None}
+            week, month = [r[3] for r in rows[-7:]], [r[3] for r in rows[-30:]]
+            if sum(month) > 0:
+                out["volume"] = {"week": sum(week) / len(week), "month": sum(month) / len(month)}
+        if symbol != "BTCUSDT":
+            btc = _closes("BTCUSDT")
+            if len(btc) >= 31:
+                out["btc_30d"] = btc[-1][2] / btc[-31][2] - 1
+    except Exception:
+        out["candles_error"] = True
+    try:
+        flow = _taker_flow(symbol)
+        if flow is not None:
+            out["taker"] = flow
+    except Exception:
+        out["taker_error"] = True
+    reading = long_short.read(symbol)
+    if reading is not None:
+        out["crowd"] = {"accounts_long": reading.accounts_long,
+                        "day_ago": reading.accounts_long_day_ago,
+                        "position_long": reading.position_long}
+    return out
+
+
+def _candles_url(symbol: str) -> str:
+    return (f"{BITGET_API}{CANDLES}?productType=USDT-FUTURES&symbol={symbol}&granularity=1D"
+            f"&limit=100")
+
+
+def _price_findings(ctx: Mapping[str, Any], name: str) -> tuple[Finding, ...]:
+    symbol = str(ctx.get("symbol") or f"{name}USDT")
+    out: list[Finding] = []
+    returns = ctx.get("returns") or {}
+    if returns:
+        text = ", ".join(f"{n}-day {r:+.1%}" for n, r in sorted(returns.items()))
+        btc = ctx.get("btc_30d")
+        if btc is not None and 30 in returns:
+            text += (f"; over 30 days {(returns[30] - btc) * 100:+.1f} points against BTC's "
+                     f"{btc:+.1%}")
+        out.append(Finding(f"{name} returns from daily closes: {text}.", "Bitget daily candles",
+                           _candles_url(symbol)))
+    volume = ctx.get("volume") or {}
+    if volume.get("month"):
+        ratio = volume["week"] / volume["month"]
+        out.append(Finding(f"{name}'s average daily volume over the last 7 days is {ratio:.2f}x "
+                           f"the 30-day average (${volume['week'] / 1e6:,.1f}M against "
+                           f"${volume['month'] / 1e6:,.1f}M).", "Bitget daily candles",
+                           _candles_url(symbol)))
+    span = ctx.get("range") or {}
+    if span.get("place") is not None:
+        out.append(Finding(f"{name} sits at {span['place']:.0%} of its {span['days']}-day range "
+                           f"({span['low']:g} to {span['high']:g}).", "Bitget daily candles",
+                           _candles_url(symbol)))
+    return tuple(out)
+
+
+def _taker_finding(ctx: Mapping[str, Any], name: str) -> Finding | None:
+    flow = ctx.get("taker")
+    if flow is None:
+        return None
+    symbol = str(ctx.get("symbol") or f"{name}USDT")
+    return Finding(f"Over the last 24 hours takers bought {flow:.2f}x what they sold on Bitget's "
+                   f"{name} perpetual.", "Bitget taker buy/sell, 4-hourly",
+                   f"{BITGET_API}{TAKER}?symbol={symbol}&period=4h")
+
+
+def _crowd_finding(ctx: Mapping[str, Any], name: str) -> Finding | None:
+    crowd = ctx.get("crowd")
+    if not crowd:
+        return None
+    symbol = str(ctx.get("symbol") or f"{name}USDT")
+    text = f"{crowd['accounts_long']:.0%} of Bitget {name} futures accounts are long"
+    if crowd.get("day_ago") is not None:
+        text += f" ({(crowd['accounts_long'] - crowd['day_ago']) * 100:+.1f} points on a day ago)"
+    if crowd.get("position_long") is not None:
+        text += f"; by position size {crowd['position_long']:.0%} is long"
+    return Finding(text + ".", "Bitget account long/short, hourly",
+                   f"{BITGET_API}/api/v2/mix/market/account-long-short?symbol={symbol}&period=1h")
+
+
+_STATED_SIDE = re.compile(r"^\s*(?:i(?:'m| am)?\s+)?(?:going\s+|considering\s+(?:going\s+)?)?"
+                          r"(long|short|buy|sell|bullish|bearish)\b", re.I)
+
+
+def stated_side(text: str) -> str | None:
+    """``long`` or ``short`` when the thesis opens with its direction, else None."""
+    found = _STATED_SIDE.match(text)
+    if found is None:
+        return None
+    return "short" if found.group(1).lower() in ("short", "sell", "bearish") else "long"
+
+
+def implied_crowding(ctx: Mapping[str, Any], name: str, side: str) -> Tested:
+    """The assumption every position carries and no trader states: the crowd is not already in
+    it. Tested on Bitget's own two splits, because they disagree often and the disagreement is the
+    reading: the share of *accounts* on the trader's side and the share of *position size*.
+
+    Crowded means both at 70% or more; clear means both at 50% or less. Many small accounts on
+    one side while the larger money is on the other is neither: it is the split a contrarian read
+    starts from, and the line says so rather than calling it crowded (SOL on 2026-09-28: 82% of
+    accounts long, 36% of position size)."""
+    reason = ("the move is not already crowded" if side == "long" else
+              "the fall is not already crowded")
+    crowd = ctx.get("crowd")
+    finding = _crowd_finding(ctx, name)
+    if not crowd or finding is None:
+        return Tested(reason, Kind.POSITIONING, Result.NOT_TESTED,
+                      f"Bitget's long/short split did not answer for {name}.", implied=True)
+    def mine(share: float) -> float:
+        return share if side == "long" else 1 - share
+
+    accounts = mine(float(crowd["accounts_long"]))
+    size = (mine(float(crowd["position_long"])) if crowd.get("position_long") is not None
+            else None)
+    split = f"{accounts:.0%} of Bitget {name} accounts" + (
+        f" and {size:.0%} of position size" if size is not None else "") + f" are {side}"
+    if accounts >= CROWDED_LONG and (size is None or size >= CROWDED_LONG):
+        result, lead = Result.CONTRADICTED, "The crowd is already there"
+    elif accounts <= UNCROWDED and (size is None or size <= UNCROWDED):
+        result, lead = Result.SUPPORTED, "The crowd is not there yet"
+    elif size is not None and (accounts >= CROWDED_LONG) != (size >= CROWDED_LONG) \
+            and abs(accounts - size) >= 0.2:
+        result = Result.NOT_MEASURABLE
+        lead = ("Split: most accounts are with you, the larger money is not" if accounts > size
+                else "Split: the larger money is with you, most accounts are not")
+    else:
+        result, lead = Result.NOT_MEASURABLE, "The crowd leans but is not one-sided"
+    return Tested(reason, Kind.POSITIONING, result,
+                  f"{lead}: {split}. A crowd measure, not an edge.",
+                  evidence=tuple(f for f in (finding, _taker_finding(ctx, name)) if f),
+                  implied=True)
 
 
 # --- the tests --------------------------------------------------------------------------------
@@ -294,19 +511,25 @@ def _activity(reason: Reason, activity: Mapping[str, Any] | None, name: str) -> 
                       f"{name} is not a chain's own token, so there is no network whose activity "
                       f"would test this.")
     parts = [(label, activity.get(key)) for key, label in (("fees", "daily fees"),
+                                                           ("dex", "DEX volume"),
                                                            ("tvl", "value locked (TVL)"))]
     read = [(label, m) for label, m in parts if m]
     if not read:
         return Tested(reason.text, reason.kind, Result.NOT_TESTED,
                       f"DeFiLlama did not answer for {activity.get('chain')} just now, so the "
                       f"claim was not tested.")
-    lines = [f"{activity['chain']} {label}: {m['change']:+.1%} over the last {WINDOW_DAYS} days "
-             f"against the {WINDOW_DAYS} before, higher than {m['percentile']:.0%} of the "
-             f"{m['months']} monthly changes in three years" for label, m in read]
+    chain = str(activity["chain"])
+    lines = [f"{label} {m['change']:+.1%} ({m['percentile']:.0%} percentile)" for label, m in read]
+    evidence = tuple(
+        Finding(f"{chain} {label}: {m['change']:+.1%} over the last {WINDOW_DAYS} days against the "
+                f"{WINDOW_DAYS} before, higher than {m['percentile']:.0%} of the {m['months']} "
+                f"monthly changes in three years (to {m['as_of']}).", "DeFiLlama",
+                f"https://defillama.com/chain/{urllib.parse.quote(chain)}")
+        for label, m in read)
     ups = [m["percentile"] >= 0.6 and m["change"] > 0 for _, m in read]
     downs = [m["percentile"] <= 0.4 and m["change"] < 0 for _, m in read]
     weakening = bool(re.search(r"weak|slow|declin|fall|drop|shrink", reason.text, re.I))
-    note = (" Both are in dollars, so a falling token price lowers them without any change in "
+    note = (" All are in dollars, so a falling token price lowers them without any change in "
             "use.")
     if all(ups):
         result = Result.CONTRADICTED if weakening else Result.SUPPORTED
@@ -317,8 +540,9 @@ def _activity(reason: Reason, activity: Mapping[str, Any] | None, name: str) -> 
     lead = {Result.SUPPORTED: "The data agrees", Result.CONTRADICTED: "The data disagrees",
             Result.NOT_MEASURABLE: "Within the usual month-to-month swing"}[result]
     return Tested(reason.text, reason.kind, result,
-                  f"{lead}: " + "; ".join(lines) + f" (DeFiLlama, to {read[0][1]['as_of']})."
-                  + note)
+                  f"{lead}: {chain} " + ", ".join(lines) + f", month on month against three "
+                  f"years of monthly changes (DeFiLlama, to {read[0][1]['as_of']})." + note,
+                  evidence=evidence)
 
 
 def _momentum(reason: Reason, tech: Mapping[str, Any], name: str) -> Tested:
@@ -401,7 +625,8 @@ _UNTESTED: Mapping[Kind, str] = {
 
 def check(stated: Sequence[Reason], *, name: str, data: Mapping[str, Mapping[str, Any]],
          activity: Mapping[str, Any] | None = None,
-         fear_greed: Mapping[str, Any] | None = None) -> tuple[Tested, ...]:
+         fear_greed: Mapping[str, Any] | None = None,
+         ctx: Mapping[str, Any] | None = None, side: str | None = None) -> tuple[Tested, ...]:
     """Each stated reason against the measurement that bears on it. ``data`` is the research
     task's step data by kind, as :func:`argus.lui.weigh.weigh` takes it."""
     analogue = data.get("analogue") or {}
@@ -424,6 +649,20 @@ def check(stated: Sequence[Reason], *, name: str, data: Mapping[str, Mapping[str
             out.append(_valuation(reason, fund, name))
         else:
             out.append(Tested(reason.text, reason.kind, Result.NOT_TESTED, _UNTESTED[reason.kind]))
+    ctx = ctx or {}
+    price = _price_findings(ctx, name)
+    crowd = tuple(f for f in (_crowd_finding(ctx, name), _taker_finding(ctx, name)) if f)
+    extra: dict[Kind, tuple[Finding, ...]] = {
+        Kind.REVERSION: price, Kind.MOMENTUM: price, Kind.POSITIONING: crowd,
+    }
+    if fear_greed:
+        extra[Kind.SENTIMENT] = (Finding(
+            f"Crypto Fear & Greed {int(fear_greed['value'])} "
+            f"({fear_greed.get('classification')}), market-wide.", "alternative.me",
+            "https://alternative.me/crypto/fear-and-greed-index/"),)
+    out = [replace(t, evidence=t.evidence + extra.get(t.kind, ())) for t in out]
+    if side is not None and stated:
+        out.append(implied_crowding(ctx, name, side))
     return tuple(out)
 
 

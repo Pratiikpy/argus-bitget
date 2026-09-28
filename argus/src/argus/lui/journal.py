@@ -1201,13 +1201,19 @@ class Journal:
     parsed_from: str
 
 
-def read_journal(text: str, *, now: date | None = None) -> Journal | None:
+def read_journal(text: str, *, now: date | None = None,
+                 explicit: bool = False) -> Journal | None:
     """The trades in a message when it is a journal to review, else None.
 
     A message is a journal when it holds a fill table, or two or more completed round trips, or one
     completed round trip and a request for review ("what did I do wrong", "复盘"). A message about
     the desk's own trades, an order still being planned ("if I buy at 180 and sell at 200"), or a
     position still open ("I bought at 188, should I sell?") is not.
+
+    ``explicit`` is for a caller whose input is a journal by definition — the MCP tool
+    ``argus_review_trades``. The review cue exists to keep a console chat about one trade from being
+    taken for a review request; a call to the review tool is that request, and its own documented
+    example, one round trip, was refused without it (QA inventory, 2026-09-28).
     """
     if not text or not text.strip():
         return None
@@ -1224,7 +1230,7 @@ def read_journal(text: str, *, now: date | None = None) -> Journal | None:
     trades, _, _ = pair(legs)
     if not trades:
         return None
-    if len(trades) == 1:
+    if len(trades) == 1 and not explicit:
         if not _REVIEW_CUE.search(text):
             return None
         if _HYPOTHETICAL.search(text) and not re.search(r"\bwhat\s+did\s+i\b|复盘", text, re.I):
@@ -1386,7 +1392,7 @@ def gate_lines(trades: Sequence[Trade]) -> tuple[list[str], dict[str, Any] | Non
     return lines, report
 
 
-def review_trades(text: str, *, now: datetime | None = None,
+def review_trades(text: str, *, now: datetime | None = None, explicit: bool = False,
                   history: Callable[[str], History] | None = daily_history,
                   releases: Callable[[str, date], Releases] | None = earnings_releases,
                   ) -> tuple[list[str], list[Source], dict[str, Any]] | None:
@@ -1397,7 +1403,7 @@ def review_trades(text: str, *, now: datetime | None = None,
     network by default; pass None (or a stub) to review from the trader's prices alone.
     """
     clock = now or datetime.now(UTC)
-    journal = read_journal(text, now=clock.date())
+    journal = read_journal(text, now=clock.date(), explicit=explicit)
     if journal is None:
         if not review_requested(text):
             return None

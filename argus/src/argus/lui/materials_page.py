@@ -11,6 +11,7 @@ comes from the environment the day it exists (``ARGUS_DEMO_VIDEO_URL``, ``ARGUS_
 from __future__ import annotations
 
 import os
+from collections.abc import Sequence
 from dataclasses import dataclass
 from html import escape
 from pathlib import Path
@@ -48,10 +49,26 @@ def _register_line(counts: dict[str, int]) -> str:
             f"{', '.join(parts)} — read from the register now.")
 
 
-def collect(data_dir: Path, base: str = "") -> list[Item]:
-    """Every deliverable, with the live figures that describe it."""
+_WORDS = ("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+          "eleven", "twelve")
+
+
+def _number(n: int) -> str:
+    return _WORDS[n] if 0 <= n < len(_WORDS) else str(n)
+
+
+def collect(data_dir: Path, base: str = "", *, tools: Sequence[str] = ()) -> list[Item]:
+    """Every deliverable, with the live figures that describe it. ``tools`` are the MCP tool names,
+    passed in by the channel that serves the page: a page may not import a channel
+    (`tests/test_lui_concerns.py`)."""
     from argus.lui.corrections import collect as collect_wrong
     from argus.lui.proof_page import collect as collect_wins
+    from argus.lui.task import STEPS
+
+    # Counted from the code, never typed: the page said "seven engines" and "one tool, argus_ask"
+    # after the research task had eight and the MCP server ten (QA inventory, 2026-09-28).
+    engines = len(STEPS)
+    tools = list(tools)
 
     _, counts = collect_wins(data_dir)
     wrong = collect_wrong(data_dir)
@@ -61,8 +78,8 @@ def collect(data_dir: Path, base: str = "") -> list[Item]:
              "computed from live data and named by source, every line labelled by where it came "
              "from.", "Use it"),
         Item("Research task", f"{base}/research", "The Track 3 demo the handbook asks for: one "
-             "question about adding a name to a book, seven engines, and an actionable insight. "
-             "Change ?name=, ?size= and ?book= to run your own.", "Use it"),
+             f"question about adding a name to a book, {_number(engines)} engines, and an "
+             "actionable insight. Change ?name=, ?size= and ?book= to run your own.", "Use it"),
         Item("What we beat", f"{base}/proof", _register_line(counts), "Check it"),
         Item("What we got wrong", f"{base}/wrong",
              f"{len(wrong)} findings published, {losses} of them comparisons a rival won.",
@@ -72,8 +89,9 @@ def collect(data_dir: Path, base: str = "") -> list[Item]:
         Item("Source code", REPOSITORY, "Public, MIT. `python -m argus.eval.standing` re-derives "
              "the register from its artefacts; `python -m argus.eval.docclaims` checks every "
              "figure the documents quote.", "Check it"),
-        Item("MCP server", f"{base}/mcp", "The same console for an agent: JSON-RPC 2.0 over POST, "
-             "one tool, argus_ask.", "Other doors"),
+        Item("MCP server", f"{base}/mcp", "The same console for an agent: JSON-RPC 2.0 over POST"
+             + (f", {_number(len(tools))} tools, from {tools[0]} to {tools[-1]}." if tools
+                else "."), "Other doors"),
         Item("Telegram", TELEGRAM, "The same console in a chat; /book saves holdings.",
              "Other doors"),
         Item("JSON", f"{base}/proof?format=json", "Every page's data without the page: add "

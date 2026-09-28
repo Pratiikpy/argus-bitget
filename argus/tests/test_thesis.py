@@ -107,7 +107,7 @@ class TestNetworkActivity:
         [got] = check(reasons("ecosystem activity strengthening"), name="SOL", data=data(),
                       activity=strong)
         assert got.result is Result.SUPPORTED
-        assert got.line.startswith("The data agrees: Solana daily fees: +32.7%")
+        assert got.line.startswith("The data agrees: Solana daily fees +32.7% (75% percentile)")
         assert "in dollars" in got.line
 
     def test_a_claim_of_weakening_is_read_the_other_way(self) -> None:
@@ -176,3 +176,67 @@ def test_the_page_and_the_json_show_each_reason_with_its_result() -> None:
     assert "“this pullback looks temporary”" in page
     assert "<span class='r not_measurable'>not measurable</span>" in page
     assert as_dict(task)["reasons_tested"][0]["result"] == "not measurable"
+
+
+class TestEvidenceBesideTheVerdict:
+    CTX: dict[str, Any] = {  # noqa: RUF012 - read-only fixture
+        "symbol": "SOLUSDT", "returns": {7: 0.003, 30: 0.126, 89: 0.61}, "btc_30d": 0.067,
+        "range": {"high": 124.933, "low": 70.516, "days": 90, "place": 0.88},
+        "crowd": {"accounts_long": 0.82, "day_ago": 0.73, "position_long": 0.36}}
+
+    def test_price_findings_ride_with_a_reversal_and_link_to_bitget(self) -> None:
+        [got] = check(reasons("this pullback looks temporary"), name="SOL", data=data(),
+                      ctx=self.CTX)
+        texts = [f.text for f in got.evidence]
+        assert texts[0].startswith("SOL returns from daily closes: 7-day +0.3%, 30-day +12.6%")
+        assert "+5.9 points against BTC's +6.7%" in texts[0]
+        assert "88% of its 90-day range" in texts[1]
+        assert all(f.url.startswith("https://api.bitget.com/") for f in got.evidence)
+        assert got.result is Result.NOT_MEASURABLE  # the evidence never changes the verdict
+
+    def test_the_implied_assumption_is_added_only_when_a_direction_is_stated(self) -> None:
+        stated = reasons("long SOL, this pullback looks temporary")
+        with_side = check(stated, name="SOL", data=data(), ctx=self.CTX, side="long")
+        assert with_side[-1].implied and with_side[-1].reason == "the move is not already crowded"
+        assert len(check(stated, name="SOL", data=data(), ctx=self.CTX)) == 1
+        assert thesis.stated_side("long SOL, x") == "long"
+        assert thesis.stated_side("I'm bearish on ETH") == "short"
+        assert thesis.stated_side("Should I enter TSLA?") is None
+
+    @pytest.mark.parametrize(("accounts", "size", "result", "lead"), [
+        (0.82, 0.36, Result.NOT_MEASURABLE, "Split: most accounts are with you"),
+        (0.82, 0.78, Result.CONTRADICTED, "The crowd is already there"),
+        (0.45, 0.40, Result.SUPPORTED, "The crowd is not there yet"),
+        (0.62, 0.58, Result.NOT_MEASURABLE, "The crowd leans but is not one-sided"),
+    ])
+    def test_crowding_reads_accounts_and_position_size_together(
+            self, accounts: float, size: float, result: Result, lead: str) -> None:
+        ctx = {"symbol": "SOLUSDT", "crowd": {"accounts_long": accounts, "day_ago": None,
+                                              "position_long": size}}
+        got = thesis.implied_crowding(ctx, "SOL", "long")
+        assert got.result is result and got.line.startswith(lead)
+
+    def test_a_short_reads_the_split_from_its_own_side(self) -> None:
+        ctx = {"symbol": "SOLUSDT", "crowd": {"accounts_long": 0.2, "day_ago": None,
+                                              "position_long": 0.25}}
+        assert thesis.implied_crowding(ctx, "SOL", "short").result is Result.CONTRADICTED
+
+    def test_each_activity_series_is_a_linked_finding(self) -> None:
+        strong = {"chain": "Solana", **{k: {"change": 0.2, "percentile": 0.7, "months": 36,
+                                            "as_of": "2026-09-28"} for k in ("fees", "dex", "tvl")}}
+        [got] = check(reasons("adoption is growing"), name="SOL", data=data(), activity=strong)
+        assert got.result is Result.SUPPORTED and len(got.evidence) == 3
+        assert {f.url for f in got.evidence} == {"https://defillama.com/chain/Solana"}
+        assert "DEX volume" in got.line
+
+
+def test_volume_trend_and_taker_flow_are_findings_too() -> None:
+    ctx = {"symbol": "SOLUSDT", "volume": {"week": 51.9e6, "month": 66.1e6}, "taker": 1.01,
+           "crowd": {"accounts_long": 0.82, "day_ago": None, "position_long": 0.36}}
+    [pullback] = check(reasons("this pullback looks temporary"), name="SOL", data=data(), ctx=ctx)
+    assert any("volume over the last 7 days is 0.79x the 30-day average ($51.9M against $66.1M)"
+               in f.text for f in pullback.evidence)
+    crowd = thesis.implied_crowding(ctx, "SOL", "long")
+    assert [f.source for f in crowd.evidence] == ["Bitget account long/short, hourly",
+                                                  "Bitget taker buy/sell, 4-hourly"]
+    assert "takers bought 1.01x what they sold" in crowd.evidence[1].text

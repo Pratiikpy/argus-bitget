@@ -85,6 +85,9 @@ PAGE = """<!doctype html>
     font-size:15px }
   textarea#q { font:15px/1.4 system-ui,sans-serif; resize:none; overflow-y:auto; max-height:320px;
     box-sizing:border-box }
+  /* On a phone the example question wraps to two lines; one row cut it in half before the
+     reader typed anything (QA screen pass, 2026-09-28). */
+  @media (max-width: 640px) { textarea#q { min-height:calc(2 * 1.4em + 24px) } }
   .deep { margin-top:10px }
   .deep button { padding:0; border:0; background:none; color:var(--accent); font-size:13.5px;
     font-weight:600; cursor:pointer; text-decoration:underline; text-underline-offset:3px }
@@ -1795,8 +1798,11 @@ class Handler(BaseHTTPRequestHandler):
                 # full URLs, so a judge can copy one straight into a message
                 host = self.headers.get("Host") or ""
                 proto = self.headers.get("X-Forwarded-Proto") or "http"
+                from argus.lui.mcp_server import TOOLS
+
                 items = collect_materials(_ledger_path().parent,
-                                          f"{proto}://{host}" if host else "")
+                                          f"{proto}://{host}" if host else "",
+                                          tools=[str(t["name"]) for t in TOOLS])
                 if (parse_qs(route.query).get("format") or [""])[0] == "json":
                     self._send(json.dumps([i.as_dict() for i in items],
                                           ensure_ascii=False).encode(), "application/json")
@@ -1868,6 +1874,7 @@ def mcp_page(host: str) -> str:
  h1 {{ font-size:26px; margin:6px 0 10px }}
  pre {{ background:var(--panel); border:1px solid var(--line); border-radius:10px;
    padding:12px 14px; font:12.5px/1.6 var(--mono); overflow-x:auto }}
+ @media (max-width: 640px) {{ pre {{ white-space:pre-wrap; overflow-wrap:anywhere }} }}
  li {{ margin:6px 0 }}
 </style></head><body>{design.nav("")}<div class="wrap">
 <h1>{title}</h1>
