@@ -12,9 +12,10 @@ modules = [
     "argus/eval/xa_arena.py",
     "argus/eval/xa_tape.py",
 ]
-state = "implemented"
+state = "tied"
 baseline = "crypto_sor real composite order-book router (CompositeOrderBook.newOrder)"
 blockers = [
+    """        RE-GRADED 2026-09-28 from IMPLEMENTED to TIED (Activity/27_CAPABILITY_CLOSE_PLAN.md §2):         the rivals this row waited on have been run on one shared, pre-registered tape         (data/xa_arena.json, seven rival configurations and four naive baselines). Under the         pre-registered primary (certainty equivalent at gamma 5, stationary bootstrap, Holm) every         comparison is a TIE in both periods, holding the book included. Two things against it are         recorded, not hidden: on the secondary guard Triad's hourly CVaR is significantly better         than ARGUS's in both periods, and removing the funding term — the mechanism this row is         named for — changed nothing (only removing costs from the objective did, in period B). Why         it cannot be won as built: at gamma 5 over 90-day windows hedging this book adds nothing         measurable over holding it.""",
     """\
         RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: crypto_sor is a same-instrument, \
         cross-venue router, and this entry's own scope says the leg is not claimed to be a \

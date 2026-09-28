@@ -76,12 +76,12 @@
           "nominal_inside_ci95": true
         },
         "argus.corrado_rank_adjusted": {
-          "rejections": 127,
+          "rejections": 1,
           "draws": 200,
-          "rate": 0.635,
+          "rate": 0.005,
           "ci95": [
-            0.5663,
-            0.6986
+            0.0009,
+            0.0278
           ],
           "nominal_inside_ci95": false
         },
@@ -96,12 +96,12 @@
           "nominal_inside_ci95": false
         },
         "argus.any_adjusted": {
-          "rejections": 131,
+          "rejections": 17,
           "draws": 200,
-          "rate": 0.655,
+          "rate": 0.085,
           "ci95": [
-            0.5868,
-            0.7174
+            0.0537,
+            0.1319
           ],
           "nominal_inside_ci95": false
         },
@@ -227,19 +227,19 @@
         }
       },
       "draws": 200,
-      "seconds": 41.5,
+      "seconds": 28.5,
       "mean_measured_correlation": -6e-05,
       "vibe_flagged_shared_dates_rate": 0.0
     },
     "clustered_3": {
       "rejection_rates": {
         "argus.verdict": {
-          "rejections": 0,
+          "rejections": 1,
           "draws": 200,
-          "rate": 0.0,
+          "rate": 0.005,
           "ci95": [
-            0.0,
-            0.0188
+            0.0009,
+            0.0278
           ],
           "nominal_inside_ci95": false
         },
@@ -264,12 +264,12 @@
           "nominal_inside_ci95": true
         },
         "argus.corrado_rank_adjusted": {
-          "rejections": 102,
+          "rejections": 1,
           "draws": 200,
-          "rate": 0.51,
+          "rate": 0.005,
           "ci95": [
-            0.4412,
-            0.5784
+            0.0009,
+            0.0278
           ],
           "nominal_inside_ci95": false
         },
@@ -284,22 +284,22 @@
           "nominal_inside_ci95": true
         },
         "argus.any_adjusted": {
-          "rejections": 112,
+          "rejections": 20,
           "draws": 200,
-          "rate": 0.56,
+          "rate": 0.1,
           "ci95": [
-            0.4907,
-            0.627
+            0.0657,
+            0.1494
           ],
           "nominal_inside_ci95": false
         },
         "argus.verdict_raw": {
-          "rejections": 0,
+          "rejections": 1,
           "draws": 200,
-          "rate": 0.0,
+          "rate": 0.005,
           "ci95": [
-            0.0,
-            0.0188
+            0.0009,
+            0.0278
           ],
           "nominal_inside_ci95": false
         },
@@ -415,19 +415,19 @@
         }
       },
       "draws": 200,
-      "seconds": 39.8,
+      "seconds": 27.1,
       "mean_measured_correlation": 0.00148,
       "vibe_flagged_shared_dates_rate": 1.0
     },
     "clustered_9": {
       "rejection_rates": {
         "argus.verdict": {
-          "rejections": 6,
+          "rejections": 5,
           "draws": 200,
-          "rate": 0.03,
+          "rate": 0.025,
           "ci95": [
-            0.0138,
-            0.0639
+            0.0107,
+            0.0572
           ],
           "nominal_inside_ci95": true
         },
@@ -452,14 +452,14 @@
           "nominal_inside_ci95": false
         },
         "argus.corrado_rank_adjusted": {
-          "rejections": 75,
+          "rejections": 7,
           "draws": 200,
-          "rate": 0.375,
+          "rate": 0.035,
           "ci95": [
-            0.3109,
-            0.4439
+            0.0171,
+            0.0705
           ],
-          "nominal_inside_ci95": false
+          "nominal_inside_ci95": true
         },
         "argus.generalised_sign_adjusted": {
           "rejections": 27,
@@ -472,22 +472,22 @@
           "nominal_inside_ci95": false
         },
         "argus.any_adjusted": {
-          "rejections": 96,
+          "rejections": 38,
           "draws": 200,
-          "rate": 0.48,
+          "rate": 0.19,
           "ci95": [
-            0.4118,
-            0.549
+            0.1417,
+            0.25
           ],
           "nominal_inside_ci95": false
         },
         "argus.verdict_raw": {
-          "rejections": 7,
+          "rejections": 5,
           "draws": 200,
-          "rate": 0.035,
+          "rate": 0.025,
           "ci95": [
-            0.0171,
-            0.0705
+            0.0107,
+            0.0572
           ],
           "nominal_inside_ci95": true
         },
@@ -603,19 +603,19 @@
         }
       },
       "draws": 200,
-      "seconds": 53.2,
+      "seconds": 27.7,
       "mean_measured_correlation": 0.00636,
       "vibe_flagged_shared_dates_rate": 1.0
     },
     "us_open_clustered": {
       "rejection_rates": {
         "argus.verdict": {
-          "rejections": 5,
+          "rejections": 6,
           "draws": 200,
-          "rate": 0.025,
+          "rate": 0.03,
           "ci95": [
-            0.0107,
-            0.0572
+            0.0138,
+            0.0639
           ],
           "nominal_inside_ci95": true
         },
@@ -640,14 +640,14 @@
           "nominal_inside_ci95": false
         },
         "argus.corrado_rank_adjusted": {
-          "rejections": 29,
+          "rejections": 13,
           "draws": 200,
-          "rate": 0.145,
+          "rate": 0.065,
           "ci95": [
-            0.1029,
-            0.2005
+            0.0384,
+            0.108
           ],
-          "nominal_inside_ci95": false
+          "nominal_inside_ci95": true
         },
         "argus.generalised_sign_adjusted": {
           "rejections": 36,
@@ -660,12 +660,12 @@
           "nominal_inside_ci95": false
         },
         "argus.any_adjusted": {
-          "rejections": 64,
+          "rejections": 48,
           "draws": 200,
-          "rate": 0.32,
+          "rate": 0.24,
           "ci95": [
-            0.2593,
-            0.3875
+            0.1861,
+            0.3037
           ],
           "nominal_inside_ci95": false
         },
@@ -791,19 +791,19 @@
         }
       },
       "draws": 200,
-      "seconds": 45.7,
+      "seconds": 28.2,
       "mean_measured_correlation": 0.00644,
       "vibe_flagged_shared_dates_rate": 1.0
     },
     "crypto_pair": {
       "rejection_rates": {
         "argus.verdict": {
-          "rejections": 1,
+          "rejections": 0,
           "draws": 200,
-          "rate": 0.005,
+          "rate": 0.0,
           "ci95": [
-            0.0009,
-            0.0278
+            0.0,
+            0.0188
           ],
           "nominal_inside_ci95": false
         },
@@ -828,12 +828,12 @@
           "nominal_inside_ci95": true
         },
         "argus.corrado_rank_adjusted": {
-          "rejections": 63,
+          "rejections": 1,
           "draws": 200,
-          "rate": 0.315,
+          "rate": 0.005,
           "ci95": [
-            0.2546,
-            0.3823
+            0.0009,
+            0.0278
           ],
           "nominal_inside_ci95": false
         },
@@ -848,22 +848,22 @@
           "nominal_inside_ci95": false
         },
         "argus.any_adjusted": {
-          "rejections": 84,
+          "rejections": 28,
           "draws": 200,
-          "rate": 0.42,
+          "rate": 0.14,
           "ci95": [
-            0.3537,
-            0.4893
+            0.0987,
+            0.1949
           ],
           "nominal_inside_ci95": false
         },
         "argus.verdict_raw": {
-          "rejections": 2,
+          "rejections": 0,
           "draws": 200,
-          "rate": 0.01,
+          "rate": 0.0,
           "ci95": [
-            0.0027,
-            0.0357
+            0.0,
+            0.0188
           ],
           "nominal_inside_ci95": false
         },
@@ -979,19 +979,19 @@
         }
       },
       "draws": 200,
-      "seconds": 29.9,
+      "seconds": 16.8,
       "mean_measured_correlation": 0.01105,
       "vibe_flagged_shared_dates_rate": 1.0
     },
     "near_clustered": {
       "rejection_rates": {
         "argus.verdict": {
-          "rejections": 3,
+          "rejections": 2,
           "draws": 200,
-          "rate": 0.015,
+          "rate": 0.01,
           "ci95": [
-            0.0051,
-            0.0432
+            0.0027,
+            0.0357
           ],
           "nominal_inside_ci95": false
         },
@@ -1016,14 +1016,14 @@
           "nominal_inside_ci95": false
         },
         "argus.corrado_rank_adjusted": {
-          "rejections": 84,
+          "rejections": 9,
           "draws": 200,
-          "rate": 0.42,
+          "rate": 0.045,
           "ci95": [
-            0.3537,
-            0.4893
+            0.0239,
+            0.0833
           ],
-          "nominal_inside_ci95": false
+          "nominal_inside_ci95": true
         },
         "argus.generalised_sign_adjusted": {
           "rejections": 22,
@@ -1036,24 +1036,24 @@
           "nominal_inside_ci95": false
         },
         "argus.any_adjusted": {
-          "rejections": 104,
+          "rejections": 38,
           "draws": 200,
-          "rate": 0.52,
+          "rate": 0.19,
           "ci95": [
-            0.451,
-            0.5882
+            0.1417,
+            0.25
           ],
           "nominal_inside_ci95": false
         },
         "argus.verdict_raw": {
-          "rejections": 5,
+          "rejections": 2,
           "draws": 200,
-          "rate": 0.025,
+          "rate": 0.01,
           "ci95": [
-            0.0107,
-            0.0572
+            0.0027,
+            0.0357
           ],
-          "nominal_inside_ci95": true
+          "nominal_inside_ci95": false
         },
         "argus.bmp_raw": {
           "rejections": 21,
@@ -1167,19 +1167,19 @@
         }
       },
       "draws": 200,
-      "seconds": 45.5,
+      "seconds": 29.1,
       "mean_measured_correlation": 0.00194,
       "vibe_flagged_shared_dates_rate": 1.0
     },
     "independent_short_estimation": {
       "rejection_rates": {
         "argus.verdict": {
-          "rejections": 1,
+          "rejections": 0,
           "draws": 200,
-          "rate": 0.005,
+          "rate": 0.0,
           "ci95": [
-            0.0009,
-            0.0278
+            0.0,
+            0.0188
           ],
           "nominal_inside_ci95": false
         },
@@ -1204,12 +1204,12 @@
           "nominal_inside_ci95": false
         },
         "argus.corrado_rank_adjusted": {
-          "rejections": 65,
+          "rejections": 2,
           "draws": 200,
-          "rate": 0.325,
+          "rate": 0.01,
           "ci95": [
-            0.2639,
-            0.3927
+            0.0027,
+            0.0357
           ],
           "nominal_inside_ci95": false
         },
@@ -1224,22 +1224,22 @@
           "nominal_inside_ci95": true
         },
         "argus.any_adjusted": {
-          "rejections": 78,
+          "rejections": 28,
           "draws": 200,
-          "rate": 0.39,
+          "rate": 0.14,
           "ci95": [
-            0.3251,
-            0.4591
+            0.0987,
+            0.1949
           ],
           "nominal_inside_ci95": false
         },
         "argus.verdict_raw": {
-          "rejections": 1,
+          "rejections": 0,
           "draws": 200,
-          "rate": 0.005,
+          "rate": 0.0,
           "ci95": [
-            0.0009,
-            0.0278
+            0.0,
+            0.0188
           ],
           "nominal_inside_ci95": false
         },
@@ -1355,7 +1355,7 @@
         }
       },
       "draws": 200,
-      "seconds": 27.3,
+      "seconds": 16.8,
       "mean_measured_correlation": -9e-05,
       "vibe_flagged_shared_dates_rate": 0.0
     }
@@ -1371,7 +1371,7 @@
       "whale_fixed_null": 0.035
     },
     "clustered_3": {
-      "argus_verdict": 0.0,
+      "argus_verdict": 0.005,
       "argus_bmp_adjusted": 0.045,
       "vibe_bmp": 0.065,
       "vibe_patell": 0.07,
@@ -1380,7 +1380,7 @@
       "whale_fixed_null": 0.1
     },
     "clustered_9": {
-      "argus_verdict": 0.03,
+      "argus_verdict": 0.025,
       "argus_bmp_adjusted": 0.08,
       "vibe_bmp": 0.15,
       "vibe_patell": 0.185,
@@ -1389,7 +1389,7 @@
       "whale_fixed_null": 0.28
     },
     "us_open_clustered": {
-      "argus_verdict": 0.025,
+      "argus_verdict": 0.03,
       "argus_bmp_adjusted": 0.07,
       "vibe_bmp": 0.135,
       "vibe_patell": 0.205,
@@ -1398,7 +1398,7 @@
       "whale_fixed_null": 0.27
     },
     "crypto_pair": {
-      "argus_verdict": 0.005,
+      "argus_verdict": 0.0,
       "argus_bmp_adjusted": 0.03,
       "vibe_bmp": 0.115,
       "vibe_patell": 0.1,
@@ -1407,7 +1407,7 @@
       "whale_fixed_null": 0.125
     },
     "near_clustered": {
-      "argus_verdict": 0.015,
+      "argus_verdict": 0.01,
       "argus_bmp_adjusted": 0.095,
       "vibe_bmp": 0.105,
       "vibe_patell": 0.16,
@@ -1416,7 +1416,7 @@
       "whale_fixed_null": 0.29
     },
     "independent_short_estimation": {
-      "argus_verdict": 0.005,
+      "argus_verdict": 0.0,
       "argus_bmp_adjusted": 0.04,
       "vibe_bmp": 0.04,
       "vibe_patell": 0.1,
@@ -1430,13 +1430,13 @@
       "shape": "independent",
       "injected_abnormal_bps": 50.0,
       "raw_power": {
-        "argus.verdict": 0.83,
+        "argus.verdict": 0.635,
         "argus.bmp_adjusted": 0.855,
         "argus.patell_adjusted": 0.93,
-        "argus.corrado_rank_adjusted": 0.995,
+        "argus.corrado_rank_adjusted": 0.71,
         "argus.generalised_sign_adjusted": 0.975,
-        "argus.any_adjusted": 1.0,
-        "argus.verdict_raw": 0.835,
+        "argus.any_adjusted": 0.99,
+        "argus.verdict_raw": 0.635,
         "argus.bmp_raw": 0.86,
         "argus.patell_raw": 0.935,
         "argus.patell_summed_adjusted": 0.93,
@@ -1450,13 +1450,13 @@
         "whale.fixed_null": 0.965
       },
       "size_adjusted_power": {
-        "argus.verdict": 0.97,
+        "argus.verdict": 0.98,
         "argus.bmp_adjusted": 0.865,
         "argus.patell_adjusted": 0.885,
-        "argus.corrado_rank_adjusted": 0.8,
+        "argus.corrado_rank_adjusted": 0.94,
         "argus.generalised_sign_adjusted": 0.995,
-        "argus.any_adjusted": 0.825,
-        "argus.verdict_raw": 0.975,
+        "argus.any_adjusted": 0.98,
+        "argus.verdict_raw": 0.98,
         "argus.bmp_raw": 0.865,
         "argus.patell_raw": 0.895,
         "argus.patell_summed_adjusted": 0.885,
@@ -1469,19 +1469,19 @@
         "ballast.pooled_t": 0.53,
         "whale.fixed_null": 0.98
       },
-      "seconds": 46.8
+      "seconds": 30.0
     },
     {
       "shape": "clustered_9",
       "injected_abnormal_bps": 50.0,
       "raw_power": {
-        "argus.verdict": 0.575,
+        "argus.verdict": 0.41,
         "argus.bmp_adjusted": 0.69,
         "argus.patell_adjusted": 0.71,
-        "argus.corrado_rank_adjusted": 0.765,
+        "argus.corrado_rank_adjusted": 0.435,
         "argus.generalised_sign_adjusted": 0.87,
-        "argus.any_adjusted": 0.925,
-        "argus.verdict_raw": 0.675,
+        "argus.any_adjusted": 0.89,
+        "argus.verdict_raw": 0.43,
         "argus.bmp_raw": 0.815,
         "argus.patell_raw": 0.855,
         "argus.patell_summed_adjusted": 0.71,
@@ -1495,13 +1495,13 @@
         "whale.fixed_null": 0.835
       },
       "size_adjusted_power": {
-        "argus.verdict": 0.69,
+        "argus.verdict": 0.575,
         "argus.bmp_adjusted": 0.63,
         "argus.patell_adjusted": 0.555,
-        "argus.corrado_rank_adjusted": 0.205,
+        "argus.corrado_rank_adjusted": 0.49,
         "argus.generalised_sign_adjusted": 0.805,
-        "argus.any_adjusted": 0.46,
-        "argus.verdict_raw": 0.695,
+        "argus.any_adjusted": 0.815,
+        "argus.verdict_raw": 0.59,
         "argus.bmp_raw": 0.625,
         "argus.patell_raw": 0.58,
         "argus.patell_summed_adjusted": 0.555,
@@ -1514,19 +1514,19 @@
         "ballast.pooled_t": 0.25,
         "whale.fixed_null": 0.595
       },
-      "seconds": 48.7
+      "seconds": 28.8
     },
     {
       "shape": "clustered_9",
       "injected_abnormal_bps": 100.0,
       "raw_power": {
-        "argus.verdict": 0.805,
+        "argus.verdict": 0.475,
         "argus.bmp_adjusted": 0.975,
         "argus.patell_adjusted": 0.99,
-        "argus.corrado_rank_adjusted": 0.815,
+        "argus.corrado_rank_adjusted": 0.475,
         "argus.generalised_sign_adjusted": 1.0,
         "argus.any_adjusted": 1.0,
-        "argus.verdict_raw": 0.81,
+        "argus.verdict_raw": 0.475,
         "argus.bmp_raw": 0.995,
         "argus.patell_raw": 1.0,
         "argus.patell_summed_adjusted": 0.99,
@@ -1540,13 +1540,13 @@
         "whale.fixed_null": 0.97
       },
       "size_adjusted_power": {
-        "argus.verdict": 0.855,
+        "argus.verdict": 0.67,
         "argus.bmp_adjusted": 0.97,
         "argus.patell_adjusted": 0.975,
-        "argus.corrado_rank_adjusted": 0.2,
+        "argus.corrado_rank_adjusted": 0.525,
         "argus.generalised_sign_adjusted": 1.0,
-        "argus.any_adjusted": 0.955,
-        "argus.verdict_raw": 0.84,
+        "argus.any_adjusted": 1.0,
+        "argus.verdict_raw": 0.645,
         "argus.bmp_raw": 0.97,
         "argus.patell_raw": 0.98,
         "argus.patell_summed_adjusted": 0.975,
@@ -1559,7 +1559,7 @@
         "ballast.pooled_t": 0.6,
         "whale.fixed_null": 0.88
       },
-      "seconds": 41.8
+      "seconds": 29.4
     }
   ],
   "out_of_sample_halves": {
@@ -1600,14 +1600,14 @@
           "nominal_inside_ci95": true
         },
         "argus.corrado_rank_adjusted": {
-          "rejections": 100,
+          "rejections": 1,
           "draws": 100,
-          "rate": 1.0,
+          "rate": 0.01,
           "ci95": [
-            0.963,
-            1.0
+            0.0018,
+            0.0545
           ],
-          "nominal_inside_ci95": false
+          "nominal_inside_ci95": true
         },
         "argus.generalised_sign_adjusted": {
           "rejections": 2,
@@ -1620,14 +1620,14 @@
           "nominal_inside_ci95": true
         },
         "argus.any_adjusted": {
-          "rejections": 100,
+          "rejections": 8,
           "draws": 100,
-          "rate": 1.0,
+          "rate": 0.08,
           "ci95": [
-            0.963,
-            1.0
+            0.0411,
+            0.15
           ],
-          "nominal_inside_ci95": false
+          "nominal_inside_ci95": true
         },
         "argus.verdict_raw": {
           "rejections": 0,
@@ -1782,12 +1782,12 @@
           "nominal_inside_ci95": true
         },
         "argus.corrado_rank_adjusted": {
-          "rejections": 72,
+          "rejections": 0,
           "draws": 100,
-          "rate": 0.72,
+          "rate": 0.0,
           "ci95": [
-            0.6251,
-            0.7986
+            0.0,
+            0.037
           ],
           "nominal_inside_ci95": false
         },
@@ -1802,24 +1802,24 @@
           "nominal_inside_ci95": true
         },
         "argus.any_adjusted": {
-          "rejections": 76,
+          "rejections": 9,
           "draws": 100,
-          "rate": 0.76,
+          "rate": 0.09,
           "ci95": [
-            0.6677,
-            0.8331
-          ],
-          "nominal_inside_ci95": false
-        },
-        "argus.verdict_raw": {
-          "rejections": 1,
-          "draws": 100,
-          "rate": 0.01,
-          "ci95": [
-            0.0018,
-            0.0545
+            0.0481,
+            0.1623
           ],
           "nominal_inside_ci95": true
+        },
+        "argus.verdict_raw": {
+          "rejections": 0,
+          "draws": 100,
+          "rate": 0.0,
+          "ci95": [
+            0.0,
+            0.037
+          ],
+          "nominal_inside_ci95": false
         },
         "argus.bmp_raw": {
           "rejections": 7,
@@ -1964,12 +1964,12 @@
           "nominal_inside_ci95": true
         },
         "argus.corrado_rank_adjusted": {
-          "rejections": 31,
+          "rejections": 0,
           "draws": 100,
-          "rate": 0.31,
+          "rate": 0.0,
           "ci95": [
-            0.2278,
-            0.4063
+            0.0,
+            0.037
           ],
           "nominal_inside_ci95": false
         },
@@ -1984,14 +1984,14 @@
           "nominal_inside_ci95": true
         },
         "argus.any_adjusted": {
-          "rejections": 37,
+          "rejections": 7,
           "draws": 100,
-          "rate": 0.37,
+          "rate": 0.07,
           "ci95": [
-            0.2818,
-            0.4678
+            0.0343,
+            0.1375
           ],
-          "nominal_inside_ci95": false
+          "nominal_inside_ci95": true
         },
         "argus.verdict_raw": {
           "rejections": 0,
@@ -2670,11 +2670,11 @@
   },
   "costs": {
     "draws": 1400,
-    "argus_seconds_per_draw": 0.09355,
-    "vibe_seconds_per_draw": 0.09593,
-    "ballast_seconds_per_draw": 0.00067,
-    "whale_seconds_per_draw": 0.00685,
-    "argus_over_vibe": 0.98
+    "argus_seconds_per_draw": 0.06286,
+    "vibe_seconds_per_draw": 0.05499,
+    "ballast_seconds_per_draw": 0.00037,
+    "whale_seconds_per_draw": 0.00336,
+    "argus_over_vibe": 1.14
   },
   "protocol": {
     "draws_per_null_shape": 200,
@@ -2687,8 +2687,8 @@
   "reproducibility": {
     "draws": 12,
     "seed": 7,
-    "first_digest": "3e42bbea304a5ef5cbe370a8a3f1f4f8542ca601107852f99f13478413af2a6d",
-    "second_digest": "3e42bbea304a5ef5cbe370a8a3f1f4f8542ca601107852f99f13478413af2a6d",
+    "first_digest": "c0f814bc7a41ecba7343fbf7f12bcaa1fd3f023ea26d45c464c384bf5f188dcc",
+    "second_digest": "c0f814bc7a41ecba7343fbf7f12bcaa1fd3f023ea26d45c464c384bf5f188dcc",
     "identical": true,
     "snapshot_sha256": "8e54f35d4f09d7651de495b3f81914ce41e6177dc21463f638f48d852a669a93"
   }

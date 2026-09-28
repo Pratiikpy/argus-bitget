@@ -13,39 +13,39 @@
       "doc": "readme",
       "line": 55,
       "quoted": [
-        "9,963"
+        "9,974"
       ],
       "live": [
-        9963
+        9974
       ],
       "status": "OK",
-      "excerpt": "9,963 tests collected"
+      "excerpt": "9,974 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 176,
       "quoted": [
-        "9,963"
+        "9,974"
       ],
       "live": [
-        9963
+        9974
       ],
       "status": "OK",
-      "excerpt": "9,963 tests collected"
+      "excerpt": "9,974 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 199,
       "quoted": [
-        "9,963"
+        "9,974"
       ],
       "live": [
-        9963
+        9974
       ],
       "status": "OK",
-      "excerpt": "9,963 tests collected"
+      "excerpt": "9,974 tests collected"
     },
     {
       "claim": "tests_passing",
@@ -53,7 +53,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        9963
+        9974
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -63,39 +63,39 @@
       "doc": "explained",
       "line": 714,
       "quoted": [
-        "9,963"
+        "9,974"
       ],
       "live": [
-        9963
+        9974
       ],
       "status": "OK",
-      "excerpt": "9,963 tests"
+      "excerpt": "9,974 tests"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 1769,
       "quoted": [
-        "9,963"
+        "9,974"
       ],
       "live": [
-        9963
+        9974
       ],
       "status": "OK",
-      "excerpt": "9,963 tests collected"
+      "excerpt": "9,974 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 2418,
       "quoted": [
-        "9,963"
+        "9,974"
       ],
       "live": [
-        9963
+        9974
       ],
       "status": "OK",
-      "excerpt": "9,963 tests collected"
+      "excerpt": "9,974 tests collected"
     },
     {
       "claim": "source_files",
@@ -223,39 +223,39 @@
       "doc": "explained",
       "line": 1771,
       "quoted": [
-        "730"
+        "742"
       ],
       "live": [
-        730
+        742
       ],
       "status": "OK",
-      "excerpt": "730** files under `argus/data/`"
+      "excerpt": "742** files under `argus/data/`"
     },
     {
       "claim": "data_files",
       "doc": "explained",
       "line": 2420,
       "quoted": [
-        "730"
+        "742"
       ],
       "live": [
-        730
+        742
       ],
       "status": "OK",
-      "excerpt": "730 files under `argus/data/`"
+      "excerpt": "742 files under `argus/data/`"
     },
     {
       "claim": "data_files",
       "doc": "architecture",
       "line": 15,
       "quoted": [
-        "730"
+        "742"
       ],
       "live": [
-        730
+        742
       ],
       "status": "OK",
-      "excerpt": "730** files under `argus/data/`"
+      "excerpt": "742** files under `argus/data/`"
     },
     {
       "claim": "memory_effect",
@@ -646,26 +646,26 @@
       "doc": "readme",
       "line": 438,
       "quoted": [
-        "14"
+        "17"
       ],
       "live": [
-        14
+        17
       ],
       "status": "OK",
-      "excerpt": "14 are TIED"
+      "excerpt": "17 are TIED"
     },
     {
       "claim": "standing_tied",
       "doc": "public-readme",
       "line": 108,
       "quoted": [
-        "14"
+        "17"
       ],
       "live": [
-        14
+        17
       ],
       "status": "OK",
-      "excerpt": "14 are TIED"
+      "excerpt": "17 are TIED"
     },
     {
       "claim": "standing_tied",
@@ -673,7 +673,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        14
+        17
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -683,26 +683,26 @@
       "doc": "explained",
       "line": 2448,
       "quoted": [
-        "14"
+        "17"
       ],
       "live": [
-        14
+        17
       ],
       "status": "OK",
-      "excerpt": "14 are TIED"
+      "excerpt": "17 are TIED"
     },
     {
       "claim": "standing_tied",
       "doc": "explained",
       "line": 2706,
       "quoted": [
-        "14"
+        "17"
       ],
       "live": [
-        14
+        17
       ],
       "status": "OK",
-      "excerpt": "14 are TIED"
+      "excerpt": "17 are TIED"
     },
     {
       "claim": "standing_tied",
@@ -710,7 +710,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        14
+        17
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -720,26 +720,26 @@
       "doc": "readme",
       "line": 438,
       "quoted": [
-        "30"
+        "27"
       ],
       "live": [
-        30
+        27
       ],
       "status": "OK",
-      "excerpt": "30 are IMPLEMENTED"
+      "excerpt": "27 are IMPLEMENTED"
     },
     {
       "claim": "standing_implemented",
       "doc": "public-readme",
       "line": 108,
       "quoted": [
-        "30"
+        "27"
       ],
       "live": [
-        30
+        27
       ],
       "status": "OK",
-      "excerpt": "30 are IMPLEMENTED"
+      "excerpt": "27 are IMPLEMENTED"
     },
     {
       "claim": "standing_implemented",
@@ -747,7 +747,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        30
+        27
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -757,26 +757,26 @@
       "doc": "explained",
       "line": 2448,
       "quoted": [
-        "30"
+        "27"
       ],
       "live": [
-        30
+        27
       ],
       "status": "OK",
-      "excerpt": "30 are IMPLEMENTED"
+      "excerpt": "27 are IMPLEMENTED"
     },
     {
       "claim": "standing_implemented",
       "doc": "explained",
       "line": 2706,
       "quoted": [
-        "30"
+        "27"
       ],
       "live": [
-        30
+        27
       ],
       "status": "OK",
-      "excerpt": "30 are IMPLEMENTED"
+      "excerpt": "27 are IMPLEMENTED"
     },
     {
       "claim": "standing_implemented",
@@ -784,7 +784,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        30
+        27
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -870,8 +870,8 @@
       "quoted": [],
       "live": [
         2,
-        14,
-        30,
+        17,
+        27,
         1
       ],
       "status": "ABSENT",
@@ -883,8 +883,8 @@
       "line": null,
       "quoted": [],
       "live": [
-        14,
-        30,
+        17,
+        27,
         1
       ],
       "status": "ABSENT",
@@ -896,8 +896,8 @@
       "line": null,
       "quoted": [],
       "live": [
-        14,
-        30,
+        17,
+        27,
         1
       ],
       "status": "ABSENT",
@@ -909,8 +909,8 @@
       "line": null,
       "quoted": [],
       "live": [
-        14,
-        30,
+        17,
+        27,
         1
       ],
       "status": "ABSENT",
@@ -922,8 +922,8 @@
       "line": null,
       "quoted": [],
       "live": [
-        14,
-        30,
+        17,
+        27,
         1
       ],
       "status": "ABSENT",
@@ -934,17 +934,17 @@
       "doc": "architecture",
       "line": 433,
       "quoted": [
-        "14",
-        "30",
+        "17",
+        "27",
         "1"
       ],
       "live": [
-        14,
-        30,
+        17,
+        27,
         1
       ],
       "status": "OK",
-      "excerpt": "14 TIED, 30 IMPLEMENTED, 1 LOST"
+      "excerpt": "17 TIED, 27 IMPLEMENTED, 1 LOST"
     },
     {
       "claim": "standing_states_zh",
@@ -953,8 +953,8 @@
       "quoted": [],
       "live": [
         2,
-        14,
-        30,
+        17,
+        27,
         1
       ],
       "status": "ABSENT",
@@ -966,18 +966,18 @@
       "line": 238,
       "quoted": [
         "2",
-        "14",
-        "30",
+        "17",
+        "27",
         "1"
       ],
       "live": [
         2,
-        14,
-        30,
+        17,
+        27,
         1
       ],
       "status": "OK",
-      "excerpt": "2 \u9879\u9886\u5148\uff08OWNED\uff09\u300114 \u9879 \u6301\u5e73\u300130 \u9879\u5df2\u5b9e\u73b0\u30011 \u9879\u843d\u540e"
+      "excerpt": "2 \u9879\u9886\u5148\uff08OWNED\uff09\u300117 \u9879 \u6301\u5e73\u300127 \u9879\u5df2\u5b9e\u73b0\u30011 \u9879\u843d\u540e"
     },
     {
       "claim": "lui_router_fresh_accuracy",
@@ -1146,14 +1146,14 @@
       "line": 165,
       "quoted": [
         "76",
-        "92"
+        "100"
       ],
       "live": [
         76,
-        92
+        100
       ],
       "status": "OK",
-      "excerpt": "76 of the 92 proofs carry a Bitcoin"
+      "excerpt": "76 of the 100 proofs carry a Bitcoin"
     },
     {
       "claim": "anchors_confirmed",
@@ -1161,14 +1161,14 @@
       "line": 3018,
       "quoted": [
         "76",
-        "92"
+        "100"
       ],
       "live": [
         76,
-        92
+        100
       ],
       "status": "OK",
-      "excerpt": "76 of the 92 carry a Bitcoin"
+      "excerpt": "76 of the 100 carry a Bitcoin"
     },
     {
       "claim": "ledger_decisions",

@@ -444,3 +444,13 @@ class TestTheReport:
 
     def test_the_average_correlation_of_a_single_window_is_zero(self) -> None:
         assert average_cross_correlation(_windows(1, seed=2700)) == 0.0
+
+
+def test_tied_returns_share_their_average_rank() -> None:
+    """Flat off-hours bars tie; a tie broken by position ranked every tied event bar above every
+    tied estimation bar and the test rejected 63.5% of placebo draws (tracker 242)."""
+    from argus.research.eventstudy import _midranks
+
+    assert _midranks([0.0, 0.0, 0.0, 1.0]) == [2.0, 2.0, 2.0, 4.0]
+    assert _midranks([3.0, 1.0, 2.0]) == [3.0, 1.0, 2.0]
+    assert _midranks([5.0, 5.0]) == [1.5, 1.5]

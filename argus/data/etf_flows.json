@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-28T09:09:20.254700+00:00",
+  "generated_at": "2026-09-28T12:14:13.838782+00:00",
   "source": "SoSoValue /etfs/summary-history and /btc-treasuries (US spot ETFs; creations less redemptions)",
   "funds": {
     "BTC": {
@@ -28,8 +28,13 @@
   "errors": [],
   "treasury": {
     "ticker": "MSTR",
-    "holding_btc": 846000.0,
+    "holding_btc": 847666.0,
     "recent": [
+      {
+        "date": "2026-09-28",
+        "btc": 1665.0,
+        "usd": 143000000.0
+      },
       {
         "date": "2026-09-21",
         "btc": 950.0,
@@ -49,11 +54,6 @@
         "date": "2026-08-03",
         "btc": -1638.0,
         "usd": -104730000.0
-      },
-      {
-        "date": "2026-07-05",
-        "btc": -2225.0,
-        "usd": -135200000.0
       }
     ]
   }

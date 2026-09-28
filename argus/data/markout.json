@@ -1,41 +1,41 @@
 {
   "symbol": "MSTRUSDT",
-  "phase": "weekend",
-  "started_at": "2026-09-27T19:30:09.090466+00:00",
+  "phase": "rth",
+  "started_at": "2026-09-28T13:30:04.472125+00:00",
   "window_seconds": 90,
   "samples": 69,
-  "prints_seen": 24,
-  "rpi_share": 0.0833,
+  "prints_seen": 22,
+  "rpi_share": 0.0,
   "maker_bps": 2.0,
   "markouts": [
     {
       "horizon_seconds": 5,
-      "prints": 22,
-      "median_bps": 0.3084,
-      "mean_bps": 0.2243,
-      "worst_bps": -0.9253
+      "prints": 0,
+      "median_bps": 0.0,
+      "mean_bps": 0.0,
+      "worst_bps": 0.0
     },
     {
       "horizon_seconds": 15,
-      "prints": 22,
-      "median_bps": 0.6168,
-      "mean_bps": 0.4065,
-      "worst_bps": -0.6169
+      "prints": 0,
+      "median_bps": 0.0,
+      "mean_bps": 0.0,
+      "worst_bps": 0.0
     },
     {
       "horizon_seconds": 30,
-      "prints": 21,
-      "median_bps": 1.2337,
-      "mean_bps": 0.984,
-      "worst_bps": -2.467
+      "prints": 0,
+      "median_bps": 0.0,
+      "mean_bps": 0.0,
+      "worst_bps": 0.0
     },
     {
       "horizon_seconds": 60,
-      "prints": 4,
-      "median_bps": 1.5419,
-      "mean_bps": 0.6168,
-      "worst_bps": -2.1586
+      "prints": 0,
+      "median_bps": 0.0,
+      "mean_bps": 0.0,
+      "worst_bps": 0.0
     }
   ],
-  "verdict": "Over 30s the passive side of 21 print(s) gained a median +1.23bps on MSTRUSDT (weekend). No measurable adverse selection in this window \u2014 which is a statement about 90 seconds, not about the instrument"
+  "verdict": "0 joined print(s) at the 5s horizon over 90s of MSTRUSDT (rth) \u2014 below the 20 this module will draw a conclusion from. The sample says the book was quiet, not that resting here is safe"
 }

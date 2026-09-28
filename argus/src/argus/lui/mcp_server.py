@@ -75,6 +75,9 @@ PROTOCOL_VERSIONS = ("2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05")
 these gets it back; anything else gets the newest, as the spec's version negotiation says."""
 SERVER_INFO = {"name": "argus-research-desk", "version": "1.0.0"}
 
+MAX_QUESTION = 500
+"""The longest question ``argus_ask`` reads; a longer one is cut and the answer says so."""
+
 TOOLS: tuple[dict[str, Any], ...] = (
     {
         "name": "argus_ask",
@@ -354,10 +357,15 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
         question = str(args.get("question") or "").strip()
         if not question:
             raise ToolError("question is required")
-        payload = server.handle_ask(question[:500], [], visitor="mcp",
+        payload = server.handle_ask(question[:MAX_QUESTION], [], visitor="mcp",
                                     book=str(args.get("book") or "")[:300],
                                     memory=str(args.get("memory") or "")[:12000])
         text = _answer_text(payload)
+        if len(question) > MAX_QUESTION:
+            # Cut without a word used to be silent (QA surfaces pass, 2026-09-28): an agent that
+            # sent a long question could not tell which half was answered.
+            text = (f"Note: only the first {MAX_QUESTION} of the question's {len(question)} "
+                    f"characters were read.\n\n{text}")
         if payload.get("memory") and payload.get("memory") != "[]":
             text += f"\n\nMemory (pass back as `memory` next time): {payload['memory']}"
         return text, bool(payload.get("refused"))
@@ -447,8 +455,10 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
             raise ToolError("fills is required")
         reviewed = review_trades(fills[:20000], explicit=True)
         if reviewed is None:
-            raise ToolError("no trades could be read from fills; paste a table with date, "
-                            "symbol, side, quantity and price, or write them out")
+            raise ToolError("no trades could be read from fills. A pasted table needs a header "
+                            "row naming its columns (at least side and price, e.g. "
+                            "'time,symbol,side,price,qty'); or write the trades out, e.g. "
+                            "'bought 10 NVDA at 180 on 2 Sep, sold at 172 on 9 Sep'")
         lines, sources, _ = reviewed
         return _engine_text(lines, sources), False
     raise ToolError(f"unknown tool {name!r}")

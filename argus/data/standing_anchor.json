@@ -55,5 +55,43 @@
       "owned": 2
     },
     "verify": "drop transitions_this_write and transition_log from data/standing.json, hash the rest as canonical JSON (sorted keys, no whitespace) with SHA-256, and check the .ots proofs in data/anchors/ with the OpenTimestamps client"
+  },
+  {
+    "digest": "b4302a28704e75751fb14fd6721c16448a18f524b5f88214d59c7fe11dc55996",
+    "at": "2026-09-28T13:41:16+00:00",
+    "anchored": true,
+    "calendars": [
+      "https://a.pool.opentimestamps.org",
+      "https://b.pool.opentimestamps.org",
+      "https://alice.btc.calendar.opentimestamps.org",
+      "https://finney.calendar.eternitywall.com"
+    ],
+    "failures": [],
+    "by_state": {
+      "lost": 1,
+      "tied": 17,
+      "implemented": 27,
+      "owned": 2
+    },
+    "verify": "drop transitions_this_write and transition_log from data/standing.json, hash the rest as canonical JSON (sorted keys, no whitespace) with SHA-256, and check the .ots proofs in data/anchors/ with the OpenTimestamps client"
+  },
+  {
+    "digest": "6cb9efe56250ababca9c75d3ecdea996b024dfef54cadbb878289b61bf2098f5",
+    "at": "2026-09-28T13:42:36+00:00",
+    "anchored": true,
+    "calendars": [
+      "https://a.pool.opentimestamps.org",
+      "https://b.pool.opentimestamps.org",
+      "https://alice.btc.calendar.opentimestamps.org",
+      "https://finney.calendar.eternitywall.com"
+    ],
+    "failures": [],
+    "by_state": {
+      "lost": 1,
+      "tied": 17,
+      "implemented": 27,
+      "owned": 2
+    },
+    "verify": "drop transitions_this_write and transition_log from data/standing.json, hash the rest as canonical JSON (sorted keys, no whitespace) with SHA-256, and check the .ots proofs in data/anchors/ with the OpenTimestamps client"
   }
 ]

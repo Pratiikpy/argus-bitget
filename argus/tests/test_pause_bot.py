@@ -286,3 +286,12 @@ class TestFloodControl:
         with pytest.raises(OSError):
             telegram_bot._call("t", "sendMessage", {})
         assert len(calls) == 1
+
+
+def test_half_size_is_written_as_a_person_writes_it() -> None:
+    """300, not 3E+2, on the reviewer's button (QA surfaces pass, 2026-09-28)."""
+    from decimal import Decimal
+    from types import SimpleNamespace
+
+    for held, half in (("600", "300"), ("5", "2.5"), ("0.30", "0.15"), ("1000000", "500000")):
+        assert str(pause_bot.half_of(SimpleNamespace(max_quantity=Decimal(held)))) == half

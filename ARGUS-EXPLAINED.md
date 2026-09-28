@@ -711,7 +711,7 @@ python -m argus.market.skills --symbol NVDAUSDT
 And to check the whole thing is what this document says it is:
 
 ```bash
-pytest                    # 9,963 tests
+pytest                    # 9,974 tests
 python -m argus.status    # 152/152 modules importable, 18/18 sub-themes, artefacts on disk
 ```
 
@@ -1766,9 +1766,9 @@ takes, and every artefact the system writes.
 |---|---|
 | Source modules | **546** files across **20 packages** (2026-09-27) |
 | Registered and importable | **152/152** (`python -m argus.status` checks this at runtime) |
-| Test files / tests | **353 files**, **9,963 tests collected** |
+| Test files / tests | **353 files**, **9,974 tests collected** |
 | Type and lint | `ruff` clean, `mypy --strict` clean on **543 source files** |
-| Artefacts written | **730** files under `argus/data/` |
+| Artefacts written | **742** files under `argus/data/` |
 | Code-level teardowns of other people's systems | **56** under `research/architecture/` |
 | Runtime dependencies | **two**: `pydantic`, `python-dateutil`. No numpy, no pandas, no scipy |
 
@@ -2415,9 +2415,9 @@ source is a build failure, not a typo.
 | Source modules | 546 files, 20 packages; `mypy --strict` clean on 543 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 152/152 modules importable |
-| Tests | 9,963 tests collected, `ruff` clean |
+| Tests | 9,974 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
-| Artefacts on disk | 730 files under `argus/data/`, every one produced by running something |
+| Artefacts on disk | 742 files under `argus/data/`, every one produced by running something |
 | Code-level teardowns of other systems | 62, each citing file and line |
 | Competitor entries read at source | 5, each cloned and verified or refuted |
 | Live data sources reaching a decision | 15 |
@@ -2445,7 +2445,7 @@ That last row is the one to read twice. An *owned* capability needs a reproduced
 same-input comparison, an out-of-sample test, an ablation and an adversarial test — thirteen
 conditions in all, enforced in code by `argus/eval/standing.py`, which raises at import if anything
 claims OWNED without them. It read zero when this table was first written; today 2 of 47
-capabilities are OWNED, 14 are TIED, 30 are IMPLEMENTED and 1 is LOST. It read 20 until the
+capabilities are OWNED, 17 are TIED, 27 are IMPLEMENTED and 1 is LOST. It read 20 until the
 per-group check of 2026-09-25 withdrew twelve, 8 until a general-purpose validator tied
 breadth rotation on 2026-09-26, and 7 until rToken factor divergence was re-graded IMPLEMENTED
 the same day. Five ties were losses first:
@@ -2703,7 +2703,7 @@ could attack today.
     graded on, so its measured accuracy cannot yet be compared against the 55% bar.
 37. **Two settled outcomes.** Calibration on the desk's own judgement cannot be computed yet; the
     49,140 figure is the policy layer, labelled as such, and the two must never be added together.
-38. **45 of 47 capabilities are not OWNED.** 1 is LOST, 14 are TIED against the named rival and 30 are
+38. **45 of 47 capabilities are not OWNED.** 1 is LOST, 17 are TIED against the named rival and 27 are
     IMPLEMENTED; each says what it is missing.
 39. **Four of five official Bitget Skills carry no data.** Measured to be their backend rather than
     our integration — but a judge sees a thin panel either way.
@@ -3015,7 +3015,7 @@ and anchored. That opening head is `bc36478291a06bc3`, submitted to four indepen
 calendars: `a.pool.opentimestamps.org`, `b.pool.opentimestamps.org`,
 `alice.btc.calendar.opentimestamps.org` and `finney.calendar.eternitywall.com`. The `.ots` proofs
 are in `argus/data/anchors/`, and anyone can verify them with the reference OpenTimestamps client
-without our cooperation. **76 of the 92 carry a Bitcoin block-header attestation** (blocks
+without our cooperation. **76 of the 100 carry a Bitcoin block-header attestation** (blocks
 966,822–967,736); the other 18 are still calendar-pending, which is what a proof honestly
 says until Bitcoin has confirmed it. `python -m argus.register.anchorcheck` re-counts both.
 

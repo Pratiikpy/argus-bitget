@@ -23,7 +23,32 @@ available; this module uses it.
    10-Q/10-K/8-K accessions were accepted after 17:30 ET and still carry that day's filing date
    (MSFT's FY2020 10-K: accepted 20:44:46 ET, filed 2020-07-30). A 17:30 bound would have leaked
    those; 22:00 ET is the end of EDGAR's accepting day, the latest any same-day acceptance was
-   observed to reach (NOT re-verified against the EDGAR Filer Manual text in this session).
+   observed to reach.
+
+   **Re-verified 2026-09-28 against SEC.gov itself** (sec.gov/submit-filings/filer-support-
+   resources/how-do-i-guides/determine-status-my-filing): "EDGAR's hours of operation are 6:00
+   a.m. to 10:00 p.m. ET, Monday through Friday" — a fixed, universal daily window, true for every
+   filer and every form, not a value fit to any specific ticker's observed behaviour. (The same page
+   also gives the *nominal* same-day-filing-date cutoff as 5:30 p.m. ET for most forms, with the
+   10:00 p.m. same-day exception documented only for Forms 3/3A/4/4A/144/144A and a few others —
+   10-Q/10-K are not on that list. MSFT's 20:44 ET same-day 10-K, above, shows EDGAR's real
+   behaviour for these forms does not strictly hold to that nominal 5:30 p.m. rule either, which is
+   exactly why the conservative 22:00 ET operating-window bound is used here instead of the nominal
+   one: it is right regardless of which of the two the filer manual meant to bind.)
+
+   This closes a fairness question `eval/pit_rivals.py`'s 619-question run raised about the nine
+   held-out tickers (`Activity/27_CAPABILITY_CLOSE_PLAN.md` §4): the docstring's own MSFT example is
+   a held-out ticker, so the bound is not provably free of having been informed by held-out data if
+   read as an empirical fit. It is not an empirical fit — 22:00 ET is EDGAR's documented operating
+   close, true independent of which tickers this benchmark happens to cover, and MSFT/NVDA above are
+   illustrations, not the derivation. Separately, and regardless of the above: in the 10-ticker,
+   2,647-fact revenue-concept snapshot this module's benchmark uses, **zero** facts ever resolve
+   through this fallback (every accession's exact ``acceptanceDateTime`` is present in the filer's
+   submissions index) — confirmed by checking ``basis`` on every fact — so this bound's value has no
+   effect on that benchmark's score either way; re-deriving it from NVDA alone (whose own latest
+   same-day acceptance, 17:30 ET, is the weakest data point of the ten and would narrow the bound
+   below MSFT's and AMD's real observed same-day-late filings) was tried and rejected: it would
+   introduce genuine leak risk for real late filers without changing anything this benchmark scores.
 3. ``observed`` — a row present in a response fetched at ``t`` was public by ``t``. The bound in (2)
    is capped at the fetch instant, so a live caller asking "as of now" is never denied a filing it
    is looking at merely because the accession index was cached before the filing landed.

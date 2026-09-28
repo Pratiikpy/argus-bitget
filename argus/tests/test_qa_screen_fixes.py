@@ -42,3 +42,28 @@ def test_materials_counts_engines_and_tools_from_the_code() -> None:
         "Research task"]
     assert "two tools, from argus_ask to argus_quote." in items["MCP server"]
     assert "one tool" not in " ".join(items.values())
+
+
+def test_a_long_mcp_question_says_it_was_cut(monkeypatch: pytest.MonkeyPatch) -> None:
+    from argus.lui import mcp_server, server
+
+    seen: list[str] = []
+
+    def handle_ask(text: str, prior: list[str], **_: object) -> dict[str, object]:
+        seen.append(text)
+        return {"lines": ["an answer"], "sources": [], "refused": False}
+
+    monkeypatch.setattr(server, "handle_ask", handle_ask)
+    text, _ = mcp_server.call_tool("argus_ask", {"question": "why?" * 200})
+    assert len(seen[0]) == mcp_server.MAX_QUESTION
+    assert text.startswith(f"Note: only the first {mcp_server.MAX_QUESTION} of the question's "
+                           f"800 characters were read.")
+    short, _ = mcp_server.call_tool("argus_ask", {"question": "why"})
+    assert not short.startswith("Note:")
+
+
+def test_an_unreadable_fill_table_says_it_needs_a_header() -> None:
+    from argus.lui import mcp_server
+
+    with pytest.raises(mcp_server.ToolError, match="needs a header row"):
+        mcp_server.call_tool("argus_review_trades", {"fills": "1,2,3\n4,5,6"})

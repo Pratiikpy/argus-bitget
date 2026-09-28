@@ -1009,7 +1009,12 @@ def may_name_a_contract(text: str) -> bool:
 
     if research_symbols(text)[0]:
         return True
-    listed = universe.contracts()
+    # The list this process already holds, else the shipped snapshot — never a live fetch. This is
+    # a gate for consulting the model, not an answer: on a cold start it made a fast question such
+    # as "how many decisions are on record" wait ~400 ms for Bitget's contract list, over the
+    # 500 ms budget (2026-09-28). A contract listed since the snapshot misses only this gate, and
+    # only until the process has read the live list once.
+    listed = universe.cached_contracts() or universe.contracts_from_snapshot()[0]
     for match in re.finditer(r"[A-Za-z][A-Za-z0-9]{1,15}", text):
         word = match.group(0).upper()
         if word in _NOT_A_NAME or len(word) < 2:

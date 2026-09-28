@@ -11,7 +11,7 @@ import urllib.error
 from datetime import UTC, date, datetime, timedelta
 from email.message import Message
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 from argus.eval import pit_rivals
 from argus.market.fundamentals import FundamentalsSource
@@ -180,6 +180,57 @@ class TestTheRivalScoring:
         assert (out["right"], out["leak"]) == (1, 0)
 
 
+class TestTheNativeAsOfRivals:
+    """Qlib PIT and edgartools call their own real as-of mechanism once per probe (the runners
+    do that, not this module); ``native_outcomes`` only classifies the answer they recorded."""
+
+    probes: ClassVar[list[pit_rivals.Probe]] = [
+        pit_rivals.Probe("T", "a-q2", ACCEPTED, "before"),
+        pit_rivals.Probe("T", "a-q2", ACCEPTED, "after"),
+    ]
+
+    def test_a_day_granular_answer_leaks_the_morning_of_a_filing(self) -> None:
+        # Qlib/edgartools carry no time of day: asked "before" on the filed day, they already
+        # show the quarter that in fact becomes public later that same day.
+        outputs: dict[str, Any] = {"qlib": {"tickers": {"T": {"probes": [
+            {"accn": "a-q2", "side": "before", "end": "2026-07-26", "value": 96.2},
+            {"accn": "a-q2", "side": "after", "end": "2026-07-26", "value": 96.2},
+        ]}}}}
+        out = pit_rivals.score_native("qlib_pit", "T", [Q1, Q2], self.probes, outputs)
+        assert (out["leak"], out["right"]) == (1, 1)
+
+    def test_no_answer_for_a_probe_is_skipped_not_scored_wrong(self) -> None:
+        outputs: dict[str, Any] = {"edgartools": {"tickers": {"T": {"probes": [
+            {"accn": "a-q2", "side": "before", "end": None, "value": None},
+            {"accn": "a-q2", "side": "after", "end": "2026-07-26", "value": 96.2},
+        ]}}}}
+        out = pit_rivals.score_native("edgartools_asof", "T", [Q1, Q2], self.probes, outputs)
+        assert out["questions"] == 1
+        assert (out["right"], out["leak"]) == (1, 0)
+
+    def test_right_period_wrong_value_is_stale_not_right(self) -> None:
+        # The case a float32-downcasting store produces (found running the real Qlib pipeline):
+        # correct period, a value off by storage rounding rather than a data or period error.
+        outputs: dict[str, Any] = {"qlib": {"tickers": {"T": {"probes": [
+            {"accn": "a-q2", "side": "before", "end": None, "value": None},
+            {"accn": "a-q2", "side": "after", "end": "2026-07-26", "value": 96.199997},
+        ]}}}}
+        out = pit_rivals.score_native("qlib_pit", "T", [Q1, Q2], self.probes, outputs)
+        assert (out["stale_after_restatement"], out["right"]) == (1, 0)
+
+    def test_by_side_splits_before_and_after_and_pools_neither(self) -> None:
+        rows = [
+            {"ticker": "T", "accn": "a", "side": "before", "as_of": "x", "outcome": "leak"},
+            {"ticker": "T", "accn": "b", "side": "before", "as_of": "x", "outcome": "right"},
+            {"ticker": "T", "accn": "c", "side": "after", "as_of": "x", "outcome": "right"},
+        ]
+        split = pit_rivals.by_side(rows)
+        assert split["before"] == {"questions": 2, "right": 1, "leak": 1, "late": 0,
+                                   "stale_after_restatement": 0, "right_rate": 0.5}
+        assert split["after"]["questions"] == 1
+        assert split["after"]["right_rate"] == 1.0
+
+
 class TestTheCommittedRun:
     run = json.loads((Path(__file__).resolve().parents[1] / "data" / "pit_rivals.json")
                      .read_text(encoding="utf-8"))
@@ -206,6 +257,23 @@ class TestTheCommittedRun:
         assert held["design_ticker"] not in held["held_out_tickers"]
         assert held["argus"]["right"] == held["argus"]["n"] > 0
         assert held["argus"]["leak"] == 0
+
+    def test_qlib_and_edgartools_are_scored_from_their_own_real_as_of_call(self) -> None:
+        rivals = self.run["rivals_from_their_own_outputs"]["latest_quarter"]
+        for rival in ("qlib_pit", "edgartools_asof"):
+            assert rivals[rival]["questions"] == 619
+            assert rivals[rival]["leak"] > 0, rival  # the day-granular gate leaks same-day
+        assert self.run["significance"]["paired"]["qlib_pit"]["argus_only_right"] > 0
+        assert self.run["significance"]["paired"]["edgartools_asof"]["argus_only_right"] > 0
+
+    def test_day_granular_fairness_reports_before_and_after_separately(self) -> None:
+        fairness = self.run["day_granular_fairness"]
+        for rival in ("qlib_pit", "edgartools_asof"):
+            before, after = fairness[rival]["before"], fairness[rival]["after"]
+            assert before["questions"] + after["questions"] == 619
+            # the fairness caveat this module's docstring names: a day-granular gate leaks on
+            # the "before" side of a same-day acceptance far more than on the "after" side
+            assert before["leak"] >= after["leak"]
 
 
 class TestTheStatistics:

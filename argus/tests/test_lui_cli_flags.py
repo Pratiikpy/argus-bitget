@@ -35,16 +35,15 @@ class _Answer:
 
 @pytest.fixture
 def console(monkeypatch: pytest.MonkeyPatch) -> list[str]:
-    """`main` with the ledger, router and answerer replaced; records every question asked."""
+    """`main` with the ledger and the console replaced; records every question asked."""
     asked: list[str] = []
 
-    def fake_ask(ledger: Any, text: str, **_: Any) -> tuple[Any, float]:
+    def fake_ask(text: str, session: Any, **_: Any) -> tuple[Any, float]:
         asked.append(text)
         return _Answer(refused=text.startswith("refuse")), 12.0
 
-    monkeypatch.setattr(cli, "ask", fake_ask)
+    monkeypatch.setattr(cli, "ask_console", fake_ask)
     monkeypatch.setattr(cli, "PaperLedger", lambda **_: object())
-    monkeypatch.setattr(cli, "build_router", lambda: None)
     return asked
 
 
@@ -86,3 +85,27 @@ def test_piped_questions_answer_one_json_line_each(
     assert cli.main(["--json"]) == 0
     rows = [json.loads(line) for line in capsys.readouterr().out.splitlines()]
     assert len(rows) == 2 and console == ["first question", "second question"]
+
+
+def test_the_terminal_answers_through_the_console_every_other_door_uses(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    """Until 2026-09-28 the terminal answered from the decision record alone; the web console,
+    MCP and Telegram all ask `server.handle_ask`, and now so does this."""
+    from argus.lui import server
+
+    calls: list[tuple[str, list[str], str]] = []
+
+    def handle_ask(text: str, prior: list[str], **kw: Any) -> dict[str, Any]:
+        calls.append((text, list(prior), kw.get("visitor", "")))
+        return {"intent": "research", "speed": "slow", "refused": False, "reason": "",
+                "lines": [f"answer to {text}"], "turns": [*prior, text], "memory": "[1]",
+                "sources": [{"kind": "venue", "ref": "bitget ticker", "detail": "last"}]}
+
+    monkeypatch.setattr(server, "handle_ask", handle_ask)
+    session = cli.Session()
+    first, _ = cli.ask_console("where is NVDA trading", session)
+    cli.ask_console("and TSLA?", session)
+    assert calls == [("where is NVDA trading", [], "cli"),
+                     ("and TSLA?", ["where is NVDA trading"], "cli")]
+    assert session.memory == "[1]" and first.question.intent == "research"
+    assert first.sources == ["venue · bitget ticker · last"] and not first.refused

@@ -1194,6 +1194,26 @@ def _pit_rivals(path: str) -> Entry:
 # Artefacts with no population to break down, with the reason read from each
 
 
+def _stress_search(path: str) -> Entry:
+    """desk/stress_search.py's out-of-sample calibration: one row per name and loss tolerance, the
+    searched probability of breaching it against a normal model, each scored on held-out windows
+    (eval/stress_search_comparison.py)."""
+    blob = _load(path)["calibration"]
+    rows = blob["rows"]
+    items = [Item(value=_f(r["normal_error"]) - _f(r["argus_error"]),
+                  groups={"symbol": str(r["symbol"]), "tolerance": f"{_f(r['tolerance_pct']):g}%"})
+             for r in rows]
+    _parity("stress search: ARGUS mean absolute error",
+            sum(_f(r["argus_error"]) for r in rows) / len(rows), _f(blob["argus_mae"]))
+    return Entry(path, CHECKED, "one row per name and loss tolerance", (
+        _headline("breach probability out of sample: ARGUS vs a normal model", items,
+                  ("symbol", "tolerance"),
+                  headline="mean absolute error of the predicted breach probability",
+                  orientation="normal-model error - ARGUS error per row: positive = ARGUS closer",
+                  role=VS_RIVAL, role_reason="the comparison's primary", source="calibration.rows",
+                  notes=("fit and test windows are chronological per name; no second split",)),))
+
+
 def _not_checkable(status: str, reason: str) -> Callable[[str], Entry]:
     def build(path: str) -> Entry:
         return Entry(path, status, reason)
@@ -1254,6 +1274,14 @@ ADAPTERS: dict[str, Callable[[str], Entry]] = {
         WITHOUT_ROWS, "hourly net asset values reduced to per-period scores per arm; "
         "eval/xa_arena.py would need to record each arm's hourly return path"),
     "data/lui_rematch.json": _lui_rematch,
+    "data/stress_search_comparison.json": _stress_search,
+    "data/constrained_comparison.json": _not_checkable(
+        DESIGNED, "six designed limit scenarios and one misspelt group, each solved by ARGUS and "
+        "skfolio: properties of two solvers on chosen inputs, not a sample of books"),
+    "data/garak_quarantine.json": _not_checkable(
+        DESIGNED, "garak's templated injection corpora (3,652 development and 2,100 held-out "
+        "attacks built from its probe classes) and three real clean-text corpora: generated "
+        "cases, not a sampled population"),
     "data/general_grammar_comparison.json": _not_checkable(
         DESIGNED, "15 designed ill-typed expressions, 39 operator checks on one symbol's series "
         "and eight designed factors: properties of the grammar on chosen inputs"),

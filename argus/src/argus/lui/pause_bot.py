@@ -122,7 +122,11 @@ class Approvals:
 
 
 def half_of(request: PauseRequest) -> Decimal:
-    return (request.max_quantity * HALF).normalize()
+    """Half the held quantity, written as a person writes it. ``normalize()`` alone turned 300
+    into ``3E+2`` on the reviewer's button and confirmation (QA surfaces pass, 2026-09-28): a whole
+    number keeps its digits, a fraction loses only its trailing zeros."""
+    half = request.max_quantity * HALF
+    return half.quantize(Decimal(1)) if half == half.to_integral_value() else half.normalize()
 
 
 def _quantity(code: str, request: PauseRequest) -> Decimal | None:

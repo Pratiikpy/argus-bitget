@@ -1,0 +1,129 @@
+﻿=== ARGUS paper cycle 2026-09-28_1900 ===
+disk_free_gb=16.6
+sampling MSTRUSDT for 90s (rth)...
+
+MARKOUT ΓÇö MSTRUSDT, 90s of rth, 69 book sample(s), 22 print(s), 0% flagged RPI
+
+   horizon  prints    median      mean     worst
+        5s       0    +0.000    +0.000    +0.000
+       15s       0    +0.000    +0.000    +0.000
+       30s       0    +0.000    +0.000    +0.000
+       60s       0    +0.000    +0.000    +0.000
+
+  0 joined print(s) at the 5s horizon over 90s of MSTRUSDT (rth) ΓÇö below the 20 this module will draw a conclusion from. The sample says the book was quiet, not that resting here is safe
+
+written to argus\data\markout.json
+markout_exit=0
+EXECUTABLE COST ΓÇö bps. 'quoted' is the full bid-ask spread; the size columns are
+slippage against mid, taking the ask (a size inside the touch reads half 'quoted').
+
+symbol         quoted      $1000      $5000     $25000    $100000
+-----------------------------------------------------------------
+NVDAUSDT         0.43       0.22       0.38       4.04      13.50
+TSLAUSDT         2.45       2.53       2.89       4.55      11.81
+AAPLUSDT         1.17       2.25       4.67      12.66      23.08
+MSFTUSDT         2.77       3.64       5.64      16.99      27.49
+METAUSDT         6.37       3.62       6.68      21.07          ΓÇö
+GOOGLUSDT        2.34       1.60       8.47      17.47      23.00
+AMZNUSDT         2.04       2.15       3.82       7.02      19.75
+COINUSDT        13.15       6.85       7.04      22.71      58.54
+MSTRUSDT         2.52       1.26       2.32       6.57          ΓÇö
+QQQUSDT          0.14       0.07       0.58       2.66       6.89
+TQQQUSDT         1.28       1.89       3.67      13.84      24.27
+SQQQUSDT         2.91       4.11       5.12      15.12      33.14
+
+12 book(s) written to argus\data\depth.json
+depth_exit=0
+recorded 12 snapshot(s) to argus\data\book_tape.jsonl
+
+  780 snapshots over 338.614h: a near-touch level holds a median 2.97 contracts. **Change is reported per horizon, not pooled** ΓÇö a level moves a very different share of itself over 30 seconds than over an hour, and one median over both is a number about the sampling schedule rather than about the book. The shortest horizon with at least 100 observations is `under_30s`, where a level moves a median 24.0% of itself ΓÇö that is the figure the simulator should take, being nearest the per-event timescale it models. The attribution rule ΓÇö which side of a resting order a decrease came from ΓÇö is not in this data and cannot be, so it stays a swept assumption rather than a measurement.
+
+written to argus\data\book_calibration.json
+bookcalib_exit=0
+  NVDAUSDT: extended=13.9 holiday=10.9 overnight=11.4 rth=31.5 weekend=4.5 | reopen=51.5 (1.6x rth, n=61)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 21.8bps per bar against a 31.5bps regular-hours bar; no reduction, and this layer may not size up
+  TSLAUSDT: extended=14.5 holiday=8.1 overnight=11.6 rth=36.5 weekend=5.8 | reopen=76.1 (2.1x rth, n=61)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 26.4bps per bar against a 36.5bps regular-hours bar; no reduction, and this layer may not size up
+  AAPLUSDT: extended=9.4 holiday=11.0 overnight=7.1 rth=23.0 weekend=5.0 | reopen=43.5 (1.9x rth, n=61)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 16.1bps per bar against a 23.0bps regular-hours bar; no reduction, and this layer may not size up
+  MSFTUSDT: extended=12.7 holiday=10.7 overnight=8.5 rth=25.6 weekend=5.0 | reopen=40.4 (1.6x rth, n=61)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 17.8bps per bar against a 25.6bps regular-hours bar; no reduction, and this layer may not size up
+  METAUSDT: extended=16.4 holiday=7.1 overnight=9.7 rth=36.8 weekend=6.3 | reopen=68.4 (1.9x rth, n=61)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 25.8bps per bar against a 36.8bps regular-hours bar; no reduction, and this layer may not size up
+  GOOGLUSDT: extended=13.6 holiday=7.1 overnight=8.5 rth=23.9 weekend=5.6 | reopen=45.0 (1.9x rth, n=61)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 17.9bps per bar against a 23.9bps regular-hours bar; no reduction, and this layer may not size up
+  AMZNUSDT: extended=12.6 holiday=6.6 overnight=7.1 rth=23.6 weekend=4.8 | reopen=40.1 (1.7x rth, n=61)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 16.8bps per bar against a 23.6bps regular-hours bar; no reduction, and this layer may not size up
+  COINUSDT: extended=28.0 holiday=22.5 overnight=19.4 rth=61.8 weekend=13.4 | reopen=95.1 (1.5x rth, n=61)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 41.8bps per bar against a 61.8bps regular-hours bar; no reduction, and this layer may not size up
+  MSTRUSDT: extended=36.6 holiday=42.1 overnight=29.7 rth=61.8 weekend=17.7 | reopen=102.9 (1.7x rth, n=61)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 46.8bps per bar against a 61.8bps regular-hours bar; no reduction, and this layer may not size up
+  QQQUSDT: extended=8.8 holiday=6.1 overnight=9.1 rth=14.4 weekend=3.5 | reopen=27.3 (1.9x rth, n=61)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 11.8bps per bar against a 14.4bps regular-hours bar; no reduction, and this layer may not size up
+  TQQQUSDT: extended=25.5 holiday=13.8 overnight=27.6 rth=43.7 weekend=9.0 | reopen=83.9 (1.9x rth, n=61)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 35.6bps per bar against a 43.7bps regular-hours bar; no reduction, and this layer may not size up
+  SQQQUSDT: extended=25.7 holiday=19.6 overnight=29.2 rth=43.9 weekend=8.1 | reopen=84.0 (1.9x rth, n=61)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 36.1bps per bar against a 43.9bps regular-hours bar; no reduction, and this layer may not size up
+
+12 profile(s) written to argus\data\session_risk.json
+session_risk_exit=0
+symbol        RTH bps/h  wknd bps/h  attenuation  anchor
+NVDAUSDT          32.27        4.32         7.47  OK
+TSLAUSDT          35.47        5.67         6.25  OK
+AAPLUSDT          23.28        4.24         5.49  OK
+MSFTUSDT          25.11        4.15         6.05  OK
+METAUSDT          37.17        5.41         6.87  OK
+GOOGLUSDT         25.01        5.14         4.86  OK
+AMZNUSDT          24.53        4.04         6.07  OK
+COINUSDT          62.96       11.91         5.29  OK
+MSTRUSDT          61.77       17.38         3.55  OK
+QQQUSDT           14.94        3.27         4.57  OK
+TQQQUSDT          44.94        7.53         5.97  OK
+SQQQUSDT          45.61        6.39         7.14  OK
+
+  all 12 shipped instruments still attenuate past 2.5x when the anchor market shuts
+
+written to argus\data\universe_validation.json
+universe_exit=0
+CPI dates: 13, FOMC decisions: 57 -> argus\data\event_calendar.json
+  Wed 14 Oct 12:30 UTC  US CPI release
+  Wed 28 Oct 18:00 UTC  FOMC rate decision
+  Tue 10 Nov 13:30 UTC  US CPI release
+calendar_exit=0
+NVDAUSDT   CPI        11 events  +34.6bps, size x1.3
+NVDAUSDT   FOMC        9 events  +41.1bps, size x1.52
+NVDAUSDT   earnings    4 events  ù
+TSLAUSDT   CPI        11 events  -52.2bps, size x1.21
+TSLAUSDT   FOMC        8 events  +11.4bps, size x0.89
+TSLAUSDT   earnings    8 events  -367.1bps, size x3.22
+AAPLUSDT   CPI        11 events  +3.2bps, size x0.94
+AAPLUSDT   FOMC        5 events  -0.6bps, size x1.08
+AAPLUSDT   earnings    4 events  ù
+MSFTUSDT   CPI        11 events  -46.4bps, size x1.04
+MSFTUSDT   FOMC        4 events  ù
+MSFTUSDT   earnings    4 events  ù
+METAUSDT   CPI        11 events  -91.8bps, size x1.44
+METAUSDT   FOMC        5 events  -16.4bps, size x1.09
+METAUSDT   earnings    4 events  ù
+GOOGLUSDT  CPI        11 events  -2.5bps, size x0.92
+GOOGLUSDT  FOMC        7 events  -5.3bps, size x1.24
+GOOGLUSDT  earnings    4 events  ù
+AMZNUSDT   CPI        11 events  -40.5bps, size x1.19
+AMZNUSDT   FOMC        6 events  +91.5bps, size x1.12
+AMZNUSDT   earnings    4 events  ù
+COINUSDT   CPI        10 events  +76.1bps, size x1.51
+COINUSDT   FOMC        7 events  +120.3bps, size x2.48
+COINUSDT   earnings    4 events  ù
+MSTRUSDT   CPI        11 events  +72.5bps, size x1.62
+MSTRUSDT   FOMC        7 events  -104.3bps, size x2.37
+MSTRUSDT   earnings    5 events  +274.5bps, size x4.04
+QQQUSDT    CPI        10 events  -16.9bps, size x0.81
+QQQUSDT    FOMC        7 events  +71.4bps, size x1.68
+TQQQUSDT   CPI         5 events  +6.5bps, size x0.3
+TQQQUSDT   FOMC        4 events  ù
+SQQQUSDT   CPI         5 events  +3.7bps, size x0.41
+SQQQUSDT   FOMC        4 events  ù
+written to argus\data\event_reactions.json
+event_reactions_exit=0
+494 macro readings written
+macro_exit=0

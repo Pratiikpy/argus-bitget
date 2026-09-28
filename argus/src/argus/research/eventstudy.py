@@ -256,6 +256,29 @@ def bmp_t(windows: Sequence[EventWindow]) -> float:
     return sqrt(n) * mean / sqrt(variance)
 
 
+def _midranks(series: Sequence[float]) -> list[float]:
+    """Ranks 1..n with every tie given the average of the ranks it spans (Corrado 1989 ranks
+    distinct values; a tie has no order to rank by).
+
+    A stable sort used to break ties by position, and the event bars come last in each pooled
+    series, so every tied event bar outranked every tied estimation bar. On tokenised equities most
+    off-hours bars are flat — the same abnormal return, bar after bar — and that one ordering choice
+    made the test reject 63.5% of placebo draws at a 5% level (data/eventdriven_rivals.json,
+    size_under_null.independent; reproduced at 100% on simulated flat bars, 4% without them)."""
+    order = sorted(range(len(series)), key=lambda i: series[i])
+    ranks = [0.0] * len(series)
+    start = 0
+    while start < len(order):
+        end = start
+        while end + 1 < len(order) and series[order[end + 1]] == series[order[start]]:
+            end += 1
+        average = (start + end) / 2.0 + 1.0
+        for position in range(start, end + 1):
+            ranks[order[position]] = average
+        start = end + 1
+    return ranks
+
+
 def corrado_rank_z(windows: Sequence[EventWindow]) -> float:
     """Corrado (1989): rank each firm's event-window returns within its own pooled series.
 
@@ -283,11 +306,7 @@ def corrado_rank_z(windows: Sequence[EventWindow]) -> float:
     pooled_ranks: list[list[float]] = []
     for w in windows:
         series = [*w.estimation_abnormal, *w.abnormal]
-        order = sorted(range(len(series)), key=lambda i: series[i])
-        ranks = [0.0] * len(series)
-        for position, index in enumerate(order, start=1):
-            ranks[index] = position / (1.0 + len(series))
-        pooled_ranks.append(ranks)
+        pooled_ranks.append([r / (1.0 + len(series)) for r in _midranks(series)])
 
     pooled_len = min(len(r) for r in pooled_ranks)
     # Cross-sectional mean rank at each pooled bar, aligned from the end so the event bars line up

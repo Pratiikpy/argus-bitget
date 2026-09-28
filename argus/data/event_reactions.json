@@ -1,57 +1,58 @@
 {
- "generated_at": "2026-09-27T15:36:21.188863+00:00",
+ "generated_at": "2026-09-28T13:36:20.845727+00:00",
  "history": {
   "interval": "1H",
   "per_symbol": {
    "NVDAUSDT": [
-    "2025-08-23T17:00:00+00:00",
-    "2026-09-27T14:00:00+00:00"
+    "2025-08-24T15:00:00+00:00",
+    "2026-09-28T12:00:00+00:00"
    ],
    "TSLAUSDT": [
-    "2025-08-23T17:00:00+00:00",
-    "2026-09-27T14:00:00+00:00"
+    "2025-08-24T15:00:00+00:00",
+    "2026-09-28T12:00:00+00:00"
    ],
    "AAPLUSDT": [
     "2025-08-26T11:00:00+00:00",
-    "2026-09-27T14:00:00+00:00"
+    "2026-09-28T12:00:00+00:00"
    ],
    "MSFTUSDT": [
     "2025-09-22T11:00:00+00:00",
-    "2026-09-27T14:00:00+00:00"
+    "2026-09-28T12:00:00+00:00"
    ],
    "METAUSDT": [
     "2025-08-26T11:00:00+00:00",
-    "2026-09-27T14:00:00+00:00"
+    "2026-09-28T12:00:00+00:00"
    ],
    "GOOGLUSDT": [
     "2025-08-26T11:00:00+00:00",
-    "2026-09-27T14:00:00+00:00"
+    "2026-09-28T12:00:00+00:00"
    ],
    "AMZNUSDT": [
     "2025-08-26T11:00:00+00:00",
-    "2026-09-27T14:00:00+00:00"
+    "2026-09-28T12:00:00+00:00"
    ],
    "COINUSDT": [
     "2025-08-27T09:00:00+00:00",
-    "2026-09-27T14:00:00+00:00"
+    "2026-09-28T12:00:00+00:00"
    ],
    "MSTRUSDT": [
     "2025-08-27T09:00:00+00:00",
-    "2026-09-27T14:00:00+00:00"
+    "2026-09-28T12:00:00+00:00"
    ],
    "QQQUSDT": [
     "2025-10-28T12:00:00+00:00",
-    "2026-09-27T14:00:00+00:00"
+    "2026-09-28T12:00:00+00:00"
    ],
    "TQQQUSDT": [
     "2026-03-31T08:00:00+00:00",
-    "2026-09-27T14:00:00+00:00"
+    "2026-09-28T12:00:00+00:00"
    ],
    "SQQQUSDT": [
     "2026-03-31T08:00:00+00:00",
-    "2026-09-27T14:00:00+00:00"
+    "2026-09-28T12:00:00+00:00"
    ]
-  }
+  },
+  "unavailable": {}
  },
  "window": {
   "event_bars": 24,
@@ -89,10 +90,10 @@
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": 0.8532,
-     "adjusted": 0.8532,
-     "p_value": 0.393543,
-     "adjusted_p_value": 0.393543,
+     "statistic": 0.5275,
+     "adjusted": 0.5275,
+     "p_value": 0.597826,
+     "adjusted_p_value": 0.597826,
      "clustering_adjusted": false
     },
     "generalised_sign": {
@@ -141,10 +142,10 @@
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": 2.5661,
-     "adjusted": 2.5661,
-     "p_value": 0.010284,
-     "adjusted_p_value": 0.010284,
+     "statistic": 2.6258,
+     "adjusted": 2.6258,
+     "p_value": 0.008643,
+     "adjusted_p_value": 0.008643,
      "clustering_adjusted": false
     },
     "generalised_sign": {
@@ -207,10 +208,10 @@
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": -0.7199,
-     "adjusted": -0.7199,
-     "p_value": 0.471581,
-     "adjusted_p_value": 0.471581,
+     "statistic": -1.0685,
+     "adjusted": -1.0685,
+     "p_value": 0.285281,
+     "adjusted_p_value": 0.285281,
      "clustering_adjusted": false
     },
     "generalised_sign": {
@@ -259,10 +260,10 @@
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": 0.3151,
-     "adjusted": 0.3151,
-     "p_value": 0.752668,
-     "adjusted_p_value": 0.752668,
+     "statistic": 0.319,
+     "adjusted": 0.319,
+     "p_value": 0.74972,
+     "adjusted_p_value": 0.74972,
      "clustering_adjusted": false
     },
     "generalised_sign": {
@@ -293,7 +294,7 @@
    "events": 8,
    "average_car_bps": -367.1,
    "size_ratio": 3.22,
-   "verdict": "PARTIAL: a negative average abnormal return of -367.1bps rejects under patell, bmp but not under corrado_rank, generalised_sign. Where a parametric test rejects and the rank test does not, the result is usually being carried by one or two events",
+   "verdict": "PARTIAL: a negative average abnormal return of -367.1bps rejects under patell, bmp, corrado_rank but not under generalised_sign. Where a parametric test rejects and the rank test does not, the result is usually being carried by one or two events",
    "tests": {
     "patell": {
      "statistic": -5.4537,
@@ -310,10 +311,10 @@
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": -1.7134,
-     "adjusted": -1.7134,
-     "p_value": 0.086639,
-     "adjusted_p_value": 0.086639,
+     "statistic": -2.3034,
+     "adjusted": -2.3034,
+     "p_value": 0.021255,
+     "adjusted_p_value": 0.021255,
      "clustering_adjusted": false
     },
     "generalised_sign": {
@@ -359,10 +360,10 @@
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": -0.2827,
-     "adjusted": -0.2827,
-     "p_value": 0.777419,
-     "adjusted_p_value": 0.777419,
+     "statistic": -0.5982,
+     "adjusted": -0.5982,
+     "p_value": 0.54974,
+     "adjusted_p_value": 0.54974,
      "clustering_adjusted": false
     },
     "generalised_sign": {
@@ -411,10 +412,10 @@
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": -0.0317,
-     "adjusted": -0.0317,
-     "p_value": 0.974707,
-     "adjusted_p_value": 0.974707,
+     "statistic": -0.0322,
+     "adjusted": -0.0322,
+     "p_value": 0.974334,
+     "adjusted_p_value": 0.974334,
      "clustering_adjusted": false
     },
     "generalised_sign": {
@@ -479,10 +480,10 @@
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": -1.0883,
-     "adjusted": -1.0883,
-     "p_value": 0.27645,
-     "adjusted_p_value": 0.27645,
+     "statistic": -1.4076,
+     "adjusted": -1.4076,
+     "p_value": 0.159236,
+     "adjusted_p_value": 0.159236,
      "clustering_adjusted": false
     },
     "generalised_sign": {
@@ -569,10 +570,10 @@
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": -1.9741,
-     "adjusted": -1.9741,
-     "p_value": 0.048375,
-     "adjusted_p_value": 0.048375,
+     "statistic": -2.315,
+     "adjusted": -2.315,
+     "p_value": 0.020613,
+     "adjusted_p_value": 0.020613,
      "clustering_adjusted": false
     },
     "generalised_sign": {
@@ -621,10 +622,10 @@
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": -0.8077,
-     "adjusted": -0.8077,
-     "p_value": 0.41927,
-     "adjusted_p_value": 0.41927,
+     "statistic": -0.8193,
+     "adjusted": -0.8193,
+     "p_value": 0.412631,
+     "adjusted_p_value": 0.412631,
      "clustering_adjusted": false
     },
     "generalised_sign": {
@@ -689,10 +690,10 @@
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": -1.0016,
-     "adjusted": -1.0016,
-     "p_value": 0.316527,
-     "adjusted_p_value": 0.316527,
+     "statistic": -1.3301,
+     "adjusted": -1.3301,
+     "p_value": 0.183501,
+     "adjusted_p_value": 0.183501,
      "clustering_adjusted": false
     },
     "generalised_sign": {
@@ -741,10 +742,10 @@
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": 1.3226,
-     "adjusted": 1.3226,
-     "p_value": 0.185985,
-     "adjusted_p_value": 0.185985,
+     "statistic": 1.3574,
+     "adjusted": 1.3574,
+     "p_value": 0.174661,
+     "adjusted_p_value": 0.174661,
      "clustering_adjusted": false
     },
     "generalised_sign": {
@@ -808,10 +809,10 @@
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": -1.0334,
-     "adjusted": -1.0334,
-     "p_value": 0.301407,
-     "adjusted_p_value": 0.301407,
+     "statistic": -1.3839,
+     "adjusted": -1.3839,
+     "p_value": 0.166386,
+     "adjusted_p_value": 0.166386,
      "clustering_adjusted": false
     },
     "generalised_sign": {
@@ -860,10 +861,10 @@
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": 1.6402,
-     "adjusted": 1.6402,
-     "p_value": 0.100963,
-     "adjusted_p_value": 0.100963,
+     "statistic": 1.6753,
+     "adjusted": 1.6753,
+     "p_value": 0.093879,
+     "adjusted_p_value": 0.093879,
      "clustering_adjusted": false
     },
     "generalised_sign": {
@@ -928,10 +929,10 @@
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": 1.9125,
-     "adjusted": 1.9125,
-     "p_value": 0.055806,
-     "adjusted_p_value": 0.055806,
+     "statistic": 1.5914,
+     "adjusted": 1.5914,
+     "p_value": 0.111518,
+     "adjusted_p_value": 0.111518,
      "clustering_adjusted": false
     },
     "generalised_sign": {
@@ -981,10 +982,10 @@
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": -0.0424,
-     "adjusted": -0.0424,
-     "p_value": 0.966214,
-     "adjusted_p_value": 0.966214,
+     "statistic": -0.0433,
+     "adjusted": -0.0433,
+     "p_value": 0.965426,
+     "adjusted_p_value": 0.965426,
      "clustering_adjusted": false
     },
     "generalised_sign": {
@@ -1049,10 +1050,10 @@
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": 1.1703,
-     "adjusted": 1.1703,
-     "p_value": 0.241883,
-     "adjusted_p_value": 0.241883,
+     "statistic": 0.8481,
+     "adjusted": 0.8481,
+     "p_value": 0.396383,
+     "adjusted_p_value": 0.396383,
      "clustering_adjusted": false
     },
     "generalised_sign": {
@@ -1101,10 +1102,10 @@
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": -0.8798,
-     "adjusted": -0.8798,
-     "p_value": 0.378959,
-     "adjusted_p_value": 0.378959,
+     "statistic": -0.9026,
+     "adjusted": -0.9026,
+     "p_value": 0.366758,
+     "adjusted_p_value": 0.366758,
      "clustering_adjusted": false
     },
     "generalised_sign": {
@@ -1153,10 +1154,10 @@
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": 0.5937,
-     "adjusted": 0.5937,
-     "p_value": 0.552736,
-     "adjusted_p_value": 0.552736,
+     "statistic": 0.6025,
+     "adjusted": 0.6025,
+     "p_value": 0.546826,
+     "adjusted_p_value": 0.546826,
      "clustering_adjusted": false
     },
     "generalised_sign": {
@@ -1199,10 +1200,10 @@
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": -0.3584,
-     "adjusted": -0.3584,
-     "p_value": 0.720057,
-     "adjusted_p_value": 0.720057,
+     "statistic": -0.3587,
+     "adjusted": -0.3587,
+     "p_value": 0.719797,
+     "adjusted_p_value": 0.719797,
      "clustering_adjusted": false
     },
     "generalised_sign": {
@@ -1250,10 +1251,10 @@
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": 2.6565,
-     "adjusted": 2.6565,
-     "p_value": 0.007896,
-     "adjusted_p_value": 0.007896,
+     "statistic": 2.6944,
+     "adjusted": 2.6944,
+     "p_value": 0.007051,
+     "adjusted_p_value": 0.007051,
      "clustering_adjusted": false
     },
     "generalised_sign": {

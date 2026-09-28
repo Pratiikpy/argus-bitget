@@ -14,6 +14,21 @@ from its source and run here unmodified:
   ``obb.equity.fundamental.income(provider="sec")`` takes.
 * **LangAlpha** (Apache-2.0) — its keyless yfinance fundamentals tool, which takes no date at all.
 
+None of the four above take a real as-of parameter for a query (Vibe-Trading's ``pit`` flag only
+picks a revision-keeping policy, not a per-query cutoff); two more real, cloned tools do, and are
+asked the question the way that lets them show it:
+
+* **Qlib PIT** (microsoft/qlib, MIT) — ``qlib/utils/__init__.py::read_period_data(index, data,
+  period, cur_date_int, quarterly)``, "read the information at ``period``... before cur_date or at
+  cur_date", over a real on-disk PIT store built by Qlib's own ``scripts/dump_pit.py`` from the
+  snapshot. Day-granular (its ``date`` column carries no time), gated by each value's *filed* date.
+* **edgartools** (dgunning/edgartools, MIT) — ``edgar/entity/query.py::FactQuery.as_of(date)``,
+  "get facts as of a specific date", ``filing_date <= as_of_date`` — also day-granular.
+
+`scripts/pit_runners/dump_pit_probes.py` writes the exact 620 (ticker, accession, side) probes this
+module generates so both call their real as-of mechanism once per probe rather than dumping a raw
+series for this module to gate externally, unlike the four above.
+
 The runners (`scripts/pit_runners/`) serve all of them the same SEC snapshot and record what their
 code returned. This module scores those records and ARGUS on the same questions.
 
@@ -37,11 +52,18 @@ tag with a visible row, and within it the most recently accepted value.
 The rivals' own outputs are checked against the behaviour this module attributes to them before
 any score uses it: their first-or-last choice on every restated period, and their date alignment.
 
+**Fairness caveat for the two day-granular arms (Qlib PIT, edgartools).** A probe an hour before an
+acceptance on the filed day and one an hour after are the same calendar day to a gate with no time
+of day, so a day-granular system can say it answers a different question on the ``before`` side
+from ARGUS's second-granular one. ``day_granular_fairness`` in the report breaks their scores out
+by ``before``/``after`` for exactly that reason; the two are not pooled into one "right rate" here.
+
     python -m argus.eval.pit_rivals        # scores research/pit_rivals/outputs/*.json
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import math
 import statistics
@@ -282,7 +304,14 @@ aligned to each value's filed date. Every other rival's tool returns today's row
 is asked about."""
 
 RIVALS = ("vibe_trading_pit", "vibe_trading_research", "openbb_pit", "openbb_default",
-          "langalpha_yfinance", "openalice_yfinance")
+          "langalpha_yfinance", "openalice_yfinance", "qlib_pit", "edgartools_asof")
+
+NATIVE_RIVALS = frozenset({"qlib_pit", "edgartools_asof"})
+"""The two rivals scored from their own real as-of mechanism, called once per probe
+(`scripts/pit_runners/qlib_pit_runner.py`, `edgartools_asof_runner.py`) rather than from a raw
+series this module gates externally (`rival_outcomes`, for the other four). Their outputs already
+carry, per probe, exactly what the rival's own code showed; `native_outcomes` only classifies it
+against the same truth `rival_outcomes` uses."""
 
 SNAP = timedelta(days=7)
 """Yahoo labels a fiscal quarter by its calendar month-end (NVDA's quarter ending 2026-07-26
@@ -311,11 +340,27 @@ def first_public(facts: Sequence[PitFact]) -> dict[date, datetime]:
     return out
 
 
+def _classify(shown_end: date, shown_value: float, truth: tuple[date, float],
+             public: Mapping[date, datetime], as_of: datetime) -> str:
+    """``right``, ``leak`` (a quarter not yet public), ``late`` (an older quarter although a newer
+    one was public) or ``stale`` (the right quarter with a superseded value) — the one outcome
+    rule shared by every rival, real-series or native-as-of alike."""
+    became = public.get(shown_end)
+    if became is None or became > as_of:
+        return "leak"
+    if shown_end < truth[0]:
+        return "late"
+    if shown_end == truth[0] and shown_value == truth[1]:
+        return "right"
+    return "stale"
+
+
 def rival_outcomes(system: str, ticker: str, facts: Sequence[PitFact], probes: Sequence[Probe],
                    outputs: Mapping[str, Any]) -> list[dict[str, Any]]:
-    """Each latest-quarter question the rival's own rows can answer, with its outcome: ``right``,
-    ``leak`` (a quarter not yet public), ``late`` (an older quarter although a newer one was
-    public) or ``stale`` (the right quarter with a superseded value)."""
+    """Each latest-quarter question the rival's own rows can answer, with its outcome (see
+    :func:`_classify`). For the four rivals with no as-of parameter of their own: their raw output
+    series, gated externally by filed date for the one rival whose output carries one
+    (:data:`DATE_ALIGNED`)."""
     public = first_public(facts)
     rows = snapped(rival_rows(system, ticker, outputs), sorted(public))
     out = []
@@ -330,27 +375,65 @@ def rival_outcomes(system: str, ticker: str, facts: Sequence[PitFact], probes: S
         if not usable:
             continue
         shown = max(usable, key=lambda r: r.end)
-        became = public.get(shown.end)
-        if became is None or became > p.as_of:
-            outcome = "leak"
-        elif shown.end < truth[0]:
-            outcome = "late"
-        elif shown.end == truth[0] and shown.value == truth[1]:
-            outcome = "right"
-        else:
-            outcome = "stale"
         out.append({"ticker": p.ticker, "accn": p.accn, "side": p.side,
-                    "as_of": p.as_of.isoformat(), "outcome": outcome})
+                    "as_of": p.as_of.isoformat(),
+                    "outcome": _classify(shown.end, shown.value, truth, public, p.as_of)})
     return out
+
+
+def native_outcomes(system: str, ticker: str, facts: Sequence[PitFact], probes: Sequence[Probe],
+                    outputs: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Each latest-quarter question, for the two rivals whose runner already called their own
+    real as-of mechanism once per probe (:data:`NATIVE_RIVALS`) — the rival's answer for a probe is
+    read directly, not re-derived from a raw series."""
+    key = "qlib" if system == "qlib_pit" else "edgartools"
+    rows_by_key = {(r["accn"], r["side"]): r for r in
+                   outputs.get(key, {}).get("tickers", {}).get(ticker, {}).get("probes", [])}
+    public = first_public(facts)
+    out = []
+    for p in probes:
+        truth = truth_latest_quarter(facts, p.as_of)
+        row = rows_by_key.get((p.accn, p.side))
+        if truth is None or row is None or row.get("end") is None:
+            continue
+        shown_end = date.fromisoformat(row["end"])
+        out.append({"ticker": p.ticker, "accn": p.accn, "side": p.side,
+                    "as_of": p.as_of.isoformat(),
+                    "outcome": _classify(shown_end, float(row["value"]), truth, public, p.as_of)})
+    return out
+
+
+def _count(rows: Sequence[Mapping[str, Any]]) -> dict[str, int]:
+    count = {k: sum(r["outcome"] == k for r in rows) for k in ("right", "leak", "late", "stale")}
+    return {"questions": len(rows), "right": count["right"], "leak": count["leak"],
+            "late": count["late"], "stale_after_restatement": count["stale"]}
 
 
 def score_rival(system: str, ticker: str, facts: Sequence[PitFact], probes: Sequence[Probe],
                 outputs: Mapping[str, Any]) -> dict[str, int]:
     """The latest-quarter questions, answered from the rival's own rows."""
-    rows = rival_outcomes(system, ticker, facts, probes, outputs)
-    count = {k: sum(r["outcome"] == k for r in rows) for k in ("right", "leak", "late", "stale")}
-    return {"questions": len(rows), "right": count["right"], "leak": count["leak"],
-            "late": count["late"], "stale_after_restatement": count["stale"]}
+    return _count(rival_outcomes(system, ticker, facts, probes, outputs))
+
+
+def score_native(system: str, ticker: str, facts: Sequence[PitFact], probes: Sequence[Probe],
+                 outputs: Mapping[str, Any]) -> dict[str, int]:
+    """The latest-quarter questions, answered by the rival's own real as-of call per probe."""
+    return _count(native_outcomes(system, ticker, facts, probes, outputs))
+
+
+def by_side(rows: Sequence[Mapping[str, Any]]) -> dict[str, dict[str, int]]:
+    """A rival's outcome rows split ``before``/``after`` — the fairness breakdown a day-granular
+    gate needs (see the module docstring): the two sides are not the same question to it."""
+    out = {}
+    for side in ("before", "after"):
+        side_rows = [r for r in rows if r["side"] == side]
+        counts = {k: sum(r["outcome"] == k for r in side_rows)
+                  for k in ("right", "leak", "late", "stale")}
+        n = len(side_rows)
+        out[side] = {"questions": n, "right": counts["right"], "leak": counts["leak"],
+                     "late": counts["late"], "stale_after_restatement": counts["stale"],
+                     "right_rate": round(counts["right"] / n, 4) if n else None}
+    return out
 
 
 def exact_mcnemar(argus_only: int, rival_only: int) -> float:
@@ -508,6 +591,8 @@ def run(snapshot: Path = SNAPSHOT, outputs: Path = OUTPUTS) -> dict[str, Any]:
     openbb = json.loads((outputs / "openbb.json").read_text(encoding="utf-8"))
     langalpha = json.loads((outputs / "langalpha.json").read_text(encoding="utf-8"))
     openalice = json.loads((outputs / "openalice.json").read_text(encoding="utf-8"))
+    qlib = json.loads((outputs / "qlib.json").read_text(encoding="utf-8"))
+    edgartools = json.loads((outputs / "edgartools.json").read_text(encoding="utf-8"))
     as_of_now = datetime(2026, 9, 25, 23, 59, tzinfo=UTC)
     per_config: dict[str, dict[str, Any]] = {c: {"questions": 0, "right": 0, "leak": 0,
                                                  "late": 0, "stale_after_restatement": 0,
@@ -554,7 +639,7 @@ def run(snapshot: Path = SNAPSHOT, outputs: Path = OUTPUTS) -> dict[str, Any]:
         n = agg["questions"]
         agg["right_rate"] = round(agg["right"] / n, 4) if n else None
     outputs_all = {"vibe": vibe, "openbb": openbb, "langalpha": langalpha,
-                   "openalice": openalice}
+                   "openalice": openalice, "qlib": qlib, "edgartools": edgartools}
     direct: dict[str, dict[str, int]] = {r: {} for r in RIVALS}
     direct_restated: dict[str, dict[str, int]] = {r: {} for r in RIVALS}
     rows_rivals: dict[str, list[dict[str, Any]]] = {r: [] for r in RIVALS}
@@ -562,11 +647,26 @@ def run(snapshot: Path = SNAPSHOT, outputs: Path = OUTPUTS) -> dict[str, Any]:
         facts = load_facts(ticker, "revenue", snapshot)
         probes = probes_for(ticker, facts)
         for rival in RIVALS:
+            if rival in NATIVE_RIVALS:
+                for key, value in score_native(rival, ticker, facts, probes,
+                                               outputs_all).items():
+                    direct[rival][key] = direct[rival].get(key, 0) + value
+                rows_rivals[rival].extend(
+                    native_outcomes(rival, ticker, facts, probes, outputs_all))
+                # Not scored: eval/pit_rivals.py's module docstring names why (the 619-question
+                # probe list built for a real per-probe as-of call has no dedicated restated-
+                # quarter probes of its own; those are a separate, smaller set the other four
+                # rivals' raw-series output happens to answer incidentally).
+                continue
             for key, value in score_rival(rival, ticker, facts, probes, outputs_all).items():
                 direct[rival][key] = direct[rival].get(key, 0) + value
             rows_rivals[rival].extend(rival_outcomes(rival, ticker, facts, probes, outputs_all))
             for key, value in score_rival_restatements(rival, ticker, facts, outputs_all).items():
                 direct_restated[rival][key] = direct_restated[rival].get(key, 0) + value
+    for rival in NATIVE_RIVALS:
+        direct_restated[rival] = {"questions": 0, "right": 0, "stale_after_restatement": 0,
+                                  "neither_value": 0}
+    day_granular_fairness = {rival: by_side(rows_rivals[rival]) for rival in NATIVE_RIVALS}
     argus_rows = per_config["argus"]["rows"]
     held_argus = [r for r in argus_rows if r["ticker"] != DESIGN_TICKER]
     significance = {
@@ -600,6 +700,13 @@ def run(snapshot: Path = SNAPSHOT, outputs: Path = OUTPUTS) -> dict[str, Any]:
             "restated_quarter": restatement},
         "significance": significance,
         "held_out": held_out,
+        "day_granular_fairness": day_granular_fairness,
+        "day_granular_fairness_note": "qlib_pit and edgartools_asof restated_quarter_after is "
+            "0/0 by design, not a gap: they are scored on the 619-question latest-quarter probes "
+            "only (native_outcomes, called from their own real as-of mechanism per probe); the "
+            "dedicated restated-quarter probes the other four rivals happen to answer "
+            "incidentally from a raw series were not extended to these two (see the module "
+            "docstring's fairness caveat and data/pit_rivals_report.md)",
         "rows_argus": per_config["argus"]["rows"],
         "rows_rivals": rows_rivals,
         "rival_behaviour_as_their_outputs_show_it": behaviour,
@@ -607,7 +714,8 @@ def run(snapshot: Path = SNAPSHOT, outputs: Path = OUTPUTS) -> dict[str, Any]:
         "rival_runs": {"vibe": vibe.get("clone"), "openbb": openbb.get("openbb_sec_dir"),
                        "langalpha_fetched_at": langalpha.get("fetched_at"),
                        "yfinance": langalpha.get("yfinance_version"),
-                       "openalice_fetched_at": openalice.get("fetched_at")},
+                       "openalice_fetched_at": openalice.get("fetched_at"),
+                       "qlib": qlib.get("clone"), "edgartools": edgartools.get("clone")},
         "not_scored": {
             "lumen_terminal": "its only fundamentals path (src/adapters/equity.ts:405-560, "
                               "EquityFundamentalsAdapter) reads Yahoo quoteSummary's "
@@ -618,8 +726,16 @@ def run(snapshot: Path = SNAPSHOT, outputs: Path = OUTPUTS) -> dict[str, Any]:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    del argv
-    report = run()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--snapshot", type=Path, default=SNAPSHOT,
+                        help="frozen SEC snapshot dir (default: a sibling research/ tree next to "
+                             "this checkout's own directory — pass explicitly when the checkout "
+                             "is a scratch copy without that sibling, e.g. the shared "
+                             "research/pit_rivals/snapshot)")
+    parser.add_argument("--outputs", type=Path, default=OUTPUTS,
+                        help="rival runner outputs dir (see --snapshot)")
+    args = parser.parse_args(argv)
+    report = run(snapshot=args.snapshot, outputs=args.outputs)
     ARTEFACT.write_text(json.dumps(report, indent=1, default=str), encoding="utf-8", newline="\n")
     a = report["argus"]
     print(f"{'argus':24s} latest {a['latest_quarter']['right']}/{a['latest_quarter']['questions']}"
