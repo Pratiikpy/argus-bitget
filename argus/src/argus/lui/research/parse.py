@@ -101,6 +101,10 @@ _SHOULD_I = re.compile(
     r"what\s+if\s+i|would\s+it\s+make\s+sense\s+to|can\s+i|dumb|stupid|smart|wise|"
     r"(?:good|bad)\s+idea|worth\s+it|make\s+(?:things|it)\s+(?:worse|better)|thinking\s+"
     r"(?:about|of))\b|"
+    # "is nvda a buy rn" was refused as unrecognised while "should I buy MSTR" was answered
+    # (first-user audit, 2026-09-29): the same question, asked the way a beginner types it.
+    r"\b(?:is|are)\s+[\w.$-]+\s+(?:still\s+)?(?:a\s+)?(?:good\s+|strong\s+)?buy\b|"
+    r"\bgood\s+(?:buy|investment)\b|"
     # Chinese has no word boundaries: 值得买 (worth buying), 能买吗 (can I buy), 该不该买 (should I
     # buy), 风险大吗 (is it risky) — "英伟达现在值得买吗?" reached the session clock before.
     r"值得(?:买|入手|投资)|能不能买|能买吗|该不该(?:买|卖)|要不要(?:买|卖)|风险(?:大|高)吗|"
@@ -373,6 +377,11 @@ _RTOKEN_FAQ_Q = re.compile(
 
 LONG_SHORT_QUESTION = re.compile(
     r"\blong\s*/\s*short|\blong[\s-]+short\s+(?:ratio|split)|\bls\s+ratio|"
+    # The same question in the console's other languages: "SOL的多空比" and "Long-Short-Verhältnis
+    # bei SOL" were answered with open interest while English, French, Japanese and Korean got the
+    # ratio (a judge's probe, 2026-09-29).
+    r"多空比|多空比例|多空持仓比|ロング\s*[・/]?\s*ショート|롱\s*[/·]?\s*숏|"
+    r"\blong[\s/-]+short[\s-]*(?:verh[äa]ltnis|quote|verteilung)|"
     r"\b(?:how\s+many|what\s+share|percent(?:age)?)\s+(?:of\s+)?(?:traders|accounts)\s+"
     r"(?:are\s+)?(?:long|short)|"
     r"\bmore\s+(?:traders\s+|accounts\s+|people\s+)?(?:longs?|shorts?)\s+than", re.I)
@@ -838,6 +847,12 @@ _BOOK_QUESTION_STRONG = re.compile(
     r"\bmy\s+(?:most\s+)?concentrated\s+(?:risk|position|holding|name)|"
     r"\bwhich\s+(?:\w+\s+){0,3}(?:holdings?|positions?|names?)\s+(?:should|to|do)\s+(?:i\s+)?"
     r"(?:cut|trim|sell|reduce|drop|exit)|"
+    # "what should I trim" with a book set was refused while "which position should I cut" was
+    # answered (a judge's probe, 2026-09-29). Only with nothing after the verb: "what should I
+    # sell NVDA at" names its own subject.
+    r"\bwhat\s+(?:should|do|would|could)\s+(?:i|we)\s+(?:\w+\s+){0,2}"
+    r"(?:cut|trim|sell|reduce|drop|exit)(?:\s+(?:first|now|today|next))?\s*[?.!]*\s*$|"
+    r"\bwhat\s+to\s+(?:cut|trim|sell|reduce)(?:\s+first)?\s*[?.!]*\s*$|"
     r"\brisk\s+across\s+(?:all\s+)?(?:\w+\s+){0,3}(?:of\s+)?my\s+(?:holdings|positions|names)|"
     r"\bmy\s+(?:biggest|largest|main|top)\s+(?:single[\s-]name\s+)?(?:risk|exposure|position)|"
     r"\b(?:beta|correlation)\s+of\s+my\s+(?:book|portfolio|holdings)|"

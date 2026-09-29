@@ -80,3 +80,29 @@ def test_the_server_offers_and_guards_translation(monkeypatch: pytest.MonkeyPatc
     english: dict[str, Any] = {"lines": ["NVDA 225.55"]}
     server.offer_translation(english, "is NVDA overbought?")
     assert "translate" not in english
+
+
+@pytest.mark.parametrize(("text", "lang"), [
+    ("Quel est le ratio long/short sur SOL ?", "fr"),
+    ("Quel est le prix de NVDA ?", "fr"),
+    ("Wie hoch ist das Long-Short-Verhältnis bei SOL?", "de"),
+    ("Was kostet NVDA?", "de"),
+    ("Qual é o preço da NVDA?", "pt"),
+    ("What is the long/short ratio on SOL?", None),
+    ("what does NVDA cost", None),
+    ("is la NVDA a buy", None),
+])
+def test_short_everyday_questions_are_read_in_their_language(text: str, lang: str | None) -> None:
+    """A judge's probe, 2026-09-29: French and German questions carried none of the old markers
+    and came back in English with no translation offered."""
+    assert tr.target_language(text) == lang
+
+
+@pytest.mark.parametrize("text", [
+    "SOL的多空比是多少？", "Wie hoch ist das Long-Short-Verhältnis bei SOL?",
+    "SOLのロングショート比率はいくつですか？", "SOL의 롱숏 비율은 얼마입니까?",
+])
+def test_the_long_short_question_is_recognised_in_every_language(text: str) -> None:
+    from argus.lui.research.parse import LONG_SHORT_QUESTION
+
+    assert LONG_SHORT_QUESTION.search(text)

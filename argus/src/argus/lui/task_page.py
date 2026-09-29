@@ -14,7 +14,7 @@ from urllib.parse import urlencode
 
 from argus.lui import design
 from argus.lui.answer import LEAD
-from argus.lui.task import DEFAULT_BOOK_VALUE, IMPACT_TITLE, Step, Task
+from argus.lui.task import ASKED_TITLE, DEFAULT_BOOK_VALUE, IMPACT_TITLE, Step, Task
 from argus.lui.thesis import Tested
 
 
@@ -233,7 +233,8 @@ def _conclusion(task: Task) -> str:
     engines disagree, what would change the call and what only the trader can answer."""
     esc = html.escape
     call, weighed = task.verdict, task.weighing
-    if call is None and weighed is None and not task.tested:
+    asked = next((s for s in task.steps if s.title == ASKED_TITLE), None)
+    if call is None and weighed is None and not task.tested and asked is None:
         return ""
 
     def listed(title: str, items: tuple[str, ...]) -> str:
@@ -241,6 +242,12 @@ def _conclusion(task: Task) -> str:
                 + "</ul>") if items else ""
 
     parts = ["<section class='verdict'><h2>Conclusion</h2>"]
+    if asked is not None:
+        # The question asked is answered first; the add-to-book call below is what the research
+        # around it says about owning the name, and is headed so (judge's probe, 2026-09-29).
+        parts.append(f"<h3>Your question</h3><p class='call'>"
+                     f"{design.linked(asked.actionable or (asked.lines[0] if asked.lines else ''))}"
+                     f"</p><h3>If you add {esc(task.name)} to your book</h3>")
     if weighed is not None:
         parts.append(f"<p class='call'>{esc(weighed.call)}</p><p>{esc(weighed.reason)}</p>")
     if task.tested:

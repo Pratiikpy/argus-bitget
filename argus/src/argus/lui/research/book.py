@@ -9,6 +9,7 @@ import math
 import re
 from collections.abc import Mapping, Sequence
 from concurrent.futures import Future
+from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any
@@ -238,7 +239,9 @@ def _book_report(request: ResearchRequest, data: MarketData,
     hedge = _hedge_line(book_beta, r2)
     if hedge:
         lines.append(hedge)
-    worst = worst_window(weights=weights, columns=columns)
+    # The columns here are open-session hours (the volatility line above says so), and the line
+    # says so too.
+    worst = replace(worst_window(weights=weights, columns=columns), session_hours=True)
     lines.append(worst.render().replace("[stress] ", "What actually happened, not a model — "))
     payload = {"risk": risk.as_dict(), "shares": shares, "book_beta": book_beta,
                "r_squared_vs_qqq": r2, "cash": request.cash, "worst_window": worst.as_dict()}

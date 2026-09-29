@@ -1,8 +1,8 @@
 {
   "total": 106,
   "checked": 106,
-  "ok": 105,
-  "lagging": 1,
+  "ok": 106,
+  "lagging": 0,
   "stale": 0,
   "absent": 61,
   "deleted": 0,
@@ -13,39 +13,39 @@
       "doc": "readme",
       "line": 55,
       "quoted": [
-        "10,300"
+        "10,326"
       ],
       "live": [
-        10300
+        10326
       ],
       "status": "OK",
-      "excerpt": "10,300 tests collected"
+      "excerpt": "10,326 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
-      "line": 199,
+      "line": 201,
       "quoted": [
-        "10,300"
+        "10,326"
       ],
       "live": [
-        10300
+        10326
       ],
       "status": "OK",
-      "excerpt": "10,300 tests collected"
+      "excerpt": "10,326 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
-      "line": 222,
+      "line": 224,
       "quoted": [
-        "10,300"
+        "10,326"
       ],
       "live": [
-        10300
+        10326
       ],
       "status": "OK",
-      "excerpt": "10,300 tests collected"
+      "excerpt": "10,326 tests collected"
     },
     {
       "claim": "tests_passing",
@@ -53,7 +53,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        10300
+        10326
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -63,39 +63,39 @@
       "doc": "explained",
       "line": 714,
       "quoted": [
-        "10,300"
+        "10,326"
       ],
       "live": [
-        10300
+        10326
       ],
       "status": "OK",
-      "excerpt": "10,300 tests"
+      "excerpt": "10,326 tests"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 1769,
       "quoted": [
-        "10,300"
+        "10,326"
       ],
       "live": [
-        10300
+        10326
       ],
       "status": "OK",
-      "excerpt": "10,300 tests collected"
+      "excerpt": "10,326 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 2418,
       "quoted": [
-        "10,300"
+        "10,326"
       ],
       "live": [
-        10300
+        10326
       ],
       "status": "OK",
-      "excerpt": "10,300 tests collected"
+      "excerpt": "10,326 tests collected"
     },
     {
       "claim": "source_files",
@@ -113,7 +113,7 @@
     {
       "claim": "source_files",
       "doc": "public-readme",
-      "line": 223,
+      "line": 225,
       "quoted": [
         "556"
       ],
@@ -223,39 +223,39 @@
       "doc": "explained",
       "line": 1771,
       "quoted": [
-        "804"
+        "812"
       ],
       "live": [
-        804
+        812
       ],
       "status": "OK",
-      "excerpt": "804** files under `argus/data/`"
+      "excerpt": "812** files under `argus/data/`"
     },
     {
       "claim": "data_files",
       "doc": "explained",
       "line": 2420,
       "quoted": [
-        "804"
+        "812"
       ],
       "live": [
-        804
+        812
       ],
       "status": "OK",
-      "excerpt": "804 files under `argus/data/`"
+      "excerpt": "812 files under `argus/data/`"
     },
     {
       "claim": "data_files",
       "doc": "architecture",
       "line": 15,
       "quoted": [
-        "804"
+        "812"
       ],
       "live": [
-        804
+        812
       ],
       "status": "OK",
-      "excerpt": "804** files under `argus/data/`"
+      "excerpt": "812** files under `argus/data/`"
     },
     {
       "claim": "memory_effect",
@@ -406,13 +406,13 @@
       "doc": "explained",
       "line": 3030,
       "quoted": [
-        "331"
+        "341"
       ],
       "live": [
         341
       ],
-      "status": "LAGGING",
-      "excerpt": "331 falsifiable claims about"
+      "status": "OK",
+      "excerpt": "341 falsifiable claims about"
     },
     {
       "claim": "register_claims",
@@ -471,7 +471,7 @@
     {
       "claim": "refusal_accuracy_2h",
       "doc": "public-readme",
-      "line": 252,
+      "line": 254,
       "quoted": [
         "262",
         "454"
@@ -499,7 +499,7 @@
     {
       "claim": "refusal_forgone_2h",
       "doc": "public-readme",
-      "line": 253,
+      "line": 255,
       "quoted": [
         "-7.42"
       ],
@@ -512,7 +512,7 @@
     {
       "claim": "premarket_mae",
       "doc": "public-readme",
-      "line": 144,
+      "line": 146,
       "quoted": [
         "36"
       ],
@@ -525,7 +525,7 @@
     {
       "claim": "workbench_breadth",
       "doc": "public-readme",
-      "line": 168,
+      "line": 170,
       "quoted": [
         "16.0",
         "12.4"
@@ -540,7 +540,7 @@
     {
       "claim": "desk_breadth",
       "doc": "public-readme",
-      "line": 176,
+      "line": 178,
       "quoted": [
         "6.2",
         "12.4"
@@ -600,7 +600,7 @@
     {
       "claim": "standing_owned",
       "doc": "public-readme",
-      "line": 226,
+      "line": 228,
       "quoted": [
         "6",
         "45"
@@ -1006,7 +1006,7 @@
     {
       "claim": "standing_states_zh",
       "doc": "public-readme",
-      "line": 268,
+      "line": 270,
       "quoted": [
         "6",
         "32",
@@ -1124,7 +1124,7 @@
     {
       "claim": "answering_data_entries_readme",
       "doc": "public-readme",
-      "line": 157,
+      "line": 159,
       "quoted": [
         "37",
         "67"
@@ -1189,14 +1189,14 @@
       "line": 165,
       "quoted": [
         "76",
-        "128"
+        "132"
       ],
       "live": [
         76,
-        128
+        132
       ],
       "status": "OK",
-      "excerpt": "76 of the 128 proofs carry a Bitcoin"
+      "excerpt": "76 of the 132 proofs carry a Bitcoin"
     },
     {
       "claim": "anchors_confirmed",
@@ -1204,14 +1204,14 @@
       "line": 3019,
       "quoted": [
         "76",
-        "128"
+        "132"
       ],
       "live": [
         76,
-        128
+        132
       ],
       "status": "OK",
-      "excerpt": "76 of the 128 carry a Bitcoin"
+      "excerpt": "76 of the 132 carry a Bitcoin"
     },
     {
       "claim": "ledger_decisions",
@@ -1266,7 +1266,7 @@
     {
       "claim": "modules_importable",
       "doc": "public-readme",
-      "line": 225,
+      "line": 227,
       "quoted": [
         "152",
         "152"
@@ -1308,7 +1308,7 @@
     {
       "claim": "subthemes",
       "doc": "public-readme",
-      "line": 226,
+      "line": 228,
       "quoted": [
         "18",
         "18"

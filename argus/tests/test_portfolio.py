@@ -634,3 +634,19 @@ class TestLeverageConsistencyDegradesSoftly:
 
     def test_no_blended_reading_reports_none(self) -> None:
         assert leverage_consistency({}) is None
+
+
+def test_the_worst_window_says_what_it_searched() -> None:
+    """A judge's probe, 2026-09-29: -2.79% and -1.92% were both "the worst" for one book, one over
+    24 open-session hours and one over 24 consecutive hours, and neither said which."""
+    from dataclasses import replace
+
+    from argus.desk.portfolio import worst_window
+
+    columns = {"A": [0.001, -0.01] * 30, "B": [0.002, -0.004] * 30}
+    found = worst_window(weights={"A": 0.5, "B": 0.5}, columns=columns)
+    assert found.history_bars == 60
+    assert "(60 hourly bars, about 2 days)" in found.render()
+    session = replace(found, session_hours=True).render()
+    assert ("(60 US open-session hours; each window is 24 of them, about 3.7 trading days)"
+            in session)

@@ -111,7 +111,7 @@ comparison with costs, out-of-sample, ablation, an adversarial test, documented 
 reproducibility.
 
 The register got stricter on 2026-09-25, 26 and 27, and the OWNED count fell from 20 to 8, then
-to 6, then to 4. A proof that rests on a population figure must now survive a per-group check, by
+to 6, then to 2. A proof that rests on a population figure must now survive a per-group check, by
 symbol and by half of the sample, and 12 capabilities went back to IMPLEMENTED: five because their
 headline was carried by one symbol or flipped between halves, seven because their proof is a
 designed case set. Breadth rotation went to TIED: it beat pytaa, but a general-purpose validator
@@ -120,10 +120,12 @@ divergence went to IMPLEMENTED when its statement was rewritten from intervals t
 On 2026-09-27 cross-sectional ranking went to TIED with qlib (the one input where ARGUS was safer,
 a one-name group, never reaches a decision), and numeric decision grounding went back to
 IMPLEMENTED (its twelve cases were fabrications the author chose, and a general pydantic range
-check was never run against them). Each row names its route back (`data/standing.json`).
-On 2026-09-29 four rows reached OWNED by taking that route: earnings-surprise ranking,
-re-measured on 7,258 SEC filers with a holdout the rule was never fitted on and against the real
-edgartools package; the research workbench's data breadth, ahead of OpenBB's keyless providers on
+check was never run against them), and so did sentiment integrity and earnings-surprise ranking,
+the second once the register began reading each headline's bootstrap interval and found its
+own included zero. That left 2. Each row names its route back (`data/standing.json`).
+On 2026-09-29 four rows reached OWNED by taking that route, for 6: earnings-surprise ranking,
+re-measured on 7,258 SEC filers with a holdout the rule was never fitted on, against
+QuantConnect's own formula on every one of them, and against the real edgartools package; the research workbench's data breadth, ahead of OpenBB's keyless providers on
 two days and on the categories both can reach; point-in-time filings, ahead of OpenBB's platform,
 edgartools and Qlib on 619 real questions; and the perpetual-implied overnight open, which also
 beats gloaming as a trade entered at the 09:00 price, net of costs. The same day every other open
@@ -196,7 +198,7 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 10,300 tests collected
+pytest -q                       # 10,326 tests collected
 ```
 
 Nothing above needs a credential. On 2026-09-29, with every outbound connection refused, 10,021
@@ -219,7 +221,7 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **10,300 tests collected** — `pytest -q` |
+| Tests | **10,326 tests collected** — `pytest -q` |
 | Types | **`mypy --strict` clean on 556 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |

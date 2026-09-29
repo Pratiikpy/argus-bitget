@@ -1325,8 +1325,18 @@ def repair(report: Report, *, include_lagging: bool = False) -> list[str]:
         for finding in findings:
             if finding.live is None or len(finding.quoted) != len(finding.live):
                 continue
-            if not finding.excerpt or finding.excerpt not in text:
+            if not finding.excerpt:
                 continue
+            # The excerpt is found with its line breaks: a figure the checker read across a wrap
+            # ("forgave -7.15bps of" / "net edge", "331 falsifiable" / "claims") was reported
+            # STALE and never repaired, so a hostile reviewer found it shipped (2026-09-29).
+            original = finding.excerpt if finding.excerpt in text else None
+            if original is None:
+                spread = re.search(
+                    r"\s+".join(re.escape(part) for part in finding.excerpt.split()), text)
+                if spread is None:
+                    continue
+                original = spread.group(0)
             # Every captured group is rewritten inside ONE copy of the excerpt, and the excerpt is
             # substituted once at the end.
             #
@@ -1335,7 +1345,7 @@ def repair(report: Report, *, include_lagging: bool = False) -> list[str]:
             # excerpt no longer matched the document, so the second group silently did nothing.
             # A repair that half-applies is worse than one that does not run, because the check
             # that follows it reports a number nobody ever wrote.
-            fixed_excerpt = finding.excerpt
+            fixed_excerpt = original
             changes: list[str] = []
             cursor = 0
             for quoted, live in zip(finding.quoted, finding.live, strict=True):
@@ -1349,8 +1359,8 @@ def repair(report: Report, *, include_lagging: bool = False) -> list[str]:
                     )
                     changes.append(f"{doc}:{finding.line} {finding.claim} {quoted} -> {fresh}")
                 cursor = at + len(fresh)
-            if fixed_excerpt != finding.excerpt:
-                text = text.replace(finding.excerpt, fixed_excerpt, 1)
+            if fixed_excerpt != original:
+                text = text.replace(original, fixed_excerpt, 1)
                 done.extend(changes)
         path.write_text(text, encoding="utf-8", newline="")
     return done

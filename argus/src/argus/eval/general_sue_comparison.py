@@ -1101,6 +1101,11 @@ def _reference_end_to_end(points: Sequence[Point]) -> Reading:
         return Reading(float(deltas[0] / np.std(deltas)), pairs)
 
 
+# The named rival's own pairing, scored on every filer beside the general tools. Until 2026-09-29 it
+# ran only in the ranking block and on the nine anchors, so the large-N McNemar tests behind the
+# OWNED row were against pandas, not against QuantConnect (a hostile review's finding).
+ALIGNMENT_METHODS["quantconnect_positional"] = _reference_end_to_end
+
 RANKING_METHODS: dict[str, Callable[[Sequence[Point]], Reading]] = {
     "quantconnect_positional": _reference_end_to_end,
     "argus_positional_before": run_argus_positional,

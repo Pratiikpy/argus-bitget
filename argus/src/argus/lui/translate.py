@@ -87,7 +87,44 @@ def target_language(text: str) -> str | None:
                         ("de", (" wenn ", " mein ", " meine ", " warum ", " passiert "))):
         if any(w in lowered for w in words):
             return code
-    return None
+    # Short everyday questions carry none of the markers above: "Quel est le ratio long/short sur
+    # SOL ?" and "Wie hoch ist das Long-Short-Verhältnis bei SOL?" came back in English with no
+    # translation offered (a judge's probe, 2026-09-29). Two or more of a language's common words,
+    # and more of them than of English's, decide it; a ticker and a number decide nothing.
+    seen = set(re.findall(r"[a-zà-öø-ÿ]+", text.lower()))
+    english = len(seen & _COMMON["en"])
+    best = max(("fr", "de", "es", "pt"), key=lambda code: len(seen & _COMMON[code]))
+    hits = len(seen & _COMMON[best])
+    return best if hits >= 2 and hits > english else None
+
+
+_COMMON: dict[str, frozenset[str]] = {
+    "en": frozenset({
+        "the", "is", "are", "what", "how", "much", "does", "do", "my", "of", "on", "for", "in",
+        "to", "and", "should", "why", "when", "which", "will", "can", "it", "this", "that", "price"
+    }),
+    "fr": frozenset({
+        "le", "la", "les", "est", "sont", "quel", "quelle", "quels", "quelles", "sur", "pour",
+        "mon", "ma", "mes", "que", "qui", "une", "des", "du", "avec", "dans", "combien", "prix",
+        "cours", "faut", "dois", "acheter", "vendre"
+    }),
+    "de": frozenset({
+        "der", "die", "das", "ist", "sind", "wie", "hoch", "bei", "mein", "meine", "was", "welche",
+        "welcher", "warum", "und", "mit", "für", "nicht", "soll", "sollte", "kaufen", "verkaufen",
+        "preis", "kurs", "wird", "kostet", "kosten", "aktie", "aktuell", "steht", "gerade"
+    }),
+    "es": frozenset({
+        "el", "la", "los", "las", "es", "son", "cuál", "cuánto", "cómo", "para", "mi", "mis", "que",
+        "en", "con", "precio", "debo", "comprar", "vender", "está"
+    }),
+    "pt": frozenset({
+        "o", "a", "os", "as", "é", "são", "qual", "quanto", "como", "para", "meu", "minha", "que",
+        "em", "com", "preço", "devo", "comprar", "vender", "está"
+    }),
+}
+"""Each language's most common short words, for :func:`target_language`'s last test. Words two
+languages share ("la", "que") count for both, so the English count is what keeps an English
+question with one borrowed word English."""
 
 
 def figures_match(source: str, translated: str) -> bool:

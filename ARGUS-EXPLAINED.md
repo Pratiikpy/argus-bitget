@@ -711,7 +711,7 @@ python -m argus.market.skills --symbol NVDAUSDT
 And to check the whole thing is what this document says it is:
 
 ```bash
-pytest                    # 10,300 tests
+pytest                    # 10,326 tests
 python -m argus.status    # 152/152 modules importable, 18/18 sub-themes, artefacts on disk
 ```
 
@@ -1766,9 +1766,9 @@ takes, and every artefact the system writes.
 |---|---|
 | Source modules | **559** files across **20 packages** (2026-09-27) |
 | Registered and importable | **152/152** (`python -m argus.status` checks this at runtime) |
-| Test files / tests | **353 files**, **10,300 tests collected** |
+| Test files / tests | **353 files**, **10,326 tests collected** |
 | Type and lint | `ruff` clean, `mypy --strict` clean on **556 source files** |
-| Artefacts written | **804** files under `argus/data/` |
+| Artefacts written | **812** files under `argus/data/` |
 | Code-level teardowns of other people's systems | **56** under `research/architecture/` |
 | Runtime dependencies | **two**: `pydantic`, `python-dateutil`. No numpy, no pandas, no scipy |
 
@@ -2415,9 +2415,9 @@ source is a build failure, not a typo.
 | Source modules | 559 files, 20 packages; `mypy --strict` clean on 556 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 152/152 modules importable |
-| Tests | 10,300 tests collected, `ruff` clean |
+| Tests | 10,326 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
-| Artefacts on disk | 804 files under `argus/data/`, every one produced by running something |
+| Artefacts on disk | 812 files under `argus/data/`, every one produced by running something |
 | Code-level teardowns of other systems | 62, each citing file and line |
 | Competitor entries read at source | 5, each cloned and verified or refuted |
 | Live data sources reaching a decision | 15 |
@@ -3016,7 +3016,7 @@ and anchored. That opening head is `bc36478291a06bc3`, submitted to four indepen
 calendars: `a.pool.opentimestamps.org`, `b.pool.opentimestamps.org`,
 `alice.btc.calendar.opentimestamps.org` and `finney.calendar.eternitywall.com`. The `.ots` proofs
 are in `argus/data/anchors/`, and anyone can verify them with the reference OpenTimestamps client
-without our cooperation. **76 of the 128 carry a Bitcoin block-header attestation** (blocks
+without our cooperation. **76 of the 132 carry a Bitcoin block-header attestation** (blocks
 966,822–967,736); the other 18 are still calendar-pending, which is what a proof honestly
 says until Bitcoin has confirmed it. `python -m argus.register.anchorcheck` re-counts both.
 
@@ -3027,7 +3027,7 @@ says until Bitcoin has confirmed it. `python -m argus.register.anchorcheck` re-c
 > were upgraded against their calendars and rewritten in the standard format. Nothing committed
 > changed; upgrading only appends the path from our digest to a block header.
 
-Each scheduled cycle appends and re-anchors, so the register grows: it now holds **331 falsifiable
+Each scheduled cycle appends and re-anchors, so the register grows: it now holds **341 falsifiable
 claims about all twelve stock perpetuals**, head `41f21e5d743cbb46`. The opening figures above are kept as
 the dated historical record — a register that quietly restates its own opening head would be
 defeating its own purpose — and `eval/docclaims.py` checks the live count on every run.

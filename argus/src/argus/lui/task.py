@@ -101,7 +101,12 @@ STEPS: tuple[tuple[str, ResearchKind | None, str], ...] = (
 """The steps in the order they are shown. ``None`` is the exposures engine, which answers a book
 rather than a research request (`lui/exposures.exposures_answer`)."""
 
-CONCLUSION_ORDER = (IMPACT_TITLE, EXPOSURE_TITLE, EXECUTION_TITLE,
+ASKED_TITLE = "Your question, answered"
+"""The step that answers the question as asked, when it asks something other than whether to add
+the name (a judge's probe, 2026-09-29: "What is the long/short ratio on SOL?" ran the add-to-book
+template and ended in a buy plan, with the ratio nowhere on the page)."""
+
+CONCLUSION_ORDER = (ASKED_TITLE, IMPACT_TITLE, EXPOSURE_TITLE, EXECUTION_TITLE,
                     "Earnings, analysts and the surprise", "News, filings and today's move",
                     "Has it been here before?", "The technical picture",
                     "Where it trades and what a trade costs")
@@ -124,6 +129,11 @@ _NOT_A_TASK: dict[ResearchKind, str] = {
 }
 
 
+_ADD_KINDS = frozenset({ResearchKind.IMPACT, ResearchKind.EXECUTION})
+"""The kinds the task's own template answers: what adding the name does to the book, and how to
+buy it. Every other kind is answered as asked first (:data:`ASKED_TITLE`)."""
+
+
 @dataclass(frozen=True)
 class Reading:
     """What a typed question was read as: the name, the size and the book the task runs on."""
@@ -136,9 +146,17 @@ class Reading:
     notional: Decimal | None = None
     """A dollar size the question stated ("buy 50k of NVDA"), which the execution step is sized
     on instead of the default book value."""
+    direct: ResearchRequest | None = field(default=None, compare=False)
+    """The question's own request when it asks something other than whether to add the name
+    (a ratio, a reaction to CPI, the news): answered first, by the console's engine for it."""
 
     @property
     def summary(self) -> str:
+        if self.direct is not None:
+            kind = self.direct.kind.value
+            return (f"{'an' if kind[0] in 'aeiou' else 'a'} {kind} question about "
+                    f"{self.name.removesuffix('USDT')}: answered first, then the full research "
+                    f"on it, including what adding {self.size_pct:g}% would do to your book")
         held = " / ".join(f"{w:.0%} {s.removesuffix('USDT')}" for s, w in self.book.items())
         if self.cash:
             held = f"{held} / {self.cash:.0%} cash" if held else f"{self.cash:.0%} cash"
@@ -206,8 +224,9 @@ def read_question(text: str, saved_book: str = "") -> Reading | str:
     if request.notional is not None:
         notes.append(f"the execution step is sized on the ${request.notional:,.0f} you named")
     notes.extend(_held_note(name, book))
+    direct = request if request.kind not in _ADD_KINDS else None
     return Reading(name=name, size_pct=size_pct, book=book, cash=cash, notes=tuple(notes),
-                   notional=request.notional)
+                   notional=request.notional, direct=direct)
 
 
 _ASKED_NAME = re.compile(
@@ -408,7 +427,11 @@ def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
         mood = pool.submit(thesis.fear_greed_now) if thesis.Kind.SENTIMENT in kinds else None
         around = pool.submit(thesis.context, symbol) if stated else None
         futures = [pool.submit(one, step) for step in STEPS]
-        pending: list[Future[Any]] = [*futures, path]
+        direct = reading.direct if reading is not None else None
+        asked_future = (pool.submit(_asked_step, asked or question, direct)
+                        if direct is not None else None)
+        pending: list[Future[Any]] = [*futures, path,
+                                      *([asked_future] if asked_future is not None else [])]
         done: set[Future[Any]] = set()
         index = {future: i for i, future in enumerate(futures)}
         try:
@@ -429,6 +452,12 @@ def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
             steps[0].path = tuple(path.result()) if path in done else ()
         except Exception:
             steps[0].path = ()  # the quote step stands without its chart
+        if asked_future is not None:
+            steps.insert(0, asked_future.result() if asked_future in done else Step(
+                title=ASKED_TITLE, engine="the console's engine for this kind of question",
+                refused=True, seconds=STEP_DEADLINE_S,
+                lines=[f"Your question did not answer within {STEP_DEADLINE_S:.0f} seconds; the "
+                       f"research below ran without it."]))
         tested: tuple[Tested, ...] = ()
         if stated:
             def extra(future: Future[Any] | None) -> Any:
@@ -449,6 +478,21 @@ def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
     return Task(question=question, name=symbol.removesuffix("USDT"), size_pct=size * 100,
                 book=book, steps=steps, seconds=time.perf_counter() - started, asked=asked,
                 reading=reading, tested=tested)
+
+
+def _asked_step(question: str, request: ResearchRequest) -> Step:
+    """The question as asked, by the same engine the console answers it with."""
+    began = time.perf_counter()
+    try:
+        answer = run(question, request)
+        lines = [line.replace(_DISCLAIMER, "").rstrip() for line in answer.lines]
+        refused, data = answer.refused, dict(answer.data or {})
+    except Exception as exc:  # the rest of the task stands without it
+        lines = [f"This step could not run just now ({type(exc).__name__})."]
+        refused, data = True, {}
+    return Step(title=ASKED_TITLE, engine=f"the console's {request.kind.value} engine",
+                lines=lines, refused=refused, seconds=time.perf_counter() - began,
+                data=data if not refused else {})
 
 
 @dataclass(frozen=True)

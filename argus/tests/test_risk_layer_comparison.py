@@ -11,6 +11,7 @@ import json
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -641,12 +642,58 @@ class TestTheRegisterQuotesTheArtefact:
         measured = blob["measurement_architecture"]
         row = next(c for c in REGISTER if c.name == "Risk layer proved by domain sweep")
         text = " ".join(p.how for p in row.proofs)
-        assert f"only {measured['freqtrade_proxy_vs_truth_correlation']:.4f}" in text
-        best = measured["freqtrade_best_precision_at_full_recall"]
-        assert f"at full recall is {best:.2%}" in text
-        assert f"scores {measured['argus_real_point']['precision']:.2%} precision" in text
+        assert f"correlates {measured['freqtrade_proxy_vs_truth_correlation']:.4f}" in text
+        # The outcome figures the proof now rests on (a hostile review, 2026-09-29).
+        outcome = blob["outcome_after_lock"]["all"]
+        books, vs = outcome["books"], outcome["comparisons"]["argus_minus_freqtrade_default"]
+        assert f"run of {outcome['n_trades_gated']} real strategy" in text
+        assert f"ARGUS keeps {books['argus']['trades_taken']}" in text
+        assert f"the {books['argus']['trades_stopped']} it" in text
+        assert f"netted {books['argus']['net_return_of_stopped_trades_pct']:.2f}%" in text
+        assert f"ends {books['argus']['sum_net_return_pct']:+.2f}%" in text
+        assert f"{books['never_lock']['sum_net_return_pct']:+.2f}%" in text
+        low, high = vs["interval_95"]
+        assert f"[{low:.4f}, {high:.4f}]" in text
+        oos = blob["outcome_after_lock"]["out_of_sample"]
+        assert f"{oos['n_trades_gated']} trades" in text
         assert f"{blob['real_symbols']['checkpoints_total']} real trade checkpoints" in text
         assert f"{blob['combined_book']['checkpoints_total']} on the combined book" in text
         compared = blob["real_symbols"]["symbols_compared"]
         failed = len(blob["real_symbols"]["symbols_failed"])
         assert f"the {compared} of {compared + failed} contracts" in text
+
+
+class TestOutcomeAfterLock:
+    """A hostile review, 2026-09-29: the precision/recall comparison scored ARGUS against its own
+    threshold. The outcome comparison can go either way; these cases show it does."""
+
+    @staticmethod
+    def _checkpoints(returns: list[float], argus: list[bool], freq: list[bool]) -> list[Any]:
+        from types import SimpleNamespace
+
+        start = datetime(2026, 9, 1, tzinfo=UTC)
+        return [SimpleNamespace(
+            symbol="NVDAUSDT", exit_ts=start + timedelta(hours=i), net_return_pct=r,
+            is_oos=i >= len(returns) // 2, argus_locked=a, freqtrade_drawdown_locked=f,
+            freqtrade_stoploss_locked=False, freqtrade_low_profit_locked=False,
+            freqtrade_cooldown_locked=False, freqtrade_drawdown_measured=0.2 if f else 0.0)
+            for i, (r, a, f) in enumerate(zip(returns, argus, freq, strict=True))]
+
+    def test_a_lock_that_stops_losers_wins_and_one_that_stops_winners_loses(self) -> None:
+        from argus.eval.risk_layer_comparison import outcome_after_lock
+
+        returns = [0.0, -1.0, 1.0, -1.0, 1.0]
+        argus_stops_losers = [True, False, True, False, False]
+        good = outcome_after_lock(self._checkpoints(returns, argus_stops_losers, [False] * 5))
+        assert good["books"]["argus"]["sum_net_return_pct"] == 2.0
+        assert good["comparisons"]["argus_minus_freqtrade_default"]["mean_per_trade_pct"] > 0
+        argus_stops_winners = [False, True, False, True, False]
+        bad = outcome_after_lock(self._checkpoints(returns, argus_stops_winners, [False] * 5))
+        assert bad["comparisons"]["argus_minus_freqtrade_default"]["mean_per_trade_pct"] < 0
+
+    def test_the_precision_comparison_is_labelled_by_construction(self) -> None:
+        from argus.truth.paths import DATA_DIR
+
+        blob = json.loads((DATA_DIR / "risk_layer_comparison.json").read_text("utf-8"))
+        assert blob["measurement_architecture"]["argus_recall_is_by_construction"] is True
+        assert set(blob["outcome_after_lock"]) == {"all", "out_of_sample"}

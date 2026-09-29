@@ -695,10 +695,18 @@ class WorstWindow:
     start_index: int | None
     contributors: tuple[tuple[str, float], ...]
     reason: str = ""
+    history_bars: int | None = None
+    """How many aligned bars the window slid over. Stated on the line because two answers for the
+    same book quoted -2.79% and -1.92% as "the worst" without saying what either searched: one slid
+    24 US open-session hours (about three and a half trading days) over 123 of them, the other 24
+    consecutive hours over 30 days (a judge's probe, 2026-09-29)."""
+    session_hours: bool = False
+    """The bars are US open-session hours only, so a window spans trading days, not one day."""
 
     def as_dict(self) -> dict[str, Any]:
         return {
             "bars": self.bars,
+            "history_bars": self.history_bars,
             "move_pct": None if self.move_pct is None else round(self.move_pct, 3),
             "start_index": self.start_index,
             "contributors": [
@@ -710,10 +718,23 @@ class WorstWindow:
     def render(self) -> str:
         if self.move_pct is None:
             return f"[stress] no {self.bars}-bar window could be evaluated: {self.reason}"
-        worst = ", ".join(f"{s} {v:+.2f}%" for s, v in self.contributors[:3])
+        # Every holding up to five, so the legs can be checked against the total; a research-task
+        # line showed three of a four-name book and its legs did not add up (judge, 2026-09-29).
+        shown = self.contributors if len(self.contributors) <= 5 else self.contributors[:3]
+        worst = ", ".join(f"{s} {v:+.2f}%" for s, v in shown)
+        if len(shown) < len(self.contributors):
+            worst += f" and {len(self.contributors) - len(shown)} more"
+        if not self.history_bars:
+            span = ""
+        elif self.session_hours:
+            span = (f" ({self.history_bars} US open-session hours; each window is {self.bars} of "
+                    f"them, about {self.bars / 6.5:.1f} trading days)")
+        else:
+            span = (f" ({self.history_bars} hourly bars, about {self.history_bars / 24:.0f} "
+                    f"days)")
         return (
-            f"[stress] the worst {self.bars}-bar window in the observed history would have moved "
-            f"this book {self.move_pct:+.2f}% — driven by {worst}"
+            f"[stress] the worst {self.bars}-bar window in the observed history{span} would have "
+            f"moved this book {self.move_pct:+.2f}% — driven by {worst}"
         )
 
 
@@ -773,6 +794,7 @@ def worst_window(
         move_pct=None if best_move is None else best_move * 100.0,
         start_index=best_start,
         contributors=tuple(contributors),
+        history_bars=length,
     )
 
 

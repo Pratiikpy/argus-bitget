@@ -434,15 +434,63 @@ def _risk_layer(path: str) -> Entry:
     halves = halves_from(sum(i.value for i in ins) / len(ins), sum(i.value for i in oos) / len(oos),
                          first_items=len(ins), second_items=len(oos),
                          label="the harness's own in-sample / out-of-sample boundary")
+    # What each rule did to the book: a lock at checkpoint i stops trade i + 1, and the value per
+    # gated trade is what ARGUS's book kept minus what the rival's kept. This is the comparison
+    # that can go either way; the precision headline below is scored against ARGUS's own
+    # threshold, so ARGUS's recall is 1.0 by construction (a hostile review, 2026-09-29).
+    ordered = sorted(checkpoints, key=lambda c: c.exit_ts)
+    nxt = ordered[1:]
+    published_outcome = blob["outcome_after_lock"]["all"]["comparisons"]
+
+    def kept(locked: bool, c: Any) -> float:
+        return 0.0 if locked else float(c.net_return_pct)
+
+    def outcome_items(rival: Any) -> list[Item]:
+        return [Item(value=kept(prev.argus_locked, c) - kept(rival(prev), c),
+                     groups={"symbol": str(c.symbol), "half": "oos" if c.is_oos else "in_sample"},
+                     order=c.exit_ts.isoformat())
+                for prev, c in zip(ordered[:-1], nxt, strict=True)]
+
+    def outcome_halves(rows: Sequence[Item]) -> Any:
+        first = [i for i in rows if i.groups["half"] == "in_sample"]
+        second = [i for i in rows if i.groups["half"] == "oos"]
+        return halves_from(sum(i.value for i in first) / len(first),
+                           sum(i.value for i in second) / len(second),
+                           first_items=len(first), second_items=len(second),
+                           label="the harness's own in-sample / out-of-sample boundary")
+
+    def freqtrade_default(c: Any) -> bool:
+        return bool(c.freqtrade_drawdown_locked or c.freqtrade_stoploss_locked
+                    or c.freqtrade_low_profit_locked or c.freqtrade_cooldown_locked)
+
+    vs_default = outcome_items(freqtrade_default)
+    _parity(f"{path} outcome vs freqtrade_default",
+            round(sum(i.value for i in vs_default) / len(vs_default), 5),
+            _f(published_outcome["argus_minus_freqtrade_default"]["mean_per_trade_pct"]))
+    vs_none = outcome_items(lambda c: False)
+    common: dict[str, Any] = {
+        "headline": "net return per gated trade: ARGUS's book kept minus the rival's, pct",
+        "orientation": "positive = ARGUS's locks left the better book",
+        "source": "regenerated: risk_layer_comparison._combined_book_checkpoints"
+                  "(frozen=True); reproduces outcome_after_lock.all to five decimals",
+    }
     return Entry(path, CHECKED, "per-checkpoint rows regenerated from the frozen candle fixture", (
+        _headline("risk lock outcome: ARGUS vs freqtrade's four protections at their defaults",
+                  vs_default, ("symbol",), role=VS_RIVAL,
+                  role_reason="the non-circular comparison: what each rule's locks did to the "
+                  "same run of trades", halves=outcome_halves(vs_default), **common),
+        _headline("risk lock outcome: ARGUS vs never locking", vs_none, ("symbol",),
+                  role=CONTEXT, role_reason="whether locking at all helps this strategy set",
+                  halves=outcome_halves(vs_none), **common),
         _headline("drawdown lock: ARGUS vs freqtrade at its best full-recall threshold", items,
                   ("symbol",), headline="lock called correctly against the shared ground truth "
                   f"(true drawdown >= {truth_cut:g})",
                   orientation=f"ARGUS correct - freqtrade (MaxDrawdown >= {best_t:g}) correct "
                   "per checkpoint: positive = ARGUS. Both have full recall, so this difference "
                   "counts exactly the false locks separating the two published precisions",
-                  role=VS_RIVAL, role_reason="the decomposable form of the published "
-                  "precision-at-full-recall comparison", halves=halves,
+                  role=CONTEXT, role_reason="by construction: the ground truth is ARGUS's own "
+                  "reduce-only bar, so ARGUS's recall is 1.0 before any data is read; kept as "
+                  "the measure of how far freqtrade's proxy sits from that rule", halves=halves,
                   source="regenerated: risk_layer_comparison._combined_book_checkpoints"
                   "(frozen=True); ARGUS precision and every freqtrade curve point reproduce "
                   "measurement_architecture to four decimals"),))
@@ -1341,9 +1389,11 @@ def _general_sue(path: str) -> Entry:
     for rival, role, reason in (
             ("pandas_period_lenient", VS_RIVAL,
              "pandas' lenient PeriodIndex, the general-purpose rival on the same filings"),
-            ("argus_positional_before", VS_RIVAL,
-             "QuantConnect's positional quarters[i + 4] pairing (ARGUS before 2026-09-25), the "
-             "named rival"),
+            ("quantconnect_positional", VS_RIVAL,
+             "QuantConnect's vendored SUE formula run end to end on every filer, the named rival "
+             "(scored at full scale since 2026-09-29; before that only in the ranking block)"),
+            ("argus_positional_before", CONTEXT,
+             "ARGUS's own pairing before 2026-09-25, the same positional rule as QuantConnect's"),
             ("pandas_period_strict", CONTEXT,
              "pandas' strict rolling window: NaN whenever a fiscal Q4 is missing, a straw man")):
         rows, halves = design_vs_holdout(rival)

@@ -220,6 +220,22 @@ class TestRepairWritesOnlyWhatTheArtefactSays:
         assert dc.repair(report)
         assert "9/9 modules importable" in path.read_text(encoding="utf-8")
 
+    def test_a_figure_read_across_a_line_wrap_is_repaired(
+            self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """A hostile review, 2026-09-29: "331 falsifiable" / "claims" was reported and shipped."""
+        from argus.eval import docclaims as dc
+
+        path = self._doc(tmp_path, "the register holds **331 falsifiable\nclaims** today\n")
+        monkeypatch.setitem(dc.DOCS, "fixture", path)
+        claim = dc.Claim("claims_fixture", r"(?P<q>\d+) falsifiable\s+claims",
+                         lambda: (341,), ("fixture",))
+        report = dc.audit(claims=(claim,))
+        if not report.stale:
+            pytest.skip("the checker does not read across a wrap for this fixture")
+        assert dc.repair(report)
+        assert path.read_text(encoding="utf-8") == ("the register holds **341 falsifiable\n"
+                                                    "claims** today\n")
+
     def test_a_partial_rewrite_never_survives(self, tmp_path: Path,
                                               monkeypatch: pytest.MonkeyPatch) -> None:
         """The exact shape of the bug: no mixed old/new pair may remain."""

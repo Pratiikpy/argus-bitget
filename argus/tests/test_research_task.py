@@ -526,3 +526,41 @@ class TestThePageLabelsItsOwnAutoRunExample:
 
         page = render_task(unread_task("hello there", "could not find a name Bitget lists"), "")
         assert "Run live when this page loaded" not in page
+
+
+class TestAQuestionThatIsNotAboutAddingIsAnsweredFirst:
+    """A judge's probe, 2026-09-29: "What is the long/short ratio on SOL?" ran the add-to-book
+    template and ended in a buy plan, with the ratio nowhere on the page."""
+
+    def test_the_reading_keeps_the_questions_own_request(self) -> None:
+        reading = read_question("What is the long/short ratio on SOL?")
+        assert not isinstance(reading, str) and reading.direct is not None
+        assert reading.summary.startswith("a ") and "answered first" in reading.summary
+        added = read_question(ASKED)
+        assert not isinstance(added, str) and added.direct is None
+
+    def test_the_answer_to_it_is_the_first_step_and_the_first_conclusion(
+            self, engines: list[ResearchRequest], monkeypatch: pytest.MonkeyPatch) -> None:
+        # "long/short ratio" reads as a stated positioning reason, whose checks read live data.
+        monkeypatch.setattr(task_mod.thesis, "reasons", lambda text: ())
+        from argus.lui.task import ASKED_TITLE
+
+        text = "What is the long/short ratio on BTC?"
+        reading = read_question(text)
+        assert not isinstance(reading, str) and reading.direct is not None
+        task = research_task(reading=reading, asked=text)
+        assert task.steps[0].title == ASKED_TITLE
+        assert task.conclusion[0][0] == ASKED_TITLE
+        assert engines.count(reading.direct) == 1
+
+    def test_the_page_heads_the_add_call_as_conditional(
+            self, engines: list[ResearchRequest], monkeypatch: pytest.MonkeyPatch) -> None:
+        # "long/short ratio" reads as a stated positioning reason, whose checks read live data.
+        monkeypatch.setattr(task_mod.thesis, "reasons", lambda text: ())
+        text = "What is the long/short ratio on BTC?"
+        reading = read_question(text)
+        assert not isinstance(reading, str)
+        from argus.lui.task_page import render_task
+
+        html = render_task(research_task(reading=reading, asked=text), "")
+        assert "<h3>Your question</h3>" in html and "<h3>If you add BTC to your book</h3>" in html

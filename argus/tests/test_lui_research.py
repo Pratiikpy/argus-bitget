@@ -1229,3 +1229,23 @@ class TestTheLongRunAnalogue:
 
     def test_no_daily_history_adds_nothing(self) -> None:
         assert research.analogue._long_run("NVDAUSDT") == ([], [], {})
+
+
+@pytest.mark.parametrize("text", ["is nvda a buy rn", "is NVDA a buy", "is TSLA still a good buy?"])
+def test_a_beginners_buy_question_is_read_as_one(text: str) -> None:
+    """First-user audit, 2026-09-29: "is nvda a buy rn" was refused as unrecognised."""
+    from argus.lui.research import ResearchKind, detect
+
+    request = detect(text)
+    assert request is not None and request.kind is ResearchKind.IMPACT
+
+
+@pytest.mark.parametrize("text", ["what should I trim", "what should I sell first?",
+                                  "what to cut first"])
+def test_what_to_trim_reads_the_book(text: str) -> None:
+    """A judge's probe, 2026-09-29: "what should I trim" with a book set was refused."""
+    from argus.lui.research import ResearchKind, detect
+    from argus.lui.research.parse import with_book
+
+    request = with_book(detect(text), "40% NVDA, 30% MSFT, 30% AAPL", text)
+    assert request is not None and request.kind is ResearchKind.BOOK

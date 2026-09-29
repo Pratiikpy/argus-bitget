@@ -1,0 +1,166 @@
+{
+ "at": "2026-09-29T15:40:21+00:00",
+ "digest": "68ceeadb52fc4ce0721006d8016744de7bc4d135ae75eb0aaca20e68f6460712",
+ "source": "risk_policy.json",
+ "thresholds": {
+  "max_position_notional": "50000",
+  "max_unhedged_notional": "20000",
+  "min_confidence_to_trade": 0.55,
+  "max_gross_exposure_notional": "150000",
+  "max_signed_exposure_notional": "100000",
+  "max_margin_usage_ratio": "0.5",
+  "factor_exposure_limits": {},
+  "max_scenario_loss_pct": null,
+  "max_liquidation_cost_bps": null,
+  "assumed_payoff": "1",
+  "session_horizon_bars": 24,
+  "min_symbol_realized_pnl": null,
+  "symbol_underperformance_window_minutes": 1440
+ },
+ "per_symbol": {
+  "NVDAUSDT": {
+   "can_fire": [
+    "max_gross_exposure_notional",
+    "max_position_notional",
+    "max_signed_exposure_notional",
+    "max_unhedged_notional",
+    "min_confidence_to_trade"
+   ],
+   "cannot_fire": [
+    "factor_exposure_limits",
+    "max_liquidation_cost_bps",
+    "max_margin_usage_ratio",
+    "max_scenario_loss_pct",
+    "min_symbol_realized_pnl"
+   ]
+  },
+  "TSLAUSDT": {
+   "can_fire": [
+    "max_gross_exposure_notional",
+    "max_position_notional",
+    "max_signed_exposure_notional",
+    "max_unhedged_notional",
+    "min_confidence_to_trade"
+   ],
+   "cannot_fire": [
+    "factor_exposure_limits",
+    "max_liquidation_cost_bps",
+    "max_margin_usage_ratio",
+    "max_scenario_loss_pct",
+    "min_symbol_realized_pnl"
+   ]
+  },
+  "AAPLUSDT": {
+   "can_fire": [
+    "max_gross_exposure_notional",
+    "max_position_notional",
+    "max_signed_exposure_notional",
+    "max_unhedged_notional",
+    "min_confidence_to_trade"
+   ],
+   "cannot_fire": [
+    "factor_exposure_limits",
+    "max_liquidation_cost_bps",
+    "max_margin_usage_ratio",
+    "max_scenario_loss_pct",
+    "min_symbol_realized_pnl"
+   ]
+  },
+  "MSFTUSDT": {
+   "can_fire": [
+    "max_gross_exposure_notional",
+    "max_position_notional",
+    "max_signed_exposure_notional",
+    "max_unhedged_notional",
+    "min_confidence_to_trade"
+   ],
+   "cannot_fire": [
+    "factor_exposure_limits",
+    "max_liquidation_cost_bps",
+    "max_margin_usage_ratio",
+    "max_scenario_loss_pct",
+    "min_symbol_realized_pnl"
+   ]
+  },
+  "METAUSDT": {
+   "can_fire": [
+    "max_gross_exposure_notional",
+    "max_position_notional",
+    "max_signed_exposure_notional",
+    "max_unhedged_notional",
+    "min_confidence_to_trade"
+   ],
+   "cannot_fire": [
+    "factor_exposure_limits",
+    "max_liquidation_cost_bps",
+    "max_margin_usage_ratio",
+    "max_scenario_loss_pct",
+    "min_symbol_realized_pnl"
+   ]
+  },
+  "GOOGLUSDT": {
+   "can_fire": [
+    "max_gross_exposure_notional",
+    "max_position_notional",
+    "max_signed_exposure_notional",
+    "max_unhedged_notional",
+    "min_confidence_to_trade"
+   ],
+   "cannot_fire": [
+    "factor_exposure_limits",
+    "max_liquidation_cost_bps",
+    "max_margin_usage_ratio",
+    "max_scenario_loss_pct",
+    "min_symbol_realized_pnl"
+   ]
+  },
+  "AMZNUSDT": {
+   "can_fire": [
+    "max_gross_exposure_notional",
+    "max_position_notional",
+    "max_signed_exposure_notional",
+    "max_unhedged_notional",
+    "min_confidence_to_trade"
+   ],
+   "cannot_fire": [
+    "factor_exposure_limits",
+    "max_liquidation_cost_bps",
+    "max_margin_usage_ratio",
+    "max_scenario_loss_pct",
+    "min_symbol_realized_pnl"
+   ]
+  },
+  "COINUSDT": {
+   "can_fire": [
+    "max_gross_exposure_notional",
+    "max_position_notional",
+    "max_signed_exposure_notional",
+    "max_unhedged_notional",
+    "min_confidence_to_trade"
+   ],
+   "cannot_fire": [
+    "factor_exposure_limits",
+    "max_liquidation_cost_bps",
+    "max_margin_usage_ratio",
+    "max_scenario_loss_pct",
+    "min_symbol_realized_pnl"
+   ]
+  },
+  "MSTRUSDT": {
+   "can_fire": [
+    "max_gross_exposure_notional",
+    "max_position_notional",
+    "max_signed_exposure_notional",
+    "max_unhedged_notional",
+    "min_confidence_to_trade"
+   ],
+   "cannot_fire": [
+    "factor_exposure_limits",
+    "max_liquidation_cost_bps",
+    "max_margin_usage_ratio",
+    "max_scenario_loss_pct",
+    "min_symbol_realized_pnl"
+   ]
+  }
+ }
+}

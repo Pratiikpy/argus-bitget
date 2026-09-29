@@ -961,8 +961,114 @@ def measurement_architecture_analysis(checkpoints: Sequence[Checkpoint]) -> dict
         },
         "freqtrade_best_precision_at_full_recall": round(freqtrade_best_precision_at_recall_1, 4),
         "argus_dominates_every_swept_threshold": dominates_every_swept_threshold,
+        "argus_recall_is_by_construction": True,
+        "by_construction_note": (
+            "the 'should have locked' label is drawdown at or past ARGUS's own reduce-only bar, "
+            "and ARGUS locks on exactly that or on a loss streak, so its recall of 1.0 is "
+            "guaranteed before any data is read; the precision/recall points say how far "
+            "freqtrade's proxy is from that rule, not that ARGUS predicts anything. The "
+            "non-circular comparison is outcome_after_lock (a hostile review, 2026-09-29)"),
         "verdict": verdict,
     }
+
+
+# --- the outcome of each lock: what the trades it stopped would have done ---------------------
+
+def _block_bootstrap_mean(values: Sequence[float], *, block: int = 10, draws: int = 4000,
+                          seed: int = 20260929) -> tuple[float, float]:
+    """A 95% interval on the mean of ``values`` by a moving-block bootstrap, so a run of
+    neighbouring trades (a regime) is resampled together rather than as independent draws."""
+    import random
+
+    n = len(values)
+    if n == 0:
+        return (0.0, 0.0)
+    block = max(1, min(block, n))
+    rng = random.Random(seed)
+    starts = range(n - block + 1)
+    means = []
+    for _ in range(draws):
+        sample: list[float] = []
+        while len(sample) < n:
+            start = rng.choice(starts)
+            sample.extend(values[start:start + block])
+        means.append(sum(sample[:n]) / n)
+    means.sort()
+    return (means[int(0.025 * draws)], means[int(0.975 * draws) - 1])
+
+
+def outcome_after_lock(checkpoints: Sequence[Checkpoint]) -> dict[str, Any]:
+    """Each rule judged by what it did to the book, not by agreement with a label either side
+    defines: a rule locked at checkpoint i stops trade i + 1, and the rule's book is the trades it
+    let through.
+
+    The precision/recall comparison in :func:`measurement_architecture_analysis` scores both
+    systems against "drawdown at or past ARGUS's reduce-only bar", the rule ARGUS itself applies,
+    so ARGUS's recall is 1.0 by construction (a hostile review, 2026-09-29). This asks the question
+    a trader would: over the same chronological run of real strategy trades, which rule's book
+    came out better, measured on each skipped trade's own net return?
+
+    Stated simplifications: one lock stops exactly the next trade (freqtrade's real locks last
+    ``stop_duration``, ARGUS's until its state clears; both are shortened alike), and the trades
+    are the strategies' own, sized as in :func:`walk_combined_book`. The per-trade difference
+    between two rules is non-zero only where they disagree, and its interval is a moving-block
+    bootstrap over the run.
+    """
+    ordered = sorted(checkpoints, key=lambda c: c.exit_ts)
+    if len(ordered) < 2:
+        raise RiskLayerComparisonError("outcome_after_lock needs at least two checkpoints")
+    nxt = [c.net_return_pct for c in ordered[1:]]
+    rules: dict[str, list[bool]] = {
+        "argus": [c.argus_locked for c in ordered[:-1]],
+        "freqtrade_default": [
+            c.freqtrade_drawdown_locked or c.freqtrade_stoploss_locked
+            or c.freqtrade_low_profit_locked or c.freqtrade_cooldown_locked
+            for c in ordered[:-1]],
+        "never_lock": [False] * len(nxt),
+        "always_lock": [True] * len(nxt),
+    }
+    for threshold in (0.01, 0.02, 0.03, 0.04, 0.06, 0.08, 0.10):
+        rules[f"freqtrade_drawdown_{threshold:g}"] = [
+            c.freqtrade_drawdown_measured >= threshold for c in ordered[:-1]]
+
+    def book(locked: Sequence[bool]) -> dict[str, Any]:
+        taken = [r for r, stop in zip(nxt, locked, strict=True) if not stop]
+        equity, peak, worst = 1.0, 1.0, 0.0
+        for r in taken:
+            equity *= 1.0 + r / 100.0
+            peak = max(peak, equity)
+            worst = min(worst, equity / peak - 1.0)
+        return {"trades_taken": len(taken), "trades_stopped": len(nxt) - len(taken),
+                "sum_net_return_pct": round(sum(taken), 4),
+                "max_drawdown_pct": round(worst * 100.0, 4),
+                "net_return_of_stopped_trades_pct": round(
+                    sum(r for r, stop in zip(nxt, locked, strict=True) if stop), 4)}
+
+    books = {name: book(locked) for name, locked in rules.items()}
+    comparisons = {}
+    for rival in [k for k in rules if k.startswith("freqtrade") or k == "never_lock"]:
+        # Per trade: what ARGUS's book kept minus what the rival's kept.
+        diff = [(0.0 if a else r) - (0.0 if b else r)
+                for r, a, b in zip(nxt, rules["argus"], rules[rival], strict=True)]
+        low, high = _block_bootstrap_mean(diff)
+        comparisons[f"argus_minus_{rival}"] = {
+            "trades_where_they_disagree": sum(1 for a, b in zip(rules["argus"], rules[rival],
+                                                                strict=True) if a != b),
+            "mean_per_trade_pct": round(sum(diff) / len(diff), 5),
+            "interval_95": [round(low, 5), round(high, 5)],
+            "favours": ("argus" if low > 0 else rival if high < 0 else "neither"),
+        }
+    return {"n_trades_gated": len(nxt), "books": books, "comparisons": comparisons,
+            "strategy_alone_is_profitable": books["never_lock"]["sum_net_return_pct"] > 0}
+
+
+def outcome_after_lock_split(checkpoints: Sequence[Checkpoint]) -> dict[str, Any]:
+    """:func:`outcome_after_lock` on the whole run and on its out-of-sample part alone (the last
+    35% of each symbol's bars, `_oos_boundary`), so a result carried by the in-sample stretch
+    shows as one."""
+    oos = [c for c in checkpoints if c.is_oos]
+    return {"all": outcome_after_lock(checkpoints),
+            "out_of_sample": outcome_after_lock(oos) if len(oos) >= 2 else None}
 
 
 # --- adversarial scenarios ------------------------------------------------------------------
@@ -1153,6 +1259,7 @@ def main(argv: list[str] | None = None) -> int:
     adversarial = adversarial_scenarios()
     checkpoints, _, _, _ = _combined_book_checkpoints(days=args.days, frozen=frozen)
     measurement = measurement_architecture_analysis(checkpoints)
+    outcome = outcome_after_lock_split(checkpoints)
     for line in render(report, adversarial):
         print(line)
     print()
@@ -1165,6 +1272,9 @@ def main(argv: list[str] | None = None) -> int:
     print(f"ARGUS real point: {measurement['argus_real_point']}")
     print(f"ARGUS dominates every swept threshold: {dominates}")
     print(f"verdict: {measurement['verdict']}")
+    for part in ("all", "out_of_sample"):
+        for name, row in (outcome[part] or {}).get("comparisons", {}).items():
+            print(f"{part} {name}: {row}")
     if args.save:
         # `argus.truth.artefact.write` (strict JSON: non-finite floats -> null, key path recorded)
         # rather than raw `json.dumps` — this module's own values are already pre-stringified
@@ -1176,7 +1286,7 @@ def main(argv: list[str] | None = None) -> int:
             Path(args.save),
             {
                 "real_symbols": report, "combined_book": combined, "adversarial": adversarial,
-                "measurement_architecture": measurement,
+                "measurement_architecture": measurement, "outcome_after_lock": outcome,
             },
         )
         if undefined:
@@ -1199,6 +1309,8 @@ __all__ = [
     "freeze_candles",
     "main",
     "measurement_architecture_analysis",
+    "outcome_after_lock",
+    "outcome_after_lock_split",
     "protection_ablation",
     "render_combined",
     "walk_combined_book",

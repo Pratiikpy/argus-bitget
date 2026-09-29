@@ -94,9 +94,11 @@ PAGE = """<!doctype html>
   button { padding:11px 18px; font-size:15px; cursor:pointer }
   button:disabled { opacity:.55; cursor:default }
   .chips { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:22px }
-  .chip { border:1px solid var(--line); background:var(--panel); color:var(--dim);
-    border-radius:999px; padding:5px 11px; font-size:12.5px; cursor:pointer }
-  .chip:hover { color:var(--ink); border-color:var(--accent) }
+  .chip { font:inherit; border:1px solid var(--line); background:var(--panel); color:var(--dim);
+    border-radius:999px; padding:5px 11px; font-size:12.5px; line-height:1.4; cursor:pointer;
+    text-align:left }
+  .chip:hover, .chip:focus-visible { color:var(--ink); border-color:var(--accent) }
+  .chip:focus-visible { outline:2px solid var(--accent); outline-offset:2px }
   .card { scroll-margin-top:84px; background:var(--panel); border:1px solid var(--line);
     padding:14px 16px; margin-bottom:12px }
   .q { font-weight:600; margin-bottom:8px }
@@ -123,10 +125,12 @@ PAGE = """<!doctype html>
     padding-left:8px }
   .line.hedge { font-weight:600 }
   .line.fine { color:var(--dim); font-size:13px }
+  /* Lowercase and light: the tag says where a line comes from without shouting over the
+     sentence it labels (first-user audit, 2026-09-29: "reads as technical noise"). */
   .pv { display:inline-block; min-width:4.6em; margin-right:.5em; padding:0 .35em;
         border-radius:3px;
-        font:600 10px/1.6 var(--mono); letter-spacing:.04em;
-        text-transform:uppercase; vertical-align:1px; text-align:center;
+        font:500 10.5px/1.6 var(--mono); letter-spacing:0;
+        vertical-align:1px; text-align:center;
         color:var(--dim); border:1px solid color-mix(in srgb, var(--dim) 45%, transparent) }
   .pv-live { color:var(--accent); border-color:color-mix(in srgb, var(--accent) 55%, transparent) }
   .pv-record { font-style:italic }
@@ -273,7 +277,10 @@ saveMemory();
 
 for (const [id, list] of [['chips-research', RESEARCH], ['chips', SUGGEST]]) {
   const el = document.getElementById(id);
-  el.innerHTML = list.map(s => `<span class="chip">${esc0(s)}</span>`).join('');
+  // Buttons, not spans: the suggestions were reachable by mouse only, never by Tab or a screen
+  // reader (first-user audit, 2026-09-29). A button is focusable and fires on Enter and Space.
+  el.innerHTML = list.map(s => `<button type="button" class="chip">${esc0(s)}</button>`)
+    .join('');
   el.addEventListener('click', e => {
     if (!e.target.classList.contains('chip')) return;
     if (e.target.textContent === REVIEW_CHIP) {

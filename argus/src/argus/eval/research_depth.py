@@ -353,8 +353,8 @@ def recompute_tree(tree: Any, raw: Mapping[str, Mapping[datetime, float]],
 
 _SHOCK_LINE = re.compile(r"If (?P<name>\S+) moves (?P<shock>[-+]?\d+(?:\.\d+)?)%: your book moves "
                          r"about (?P<move>[-+]\d+\.\d+)%")
-_WINDOW_LINE = re.compile(r"worst 24-bar window in the observed history would have moved this "
-                          r"book (?P<move>[-+]\d+\.\d+)%")
+_WINDOW_LINE = re.compile(r"worst 24-bar window in the observed history(?: \([^)]*\))? would "
+                          r"have moved this book (?P<move>[-+]\d+\.\d+)%")
 _SHARE_LINE = re.compile(r"(?P<name>[A-Z0-9]+) is (?P<w>\d+)% of the book but (?P<s>\d+)% of its "
                          r"loss")
 _HEDGE_LINE = re.compile(r"Hedge: (?:short|long) (?P<name>\S+) worth about (?P<b>\d+)% of the "

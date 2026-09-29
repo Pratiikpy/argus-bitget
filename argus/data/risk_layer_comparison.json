@@ -1,6 +1,6 @@
 {
   "real_symbols": {
-    "generated_at": "2026-09-26T21:51:12.447394+00:00",
+    "generated_at": "2026-09-29T16:58:16.302858+00:00",
     "days": 90,
     "frozen": true,
     "symbols_compared": 7,
@@ -348,7 +348,7 @@
     "checkpoints_total": 314
   },
   "combined_book": {
-    "generated_at": "2026-09-26T21:51:13.260261+00:00",
+    "generated_at": "2026-09-29T16:58:17.124568+00:00",
     "days": 90,
     "frozen": true,
     "symbols_combined": [
@@ -693,6 +693,342 @@
     },
     "freqtrade_best_precision_at_full_recall": 0.1701,
     "argus_dominates_every_swept_threshold": true,
+    "argus_recall_is_by_construction": true,
+    "by_construction_note": "the 'should have locked' label is drawdown at or past ARGUS's own reduce-only bar, and ARGUS locks on exactly that or on a loss streak, so its recall of 1.0 is guaranteed before any data is read; the precision/recall points say how far freqtrade's proxy is from that rule, not that ARGUS predicts anything. The non-circular comparison is outcome_after_lock (a hostile review, 2026-09-29)",
     "verdict": "WEAK correlation (|r| < 0.3): freqtrade's proxy is not meaningfully informed by the ground truth it approximates, so no threshold re-tuning could make its near-constant lock read as a deliberate conservative-margin CHOICE rather than a measurement gap \u2014 the 'conservative by design' framing is ruled out by this evidence, not merely disfavoured"
+  },
+  "outcome_after_lock": {
+    "all": {
+      "n_trades_gated": 313,
+      "books": {
+        "argus": {
+          "trades_taken": 226,
+          "trades_stopped": 87,
+          "sum_net_return_pct": 1.4868,
+          "max_drawdown_pct": -0.1733,
+          "net_return_of_stopped_trades_pct": -0.2354
+        },
+        "freqtrade_default": {
+          "trades_taken": 0,
+          "trades_stopped": 313,
+          "sum_net_return_pct": 0,
+          "max_drawdown_pct": 0.0,
+          "net_return_of_stopped_trades_pct": 1.2514
+        },
+        "never_lock": {
+          "trades_taken": 313,
+          "trades_stopped": 0,
+          "sum_net_return_pct": 1.2514,
+          "max_drawdown_pct": -0.3481,
+          "net_return_of_stopped_trades_pct": 0
+        },
+        "always_lock": {
+          "trades_taken": 0,
+          "trades_stopped": 313,
+          "sum_net_return_pct": 0,
+          "max_drawdown_pct": 0.0,
+          "net_return_of_stopped_trades_pct": 1.2514
+        },
+        "freqtrade_drawdown_0.01": {
+          "trades_taken": 2,
+          "trades_stopped": 311,
+          "sum_net_return_pct": -0.0105,
+          "max_drawdown_pct": -0.0105,
+          "net_return_of_stopped_trades_pct": 1.2619
+        },
+        "freqtrade_drawdown_0.02": {
+          "trades_taken": 3,
+          "trades_stopped": 310,
+          "sum_net_return_pct": -0.0408,
+          "max_drawdown_pct": -0.0408,
+          "net_return_of_stopped_trades_pct": 1.2922
+        },
+        "freqtrade_drawdown_0.03": {
+          "trades_taken": 3,
+          "trades_stopped": 310,
+          "sum_net_return_pct": -0.0408,
+          "max_drawdown_pct": -0.0408,
+          "net_return_of_stopped_trades_pct": 1.2922
+        },
+        "freqtrade_drawdown_0.04": {
+          "trades_taken": 4,
+          "trades_stopped": 309,
+          "sum_net_return_pct": -0.137,
+          "max_drawdown_pct": -0.1369,
+          "net_return_of_stopped_trades_pct": 1.3884
+        },
+        "freqtrade_drawdown_0.06": {
+          "trades_taken": 4,
+          "trades_stopped": 309,
+          "sum_net_return_pct": -0.137,
+          "max_drawdown_pct": -0.1369,
+          "net_return_of_stopped_trades_pct": 1.3884
+        },
+        "freqtrade_drawdown_0.08": {
+          "trades_taken": 4,
+          "trades_stopped": 309,
+          "sum_net_return_pct": -0.137,
+          "max_drawdown_pct": -0.1369,
+          "net_return_of_stopped_trades_pct": 1.3884
+        },
+        "freqtrade_drawdown_0.1": {
+          "trades_taken": 26,
+          "trades_stopped": 287,
+          "sum_net_return_pct": -0.1213,
+          "max_drawdown_pct": -0.1463,
+          "net_return_of_stopped_trades_pct": 1.3727
+        }
+      },
+      "comparisons": {
+        "argus_minus_freqtrade_default": {
+          "trades_where_they_disagree": 226,
+          "mean_per_trade_pct": 0.00475,
+          "interval_95": [
+            0.00116,
+            0.00864
+          ],
+          "favours": "argus"
+        },
+        "argus_minus_never_lock": {
+          "trades_where_they_disagree": 87,
+          "mean_per_trade_pct": 0.00075,
+          "interval_95": [
+            -0.00164,
+            0.00246
+          ],
+          "favours": "neither"
+        },
+        "argus_minus_freqtrade_drawdown_0.01": {
+          "trades_where_they_disagree": 224,
+          "mean_per_trade_pct": 0.00478,
+          "interval_95": [
+            0.00117,
+            0.00865
+          ],
+          "favours": "argus"
+        },
+        "argus_minus_freqtrade_drawdown_0.02": {
+          "trades_where_they_disagree": 223,
+          "mean_per_trade_pct": 0.00488,
+          "interval_95": [
+            0.0012,
+            0.00869
+          ],
+          "favours": "argus"
+        },
+        "argus_minus_freqtrade_drawdown_0.03": {
+          "trades_where_they_disagree": 223,
+          "mean_per_trade_pct": 0.00488,
+          "interval_95": [
+            0.0012,
+            0.00869
+          ],
+          "favours": "argus"
+        },
+        "argus_minus_freqtrade_drawdown_0.04": {
+          "trades_where_they_disagree": 224,
+          "mean_per_trade_pct": 0.00519,
+          "interval_95": [
+            0.00136,
+            0.00886
+          ],
+          "favours": "argus"
+        },
+        "argus_minus_freqtrade_drawdown_0.06": {
+          "trades_where_they_disagree": 224,
+          "mean_per_trade_pct": 0.00519,
+          "interval_95": [
+            0.00136,
+            0.00886
+          ],
+          "favours": "argus"
+        },
+        "argus_minus_freqtrade_drawdown_0.08": {
+          "trades_where_they_disagree": 224,
+          "mean_per_trade_pct": 0.00519,
+          "interval_95": [
+            0.00136,
+            0.00886
+          ],
+          "favours": "argus"
+        },
+        "argus_minus_freqtrade_drawdown_0.1": {
+          "trades_where_they_disagree": 204,
+          "mean_per_trade_pct": 0.00514,
+          "interval_95": [
+            0.00139,
+            0.00874
+          ],
+          "favours": "argus"
+        }
+      },
+      "strategy_alone_is_profitable": true
+    },
+    "out_of_sample": {
+      "n_trades_gated": 122,
+      "books": {
+        "argus": {
+          "trades_taken": 94,
+          "trades_stopped": 28,
+          "sum_net_return_pct": 0.4748,
+          "max_drawdown_pct": -0.1733,
+          "net_return_of_stopped_trades_pct": -0.1162
+        },
+        "freqtrade_default": {
+          "trades_taken": 0,
+          "trades_stopped": 122,
+          "sum_net_return_pct": 0,
+          "max_drawdown_pct": 0.0,
+          "net_return_of_stopped_trades_pct": 0.3586
+        },
+        "never_lock": {
+          "trades_taken": 122,
+          "trades_stopped": 0,
+          "sum_net_return_pct": 0.3586,
+          "max_drawdown_pct": -0.171,
+          "net_return_of_stopped_trades_pct": 0
+        },
+        "always_lock": {
+          "trades_taken": 0,
+          "trades_stopped": 122,
+          "sum_net_return_pct": 0,
+          "max_drawdown_pct": 0.0,
+          "net_return_of_stopped_trades_pct": 0.3586
+        },
+        "freqtrade_drawdown_0.01": {
+          "trades_taken": 0,
+          "trades_stopped": 122,
+          "sum_net_return_pct": 0,
+          "max_drawdown_pct": 0.0,
+          "net_return_of_stopped_trades_pct": 0.3586
+        },
+        "freqtrade_drawdown_0.02": {
+          "trades_taken": 0,
+          "trades_stopped": 122,
+          "sum_net_return_pct": 0,
+          "max_drawdown_pct": 0.0,
+          "net_return_of_stopped_trades_pct": 0.3586
+        },
+        "freqtrade_drawdown_0.03": {
+          "trades_taken": 0,
+          "trades_stopped": 122,
+          "sum_net_return_pct": 0,
+          "max_drawdown_pct": 0.0,
+          "net_return_of_stopped_trades_pct": 0.3586
+        },
+        "freqtrade_drawdown_0.04": {
+          "trades_taken": 0,
+          "trades_stopped": 122,
+          "sum_net_return_pct": 0,
+          "max_drawdown_pct": 0.0,
+          "net_return_of_stopped_trades_pct": 0.3586
+        },
+        "freqtrade_drawdown_0.06": {
+          "trades_taken": 0,
+          "trades_stopped": 122,
+          "sum_net_return_pct": 0,
+          "max_drawdown_pct": 0.0,
+          "net_return_of_stopped_trades_pct": 0.3586
+        },
+        "freqtrade_drawdown_0.08": {
+          "trades_taken": 0,
+          "trades_stopped": 122,
+          "sum_net_return_pct": 0,
+          "max_drawdown_pct": 0.0,
+          "net_return_of_stopped_trades_pct": 0.3586
+        },
+        "freqtrade_drawdown_0.1": {
+          "trades_taken": 22,
+          "trades_stopped": 100,
+          "sum_net_return_pct": 0.0157,
+          "max_drawdown_pct": -0.1173,
+          "net_return_of_stopped_trades_pct": 0.3429
+        }
+      },
+      "comparisons": {
+        "argus_minus_freqtrade_default": {
+          "trades_where_they_disagree": 94,
+          "mean_per_trade_pct": 0.00389,
+          "interval_95": [
+            -0.00065,
+            0.00707
+          ],
+          "favours": "neither"
+        },
+        "argus_minus_never_lock": {
+          "trades_where_they_disagree": 28,
+          "mean_per_trade_pct": 0.00095,
+          "interval_95": [
+            -0.00056,
+            0.00215
+          ],
+          "favours": "neither"
+        },
+        "argus_minus_freqtrade_drawdown_0.01": {
+          "trades_where_they_disagree": 94,
+          "mean_per_trade_pct": 0.00389,
+          "interval_95": [
+            -0.00065,
+            0.00707
+          ],
+          "favours": "neither"
+        },
+        "argus_minus_freqtrade_drawdown_0.02": {
+          "trades_where_they_disagree": 94,
+          "mean_per_trade_pct": 0.00389,
+          "interval_95": [
+            -0.00065,
+            0.00707
+          ],
+          "favours": "neither"
+        },
+        "argus_minus_freqtrade_drawdown_0.03": {
+          "trades_where_they_disagree": 94,
+          "mean_per_trade_pct": 0.00389,
+          "interval_95": [
+            -0.00065,
+            0.00707
+          ],
+          "favours": "neither"
+        },
+        "argus_minus_freqtrade_drawdown_0.04": {
+          "trades_where_they_disagree": 94,
+          "mean_per_trade_pct": 0.00389,
+          "interval_95": [
+            -0.00065,
+            0.00707
+          ],
+          "favours": "neither"
+        },
+        "argus_minus_freqtrade_drawdown_0.06": {
+          "trades_where_they_disagree": 94,
+          "mean_per_trade_pct": 0.00389,
+          "interval_95": [
+            -0.00065,
+            0.00707
+          ],
+          "favours": "neither"
+        },
+        "argus_minus_freqtrade_drawdown_0.08": {
+          "trades_where_they_disagree": 94,
+          "mean_per_trade_pct": 0.00389,
+          "interval_95": [
+            -0.00065,
+            0.00707
+          ],
+          "favours": "neither"
+        },
+        "argus_minus_freqtrade_drawdown_0.1": {
+          "trades_where_they_disagree": 74,
+          "mean_per_trade_pct": 0.00376,
+          "interval_95": [
+            -4e-05,
+            0.00654
+          ],
+          "favours": "neither"
+        }
+      },
+      "strategy_alone_is_profitable": true
+    }
   }
 }

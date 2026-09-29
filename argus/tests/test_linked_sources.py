@@ -40,3 +40,11 @@ def test_a_question_in_flight_stays_on_screen_with_a_running_count() -> None:
 
     assert 'class="card pending" id="pending"' in server.PAGE
     assert "clearInterval(ticker)" in server.PAGE and "pending.remove()" in server.PAGE
+
+
+def test_the_suggestions_are_buttons_a_keyboard_can_reach() -> None:
+    """First-user audit, 2026-09-29: the 25 suggestion chips were spans, mouse-only."""
+    from argus.lui import server
+
+    assert '<button type="button" class="chip">' in server.PAGE
+    assert '<span class="chip">' not in server.PAGE
