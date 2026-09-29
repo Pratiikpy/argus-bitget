@@ -48,8 +48,14 @@ def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict
     capability is OWNED for the integrity layer — "five accounts repeating one article is one
     source" — and until 2026-09-24 the console showed none of it (a judge audit's finding)."""
 
-    from argus.market.bitget import fetch_tickers
+    from argus.market.bitget import ANCHOR_OF, fetch_tickers
     from argus.market.stories import group
+
+    if symbol in ANCHOR_OF:
+        # Listed options and dark-pool flow take seconds to read; start them before the rest.
+        from argus.lui.research.positioning import prefetch
+
+        prefetch(ANCHOR_OF[symbol])
 
     def alternative_week(ident: str, args: dict[str, Any]
                          ) -> tuple[Health, str, Any, str, bool]:
@@ -262,6 +268,16 @@ def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict
             sources.append(Source(kind="venue", ref="bitget-mcp-server",
                                   detail="sentiment_market_fear_greed, long/short ratios, "
                                          "Hyperliquid whale positions, liquidations"))
+        # The money that is not on Bitget: listed options and off-exchange flow in the stock
+        # (lui/research/positioning.py). Every rToken's underlying has a listed chain, COIN and
+        # MSTR included; a crypto contract has none.
+        positioning: dict[str, Any] = {}
+        if symbol in ANCHOR_OF:
+            from argus.lui.research.positioning import listed_positioning
+
+            held, held_sources, positioning = listed_positioning(ANCHOR_OF[symbol])
+            lines.extend(held)
+            sources.extend(held_sources)
         if tested is not None:
             lines.append(tested[0])
             sources.append(Source(kind="computation", ref="data/sentiment_comparison.json",
@@ -269,8 +285,17 @@ def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict
                                          "posting"))
         return lines, sources, {"index": now_value, "label": label, "week": week,
                                 "headlines": len(headlines), "stories": len(stories),
-                                "integrity": integrity}
+                                "integrity": integrity, "positioning": positioning}
     lines[1:1] = extra
+    market_positioning: dict[str, Any] = {}
+    if symbol in ANCHOR_OF:
+        # The benchmark (QQQ) is answered as the market, and its options and dark-pool flow are
+        # the market's too.
+        from argus.lui.research.positioning import listed_positioning
+
+        held, held_sources, market_positioning = listed_positioning(ANCHOR_OF[symbol])
+        lines.extend(held)
+        sources.extend(held_sources)
     if tested is not None:
         lines.append(tested[0])
     if own is not None:
@@ -286,7 +311,8 @@ def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict
         sources.append(Source(kind="venue", ref="bitget-mcp-server",
                               detail="stock-market fear & greed, long/short ratios, Hyperliquid "
                                      "whale positions, liquidations"))
-    return lines, sources, {"index": now_value, "label": label, "week": week}
+    return lines, sources, {"index": now_value, "label": label, "week": week,
+                            "positioning": market_positioning}
 
 
 # Every engine here is a traced step from import on (lui/trace.py, trace_module).

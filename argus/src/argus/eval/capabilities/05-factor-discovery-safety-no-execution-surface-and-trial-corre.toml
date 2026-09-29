@@ -15,9 +15,27 @@ modules = [
 # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
 # proof now needs a groupwise check on the capability's own artefact, and this
 # row's does not pass it. The reason and the route back are its first blocker.
-state = "implemented"
-baseline = "microsoft/RD-Agent real factor-implementation pipeline (FBWorkspace, factor_coder)"
+state = "tied"
+baseline = """\
+    microsoft/RD-Agent real factor-implementation pipeline (FBWorkspace, factor_coder) for the \
+    execution surface, and vectorbt's deflated_sharpe_ratio (Bailey and Lopez de Prado) for the \
+    trial correction"""
 blockers = [
+    """\
+        RE-GRADED 2026-09-29 from IMPLEMENTED to TIED (Activity/28_CAPABILITY_CLOSE_PLAN_2.md \
+        §5). The measured parts favour ARGUS over RD-Agent: RD-Agent's unmodified \
+        FactorFBWorkspace.execute() ran an attacker payload (data/rdagent_comparison.json \
+        injection_proof), while ARGUS's search path has no eval, exec or subprocess call; and on \
+        one 400-trial pool of 326 distinct candidates on NVDAUSDT, the best in-sample Sharpe of \
+        0.0178 deflates to p = 9.3e-05 once the trials are counted. But RD-Agent's accept \
+        decision is an LLM vote (rdagent/scenarios/qlib/developer/ feedback.py:110, 'Replace \
+        Best Result') that was read and never run on that pool, so the selection half has no \
+        same-input contest. Against the general method the correction is the same formula with \
+        the same outputs: ARGUS's deflated Sharpe equals vectorbt's on 1,215 of 1,215 swept \
+        cases, max abs diff 0.0 (data/dsr_comparison.json), so on the correction's arithmetic \
+        parity is the ceiling. The execution-surface half is a property shown by running it, not \
+        a population measurement with an interval. Running RD-Agent's real generate_feedback on \
+        the same candidates is about 240 Qwen calls and is not done.""",
     """\
         RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate \
         (data/groupwise_audit.json): data/rdagent_comparison.json holds an injection proof, a \

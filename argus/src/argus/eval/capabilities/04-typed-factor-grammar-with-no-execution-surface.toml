@@ -16,9 +16,26 @@ modules = [
 # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
 # proof now needs a groupwise check on the capability's own artefact, and this
 # row's does not pass it. The reason and the route back are its first blocker.
-state = "implemented"
-baseline = "microsoft/qlib real expression engine (qlib/data/base.py, ops.py, data.py, utils)"
+state = "tied"
+baseline = """\
+    Google CEL (cel-expr-python 0.1.3) for safe static typing, Polars 1.44.2 for evaluation \
+    speed, and microsoft/qlib's real expression engine (qlib/data/base.py, ops.py, data.py, \
+    utils) as the named rival"""
 blockers = [
+    """\
+        RE-GRADED 2026-09-29 from IMPLEMENTED to TIED (Activity/28_CAPABILITY_CLOSE_PLAN_2.md \
+        §4) with Google CEL (cel-expr-python 0.1.3), the best general-purpose safe typed \
+        expression language, run live on the same trees and the same 1,439 real NVDAUSDT hourly \
+        closes (data/general_grammar_comparison.json). On the capability's defining properties \
+        the two are equal: both reject 10 of 10 ill-typed cases before touching data, and \
+        neither has an execution surface (the AST scan of grammar.py, grammar_text.py and \
+        grammar_series.py is clean; CEL is non-Turing-complete by design). Against the named \
+        rival ARGUS wins the defining property: qlib's ExpressionProvider evaluates expressions \
+        through a nested eval (CWE-95). ARGUS's only edge over the general tools is duplicate \
+        identity on designed pairs (normal_form merges 8 of 8, SymPy 7, CEL 0), where no \
+        interval is possible. It LOSES on speed to Polars, which is 14.5x to 187x faster than \
+        grammar_series with signal agreement 1.0 and numeric parity near 1e-13. Parity with CEL \
+        is the ceiling on these axes, since CEL is safe and typed by construction.""",
     """\
         RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate \
         (data/groupwise_audit.json): the real-market half of the parity claim, \

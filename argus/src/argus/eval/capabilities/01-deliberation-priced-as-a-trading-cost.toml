@@ -19,12 +19,28 @@ modules = [
 # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
 # proof now needs a groupwise check on the capability's own artefact, and this
 # row's does not pass it. The reason and the route back are its first blocker.
-state = "implemented"
+state = "lost"
 baseline = """\
     HaoKang-Timmy/LatencySensitiveBench (arxiv 2505.19481, NeurIPS 2025) — found 2026-09-16 by \
     a fresh, targeted search after the original 88-repo corpus survey found nothing; the ONE \
     real exception to 'every harness treats latency as free'"""
 blockers = [
+    """\
+        RE-GRADED 2026-09-29 from IMPLEMENTED to LOST (Activity/28_CAPABILITY_CLOSE_PLAN_2.md \
+        §1). The comparison the blocker below marked NOT VERIFIED has now run: \
+        data/general_delib_comparison.json, 23,003 real decision instants from free Tardis \
+        Bitget books (2026-08-01 and 2026-09-01) and the 2026-09-24 forward tape, scored against \
+        the realised move at ARGUS's three thinking delays. The charge that runs in production \
+        (agents/meta_pm.py with the constant 0.45 vol and the depth multiplier) has MSE 10.85 at \
+        3s; the trailing empirical estimator (the same method as agents/delay_cost.py, parity \
+        2e-12 on 238 instants) has 0.96, and trailing realised vol 0.99. The production charge's \
+        excess MSE over the trailing estimator is 9.89, block-bootstrap interval [9.20, 10.57] \
+        over 406 blocks, and it is biased 6.2x high. It beats the named specialist by a wide \
+        margin (LatencySensitiveBench's linear model, MSE 544), but loses significantly to the \
+        textbook general estimator at every horizon, on every book out of sample, in both halves \
+        and after a jump. The report reproduces byte for byte. Chronos-2 was not run (reported \
+        absent). To climb to TIED: wire delay_cost into meta_pm.deliberation_cost_bps and \
+        re-run, at which point ARGUS is the general estimator.""",
     """\
         RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate \
         (data/groupwise_audit.json): its statistical and out-of-sample evidence is \

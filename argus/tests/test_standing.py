@@ -798,7 +798,8 @@ def _stat_cap() -> Capability:
 
 
 def _groupwise(**headline: Any) -> dict[str, Any]:
-    head = {"name": "h", "role": "argus_vs_rival", "flags": [], "favours": "argus", **headline}
+    head = {"name": "h", "role": "argus_vs_rival", "flags": [], "favours": "argus",
+            "interval": {"low": 0.1, "high": 0.4, "spans_zero": False}, **headline}
     return {"artefacts": {_ARTEFACT: {
         "status": "checked", "sha256": standing._sha256(standing.PACKAGE / _ARTEFACT),
         "headlines": [head]}}}
@@ -884,15 +885,25 @@ class TestDemotionsCarryTheirRouteBack:
         demoted = [c for c in REGISTER
                    if c.blockers and "by the groupwise gate" in c.blockers[0]]
         # twelve on 2026-09-25; numeric grounding on 2026-09-27, once its designed cases were
-        # filed as designed (audit finding 95); net executable arbitrage left on 2026-09-28, when
-        # it took its route back (proofs on the groupwise-checked real-book artefact) and was
-        # re-graded TIED — its TIED line now leads, and the gate's demotion follows it
-        assert len(demoted) == 12
+        # filed as designed (audit finding 95). Rows that have since taken a route back lead with
+        # that re-grade instead, and are checked below.
+        assert len(demoted) == 4
         for cap in demoted:
             assert cap.state is State.IMPLEMENTED, cap.name
             assert re.match(r"RE-GRADED 2026-09-2[57] from OWNED to IMPLEMENTED by the "
                             r"groupwise gate", cap.blockers[0]), cap.name
             assert "oute back" in cap.blockers[0], cap.name
+
+    def test_a_row_that_left_the_gates_demotion_leads_with_its_measured_regrade(self) -> None:
+        # Net executable arbitrage on 2026-09-28; eight more on 2026-09-29
+        # (Activity/28_CAPABILITY_CLOSE_PLAN_2.md), five TIED and three LOST.
+        moved = [c for c in REGISTER
+                 if len(c.blockers) > 1 and "by the groupwise gate" in c.blockers[1]]
+        assert len(moved) == 9
+        for cap in moved:
+            assert cap.state in (State.TIED, State.LOST), cap.name
+            assert re.match(r"RE-GRADED 2026-09-2[89] from IMPLEMENTED to "
+                            rf"{cap.state.value.upper()} ", cap.blockers[0]), cap.name
 
 
 # --- verdicts read from the harness, not restated ------------------------------------------------
@@ -1024,8 +1035,35 @@ class TestAnIntervalThatIncludesZeroIsNotAValidEvaluation:
         ok, _ = self._verdict({"low": 0.0, "high": 0.0, "spans_zero": True}, monkeypatch)
         assert ok
 
-    def test_no_interval_is_judged_as_before(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        ok, _ = self._verdict(None, monkeypatch)
+    def test_no_interval_at_all_fails(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        # The first loophole (Activity/28_CAPABILITY_CLOSE_PLAN_2.md): a claim headline with no
+        # interval used to pass, because only a spanning interval was looked at.
+        ok, why = self._verdict(None, monkeypatch)
+        assert not ok and "no claim headline carries an interval" in why
+
+    def test_a_zero_that_means_nothing_survived_fails(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        # The second: "0 of 66 pairs survive" is certainty that the effect is absent.
+        import argus.eval.standing as standing
+
+        monkeypatch.setattr(standing, "proof_scope", lambda cap, proof: ("data/x.json",))
+        blob = self._audit({"low": 0.0, "high": 0.0, "spans_zero": True})
+        blob["artefacts"]["data/x.json"]["headlines"][0]["zero_is_no_effect"] = True
+        cap = standing.REGISTER[0]
+        ok, why = standing.groupwise_verdict(cap, cap.proofs[0], blob)
+        assert not ok and "nothing survived" in why
+
+    def test_a_null_breakdown_beside_a_measured_headline_passes(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        # profile_divergence.json: the same effect by symbol (measured) and by rung (6 units).
+        import argus.eval.standing as standing
+
+        monkeypatch.setattr(standing, "proof_scope", lambda cap, proof: ("data/x.json",))
+        blob = self._audit({"low": 0.1, "high": 0.4, "spans_zero": False})
+        heads = blob["artefacts"]["data/x.json"]["headlines"]
+        heads.append({**heads[0], "name": "by rung", "interval": None})
+        cap = standing.REGISTER[0]
+        ok, _ = standing.groupwise_verdict(cap, cap.proofs[0], blob)
         assert ok
 
 

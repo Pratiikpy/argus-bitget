@@ -786,6 +786,30 @@ def groupwise_verdict(capability: Capability, proof: Proof,
     headline cannot be told apart from no effect has not had a statistically valid evaluation,
     however it reads. A degenerate interval (every draw the same value, as when every trial scored
     zero) says nothing about uncertainty and is not held against the claim.
+
+    **Two loopholes closed (2026-09-29, Activity/28_CAPABILITY_CLOSE_PLAN_2.md).** The rule above
+    failed a headline only when its interval spanned zero, so two kinds passed without evidence:
+
+    - an artefact none of whose claim headlines carries an interval (``interval: null``, which
+      `groupwise.headline_interval` returns below its minimum number of units), which the rule
+      never looked at; a claim with no measured uncertainty has not had a statistically valid
+      evaluation either. One null headline beside a measured one is not held against the claim:
+      `profile_divergence.json` states the same effect by symbol (12 units, measured) and by rung
+      (6 units, too few to resample), and the second adds a breakdown, not a doubt;
+    - a degenerate ``[0, 0]`` interval on a headline whose zero *is* the absence of the effect, as
+      a "0 of N survive" artefact produces. Every draw being zero there is not uncertainty-free
+      support for a claim; it is certainty that nothing survived, and citing one would have passed
+      the gate with no rival in the row. The adapter marks such a headline
+      (``zero_is_no_effect``, `eval/groupwise_audit.py`), because the same ``[0, 0]`` means the
+      opposite elsewhere: on a head-to-head it is an exact tie on every item, and on an error
+      count ("0 = right") it is every item right. Those still pass, as does a degenerate interval
+      at a nonzero value.
+
+    Considered and not adopted (fresh-eyes audit, 2026-09-29): failing a head-to-head headline
+    whose interval is an exact [0, 0]. That is a tie on every item, measured without uncertainty,
+    and it is a statistically valid finding of a tie. What it cannot support is superiority,
+    which is a different condition (``no_specialist_capability_superior``) with its own check. The
+    two rows it would touch today (claimcheck vs MirrorLine, copilot hedge vs Ballast) are TIED.
     """
     if groupwise is None:
         return False, ("no groupwise check has run: data/groupwise_audit.json is missing or "
@@ -800,6 +824,7 @@ def groupwise_verdict(capability: Capability, proof: Proof,
     stale: list[str] = []
     missing: list[str] = []
     uncertain: list[str] = []
+    unmeasured: list[str] = []
     for ref in scope:
         entry = entries.get(ref)
         if entry is None:
@@ -816,6 +841,8 @@ def groupwise_verdict(capability: Capability, proof: Proof,
         if recorded is not None and recorded != _sha256(PACKAGE / ref):
             stale.append(ref)
             continue
+        if not any(h.get("interval") for h in claims):
+            unmeasured.append(f"{ref}: no claim headline carries an interval")
         for h in claims:
             label = f"{ref} :: {h.get('name')}"
             checked.append(label)
@@ -824,7 +851,9 @@ def groupwise_verdict(capability: Capability, proof: Proof,
             if h.get("favours") == "rival":
                 rival.append(label)
             interval = h.get("interval") or {}
-            if interval.get("spans_zero") and interval.get("low") != interval.get("high"):
+            if h.get("zero_is_no_effect") and interval.get("low") == interval.get("high") == 0:
+                unmeasured.append(f"{label}: degenerate [0, 0], nothing survived")
+            elif interval.get("spans_zero") and interval.get("low") != interval.get("high"):
                 uncertain.append(f"{label} [{interval.get('low')}, {interval.get('high')}]")
     if stale:
         return False, (f"the groupwise audit predates the current {', '.join(stale)}; re-run "
@@ -836,6 +865,9 @@ def groupwise_verdict(capability: Capability, proof: Proof,
     if uncertain:
         return False, ("the headline's 95% interval includes zero, so the claim cannot be told "
                        "apart from no effect: " + "; ".join(uncertain))
+    if unmeasured:
+        return False, ("the headline carries no measured uncertainty, so it is not a statistically "
+                       "valid evaluation: " + "; ".join(unmeasured))
     if not checked:
         return False, "no groupwise check has run on its artefacts: " + "; ".join(missing)
     more = f" (+{len(checked) - 1} more)" if len(checked) > 1 else ""

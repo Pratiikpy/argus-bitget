@@ -6,9 +6,23 @@ modules = [
     "argus/eval/l3feeds.py",
     "argus/eval/realqueue.py",
 ]
-state = "implemented"
+state = "tied"
 baseline = "nkaz001/hftbacktest, backtest/models/queue.rs"
 blockers = [
+    """\
+        RE-GRADED 2026-09-29 from IMPLEMENTED to TIED (Activity/28_CAPABILITY_CLOSE_PLAN_2.md \
+        §25) with hftbacktest's queue models (backtest/models/queue.rs) and its L3/L2 engine. \
+        The capability is a faithful port: all eight probability functions reproduce hftbacktest \
+        to 1.1e-16 (data/queue_proof.json), and on real CME market-by-order data (ESH4, \
+        2023-12-25, 1,438 orders, hftbacktest 2.4.4, data/hftbacktest_run.json) fill agreement \
+        at L3 is 1.0 with the same timestamp on all 1,130 fills. Both sides share the same best \
+        model, which is hftbacktest's own PowerProbQueueFunc3 n=3 (queue error 0.04736 against \
+        the shipped LogProbQueueFunc2's 0.04809, a 0.0007 margin with no interval on the \
+        corrected replay, chosen in-sample on one holiday session). It cannot be won: every arm \
+        available to ARGUS is also an hftbacktest arm. Two findings against the row stand beside \
+        the tie: the groupwise headline on the simulated regimes favours the best naive rule \
+        (micro mean -0.0082 over five regimes, carried mostly by front-sticky), and Bitget \
+        publishes no market-by-order feed, so the model serves backtest fills only.""",
     """\
         no_specialist_capability_superior is NOT established, and it is the thirteenth. The gap is \
         narrower than this entry used to claim, and the correction is recorded rather than quietly \

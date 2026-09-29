@@ -621,13 +621,36 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
         # Three more of the server's equity entries, unused until an audit of the toolkit counted
         # 5 of 22 in use (2026-09-24): valuation ratios, the institutional position summary and
         # insider (Form 4) filings. Each is read only where its fields mean one thing.
+        # And two more after the perception comparison against OpenBB's keyless providers
+        # (eval/perception_breadth.py, 2026-09-28) found company profiles and major holders
+        # answering there and not here: the same service had both all along.
         for entry_id in ("equity_fundamental_ratios", "equity_ownership_inst_position_summary",
-                         "equity_ownership_insider_trading"):
+                         "equity_ownership_insider_trading", "equity_profile",
+                         "equity_ownership_major_holders"):
             pending[entry_id] = pool.submit(entry, entry_id)
         # The second source, read side by side and used only for what the first did not return:
         # Bitget's data service answered 503 for a whole afternoon (2026-09-25) and every
         # earnings-date and analyst-target question lost its answer without a word (audit round 3).
         pending["yahoo"] = pool.submit(yahoo_summary, ticker)
+        # Corporate actions and the filing record, which the perception comparison counted
+        # missing from this answer (eval/perception_breadth.py, 2026-09-29).
+        from argus.market.bitget_positioning import dividend_history
+        from argus.market.evidence import EdgarSource
+
+        pending["dividend_history"] = pool.submit(dividend_history, ticker)
+        # What a fund holds (the one category OpenBB still answered for QQQ and this did not).
+        from argus.market.instruments import REGISTRY as _REGISTRY
+        from argus.market.instruments import InstrumentKind as _Kind
+
+        if symbol in _REGISTRY and _REGISTRY[symbol].kind in (_Kind.INDEX_ETF,
+                                                                _Kind.LEVERAGED_ETF):
+            from argus.market.estimates import EstimatesSource
+
+            pending["fund_holdings"] = pool.submit(
+                lambda: EstimatesSource().summary(ticker, "topHoldings"))
+        pending["filings"] = pool.submit(
+            lambda: EdgarSource().filings(ticker, since=datetime.now(UTC) - timedelta(days=400),
+                                          limit=60))
 
     def safe(name: str) -> Any:
         try:
@@ -684,8 +707,10 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
                 f"{'' if scraped else 'date'} — too old to present as today's expectation, so "
                 f"it is withheld rather than quoted."
             )
+        current = age is not None and age <= CONSENSUS_MAX_AGE_DAYS
         sources.append(Source(kind="venue", ref="bitget-mcp-server consensus",
-                              detail=f"scraped {scraped}"))
+                              detail=f"scraped {scraped}" + ("" if current else
+                                                             "; withheld as too old")))
 
     holders = safe("institutional_holdings")
     if isinstance(holders, list) and holders:
@@ -713,11 +738,24 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
     if isinstance(yahoo, dict):
         backup, backup_sources = _yahoo_fundamental_lines(
             ticker, yahoo, today,
-            need_date=not any(line.startswith(("Next report", "Most recent report"))
-                              for line in lines),
+            # A past report on file is not a next date: Yahoo is asked whenever the first source
+            # has no upcoming one (NVDA on 2026-09-29: Bitget held 2026-08-26 only, Yahoo had
+            # 2026-11-17, and the answer said "not published yet").
+            need_date=not any(line.startswith("Next report") for line in lines),
             need_targets=target_line is None,
-            need_consensus=not any(line.startswith(("Analyst consensus", "The analyst consensus"))
-                                   for line in lines), found=found)
+            # A consensus withheld as stale is not a consensus: the second source is asked for
+            # one, and the withholding note gives way to it when it answers (the breadth
+            # comparison found NVDA's estimates missing on 2026-09-29 for exactly this reason).
+            need_consensus=not any(line.startswith("Analyst consensus") for line in lines),
+            found=found)
+        if any(line.startswith("Analyst consensus") for line in backup):
+            lines = [line for line in lines if not line.startswith("The analyst consensus")]
+        if any(line.startswith("Next report") for line in backup):
+            lines = [line.replace("; the source has not yet published the next date.",
+                                  "; Bitget's data service has not published the next one, "
+                                  "Yahoo's calendar has.")
+                     for line in lines
+                     if not line.startswith(f"Bottom line: {ticker}'s next report date is not")]
         for line in backup:
             if bool(LEAD.match(line)):
                 lines.insert(0, line)
@@ -754,6 +792,41 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
         lines.append(dividend)
         sources.append(Source(kind="venue", ref="bitget-mcp-server equity_fundamental_dividends",
                               detail=f"{ticker} ex-dividend date"))
+    else:
+        history = safe("dividend_history")
+        if isinstance(history, str):
+            lines.append(history)
+            sources.append(Source(kind="venue",
+                                  ref="bitget-mcp-server equity_fundamental_dividends",
+                                  detail=f"{ticker} dividend and split history"))
+    held = (safe("fund_holdings") or {}).get("topHoldings") if "fund_holdings" in pending else None
+    if isinstance(held, dict) and held.get("holdings"):
+        weights = [(str(h.get("symbol") or h.get("holdingName")),
+                    raw_number(h.get("holdingPercent"))) for h in held["holdings"]]
+        fund_top = [(name, w) for name, w in weights if w]
+        sectors = sorted(((next(iter(row)), raw_number(next(iter(row.values()))))
+                          for row in held.get("sectorWeightings") or [] if row),
+                         key=lambda kv: -(kv[1] or 0.0))[:3]
+        if fund_top:
+            fund_names = ", ".join(f"{name} {w * 100:.1f}%" for name, w in fund_top[:5])
+            covered = sum(w for _, w in fund_top)
+            shown = [f"{name.replace('_', ' ')} {w * 100:.0f}%" for name, w in sectors if w]
+            lines.append(f"Fund holdings (Yahoo Finance): {fund_names}; its top {len(fund_top)} "
+                         f"holdings are {covered * 100:.0f}% of the fund"
+                         + (f"; largest sectors {', '.join(shown)}." if shown else "."))
+            sources.append(Source(kind="venue", ref="Yahoo Finance quoteSummary topHoldings",
+                                  detail=f"{ticker} top holdings and sector weights"))
+    filed = safe("filings")
+    if isinstance(filed, list) and filed:
+        by_form: dict[str, Any] = {}
+        for f in sorted(filed, key=lambda f: f.filed, reverse=True):
+            by_form.setdefault(f.form.replace("/A", ""), f)
+        shown = [f"{form} filed {by_form[form].filed:%d %b %Y}" for form in ("10-Q", "10-K", "8-K")
+                 if form in by_form]
+        if shown:
+            lines.append(f"Latest SEC filings: {'; '.join(shown)}.")
+            sources.append(Source(kind="venue", ref="SEC EDGAR submissions",
+                                  detail=f"{ticker} 10-Q, 10-K and 8-K, last 400 days"))
     if ratio_row is not None:
         parts = [(label, ratio_row.get(key)) for label, key in (
             ("P/E (trailing 12m)", "pe_ttm_ed"), ("P/S (trailing 12m)", "ps_ttm_ed"),
@@ -789,6 +862,44 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
             sources.append(Source(kind="venue",
                                   ref="bitget-mcp-server equity_ownership_inst_position_summary",
                                   detail=f"{ticker} {now_row.get('chg_date')}"))
+    major = safe("equity_ownership_major_holders")
+    if isinstance(major, list) and major:
+        # The service returns every year's 5%-holder disclosure (NVDA: 2014 to 2026), so a
+        # ranking over all of them named FMR's 2014 stake as a current holder. Only the newest
+        # disclosure is read.
+        dated = [h for h in major if h.get("date")
+                 and isinstance(h.get("total_held_ratio_dsclsr_value"), (int, float))]
+        newest = max((str(h["date"]) for h in dated), default="")
+        ranked = sorted((h for h in dated if str(h["date"]) == newest),
+                        key=lambda h: -float(h["total_held_ratio_dsclsr_value"]))[:3]
+        if ranked:
+            named = "; ".join(f"{h.get('investor_name')} "
+                              f"{float(h['total_held_ratio_dsclsr_value']):.1f}%" for h in ranked)
+            lines.append(f"Largest disclosed holders (as of {newest}, filed "
+                         f"{ranked[0].get('filing_date')}): {named}.")
+            sources.append(Source(kind="venue",
+                                  ref="bitget-mcp-server equity_ownership_major_holders",
+                                  detail=f"{ticker} 5% holders disclosed as of {newest}"))
+    profile = safe("equity_profile")
+    row = profile[0] if isinstance(profile, list) and profile else None
+    if isinstance(row, dict) and row.get("legal_name") and str(row.get("symbol")) == ticker:
+        from argus.market.instruments import REGISTRY, InstrumentKind
+
+        # For a fund the service's legal name is the sponsor (QQQ -> "Invesco Ltd.", TQQQ ->
+        # "Proshare Advisors") and its head count is the sponsor's, so a fund is said to be one
+        # and the head count is left out.
+        registered = REGISTRY[symbol].kind if symbol in REGISTRY else None
+        fund = registered in (InstrumentKind.INDEX_ETF, InstrumentKind.LEVERAGED_ETF)
+        bits = [f"sponsored by {row['legal_name']}" if fund else str(row["legal_name"])]
+        if not fund and isinstance(row.get("employees"), (int, float)) and row["employees"] > 0:
+            bits.append(f"{float(row['employees']):,.0f} employees")
+        if row.get("first_stock_price_date"):
+            bits.append(f"trading since {row['first_stock_price_date']}")
+        if row.get("isin"):
+            bits.append(f"ISIN {row['isin']}")
+        lines.append(f"{'Fund' if fund else 'Company'}: {', '.join(bits)}.")
+        sources.append(Source(kind="venue", ref="bitget-mcp-server equity_profile",
+                              detail=f"{ticker} {'fund' if fund else 'company'} profile"))
     insiders = safe("equity_ownership_insider_trading")
     if isinstance(insiders, list) and insiders:
         recent = sorted(insiders, key=lambda r: str(r.get("filing_date") or ""), reverse=True)[:3]
@@ -819,7 +930,8 @@ _FOCUS: tuple[tuple[re.Pattern[str], tuple[str, ...], str], ...] = (
     (re.compile(r"\b(?:expensive|cheap|pricey|valuation|(?:over|under)[\s-]?valued|p/?e\b|"
                 r"p/?b\b|ev/?ebitda|multiple)", re.I), ("Valuation on",), "valuation"),
     (re.compile(r"\b(?:institution\w*|who\s+owns|holders?|13f)\b", re.I),
-     ("Institutions:", "Institutional holders"), "institutional holders"),
+     ("Institutions:", "Institutional holders", "Largest disclosed holders"),
+     "institutional holders"),
     (re.compile(r"\binsiders?\b|form\s+4", re.I), ("Insider filings",), "insider filings"),
 )
 """What the question asked for, and the line that answers it. The fundamentals engine gathers the
@@ -921,11 +1033,18 @@ def _fundamentals_focus(lines: list[str], question: str, ticker: str) -> list[st
             continue
         plain = [unlead(line)
                  for line in lines]
-        hit = next((i for i, line in enumerate(plain)
-                    if any(line.startswith(p) or (p in ("holds", "bitcoin") and p in line.lower()
-                                                   and "bitcoin" in line.lower())
-                           for p in starts)
-                    and (topic != "dividend" or "dividend" in line.lower())), None)
+        # A dividend is also stated mid-line ("NVDA goes ex-dividend on ...", "NVDA corporate
+        # actions: last cash dividend ..."), and those lines, not the yield inside the valuation
+        # row, are what a dividend question asks for; they are looked for first.
+        dated = (next((i for i, line in enumerate(plain)
+                       if "ex-dividend" in line or "corporate actions:" in line), None)
+                 if topic == "dividend" else None)
+        hit = dated if dated is not None else next(
+            (i for i, line in enumerate(plain)
+             if any(line.startswith(p) or (p in ("holds", "bitcoin") and p in line.lower()
+                                            and "bitcoin" in line.lower())
+                    for p in starts)
+             and (topic != "dividend" or "dividend" in line.lower())), None)
         if hit is None:
             return [f"Bottom line: the data source holds no {topic} figure for {ticker} right now, "
                     f"so none is given — the rest of its fundamentals follow.", *plain]

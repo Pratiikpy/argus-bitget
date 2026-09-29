@@ -1,0 +1,6785 @@
+{
+ "as_of_utc": "2026-09-28T22:35:42.183495+00:00",
+ "openbb_commit": "3e071fcc2cd9f891cac6040ae60296dba76dab46",
+ "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+ "installed_openbb_packages": {
+  "openbb-cboe": "1.6.1",
+  "openbb-core": "1.6.13",
+  "openbb-derivatives": "1.6.2",
+  "openbb-equity": "1.6.2",
+  "openbb-etf": "1.6.2",
+  "openbb-finra": "1.6.1",
+  "openbb-finviz": "1.5.1",
+  "openbb-mcp-server": "1.4.1",
+  "openbb-news": "1.6.2",
+  "openbb-sec": "1.6.7",
+  "openbb-seeking-alpha": "1.6.1",
+  "openbb-stockgrid": "1.6.1",
+  "openbb-tmx": "1.5.2",
+  "openbb-wsj": "1.6.1",
+  "openbb-yfinance": "1.6.3"
+ },
+ "tickers": [
+  "NVDA",
+  "TSLA",
+  "AAPL",
+  "MSFT",
+  "META",
+  "GOOGL",
+  "AMZN",
+  "COIN",
+  "MSTR",
+  "QQQ",
+  "TQQQ",
+  "SQQQ"
+ ],
+ "timeout_s": 30.0,
+ "keyless_tested_providers": [
+  "cboe",
+  "finra",
+  "finviz",
+  "sec",
+  "tmx",
+  "wsj",
+  "yfinance",
+  "stockgrid",
+  "seeking_alpha"
+ ],
+ "keyless_not_tested_no_per_symbol_endpoint": [
+  "deribit",
+  "famafrench",
+  "federal_reserve",
+  "government_us",
+  "imf",
+  "oecd",
+  "ecb",
+  "multpl",
+  "cftc",
+  "eia"
+ ],
+ "excluded_keyed_providers": {
+  "alpha_vantage": [
+   "api_key"
+  ],
+  "benzinga": [
+   "api_key"
+  ],
+  "biztoc": [
+   "api_key"
+  ],
+  "bls": [
+   "api_key"
+  ],
+  "congress_gov": [
+   "api_key"
+  ],
+  "fmp": [
+   "api_key"
+  ],
+  "fred": [
+   "api_key"
+  ],
+  "intrinio": [
+   "api_key"
+  ],
+  "nasdaq": [
+   "api_key"
+  ],
+  "tiingo": [
+   "token"
+  ],
+  "tradier": [
+   "account_type + api_key/token (has a shared demo token but still a required credential)"
+  ],
+  "tradingeconomics": [
+   "api_key"
+  ],
+  "cftc": [
+   "app_token (optional; throttled without it)"
+  ],
+  "econdb": [
+   "api_key (optional; falls back to a temporary token if unset)"
+  ],
+  "eia": [
+   "api_key (optional; only required for functions beyond the Weekly Petroleum Status Report)"
+  ]
+ },
+ "wall_time_s": 948.2,
+ "run_error": null,
+ "per_symbol": [
+  {
+   "provider": "sec",
+   "endpoint": "equity.compare.company_facts",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 28,
+   "latency_s": 0.95,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.compare.company_facts",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 45,
+   "latency_s": 0.045,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.compare.company_facts",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 117,
+   "latency_s": 0.052,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.compare.company_facts",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 134,
+   "latency_s": 0.052,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.compare.company_facts",
+   "ticker": "META",
+   "answered": true,
+   "rows": 110,
+   "latency_s": 0.054,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.compare.company_facts",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 87,
+   "latency_s": 0.05,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.compare.company_facts",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 128,
+   "latency_s": 0.056,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.compare.company_facts",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.632,
+   "error": "EmptyDataError: \n[Empty] -> ['Symbol Error: No data was found for, COIN and RevenueFromContractWithCustomerExcludingAssessedTax']"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.compare.company_facts",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 132,
+   "latency_s": 0.051,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.compare.company_facts",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.523,
+   "error": "EmptyDataError: \n[Empty] -> ['Symbol Error: No data was found for, QQQ and RevenueFromContractWithCustomerExcludingAssessedTax']"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.compare.company_facts",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.636,
+   "error": "EmptyDataError: \n[Empty] -> ['Symbol Error: No data was found for, TQQQ and RevenueFromContractWithCustomerExcludingAssessedTax']"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.compare.company_facts",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.229,
+   "error": "EmptyDataError: \n[Empty] -> ['Symbol Error: No data was found for, SQQQ and RevenueFromContractWithCustomerExcludingAssessedTax']"
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.darkpool.otc",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 52,
+   "latency_s": 3.663,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.darkpool.otc",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 52,
+   "latency_s": 5.673,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.darkpool.otc",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 52,
+   "latency_s": 3.525,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.darkpool.otc",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 52,
+   "latency_s": 3.502,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.darkpool.otc",
+   "ticker": "META",
+   "answered": true,
+   "rows": 52,
+   "latency_s": 3.428,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.darkpool.otc",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 52,
+   "latency_s": 3.565,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.darkpool.otc",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 52,
+   "latency_s": 3.443,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.darkpool.otc",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 52,
+   "latency_s": 3.734,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.darkpool.otc",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 52,
+   "latency_s": 3.283,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.darkpool.otc",
+   "ticker": "QQQ",
+   "answered": true,
+   "rows": 52,
+   "latency_s": 3.426,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.darkpool.otc",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.274,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.darkpool.otc",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.216,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.043,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.97,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.954,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.014,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "META",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.951,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.373,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.961,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.947,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.979,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "QQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.961,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.354,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.392,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.081,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.516,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.536,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.533,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "META",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.499,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.55,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.498,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.53,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.518,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.534,
+   "error": "EmptyDataError: \n[Empty] -> No data was returned for the given symbol(s)"
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.532,
+   "error": "EmptyDataError: \n[Empty] -> No data was returned for the given symbol(s)"
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.estimates.consensus",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.508,
+   "error": "EmptyDataError: \n[Empty] -> No data was returned for the given symbol(s)"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_eps",
+   "ticker": "NVDA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.852,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: NVDA"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_eps",
+   "ticker": "TSLA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.813,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: TSLA"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_eps",
+   "ticker": "AAPL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.798,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: AAPL"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_eps",
+   "ticker": "MSFT",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.826,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: MSFT"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_eps",
+   "ticker": "META",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.855,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: META"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_eps",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.855,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: GOOGL"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_eps",
+   "ticker": "AMZN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.837,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: AMZN"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_eps",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.836,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: COIN"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_eps",
+   "ticker": "MSTR",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.813,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: MSTR"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_eps",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.792,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: QQQ"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_eps",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.81,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: TQQQ"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_eps",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.85,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: SQQQ"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_sales",
+   "ticker": "NVDA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.859,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: NVDA"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_sales",
+   "ticker": "TSLA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.82,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: TSLA"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_sales",
+   "ticker": "AAPL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.807,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: AAPL"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_sales",
+   "ticker": "MSFT",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.855,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: MSFT"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_sales",
+   "ticker": "META",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.848,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: META"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_sales",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.836,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: GOOGL"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_sales",
+   "ticker": "AMZN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.864,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: AMZN"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_sales",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.846,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: COIN"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_sales",
+   "ticker": "MSTR",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.822,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: MSTR"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_sales",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.801,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: QQQ"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_sales",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.834,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: TQQQ"
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.estimates.forward_sales",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.852,
+   "error": "OpenBBError: \n[Error] -> No estimates data was returned for: SQQQ"
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.estimates.price_target",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 20,
+   "latency_s": 1.591,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.estimates.price_target",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 20,
+   "latency_s": 1.557,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.estimates.price_target",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 20,
+   "latency_s": 1.614,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.estimates.price_target",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 20,
+   "latency_s": 1.803,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.estimates.price_target",
+   "ticker": "META",
+   "answered": true,
+   "rows": 20,
+   "latency_s": 1.688,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.estimates.price_target",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 20,
+   "latency_s": 1.557,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.estimates.price_target",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 20,
+   "latency_s": 2.21,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.estimates.price_target",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 20,
+   "latency_s": 1.576,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.estimates.price_target",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 20,
+   "latency_s": 1.559,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.estimates.price_target",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.78,
+   "error": "OpenBBError: \n[Error] -> Failed to get data for QQQ"
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.estimates.price_target",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.726,
+   "error": "OpenBBError: \n[Error] -> Failed to get data for TQQQ"
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.estimates.price_target",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.817,
+   "error": "OpenBBError: \n[Error] -> Failed to get data for SQQQ"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 18,
+   "latency_s": 2.282,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 16,
+   "latency_s": 2.014,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 18,
+   "latency_s": 1.439,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 18,
+   "latency_s": 1.793,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "META",
+   "answered": true,
+   "rows": 15,
+   "latency_s": 1.185,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 12,
+   "latency_s": 1.232,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 18,
+   "latency_s": 1.624,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 6,
+   "latency_s": 0.981,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 16,
+   "latency_s": 1.423,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.518,
+   "error": "OpenBBError: \n[Unexpected Error] -> ContentTypeError -> 404, message='Attempt to decode JSON with unexpected mimetype: application/xml', url='https://data.sec.gov/api/xbrl/companyfacts/CIK0001067839.json'"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.541,
+   "error": "OpenBBError: \n[Error] -> Unexpected response from SEC for CIK 0001174610"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.354,
+   "error": "OpenBBError: \n[Error] -> Unexpected response from SEC for CIK 0001174610"
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.478,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.374,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.351,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.405,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "META",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.452,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.403,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.477,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.391,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.544,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.247,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.294,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.balance",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.281,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance_growth",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 16,
+   "latency_s": 1.487,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance_growth",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 15,
+   "latency_s": 1.378,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance_growth",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 17,
+   "latency_s": 1.499,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance_growth",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 17,
+   "latency_s": 1.354,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance_growth",
+   "ticker": "META",
+   "answered": true,
+   "rows": 14,
+   "latency_s": 1.136,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance_growth",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 11,
+   "latency_s": 0.93,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance_growth",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 17,
+   "latency_s": 1.388,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance_growth",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.572,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance_growth",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 15,
+   "latency_s": 1.059,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance_growth",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.518,
+   "error": "OpenBBError: \n[Unexpected Error] -> ContentTypeError -> 404, message='Attempt to decode JSON with unexpected mimetype: application/xml', url='https://data.sec.gov/api/xbrl/companyfacts/CIK0001067839.json'"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance_growth",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.32,
+   "error": "OpenBBError: \n[Error] -> Unexpected response from SEC for CIK 0001174610"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.balance_growth",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.227,
+   "error": "OpenBBError: \n[Error] -> Unexpected response from SEC for CIK 0001174610"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 1.177,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 1.179,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 1.155,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 1.398,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "META",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.902,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.898,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 1.501,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.551,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 1.05,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.547,
+   "error": "OpenBBError: \n[Unexpected Error] -> ContentTypeError -> 404, message='Attempt to decode JSON with unexpected mimetype: application/xml', url='https://data.sec.gov/api/xbrl/companyfacts/CIK0001067839.json'"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.335,
+   "error": "OpenBBError: \n[Error] -> Unexpected response from SEC for CIK 0001174610"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.24,
+   "error": "OpenBBError: \n[Error] -> Unexpected response from SEC for CIK 0001174610"
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.34,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.337,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.356,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.444,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "META",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.364,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.329,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.311,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.357,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.35,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.269,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.368,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.cash",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.266,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash_growth",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 16,
+   "latency_s": 1.182,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash_growth",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 15,
+   "latency_s": 1.074,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash_growth",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 17,
+   "latency_s": 1.161,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash_growth",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 17,
+   "latency_s": 1.345,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash_growth",
+   "ticker": "META",
+   "answered": true,
+   "rows": 14,
+   "latency_s": 0.91,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash_growth",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 11,
+   "latency_s": 0.913,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash_growth",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 17,
+   "latency_s": 1.371,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash_growth",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.637,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash_growth",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 15,
+   "latency_s": 1.008,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash_growth",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.516,
+   "error": "OpenBBError: \n[Unexpected Error] -> ContentTypeError -> 404, message='Attempt to decode JSON with unexpected mimetype: application/xml', url='https://data.sec.gov/api/xbrl/companyfacts/CIK0001067839.json'"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash_growth",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.239,
+   "error": "OpenBBError: \n[Error] -> Unexpected response from SEC for CIK 0001174610"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.cash_growth",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.342,
+   "error": "OpenBBError: \n[Error] -> Unexpected response from SEC for CIK 0001174610"
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 19,
+   "latency_s": 1.035,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "TSLA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.967,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 18,
+   "latency_s": 0.993,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 18,
+   "latency_s": 1.019,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "META",
+   "answered": true,
+   "rows": 11,
+   "latency_s": 0.993,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.001,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "AMZN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.006,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.028,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "MSTR",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.996,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.991,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.904,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.975,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 56,
+   "latency_s": 0.87,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "TSLA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.405,
+   "error": "OpenBBError: \n[Error] -> Error getting data for TSLA: No dividend data found for TSLA"
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 92,
+   "latency_s": 0.598,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 91,
+   "latency_s": 0.639,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "META",
+   "answered": true,
+   "rows": 11,
+   "latency_s": 0.464,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.452,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "AMZN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.454,
+   "error": "OpenBBError: \n[Error] -> Error getting data for AMZN: No dividend data found for AMZN"
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.281,
+   "error": "OpenBBError: \n[Error] -> Error getting data for COIN: No dividend data found for COIN"
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "MSTR",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.431,
+   "error": "OpenBBError: \n[Error] -> Error getting data for MSTR: No dividend data found for MSTR"
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "QQQ",
+   "answered": true,
+   "rows": 90,
+   "latency_s": 0.686,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 22,
+   "latency_s": 0.542,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.dividends",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 26,
+   "latency_s": 0.402,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 1000,
+   "latency_s": 0.191,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 1003,
+   "latency_s": 0.165,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 1000,
+   "latency_s": 0.168,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 1002,
+   "latency_s": 0.161,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "META",
+   "answered": true,
+   "rows": 1001,
+   "latency_s": 0.157,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 1013,
+   "latency_s": 0.173,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 1003,
+   "latency_s": 0.165,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 1000,
+   "latency_s": 0.178,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 1002,
+   "latency_s": 0.196,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "QQQ",
+   "answered": true,
+   "rows": 258,
+   "latency_s": 0.283,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 1220,
+   "latency_s": 0.205,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 1220,
+   "latency_s": 0.192,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "NVDA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.015,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "TSLA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.373,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "AAPL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.437,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "MSFT",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.02,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "META",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.06,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.457,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "AMZN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.432,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.576,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "MSTR",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.372,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.053,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.062,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.fundamental.filings",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.5,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 18,
+   "latency_s": 1.742,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 16,
+   "latency_s": 1.537,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 18,
+   "latency_s": 1.562,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 18,
+   "latency_s": 2.151,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "META",
+   "answered": true,
+   "rows": 15,
+   "latency_s": 1.326,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 12,
+   "latency_s": 1.465,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 18,
+   "latency_s": 1.777,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 6,
+   "latency_s": 1.006,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 16,
+   "latency_s": 1.34,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.496,
+   "error": "OpenBBError: \n[Unexpected Error] -> ContentTypeError -> 404, message='Attempt to decode JSON with unexpected mimetype: application/xml', url='https://data.sec.gov/api/xbrl/companyfacts/CIK0001067839.json'"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.555,
+   "error": "OpenBBError: \n[Error] -> Unexpected response from SEC for CIK 0001174610"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.234,
+   "error": "OpenBBError: \n[Error] -> Unexpected response from SEC for CIK 0001174610"
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.354,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.332,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.347,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 4,
+   "latency_s": 0.341,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "META",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.344,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 4,
+   "latency_s": 0.298,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 4,
+   "latency_s": 0.335,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.325,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.336,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.243,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.253,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.income",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.235,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income_growth",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 16,
+   "latency_s": 1.453,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income_growth",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 15,
+   "latency_s": 1.174,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income_growth",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 17,
+   "latency_s": 1.185,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income_growth",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 17,
+   "latency_s": 1.384,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income_growth",
+   "ticker": "META",
+   "answered": true,
+   "rows": 14,
+   "latency_s": 0.911,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income_growth",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 11,
+   "latency_s": 0.931,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income_growth",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 17,
+   "latency_s": 1.618,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income_growth",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 5,
+   "latency_s": 0.609,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income_growth",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 15,
+   "latency_s": 1.116,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income_growth",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.574,
+   "error": "OpenBBError: \n[Unexpected Error] -> ContentTypeError -> 404, message='Attempt to decode JSON with unexpected mimetype: application/xml', url='https://data.sec.gov/api/xbrl/companyfacts/CIK0001067839.json'"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income_growth",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.217,
+   "error": "OpenBBError: \n[Error] -> Unexpected response from SEC for CIK 0001174610"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.income_growth",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.231,
+   "error": "OpenBBError: \n[Error] -> Unexpected response from SEC for CIK 0001174610"
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.management",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.435,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.management",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.411,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.management",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.425,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.management",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.419,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.management",
+   "ticker": "META",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.403,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.management",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.413,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.management",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.415,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.management",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.417,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.management",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.429,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.management",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.412,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.management",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.4,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.management",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.422,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.management_discussion_analysis",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 2.021,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.management_discussion_analysis",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.759,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.management_discussion_analysis",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.523,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.management_discussion_analysis",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 7.177,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.management_discussion_analysis",
+   "ticker": "META",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.995,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.management_discussion_analysis",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 2.547,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.management_discussion_analysis",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 2.023,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.management_discussion_analysis",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 2.174,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.management_discussion_analysis",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 3.089,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.management_discussion_analysis",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.121,
+   "error": "EmptyDataError: \n[Empty] -> No filings were found using the filters provided."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.management_discussion_analysis",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.483,
+   "error": "EmptyDataError: \n[Empty] -> No filings were found using the filters provided."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.fundamental.management_discussion_analysis",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.282,
+   "error": "EmptyDataError: \n[Empty] -> No filings were found using the filters provided."
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 2.331,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.613,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.558,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.997,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "META",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.558,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.67,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.784,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.555,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.709,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 2.632,
+   "error": "EmptyDataError: \n[Empty] -> No data was returned for any symbol"
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 2.911,
+   "error": "EmptyDataError: \n[Empty] -> No data was returned for any symbol"
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.543,
+   "error": "EmptyDataError: \n[Empty] -> No data was returned for any symbol"
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.455,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.43,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.418,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.443,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "META",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.405,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.436,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.417,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.438,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.411,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.407,
+   "error": "EmptyDataError: \n[Empty] -> No data was returned for the given symbol(s)."
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.434,
+   "error": "EmptyDataError: \n[Empty] -> No data was returned for the given symbol(s)."
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.fundamental.metrics",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.403,
+   "error": "EmptyDataError: \n[Empty] -> No data was returned for the given symbol(s)."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.form_13f",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 8,
+   "latency_s": 1.686,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.form_13f",
+   "ticker": "TSLA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.365,
+   "error": "EmptyDataError: \n[Empty] -> No filings were found using the filters provided."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.form_13f",
+   "ticker": "AAPL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.272,
+   "error": "EmptyDataError: \n[Empty] -> No filings were found using the filters provided."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.form_13f",
+   "ticker": "MSFT",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.342,
+   "error": "EmptyDataError: \n[Empty] -> No filings were found using the filters provided."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.form_13f",
+   "ticker": "META",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.316,
+   "error": "EmptyDataError: \n[Empty] -> No filings were found using the filters provided."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.form_13f",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 28,
+   "latency_s": 1.62,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.form_13f",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 6,
+   "latency_s": 1.516,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.form_13f",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.241,
+   "error": "EmptyDataError: \n[Empty] -> No filings were found using the filters provided."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.form_13f",
+   "ticker": "MSTR",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.268,
+   "error": "EmptyDataError: \n[Empty] -> No filings were found using the filters provided."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.form_13f",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.29,
+   "error": "EmptyDataError: \n[Empty] -> No filings were found using the filters provided."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.form_13f",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.986,
+   "error": "EmptyDataError: \n[Empty] -> No filings were found using the filters provided."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.form_13f",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.126,
+   "error": "EmptyDataError: \n[Empty] -> No filings were found using the filters provided."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 61,
+   "latency_s": 0.286,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 9,
+   "latency_s": 0.241,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 18,
+   "latency_s": 0.29,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 135,
+   "latency_s": 0.404,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "META",
+   "answered": true,
+   "rows": 189,
+   "latency_s": 0.422,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 277,
+   "latency_s": 0.354,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 63,
+   "latency_s": 0.365,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 112,
+   "latency_s": 0.234,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 140,
+   "latency_s": 0.247,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.171,
+   "error": "OpenBBError: \n[Error] -> No Form 4 data was returned for QQQ."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.733,
+   "error": "OpenBBError: \n[Error] -> No Form 4 data was returned for TQQQ."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.578,
+   "error": "OpenBBError: \n[Error] -> No Form 4 data was returned for SQQQ."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "NVDA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.007,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "TSLA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.006,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "AAPL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.0,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "MSFT",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.009,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "META",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.919,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.024,
+   "error": "EmptyDataError: \n[Empty] -> No results found. Try adjusting the query parameters."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "AMZN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.999,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.993,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "MSTR",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.028,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.975,
+   "error": "EmptyDataError: \n[Empty] -> No results found. Try adjusting the query parameters."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.995,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.ownership.insider_trading",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.959,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.ownership.share_statistics",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.578,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.ownership.share_statistics",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.559,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.ownership.share_statistics",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.52,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.ownership.share_statistics",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.534,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.ownership.share_statistics",
+   "ticker": "META",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.519,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.ownership.share_statistics",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.527,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.ownership.share_statistics",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.544,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.ownership.share_statistics",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.615,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.ownership.share_statistics",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.558,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.ownership.share_statistics",
+   "ticker": "QQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.82,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.ownership.share_statistics",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.77,
+   "error": "EmptyDataError: \n[Empty] -> No data was returned for the given symbol(s)."
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.ownership.share_statistics",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.72,
+   "error": "EmptyDataError: \n[Empty] -> No data was returned for the given symbol(s)."
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.historical",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 5720,
+   "latency_s": 1.317,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.historical",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 4087,
+   "latency_s": 1.192,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.historical",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 5720,
+   "latency_s": 1.248,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.historical",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 5720,
+   "latency_s": 1.259,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.historical",
+   "ticker": "META",
+   "answered": true,
+   "rows": 3610,
+   "latency_s": 1.183,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.historical",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 3488,
+   "latency_s": 1.313,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.historical",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 5720,
+   "latency_s": 1.292,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.historical",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 1372,
+   "latency_s": 1.142,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.historical",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 5720,
+   "latency_s": 1.3,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.historical",
+   "ticker": "QQQ",
+   "answered": true,
+   "rows": 5720,
+   "latency_s": 1.275,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.historical",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 4182,
+   "latency_s": 1.182,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.historical",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 4182,
+   "latency_s": 1.233,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.historical",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 212,
+   "latency_s": 3.98,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.historical",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 153,
+   "latency_s": 4.016,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.historical",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 153,
+   "latency_s": 3.977,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.historical",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 191,
+   "latency_s": 3.986,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.historical",
+   "ticker": "META",
+   "answered": true,
+   "rows": 192,
+   "latency_s": 4.0,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.historical",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.97,
+   "error": "EmptyDataError: \n[Empty] -> No results found. Try adjusting the query parameters."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.historical",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 153,
+   "latency_s": 4.002,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.historical",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 134,
+   "latency_s": 4.012,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.historical",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 163,
+   "latency_s": 3.998,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.historical",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.981,
+   "error": "EmptyDataError: \n[Empty] -> No results found. Try adjusting the query parameters."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.historical",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 171,
+   "latency_s": 3.981,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.historical",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 154,
+   "latency_s": 4.002,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.historical",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.29,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.historical",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.253,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.historical",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.289,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.historical",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.331,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.historical",
+   "ticker": "META",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.249,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.historical",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.283,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.historical",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.243,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.historical",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.26,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.historical",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.254,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.historical",
+   "ticker": "QQQ",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.266,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.historical",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.275,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.historical",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.283,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.price.performance",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.266,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.price.performance",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.18,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.price.performance",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.192,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.price.performance",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.318,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.price.performance",
+   "ticker": "META",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.163,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.price.performance",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.194,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.price.performance",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.189,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.price.performance",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.197,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.price.performance",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.188,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.price.performance",
+   "ticker": "QQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.186,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.price.performance",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.182,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.price.performance",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.184,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.quote",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.934,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.quote",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.969,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.quote",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.34,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.quote",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.951,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.quote",
+   "ticker": "META",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.938,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.quote",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.932,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.quote",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.917,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.quote",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.951,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.quote",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.985,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.quote",
+   "ticker": "QQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 2.037,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.quote",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 2.026,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.price.quote",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.993,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.quote",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.939,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.quote",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.999,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.quote",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.994,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.quote",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.007,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.quote",
+   "ticker": "META",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.997,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.quote",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.985,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.quote",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.015,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.quote",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.014,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.quote",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.072,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.quote",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.97,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.quote",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.03,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.price.quote",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.999,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.quote",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.668,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.quote",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.429,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.quote",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.435,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.quote",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.412,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.quote",
+   "ticker": "META",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.414,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.quote",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.401,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.quote",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.415,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.quote",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.423,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.quote",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.389,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.quote",
+   "ticker": "QQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.411,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.quote",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.396,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.price.quote",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.407,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.profile",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.589,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.profile",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.729,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.profile",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.817,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.profile",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.559,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.profile",
+   "ticker": "META",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.546,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.profile",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.564,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.profile",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.575,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.profile",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.825,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.profile",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.587,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.profile",
+   "ticker": "QQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.665,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.profile",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.819,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.profile",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.537,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.profile",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.975,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.profile",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.105,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.profile",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.946,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.profile",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.993,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.profile",
+   "ticker": "META",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.024,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.profile",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.0,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.profile",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.994,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.profile",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.06,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.profile",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.028,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.profile",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.974,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.profile",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.997,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.profile",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.01,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.profile",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.409,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.profile",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.459,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.profile",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.438,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.profile",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.434,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.profile",
+   "ticker": "META",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.441,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.profile",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.407,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.profile",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.434,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.profile",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.402,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.profile",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.419,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.profile",
+   "ticker": "QQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.411,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.profile",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.399,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.profile",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.399,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.shorts.fails_to_deliver",
+   "ticker": "NVDA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.127,
+   "error": "OpenBBError: \n[Unexpected Error] -> ClientConnectorDNSError -> Cannot connect to host dcm.sec.gov:443 ssl:default [Domain name not found]"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.shorts.fails_to_deliver",
+   "ticker": "TSLA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.422,
+   "error": "OpenBBError: \n[Unexpected Error] -> ClientConnectorDNSError -> Cannot connect to host dcm.sec.gov:443 ssl:default [Domain name not found]"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.shorts.fails_to_deliver",
+   "ticker": "AAPL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.078,
+   "error": "OpenBBError: \n[Unexpected Error] -> ClientConnectorDNSError -> Cannot connect to host dcm.sec.gov:443 ssl:default [Domain name not found]"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.shorts.fails_to_deliver",
+   "ticker": "MSFT",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 2.452,
+   "error": "OpenBBError: \n[Unexpected Error] -> ClientConnectorDNSError -> Cannot connect to host dcm.sec.gov:443 ssl:default [Domain name not found]"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.shorts.fails_to_deliver",
+   "ticker": "META",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 2.555,
+   "error": "OpenBBError: \n[Unexpected Error] -> ClientConnectorDNSError -> Cannot connect to host dcm.sec.gov:443 ssl:default [Domain name not found]"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.shorts.fails_to_deliver",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.463,
+   "error": "OpenBBError: \n[Unexpected Error] -> ClientConnectorDNSError -> Cannot connect to host dcm.sec.gov:443 ssl:default [Domain name not found]"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.shorts.fails_to_deliver",
+   "ticker": "AMZN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 2.457,
+   "error": "OpenBBError: \n[Unexpected Error] -> ClientConnectorDNSError -> Cannot connect to host dcm.sec.gov:443 ssl:default [Domain name not found]"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.shorts.fails_to_deliver",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.459,
+   "error": "OpenBBError: \n[Unexpected Error] -> ClientConnectorDNSError -> Cannot connect to host dcm.sec.gov:443 ssl:default [Domain name not found]"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.shorts.fails_to_deliver",
+   "ticker": "MSTR",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 2.475,
+   "error": "OpenBBError: \n[Unexpected Error] -> ClientConnectorDNSError -> Cannot connect to host dcm.sec.gov:443 ssl:default [Domain name not found]"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.shorts.fails_to_deliver",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 2.456,
+   "error": "OpenBBError: \n[Unexpected Error] -> ClientConnectorDNSError -> Cannot connect to host dcm.sec.gov:443 ssl:default [Domain name not found]"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.shorts.fails_to_deliver",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.595,
+   "error": "OpenBBError: \n[Unexpected Error] -> ClientConnectorDNSError -> Cannot connect to host dcm.sec.gov:443 ssl:default [Domain name not found]"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.shorts.fails_to_deliver",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.455,
+   "error": "OpenBBError: \n[Unexpected Error] -> ClientConnectorDNSError -> Cannot connect to host dcm.sec.gov:443 ssl:default [Domain name not found]"
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.shorts.short_interest",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 122,
+   "latency_s": 2.713,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.shorts.short_interest",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 122,
+   "latency_s": 2.51,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.shorts.short_interest",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 122,
+   "latency_s": 2.566,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.shorts.short_interest",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 122,
+   "latency_s": 2.506,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.shorts.short_interest",
+   "ticker": "META",
+   "answered": true,
+   "rows": 113,
+   "latency_s": 2.598,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.shorts.short_interest",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 122,
+   "latency_s": 2.696,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.shorts.short_interest",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 122,
+   "latency_s": 2.543,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.shorts.short_interest",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 122,
+   "latency_s": 2.876,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.shorts.short_interest",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 122,
+   "latency_s": 2.585,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.shorts.short_interest",
+   "ticker": "QQQ",
+   "answered": true,
+   "rows": 122,
+   "latency_s": 2.989,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.shorts.short_interest",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 122,
+   "latency_s": 2.764,
+   "error": null
+  },
+  {
+   "provider": "finra",
+   "endpoint": "equity.shorts.short_interest",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 122,
+   "latency_s": 2.559,
+   "error": null
+  },
+  {
+   "provider": "stockgrid",
+   "endpoint": "equity.shorts.short_volume",
+   "ticker": "NVDA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 4.903,
+   "error": "OpenBBError: \n[Unexpected Error] -> JSONDecodeError -> Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+   "provider": "stockgrid",
+   "endpoint": "equity.shorts.short_volume",
+   "ticker": "TSLA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.477,
+   "error": "OpenBBError: \n[Unexpected Error] -> JSONDecodeError -> Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+   "provider": "stockgrid",
+   "endpoint": "equity.shorts.short_volume",
+   "ticker": "AAPL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.495,
+   "error": "OpenBBError: \n[Unexpected Error] -> JSONDecodeError -> Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+   "provider": "stockgrid",
+   "endpoint": "equity.shorts.short_volume",
+   "ticker": "MSFT",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.448,
+   "error": "OpenBBError: \n[Unexpected Error] -> JSONDecodeError -> Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+   "provider": "stockgrid",
+   "endpoint": "equity.shorts.short_volume",
+   "ticker": "META",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.429,
+   "error": "OpenBBError: \n[Unexpected Error] -> JSONDecodeError -> Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+   "provider": "stockgrid",
+   "endpoint": "equity.shorts.short_volume",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.369,
+   "error": "OpenBBError: \n[Unexpected Error] -> JSONDecodeError -> Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+   "provider": "stockgrid",
+   "endpoint": "equity.shorts.short_volume",
+   "ticker": "AMZN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 6.068,
+   "error": "OpenBBError: \n[Unexpected Error] -> JSONDecodeError -> Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+   "provider": "stockgrid",
+   "endpoint": "equity.shorts.short_volume",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.729,
+   "error": "OpenBBError: \n[Unexpected Error] -> JSONDecodeError -> Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+   "provider": "stockgrid",
+   "endpoint": "equity.shorts.short_volume",
+   "ticker": "MSTR",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.573,
+   "error": "OpenBBError: \n[Unexpected Error] -> JSONDecodeError -> Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+   "provider": "stockgrid",
+   "endpoint": "equity.shorts.short_volume",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.412,
+   "error": "OpenBBError: \n[Unexpected Error] -> JSONDecodeError -> Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+   "provider": "stockgrid",
+   "endpoint": "equity.shorts.short_volume",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.536,
+   "error": "OpenBBError: \n[Unexpected Error] -> JSONDecodeError -> Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+   "provider": "stockgrid",
+   "endpoint": "equity.shorts.short_volume",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.424,
+   "error": "OpenBBError: \n[Unexpected Error] -> JSONDecodeError -> Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "news.company",
+   "ticker": "NVDA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.981,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "news.company",
+   "ticker": "TSLA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.974,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "news.company",
+   "ticker": "AAPL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.006,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "news.company",
+   "ticker": "MSFT",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.943,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "news.company",
+   "ticker": "META",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.881,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "news.company",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.969,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "news.company",
+   "ticker": "AMZN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.961,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "news.company",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.939,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "news.company",
+   "ticker": "MSTR",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.945,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "news.company",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.884,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "news.company",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.986,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "news.company",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.957,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "news.company",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.429,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "news.company",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.336,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "news.company",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.342,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "news.company",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.332,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "news.company",
+   "ticker": "META",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.331,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "news.company",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.377,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "news.company",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.345,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "news.company",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.34,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "news.company",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.345,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "news.company",
+   "ticker": "QQQ",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.342,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "news.company",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.279,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "news.company",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 6,
+   "latency_s": 0.28,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "NVDA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.001,
+   "error": "OpenBBError: \n[Error] -> Invalid value 'NVDA' for 'symbol' (provider: 'cboe'). Must be one of: ['VX_AM', 'VX_EOD']"
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "TSLA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.001,
+   "error": "OpenBBError: \n[Error] -> Invalid value 'TSLA' for 'symbol' (provider: 'cboe'). Must be one of: ['VX_AM', 'VX_EOD']"
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "AAPL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.001,
+   "error": "OpenBBError: \n[Error] -> Invalid value 'AAPL' for 'symbol' (provider: 'cboe'). Must be one of: ['VX_AM', 'VX_EOD']"
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "MSFT",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.001,
+   "error": "OpenBBError: \n[Error] -> Invalid value 'MSFT' for 'symbol' (provider: 'cboe'). Must be one of: ['VX_AM', 'VX_EOD']"
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "META",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.001,
+   "error": "OpenBBError: \n[Error] -> Invalid value 'META' for 'symbol' (provider: 'cboe'). Must be one of: ['VX_AM', 'VX_EOD']"
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.001,
+   "error": "OpenBBError: \n[Error] -> Invalid value 'GOOGL' for 'symbol' (provider: 'cboe'). Must be one of: ['VX_AM', 'VX_EOD']"
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "AMZN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.001,
+   "error": "OpenBBError: \n[Error] -> Invalid value 'AMZN' for 'symbol' (provider: 'cboe'). Must be one of: ['VX_AM', 'VX_EOD']"
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.001,
+   "error": "OpenBBError: \n[Error] -> Invalid value 'COIN' for 'symbol' (provider: 'cboe'). Must be one of: ['VX_AM', 'VX_EOD']"
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "MSTR",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.001,
+   "error": "OpenBBError: \n[Error] -> Invalid value 'MSTR' for 'symbol' (provider: 'cboe'). Must be one of: ['VX_AM', 'VX_EOD']"
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.001,
+   "error": "OpenBBError: \n[Error] -> Invalid value 'QQQ' for 'symbol' (provider: 'cboe'). Must be one of: ['VX_AM', 'VX_EOD']"
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.001,
+   "error": "OpenBBError: \n[Error] -> Invalid value 'TQQQ' for 'symbol' (provider: 'cboe'). Must be one of: ['VX_AM', 'VX_EOD']"
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.001,
+   "error": "OpenBBError: \n[Error] -> Invalid value 'SQQQ' for 'symbol' (provider: 'cboe'). Must be one of: ['VX_AM', 'VX_EOD']"
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "NVDA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.441,
+   "error": "OpenBBError: \n[Unexpected Error] -> HTTPError -> HTTP Error 404: "
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "TSLA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.546,
+   "error": "OpenBBError: \n[Unexpected Error] -> HTTPError -> HTTP Error 404: "
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "AAPL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.401,
+   "error": "OpenBBError: \n[Unexpected Error] -> HTTPError -> HTTP Error 404: "
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "MSFT",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.61,
+   "error": "OpenBBError: \n[Unexpected Error] -> HTTPError -> HTTP Error 404: "
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "META",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.436,
+   "error": "OpenBBError: \n[Unexpected Error] -> HTTPError -> HTTP Error 404: "
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.499,
+   "error": "OpenBBError: \n[Unexpected Error] -> HTTPError -> HTTP Error 404: "
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "AMZN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.446,
+   "error": "OpenBBError: \n[Unexpected Error] -> HTTPError -> HTTP Error 404: "
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.554,
+   "error": "OpenBBError: \n[Unexpected Error] -> HTTPError -> HTTP Error 404: "
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "MSTR",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.425,
+   "error": "OpenBBError: \n[Unexpected Error] -> HTTPError -> HTTP Error 404: "
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.517,
+   "error": "OpenBBError: \n[Unexpected Error] -> HTTPError -> HTTP Error 404: "
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.402,
+   "error": "OpenBBError: \n[Unexpected Error] -> HTTPError -> HTTP Error 404: "
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.futures.curve",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.514,
+   "error": "OpenBBError: \n[Unexpected Error] -> HTTPError -> HTTP Error 404: "
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 3840,
+   "latency_s": 2.327,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 4950,
+   "latency_s": 2.411,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 3534,
+   "latency_s": 2.202,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 3582,
+   "latency_s": 2.378,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "META",
+   "answered": true,
+   "rows": 7566,
+   "latency_s": 2.683,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 4754,
+   "latency_s": 2.399,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 2480,
+   "latency_s": 2.063,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 2856,
+   "latency_s": 2.398,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 3078,
+   "latency_s": 2.174,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "QQQ",
+   "answered": true,
+   "rows": 11388,
+   "latency_s": 1.209,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 1748,
+   "latency_s": 1.9,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 1214,
+   "latency_s": 1.833,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 1352,
+   "latency_s": 3.565,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 1294,
+   "latency_s": 3.623,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 1242,
+   "latency_s": 3.588,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 1236,
+   "latency_s": 3.244,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "META",
+   "answered": true,
+   "rows": 1676,
+   "latency_s": 5.77,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.073,
+   "error": "OpenBBError: \n[Error] -> The symbol, GOOGL, is not a valid listing or does not trade options."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 1054,
+   "latency_s": 3.164,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.051,
+   "error": "OpenBBError: \n[Error] -> The symbol, COIN, is not a valid listing or does not trade options."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "MSTR",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.05,
+   "error": "OpenBBError: \n[Error] -> The symbol, MSTR, is not a valid listing or does not trade options."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.055,
+   "error": "OpenBBError: \n[Unexpected Error] -> IndexError -> index out of bounds"
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.045,
+   "error": "OpenBBError: \n[Error] -> The symbol, TQQQ, is not a valid listing or does not trade options."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.051,
+   "error": "OpenBBError: \n[Error] -> The symbol, SQQQ, is not a valid listing or does not trade options."
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 3496,
+   "latency_s": 4.171,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 4161,
+   "latency_s": 4.292,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 2786,
+   "latency_s": 4.076,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 3153,
+   "latency_s": 4.138,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "META",
+   "answered": true,
+   "rows": 5367,
+   "latency_s": 4.146,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 3696,
+   "latency_s": 4.194,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 2127,
+   "latency_s": 4.096,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 2487,
+   "latency_s": 3.81,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 2887,
+   "latency_s": 3.57,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "QQQ",
+   "answered": true,
+   "rows": 9315,
+   "latency_s": 7.306,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 1740,
+   "latency_s": 2.898,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "derivatives.options.chains",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 1024,
+   "latency_s": 2.396,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.countries",
+   "ticker": "NVDA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.128,
+   "error": "EmptyDataError: \n[Empty] -> No countries info found for the given symbol(s)."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.countries",
+   "ticker": "TSLA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.102,
+   "error": "EmptyDataError: \n[Empty] -> No countries info found for the given symbol(s)."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.countries",
+   "ticker": "AAPL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.097,
+   "error": "EmptyDataError: \n[Empty] -> No countries info found for the given symbol(s)."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.countries",
+   "ticker": "MSFT",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.117,
+   "error": "EmptyDataError: \n[Empty] -> No countries info found for the given symbol(s)."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.countries",
+   "ticker": "META",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.117,
+   "error": "EmptyDataError: \n[Empty] -> No countries info found for the given symbol(s)."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.countries",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.107,
+   "error": "EmptyDataError: \n[Empty] -> No countries info found for the given symbol(s)."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.countries",
+   "ticker": "AMZN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.156,
+   "error": "EmptyDataError: \n[Empty] -> No countries info found for the given symbol(s)."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.countries",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.1,
+   "error": "EmptyDataError: \n[Empty] -> No countries info found for the given symbol(s)."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.countries",
+   "ticker": "MSTR",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.31,
+   "error": "EmptyDataError: \n[Empty] -> No countries info found for the given symbol(s)."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.countries",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.109,
+   "error": "EmptyDataError: \n[Empty] -> No countries info found for the given symbol(s)."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.countries",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 7,
+   "latency_s": 1.303,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.countries",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.263,
+   "error": "EmptyDataError: \n[Empty] -> No countries info found for the given symbol(s)."
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "etf.historical",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 5720,
+   "latency_s": 1.264,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "etf.historical",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 4087,
+   "latency_s": 1.268,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "etf.historical",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 5720,
+   "latency_s": 1.271,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "etf.historical",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 5720,
+   "latency_s": 1.263,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "etf.historical",
+   "ticker": "META",
+   "answered": true,
+   "rows": 3610,
+   "latency_s": 1.16,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "etf.historical",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 3488,
+   "latency_s": 1.178,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "etf.historical",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 5720,
+   "latency_s": 1.334,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "etf.historical",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 1372,
+   "latency_s": 1.111,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "etf.historical",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 5720,
+   "latency_s": 1.265,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "etf.historical",
+   "ticker": "QQQ",
+   "answered": true,
+   "rows": 5720,
+   "latency_s": 1.262,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "etf.historical",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 4182,
+   "latency_s": 1.372,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "etf.historical",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 4182,
+   "latency_s": 1.177,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.historical",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 211,
+   "latency_s": 4.008,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.historical",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 135,
+   "latency_s": 3.978,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.historical",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 192,
+   "latency_s": 3.998,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.historical",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 95,
+   "latency_s": 3.999,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.historical",
+   "ticker": "META",
+   "answered": true,
+   "rows": 211,
+   "latency_s": 3.994,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.historical",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.988,
+   "error": "EmptyDataError: \n[Empty] -> No results found. Try adjusting the query parameters."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.historical",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 231,
+   "latency_s": 3.956,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.historical",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 172,
+   "latency_s": 4.003,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.historical",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 220,
+   "latency_s": 3.98,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.historical",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 3.971,
+   "error": "EmptyDataError: \n[Empty] -> No results found. Try adjusting the query parameters."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.historical",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 192,
+   "latency_s": 3.965,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.historical",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 154,
+   "latency_s": 3.959,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.historical",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.286,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.historical",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.243,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.historical",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.3,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.historical",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.268,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.historical",
+   "ticker": "META",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.255,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.historical",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.252,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.historical",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.235,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.historical",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.256,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.historical",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.248,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.historical",
+   "ticker": "QQQ",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.295,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.historical",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.276,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.historical",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 251,
+   "latency_s": 0.271,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.holdings",
+   "ticker": "NVDA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.196,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.holdings",
+   "ticker": "TSLA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.165,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.holdings",
+   "ticker": "AAPL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.211,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.holdings",
+   "ticker": "MSFT",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.187,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.holdings",
+   "ticker": "META",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.178,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.holdings",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.257,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.holdings",
+   "ticker": "AMZN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.239,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.holdings",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.26,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.holdings",
+   "ticker": "MSTR",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.325,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.holdings",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.165,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.holdings",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.139,
+   "error": "OpenBBError: \n[Error] -> 2 validations error(s)\n[Data Model] TmxEtfHoldingsData\n[Arg] symbol -> input: nan -> Input should be a valid string\n[Data Model] TmxEtfHoldingsData\n[Arg] exchange -> input: nan -> Input should be a valid string"
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.holdings",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 1.144,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.info",
+   "ticker": "NVDA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.209,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.info",
+   "ticker": "TSLA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.159,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.info",
+   "ticker": "AAPL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.166,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.info",
+   "ticker": "MSFT",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.146,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.info",
+   "ticker": "META",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.135,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.info",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.185,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.info",
+   "ticker": "AMZN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.325,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.info",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.21,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.info",
+   "ticker": "MSTR",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.356,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.info",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.237,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.info",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.137,
+   "error": "OpenBBError: \n[Error] -> 1 validations error(s)\n[Data Model] TmxEtfInfoData\n[Arg] dividend_frequency -> input: nan -> Input should be a valid string"
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.info",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.164,
+   "error": "OpenBBError: \n[Error] -> 1 validations error(s)\n[Data Model] TmxEtfInfoData\n[Arg] dividend_frequency -> input: nan -> Input should be a valid string"
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.info",
+   "ticker": "NVDA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.655,
+   "error": "OpenBBError: \n[Error] -> NVDA is not an ETF."
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.info",
+   "ticker": "TSLA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.534,
+   "error": "OpenBBError: \n[Error] -> TSLA is not an ETF."
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.info",
+   "ticker": "AAPL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.464,
+   "error": "OpenBBError: \n[Error] -> AAPL is not an ETF."
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.info",
+   "ticker": "MSFT",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.401,
+   "error": "OpenBBError: \n[Error] -> MSFT is not an ETF."
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.info",
+   "ticker": "META",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.49,
+   "error": "OpenBBError: \n[Error] -> META is not an ETF."
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.info",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.434,
+   "error": "OpenBBError: \n[Error] -> GOOGL is not an ETF."
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.info",
+   "ticker": "AMZN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.403,
+   "error": "OpenBBError: \n[Error] -> AMZN is not an ETF."
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.info",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.383,
+   "error": "OpenBBError: \n[Error] -> COIN is not an ETF."
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.info",
+   "ticker": "MSTR",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.604,
+   "error": "OpenBBError: \n[Error] -> MSTR is not an ETF."
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.info",
+   "ticker": "QQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.393,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.info",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.429,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "etf.info",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 0.377,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "etf.nport_disclosure",
+   "ticker": "NVDA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.522,
+   "error": "OpenBBError: \n[Error] -> No N-Port records found for NVDA."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "etf.nport_disclosure",
+   "ticker": "TSLA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.304,
+   "error": "OpenBBError: \n[Error] -> No N-Port records found for TSLA."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "etf.nport_disclosure",
+   "ticker": "AAPL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.432,
+   "error": "OpenBBError: \n[Error] -> No N-Port records found for AAPL."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "etf.nport_disclosure",
+   "ticker": "MSFT",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.433,
+   "error": "OpenBBError: \n[Error] -> No N-Port records found for MSFT."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "etf.nport_disclosure",
+   "ticker": "META",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.292,
+   "error": "OpenBBError: \n[Error] -> No N-Port records found for META."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "etf.nport_disclosure",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.495,
+   "error": "OpenBBError: \n[Error] -> No N-Port records found for GOOGL."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "etf.nport_disclosure",
+   "ticker": "AMZN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.499,
+   "error": "OpenBBError: \n[Error] -> No N-Port records found for AMZN."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "etf.nport_disclosure",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.296,
+   "error": "OpenBBError: \n[Error] -> No N-Port records found for COIN."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "etf.nport_disclosure",
+   "ticker": "MSTR",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.45,
+   "error": "OpenBBError: \n[Error] -> No N-Port records found for MSTR."
+  },
+  {
+   "provider": "sec",
+   "endpoint": "etf.nport_disclosure",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.378,
+   "error": "OpenBBError: \n[Error] -> 8 validations error(s)\n[Data Model] SecNportDisclosureData\n[Arg] other_id -> input: nan -> Input should be a valid string\n[Data Model] SecNportDisclosureData\n[Arg] isLoanByFund -> input: nan -> Input should be a valid string\n[Data Model] SecNportDisclosureData\n[Arg] issuer_c"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "etf.nport_disclosure",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.751,
+   "error": "OpenBBError: \n[Error] -> 31 validations error(s)\n[Data Model] SecNportDisclosureData\n[Arg] other_id -> input: nan -> Input should be a valid string\n[Data Model] SecNportDisclosureData\n[Arg] issuer_conditional -> input: nan -> Input should be a valid string\n[Data Model] SecNportDisclosureData\n[Arg] a"
+  },
+  {
+   "provider": "sec",
+   "endpoint": "etf.nport_disclosure",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.451,
+   "error": "OpenBBError: \n[Error] -> 31 validations error(s)\n[Data Model] SecNportDisclosureData\n[Arg] other_id -> input: nan -> Input should be a valid string\n[Data Model] SecNportDisclosureData\n[Arg] issuer_conditional -> input: nan -> Input should be a valid string\n[Data Model] SecNportDisclosureData\n[Arg] a"
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "etf.price_performance",
+   "ticker": "NVDA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.526,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "etf.price_performance",
+   "ticker": "TSLA",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.182,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "etf.price_performance",
+   "ticker": "AAPL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.201,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "etf.price_performance",
+   "ticker": "MSFT",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.179,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "etf.price_performance",
+   "ticker": "META",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.723,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "etf.price_performance",
+   "ticker": "GOOGL",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.173,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "etf.price_performance",
+   "ticker": "AMZN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.189,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "etf.price_performance",
+   "ticker": "COIN",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.466,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "etf.price_performance",
+   "ticker": "MSTR",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.131,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "etf.price_performance",
+   "ticker": "QQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.273,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "etf.price_performance",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.417,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "etf.price_performance",
+   "ticker": "SQQQ",
+   "answered": true,
+   "rows": 1,
+   "latency_s": 1.511,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.sectors",
+   "ticker": "NVDA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.297,
+   "error": "EmptyDataError: \n[Empty] -> No data found for the given ETF symbols."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.sectors",
+   "ticker": "TSLA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.14,
+   "error": "EmptyDataError: \n[Empty] -> No data found for the given ETF symbols."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.sectors",
+   "ticker": "AAPL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.089,
+   "error": "EmptyDataError: \n[Empty] -> No data found for the given ETF symbols."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.sectors",
+   "ticker": "MSFT",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.099,
+   "error": "EmptyDataError: \n[Empty] -> No data found for the given ETF symbols."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.sectors",
+   "ticker": "META",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.097,
+   "error": "EmptyDataError: \n[Empty] -> No data found for the given ETF symbols."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.sectors",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.081,
+   "error": "EmptyDataError: \n[Empty] -> No data found for the given ETF symbols."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.sectors",
+   "ticker": "AMZN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.099,
+   "error": "EmptyDataError: \n[Empty] -> No data found for the given ETF symbols."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.sectors",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.084,
+   "error": "EmptyDataError: \n[Empty] -> No data found for the given ETF symbols."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.sectors",
+   "ticker": "MSTR",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.344,
+   "error": "EmptyDataError: \n[Empty] -> No data found for the given ETF symbols."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.sectors",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.266,
+   "error": "EmptyDataError: \n[Empty] -> No data found for the given ETF symbols."
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.sectors",
+   "ticker": "TQQQ",
+   "answered": true,
+   "rows": 11,
+   "latency_s": 1.29,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.sectors",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 1.16,
+   "error": "OpenBBError: \n[Unexpected Error] -> KeyError -> \"['sector', 'weight'] not in index\""
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "NVDA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 26.502,
+   "error": "4 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-19: OpenBBError; 2026-11-09: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "TSLA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 26.502,
+   "error": "4 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-19: OpenBBError; 2026-11-09: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "AAPL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 26.502,
+   "error": "4 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-19: OpenBBError; 2026-11-09: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "MSFT",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 26.502,
+   "error": "4 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-19: OpenBBError; 2026-11-09: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "META",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 26.502,
+   "error": "4 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-19: OpenBBError; 2026-11-09: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 26.502,
+   "error": "4 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-19: OpenBBError; 2026-11-09: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "AMZN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 26.502,
+   "error": "4 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-19: OpenBBError; 2026-11-09: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 26.502,
+   "error": "4 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-19: OpenBBError; 2026-11-09: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "MSTR",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 26.502,
+   "error": "4 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-19: OpenBBError; 2026-11-09: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 26.502,
+   "error": "4 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-19: OpenBBError; 2026-11-09: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 26.502,
+   "error": "4 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-19: OpenBBError; 2026-11-09: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 26.502,
+   "error": "4 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-19: OpenBBError; 2026-11-09: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "NVDA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 16.84,
+   "error": "18 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-05: OpenBBError; 2026-10-12: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "TSLA",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 16.84,
+   "error": "18 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-05: OpenBBError; 2026-10-12: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "AAPL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 16.84,
+   "error": "18 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-05: OpenBBError; 2026-10-12: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "MSFT",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 16.84,
+   "error": "18 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-05: OpenBBError; 2026-10-12: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "META",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 16.84,
+   "error": "18 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-05: OpenBBError; 2026-10-12: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "GOOGL",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 16.84,
+   "error": "18 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-05: OpenBBError; 2026-10-12: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "AMZN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 16.84,
+   "error": "18 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-05: OpenBBError; 2026-10-12: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "COIN",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 16.84,
+   "error": "18 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-05: OpenBBError; 2026-10-12: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "MSTR",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 16.84,
+   "error": "18 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-05: OpenBBError; 2026-10-12: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "QQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 16.84,
+   "error": "18 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-05: OpenBBError; 2026-10-12: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "TQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 16.84,
+   "error": "18 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-05: OpenBBError; 2026-10-12: OpenBBError",
+   "report_date": null
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.calendar.earnings",
+   "ticker": "SQQQ",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 16.84,
+   "error": "18 of 18 weeks failed: 2026-09-28: OpenBBError; 2026-10-05: OpenBBError; 2026-10-12: OpenBBError",
+   "report_date": null
+  }
+ ],
+ "market_wide": [
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.discovery.active",
+   "answered": true,
+   "rows": 200,
+   "latency_s": 0.969,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.discovery.aggressive_small_caps",
+   "answered": true,
+   "rows": 395,
+   "latency_s": 1.622,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.discovery.gainers",
+   "answered": true,
+   "rows": 50,
+   "latency_s": 1.071,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.discovery.gainers",
+   "answered": true,
+   "rows": 67,
+   "latency_s": 0.662,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.discovery.growth_tech",
+   "answered": true,
+   "rows": 52,
+   "latency_s": 0.708,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.discovery.latest_financial_reports",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.658,
+   "error": "OpenBBError: \n[Error] -> No data was returned."
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.discovery.losers",
+   "answered": true,
+   "rows": 200,
+   "latency_s": 0.837,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.discovery.undervalued_growth",
+   "answered": true,
+   "rows": 200,
+   "latency_s": 0.944,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.discovery.undervalued_large_caps",
+   "answered": true,
+   "rows": 68,
+   "latency_s": 1.027,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.screener",
+   "answered": true,
+   "rows": 130,
+   "latency_s": 6.175,
+   "error": null
+  },
+  {
+   "provider": "yfinance",
+   "endpoint": "equity.screener",
+   "answered": true,
+   "rows": 200,
+   "latency_s": 1.439,
+   "error": null
+  },
+  {
+   "provider": "cboe",
+   "endpoint": "equity.search",
+   "answered": true,
+   "rows": 3,
+   "latency_s": 0.035,
+   "error": null
+  },
+  {
+   "provider": "sec",
+   "endpoint": "equity.search",
+   "answered": true,
+   "rows": 6,
+   "latency_s": 0.057,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.search",
+   "answered": true,
+   "rows": 2,
+   "latency_s": 0.068,
+   "error": null
+  },
+  {
+   "provider": "finviz",
+   "endpoint": "equity.compare.groups",
+   "answered": true,
+   "rows": 11,
+   "latency_s": 1.202,
+   "error": null
+  },
+  {
+   "provider": "seeking_alpha",
+   "endpoint": "equity.calendar.earnings",
+   "answered": false,
+   "rows": 0,
+   "latency_s": 0.862,
+   "error": "OpenBBError: \n[Error] -> Error with the Seeking Alpha request -> ['{\"blockScript\": \"/xgCxM9By/captcha/PXxgCxM9By/captcha.js?a=captcha&m=0&u=d495f871-bb8c-11f1-a4a2-a2c7169ffd6b&v=\", \"altBlockScript\": \"https://captcha.px-cloud.net/PXxgCxM9By/captcha.js?a=captcha&m=0&u=d495f871-bb8c-11f1-a4a2-a2c7169f"
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "equity.calendar.earnings",
+   "answered": true,
+   "rows": 44,
+   "latency_s": 1.05,
+   "error": null
+  },
+  {
+   "provider": "wsj",
+   "endpoint": "etf.discovery.active",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 1.339,
+   "error": null
+  },
+  {
+   "provider": "wsj",
+   "endpoint": "etf.discovery.gainers",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 1.213,
+   "error": null
+  },
+  {
+   "provider": "wsj",
+   "endpoint": "etf.discovery.losers",
+   "answered": true,
+   "rows": 10,
+   "latency_s": 0.693,
+   "error": null
+  },
+  {
+   "provider": "tmx",
+   "endpoint": "etf.search",
+   "answered": true,
+   "rows": 13,
+   "latency_s": 1.154,
+   "error": null
+  }
+ ]
+}

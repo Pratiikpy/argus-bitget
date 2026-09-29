@@ -50,6 +50,7 @@ import json
 import threading
 from collections.abc import Mapping
 from dataclasses import dataclass
+from datetime import date, timedelta
 from typing import Any
 
 from argus.market.rpc import (
@@ -91,7 +92,9 @@ ANSWER_ENTRIES: tuple[str, ...] = (
     "equity_ownership_form_13f",
     "equity_ownership_inst_position_summary",
     "equity_ownership_insider_trading",
+    "equity_ownership_major_holders",
     "equity_price_quote",
+    "equity_profile",
     "news_label_search",
     "sentiment_market_fear_greed",
 )
@@ -125,6 +128,62 @@ class Entry:
             "entry_id": self.entry_id, "category": self.category,
             "name": self.name, "description": self.description,
         }
+
+
+SHIFTED_DATE_FIELDS: dict[str, tuple[str, ...]] = {
+    "equity_calendar": ("period_ending", "perf_brief_dsclsr_date",
+                        "perf_briefing_fore_dsclsr_date", "perf_report_dsclsr_date",
+                        "perf_report_fore_dsclsr_date"),
+    "equity_fundamental_dividends": ("ex_dividend_date", "record_date", "payment_date",
+                                     "declaration_date"),
+}
+"""Date fields this service returns one day early, and that are corrected on the way in.
+
+**Found by checking the dates against primary sources (2026-09-29), not assumed.** Every one of
+these fields reads one calendar day before the true date, consistently, on every row checked:
+
+* dividends: Apple's ex-dates came back on Sundays (2025-02-09, 2025-05-11, 2025-08-10,
+  2025-11-09, 2026-02-08, 2026-05-10, 2026-08-09); Apple's own announcements give Mondays
+  (2025-05-12, 2025-08-11), with declaration and payment dates one day later too (declared
+  2025-07-31, paid 2025-08-14 against the service's 07-30 and 08-13). NVIDIA's 10-for-1 split,
+  split-adjusted from 2024-06-10, came back as 2024-06-09;
+* the earnings calendar: fiscal quarters ending 2026-06-30 and 2026-03-31 (Microsoft, Tesla) came
+  back as 06-29 and 03-30, and NVIDIA's report came back as 2026-08-25 while its 10-Q, which it
+  files on the day it reports, is dated 2026-08-26 on EDGAR.
+
+The shape fits a date stored as midnight in UTC+8 and read back in UTC. Fields checked and **not**
+shifted: insider filing dates (``equity_ownership_insider_trading``: the newest five per name
+matched EDGAR's Form 4 filing dates for NVDA, AAPL and TSLA, and every MSFT date served is on
+EDGAR), 13F ``period_ending`` (quarter-ends exact), and the split ``split_valid_date`` (NVIDIA's
+record date, 2024-06-06, exact). ``equity_ownership_major_holders.date`` looks shifted too but is
+NOT VERIFIED against a proxy statement and is left as served.
+"""
+
+
+def _next_day(value: Any) -> Any:
+    if not isinstance(value, str) or len(value) < 10:
+        return value
+    try:
+        day = date.fromisoformat(value[:10])
+    except ValueError:
+        return value
+    return (day + timedelta(days=1)).isoformat() + value[10:]
+
+
+def correct_dates(entry_id: str, rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """``rows`` with :data:`SHIFTED_DATE_FIELDS` moved to the true date; other entries unchanged."""
+    fields = SHIFTED_DATE_FIELDS.get(entry_id)
+    if not fields:
+        return rows
+    out = []
+    for row in rows:
+        fixed = {**row, **{f: _next_day(row[f]) for f in fields if row.get(f)}}
+        # ``time`` is the same served date as epoch milliseconds (MSFT's 1782691200000 is the
+        # 2026-06-29 it served for a quarter ending 06-30), so it moves with the others.
+        if isinstance(row.get("time"), int):
+            fixed["time"] = row["time"] + 86_400_000
+        out.append(fixed)
+    return out
 
 
 class BitgetDataService:
@@ -209,7 +268,7 @@ class BitgetDataService:
     def results(self, entry_id: str, **params: Any) -> list[dict[str, Any]]:
         """The rows of a query, unwrapped from the service's envelope."""
         rows = self.query(entry_id, **params).get("results", [])
-        return [dict(r) for r in rows] if isinstance(rows, list) else []
+        return correct_dates(entry_id, [dict(r) for r in rows]) if isinstance(rows, list) else []
 
     # --- the anchor facts a tokenized-equity desk cannot see from the venue's book -------------
 
@@ -241,8 +300,17 @@ class BitgetDataService:
         rows = self.results("equity_calendar", symbol=symbol)
         if not rows:
             return {}
-        row = rows[0]
-        report_date = row.get("perf_brief_dsclsr_date") or row.get("perf_briefing_fore_dsclsr_date")
+
+        def when(row: Mapping[str, Any]) -> str:
+            return str(row.get("perf_brief_dsclsr_date")
+                       or row.get("perf_briefing_fore_dsclsr_date") or "")
+
+        # The newest report date, and on a tie the confirmed row. The service puts a forecast
+        # placeholder first that repeats a confirmed report under a quarter-end that does not
+        # exist (NVDA: 2026-07-30 beside the real 2026-07-26 for the same 2026-08-26 report), so
+        # reading ``rows[0]`` printed two different quarter-ends in one answer.
+        row = max(rows, key=lambda r: (when(r), r.get("perf_brief_dsclsr_date") is not None))
+        report_date = when(row) or None
         return {**row, "report_date": report_date} if report_date else dict(row)
 
     def consensus(self, symbol: str) -> dict[str, Any]:

@@ -171,12 +171,57 @@ def next_ex_dividend(ticker: str, today: date | None = None) -> str | None:
             continue
         if now - timedelta(days=7) <= ex <= now + timedelta(days=30):
             when = "goes" if ex >= now else "went"
-            return (f"{ticker} {when} ex-dividend on {ex:%d %b %Y} (${amount:g} a share, paid "
-                    f"{str(row.get('payment_date', ''))[:10]}); the stock drops by about the "
+            pay = str(row.get("payment_date", ""))[:10]
+            paid = "paid" if pay and pay <= now.isoformat() else "payable"
+            return (f"{ticker} {when} ex-dividend on {ex:%d %b %Y} (${amount:g} a share, {paid} "
+                    f"{pay}); the stock drops by about the "
                     f"dividend that morning, and a tokenised price follows it ({SOURCE}).")
         if ex < now - timedelta(days=7):
             return None
     return None
+
+
+def dividend_history(ticker: str, today: date | None = None) -> str | None:
+    """The last cash dividend, the trailing twelve months' total, and the last split, as the
+    service records them. Read when no ex-date is near (:func:`next_ex_dividend` covers that):
+    the perception comparison against OpenBB counted corporate actions missing from the answer for
+    every name without an ex-date inside a month (2026-09-29)."""
+    now = today or datetime.now(UTC).date()
+    rows = _safe("equity_fundamental_dividends", symbol=ticker)
+    cash: list[tuple[date, float, str]] = []
+    splits: list[tuple[date, float, float]] = []
+    for row in rows:
+        try:
+            ex = date.fromisoformat(str(row["ex_dividend_date"])[:10])
+        except (KeyError, TypeError, ValueError):
+            continue
+        if ex > now:
+            continue
+        if row.get("amount") is not None:
+            try:
+                cash.append((ex, float(row["amount"]), str(row.get("payment_date") or "")[:10]))
+            except (TypeError, ValueError):
+                continue
+        elif row.get("split_numerator") and row.get("split_denominator"):
+            try:
+                splits.append((ex, float(row["split_numerator"]), float(row["split_denominator"])))
+            except (TypeError, ValueError):
+                continue
+    parts: list[str] = []
+    if cash:
+        ex, amount, paid = max(cash)
+        year = [a for d, a, _ in cash if d > now - timedelta(days=365)]
+        parts.append(f"last cash dividend ${amount:g} a share, ex {ex:%d %b %Y}"
+                     + (f", {'paid' if paid <= now.isoformat() else 'payable'} {paid}"
+                        if paid else "")
+                     + (f"; ${sum(year):g} over the last 12 months in {len(year)} payment(s)"
+                        if year else ""))
+    if splits:
+        ex, num, den = max(splits)
+        parts.append(f"last split {num:g}-for-{den:g} on {ex:%d %b %Y}")
+    if not parts:
+        return None
+    return f"{ticker} corporate actions: " + "; ".join(parts) + f" ({SOURCE})."
 
 
 def bitcoin_treasury(ticker: str, market_cap_usd: float | None,

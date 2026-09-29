@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-28T18:19:40.355226+00:00",
+  "generated_at": "2026-09-28T21:24:16.954142+00:00",
   "lookback_hours": 48.0,
   "coordination_rule": "3 or more distinct accounts inside 2h",
   "sources": "X via twitter-cli, Reddit via rdt-cli (the agent-reach router's backends)",
@@ -9,97 +9,97 @@
   "symbols": [
     {
       "symbol": "NVDAUSDT",
-      "posts": 48,
-      "accounts": 45,
+      "posts": 54,
+      "accounts": 37,
       "by_channel": {
-        "x": 20,
+        "x": 26,
         "reddit": 28
       },
-      "distinct_stories": 47,
+      "distinct_stories": 48,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
-      "withheld_abusive": 2,
+      "withheld_abusive": 3,
       "withheld_by_reason": {
-        "abusive_term": 2
+        "abusive_term": 3
       },
       "withheld_accounts": 2,
       "top_stories": [
         {
-          "text": "The profit map of the US stock market [OC] — * **Size:** each box is a company's net profit over the past 12 months. Companies that lost money over those 12 months aren't shown\n* **Color:** how much that profit changed f",
+          "text": "Stock Market Recap for Monday, September 28, 2026 — The major U.S. stock indexes ended **broadly lower** on Monday, **September 28, 2026**, as Trump flatly rejected Iran's terms to reopen the Strait of Hormuz over the we",
+          "posts": 4,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "u/TorukMaktoM"
+          ],
+          "first_seen": "2026-09-28T20:28:29+00:00"
+        },
+        {
+          "text": "NVDA Grind up to $250 and AMD will have to come down below $550 after MUSE POP (Discussion Only, Not Recommendations)",
+          "posts": 3,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "u/RZDirInvest"
+          ],
+          "first_seen": "2026-09-28T18:44:07+00:00"
+        },
+        {
+          "text": "Retail investors are getting worried. — The average investor appears to be rethinking their bullishness amid daily headlines of record diesel prices and surging 10-year Treasury yields.\n\nRetail investors have purchased j",
           "posts": 2,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "u/pierreb5"
+            "u/coinfanking"
           ],
-          "first_seen": "2026-09-28T15:38:06+00:00"
+          "first_seen": "2026-09-28T20:04:25+00:00"
         },
         {
-          "text": "JUST IN: 🇨🇳 China considers permitting ByteDance, Alibaba to buy new $NVDA chips - The Information. https://t.co/zNmHzSaRFL",
+          "text": "$NVDA is already backing $133 billion of debt, and now basically stuck guaranteeing every dollar of debt that Neo-clouds and OpenAi borrow. Add on the $125 billion guarantee coming and Oh boy.\n\nNvidia isn’t going to be l",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@WhaleInsider"
+            "@rdd147"
           ],
-          "first_seen": "2026-09-27T16:08:10+00:00"
+          "first_seen": "2026-09-27T02:56:34+00:00"
         },
         {
-          "text": "$NVDA HOLDERS: https://t.co/qm0fusHrBS",
+          "text": "My advice for October is:\n\n• $TSLA (Tesla) — Don't buy\n• $INTC (Intel) — Don't buy\n• $ARM (Arm) — Don't buy\n• $AMD (AMD) — Buy at $630–$700\n• $NVDA (Nvidia) — Buy at $225–$260\n• $AVGO (Broadcom) — Buy at $352–$426\n• $DEL",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@MZohaibKhan92"
+            "@jsouthard_"
           ],
-          "first_seen": "2026-09-27T17:46:20+00:00"
-        },
-        {
-          "text": "Trump on AI risks being overblown, to some extent true $nvda https://t.co/EH0s4QtLeA",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "@SpecialSitsNews"
-          ],
-          "first_seen": "2026-09-27T22:00:31+00:00"
-        },
-        {
-          "text": "🚨 MICHAEL BURRY, THE MAN WHO PREDICTED THE 2008 CRASH, JUST DOUBLED DOWN ON AI SHORTS\n\n$MU +284% YTD\n$NBIS +182% YTD\n$SOXX +90% YTD\n\nOn Tuesday, he added to shorts in all three, plus $PLTR\n\nHe’s also short $NVDA and $ORC",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "@leshka_eth"
-          ],
-          "first_seen": "2026-09-28T04:36:06+00:00"
+          "first_seen": "2026-09-27T11:48:58+00:00"
         }
       ],
       "tone": {
         "status": "ok",
         "scorer": "VADER compound (Hutto & Gilbert, ICWSM 2014), >= 0.05 positive, <= -0.05 negative (paper §4; README.rst:241-245)",
         "weighting": "a coordinated story counts once however many accounts pushed it; one account repeating a story counts once; every other account counts once",
-        "posts_scored": 48,
-        "voices": 47.0,
+        "posts_scored": 54,
+        "voices": 48.0,
         "counts": {
-          "positive": 25,
-          "neutral": 14,
-          "negative": 9
+          "positive": 20,
+          "neutral": 17,
+          "negative": 17
         },
         "share": {
-          "positive": 0.5106382978723404,
-          "neutral": 0.2978723404255319,
-          "negative": 0.19148936170212766
+          "positive": 0.4166666666666667,
+          "neutral": 0.31250000000000006,
+          "negative": 0.2708333333333333
         },
         "share_unweighted": {
-          "positive": 0.5208333333333334,
-          "neutral": 0.2916666666666667,
-          "negative": 0.1875
+          "positive": 0.37037037037037035,
+          "neutral": 0.3148148148148148,
+          "negative": 0.3148148148148148
         },
-        "mean_compound": 0.17227659574468088,
+        "mean_compound": 0.10048750000000005,
         "coordinated_stories_counted_once": 0,
         "posts_in_coordinated_stories": 0,
-        "withheld_not_scored": 2
+        "withheld_not_scored": 3
       },
       "post_tone": [
         {
@@ -115,8 +115,92 @@
           "weight": 1.0
         },
         {
+          "id": "twitter-2104533577278853515",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104665752653500429",
+          "compound": 0.7815,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104668244099711331",
+          "compound": 0.6697,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104042487480451522",
+          "compound": -0.5994,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
           "id": "twitter-2104330368409288754",
           "compound": 0.1779,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104647334181351667",
+          "compound": 0.296,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104545247338680548",
+          "compound": -0.34,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104642141901455842",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104241698582995370",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104543393775055277",
+          "compound": -0.4466,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104540587609198720",
+          "compound": 0.7906,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104584366408257684",
+          "compound": 0.75,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104565029060112752",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104595424808165482",
+          "compound": 0.5719,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104623571071128045",
+          "compound": 0.296,
           "label": "positive",
           "weight": 1.0
         },
@@ -127,274 +211,246 @@
           "weight": 1.0
         },
         {
-          "id": "twitter-2104533577278853515",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104616163611386199",
-          "compound": -0.2903,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104560356395745580",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104565029060112752",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104623571071128045",
+          "id": "twitter-2104533679431123203",
           "compound": 0.296,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104591461345833421",
-          "compound": 0.4939,
+          "id": "twitter-2104505960559529992",
+          "compound": 0.4404,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104241698582995370",
+          "id": "twitter-2104660841274478599",
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104540587609198720",
-          "compound": 0.7906,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104527003298980340",
-          "compound": 0.4466,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104543393775055277",
-          "compound": -0.4466,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104545247338680548",
-          "compound": -0.34,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104595424808165482",
-          "compound": 0.5719,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104574154238570750",
-          "compound": -0.6249,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104629964393910616",
-          "compound": 0.1027,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104429920202187256",
-          "compound": -0.8091,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104502721323684145",
-          "compound": -0.6369,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsm0ek",
-          "compound": -0.128,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wslzqg",
-          "compound": 0.2846,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsl4fn",
+          "id": "twitter-2104176466888167444",
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsklqx",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wskiem",
-          "compound": 0.4939,
+          "id": "twitter-2104528588402012477",
+          "compound": 0.7481,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wske8y",
-          "compound": 0.4576,
+          "id": "twitter-2104310367333556692",
+          "compound": 0.3818,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsk6wh",
-          "compound": 0.7269,
+          "id": "twitter-2104305774721913277",
+          "compound": 0.128,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsk2z5",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsjjcp",
-          "compound": 0.1531,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsj6c3",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsizrg",
-          "compound": 0.7476,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsiayw",
-          "compound": 0.4215,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsi745",
-          "compound": 0.6696,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsi0mi",
-          "compound": 0.8402,
-          "label": "positive",
-          "weight": 0.5
-        },
-        {
-          "id": "reddit-1wshxum",
-          "compound": 0.8402,
-          "label": "positive",
-          "weight": 0.5
-        },
-        {
-          "id": "reddit-1wshkh1",
-          "compound": 0.4023,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsgy45",
-          "compound": -0.1695,
+          "id": "twitter-2104628523134779643",
+          "compound": -0.2023,
           "label": "negative",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsgwhz",
-          "compound": 0.836,
+          "id": "reddit-1wsr7c4",
+          "compound": 0.4404,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsgub2",
-          "compound": 0.9578,
-          "label": "positive",
+          "id": "reddit-1wsr61d",
+          "compound": -0.5574,
+          "label": "negative",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsgetn",
+          "id": "reddit-1wsqaii",
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsgcoc",
+          "id": "reddit-1wspycp",
+          "compound": -0.5719,
+          "label": "negative",
+          "weight": 0.25
+        },
+        {
+          "id": "reddit-1wspy9c",
+          "compound": -0.5719,
+          "label": "negative",
+          "weight": 0.25
+        },
+        {
+          "id": "reddit-1wspxdj",
+          "compound": -0.5719,
+          "label": "negative",
+          "weight": 0.25
+        },
+        {
+          "id": "reddit-1wspx7d",
+          "compound": -0.5719,
+          "label": "negative",
+          "weight": 0.25
+        },
+        {
+          "id": "reddit-1wspog7",
           "compound": 0.3612,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsg8mb",
-          "compound": 0.4019,
+          "id": "reddit-1wspn3t",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wspbsf",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wspaag",
+          "compound": -0.1027,
+          "label": "negative",
+          "weight": 0.5
+        },
+        {
+          "id": "reddit-1wsp9nr",
+          "compound": -0.1027,
+          "label": "negative",
+          "weight": 0.5
+        },
+        {
+          "id": "reddit-1wsp8an",
+          "compound": -0.2732,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsp7ls",
+          "compound": 0.802,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsfvvf",
-          "compound": 0.296,
+          "id": "reddit-1wsp4uz",
+          "compound": -0.7906,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsorib",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsolxd",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wso2vw",
+          "compound": 0.5994,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsfvgl",
-          "compound": 0.0,
-          "label": "neutral",
+          "id": "reddit-1wso16g",
+          "compound": -0.5562,
+          "label": "negative",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsfv4a",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsfhra",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsfhmz",
-          "compound": 0.296,
+          "id": "reddit-1wsntex",
+          "compound": 0.3818,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsfdby",
+          "id": "reddit-1wsnprl",
           "compound": 0.0,
           "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsnij7",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsn68s",
+          "compound": -0.6597,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsn1zp",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 0.3333
+        },
+        {
+          "id": "reddit-1wsn1sk",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 0.3333
+        },
+        {
+          "id": "reddit-1wsn1gz",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 0.3333
+        },
+        {
+          "id": "reddit-1wsn0z6",
+          "compound": -0.0516,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsmicw",
+          "compound": 0.7458,
+          "label": "positive",
           "weight": 1.0
         }
       ],
       "shares": [
         [
-          "u/pierreb5",
-          "s-0c7299e3570c0c67",
+          "u/TorukMaktoM",
+          "s-732d3da0ce7ce3aa",
+          false
+        ],
+        [
+          "u/RZDirInvest",
+          "s-c32e60adb2caceda",
+          false
+        ],
+        [
+          "u/coinfanking",
+          "s-78b903abe9cb559c",
+          false
+        ],
+        [
+          "@rdd147",
+          "s-39d1a50be76d10e7",
+          false
+        ],
+        [
+          "@jsouthard_",
+          "s-6d9d636a298e296c",
           false
         ],
         [
@@ -408,28 +464,38 @@
           false
         ],
         [
+          "@rdd147",
+          "s-19f62d654cf383ea",
+          false
+        ],
+        [
+          "@drayinvests",
+          "s-4cd27959fdbdb3df",
+          false
+        ],
+        [
           "@SpecialSitsNews",
           "s-0cefb2e08adad232",
           false
         ],
         [
-          "@leshka_eth",
-          "s-6f7e30af05596669",
+          "@StockMKTNewz",
+          "s-189ddad6eb4c11b4",
           false
         ],
         [
-          "@NathanCrossNC",
-          "s-e6c21932575ce838",
-          false
-        ],
-        [
-          "@wallstengine",
-          "s-e5c92a32c6584b7a",
+          "@StockSavvyShay",
+          "s-673dcd59b70dadc9",
           false
         ],
         [
           "@antibearthesis",
           "s-8be0f06611ea66fc",
+          false
+        ],
+        [
+          "@coinbureau",
+          "s-d27164d4d5434a42",
           false
         ],
         [
@@ -453,148 +519,18 @@
           false
         ],
         [
-          "@hbar0n",
-          "s-25a866bc5acaf4dc",
-          false
-        ],
-        [
           "@CKCapitalxx",
           "s-e69ee2217371db26",
           false
         ],
         [
-          "u/Lucid_Dreamer5",
-          "s-ffd8afc48bd9d412",
-          false
-        ],
-        [
-          "u/ConnectStar7662",
-          "s-9ee6784a1761e008",
-          false
-        ],
-        [
-          "u/behereforsomething",
-          "s-b76db11aa0080e2e",
-          false
-        ],
-        [
-          "@nordin_eth",
-          "s-c9a86bf5c2c011c8",
-          false
-        ],
-        [
-          "u/InnerCircleTI",
-          "s-115015f38fb92ad5",
-          false
-        ],
-        [
-          "u/No-Contribution1070",
-          "s-c140e5db608c9b4d",
-          false
-        ],
-        [
-          "u/JeffersonsHat",
-          "s-52c7fb1fae7ce577",
-          false
-        ],
-        [
-          "u/zin1422",
-          "s-64f2217ce5087c29",
-          false
-        ],
-        [
-          "u/Eastern-Ad3055",
-          "s-8072d8b42b7b1db1",
-          false
-        ],
-        [
-          "u/Putrid-Falcon9153",
-          "s-83c6e9624d3d40d1",
-          false
-        ],
-        [
-          "u/ZDE4Doncrack",
-          "s-3f0e071785893796",
-          false
-        ],
-        [
-          "u/Ensheen",
-          "s-ef2fe51013184403",
-          false
-        ],
-        [
-          "u/supabot-devvit",
-          "s-873dc3fe85b99ebe",
-          false
-        ],
-        [
-          "@unusual_whales",
-          "s-cb8e03399bec10f6",
-          false
-        ],
-        [
-          "u/PurpleDurian7220",
-          "s-7a9684bd08d6d529",
+          "@corleoneinvests",
+          "s-c164e77a6368417b",
           false
         ],
         [
           "@jsouthard_",
           "s-02b270db64e26e30",
-          false
-        ],
-        [
-          "u/Frequent-Salary-9460",
-          "s-53af1549c4d4b53f",
-          false
-        ],
-        [
-          "u/Upstairs_Whole_580",
-          "s-0656ba5345088ac9",
-          false
-        ],
-        [
-          "u/Valuable-Register636",
-          "s-bcd83939fd4a2142",
-          false
-        ],
-        [
-          "u/HalfDayLeisure530",
-          "s-1d33ba3ea1894ab3",
-          false
-        ],
-        [
-          "u/Mamuthone125",
-          "s-3b26235c68f917fe",
-          false
-        ],
-        [
-          "@WOLF_Financial",
-          "s-73d8cad6ef4ca051",
-          false
-        ],
-        [
-          "u/zin1422",
-          "s-6c88e40cc378f824",
-          false
-        ],
-        [
-          "u/moodoid",
-          "s-532555cb811eb7fd",
-          false
-        ],
-        [
-          "u/MyProof_Fly",
-          "s-2744abeddab0a767",
-          false
-        ],
-        [
-          "u/diksha_chanana",
-          "s-a604a3dd921655a4",
-          false
-        ],
-        [
-          "u/MyProof_Fly",
-          "s-d9db0dbe1683043d",
           false
         ],
         [
@@ -608,23 +544,128 @@
           false
         ],
         [
-          "u/inpotay",
-          "s-e3ebb89ff0814c0e",
+          "@antibearthesis",
+          "s-aaa3c06ee59e03c7",
           false
         ],
         [
-          "@MMatters22596",
-          "s-742987632565bb0d",
+          "u/Regular-Lie7449",
+          "s-d5656975e4ddd0b6",
           false
         ],
         [
-          "u/aafusumi77",
-          "s-224eb312b8da4306",
+          "@Barchart",
+          "s-5a6fcca6b9c421cc",
           false
         ],
         [
-          "u/Gedan2589",
-          "s-b2b0e25478f3d81c",
+          "u/RZDirInvest",
+          "s-ad51ee22a77adede",
+          false
+        ],
+        [
+          "u/Punterfox",
+          "s-f3d39c1a816fc988",
+          false
+        ],
+        [
+          "@CoinvoTrading",
+          "s-c2b5ed412668c28e",
+          false
+        ],
+        [
+          "u/Weird-Ad-7669",
+          "s-6b0bdd0656ac8c4b",
+          false
+        ],
+        [
+          "u/brian-augustin",
+          "s-0de38d9501eb9b38",
+          false
+        ],
+        [
+          "u/Bmoses99",
+          "s-ee41d79e92c4454e",
+          false
+        ],
+        [
+          "u/zin1422",
+          "s-85abcb57c06800fe",
+          false
+        ],
+        [
+          "u/robot2trade",
+          "s-3d1593aa63d93b99",
+          false
+        ],
+        [
+          "u/69thnoobmaster69",
+          "s-3ed9990da6cc235d",
+          false
+        ],
+        [
+          "u/Sloth3535",
+          "s-a4fa504671f9b32b",
+          false
+        ],
+        [
+          "@JesseCohenInv",
+          "s-a9099bcf5ec1e4e0",
+          false
+        ],
+        [
+          "u/saasfin",
+          "s-786b7addf44daca9",
+          false
+        ],
+        [
+          "u/zin1422",
+          "s-ab971ffa56650df2",
+          false
+        ],
+        [
+          "u/robot2trade",
+          "s-b9c90ef42e7250e1",
+          false
+        ],
+        [
+          "u/Superb-Neck-5160",
+          "s-dc9461305dc25e14",
+          false
+        ],
+        [
+          "@cmsinvests",
+          "s-e1af9599bb2b3787",
+          false
+        ],
+        [
+          "u/Stock_Titan",
+          "s-e680c799edb663d9",
+          false
+        ],
+        [
+          "u/FragrantDistance471",
+          "s-b03346d22b634f29",
+          false
+        ],
+        [
+          "@StockSavvyShay",
+          "s-6eae5f69826d5f41",
+          false
+        ],
+        [
+          "u/raimermontilla",
+          "s-eee57b455a009879",
+          false
+        ],
+        [
+          "u/Purple_Dish_9694",
+          "s-7f9cde7e992fea80",
+          false
+        ],
+        [
+          "u/robot2trade",
+          "s-267439339767dbbb",
           false
         ]
       ],
@@ -632,64 +673,44 @@
         "twitter: 30 tweets",
         "reddit: 30 posts"
       ],
-      "checked_at": "2026-09-28T18:19:40.355226+00:00"
+      "checked_at": "2026-09-28T21:24:16.954142+00:00"
     },
     {
       "symbol": "TSLAUSDT",
-      "posts": 38,
-      "accounts": 33,
+      "posts": 46,
+      "accounts": 31,
       "by_channel": {
-        "x": 12,
-        "reddit": 26
+        "x": 18,
+        "reddit": 28
       },
-      "distinct_stories": 38,
+      "distinct_stories": 43,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
-      "withheld_abusive": 4,
+      "withheld_abusive": 2,
       "withheld_by_reason": {
-        "abusive_term": 4
+        "abusive_term": 2
       },
-      "withheld_accounts": 4,
+      "withheld_accounts": 2,
       "top_stories": [
         {
-          "text": "If you go to Shanghai, you can see many Teslas on the road! https://t.co/Q49n0elI5c",
-          "posts": 1,
+          "text": "Stock Market Recap for Monday, September 28, 2026 — The major U.S. stock indexes ended **broadly lower** on Monday, **September 28, 2026**, as Trump flatly rejected Iran's terms to reopen the Strait of Hormuz over the we",
+          "posts": 4,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@Tslachan"
+            "u/TorukMaktoM"
           ],
-          "first_seen": "2026-09-26T22:02:26+00:00"
+          "first_seen": "2026-09-28T20:28:29+00:00"
         },
         {
-          "text": "For $20,000, $TSLA Optimus will take care of the one chore nobody wants to do. https://t.co/0KkbJnTIZJ",
+          "text": "My advice for October is:\n\n• $TSLA (Tesla) — Don't buy\n• $INTC (Intel) — Don't buy\n• $ARM (Arm) — Don't buy\n• $AMD (AMD) — Buy at $630–$700\n• $NVDA (Nvidia) — Buy at $225–$260\n• $AVGO (Broadcom) — Buy at $352–$426\n• $DEL",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@JesseCohenInv"
+            "@jsouthard_"
           ],
-          "first_seen": "2026-09-26T22:04:29+00:00"
-        },
-        {
-          "text": "Counting down to the future\n\nElon's robots are coming\n\nOptimus 🌔🪐💫🦾\n\n$TSLA https://t.co/vfeUg3lcmM",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "@Miaavswpv"
-          ],
-          "first_seen": "2026-09-26T23:36:23+00:00"
-        },
-        {
-          "text": "I’m only going to say this once.\n\nIf you’re under 60 and your savings are below $1 million, this article is crucial\n\n$MU $1,082 now. $1,300 stock. Memory chip demand rebounding, AI servers driving growth.\n\n$AMD $630 now.",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "@BillBrooklyn10"
-          ],
-          "first_seen": "2026-09-27T14:08:52+00:00"
+          "first_seen": "2026-09-27T11:48:58+00:00"
         },
         {
           "text": "My September advice:\n$IREN (IREN Ltd) - Don't buy\n$ORCL (Oracle) — Don’t buy\n$CRWV (CoreWeave) — Don’t buy\n$INTC (Intel) — Buy at $115–$122\n$TSLA (Tesla) — Buy at $368–$372\n$SPCX (SpaceX) — Buy at $146–$148\n$MSFT (Micros",
@@ -700,35 +721,67 @@
             "@vip92226041"
           ],
           "first_seen": "2026-09-27T17:43:20+00:00"
+        },
+        {
+          "text": "Pre-market: red morning, but NVDA and energy showing relative strength — Morning board is red into the open. Strength is concentrated: NVDA +1.63%, XOM +1.47%, CVX +1.31%. Weak side: ORCL -2.92%, META -2.65%, INTC -2.42%",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "u/TradeEchoApp"
+          ],
+          "first_seen": "2026-09-28T12:38:45+00:00"
+        },
+        {
+          "text": "SODAX and SaucerSwap Partner for Cross-Network Swaps and Robinhood Stocks — [https://x.com/gosodax/status/2104527146458705970](https://x.com/gosodax/status/2104527146458705970)",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "u/lhodax"
+          ],
+          "first_seen": "2026-09-28T12:48:18+00:00"
         }
       ],
       "tone": {
         "status": "ok",
         "scorer": "VADER compound (Hutto & Gilbert, ICWSM 2014), >= 0.05 positive, <= -0.05 negative (paper §4; README.rst:241-245)",
         "weighting": "a coordinated story counts once however many accounts pushed it; one account repeating a story counts once; every other account counts once",
-        "posts_scored": 38,
-        "voices": 38.0,
+        "posts_scored": 46,
+        "voices": 43.0,
         "counts": {
-          "positive": 11,
-          "neutral": 20,
-          "negative": 7
+          "positive": 13,
+          "neutral": 18,
+          "negative": 15
         },
         "share": {
-          "positive": 0.2894736842105263,
-          "neutral": 0.5263157894736842,
-          "negative": 0.18421052631578946
+          "positive": 0.3023255813953488,
+          "neutral": 0.4186046511627907,
+          "negative": 0.27906976744186046
         },
         "share_unweighted": {
-          "positive": 0.2894736842105263,
-          "neutral": 0.5263157894736842,
-          "negative": 0.18421052631578946
+          "positive": 0.2826086956521739,
+          "neutral": 0.391304347826087,
+          "negative": 0.32608695652173914
         },
-        "mean_compound": 0.06992105263157895,
+        "mean_compound": 0.05115813953488371,
         "coordinated_stories_counted_once": 0,
         "posts_in_coordinated_stories": 0,
-        "withheld_not_scored": 4
+        "withheld_not_scored": 2
       },
       "post_tone": [
+        {
+          "id": "twitter-2104641200015704448",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104677750787518530",
+          "compound": -0.197,
+          "label": "negative",
+          "weight": 1.0
+        },
         {
           "id": "twitter-2104630950433067377",
           "compound": 0.0,
@@ -736,9 +789,39 @@
           "weight": 1.0
         },
         {
-          "id": "twitter-2104607455141302344",
+          "id": "twitter-2104660841274478599",
           "compound": 0.0,
           "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104680120959295923",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104655199327457329",
+          "compound": -0.3182,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104644175279132981",
+          "compound": -0.4767,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104579902083145823",
+          "compound": -0.7269,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104638276816761319",
+          "compound": -0.296,
+          "label": "negative",
           "weight": 1.0
         },
         {
@@ -748,57 +831,129 @@
           "weight": 1.0
         },
         {
-          "id": "twitter-2104599931755413778",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2103968982684299339",
-          "compound": 0.4939,
+          "id": "twitter-2104678788390957509",
+          "compound": 0.7778,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "twitter-2103968463685652868",
+          "id": "twitter-2104607455141302344",
           "compound": 0.0,
           "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2103992106083598795",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104561203171275012",
-          "compound": -0.2023,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104630568482938977",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104619451010392436",
-          "compound": 0.4588,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104211675972874569",
-          "compound": 0.6597,
-          "label": "positive",
           "weight": 1.0
         },
         {
           "id": "twitter-2104618941645553930",
           "compound": 0.0,
           "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104660205535387925",
+          "compound": -0.2023,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104664009416864065",
+          "compound": 0.8402,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104176466888167444",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104647852534485402",
+          "compound": -0.7324,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104675466032669015",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsqaii",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wspycp",
+          "compound": -0.5719,
+          "label": "negative",
+          "weight": 0.25
+        },
+        {
+          "id": "reddit-1wspy9c",
+          "compound": -0.5719,
+          "label": "negative",
+          "weight": 0.25
+        },
+        {
+          "id": "reddit-1wspxdj",
+          "compound": -0.5719,
+          "label": "negative",
+          "weight": 0.25
+        },
+        {
+          "id": "reddit-1wspx7d",
+          "compound": -0.5719,
+          "label": "negative",
+          "weight": 0.25
+        },
+        {
+          "id": "reddit-1wspn3t",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsp8an",
+          "compound": -0.2732,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsp7ls",
+          "compound": 0.802,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsp30j",
+          "compound": 0.2732,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wso16g",
+          "compound": -0.5562,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsnctw",
+          "compound": 0.4155,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsn1w3",
+          "compound": 0.5423,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsmicw",
+          "compound": 0.7458,
+          "label": "positive",
           "weight": 1.0
         },
         {
@@ -890,153 +1045,22 @@
           "compound": 0.8126,
           "label": "positive",
           "weight": 1.0
-        },
-        {
-          "id": "reddit-1wscukq",
-          "compound": -0.3889,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsbvdd",
-          "compound": -0.3612,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsbp7y",
-          "compound": 0.1779,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1ws9i14",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1ws8mzf",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1ws5y7g",
-          "compound": -0.4037,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1ws39t5",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1ws2qbh",
-          "compound": -0.6313,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wrylfp",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wrx7qb",
-          "compound": 0.7003,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wrx42c",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
         }
       ],
       "shares": [
         [
-          "@Tslachan",
-          "s-f7a8410ebbe358b8",
+          "u/TorukMaktoM",
+          "s-732d3da0ce7ce3aa",
           false
         ],
         [
-          "@JesseCohenInv",
-          "s-ada4d07d8ef69c2b",
-          false
-        ],
-        [
-          "@Miaavswpv",
-          "s-7f209fedbb5e9d31",
-          false
-        ],
-        [
-          "@BillBrooklyn10",
-          "s-cce51ff97d3ef683",
+          "@jsouthard_",
+          "s-6d9d636a298e296c",
           false
         ],
         [
           "@vip92226041",
           "s-532c0e2ead3d55e6",
-          false
-        ],
-        [
-          "u/lineup-sweep",
-          "s-dd3341aba4a76438",
-          false
-        ],
-        [
-          "u/Adventurous-Shoe-903",
-          "s-2e8adc4d74fa26f1",
-          false
-        ],
-        [
-          "u/JiuCai718718",
-          "s-e7f25185e1588b79",
-          false
-        ],
-        [
-          "u/TeamDaveB",
-          "s-04c14d0551200d65",
-          false
-        ],
-        [
-          "u/AutoModerator",
-          "s-6ad59bfebe57213b",
-          false
-        ],
-        [
-          "u/triniwoman_",
-          "s-f13f45ea1d4617d8",
-          false
-        ],
-        [
-          "u/Superb-Neck-5160",
-          "s-d585bf48e2219cc5",
-          false
-        ],
-        [
-          "u/AutoModerator",
-          "s-bbf726510c9df8c6",
-          false
-        ],
-        [
-          "u/ALPHAtradingpro",
-          "s-8a0759ff5537b667",
-          false
-        ],
-        [
-          "u/upbstock",
-          "s-261efb04661ac94b",
-          false
-        ],
-        [
-          "u/Kmcoyne0519",
-          "s-2f0d6ca7da4e7c7f",
           false
         ],
         [
@@ -1065,11 +1089,6 @@
           false
         ],
         [
-          "@wickedstocks",
-          "s-df111e861a912f77",
-          false
-        ],
-        [
           "u/zin1422",
           "s-cd1ebc7e4ad7d705",
           false
@@ -1085,6 +1104,11 @@
           false
         ],
         [
+          "@na_option",
+          "s-73271183614b15ed",
+          false
+        ],
+        [
           "u/zin1422",
           "s-64f2217ce5087c29",
           false
@@ -1092,11 +1116,6 @@
         [
           "u/Creative_Apricot6937",
           "s-5df011e1cadcf70b",
-          false
-        ],
-        [
-          "@TheSonOfWalkley",
-          "s-48e3da7258bb188c",
           false
         ],
         [
@@ -1130,23 +1149,118 @@
           false
         ],
         [
-          "@colin_gladman",
-          "s-7dba95f89571fbb5",
-          false
-        ],
-        [
           "u/Dragonlance12",
           "s-edf7c53d2845d390",
           false
         ],
         [
-          "@JOBhakdi",
-          "s-d497cbb84da9d25e",
+          "@TheSonOfWalkley",
+          "s-6dec9c73914d7085",
           false
         ],
         [
-          "@TheSonOfWalkley",
-          "s-6dec9c73914d7085",
+          "@GrindeOptions",
+          "s-37790f420f36c3e5",
+          false
+        ],
+        [
+          "u/Regular-Lie7449",
+          "s-d5656975e4ddd0b6",
+          false
+        ],
+        [
+          "@na_option",
+          "s-be1970739d611f48",
+          false
+        ],
+        [
+          "u/oddindicators",
+          "s-f096eec24ef11748",
+          false
+        ],
+        [
+          "@GrindeOptions",
+          "s-382e7bc5e165ef70",
+          false
+        ],
+        [
+          "u/Inevitable-Salt4800",
+          "s-c30e7b4f76646a24",
+          false
+        ],
+        [
+          "@tradfi",
+          "s-8d8849f05e90a8a1",
+          false
+        ],
+        [
+          "u/zin1422",
+          "s-85abcb57c06800fe",
+          false
+        ],
+        [
+          "@MarketRebels",
+          "s-9c297c79b96db900",
+          false
+        ],
+        [
+          "@squawksquare",
+          "s-8828a5301bdfa826",
+          false
+        ],
+        [
+          "@JesseCohenInv",
+          "s-a9099bcf5ec1e4e0",
+          false
+        ],
+        [
+          "u/Few_Fill5904",
+          "s-16223c590f54db16",
+          false
+        ],
+        [
+          "u/zin1422",
+          "s-ab971ffa56650df2",
+          false
+        ],
+        [
+          "u/robot2trade",
+          "s-b9c90ef42e7250e1",
+          false
+        ],
+        [
+          "@pdicarlotrader",
+          "s-e970655a04e8ee00",
+          false
+        ],
+        [
+          "u/Stock_Titan",
+          "s-e680c799edb663d9",
+          false
+        ],
+        [
+          "u/raimermontilla",
+          "s-eee57b455a009879",
+          false
+        ],
+        [
+          "@SeekUpUF",
+          "s-187721dc6197733b",
+          false
+        ],
+        [
+          "@GrindeOptions",
+          "s-38c5580bf30bd6fa",
+          false
+        ],
+        [
+          "@Bogachan_1971",
+          "s-c0d6d284ebaa92df",
+          false
+        ],
+        [
+          "@GrindeOptions",
+          "s-3f98a385c27bc8cd",
           false
         ]
       ],
@@ -1154,17 +1268,17 @@
         "twitter: 30 tweets",
         "reddit: 30 posts"
       ],
-      "checked_at": "2026-09-28T18:19:40.355226+00:00"
+      "checked_at": "2026-09-28T21:24:16.954142+00:00"
     },
     {
       "symbol": "AAPLUSDT",
       "posts": 37,
-      "accounts": 34,
+      "accounts": 29,
       "by_channel": {
         "x": 10,
         "reddit": 27
       },
-      "distinct_stories": 35,
+      "distinct_stories": 32,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
       "withheld_abusive": 3,
@@ -1173,6 +1287,16 @@
       },
       "withheld_accounts": 3,
       "top_stories": [
+        {
+          "text": "Stock Market Recap for Monday, September 28, 2026 — The major U.S. stock indexes ended **broadly lower** on Monday, **September 28, 2026**, as Trump flatly rejected Iran's terms to reopen the Strait of Hormuz over the we",
+          "posts": 4,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "u/TorukMaktoM"
+          ],
+          "first_seen": "2026-09-28T20:28:29+00:00"
+        },
         {
           "text": "The profit map of the US stock market [OC] — * **Size:** each box is a company's net profit over the past 12 months. Companies that lost money over those 12 months aren't shown\n* **Color:** how much that profit changed f",
           "posts": 2,
@@ -1212,16 +1336,6 @@
             "@jsouthard_"
           ],
           "first_seen": "2026-09-27T02:38:37+00:00"
-        },
-        {
-          "text": "Apple $AAPL  found a remarkable place to collect rent:\n\nBetween a bank and its own customer.\n\nFor every credit-card purchase made through Apple Pay, issuers pay Apple 0.15% of the transaction value. Debit costs half a ce",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "@0xApollo440"
-          ],
-          "first_seen": "2026-09-27T10:41:39+00:00"
         }
       ],
       "tone": {
@@ -1229,23 +1343,23 @@
         "scorer": "VADER compound (Hutto & Gilbert, ICWSM 2014), >= 0.05 positive, <= -0.05 negative (paper §4; README.rst:241-245)",
         "weighting": "a coordinated story counts once however many accounts pushed it; one account repeating a story counts once; every other account counts once",
         "posts_scored": 37,
-        "voices": 35.0,
+        "voices": 32.0,
         "counts": {
-          "positive": 21,
+          "positive": 18,
           "neutral": 10,
-          "negative": 6
+          "negative": 9
         },
         "share": {
-          "positive": 0.5428571428571428,
-          "neutral": 0.2857142857142857,
-          "negative": 0.17142857142857143
+          "positive": 0.5,
+          "neutral": 0.3125,
+          "negative": 0.1875
         },
         "share_unweighted": {
-          "positive": 0.5675675675675675,
+          "positive": 0.4864864864864865,
           "neutral": 0.2702702702702703,
-          "negative": 0.16216216216216217
+          "negative": 0.24324324324324326
         },
-        "mean_compound": 0.18992,
+        "mean_compound": 0.21359999999999998,
         "coordinated_stories_counted_once": 0,
         "posts_in_coordinated_stories": 0,
         "withheld_not_scored": 3
@@ -1258,20 +1372,44 @@
           "weight": 1.0
         },
         {
-          "id": "twitter-2104374059274580151",
-          "compound": 0.1531,
+          "id": "twitter-2104608220287483943",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104642193273286962",
+          "compound": 0.8237,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104159528493228418",
-          "compound": 0.7783,
+          "id": "twitter-2104544507056312363",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104644443642929338",
+          "compound": 0.7845,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104165496203645093",
-          "compound": 0.25,
+          "id": "twitter-2104640340464374063",
+          "compound": -0.2023,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104582770055909389",
+          "compound": 0.5106,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104650795778265376",
+          "compound": 0.6597,
           "label": "positive",
           "weight": 1.0
         },
@@ -1282,38 +1420,62 @@
           "weight": 1.0
         },
         {
-          "id": "twitter-2104608220287483943",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104574154238570750",
-          "compound": -0.6249,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104629398658039921",
-          "compound": 0.2974,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104545539190849748",
+          "id": "twitter-2104219509896671624",
           "compound": 0.3612,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104628523134779643",
-          "compound": -0.2023,
+          "id": "reddit-1wsqaii",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wspycp",
+          "compound": -0.5719,
+          "label": "negative",
+          "weight": 0.25
+        },
+        {
+          "id": "reddit-1wspy9c",
+          "compound": -0.5719,
+          "label": "negative",
+          "weight": 0.25
+        },
+        {
+          "id": "reddit-1wspxdj",
+          "compound": -0.5719,
+          "label": "negative",
+          "weight": 0.25
+        },
+        {
+          "id": "reddit-1wspx7d",
+          "compound": -0.5719,
+          "label": "negative",
+          "weight": 0.25
+        },
+        {
+          "id": "reddit-1wspn3t",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsp8an",
+          "compound": -0.2732,
           "label": "negative",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsl6cw",
-          "compound": 0.9477,
+          "id": "reddit-1wsnjj9",
+          "compound": 0.5859,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsmicw",
+          "compound": 0.7458,
           "label": "positive",
           "weight": 1.0
         },
@@ -1424,57 +1586,14 @@
           "compound": 0.1779,
           "label": "positive",
           "weight": 1.0
-        },
-        {
-          "id": "reddit-1ws2fwx",
-          "compound": 0.5122,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1ws09yg",
-          "compound": -0.0258,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wrx7qb",
-          "compound": 0.7003,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wrx30m",
-          "compound": 0.1298,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wrwb7o",
-          "compound": -0.4005,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wrvlgz",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wrqdkz",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wrpa78",
-          "compound": 0.3595,
-          "label": "positive",
-          "weight": 1.0
         }
       ],
       "shares": [
+        [
+          "u/TorukMaktoM",
+          "s-732d3da0ce7ce3aa",
+          false
+        ],
         [
           "u/pierreb5",
           "s-0c7299e3570c0c67",
@@ -1496,58 +1615,8 @@
           false
         ],
         [
-          "@0xApollo440",
-          "s-d570832c054de811",
-          false
-        ],
-        [
-          "@Hash_hopes",
-          "s-a28ca479636ca9ef",
-          false
-        ],
-        [
-          "u/SlyMoneyMinx",
-          "s-8936564991298507",
-          false
-        ],
-        [
-          "u/PrimeDayDeal",
-          "s-2e4e958245dc87d1",
-          false
-        ],
-        [
-          "u/Ok-Yam-1715",
-          "s-a66046ecd6ae7a4e",
-          false
-        ],
-        [
-          "u/eskhalaf",
-          "s-9fa4d347fdc57296",
-          false
-        ],
-        [
-          "u/Deep_Quantity4768",
-          "s-0274cedc7202a53d",
-          false
-        ],
-        [
-          "u/Adventurous-Shoe-903",
-          "s-2e8adc4d74fa26f1",
-          false
-        ],
-        [
-          "u/Badboyardie",
-          "s-15908873ea7be84d",
-          false
-        ],
-        [
-          "@Sam_Badawi",
-          "s-369f0124fab01ce8",
-          false
-        ],
-        [
-          "u/Spare_Fix29",
-          "s-284975189d5d988c",
+          "@korinek_trades",
+          "s-59595b5cd832f637",
           false
         ],
         [
@@ -1556,8 +1625,8 @@
           false
         ],
         [
-          "@BITCOINTRAPPER",
-          "s-76a5d788cb54f0b4",
+          "@zerohedge",
+          "s-53545801f0574b2c",
           false
         ],
         [
@@ -1591,13 +1660,13 @@
           false
         ],
         [
-          "@nordin_eth",
-          "s-c9a86bf5c2c011c8",
+          "u/InnerCircleTI",
+          "s-115015f38fb92ad5",
           false
         ],
         [
-          "u/InnerCircleTI",
-          "s-115015f38fb92ad5",
+          "@roqqupay",
+          "s-a61a5f03bbc1b6e3",
           false
         ],
         [
@@ -1636,535 +1705,48 @@
           false
         ],
         [
-          "u/Srqpon",
-          "s-eddaf242a54e6850",
+          "u/Regular-Lie7449",
+          "s-d5656975e4ddd0b6",
           false
         ],
         [
-          "@antibearthesis",
-          "s-aaa3c06ee59e03c7",
+          "@stonkstradamus",
+          "s-d531ced8fab5fb2a",
           false
         ],
         [
-          "@aaplbottomjeans",
-          "s-51b7277c7e6d28fc",
-          false
-        ]
-      ],
-      "status": [
-        "twitter: 30 tweets",
-        "reddit: 30 posts"
-      ],
-      "checked_at": "2026-09-28T18:19:40.355226+00:00"
-    },
-    {
-      "symbol": "MSFTUSDT",
-      "posts": 38,
-      "accounts": 34,
-      "by_channel": {
-        "x": 10,
-        "reddit": 28
-      },
-      "distinct_stories": 37,
-      "coordinated_stories": 0,
-      "coordinated_posts": 0,
-      "withheld_abusive": 2,
-      "withheld_by_reason": {
-        "abusive_term": 2
-      },
-      "withheld_accounts": 2,
-      "top_stories": [
-        {
-          "text": "The profit map of the US stock market [OC] — * **Size:** each box is a company's net profit over the past 12 months. Companies that lost money over those 12 months aren't shown\n* **Color:** how much that profit changed f",
-          "posts": 2,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "u/pierreb5"
-          ],
-          "first_seen": "2026-09-28T15:38:06+00:00"
-        },
-        {
-          "text": "My September advice:\n$IREN (IREN Ltd) - Don't buy\n$ORCL (Oracle) — Don’t buy\n$CRWV (CoreWeave) — Don’t buy\n$INTC (Intel) — Buy at $115–$122\n$TSLA (Tesla) — Buy at $368–$372\n$SPCX (SpaceX) — Buy at $146–$148\n$MSFT (Micros",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "@vip92226041"
-          ],
-          "first_seen": "2026-09-27T17:43:20+00:00"
-        },
-        {
-          "text": "Retired at 60: My September 28 Market Note\n$SNDK (SanDisk) — Don’t buy\n$MCD (McDonald) — Don’t buy\n$META (Meta Platforms) — Don’t buy\n$NVDA (NVIDIA) — Buy at $210–$216\n$MSFT (Microsoft) — Buy at $500–$508\n$MRVL (Marvell ",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "@BillBrooklyn10"
-          ],
-          "first_seen": "2026-09-27T23:52:00+00:00"
-        },
-        {
-          "text": "SoSoValue Flash: Fed Officials Warn AI Capex Drives Inflation, Global Bond Sell-off Intensifies, Microsoft Jumps 3.7% on Copilot Upgrade\n\n💥 Core Catalyst:\nIn Macro & Rates, hawkish signals escalated across the Federal Re",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "@SoSoValueCrypto"
-          ],
-          "first_seen": "2026-09-28T01:11:16+00:00"
-        },
-        {
-          "text": "I built an AI stock discussion forum and first seeing a bullish rating from all models — Each models looks at RSI data and news for a stock and posts a bullish or bearish comment.",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "u/aviatorview"
-          ],
-          "first_seen": "2026-09-28T01:22:41+00:00"
-        }
-      ],
-      "tone": {
-        "status": "ok",
-        "scorer": "VADER compound (Hutto & Gilbert, ICWSM 2014), >= 0.05 positive, <= -0.05 negative (paper §4; README.rst:241-245)",
-        "weighting": "a coordinated story counts once however many accounts pushed it; one account repeating a story counts once; every other account counts once",
-        "posts_scored": 38,
-        "voices": 37.0,
-        "counts": {
-          "positive": 16,
-          "neutral": 16,
-          "negative": 6
-        },
-        "share": {
-          "positive": 0.40540540540540543,
-          "neutral": 0.43243243243243246,
-          "negative": 0.16216216216216217
-        },
-        "share_unweighted": {
-          "positive": 0.42105263157894735,
-          "neutral": 0.42105263157894735,
-          "negative": 0.15789473684210525
-        },
-        "mean_compound": 0.15332972972972972,
-        "coordinated_stories_counted_once": 0,
-        "posts_in_coordinated_stories": 0,
-        "withheld_not_scored": 2
-      },
-      "post_tone": [
-        {
-          "id": "twitter-2104602041477702003",
-          "compound": 0.2263,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104265646737686777",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104378376152887756",
-          "compound": -0.4404,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104358427862643132",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104558288738340945",
-          "compound": 0.1779,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104595424808165482",
-          "compound": 0.5719,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104537138167685601",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104390934221734303",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104549445941530628",
-          "compound": 0.6808,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104438164009959892",
-          "compound": 0.3182,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsl7df",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsklqx",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsi0mi",
-          "compound": 0.8402,
-          "label": "positive",
-          "weight": 0.5
-        },
-        {
-          "id": "reddit-1wshxum",
-          "compound": 0.8402,
-          "label": "positive",
-          "weight": 0.5
-        },
-        {
-          "id": "reddit-1wshkh1",
-          "compound": 0.4023,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsh7as",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsgy45",
-          "compound": -0.1695,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsfv3d",
-          "compound": -0.7027,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsf2ji",
-          "compound": 0.3612,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsez4a",
-          "compound": -0.7003,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wseviq",
-          "compound": 0.3182,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wseq1d",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wse3gb",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsdyhr",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsdudb",
-          "compound": -0.0018,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsdtpa",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsdshp",
-          "compound": 0.368,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsdotb",
-          "compound": 0.5886,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsdi4t",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsdh87",
-          "compound": 0.8126,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wscyg8",
-          "compound": -0.0943,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wscidm",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1ws9kw2",
-          "compound": 0.8316,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1ws73u2",
-          "compound": -0.1531,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1ws5hjr",
-          "compound": 0.8348,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1ws57p4",
-          "compound": 0.6027,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1ws33fn",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1ws1cf4",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        }
-      ],
-      "shares": [
-        [
-          "u/pierreb5",
-          "s-0c7299e3570c0c67",
+          "@realMeetKevin",
+          "s-bfcaf5440956fb10",
           false
         ],
         [
-          "@vip92226041",
-          "s-532c0e2ead3d55e6",
+          "@crypto_bitlord7",
+          "s-f8c3a0f5aba0778c",
           false
         ],
         [
-          "@BillBrooklyn10",
-          "s-7d00dde8285ec4bb",
+          "u/Buttered_Toast33",
+          "s-e2708974b18a3bab",
           false
         ],
         [
-          "@SoSoValueCrypto",
-          "s-6a3ce17e17d93d13",
-          false
-        ],
-        [
-          "u/aviatorview",
-          "s-aad9572f13094272",
-          false
-        ],
-        [
-          "@vip92226041",
-          "s-896491f337f88455",
-          false
-        ],
-        [
-          "u/Legitimate-Base434",
-          "s-80983c3c7d2daf82",
-          false
-        ],
-        [
-          "u/Maleficent-Refuse-48",
-          "s-668d7966aba4e620",
-          false
-        ],
-        [
-          "u/Hardwareimpaired",
-          "s-ae53fdf04c34289d",
-          false
-        ],
-        [
-          "@RichardESPR",
-          "s-55687f199e5a79ad",
-          false
-        ],
-        [
-          "u/Secret_Toe2639",
-          "s-13ca02dd759ed53b",
-          false
-        ],
-        [
-          "u/EOTBlank",
-          "s-3521e3fbc22e0f36",
-          false
-        ],
-        [
-          "@933Athkar",
-          "s-3d0bbfb711b35a5d",
-          false
-        ],
-        [
-          "u/Funny-Sprinkles-5674",
-          "s-ef852a4e1e9b2879",
+          "@realdogen",
+          "s-d4444a0707a3d31c",
           false
         ],
         [
           "u/robot2trade",
-          "s-df83874eec4bccd7",
-          false
-        ],
-        [
-          "@thestockwhale",
-          "s-6e89ab2f9e2af8c4",
-          false
-        ],
-        [
-          "u/TradeEchoApp",
-          "s-e1b2fa3e0e17cdf6",
-          false
-        ],
-        [
-          "u/theJimmybob",
-          "s-9f6d94f9fc7ff987",
-          false
-        ],
-        [
-          "u/TearRepresentative56",
-          "s-fcaf0dd307a146b1",
-          false
-        ],
-        [
-          "u/Routine_Bat6675",
-          "s-1d7a1b51c3003a94",
-          false
-        ],
-        [
-          "u/Ok_South_5824",
-          "s-4c0a4771af5792ca",
-          false
-        ],
-        [
-          "u/breakoutsHappen",
-          "s-064b29c492c4dc91",
+          "s-b9c90ef42e7250e1",
           false
         ],
         [
           "u/Stock_Titan",
-          "s-eae95a09e28c89ea",
+          "s-e680c799edb663d9",
           false
         ],
         [
-          "u/Tickerade",
-          "s-c2892caf3576da27",
-          false
-        ],
-        [
-          "@HedgeyeComm",
-          "s-08c8c85aa6ad07a5",
-          false
-        ],
-        [
-          "u/custintel",
-          "s-ab4cc0813069e335",
-          false
-        ],
-        [
-          "u/fark13",
-          "s-bfdd18bec12edebd",
-          false
-        ],
-        [
-          "u/robot2trade",
-          "s-478661987252d8ac",
-          false
-        ],
-        [
-          "u/streetsent",
-          "s-bc6dae9ede33a0dd",
-          false
-        ],
-        [
-          "u/Single_Guarantee9545",
-          "s-c432055db40667e3",
-          false
-        ],
-        [
-          "u/supabot-devvit",
-          "s-873dc3fe85b99ebe",
-          false
-        ],
-        [
-          "u/Ok-Yam-1715",
-          "s-4a5ef81051f4918f",
-          false
-        ],
-        [
-          "u/PurpleDurian7220",
-          "s-7a9684bd08d6d529",
-          false
-        ],
-        [
-          "@jsouthard_",
-          "s-02b270db64e26e30",
-          false
-        ],
-        [
-          "@coinbureau",
-          "s-bc1884df2680adda",
-          false
-        ],
-        [
-          "u/MyProof_Fly",
-          "s-d9db0dbe1683043d",
-          false
-        ],
-        [
-          "u/pierreb5",
-          "s-e092318ead4d219e",
+          "u/raimermontilla",
+          "s-eee57b455a009879",
           false
         ]
       ],
@@ -2172,17 +1754,16 @@
         "twitter: 30 tweets",
         "reddit: 30 posts"
       ],
-      "checked_at": "2026-09-28T18:19:40.355226+00:00"
+      "checked_at": "2026-09-28T21:24:16.954142+00:00"
     },
     {
-      "symbol": "METAUSDT",
-      "posts": 42,
-      "accounts": 41,
+      "symbol": "MSFTUSDT",
+      "posts": 12,
+      "accounts": 11,
       "by_channel": {
-        "x": 13,
-        "reddit": 29
+        "x": 12
       },
-      "distinct_stories": 41,
+      "distinct_stories": 12,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
       "withheld_abusive": 1,
@@ -2192,15 +1773,241 @@
       "withheld_accounts": 1,
       "top_stories": [
         {
-          "text": "Meta Quest device referral — 30 € or 30$ if you buy a meta quest headset\nhttps://www.meta.com/referrals/link/tserof/",
-          "posts": 2,
+          "text": "For reference, here are some of my favorite calls from just the past year:\n- $DELL at $230 → flew 150%\n- $MU at $500 → flew +150%\n- $SNDK at $1,000 → flew +135%\n- $META at $540 → flew +40%\n- $MSFT at $350 → flew +40%\n\nMa",
+          "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "u/tserof"
+            "@cmsinvests"
           ],
-          "first_seen": "2026-09-28T18:13:03+00:00"
+          "first_seen": "2026-09-27T18:58:35+00:00"
         },
+        {
+          "text": "Microsoft $MSFT building a flat base inside a massive 14-month base.\n\nAzure revenue growth accelerated to +43% YoY while Microsoft Cloud generated $214B in FY26.\n\nAzure + Microsoft 365 + GitHub + LinkedIn + Gaming.\n\nMult",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "@Venu_7_"
+          ],
+          "first_seen": "2026-09-27T21:40:14+00:00"
+        },
+        {
+          "text": "$RZLV $META $MSFT $AMZN  Rezolve a.i going from $1 billion to $100 billion META Muse is huge for Rezolve. https://t.co/Grg903tNyX",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "@RichardESPR"
+          ],
+          "first_seen": "2026-09-28T05:08:51+00:00"
+        },
+        {
+          "text": "This is your daily reminder that Donald Trump has sold up to $25 MILLION of Amazon $AMZN and Microsoft $MSFT stock.\n\nUse this information as you wish. We're just the messenger.\n\nIf you want to WIN this year, follow us. h",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "@DJTRadar"
+          ],
+          "first_seen": "2026-09-28T09:40:30+00:00"
+        },
+        {
+          "text": "This can not read good for $MSFT tbh",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "@ScroogeCap"
+          ],
+          "first_seen": "2026-09-28T12:38:04+00:00"
+        }
+      ],
+      "tone": {
+        "status": "ok",
+        "scorer": "VADER compound (Hutto & Gilbert, ICWSM 2014), >= 0.05 positive, <= -0.05 negative (paper §4; README.rst:241-245)",
+        "weighting": "a coordinated story counts once however many accounts pushed it; one account repeating a story counts once; every other account counts once",
+        "posts_scored": 12,
+        "voices": 12.0,
+        "counts": {
+          "positive": 8,
+          "neutral": 2,
+          "negative": 2
+        },
+        "share": {
+          "positive": 0.6666666666666666,
+          "neutral": 0.16666666666666666,
+          "negative": 0.16666666666666666
+        },
+        "share_unweighted": {
+          "positive": 0.6666666666666666,
+          "neutral": 0.16666666666666666,
+          "negative": 0.16666666666666666
+        },
+        "mean_compound": 0.19633333333333333,
+        "coordinated_stories_counted_once": 0,
+        "posts_in_coordinated_stories": 0,
+        "withheld_not_scored": 1
+      },
+      "post_tone": [
+        {
+          "id": "twitter-2104506526983446538",
+          "compound": 0.8494,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104551213446439107",
+          "compound": -0.3412,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104602041477702003",
+          "compound": 0.2263,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104553298678427762",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104653704867811425",
+          "compound": 0.4767,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104325265027748209",
+          "compound": 0.3818,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104657557612609700",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104664009416864065",
+          "compound": 0.8402,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104558288738340945",
+          "compound": 0.1779,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104574154238570750",
+          "compound": -0.6249,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104438164009959892",
+          "compound": 0.3182,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104284585362399639",
+          "compound": 0.0516,
+          "label": "positive",
+          "weight": 1.0
+        }
+      ],
+      "shares": [
+        [
+          "@cmsinvests",
+          "s-cacff9cdbee9427d",
+          false
+        ],
+        [
+          "@Venu_7_",
+          "s-8218b5fc136de0c7",
+          false
+        ],
+        [
+          "@RichardESPR",
+          "s-55687f199e5a79ad",
+          false
+        ],
+        [
+          "@DJTRadar",
+          "s-ec09e7c4797d5152",
+          false
+        ],
+        [
+          "@ScroogeCap",
+          "s-df07b2c7ab9fb9ab",
+          false
+        ],
+        [
+          "@MsVeilMoney",
+          "s-863b0b03eeed5f35",
+          false
+        ],
+        [
+          "@HedgeyeComm",
+          "s-08c8c85aa6ad07a5",
+          false
+        ],
+        [
+          "@nordin_eth",
+          "s-c9a86bf5c2c011c8",
+          false
+        ],
+        [
+          "@coinbureau",
+          "s-bc1884df2680adda",
+          false
+        ],
+        [
+          "@cmsinvests",
+          "s-ccabb9d7ef138a91",
+          false
+        ],
+        [
+          "@Oculustrade",
+          "s-5a2f525642ee3692",
+          false
+        ],
+        [
+          "@pdicarlotrader",
+          "s-e970655a04e8ee00",
+          false
+        ]
+      ],
+      "status": [
+        "twitter: 30 tweets",
+        "reddit: 0 posts"
+      ],
+      "checked_at": "2026-09-28T21:24:16.954142+00:00"
+    },
+    {
+      "symbol": "METAUSDT",
+      "posts": 46,
+      "accounts": 28,
+      "by_channel": {
+        "x": 17,
+        "reddit": 29
+      },
+      "distinct_stories": 46,
+      "coordinated_stories": 0,
+      "coordinated_posts": 0,
+      "withheld_abusive": 1,
+      "withheld_by_reason": {
+        "abusive_term": 1
+      },
+      "withheld_accounts": 1,
+      "top_stories": [
         {
           "text": "JUST IN: Man outraged after Meta’s Muse AI agent allegedly gave a Facebook Marketplace buyer his home address, accepted a lowball offer, &amp; arranged a pickup without telling him.",
           "posts": 1,
@@ -2232,6 +2039,16 @@
           "first_seen": "2026-09-28T12:35:40+00:00"
         },
         {
+          "text": "$META LAUNCHES NEW ENTERPRISE AI BUSINESS, HIRES FORMER MONGODB CEO TO RUN IT\n\nMeta is creating a new business line to sell AI tools directly to companies, bringing together Muse, its coding tools, access to its top AI m",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "@wallstengine"
+          ],
+          "first_seen": "2026-09-28T12:36:34+00:00"
+        },
+        {
           "text": "Today we are starting Meta Enterprise Platform to help businesses use AI to grow and transform in new ways, and Chirantan \"CJ\" Desai will join Meta as Chief Enterprise Platform Officer. \n\nhttps://t.co/8VjGBu2WFK",
           "posts": 1,
           "accounts": 1,
@@ -2246,35 +2063,29 @@
         "status": "ok",
         "scorer": "VADER compound (Hutto & Gilbert, ICWSM 2014), >= 0.05 positive, <= -0.05 negative (paper §4; README.rst:241-245)",
         "weighting": "a coordinated story counts once however many accounts pushed it; one account repeating a story counts once; every other account counts once",
-        "posts_scored": 42,
-        "voices": 41.0,
+        "posts_scored": 46,
+        "voices": 46.0,
         "counts": {
-          "positive": 28,
-          "neutral": 9,
-          "negative": 5
+          "positive": 24,
+          "neutral": 10,
+          "negative": 12
         },
         "share": {
-          "positive": 0.6829268292682927,
-          "neutral": 0.1951219512195122,
-          "negative": 0.12195121951219512
+          "positive": 0.5217391304347826,
+          "neutral": 0.21739130434782608,
+          "negative": 0.2608695652173913
         },
         "share_unweighted": {
-          "positive": 0.6666666666666666,
-          "neutral": 0.21428571428571427,
-          "negative": 0.11904761904761904
+          "positive": 0.5217391304347826,
+          "neutral": 0.21739130434782608,
+          "negative": 0.2608695652173913
         },
-        "mean_compound": 0.29218048780487815,
+        "mean_compound": 0.12898695652173914,
         "coordinated_stories_counted_once": 0,
         "posts_in_coordinated_stories": 0,
         "withheld_not_scored": 1
       },
       "post_tone": [
-        {
-          "id": "twitter-2104551228709691504",
-          "compound": 0.5994,
-          "label": "positive",
-          "weight": 1.0
-        },
         {
           "id": "twitter-2104550609403695581",
           "compound": 0.802,
@@ -2288,9 +2099,57 @@
           "weight": 1.0
         },
         {
+          "id": "twitter-2104551228709691504",
+          "compound": 0.5994,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104663270175154292",
+          "compound": -0.2263,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104654421884010860",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104572093996454245",
+          "compound": -0.5719,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104550837033091292",
+          "compound": 0.4588,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104658659808825372",
+          "compound": 0.2263,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104555895841767718",
+          "compound": 0.6705,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
           "id": "twitter-2104349619790684301",
           "compound": -0.4939,
           "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104593582808281248",
+          "compound": 0.3612,
+          "label": "positive",
           "weight": 1.0
         },
         {
@@ -2306,228 +2165,205 @@
           "weight": 1.0
         },
         {
-          "id": "twitter-2104555895841767718",
-          "compound": 0.6705,
+          "id": "twitter-2104596017652084846",
+          "compound": -0.6467,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104596531038818549",
+          "compound": 0.5267,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104631725540380921",
-          "compound": 0.3818,
+          "id": "twitter-2104556185391190465",
+          "compound": 0.7761,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104554331345457387",
-          "compound": 0.3818,
+          "id": "twitter-2104573474417119266",
+          "compound": 0.7553,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104597410924077141",
-          "compound": 0.5719,
+          "id": "reddit-1wsrepj",
+          "compound": -0.8316,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsre8i",
+          "compound": 0.9665,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104572093996454245",
+          "id": "reddit-1wsrdfv",
+          "compound": -0.6808,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrdf9",
+          "compound": -0.2732,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrcji",
+          "compound": -0.6808,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrc9m",
+          "compound": 0.1531,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrbwg",
+          "compound": -0.7717,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrbeo",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrb0u",
+          "compound": 0.9022,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrax6",
+          "compound": -0.7717,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsra1c",
+          "compound": -0.7717,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsr9ey",
+          "compound": 0.5346,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsr8x5",
           "compound": -0.5719,
           "label": "negative",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104579380848861671",
-          "compound": 0.5859,
+          "id": "reddit-1wsr8pg",
+          "compound": 0.4753,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104556290790101315",
+          "id": "reddit-1wsr8it",
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsmd6h",
-          "compound": 0.6115,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsmd6f",
-          "compound": 0.7263,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsmcd2",
+          "id": "reddit-1wsr8cy",
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsmb77",
+          "id": "reddit-1wsr85x",
+          "compound": 0.4753,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsr7z8",
+          "compound": 0.4753,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsr7sq",
+          "compound": 0.6696,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsr7mt",
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsman2",
-          "compound": -0.886,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsmah8",
+          "id": "reddit-1wsr7g9",
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsma9z",
-          "compound": 0.6908,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsm9oo",
-          "compound": 0.2732,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsm9jl",
-          "compound": -0.901,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsm778",
+          "id": "reddit-1wsr7af",
           "compound": 0.0,
           "label": "neutral",
-          "weight": 0.5
-        },
-        {
-          "id": "reddit-1wsm76g",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 0.5
-        },
-        {
-          "id": "reddit-1wsm6wl",
-          "compound": -0.8807,
-          "label": "negative",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsm6up",
-          "compound": 0.2732,
+          "id": "reddit-1wsr73d",
+          "compound": 0.7712,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsm6d9",
-          "compound": 0.4767,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsm6by",
-          "compound": 0.6808,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsm61m",
-          "compound": 0.5187,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsm59v",
+          "id": "reddit-1wsr6xn",
           "compound": 0.6239,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsm4sc",
-          "compound": 0.8895,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsm4qd",
-          "compound": 0.4767,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsm4in",
-          "compound": 0.1431,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsm498",
-          "compound": 0.765,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsm48k",
-          "compound": 0.4767,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsm2v8",
+          "id": "reddit-1wsr6wv",
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsm2o5",
+          "id": "reddit-1wsr6qo",
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsm1ym",
-          "compound": 0.8442,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsm1em",
-          "compound": 0.656,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsm10m",
+          "id": "reddit-1wsr6jz",
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsm0j8",
-          "compound": 0.4019,
+          "id": "reddit-1wsr6g0",
+          "compound": 0.0989,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsm0g0",
-          "compound": 0.7269,
+          "id": "reddit-1wsr6dz",
+          "compound": 0.4389,
           "label": "positive",
           "weight": 1.0
         }
       ],
       "shares": [
-        [
-          "u/tserof",
-          "s-cfad760e4d009dec",
-          false
-        ],
         [
           "@Polymarket",
           "s-9e9c6e08f4c8797f",
@@ -2544,6 +2380,11 @@
           false
         ],
         [
+          "@wallstengine",
+          "s-16a8223f2199eca5",
+          false
+        ],
+        [
           "@MetaNewsroom",
           "s-b74bb10555c1c520",
           false
@@ -2554,18 +2395,13 @@
           false
         ],
         [
-          "@wallstengine",
-          "s-18b556de1dcdf49a",
-          false
-        ],
-        [
           "@WatcherGuru",
           "s-0753614daf62f028",
           false
         ],
         [
-          "@firstadopter",
-          "s-2e0e67e35c1493cd",
+          "@gurgavin",
+          "s-eb355dfb4c6afffc",
           false
         ],
         [
@@ -2574,8 +2410,8 @@
           false
         ],
         [
-          "@AbhinavXJ",
-          "s-7e228be5049e4054",
+          "@kimmonismus",
+          "s-76b33732e1bfd42c",
           false
         ],
         [
@@ -2584,208 +2420,231 @@
           false
         ],
         [
-          "@testingcatalog",
-          "s-e42fb510aaa6cfbc",
+          "@EthanDeFi_",
+          "s-9dfa8081caff4688",
           false
         ],
         [
-          "@unusual_whales",
-          "s-e699f06151f18fcf",
+          "@GergelyOrosz",
+          "s-fb01618d5951e9a8",
           false
         ],
         [
-          "u/Feeling_Ad4052",
-          "s-cfa49111eb249adb",
+          "@GergelyOrosz",
+          "s-7640cce8e708c542",
           false
         ],
         [
-          "u/off_line24",
-          "s-a0700fb980213fde",
+          "@Kalshi_Finance",
+          "s-7f4a0b519fa024da",
           false
         ],
         [
-          "u/New_Republic_87",
-          "s-5a814d51e9df1364",
+          "@stacy_muur",
+          "s-6589a949293bac18",
           false
         ],
         [
-          "u/Seattle-Massage",
-          "s-ef04a9df9651d24b",
+          "@tradfi",
+          "s-9f27a2a63771eb5e",
           false
         ],
         [
-          "u/Complete_Seesaw5307",
-          "s-78bf93a00fd0dd53",
+          "u/rrmdp",
+          "s-71df9ed4f626be6f",
           false
         ],
         [
-          "u/Spiritual_Corgi_8085",
-          "s-a5eef63a4a990707",
+          "u/SkacikPL",
+          "s-32f3c40a9bf2ec2d",
           false
         ],
         [
-          "u/Ashamed-Echo-2122",
-          "s-6844ab94592529f9",
+          "u/rrmdp",
+          "s-1e053c8cacfc98cd",
           false
         ],
         [
-          "u/mahahatra13",
-          "s-28f8fe79e4ad745e",
+          "u/rrmdp",
+          "s-aa71b08fda3b1fbe",
           false
         ],
         [
-          "u/No_Hand5428",
-          "s-5d628ea7cf40af41",
+          "u/rrmdp",
+          "s-f38bc9d19b27d756",
           false
         ],
         [
-          "u/coldnorth4enf4",
-          "s-387613fd861941b7",
+          "u/Substantial-Rough723",
+          "s-20869d9f6f610242",
           false
         ],
         [
-          "u/Nicodbpq",
-          "s-4843dff22c20582c",
+          "u/rrmdp",
+          "s-a66126450bb4795c",
           false
         ],
         [
-          "u/abusancianas",
-          "s-29c8297e6290d8d7",
+          "u/rrmdp",
+          "s-bf873617e3771b7d",
           false
         ],
         [
-          "u/HiAmAi",
-          "s-ec4be17db4366391",
+          "u/rrmdp",
+          "s-ad0fe89deda19d08",
           false
         ],
         [
-          "u/BOSSINTELLIGENCY",
-          "s-46c197d281d6647d",
+          "u/rrmdp",
+          "s-52a9818b02f5b5ed",
           false
         ],
         [
-          "u/Iqrash__08",
-          "s-921e94b1d10a4565",
+          "u/rrmdp",
+          "s-bd69544b60180923",
           false
         ],
         [
-          "u/Muted-Barnacle-559",
-          "s-2394948a68cb6144",
+          "u/rrmdp",
+          "s-89b330302e45ab0a",
           false
         ],
         [
-          "u/100pro_stack",
-          "s-7cf34870fa18012d",
+          "u/rrmdp",
+          "s-ba156751e93826d6",
           false
         ],
         [
-          "u/Delicious-History342",
-          "s-7389086d77a22df4",
+          "u/rrmdp",
+          "s-2824a7d5b6ca19f7",
           false
         ],
         [
-          "u/LeakyLettuce69",
-          "s-3739168d8f8c52bb",
+          "u/rrmdp",
+          "s-49390d56d77f36b5",
           false
         ],
         [
-          "u/Affectionate-Dot8640",
-          "s-1d7f17c5452705da",
+          "u/rrmdp",
+          "s-51e1a4317fcff0b8",
           false
         ],
         [
-          "u/Carlos_7x",
-          "s-f121ca0d8682e815",
+          "u/kektea",
+          "s-dc2b7f6906aa9d24",
           false
         ],
         [
-          "u/AndroidAnthem",
-          "s-935479b4f7818fdd",
+          "u/randomginger11",
+          "s-d0352b5753e33973",
           false
         ],
         [
-          "u/Azrael2222",
-          "s-31ca37024832eeba",
+          "u/GroundbreakingBoss14",
+          "s-9113668199e872cd",
           false
         ],
         [
-          "u/Anxious-Geologist-11",
-          "s-363006c0df39d929",
+          "u/GroundbreakingBoss14",
+          "s-5c5d8b062d44a3b8",
           false
         ],
         [
-          "u/Leo0806-studios",
-          "s-05712e87c2191059",
+          "u/No-Weekend2592",
+          "s-178201761cf56df4",
           false
         ],
         [
-          "u/HuffyMedia",
-          "s-adaa97caa53ba882",
+          "u/Street_Carrot9102",
+          "s-87c001f6d666dc83",
+          false
+        ],
+        [
+          "u/GroundbreakingBoss14",
+          "s-6c43f716574c9a4d",
+          false
+        ],
+        [
+          "u/SirBaza",
+          "s-d8dec5c3c7cd0b86",
+          false
+        ],
+        [
+          "u/GroundbreakingBoss14",
+          "s-da5454d5d17c8c4d",
+          false
+        ],
+        [
+          "u/Tydude2641",
+          "s-69edcd4fa2fbdd6a",
+          false
+        ],
+        [
+          "u/GroundbreakingBoss14",
+          "s-175f05efcf75fda9",
+          false
+        ],
+        [
+          "u/kr1638a",
+          "s-f9de207aef4ededf",
+          false
+        ],
+        [
+          "u/JamStan1978",
+          "s-126081c32a1b3b48",
           false
         ]
       ],
       "status": [
         "twitter: 30 tweets",
-        "reddit: 29 posts"
+        "reddit: 30 posts"
       ],
-      "checked_at": "2026-09-28T18:19:40.355226+00:00"
+      "checked_at": "2026-09-28T21:24:16.954142+00:00"
     },
     {
       "symbol": "GOOGLUSDT",
-      "posts": 21,
-      "accounts": 18,
+      "posts": 47,
+      "accounts": 43,
       "by_channel": {
-        "x": 11,
-        "reddit": 10
+        "x": 18,
+        "reddit": 29
       },
-      "distinct_stories": 19,
+      "distinct_stories": 46,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
-      "withheld_abusive": 3,
-      "withheld_by_reason": {
-        "abusive_term": 3
-      },
-      "withheld_accounts": 2,
+      "withheld_abusive": 0,
+      "withheld_by_reason": {},
+      "withheld_accounts": 0,
       "top_stories": [
         {
-          "text": "Can anyone help me find him? — I have this teddy from my childhood from \"keel toys\" but i cannot find any anything like him anywhere I have tried google image search  and contacting the brand but have heard nothing. Any ",
+          "text": "Made a how-to guide for therapy reimbursement with Blue Shield PPO — Hi  AuDHDD women! For anyone with PPO insurance seeking therapy: **here's a community resource guide about how to access therapy through Blue Shield CA",
           "posts": 2,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "u/No_Note405"
+            "u/Connect-Reason-284"
           ],
-          "first_seen": "2026-09-28T18:18:03+00:00"
+          "first_seen": "2026-09-28T21:20:54+00:00"
         },
         {
-          "text": "emotional synth pop song — Made this weeknd emotional synth rnb typa song that i really liked and wanted to share it out there with others, ik i put a spiderman dialogue in it but i won't release and i did that jus for f",
-          "posts": 2,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "u/Simple_Read_1785"
-          ],
-          "first_seen": "2026-09-28T18:18:34+00:00"
-        },
-        {
-          "text": "15 $GOOGL Deepmind researchers left their breakfast club and the research positions to raise money for their own startups \n\nThe FOMO is real. Many folks I talk to think this is the best time ever (next 5-10 years) to mak",
+          "text": "$GOOGL feels like it's getting left behind in AI conversation. \n\nGoogle search &amp; other revenue is still strong. Cloud is accelerating and Gemini 4 rumored to be out soon.\n\nThey will do just fine. https://t.co/JNYMCi6",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@mukund"
+            "@TSinvests"
           ],
-          "first_seen": "2026-09-26T20:31:14+00:00"
+          "first_seen": "2026-09-27T11:26:22+00:00"
         },
         {
-          "text": "My Updated Stock Picks for October:\n\n• $AAPL (Apple) — Don't chase\n• $META (Meta Platforms) — Don't chase\n• $GOOGL (Alphabet) — Buy at $220–$250\n• $AMZN (Amazon) — Buy at $260–$290\n• $ORCL (Oracle) — Buy at $190–$220\n• $",
+          "text": "$GOOG $GOOGL SVP: Gemini token usage is up 7x YoY, while Gemini has reached 1B monthly users\n\n“Token usage has gone up 7x year over year...Gemini grew to one billion monthly users, the fastest one-billion-user product in",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@jsouthard_"
+            "@TheTranscript_"
           ],
-          "first_seen": "2026-09-27T02:38:37+00:00"
+          "first_seen": "2026-09-27T12:00:18+00:00"
         },
         {
           "text": "Google's investment portfolio is INSANE!\n\nIts SpaceX $SPCX stake alone is valued at $94 BILLION, accounting for roughly 95% of its disclosed portfolio.\n\nHere's $GOOGL latest portfolio: https://t.co/2vWuoHNFrH",
@@ -2796,39 +2655,67 @@
             "@patientinvestor"
           ],
           "first_seen": "2026-09-27T13:54:31+00:00"
+        },
+        {
+          "text": "Interesting...Google achieves 43% cost savings or ~$78 billion per 10 million units by moving TPUv8 from Broadcom to Mediatek's semi-CoT model 👀\n\n$AVGO $GOOGL https://t.co/2bPnCiVuWs",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "@pequityresearch"
+          ],
+          "first_seen": "2026-09-28T01:17:00+00:00"
         }
       ],
       "tone": {
         "status": "ok",
         "scorer": "VADER compound (Hutto & Gilbert, ICWSM 2014), >= 0.05 positive, <= -0.05 negative (paper §4; README.rst:241-245)",
         "weighting": "a coordinated story counts once however many accounts pushed it; one account repeating a story counts once; every other account counts once",
-        "posts_scored": 21,
-        "voices": 19.0,
+        "posts_scored": 47,
+        "voices": 46.0,
         "counts": {
-          "positive": 15,
-          "neutral": 3,
-          "negative": 3
+          "positive": 19,
+          "neutral": 16,
+          "negative": 12
         },
         "share": {
-          "positive": 0.6842105263157895,
-          "neutral": 0.15789473684210525,
-          "negative": 0.15789473684210525
+          "positive": 0.41304347826086957,
+          "neutral": 0.32608695652173914,
+          "negative": 0.2608695652173913
         },
         "share_unweighted": {
-          "positive": 0.7142857142857143,
-          "neutral": 0.14285714285714285,
-          "negative": 0.14285714285714285
+          "positive": 0.40425531914893614,
+          "neutral": 0.3404255319148936,
+          "negative": 0.2553191489361702
         },
-        "mean_compound": 0.38779473684210525,
+        "mean_compound": 0.09430869565217388,
         "coordinated_stories_counted_once": 0,
         "posts_in_coordinated_stories": 0,
-        "withheld_not_scored": 3
+        "withheld_not_scored": 0
       },
       "post_tone": [
         {
-          "id": "twitter-2104634745711694096",
-          "compound": 0.6187,
+          "id": "twitter-2104590844699324724",
+          "compound": -0.3818,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104682580029460909",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104619502621057244",
+          "compound": 0.2732,
           "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104683203659489698",
+          "compound": -0.34,
+          "label": "negative",
           "weight": 1.0
         },
         {
@@ -2838,7 +2725,55 @@
           "weight": 1.0
         },
         {
-          "id": "twitter-2104214971970363698",
+          "id": "twitter-2104683199603355686",
+          "compound": 0.4867,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104683206834323793",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104663633305158031",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104531004371480677",
+          "compound": 0.3182,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104179321376325751",
+          "compound": 0.1027,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104566762817589263",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104529509265645970",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104628523134779643",
+          "compound": -0.2023,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104551951174123593",
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
@@ -2850,127 +2785,212 @@
           "weight": 1.0
         },
         {
-          "id": "twitter-2104037970550587882",
-          "compound": 0.1779,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104619502621057244",
-          "compound": 0.2732,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104628523134779643",
-          "compound": -0.2023,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104590844699324724",
-          "compound": -0.3818,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104225942453236016",
-          "compound": 0.6369,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2103945512600952861",
-          "compound": 0.6369,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104210450024190031",
+          "id": "twitter-2104379815801577751",
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsmdm4",
-          "compound": 0.8512,
-          "label": "positive",
-          "weight": 0.5
-        },
-        {
-          "id": "reddit-1wsmcs9",
-          "compound": 0.8512,
-          "label": "positive",
-          "weight": 0.5
-        },
-        {
-          "id": "reddit-1wsmcmj",
-          "compound": 0.9022,
+          "id": "twitter-2104170779227148595",
+          "compound": 0.765,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsmciw",
-          "compound": 0.8867,
-          "label": "positive",
-          "weight": 0.5
+          "id": "twitter-2104568613151592932",
+          "compound": -0.4019,
+          "label": "negative",
+          "weight": 1.0
         },
         {
-          "id": "reddit-1wsmca8",
-          "compound": 0.8867,
+          "id": "reddit-1wsreqe",
+          "compound": 0.5562,
           "label": "positive",
-          "weight": 0.5
+          "weight": 1.0
         },
         {
-          "id": "reddit-1wsmc9p",
+          "id": "reddit-1wsreq5",
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsmc8x",
-          "compound": 0.8409,
+          "id": "reddit-1wsrekf",
+          "compound": 0.7263,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsmc4i",
+          "id": "reddit-1wsrei7",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrehq",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsre3j",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsre2s",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 0.5
+        },
+        {
+          "id": "reddit-1wsre1e",
+          "compound": -0.2732,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrdzw",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrdw8",
+          "compound": -0.6642,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrduy",
+          "compound": 0.9081,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrduu",
+          "compound": 0.34,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrdif",
+          "compound": 0.3182,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrdd4",
+          "compound": -0.2144,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrd7f",
+          "compound": 0.7744,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrd0l",
+          "compound": 0.1862,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrcx8",
           "compound": 0.5859,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsmbwn",
-          "compound": 0.7574,
+          "id": "reddit-1wsrctc",
+          "compound": 0.8225,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsmbed",
-          "compound": 0.7339,
+          "id": "reddit-1wsrcnv",
+          "compound": -0.3009,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrcn8",
+          "compound": 0.6705,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrccl",
+          "compound": -0.9168,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrc57",
+          "compound": -0.7906,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrby3",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrbri",
+          "compound": 0.5837,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrbqn",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 0.5
+        },
+        {
+          "id": "reddit-1wsrbq0",
+          "compound": 0.3595,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrblu",
+          "compound": -0.7684,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsraya",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsrawk",
+          "compound": 0.765,
           "label": "positive",
           "weight": 1.0
         }
       ],
       "shares": [
         [
-          "u/No_Note405",
-          "s-8f353aeecf64f457",
+          "u/Connect-Reason-284",
+          "s-6e0f70c73019c809",
           false
         ],
         [
-          "u/Simple_Read_1785",
-          "s-ef0d4b33a6dfad61",
+          "@TSinvests",
+          "s-e7271f40603fd5a3",
           false
         ],
         [
-          "@mukund",
-          "s-099e052350c726c6",
-          false
-        ],
-        [
-          "@jsouthard_",
-          "s-d6e276699c913dde",
+          "@TheTranscript_",
+          "s-09e99fc8278dc5bc",
           false
         ],
         [
@@ -2979,18 +2999,33 @@
           false
         ],
         [
-          "@StokPix",
-          "s-cbcadeec3c9396d1",
+          "@pequityresearch",
+          "s-d3d5d8a27e43efdd",
           false
         ],
         [
-          "@StockSavvyShay",
-          "s-99cddeae92de070d",
+          "@NodeWire",
+          "s-776273e5ed78183c",
           false
         ],
         [
-          "@danielisdizzy",
-          "s-f6f497e4708064bd",
+          "@wallstengine",
+          "s-de4e47cb03d551c6",
+          false
+        ],
+        [
+          "@wealthmatica",
+          "s-b264556ccfd0e782",
+          false
+        ],
+        [
+          "@FL0WG0D",
+          "s-27a58ba23e512ffb",
+          false
+        ],
+        [
+          "@_charan_04",
+          "s-941770ae70a26105",
           false
         ],
         [
@@ -3014,73 +3049,191 @@
           false
         ],
         [
-          "@VJNCapital",
-          "s-8f69c3bc744701c7",
+          "@TrendSpider",
+          "s-da12ae2c5c088748",
           false
         ],
         [
-          "u/EstoyAgusto",
-          "s-06d4c2aefe7a0612",
+          "u/Sphyro-me",
+          "s-f73256eced56c532",
           false
         ],
         [
-          "u/Young_Boss2",
-          "s-d928278a1513b5d9",
+          "u/dikshiyapaa",
+          "s-45c7fbe8f6fe1900",
           false
         ],
         [
-          "u/FUTMind",
-          "s-f404f11c244981dd",
+          "@ifmarkets",
+          "s-71b39384cfd5049c",
           false
         ],
         [
-          "u/Both_Worker_7681",
-          "s-762270b00219d034",
+          "u/-Skelenator",
+          "s-7f7364b08e755cb9",
           false
         ],
         [
-          "u/FUTMind",
-          "s-ca6763b518dcb97f",
+          "u/Reasonable_Debt5514",
+          "s-31be34f600bee046",
           false
         ],
         [
-          "u/Past-Sink-2068",
-          "s-bf634997f5829768",
+          "u/Necessary-Show8872",
+          "s-683ba26e6bd9fa86",
+          false
+        ],
+        [
+          "u/Reasonable_Debt5514",
+          "s-713ffc6c83f1f441",
+          false
+        ],
+        [
+          "u/Think_Economy5581",
+          "s-1433fd76b0e2f343",
+          false
+        ],
+        [
+          "u/Fun_Lemon_9873",
+          "s-b46453d4883fb723",
+          false
+        ],
+        [
+          "u/No_Host1294",
+          "s-f8a1bc49dd4246a4",
+          false
+        ],
+        [
+          "u/SimplyRain",
+          "s-afdeaeccdc834b61",
+          false
+        ],
+        [
+          "u/Spare_Inevitable",
+          "s-2347a6feb7df5edd",
+          false
+        ],
+        [
+          "u/56cigolayt",
+          "s-46b29a9d2cc38a97",
+          false
+        ],
+        [
+          "u/jwmazza90",
+          "s-d03fdee9000ed02b",
+          false
+        ],
+        [
+          "u/A_O_W_Candles",
+          "s-417014e70686de71",
+          false
+        ],
+        [
+          "@DudeWhoInvests",
+          "s-7f9ea065d78739a2",
+          false
+        ],
+        [
+          "@DudeWhoInvests",
+          "s-80490000a3f4d87b",
+          false
+        ],
+        [
+          "@DudeWhoInvests",
+          "s-b8beed412c26dd8f",
+          false
+        ],
+        [
+          "u/Greedy_Aside516",
+          "s-feac878a6f8d3855",
+          false
+        ],
+        [
+          "u/zahmat_k0",
+          "s-208413b781701278",
+          false
+        ],
+        [
+          "u/Admirablation",
+          "s-50d218c466818c3e",
+          false
+        ],
+        [
+          "u/GameHands",
+          "s-6ed45203bdf2f745",
+          false
+        ],
+        [
+          "u/ChemicalPass6586",
+          "s-2a5fd17c0134fa55",
+          false
+        ],
+        [
+          "u/cheesyjollyhatdog",
+          "s-f4da0e5052cea85c",
+          false
+        ],
+        [
+          "u/Embarrassed-Pilot-59",
+          "s-b9fdefdfe099a78b",
+          false
+        ],
+        [
+          "u/oMxmba",
+          "s-e25af2352afcae81",
+          false
+        ],
+        [
+          "u/nico-tine1337",
+          "s-a9abfe0607d70250",
+          false
+        ],
+        [
+          "u/E_C_H",
+          "s-4d93fe2cd8e16351",
+          false
+        ],
+        [
+          "u/DeliWtz",
+          "s-d39f1a57222b231a",
+          false
+        ],
+        [
+          "u/BrainstormBot",
+          "s-7d7e6a76d1a9d7fb",
           false
         ]
       ],
       "status": [
         "twitter: 30 tweets",
-        "reddit: 13 posts"
+        "reddit: 29 posts"
       ],
-      "checked_at": "2026-09-28T18:19:40.355226+00:00"
+      "checked_at": "2026-09-28T21:24:16.954142+00:00"
     },
     {
       "symbol": "AMZNUSDT",
-      "posts": 43,
-      "accounts": 33,
+      "posts": 47,
+      "accounts": 34,
       "by_channel": {
-        "x": 16,
-        "reddit": 27
+        "x": 17,
+        "reddit": 30
       },
-      "distinct_stories": 41,
+      "distinct_stories": 42,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
-      "withheld_abusive": 2,
-      "withheld_by_reason": {
-        "abusive_term": 2
-      },
-      "withheld_accounts": 2,
+      "withheld_abusive": 0,
+      "withheld_by_reason": {},
+      "withheld_accounts": 0,
       "top_stories": [
         {
-          "text": "The profit map of the US stock market [OC] — * **Size:** each box is a company's net profit over the past 12 months. Companies that lost money over those 12 months aren't shown\n* **Color:** how much that profit changed f",
-          "posts": 2,
+          "text": "Stock Market Recap for Monday, September 28, 2026 — The major U.S. stock indexes ended **broadly lower** on Monday, **September 28, 2026**, as Trump flatly rejected Iran's terms to reopen the Strait of Hormuz over the we",
+          "posts": 4,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "u/pierreb5"
+            "u/TorukMaktoM"
           ],
-          "first_seen": "2026-09-28T15:38:06+00:00"
+          "first_seen": "2026-09-28T20:28:29+00:00"
         },
         {
           "text": "Kuvings B1700 Cold Press Juicer | @17k — Have a brand new, sealed Kuvings B1700 Cold Press Juicer for sale.\n\n💰 ₹17,000 (negotiable)\n\n📦 Sealed pack, unopened\n\n📍 Beeramguda / Hitech City\n\n🚨 Urgent sale\n\nAmazon price curren",
@@ -3093,61 +3246,61 @@
           "first_seen": "2026-09-28T16:13:04+00:00"
         },
         {
-          "text": "🚨 I’M UP 72% YTD.\n\nI bought 5 stocks this month.\n\n2 are already up BIG. 📈\n\nHere’s what I bought and why: 🧵👇\n\n1. $AMZN — Amazon\n\nAI is driving massive demand for cloud infrastructure. Amazon gives me exposure to AI, AWS, ",
-          "posts": 1,
+          "text": "total newbie, lines look weird. what is it? — **(I edited the stencil color so it’s easier to see which parts are ink and which parts are stencil)**  \n**Pic 1:** 3mm fake skin, current piece  \n**Pic 2:** 1mm fake skin, t",
+          "posts": 2,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@LongGameEquity"
+            "u/mimamelse"
           ],
-          "first_seen": "2026-09-26T18:41:01+00:00"
+          "first_seen": "2026-09-28T18:34:36+00:00"
         },
         {
-          "text": "If you are not buying Amazon $AMZN stock under $250 do you even want to escape the rat race?!!?!?\n\nThis stock will mint millionaires eventually.\n\nNot financial or investment advice. https://t.co/gks5Ja1huy",
+          "text": "🚨5 STOCK THAT ARE SERVERLY MISPRICED.🚨\n\n🧵Thread below.👇👇\n\n1/ $AMZN - Amazon\nForward PE: 24x https://t.co/v9tlJmIQr7",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@DudeWhoInvests"
+            "@QualCompounders"
           ],
-          "first_seen": "2026-09-27T01:22:14+00:00"
+          "first_seen": "2026-09-27T00:00:01+00:00"
         },
         {
-          "text": "My Updated Stock Picks for October:\n\n• $AAPL (Apple) — Don't chase\n• $META (Meta Platforms) — Don't chase\n• $GOOGL (Alphabet) — Buy at $220–$250\n• $AMZN (Amazon) — Buy at $260–$290\n• $ORCL (Oracle) — Buy at $190–$220\n• $",
+          "text": "The personal brand transformation of Jeff Bezos since his divorce will be studied throughout history. $AMZN  https://t.co/R3bHhxgzul",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@jsouthard_"
+            "@JesseCohenInv"
           ],
-          "first_seen": "2026-09-27T02:38:37+00:00"
+          "first_seen": "2026-09-27T09:25:37+00:00"
         }
       ],
       "tone": {
         "status": "ok",
         "scorer": "VADER compound (Hutto & Gilbert, ICWSM 2014), >= 0.05 positive, <= -0.05 negative (paper §4; README.rst:241-245)",
         "weighting": "a coordinated story counts once however many accounts pushed it; one account repeating a story counts once; every other account counts once",
-        "posts_scored": 43,
-        "voices": 41.0,
+        "posts_scored": 47,
+        "voices": 42.0,
         "counts": {
-          "positive": 29,
-          "neutral": 4,
-          "negative": 10
+          "positive": 21,
+          "neutral": 10,
+          "negative": 16
         },
         "share": {
-          "positive": 0.6585365853658537,
-          "neutral": 0.0975609756097561,
-          "negative": 0.24390243902439024
+          "positive": 0.47619047619047616,
+          "neutral": 0.23809523809523808,
+          "negative": 0.2857142857142857
         },
         "share_unweighted": {
-          "positive": 0.6744186046511628,
-          "neutral": 0.09302325581395349,
-          "negative": 0.23255813953488372
+          "positive": 0.44680851063829785,
+          "neutral": 0.2127659574468085,
+          "negative": 0.3404255319148936
         },
-        "mean_compound": 0.24063414634146332,
+        "mean_compound": 0.11437380952380953,
         "coordinated_stories_counted_once": 0,
         "posts_in_coordinated_stories": 0,
-        "withheld_not_scored": 2
+        "withheld_not_scored": 0
       },
       "post_tone": [
         {
@@ -3157,7 +3310,49 @@
           "weight": 1.0
         },
         {
+          "id": "twitter-2104683199603355686",
+          "compound": 0.4867,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104683203659489698",
+          "compound": -0.34,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104201812987248757",
+          "compound": 0.4404,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104677533954556020",
+          "compound": 0.168,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104634237496262962",
+          "compound": -0.1877,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104636856461856955",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
           "id": "twitter-2104631551791354293",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104585468319023497",
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
@@ -3169,80 +3364,152 @@
           "weight": 1.0
         },
         {
-          "id": "twitter-2104201812987248757",
-          "compound": 0.4404,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104585468319023497",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104368820647276556",
-          "compound": -0.2732,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
           "id": "twitter-2104206201777164294",
           "compound": 0.4497,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104634237496262962",
-          "compound": -0.1877,
+          "id": "twitter-2104140392232878546",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104506526983446538",
+          "compound": 0.8494,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2103998057536798881",
+          "compound": 0.1779,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104574154238570750",
+          "compound": -0.6249,
           "label": "negative",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104589461170565315",
-          "compound": 0.1779,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104621613417422862",
-          "compound": 0.1779,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104245824230469811",
+          "id": "twitter-2104582904060031162",
           "compound": -0.5859,
           "label": "negative",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104037970550587882",
+          "id": "twitter-2104648304873328753",
           "compound": 0.1779,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "twitter-2103917774548373710",
-          "compound": 0.2263,
-          "label": "positive",
+          "id": "reddit-1wsqaii",
+          "compound": 0.0,
+          "label": "neutral",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104018746276806894",
-          "compound": 0.4401,
-          "label": "positive",
+          "id": "reddit-1wspycp",
+          "compound": -0.5719,
+          "label": "negative",
+          "weight": 0.25
+        },
+        {
+          "id": "reddit-1wspy9c",
+          "compound": -0.5719,
+          "label": "negative",
+          "weight": 0.25
+        },
+        {
+          "id": "reddit-1wspxdj",
+          "compound": -0.5719,
+          "label": "negative",
+          "weight": 0.25
+        },
+        {
+          "id": "reddit-1wspx7d",
+          "compound": -0.5719,
+          "label": "negative",
+          "weight": 0.25
+        },
+        {
+          "id": "reddit-1wspn3t",
+          "compound": 0.0,
+          "label": "neutral",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104587788821672118",
-          "compound": -0.4588,
+          "id": "reddit-1wsp8an",
+          "compound": -0.2732,
           "label": "negative",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104544059209425110",
-          "compound": 0.7264,
+          "id": "reddit-1wsog7t",
+          "compound": -0.3802,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsntex",
+          "compound": 0.3818,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsnjlv",
+          "compound": 0.9231,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsnan8",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsn68s",
+          "compound": -0.6597,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsn1nh",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsmuqq",
+          "compound": -0.6266,
+          "label": "negative",
+          "weight": 0.5
+        },
+        {
+          "id": "reddit-1wsms9y",
+          "compound": -0.6266,
+          "label": "negative",
+          "weight": 0.5
+        },
+        {
+          "id": "reddit-1wsmicw",
+          "compound": 0.7458,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsmgyw",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsmev4",
+          "compound": 0.34,
           "label": "positive",
           "weight": 1.0
         },
@@ -3317,102 +3584,12 @@
           "compound": 0.34,
           "label": "positive",
           "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsiije",
-          "compound": -0.296,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsi0mi",
-          "compound": 0.8402,
-          "label": "positive",
-          "weight": 0.5
-        },
-        {
-          "id": "reddit-1wshxum",
-          "compound": 0.8402,
-          "label": "positive",
-          "weight": 0.5
-        },
-        {
-          "id": "reddit-1wshmv6",
-          "compound": 0.5267,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsh9am",
-          "compound": 0.802,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsgzph",
-          "compound": 0.7906,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsgy45",
-          "compound": -0.1695,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsgisa",
-          "compound": 0.9484,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsg6sx",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsg0ex",
-          "compound": -0.34,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsfwug",
-          "compound": 0.296,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsfu51",
-          "compound": 0.2023,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsfhpu",
-          "compound": 0.34,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsffvu",
-          "compound": 0.34,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsf2ji",
-          "compound": 0.3612,
-          "label": "positive",
-          "weight": 1.0
         }
       ],
       "shares": [
         [
-          "u/pierreb5",
-          "s-0c7299e3570c0c67",
+          "u/TorukMaktoM",
+          "s-732d3da0ce7ce3aa",
           false
         ],
         [
@@ -3421,18 +3598,18 @@
           false
         ],
         [
-          "@LongGameEquity",
-          "s-6c114c4907b7c84b",
+          "u/mimamelse",
+          "s-049c053a501ac3ab",
           false
         ],
         [
-          "@DudeWhoInvests",
-          "s-1f0ba6389cdf8f80",
+          "@QualCompounders",
+          "s-267312c56ed66c40",
           false
         ],
         [
-          "@jsouthard_",
-          "s-d6e276699c913dde",
+          "@JesseCohenInv",
+          "s-282586fc17bfabaa",
           false
         ],
         [
@@ -3446,98 +3623,23 @@
           false
         ],
         [
-          "@drayinvests",
-          "s-1a4e5506dbdff82e",
+          "@DJTRadar",
+          "s-ec09e7c4797d5152",
           false
         ],
         [
-          "@NotA_Bull",
-          "s-dd9a345b7297233b",
+          "@nordin_eth",
+          "s-c9a86bf5c2c011c8",
           false
         ],
         [
-          "@FinanceJack44",
-          "s-cc78772db0dfeb7c",
-          false
-        ],
-        [
-          "u/streetsent",
-          "s-bc6dae9ede33a0dd",
-          false
-        ],
-        [
-          "u/fooeynet",
-          "s-3288d5244dadbcb6",
-          false
-        ],
-        [
-          "u/fooeynet",
-          "s-1ad99fdbf3556ab0",
-          false
-        ],
-        [
-          "u/K1t3mmu0rt",
-          "s-b17fc177209447a0",
-          false
-        ],
-        [
-          "u/Efficient_Gear_9748",
-          "s-91ed847070bd2758",
-          false
-        ],
-        [
-          "u/fooeynet",
-          "s-df47d87db2f791f1",
-          false
-        ],
-        [
-          "u/m8n8s",
-          "s-41504963ceffe37c",
-          false
-        ],
-        [
-          "u/Jermalex1",
-          "s-76b37779074fc961",
+          "@VJNCapital",
+          "s-9a06cbda293ce0bd",
           false
         ],
         [
           "@MZohaibKhan92",
           "s-411b91d259acee7a",
-          false
-        ],
-        [
-          "u/supabot-devvit",
-          "s-873dc3fe85b99ebe",
-          false
-        ],
-        [
-          "u/fooeynet",
-          "s-f665f73d054bb5b1",
-          false
-        ],
-        [
-          "@LazaroInvestor",
-          "s-e251101e19abb29e",
-          false
-        ],
-        [
-          "@DividendDrip",
-          "s-93db04b416193cf8",
-          false
-        ],
-        [
-          "u/downiecatpunchface",
-          "s-53b40a8e569f4337",
-          false
-        ],
-        [
-          "u/Icy_Heat_1076",
-          "s-b93b5d42fdc9739c",
-          false
-        ],
-        [
-          "u/fooeynet",
-          "s-093e9a4497378fcf",
           false
         ],
         [
@@ -3586,11 +3688,6 @@
           false
         ],
         [
-          "@optionscjp",
-          "s-174f9a16e7e54cc3",
-          false
-        ],
-        [
           "u/nxs_sss",
           "s-13e2cbff48bacabe",
           false
@@ -3614,107 +3711,192 @@
           "@RampCapitalLLC",
           "s-73be247dd853de40",
           false
+        ],
+        [
+          "@MZohaibKhan92",
+          "s-6101360cd8770b23",
+          false
+        ],
+        [
+          "u/fooeynet",
+          "s-b9c9a4db20fdeacb",
+          false
+        ],
+        [
+          "u/Bakemra",
+          "s-5910c15b52576d9d",
+          false
+        ],
+        [
+          "u/Regular-Lie7449",
+          "s-d5656975e4ddd0b6",
+          false
+        ],
+        [
+          "u/shopnery",
+          "s-d037fc3a543fb771",
+          false
+        ],
+        [
+          "u/Punterfox",
+          "s-f3d39c1a816fc988",
+          false
+        ],
+        [
+          "u/shopnery",
+          "s-ec41b097aa067ff4",
+          false
+        ],
+        [
+          "u/Tickerade",
+          "s-753c8ebf77db8da4",
+          false
+        ],
+        [
+          "@financialjuice",
+          "s-fc71f794bbd08e86",
+          false
+        ],
+        [
+          "u/Bmoses99",
+          "s-ee41d79e92c4454e",
+          false
+        ],
+        [
+          "u/Pravculear",
+          "s-4edb9c6592b46f82",
+          false
+        ],
+        [
+          "u/robot2trade",
+          "s-b9c90ef42e7250e1",
+          false
+        ],
+        [
+          "u/Stock_Titan",
+          "s-e680c799edb663d9",
+          false
+        ],
+        [
+          "u/raimermontilla",
+          "s-eee57b455a009879",
+          false
+        ],
+        [
+          "@DudeWhoInvests",
+          "s-9ae7ad3c6099f9a1",
+          false
+        ],
+        [
+          "@DudeWhoInvests",
+          "s-7f9ea065d78739a2",
+          false
+        ],
+        [
+          "@DudeWhoInvests",
+          "s-80490000a3f4d87b",
+          false
         ]
       ],
       "status": [
         "twitter: 30 tweets",
-        "reddit: 29 posts"
+        "reddit: 30 posts"
       ],
-      "checked_at": "2026-09-28T18:19:40.355226+00:00"
+      "checked_at": "2026-09-28T21:24:16.954142+00:00"
     },
     {
       "symbol": "COINUSDT",
-      "posts": 48,
-      "accounts": 45,
+      "posts": 45,
+      "accounts": 41,
       "by_channel": {
-        "x": 23,
-        "reddit": 25
+        "x": 24,
+        "reddit": 21
       },
-      "distinct_stories": 47,
+      "distinct_stories": 45,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
-      "withheld_abusive": 1,
+      "withheld_abusive": 5,
       "withheld_by_reason": {
-        "abusive_term": 1
+        "abusive_term": 5
       },
-      "withheld_accounts": 1,
+      "withheld_accounts": 4,
       "top_stories": [
         {
-          "text": "Selling/Trading these! — MLF: Coins or a good Seik (worth 15m-17m) for the Fulong and the Vulp each!\n\nNYP on the other two!\n\nPlease DM me your offer if you're interested!",
-          "posts": 2,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "u/Impossible-Bee-4575"
-          ],
-          "first_seen": "2026-09-28T18:06:12+00:00"
-        },
-        {
-          "text": "YAP now launches on https://t.co/76o9lfGncC.\n\nPair your coin with any stonk. Tokenised stocks, pre-IPO names like OpenAI and Anthropic, currencies, memes. 516 pairs.\n\nLet’s $YAP https://t.co/jvHSI4xe8y",
+          "text": "🚀 $NEAR nears top 20 coin by market cap ranking after weekend surge https://t.co/N71SHlP5Rh",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@useyapdotfun"
+            "@coingecko"
           ],
-          "first_seen": "2026-09-26T19:46:50+00:00"
+          "first_seen": "2026-09-27T06:02:11+00:00"
         },
         {
-          "text": "There's a coin that's up 5x in the last 4 weeks and no one on CT is talking about it.\n\nThe smell when this goes back to $5.... https://t.co/dSZ7daLofy",
+          "text": "🚨BULLISH: Binance records its BIGGEST single-day Bitcoin net outflow since 2023, with over 13,800 BTC leaving the exchange, per CryptoQuant.\n\nBinance holds around 30% of BTC on platforms accessible to investors. \n\nIts re",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@lbexplorer"
+            "@coinbureau"
           ],
-          "first_seen": "2026-09-27T08:46:09+00:00"
+          "first_seen": "2026-09-28T04:13:00+00:00"
         },
         {
-          "text": "imagine finding a coin before the timeline discovers it\n\nthat feeling is undefeated.",
+          "text": "This takes DECEPTION to whole new level.\n\nScammers just pulled over $2 MILLION by creating a FAKE GIWA blockchain and tricking users into sending more than 766 ETH through a fraudulent bridge.\n\nGIWA is a legitimate Ether",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@JR5_Crypto"
+            "@coinbureau"
           ],
-          "first_seen": "2026-09-28T05:00:00+00:00"
+          "first_seen": "2026-09-28T05:37:43+00:00"
         },
         {
-          "text": "100% APR on USDT. Exclusively for new users 💚\n\nCoinUp Simple Earn just got more rewarding for newcomers. Earn 100% APR on USDT with our new user exclusive offer.\n\nNew users only · 100% APR\n\nRead More 👉 https://t.co/QmiVd",
+          "text": "CITI PARTNERS WITH COINBASE TO ENABLE STABLECOIN PAYMENTS FOR INSTITUTIONAL CLIENTS\n\nCiti’s $C large corporate clients will be able to accept stablecoin payments from customers through Citi’s merchant-processing services",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@CoinUpOfficials"
+            "@wallstengine"
           ],
-          "first_seen": "2026-09-28T10:49:05+00:00"
+          "first_seen": "2026-09-28T11:32:22+00:00"
+        },
+        {
+          "text": "🚨BREAKING: $2.8T Citi partners with Coinbase, US' largest crypto exchange, to allow stablecoin payments for institutional clients.\n\nThe partnership will let Citi clients convert fiat into crypto or stablecoins, send paym",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "@coinbureau"
+          ],
+          "first_seen": "2026-09-28T11:40:58+00:00"
         }
       ],
       "tone": {
         "status": "ok",
         "scorer": "VADER compound (Hutto & Gilbert, ICWSM 2014), >= 0.05 positive, <= -0.05 negative (paper §4; README.rst:241-245)",
         "weighting": "a coordinated story counts once however many accounts pushed it; one account repeating a story counts once; every other account counts once",
-        "posts_scored": 48,
-        "voices": 47.0,
+        "posts_scored": 45,
+        "voices": 45.0,
         "counts": {
-          "positive": 28,
-          "neutral": 13,
-          "negative": 7
+          "positive": 20,
+          "neutral": 19,
+          "negative": 6
         },
         "share": {
-          "positive": 0.574468085106383,
-          "neutral": 0.2765957446808511,
-          "negative": 0.14893617021276595
+          "positive": 0.4444444444444444,
+          "neutral": 0.4222222222222222,
+          "negative": 0.13333333333333333
         },
         "share_unweighted": {
-          "positive": 0.5833333333333334,
-          "neutral": 0.2708333333333333,
-          "negative": 0.14583333333333334
+          "positive": 0.4444444444444444,
+          "neutral": 0.4222222222222222,
+          "negative": 0.13333333333333333
         },
-        "mean_compound": 0.26516595744680843,
+        "mean_compound": 0.21384,
         "coordinated_stories_counted_once": 0,
         "posts_in_coordinated_stories": 0,
-        "withheld_not_scored": 1
+        "withheld_not_scored": 5
       },
       "post_tone": [
         {
@@ -3724,19 +3906,31 @@
           "weight": 1.0
         },
         {
-          "id": "twitter-2104594828826914903",
-          "compound": 0.9035,
+          "id": "twitter-2104668077702906354",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104644581673304343",
+          "compound": 0.6249,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104573500035850264",
-          "compound": 0.4767,
-          "label": "positive",
+          "id": "twitter-2104641791890714878",
+          "compound": 0.0,
+          "label": "neutral",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104542891192246680",
+          "id": "twitter-2104649172976857444",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104597930761924785",
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
@@ -3748,45 +3942,9 @@
           "weight": 1.0
         },
         {
-          "id": "twitter-2104634717865664979",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104536842833915907",
-          "compound": 0.2263,
+          "id": "twitter-2104594828826914903",
+          "compound": 0.9035,
           "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104590302959063179",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104571283773985275",
-          "compound": 0.5162,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104566515903144284",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104523788511523260",
-          "compound": 0.8553,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104572345851806073",
-          "compound": 0.0,
-          "label": "neutral",
           "weight": 1.0
         },
         {
@@ -3796,13 +3954,7 @@
           "weight": 1.0
         },
         {
-          "id": "twitter-2104435937791111248",
-          "compound": 0.128,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104560574268870742",
+          "id": "twitter-2104542891192246680",
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
@@ -3814,27 +3966,69 @@
           "weight": 1.0
         },
         {
-          "id": "twitter-2104628461130195080",
-          "compound": -0.1027,
+          "id": "twitter-2104648358656950709",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104572345851806073",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104534679756116431",
+          "compound": 0.3818,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104636450843300192",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104536842833915907",
+          "compound": 0.2263,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104586943854264782",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104089196290084929",
+          "compound": 0.2023,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104445429060718828",
+          "compound": -0.6987,
           "label": "negative",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104588081349218804",
-          "compound": 0.7579,
+          "id": "twitter-2104621627879178620",
+          "compound": 0.296,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104617262594294210",
-          "compound": 0.8402,
+          "id": "twitter-2104577264272687558",
+          "compound": 0.9333,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104597197010686389",
-          "compound": 0.0516,
-          "label": "positive",
+          "id": "twitter-2104424107744038973",
+          "compound": 0.0,
+          "label": "neutral",
           "weight": 1.0
         },
         {
@@ -3844,192 +4038,157 @@
           "weight": 1.0
         },
         {
-          "id": "twitter-2103934338798858274",
-          "compound": 0.3612,
+          "id": "twitter-2104645434132283805",
+          "compound": 0.7717,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104130462205796728",
-          "compound": -0.296,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsmdut",
-          "compound": 0.7096,
+          "id": "reddit-1wsrdao",
+          "compound": 0.9403,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsmdmi",
-          "compound": -0.5423,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsmdhe",
-          "compound": 0.3182,
+          "id": "reddit-1wsrd9f",
+          "compound": 0.8604,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsmc81",
-          "compound": 0.4574,
+          "id": "reddit-1wsrd71",
+          "compound": 0.8677,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsmbwa",
-          "compound": 0.1154,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsmbbi",
-          "compound": -0.2382,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsmb1a",
-          "compound": 0.875,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsmas8",
-          "compound": 0.7541,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsmaqz",
+          "id": "reddit-1wsrcs3",
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsm9zk",
-          "compound": 0.9144,
-          "label": "positive",
+          "id": "reddit-1wsrbir",
+          "compound": 0.0,
+          "label": "neutral",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsm65y",
-          "compound": -0.296,
+          "id": "reddit-1wsrb9s",
+          "compound": -0.4857,
           "label": "negative",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsm4hc",
-          "compound": 0.5081,
+          "id": "reddit-1wsrb3u",
+          "compound": 0.7149,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsm4fh",
-          "compound": 0.7425,
+          "id": "reddit-1wsrayb",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsraje",
+          "compound": 0.5719,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsm3vn",
-          "compound": 0.8739,
-          "label": "positive",
+          "id": "reddit-1wsrad9",
+          "compound": -0.2003,
+          "label": "negative",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsm3k5",
-          "compound": 0.1779,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsm2vn",
+          "id": "reddit-1wsr9f9",
           "compound": 0.1655,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsm2dl",
-          "compound": 0.8741,
+          "id": "reddit-1wsr93s",
+          "compound": 0.5183,
           "label": "positive",
-          "weight": 0.5
+          "weight": 1.0
         },
         {
-          "id": "reddit-1wsm1wt",
+          "id": "reddit-1wsr91j",
+          "compound": 0.8922,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsr7ph",
           "compound": -0.4588,
           "label": "negative",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsm1rf",
+          "id": "reddit-1wsr794",
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsm17f",
-          "compound": -0.5983,
+          "id": "reddit-1wsr6ao",
+          "compound": -0.0754,
           "label": "negative",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wsm0jq",
-          "compound": 0.8741,
-          "label": "positive",
-          "weight": 0.5
-        },
-        {
-          "id": "reddit-1wsm01z",
-          "compound": 0.6597,
+          "id": "reddit-1wsr637",
+          "compound": 0.3818,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wslzpb",
+          "id": "reddit-1wsr5zo",
+          "compound": 0.5994,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsr5ax",
+          "compound": -0.4741,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsr57v",
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
         },
         {
-          "id": "reddit-1wslytb",
-          "compound": 0.4767,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wslxla",
-          "compound": 0.729,
+          "id": "reddit-1wsr491",
+          "compound": 0.6369,
           "label": "positive",
           "weight": 1.0
         }
       ],
       "shares": [
         [
-          "u/Impossible-Bee-4575",
-          "s-54677491810f682d",
+          "@coingecko",
+          "s-588217f69c7d58f6",
           false
         ],
         [
-          "@useyapdotfun",
-          "s-c00bc2454f3ca6cb",
+          "@coinbureau",
+          "s-3b40ce4e0d510408",
           false
         ],
         [
-          "@lbexplorer",
-          "s-c45afb6f41370ff9",
+          "@coinbureau",
+          "s-9d0c969f3807e386",
           false
         ],
         [
-          "@JR5_Crypto",
-          "s-ef0340a8fcd46c43",
-          false
-        ],
-        [
-          "@CoinUpOfficials",
-          "s-21050644a12bbc93",
+          "@wallstengine",
+          "s-eb78557aeca65a25",
           false
         ],
         [
@@ -4043,28 +4202,13 @@
           false
         ],
         [
-          "@WhaleFactor",
-          "s-46377f10ffc8256a",
-          false
-        ],
-        [
-          "@minepadsol",
-          "s-9259569f52a3aebb",
-          false
-        ],
-        [
-          "@KriptonunUzmani",
-          "s-666fb23f6232da58",
-          false
-        ],
-        [
           "@scottmelker",
           "s-5fd079eccb4a192a",
           false
         ],
         [
-          "@corleonescrypto",
-          "s-f093a8891350b4ef",
+          "@muchboge",
+          "s-e8ab2f88aa2634cf",
           false
         ],
         [
@@ -4073,8 +4217,8 @@
           false
         ],
         [
-          "@kivoxbt",
-          "s-c8edc48b4f65907b",
+          "@coinbureau",
+          "s-71796fe70d0898b9",
           false
         ],
         [
@@ -4083,18 +4227,13 @@
           false
         ],
         [
-          "@Noahhcalls",
-          "s-806fac691ec8f3f2",
-          false
-        ],
-        [
           "@WhaleScan",
           "s-d2334033ea74840e",
           false
         ],
         [
-          "@king_smart25",
-          "s-bb0db5ce8e9a7c49",
+          "@missteencrypto",
+          "s-8ddfd8b5e59d13ed",
           false
         ],
         [
@@ -4103,13 +4242,13 @@
           false
         ],
         [
-          "@slingoorio",
-          "s-08633b03510c67dd",
+          "@CryptotwitsHQ",
+          "s-059fddf58f491708",
           false
         ],
         [
-          "@CryptotwitsHQ",
-          "s-059fddf58f491708",
+          "@ast_dotfun",
+          "s-3925d8d43433e0e7",
           false
         ],
         [
@@ -4118,136 +4257,146 @@
           false
         ],
         [
-          "@chadscabal",
-          "s-2d81919ff177c05b",
+          "@SolLunix",
+          "s-808243bb9634762e",
           false
         ],
         [
-          "u/NightonVAL",
-          "s-5941b39c5fc80175",
+          "@cottonxbt",
+          "s-b84f2e369419e308",
           false
         ],
         [
-          "u/BetterStayAlone",
-          "s-68059f8e7cf34d82",
+          "@impixiecat",
+          "s-b8c865ac55920bd8",
           false
         ],
         [
-          "u/scrowdum",
-          "s-d0fd8444d64ed5c6",
+          "@yogurt_eth",
+          "s-e0aec2e9f5e22690",
           false
         ],
         [
-          "u/CivilOil7020",
-          "s-0a1b30309dde88c8",
+          "@cantonmeow",
+          "s-a7ca5b7c657547e6",
           false
         ],
         [
-          "u/LogicCool",
-          "s-c340bc15b8fd3e3e",
+          "@Blxme",
+          "s-62988082d8e4d8f3",
           false
         ],
         [
-          "u/FuzzBallTrade",
-          "s-60e60cdc35636f61",
+          "@impixiecat",
+          "s-f96927cff310ac59",
           false
         ],
         [
-          "u/Wreath_517",
-          "s-ea0585a761846f63",
+          "u/ConsciousHost",
+          "s-5fd8a21e73e8b07b",
           false
         ],
         [
-          "u/protoprofit",
-          "s-c7d6d775d12c0b93",
+          "u/Similar-Market6406",
+          "s-4002474b590d0ce6",
           false
         ],
         [
-          "u/TerrorofNight",
-          "s-2db960fc262e6d08",
+          "u/ParaClaw",
+          "s-038df2118bbfafd5",
           false
         ],
         [
-          "u/Admirable-Client7238",
-          "s-085ea9b63d4cc420",
+          "u/shdwgnnr",
+          "s-076006fbfff108cb",
           false
         ],
         [
-          "@braindotsite",
-          "s-3c63ffc0983973f2",
+          "u/zbrgamez",
+          "s-dd119f203ad74708",
           false
         ],
         [
-          "u/choicemeats",
-          "s-b5a3effb925dbf59",
+          "u/Tough-Marsupial-6254",
+          "s-ecabece42c94ae11",
           false
         ],
         [
-          "u/Mediocre-Yam-1133",
-          "s-9288f67187890754",
+          "u/wholeein",
+          "s-c9b72cf1baee98e7",
           false
         ],
         [
-          "u/MechaMonib",
-          "s-a79a3e9be32b2b5a",
+          "u/Then_Marionberry_259",
+          "s-2b655fdb5058f0c8",
           false
         ],
         [
-          "u/Impressive_History74",
-          "s-2b6d2d35d28336a1",
+          "u/beuxjdbdbd",
+          "s-aa299f5c848409f7",
           false
         ],
         [
-          "u/Mythical_Miller",
-          "s-9ce6baa79b9a13d7",
+          "u/IceSame9166",
+          "s-aa53b1e42bca91cd",
           false
         ],
         [
-          "u/Gold-Let-3666",
-          "s-c6261faca9619ad4",
+          "u/TopAlert2383",
+          "s-429b901f8c413730",
           false
         ],
         [
-          "u/Striking-Werewolf870",
-          "s-330312ec23f64ead",
+          "u/BlueLobster747",
+          "s-80b3d509c11fc136",
           false
         ],
         [
-          "u/MDOT_SHOOTA",
-          "s-02e899334f13d561",
+          "u/zero-taeko",
+          "s-b4e85d4def8b335e",
           false
         ],
         [
-          "u/namix8",
-          "s-c0292723fcdc481f",
+          "u/Deep_Helicopter4591",
+          "s-b094764b08cd9983",
           false
         ],
         [
-          "u/koraniaa",
-          "s-c4965df107eb7c2b",
+          "u/dipsy7",
+          "s-2304a53052e9b442",
           false
         ],
         [
-          "u/TheMonkieKing247",
-          "s-8d07c316cdb7914a",
+          "u/Dangerous_Drama6843",
+          "s-535152027c661623",
           false
         ],
         [
-          "u/FuzzBallTrade",
-          "s-c0acc7f5e5e2d62a",
+          "u/Clear_Delilah_7268",
+          "s-e930d208348c297d",
           false
         ],
         [
-          "u/CuriousPhrase696",
-          "s-1e52a3056abf5f12",
+          "u/G_aster",
+          "s-7c34d996f3e85ac1",
+          false
+        ],
+        [
+          "u/AlwaysBLurkin",
+          "s-552268333ca32b48",
+          false
+        ],
+        [
+          "u/Wonderful_Winner_202",
+          "s-d47cd8a79ebb0f00",
           false
         ]
       ],
       "status": [
         "twitter: 30 tweets",
-        "reddit: 25 posts"
+        "reddit: 26 posts"
       ],
-      "checked_at": "2026-09-28T18:19:40.355226+00:00"
+      "checked_at": "2026-09-28T21:24:16.954142+00:00"
     },
     {
       "symbol": "MSTRUSDT",
@@ -4288,26 +4437,6 @@
           "first_seen": "2026-09-26T21:48:13+00:00"
         },
         {
-          "text": "Michael Saylor hints at Strategy $MSTR buying more Bitcoin.\n\nBullish! https://t.co/07Mo4X9sMg",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "@cryptogoos"
-          ],
-          "first_seen": "2026-09-27T11:48:13+00:00"
-        },
-        {
-          "text": "The burgundy chapter: Omega Speedmaster '57 in daylight — Another view of my burgundy Speedmaster '57, this time out in the sunlight. The red dial and matching leather are the focus here; the steel bezel and broad-arrow ",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "u/TheOGSwagPanda"
-          ],
-          "first_seen": "2026-09-27T16:14:52+00:00"
-        },
-        {
           "text": "Pete Crow-Armstrong 5 card lot $10 shipped — Pwe",
           "posts": 1,
           "accounts": 1,
@@ -4316,6 +4445,26 @@
             "u/complete_data75"
           ],
           "first_seen": "2026-09-27T17:38:57+00:00"
+        },
+        {
+          "text": "Just found my old Yu-Gi-Oh cards in the garage. Hadn't seen them about 20 years! — Tried to organise a bit by edition, card type and card level",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "u/J5T94"
+          ],
+          "first_seen": "2026-09-27T17:52:24+00:00"
+        },
+        {
+          "text": "Something happening in the old Cypress Cafe space.",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "u/Acrobatic-Archer-393"
+          ],
+          "first_seen": "2026-09-27T18:39:40+00:00"
         }
       ],
       "tone": {
@@ -4325,21 +4474,21 @@
         "posts_scored": 35,
         "voices": 35.0,
         "counts": {
-          "positive": 19,
-          "neutral": 9,
-          "negative": 7
+          "positive": 16,
+          "neutral": 11,
+          "negative": 8
         },
         "share": {
-          "positive": 0.5428571428571428,
-          "neutral": 0.2571428571428571,
-          "negative": 0.2
+          "positive": 0.45714285714285713,
+          "neutral": 0.3142857142857143,
+          "negative": 0.22857142857142856
         },
         "share_unweighted": {
-          "positive": 0.5428571428571428,
-          "neutral": 0.2571428571428571,
-          "negative": 0.2
+          "positive": 0.45714285714285713,
+          "neutral": 0.3142857142857143,
+          "negative": 0.22857142857142856
         },
-        "mean_compound": 0.16694285714285714,
+        "mean_compound": 0.12163999999999998,
         "coordinated_stories_counted_once": 0,
         "posts_in_coordinated_stories": 0,
         "withheld_not_scored": 4
@@ -4352,21 +4501,9 @@
           "weight": 1.0
         },
         {
-          "id": "twitter-2104176280229073026",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104542212184813634",
-          "compound": 0.1779,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104625923408703579",
-          "compound": 0.5812,
-          "label": "positive",
+          "id": "twitter-2104285899362095354",
+          "compound": -0.5362,
+          "label": "negative",
           "weight": 1.0
         },
         {
@@ -4376,25 +4513,43 @@
           "weight": 1.0
         },
         {
-          "id": "twitter-2104541277878469064",
-          "compound": 0.2263,
+          "id": "twitter-2104555856704520487",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104543858055061630",
+          "compound": 0.296,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104542323355099569",
-          "compound": 0.4767,
+          "id": "twitter-2104542212184813634",
+          "compound": 0.1779,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104285899362095354",
-          "compound": -0.5362,
+          "id": "twitter-2104549186758668291",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104652950677209572",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104600629734002990",
+          "compound": -0.1759,
           "label": "negative",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104620855682900020",
+          "id": "reddit-1wspb43",
           "compound": 0.5983,
           "label": "positive",
           "weight": 1.0
@@ -4548,12 +4703,6 @@
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
-        },
-        {
-          "id": "reddit-1wro99j",
-          "compound": 0.4215,
-          "label": "positive",
-          "weight": 1.0
         }
       ],
       "shares": [
@@ -4570,16 +4719,6 @@
         [
           "@StrategyMaxi",
           "s-46c93c65a06ff290",
-          false
-        ],
-        [
-          "@cryptogoos",
-          "s-a0f757c70774063e",
-          false
-        ],
-        [
-          "u/TheOGSwagPanda",
-          "s-7950e6b6a24dc1f7",
           false
         ],
         [
@@ -4668,13 +4807,18 @@
           false
         ],
         [
-          "@cryptorover",
-          "s-2c1ceef8a81ccec0",
+          "@WuBlockchain",
+          "s-c169b692d0268c71",
           false
         ],
         [
-          "@BitcoinArchive",
-          "s-b4022263631bcdc7",
+          "@CryptoPatel",
+          "s-c452c27ecab0379b",
+          false
+        ],
+        [
+          "@AIStockSavvy",
+          "s-a69d0a541d886fa2",
           false
         ],
         [
@@ -4713,13 +4857,13 @@
           false
         ],
         [
-          "u/rwatimes",
-          "s-dce3249bf90c8f40",
+          "@RobinSeyr",
+          "s-43daa4c773b05213",
           false
         ],
         [
-          "@RobinSeyr",
-          "s-4c9703204081dee3",
+          "u/rwatimes",
+          "s-dce3249bf90c8f40",
           false
         ],
         [
@@ -4728,8 +4872,13 @@
           false
         ],
         [
-          "@KinggTrades",
-          "s-3c373417f839d924",
+          "@ChartingGuy",
+          "s-1f28cb4ad4626e11",
+          false
+        ],
+        [
+          "u/IND_Research",
+          "s-4658e2c1ac8d87b9",
           false
         ]
       ],
@@ -4737,22 +4886,24 @@
         "twitter: 30 tweets",
         "reddit: 30 posts"
       ],
-      "checked_at": "2026-09-28T18:19:40.355226+00:00"
+      "checked_at": "2026-09-28T21:24:16.954142+00:00"
     },
     {
       "symbol": "QQQUSDT",
-      "posts": 46,
-      "accounts": 40,
+      "posts": 49,
+      "accounts": 43,
       "by_channel": {
-        "x": 16,
-        "reddit": 30
+        "x": 20,
+        "reddit": 29
       },
-      "distinct_stories": 43,
+      "distinct_stories": 46,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
-      "withheld_abusive": 0,
-      "withheld_by_reason": {},
-      "withheld_accounts": 0,
+      "withheld_abusive": 1,
+      "withheld_by_reason": {
+        "abusive_term": 1
+      },
+      "withheld_accounts": 1,
       "top_stories": [
         {
           "text": "Macro Radar — Gazzetta di Kyiv — # Site Review — Gazzetta di Kyiv, June 3 Cycle\n\nThe terminal is tracking 7 stories across geopolitics, macro, and tech convergence. The unifying thesis: **three stagflationary forces are ",
@@ -4762,17 +4913,7 @@
           "authors": [
             "u/lagazzettadikyiv"
           ],
-          "first_seen": "2026-09-28T12:00:19+00:00"
-        },
-        {
-          "text": "INDMoney for US stocks/etf. Tax planning for 5.5LPA — My wife earns 5.5LPA.  \nI earn 50LPA.\n\nI want to open an INDMoney account to have us invest in US stocks/etfs like VTI, VOO, QQQ, etc.\n\nShort term capital gains for f",
-          "posts": 2,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "u/BigWar6156"
-          ],
-          "first_seen": "2026-09-28T14:10:12+00:00"
+          "first_seen": "2026-09-28T16:00:20+00:00"
         },
         {
           "text": "Trump rejects Iran's peace proposal to reopen the Strait of Hormuz, sending tech stocks into a freefall as QQQ plunges over 12 points in minutes.",
@@ -4785,51 +4926,62 @@
           "first_seen": "2026-09-28T17:09:39+00:00"
         },
         {
-          "text": "Big Altcoin Moves This Week 📛\n\n1️⃣ $ONDO\n\n- three blackrock-modeled onchain portfolios\n- income, diversified growth, high growth\n- blackrock supplies models, not management\n\n2️⃣ $QNT\n\n- tch picks quant for tokenized depo",
-          "posts": 1,
-          "accounts": 1,
+          "text": "whats with the high correlation of gold with QQQ for almost a year. The correlation went as high as 0.7 in the summer",
+          "posts": 2,
+          "accounts": 2,
           "coordinated": false,
           "authors": [
-            "@0xchainink"
+            "u/Then_Marionberry_259",
+            "u/fordat1"
           ],
-          "first_seen": "2026-09-26T19:56:03+00:00"
+          "first_seen": "2026-09-28T19:56:50+00:00"
         },
         {
-          "text": "Yearly dividend income with $1,000,000 invested:\n\n$QQQ: ~$4,200\n$VOO: ~$10,400\n$SCHD: ~$31,700\n$JEPI: ~$81,000\n$SPYI: ~$118,700\n$QQQI: ~$137,600\n$TDAQ: ~$165,200\n\nWhich is your favorite?",
+          "text": "THIS HAS MARKED EVERY MAJOR BUYING & SELLING OPPORTUNITY SINCE 1990\n\nUse it. It’s how generational wealth is made.\n\nDot-Com Crash.\nGlobal Financial Crisis.\nCOVID Crash.\n2022 Bear Market.\n2025 Tariff Selloff.\n\nThe $VIX is",
           "posts": 1,
           "accounts": 1,
           "coordinated": false,
           "authors": [
-            "@dividendology"
+            "@RealJGBanks"
           ],
-          "first_seen": "2026-09-27T13:15:00+00:00"
+          "first_seen": "2026-09-26T22:18:42+00:00"
+        },
+        {
+          "text": "I MADE $200k trading in the last two weeks\n\nRead this. Use it BEFORE you trade next, \n\nAfter 13 years, steal my EXACT process behind my $100K trading weeks:\n\n1. START WITH $SPY + $QQQ\n\nBefore I look at individual stocks,",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "@RealJGBanks"
+          ],
+          "first_seen": "2026-09-27T19:16:47+00:00"
         }
       ],
       "tone": {
         "status": "ok",
         "scorer": "VADER compound (Hutto & Gilbert, ICWSM 2014), >= 0.05 positive, <= -0.05 negative (paper §4; README.rst:241-245)",
         "weighting": "a coordinated story counts once however many accounts pushed it; one account repeating a story counts once; every other account counts once",
-        "posts_scored": 46,
-        "voices": 43.0,
+        "posts_scored": 49,
+        "voices": 47.0,
         "counts": {
-          "positive": 22,
-          "neutral": 13,
-          "negative": 11
+          "positive": 19,
+          "neutral": 15,
+          "negative": 15
         },
         "share": {
-          "positive": 0.46511627906976744,
-          "neutral": 0.3023255813953488,
-          "negative": 0.23255813953488372
+          "positive": 0.3829787234042553,
+          "neutral": 0.3191489361702128,
+          "negative": 0.2978723404255319
         },
         "share_unweighted": {
-          "positive": 0.4782608695652174,
-          "neutral": 0.2826086956521739,
-          "negative": 0.2391304347826087
+          "positive": 0.3877551020408163,
+          "neutral": 0.30612244897959184,
+          "negative": 0.30612244897959184
         },
-        "mean_compound": 0.1463186046511628,
+        "mean_compound": 0.07682340425531915,
         "coordinated_stories_counted_once": 0,
         "posts_in_coordinated_stories": 0,
-        "withheld_not_scored": 0
+        "withheld_not_scored": 1
       },
       "post_tone": [
         {
@@ -4845,20 +4997,38 @@
           "weight": 1.0
         },
         {
-          "id": "twitter-2104621773786431562",
-          "compound": 0.8402,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
           "id": "twitter-2104582266445779228",
           "compound": 0.5106,
           "label": "positive",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104198118707274019",
-          "compound": 0.4588,
+          "id": "twitter-2104652914295800095",
+          "compound": -0.4848,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104596559799234871",
+          "compound": -0.3182,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104584304474865895",
+          "compound": -0.5627,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104593748575555794",
+          "compound": -0.3182,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104607673966538874",
+          "compound": 0.8431,
           "label": "positive",
           "weight": 1.0
         },
@@ -4869,26 +5039,26 @@
           "weight": 1.0
         },
         {
-          "id": "twitter-2104618454787703263",
+          "id": "twitter-2103972556999139476",
+          "compound": -0.7155,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104656966777803087",
+          "compound": -0.296,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104594926419779755",
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104482284107641296",
-          "compound": 0.3612,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2103936661386318331",
-          "compound": 0.6369,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104596559799234871",
-          "compound": -0.3182,
+          "id": "twitter-2104634035943444970",
+          "compound": -0.2003,
           "label": "negative",
           "weight": 1.0
         },
@@ -4899,33 +5069,117 @@
           "weight": 1.0
         },
         {
-          "id": "twitter-2104593707307577401",
-          "compound": 0.8845,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104578699378950379",
-          "compound": 0.34,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "twitter-2104556995412103518",
+          "id": "twitter-2104618454787703263",
           "compound": 0.0,
           "label": "neutral",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104527288008409478",
-          "compound": -0.7357,
+          "id": "twitter-2104667863256629311",
+          "compound": 0.3612,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104610148190929209",
+          "compound": 0.8271,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104641933532368901",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104637447120601113",
+          "compound": 0.1027,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104672600916107394",
+          "compound": 0.1967,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wspzxi",
+          "compound": -0.2846,
           "label": "negative",
           "weight": 1.0
         },
         {
-          "id": "twitter-2104591469243670931",
-          "compound": -0.1779,
+          "id": "reddit-1wspoj9",
+          "compound": 0.0258,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wspm0x",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsp593",
+          "compound": -0.2732,
           "label": "negative",
+          "weight": 0.5
+        },
+        {
+          "id": "reddit-1wsp4uz",
+          "compound": -0.7906,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsp31n",
+          "compound": 0.6935,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsp1qg",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsolxd",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wso0di",
+          "compound": -0.1685,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsnmdj",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsmwc0",
+          "compound": 0.8117,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsmw85",
+          "compound": 0.7757,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsmicw",
+          "compound": 0.7458,
+          "label": "positive",
           "weight": 1.0
         },
         {
@@ -4938,18 +5192,12 @@
           "id": "reddit-1wslamm",
           "compound": 0.7096,
           "label": "positive",
-          "weight": 0.5
+          "weight": 1.0
         },
         {
           "id": "reddit-1wsl7jr",
           "compound": 0.0,
           "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsl6cw",
-          "compound": 0.9477,
-          "label": "positive",
           "weight": 1.0
         },
         {
@@ -5029,84 +5277,6 @@
           "compound": -0.25,
           "label": "negative",
           "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsgb2u",
-          "compound": -0.25,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsg7ev",
-          "compound": -0.802,
-          "label": "negative",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsfv4a",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsfo0h",
-          "compound": 0.7096,
-          "label": "positive",
-          "weight": 0.5
-        },
-        {
-          "id": "reddit-1wsejr1",
-          "compound": 0.5622,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsebth",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsdvj3",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsdatq",
-          "compound": 0.5994,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wscnf4",
-          "compound": -0.2732,
-          "label": "negative",
-          "weight": 0.5
-        },
-        {
-          "id": "reddit-1wscd82",
-          "compound": 0.4515,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsbp7y",
-          "compound": 0.1779,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsbcv8",
-          "compound": 0.0,
-          "label": "neutral",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wsazo1",
-          "compound": -0.0516,
-          "label": "negative",
-          "weight": 1.0
         }
       ],
       "shares": [
@@ -5116,23 +5286,23 @@
           false
         ],
         [
-          "u/BigWar6156",
-          "s-cd083e8d2b9d8b8c",
-          false
-        ],
-        [
           "u/DumbMoneyMedia",
           "s-7bb4d7ce0a6a37bc",
           false
         ],
         [
-          "@0xchainink",
-          "s-3b27dcea20894374",
+          "u/Then_Marionberry_259",
+          "s-61e3e4a5db803287",
           false
         ],
         [
-          "@dividendology",
-          "s-c03fadf19b02120f",
+          "u/fordat1",
+          "s-61e3e4a5db803287",
+          false
+        ],
+        [
+          "@RealJGBanks",
+          "s-a0588eb2389300d6",
           false
         ],
         [
@@ -5146,83 +5316,13 @@
           false
         ],
         [
-          "@cypherpunkgod",
-          "s-6efe55c1cf4007dd",
-          false
-        ],
-        [
-          "u/Asleep-Confidence-26",
-          "s-57cc0419c194eccd",
-          false
-        ],
-        [
-          "u/lineup-sweep",
-          "s-8b23c96e01b4f9c2",
-          false
-        ],
-        [
-          "@Mariusz_Invest",
-          "s-796e394d237cc711",
-          false
-        ],
-        [
-          "u/ALPHAtradingpro",
-          "s-8a0759ff5537b667",
-          false
-        ],
-        [
-          "u/August_snowrain",
-          "s-020a55dfb1af7606",
-          false
-        ],
-        [
-          "u/misanthropicitis",
-          "s-7e268bdd8f4380ee",
-          false
-        ],
-        [
-          "u/ShaytonSky",
-          "s-caf7838a9bc8a8da",
-          false
-        ],
-        [
-          "@Invest_Brandon",
-          "s-0855998ba430fb89",
-          false
-        ],
-        [
-          "u/Purple_Dish_9694",
-          "s-28e50366b1bea5ab",
-          false
-        ],
-        [
-          "u/Accomplished_Olive99",
-          "s-338ccd4946d87171",
-          false
-        ],
-        [
-          "u/InnerCircleTI",
-          "s-115015f38fb92ad5",
-          false
-        ],
-        [
-          "@MrZackMorris",
-          "s-2e119226947ceea4",
-          false
-        ],
-        [
-          "u/NumerousFloor9264",
-          "s-431b27943983b81c",
-          false
-        ],
-        [
-          "u/laurenthu",
-          "s-d123c34b995414a9",
-          false
-        ],
-        [
           "@BeardoTrader",
           "s-065c10abedd209c8",
+          false
+        ],
+        [
+          "@clintoptions",
+          "s-19622a1bf97eab28",
           false
         ],
         [
@@ -5231,13 +5331,13 @@
           false
         ],
         [
-          "@The_Blake_VIC",
-          "s-653a2496a851c827",
+          "@TheLongInvest",
+          "s-f6518d4353aec88b",
           false
         ],
         [
-          "@Oculustrade",
-          "s-4de757e46d9090c8",
+          "@CheddarFlow",
+          "s-6371b52aa292267b",
           false
         ],
         [
@@ -5256,8 +5356,18 @@
           false
         ],
         [
+          "@AIStockSavvy",
+          "s-4c01d8278b393cd2",
+          false
+        ],
+        [
           "u/humandisaster93",
           "s-8d1856eca60d4a4c",
+          false
+        ],
+        [
+          "@doughboysfn",
+          "s-567a0e01c6b8286a",
           false
         ],
         [
@@ -5296,18 +5406,8 @@
           false
         ],
         [
-          "@CKCapitalxx",
-          "s-eba83bae2d6040d9",
-          false
-        ],
-        [
           "u/dollar_bago",
           "s-a66bf09eb0469398",
-          false
-        ],
-        [
-          "u/Srqpon",
-          "s-eddaf242a54e6850",
           false
         ],
         [
@@ -5316,69 +5416,127 @@
           false
         ],
         [
+          "u/BigWar6156",
+          "s-cd083e8d2b9d8b8c",
+          false
+        ],
+        [
           "u/Apprehensive-Fox7570",
           "s-65671b527f2047b1",
+          false
+        ],
+        [
+          "@CapitalFlowApp",
+          "s-a57caf58ebab2ff1",
           false
         ],
         [
           "@Team2Trading",
           "s-f650630bd241d48a",
           false
+        ],
+        [
+          "@The_RockTrading",
+          "s-85186863645f1d9e",
+          false
+        ],
+        [
+          "u/Regular-Lie7449",
+          "s-d5656975e4ddd0b6",
+          false
+        ],
+        [
+          "@clintoptions",
+          "s-c2f778cc02d25c08",
+          false
+        ],
+        [
+          "u/FatherCapalott",
+          "s-a59547970bfdb97b",
+          false
+        ],
+        [
+          "u/NoMuddyFeet",
+          "s-2ada5e126c1d9882",
+          false
+        ],
+        [
+          "u/Julie-Warda",
+          "s-804dc4770c4bab4b",
+          false
+        ],
+        [
+          "u/AustinTheBigRod",
+          "s-7dd6f01453dbfe1f",
+          false
+        ],
+        [
+          "@JEFETRADES",
+          "s-55222351ee24d7c5",
+          false
+        ],
+        [
+          "@kurtsaltrichter",
+          "s-26c49abd3d85db5e",
+          false
+        ],
+        [
+          "u/69thnoobmaster69",
+          "s-3ed9990da6cc235d",
+          false
+        ],
+        [
+          "u/BillWWouldveDoneTSM",
+          "s-e13b1ee848de1143",
+          false
+        ],
+        [
+          "u/saasfin",
+          "s-786b7addf44daca9",
+          false
+        ],
+        [
+          "u/Steadiclarke",
+          "s-5f84aad4e7f70de3",
+          false
+        ],
+        [
+          "@TraderJohnny_",
+          "s-fb6b9c4ddd622e75",
+          false
+        ],
+        [
+          "u/robot2trade",
+          "s-9a946e1b471a912a",
+          false
+        ],
+        [
+          "@FranVezz",
+          "s-09a3f1f9a1c7154b",
+          false
         ]
       ],
       "status": [
-        "twitter: 29 tweets",
-        "reddit: 30 posts"
+        "twitter: 30 tweets",
+        "reddit: 29 posts"
       ],
-      "checked_at": "2026-09-28T18:19:40.355226+00:00"
+      "checked_at": "2026-09-28T21:24:16.954142+00:00"
     },
     {
       "symbol": "TQQQUSDT",
-      "posts": 20,
-      "accounts": 18,
+      "posts": 23,
+      "accounts": 20,
       "by_channel": {
-        "x": 2,
-        "reddit": 18
+        "x": 3,
+        "reddit": 20
       },
-      "distinct_stories": 20,
+      "distinct_stories": 23,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
-      "withheld_abusive": 1,
-      "withheld_by_reason": {
-        "abusive_term": 1
-      },
-      "withheld_accounts": 1,
+      "withheld_abusive": 0,
+      "withheld_by_reason": {},
+      "withheld_accounts": 0,
       "top_stories": [
-        {
-          "text": "Someone asked for trading advice. And for what it's worth, here's my response. — As part time trader, here's how I started. I read a lot of books and watched a lot of videos on day trading, swing trading, risk management",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "u/Born_Kaleidoscope163"
-          ],
-          "first_seen": "2026-09-26T19:36:16+00:00"
-        },
-        {
-          "text": "Tool to visualize rebalancing during drawdowns — Are there any such tools out there? most I have checked so far only has the usual quarterly/annual,etc. options however I could not find any that would allow to backtest w",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "u/Dribbler365"
-          ],
-          "first_seen": "2026-09-26T20:45:45+00:00"
-        },
-        {
-          "text": "@damian173_ @grok what would it be the result if the person would have invested in tqqq instead of Heineken",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "@JuanchoChab"
-          ],
-          "first_seen": "2026-09-26T23:17:48+00:00"
-        },
         {
           "text": "HMM ten-minute maximum absolute excursions — Using 1 minute signed returns, does provide something useful for predicting ten-minute maximum absolute excursions. However, synthesizing from ATR14 data is better than the HM",
           "posts": 1,
@@ -5398,35 +5556,77 @@
             "u/Public-Lifeguard3669"
           ],
           "first_seen": "2026-09-27T09:09:47+00:00"
+        },
+        {
+          "text": "HMM ten-minute maximum absolute excursions (continued) — log log plots per request.",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "u/Grand-Fly-6090"
+          ],
+          "first_seen": "2026-09-27T12:01:13+00:00"
+        },
+        {
+          "text": "ATR vs EWMA predicting ten-minute maximum absolute excursions — ATR and EWMA look almost identical. ATR 67.0% wins on Pearson vs EWMA 66.9%. Another OOS might flip that result.",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "u/Grand-Fly-6090"
+          ],
+          "first_seen": "2026-09-27T13:22:16+00:00"
+        },
+        {
+          "text": "@WOLF_Financial @grok where is TQQQ in this list?",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "@Kioumars18"
+          ],
+          "first_seen": "2026-09-27T14:23:15+00:00"
         }
       ],
       "tone": {
         "status": "ok",
         "scorer": "VADER compound (Hutto & Gilbert, ICWSM 2014), >= 0.05 positive, <= -0.05 negative (paper §4; README.rst:241-245)",
         "weighting": "a coordinated story counts once however many accounts pushed it; one account repeating a story counts once; every other account counts once",
-        "posts_scored": 20,
-        "voices": 20.0,
+        "posts_scored": 23,
+        "voices": 23.0,
         "counts": {
-          "positive": 8,
-          "neutral": 7,
+          "positive": 9,
+          "neutral": 9,
           "negative": 5
         },
         "share": {
-          "positive": 0.4,
-          "neutral": 0.35,
-          "negative": 0.25
+          "positive": 0.391304347826087,
+          "neutral": 0.391304347826087,
+          "negative": 0.21739130434782608
         },
         "share_unweighted": {
-          "positive": 0.4,
-          "neutral": 0.35,
-          "negative": 0.25
+          "positive": 0.391304347826087,
+          "neutral": 0.391304347826087,
+          "negative": 0.21739130434782608
         },
-        "mean_compound": 0.13774499999999998,
+        "mean_compound": 0.14528695652173912,
         "coordinated_stories_counted_once": 0,
         "posts_in_coordinated_stories": 0,
-        "withheld_not_scored": 1
+        "withheld_not_scored": 0
       },
       "post_tone": [
+        {
+          "id": "twitter-2104613118563254735",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104655988880285767",
+          "compound": -0.4588,
+          "label": "negative",
+          "weight": 1.0
+        },
         {
           "id": "twitter-2104215295686816024",
           "compound": 0.0,
@@ -5434,9 +5634,27 @@
           "weight": 1.0
         },
         {
-          "id": "twitter-2103987431397892515",
+          "id": "reddit-1wsp31n",
+          "compound": 0.6935,
+          "label": "positive",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsolxd",
           "compound": 0.0,
           "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsnij7",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "reddit-1wsnfsw",
+          "compound": 0.5267,
+          "label": "positive",
           "weight": 1.0
         },
         {
@@ -5534,36 +5752,9 @@
           "compound": 0.7003,
           "label": "positive",
           "weight": 1.0
-        },
-        {
-          "id": "reddit-1wr15fz",
-          "compound": 0.2263,
-          "label": "positive",
-          "weight": 1.0
-        },
-        {
-          "id": "reddit-1wqzgxe",
-          "compound": -0.0516,
-          "label": "negative",
-          "weight": 1.0
         }
       ],
       "shares": [
-        [
-          "u/Born_Kaleidoscope163",
-          "s-5abc022019131553",
-          false
-        ],
-        [
-          "u/Dribbler365",
-          "s-56bfee71fa3fe92c",
-          false
-        ],
-        [
-          "@JuanchoChab",
-          "s-0c95b6dde0c1b983",
-          false
-        ],
         [
           "u/Grand-Fly-6090",
           "s-805c61d9085fb5bd",
@@ -5640,6 +5831,11 @@
           false
         ],
         [
+          "@mistressdivy",
+          "s-d9c24fae22ea2ba1",
+          false
+        ],
+        [
           "u/X-otic_Life",
           "s-4caa0cdb3631de88",
           false
@@ -5648,30 +5844,55 @@
           "u/jalard",
           "s-502d7db0a1d0bd6a",
           false
+        ],
+        [
+          "u/Weird-Ad-7669",
+          "s-4a1616c9e851b01a",
+          false
+        ],
+        [
+          "u/Weird-Ad-7669",
+          "s-6b0bdd0656ac8c4b",
+          false
+        ],
+        [
+          "@GabeVerzino",
+          "s-ec89c61639094421",
+          false
+        ],
+        [
+          "u/69thnoobmaster69",
+          "s-3ed9990da6cc235d",
+          false
+        ],
+        [
+          "u/BillWWouldveDoneTSM",
+          "s-e13b1ee848de1143",
+          false
         ]
       ],
       "status": [
         "twitter: 30 tweets",
         "reddit: 30 posts"
       ],
-      "checked_at": "2026-09-28T18:19:40.355226+00:00"
+      "checked_at": "2026-09-28T21:24:16.954142+00:00"
     },
     {
       "symbol": "SQQQUSDT",
-      "posts": 8,
-      "accounts": 7,
+      "posts": 11,
+      "accounts": 9,
       "by_channel": {
-        "x": 7,
+        "x": 10,
         "reddit": 1
       },
-      "distinct_stories": 8,
+      "distinct_stories": 11,
       "coordinated_stories": 0,
       "coordinated_posts": 0,
-      "withheld_abusive": 2,
+      "withheld_abusive": 1,
       "withheld_by_reason": {
-        "abusive_term": 2
+        "abusive_term": 1
       },
-      "withheld_accounts": 2,
+      "withheld_accounts": 1,
       "top_stories": [
         {
           "text": "An index can finish flat over two days while a daily -3x fund loses money.\n\nSolana's weekly roundup mentions SQQQ. The underlying ProShares ETF targets -3x the DAILY performance of the Nasdaq-100, before fees and expense",
@@ -5694,6 +5915,16 @@
           "first_seen": "2026-09-27T20:12:24+00:00"
         },
         {
+          "text": "Goodnight. See y'all in the morning. Hopefully not as red, because green would be a great sight to wake up to. Green is unlikely, all things considered. Sold my $SQQQ weekend swing with an overnight session trade to secu",
+          "posts": 1,
+          "accounts": 1,
+          "coordinated": false,
+          "authors": [
+            "@Atlantastanian"
+          ],
+          "first_seen": "2026-09-28T02:34:57+00:00"
+        },
+        {
           "text": "Good luck in the stock market this week.",
           "posts": 1,
           "accounts": 1,
@@ -5712,49 +5943,39 @@
             "@kenr0966"
           ],
           "first_seen": "2026-09-28T11:24:26+00:00"
-        },
-        {
-          "text": "My Short-Term Buy List:\n\n$SQQQ  — Buy between $33 and $34\n\nPrice target: $36.88\n\nA hedge against a tech-sector pullback amid rising macroeconomic and geopolitical risks, as well as a short-term momentum-based bearish tra",
-          "posts": 1,
-          "accounts": 1,
-          "coordinated": false,
-          "authors": [
-            "@Rigober82250442"
-          ],
-          "first_seen": "2026-09-28T14:28:37+00:00"
         }
       ],
       "tone": {
         "status": "ok",
         "scorer": "VADER compound (Hutto & Gilbert, ICWSM 2014), >= 0.05 positive, <= -0.05 negative (paper §4; README.rst:241-245)",
         "weighting": "a coordinated story counts once however many accounts pushed it; one account repeating a story counts once; every other account counts once",
-        "posts_scored": 8,
-        "voices": 8.0,
+        "posts_scored": 11,
+        "voices": 11.0,
         "counts": {
-          "positive": 3,
-          "neutral": 1,
-          "negative": 4
+          "positive": 4,
+          "neutral": 2,
+          "negative": 5
         },
         "share": {
-          "positive": 0.375,
-          "neutral": 0.125,
-          "negative": 0.5
+          "positive": 0.36363636363636365,
+          "neutral": 0.18181818181818182,
+          "negative": 0.45454545454545453
         },
         "share_unweighted": {
-          "positive": 0.375,
-          "neutral": 0.125,
-          "negative": 0.5
+          "positive": 0.36363636363636365,
+          "neutral": 0.18181818181818182,
+          "negative": 0.45454545454545453
         },
-        "mean_compound": 0.08655,
+        "mean_compound": 0.12425454545454548,
         "coordinated_stories_counted_once": 0,
         "posts_in_coordinated_stories": 0,
-        "withheld_not_scored": 2
+        "withheld_not_scored": 1
       },
       "post_tone": [
         {
-          "id": "twitter-2104617137339855252",
-          "compound": 0.7177,
-          "label": "positive",
+          "id": "twitter-2104679151311413729",
+          "compound": -0.2732,
+          "label": "negative",
           "weight": 1.0
         },
         {
@@ -5776,15 +5997,33 @@
           "weight": 1.0
         },
         {
-          "id": "twitter-2104607082028634357",
-          "compound": -0.4939,
-          "label": "negative",
+          "id": "twitter-2104617137339855252",
+          "compound": 0.7177,
+          "label": "positive",
           "weight": 1.0
         },
         {
           "id": "twitter-2104579033724014791",
           "compound": 0.0,
           "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104607082028634357",
+          "compound": -0.4939,
+          "label": "negative",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104680884741837161",
+          "compound": 0.0,
+          "label": "neutral",
+          "weight": 1.0
+        },
+        {
+          "id": "twitter-2104399432380731766",
+          "compound": 0.9476,
+          "label": "positive",
           "weight": 1.0
         },
         {
@@ -5809,6 +6048,11 @@
         [
           "u/sakernpro",
           "s-94f4afa128112153",
+          false
+        ],
+        [
+          "@Atlantastanian",
+          "s-4e0829a982c7943b",
           false
         ],
         [
@@ -5840,13 +6084,23 @@
           "@BiconomyCom",
           "s-974c4949b261f629",
           false
+        ],
+        [
+          "@AIQuantClash",
+          "s-46b5fe948c43fd11",
+          false
+        ],
+        [
+          "@Captainturk4",
+          "s-c19cf616763236e0",
+          false
         ]
       ],
       "status": [
         "twitter: 30 tweets",
-        "reddit: 12 posts"
+        "reddit: 11 posts"
       ],
-      "checked_at": "2026-09-28T18:19:40.355226+00:00"
+      "checked_at": "2026-09-28T21:24:16.954142+00:00"
     }
   ],
   "repeat_pairs": []

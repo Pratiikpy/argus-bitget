@@ -18,12 +18,26 @@ modules = [
 # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
 # proof now needs a groupwise check on the capability's own artefact, and this
 # row's does not pass it. The reason and the route back are its first blocker.
-state = "implemented"
+state = "tied"
 baseline = """\
     polakowo/vectorbt deflated_sharpe_ratio (accessors.py:596) - not itself gated anywhere in \
     vectorbt, but silently NaN on a single trial (var_sharpe = np.var of one value, ddof=1); a \
     caller filtering with a negated < comparison admits it"""
 blockers = [
+    """\
+        RE-GRADED 2026-09-29 from IMPLEMENTED to TIED (Activity/28_CAPABILITY_CLOSE_PLAN_2.md \
+        §3) with a pydantic v2 validate_call + FiniteFloat contract around vectorbt, the best \
+        general tool for the same job, on 1,332 identical deflated-Sharpe inputs \
+        (data/general_overfitgates_comparison.json). On the 24 real-producer cases (real Bitget \
+        hourly candles, a 7-variant family, net of 12 bps) ARGUS and the pydantic contract \
+        return identical grades: 7 correct values and 17 correct refusals each. Against the \
+        named baseline ARGUS wins on the same real cases: bare vectorbt returns 17 silent-wrong \
+        values, all 17 discordant cases favour ARGUS (exact sign test p about 1.5e-5). ARGUS's \
+        remaining lead over pydantic (5 silent-wrong and 4 over-refusals) is on the poisoned and \
+        overflow tiers, which are constructed inputs, and on overflow ARGUS refuses 3 of 6 \
+        inputs that have a real answer. The guards themselves were adapted from pydantic and \
+        SciPy after ARGUS first lost this comparison with 28 silent-wrong outputs, so on real \
+        inputs the most it can reach is parity.""",
     """\
         RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate \
         (data/groupwise_audit.json): the gates' verdicts over all trials are broken down across \
@@ -95,7 +109,9 @@ condition = "failure_cases_documented"
 # they cannot reach a verdict at all, and those live in `overfit_gates.json`,
 # where the count had been recorded since the module was written and never named.
 how = """\
-    2 of 8 primitives return no verdict: the deflated-Sharpe gate needs a variance across \
+    0 of 8 primitives return no verdict on the current run (data/overfit_gates.json \
+    failure_cases.count; corrected 2026-09-29 from a stale '2 of 8'). The documented failure \
+    case is the one the gate is built for: the deflated-Sharpe gate needs a variance across \
     trials and raises rather than returning NaN when the observations cannot supply one. The \
     refusal is designed — vectorbt's own deflated_sharpe_ratio silently NaNs on a single trial \
     — and a gate that cannot decide has still protected nothing on that input, which is why it \

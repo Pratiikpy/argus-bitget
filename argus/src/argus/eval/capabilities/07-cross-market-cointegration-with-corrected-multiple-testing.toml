@@ -11,9 +11,25 @@ modules = [
 # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
 # proof now needs a groupwise check on the capability's own artefact, and this
 # row's does not pass it. The reason and the route back are its first blocker.
-state = "implemented"
+state = "lost"
 baseline = "statsmodels adfuller; QuantConnect/Lean pearsonr pair ranking; FinceptTerminal"
 blockers = [
+    """\
+        RE-GRADED 2026-09-29 from IMPLEMENTED to LOST (Activity/28_CAPABILITY_CLOSE_PLAN_2.md \
+        §7). The harness's own pre-registered decision in data/general_coint_comparison.json is \
+        rival_wins: ARGUS's production screen does not hold its false-discovery rate at q 0.05 \
+        (18.9% on planted universes, 10.0% on null), while 128 general pipelines do. The \
+        out-of-sample-confirmed set the desk trades holds it (4.2% planted, 0% null) but at \
+        power 0.274, below arch's Phillips-Ouliaris Pz with the same correction and the same \
+        gate (power 0.333 at 6.1%); that gap was measured against the screen (+0.021, s.e. \
+        0.026) and has not yet been measured against the confirmed set. Under broken \
+        relationships the confirmed set's FDR is 17.5% (s.e. 5.2%). On the real 12-rToken \
+        universe every pipeline finds the same one or two pairs, a tie. \
+        data/cointegration.json's '0 of 66 pairs survive' is not cited as evidence: it compares \
+        with no rival, and the groupwise gate now holds a nothing-survived [0, 0] interval \
+        against a claim. LOST can climb only to TIED: make the confirmed set the production arm \
+        of decide(), write per-universe rows, and adopt arch's Pz (NCSA licence) or publish the \
+        paired power loss.""",
     """\
         RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate \
         (data/groupwise_audit.json): the statistical proof reads \
@@ -36,7 +52,7 @@ blockers = [
         against arch's Engle-Granger and Phillips-Ouliaris, statsmodels' coint and five \
         multiple-testing corrections from statsmodels and SciPy, on the same selection slice. LOSS \
         for the screen: survivors_fdr, ARGUS's Benjamini-Hochberg screen, does not hold its target \
-        on planted universes (false-discovery rate 18.9% at q 10%), while 128 general pipelines \
+        on planted universes (false-discovery rate 18.9% at q 0.05), while 128 general pipelines \
         do. What the desk acts on is the out-of-sample-confirmed set (PairResult.tradeable), which \
         does hold it (4.2%) at power 0.274; the best general pipeline, arch's Phillips-Ouliaris \
         with the same correction and the same out-of-sample gate, holds it at 6.1% with power \

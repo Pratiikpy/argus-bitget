@@ -102,10 +102,17 @@ class TestTheCommittedPageAgreesWithTheArtefacts:
 
     def test_every_live_figure_appears_on_the_committed_page(self, committed: str) -> None:
         """A value that has moved since the page was written fails here by name."""
+        import html
+
+        # Beside its own label, not anywhere on the page: a bare substring check passed a stale
+        # "figures gated" of 142 against a live 103 on 2026-09-28, because "103" appeared in
+        # another panel.
         stale: list[str] = []
         for panel in build().panels:
             for metric in panel.metrics:
-                if metric.available and str(metric.value) not in committed:
+                cell = (f"<dt>{html.escape(metric.label)}</dt>"
+                        f"<dd>{html.escape(str(metric.value))}</dd>")
+                if metric.available and cell not in committed:
                     stale.append(f"{panel.title} · {metric.label} = {metric.value}")
         assert not stale, f"cockpit.html disagrees with the artefacts: {stale}"
 

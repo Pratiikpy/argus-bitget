@@ -105,7 +105,7 @@ deflation gate, and the console says so.
 Every capability is graded against the specialist that leads its sub-theme, by a register that
 opens the evidence rather than trusting a filename (`python -m argus.eval.standing`), and may claim
 OWNED only after that rival has been run on the same input and beaten.
-**2 of 47 capabilities are OWNED, 19 are TIED, 24 are IMPLEMENTED, and 2 are LOST: crowd sentiment classification, to RoB-RT on TweetEval (0.544 against 0.729 macro-recall on the same 12,284 tweets), and session-aware execution, to Bitget's own TWAP on replayed order books (0.62 bps dearer on boundary-crossing orders, interval [0.01, 1.53]).** OWNED needs
+**2 of 48 capabilities are OWNED, 25 are TIED, 16 are IMPLEMENTED, and 5 are LOST: crowd sentiment classification, to RoB-RT on TweetEval (0.544 against 0.729 macro-recall on the same 12,284 tweets); session-aware execution, to Bitget's own TWAP on replayed order books (0.62 bps dearer on boundary-crossing orders, interval [0.01, 1.53]); the price of thinking time, to a trailing realised-move estimator on 23,003 real decision instants (production's excess error 9.89, interval [9.20, 10.57]); cointegration screening, whose false-discovery rate misses its own target where 128 general pipelines hold it; and perception breadth, to OpenBB's keyless providers (12.4 data categories per stock against the desk's 6.2, same stocks, same day).** OWNED needs
 all thirteen conditions: the rival's best implementation read and reproduced, a same-input
 comparison with costs, out-of-sample, ablation, an adversarial test, documented failure cases and
 reproducibility.
@@ -146,13 +146,24 @@ The full table, rival by rival, is on [`/proof`](https://deploy-topaz-seven-64.v
 |---|---|---|
 | Public market API (v3) | Candles, tickers, 50-level books, funding — every price and cost in the console | Answering, checked live on `/status` |
 | Order-book websocket (`books5`, trades) | Execution replay and the order-splitting comparison | Recorded locally, RFC 6455 client |
-| `bitget-mcp-server` | US fundamentals, 13F holders, analyst estimates, earnings calendar, the stock behind each rToken | 37 of 67 catalog entries answered on 25 Sep, before its upstream began answering 503; 0 of 67 catalog entries answer in the latest sweep (`data/data_coverage.json`, dated inside and on `/status`) |
+| `bitget-mcp-server` | US fundamentals, 13F holders, analyst estimates, earnings calendar, the stock behind each rToken | 37 of 67 catalog entries answer in the latest sweep (`data/data_coverage.json`, dated inside and on `/status`); on 26 Sep every entry refused while its upstream answered 503 |
 | `bitget-signal` Skills | The console asks the Skill first for technicals (MACD corrected against Bitget's own candles), crypto sentiment and the rates curve, and checks BTC against `crypto_derivatives` | 2 of bitget-signal's 19 tools answered all three attempts on 2026-09-26 (crypto_derivatives, technical_analysis), from 1 of its 5 Skills (technical-analysis) plus 1 tool no SKILL.md names; when a Skill is silent the answer names the public source it read instead |
 
 When a Skill's hosted server fails, ARGUS reads the source that Skill names (alternative.me,
 Binance futures data, FRED, Yahoo, DeFiLlama, CoinGecko, the RSS feeds). Every such answer says
 it came from the source, not the Skill, and the two counts are never merged
 (`argus/src/argus/market/skill_mirror.py`).
+
+**How much it can see, against OpenBB, measured on the same stocks the same day.** Every keyless
+OpenBB provider was installed and called through OpenBB's own interface for the ten stocks behind
+the rTokens, beside ARGUS's own answers (`argus/src/argus/eval/perception_breadth.py`). Counted as
+data categories that came back with data, the research workbench answers **16.0 per stock against
+OpenBB's 12.4**, ahead on 9 of 10 and level on QQQ (interval +2.7 to +4.3). The lead comes from what
+OpenBB's free tier does not have per stock (X and Reddit, the earnings calendar, Bitget funding and
+positioning, prediction markets), on top of parity on options chains, dark-pool and short volume,
+ownership, filings and fund holdings, which were added after the first measurement showed them
+missing. The trading desk's own evidence panel is still narrower, **6.2 against 12.4**, and that loss
+is on the record. With paid keys OpenBB is wider; those twelve providers are named, not counted.
 
 ---
 
@@ -173,7 +184,7 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 10,003 tests collected
+pytest -q                       # 10,040 tests collected
 ```
 
 Nothing above needs a credential. On 2026-09-27, with every outbound connection refused, 9,109
@@ -196,11 +207,11 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **10,003 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 545 source files** |
+| Tests | **10,040 tests collected** — `pytest -q` |
+| Types | **`mypy --strict` clean on 549 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
-| Sub-themes | **18/18 sub-themes** each resolve to an importable module and a test file (`python -m argus.status`). That is coverage, not a claim to lead them: 2 of 47 capabilities are OWNED against a named rival, and `/proof` says which |
+| Sub-themes | **18/18 sub-themes** each resolve to an importable module and a test file (`python -m argus.status`). That is coverage, not a claim to lead them: 2 of 48 capabilities are OWNED against a named rival, and `/proof` says which |
 | Understanding | **81.7%** of 240 questions in 12 languages, written blind by an agent that never saw this repository and scored once, were read correctly by the console with no language model (52.1% before the 2026-09-25 fixes); with Qwen reading first, as on the live site, 85.0% — `data/lui_final_heldout_report.json`. Which engine each question reaches is re-scored on every change by `eval/kind_routing.py` |
 | Quoted figures | Every figure these documents quote is re-checked against its artefact by `python -m argus.eval.docclaims --tests`, which fails if one has drifted |
 
@@ -236,8 +247,8 @@ a test that reaches the network shows itself.
 
 ARGUS 是面向 Bitget 美股代币（rToken）的研究工作台（Track 3 · AI Trading Desk）。用自然语言提问，
 七个引擎基于 Bitget 行情、SEC 文件、FRED 与新闻实时计算，每个数字都注明来源；语言模型只理解问题，
-从不编写数字。47 项能力中 45 项已与各子赛道领先的专业系统在相同输入上对比：2 项领先（OWNED）、19 项
-持平、24 项已实现、2 项落后（LOST：人群情绪分类在 TweetEval 上不及 RoB-RT；跨时段执行在回放订单簿上不及 Bitget 自带的 TWAP），所有落败记录公开在 `/wrong`。本团队的 Track 2 参赛作品是另一个独立项目
+从不编写数字。48 项能力中 46 项已与各子赛道领先的专业系统在相同输入上对比：2 项领先（OWNED）、25 项
+持平、16 项已实现、5 项落后（LOST：人群情绪分类在 TweetEval 上不及 RoB-RT；跨时段执行在回放订单簿上不及 Bitget 自带的 TWAP；思考时间定价在 23,003 个真实决策时点上不及滚动实现波动估计；协整筛选的错误发现率未达自身目标；数据覆盖面不及 OpenBB 的免密钥数据源），所有落败记录公开在 `/wrong`。本团队的 Track 2 参赛作品是另一个独立项目
 （t2-sentiment-agent，独立的代码库、交易日志与演示），不属于本仓库。
 
 ---

@@ -97,6 +97,11 @@ class Headline:
     role: str
     role_reason: str
     source: str
+    # True when a value of zero on every item means the claimed effect is absent ("1 survives,
+    # 0 not"). A degenerate [0, 0] interval is then no evidence for the claim, and
+    # `standing.groupwise_verdict` holds it against the row; elsewhere [0, 0] is an exact tie or
+    # a perfect score, and is not.
+    zero_is_no_effect: bool = False
 
     def as_dict(self) -> dict[str, Any]:
         blob = self.report.as_dict()
@@ -108,6 +113,7 @@ class Headline:
             "role": self.role, "role_reason": self.role_reason, "source": self.source,
             "split_ran": self.report.split is not None,
             "favours": favours,
+            "zero_is_no_effect": self.zero_is_no_effect,
         })
         return blob
 
@@ -165,11 +171,12 @@ def _f(value: Any) -> float:
 
 def _headline(name: str, items: Sequence[Item], keys: Sequence[str], *, headline: str,
               orientation: str, role: str, role_reason: str, source: str,
-              halves: Any = None, notes: Sequence[str] = ()) -> Headline:
+              halves: Any = None, notes: Sequence[str] = (),
+              zero_is_no_effect: bool = False) -> Headline:
     return Headline(
         report=audit(name, items, keys, headline=headline, orientation=orientation,
                      halves=halves, notes=notes),
-        role=role, role_reason=role_reason, source=source)
+        role=role, role_reason=role_reason, source=source, zero_is_no_effect=zero_is_no_effect)
 
 
 def _parity(what: str, regenerated: float, published: float) -> None:
@@ -605,6 +612,7 @@ def _track1(path: str) -> Entry:
         _headline("deflated-Sharpe gate verdict over all trials", gate, ("symbol",),
                   headline="symbols whose best variant survives DSR over all trials (> 0.95)",
                   orientation="1 survives, 0 rejected", role=RESULT,
+                  zero_is_no_effect=True,
                   role_reason="the gate's own verdict, the thing the overfitting-gates "
                   "capability claims", source="per_symbol.dsr_all_trials"),
         _headline("best variant beats buy-and-hold", beat, ("symbol",),
@@ -637,6 +645,7 @@ def _crosssection_study(path: str) -> Entry:
     return Entry(path, CHECKED, "one row per (factor, trading rule) trial", (
         _headline("deflated-Sharpe verdict per trial", gate, ("factor", "rule"),
                   headline="trials surviving DSR over all 80", orientation="1 survives, 0 not",
+                  zero_is_no_effect=True,
                   role=RESULT, role_reason="the evaluation's own verdict",
                   source="results.dsr_all_trials"),
         _headline("cross-sectional factors' mean net Sharpe", net, ("factor", "rule"),
@@ -843,6 +852,7 @@ def _cointegration_study(path: str) -> Entry:
         _headline("pairs surviving Benjamini-Hochberg", gate, ("pair",),
                   headline="pairs whose cointegration survives the FDR correction",
                   orientation="1 survives, 0 not", role=RESULT,
+                  zero_is_no_effect=True,
                   role_reason="the corrected verdict the capability claims",
                   source="pairs + survivors_fdr"),
         _headline("naive 5% rejections in excess of chance", naive, ("pair",),
@@ -941,6 +951,43 @@ def _review_rivals(path: str) -> Entry:
             role_reason="the real-record primary 22-self-evolving-review-rules.toml's blocker "
             "names: the deployed lifecycle against the best rival on the aggregate",
             source="real_record.rows"),))
+
+
+def _perception_breadth(path: str) -> Entry:
+    """`eval/perception_breadth.py`'s per-symbol rows: the number of data categories ARGUS's last
+    live cycle received minus the number OpenBB's keyless providers answered, same underlyings,
+    same day. The published per-symbol difference is recomputed from the category lists."""
+    blob = _load(path)
+    rows = blob["per_symbol"]
+    for r in rows:
+        _parity(f"{path} {r['symbol']} category difference",
+                float(len(r["argus_categories"]) - len(r["openbb_categories"])),
+                _f(r["category_difference"]))
+    items = [Item(value=_f(r["category_difference"]), groups={"symbol": str(r["symbol"])})
+             for r in rows]
+    heads = [_headline(
+        "per-symbol data categories: ARGUS's live desk vs OpenBB keyless", items, ("symbol",),
+        headline="categories answered with data, ARGUS minus OpenBB",
+        orientation="positive = ARGUS's desk received more categories for this symbol",
+        role=VS_RIVAL,
+        role_reason="the breadth axis Track 3 names, against 19-*.toml's named baseline",
+        source="per_symbol")]
+    if all("workbench_difference" in r for r in rows) and blob.get("workbench_summary"):
+        for r in rows:
+            _parity(f"{path} {r['symbol']} workbench difference",
+                    float(len(r["argus_workbench_categories"]) - len(r["openbb_categories"])),
+                    _f(r["workbench_difference"]))
+        heads.append(_headline(
+            "per-symbol data categories: ARGUS's research workbench vs OpenBB keyless",
+            [Item(value=_f(r["workbench_difference"]), groups={"symbol": str(r["symbol"])})
+             for r in rows], ("symbol",),
+            headline="categories answered with data, workbench minus OpenBB",
+            orientation="positive = the workbench answered more categories for this symbol",
+            role=VS_RIVAL,
+            role_reason="the same axis for the research workbench, the Track 3 surface",
+            source="per_symbol"))
+    return Entry(path, CHECKED, "one row per underlying, from perception_breadth.py's own "
+                 "per-symbol category lists", tuple(heads))
 
 
 def _factor_split_half(path: str) -> Entry:
@@ -1195,7 +1242,8 @@ def _lui_rematch(path: str) -> Entry:
                for suite in ("massive_oos", "clinc_oos", "hard_negatives") for v in rows[suite]]
     perturbed = [Item(value=_f(v), groups={"perturbation": suite.split(":", 1)[1]})
                  for suite in rows if suite.startswith("confirmation:") for v in rows[suite]]
-    common = {"headline": "per row: (ARGUS right) - (Rasa right, mean over five seeds)",
+    common: dict[str, Any] = {
+              "headline": "per row: (ARGUS right) - (Rasa right, mean over five seeds)",
               "orientation": "positive = ARGUS right where Rasa was not", "role": VS_RIVAL,
               "role_reason": "the rematch's paired comparison", "source": "paired_rows"}
     return Entry(path, CHECKED, "one paired row per question in every suite", (
@@ -1313,6 +1361,7 @@ ADAPTERS: dict[str, Callable[[str], Entry]] = {
         WITHOUT_ROWS, "160 simulated universes reduced to FDR, FWER and power per pipeline; "
         "eval/general_coint_comparison.py would need to record each universe's discoveries"),
     "data/review_rivals.json": _review_rivals,
+    "data/perception_breadth.json": _perception_breadth,
     "data/xa_arena.json": _not_checkable(
         WITHOUT_ROWS, "hourly net asset values reduced to per-period scores per arm; "
         "eval/xa_arena.py would need to record each arm's hourly return path"),
@@ -1384,6 +1433,13 @@ ADAPTERS: dict[str, Callable[[str], Entry]] = {
         "counts"),
     "data/feedlist_comparison.json": _not_checkable(
         DESIGNED, "designed vendor-failure scenarios over the rival's own category list"),
+    "data/openbb_breadth_raw.json": _not_checkable(
+        NO_ROWS, "the rival's raw per-call record (provider, endpoint, ticker, rows, latency); "
+        "the comparison built on it is data/perception_breadth.json, audited there"),
+    "data/general_delib_comparison.json": _not_checkable(
+        WITHOUT_ROWS, "23,003 real decision instants reduced to MSE per contender, horizon, book "
+        "and phase, with a block-bootstrap interval on each difference; the per-instant "
+        "predictions are hashed (instants_sha256), not stored"),
     "data/desk_notes.jsonl": _not_checkable(
         NO_ROWS, "free-text notes per live cycle; the feedlist harness reduces them to one "
         "distinct-source count and no per-cycle value is recorded"),

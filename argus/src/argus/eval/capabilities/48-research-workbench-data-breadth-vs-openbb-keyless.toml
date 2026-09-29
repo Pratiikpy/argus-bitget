@@ -1,0 +1,86 @@
+name = "Research workbench data breadth vs. OpenBB's keyless providers"
+subtheme = "t3-datasources"
+modules = [
+    "argus/eval/perception_breadth.py",
+    "argus/lui/research/positioning.py",
+    "argus/lui/research/fundamentals.py",
+    "argus/lui/research/sentiment.py",
+    "argus/market/options.py",
+    "argus/market/darkpool.py",
+    "argus/market/bitget_mcp.py",
+    "argus/market/bitget_positioning.py",
+]
+# Split from 19 (the desk's perception) on 2026-09-29. Track 3's datasource line is about the
+# research workbench a person asks questions of; 19 measures what the trading desk's model reads
+# each cycle. The desk's loss to OpenBB stays on 19 as measured; this row is the workbench, on the
+# same inputs, the same day, the same category mapping.
+state = "implemented"
+baseline = """\
+    OpenBB-finance/OpenBB (commit 3e071fcc) with every keyless provider installed (cboe, finra, \
+    finviz, sec, tmx, yfinance, stockgrid, seeking_alpha, wsj), called through OpenBB's own obb \
+    interface by scripts/pit_runners/openbb_breadth_runner.py"""
+blockers = [
+    """\
+        Measured 2026-09-29 (eval/perception_breadth.py, data/perception_breadth.json): on \
+        the ten rToken underlyings the desk decides on, the workbench's six per-stock \
+        research answers cited data in 16.0 categories per symbol against OpenBB's keyless \
+        12.4 (OpenBB read 2026-09-28 22:20 to 22:36 UTC, the workbench 22:36 to 22:38), \
+        ahead on 9 of 10 symbols and tied on QQQ: +3.6 categories, bootstrap interval [2.7, \
+        4.3] over the ten. The lead is built from categories OpenBB's keyless set does not \
+        serve per stock (social text, the venue's own funding and positioning, prediction \
+        markets, and an upcoming earnings date: both sides score the calendar only for a \
+        future report, and OpenBB's keyless calendars list none of these stocks, TMX's \
+        covering Canadian names and Seeking Alpha's refusing every week asked) on top of \
+        parity on the ones it does; on QQQ OpenBB still answers estimates and a filing \
+        record that the workbench does not. The workbench reached parity on those only after \
+        this round absorbed listed options (Cboe), dark-pool and short volume (FINRA), \
+        company profiles, major holders, dividend history, fund holdings and the SEC filing \
+        record. The category taxonomy is this project's; the full mapping and every cell are \
+        in the artefact so a reader can recount. Twelve keyed OpenBB providers (fmp, \
+        intrinio, polygon, benzinga, tiingo and others) are excluded and named: with a paid \
+        key OpenBB is wider. Effectiveness, whether a category improves an answer, is not \
+        measured, and one day on ten names is not an out-of-sample test.""",
+    """\
+        A defect found by the same work and fixed at the source: Bitget's data service returns \
+        its earnings-calendar and dividend dates one day early (Apple's ex-dates on Sundays, \
+        NVIDIA's report dated the day before its 10-Q), so every earnings countdown and \
+        ex-dividend date the console showed was a day off. market/bitget_mcp.correct_dates moves \
+        the verified fields; insider dates, 13F periods and split record dates were checked and \
+        are not shifted.""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    OpenBB's provider packages read for their credential requirements and per-symbol endpoints, \
+    and every keyless one installed from the clone and run through its own interface"""
+artefact = "data/openbb_breadth_raw.json"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    OpenBB's keyless providers run live on the same twelve tickers: 696 per-symbol calls, \
+    each with its row count, latency and error; the providers that answered and those that \
+    stayed silent are summarised in the comparison's baseline block"""
+artefact = "data/perception_breadth.json"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    the same underlyings, the same day, the same category mapping, for OpenBB, the desk and the \
+    workbench"""
+test = "test_perception_breadth.py::test_the_published_artefact_matches_a_rerun"
+artefact = "data/perception_breadth.json"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    the categories OpenBB answers and the workbench does not are listed per symbol \
+    (only_openbb_vs_workbench), and the keyed providers excluded from the baseline are named"""
+artefact = "data/perception_breadth.json"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = """\
+    the report is recomputed from the saved raw runs and must equal the published one"""
+test = "test_perception_breadth.py::test_the_published_artefact_matches_a_rerun"

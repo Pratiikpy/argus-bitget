@@ -12,11 +12,29 @@ modules = [
 # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
 # proof now needs a groupwise check on the capability's own artefact, and this
 # row's does not pass it. The reason and the route back are its first blocker.
-state = "implemented"
+state = "tied"
 baseline = """\
-    insaneamogh/AutonomousTradeAgents 'Ghost P&L' ledger — found 2026-09-16 by a fresh, \
-    targeted search after the original corpus survey found nothing in the wider corpus"""
+    fd-shifts (c4467aec, Apache-2.0), the general selective-prediction evaluator, run unmodified \
+    on the same leans; and insaneamogh/AutonomousTradeAgents 'Ghost P&L' ledger, found \
+    2026-09-16 by a fresh, targeted search after the original corpus survey found nothing in the \
+    wider corpus"""
 blockers = [
+    """\
+        RE-GRADED 2026-09-29 from IMPLEMENTED to TIED (Activity/28_CAPABILITY_CLOSE_PLAN_2.md \
+        §2) with fd-shifts (c4467aec, Apache-2.0), the general selective-prediction evaluator \
+        the category is built on. The general tool won first: before the adaptation, \
+        observatory.abstention_quality returned the same output for an oracle, a random and an \
+        inverted gate, while fd-shifts ranked all three correctly. eval/abstention_coverage.py \
+        now implements fd-shifts' method, and on the parity fixtures and the live leans \
+        (data/general_abstention_comparison.json) AURC, AUGRC and their optima match fd-shifts \
+        to floating-point error, so on the shared metric the two cannot be told apart by \
+        construction. What ARGUS adds is features, not a same-metric win: losses priced in bps, \
+        a day-clustered interval, and no crash on a ranking where fd-shifts raises on an empty \
+        sequence. The desk itself shows no ranking skill on 470 settled leans (gate skill \
+        -0.024, day interval [-0.103, 0.053]), and the value of abstaining has an unknown sign \
+        (day interval [-30,789, +28,574] bps). The Ghost-ledger defect below remains the \
+        named-rival finding, shown on that project's documented example and a designed sweep \
+        rather than a population.""",
     """\
         RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate \
         (data/groupwise_audit.json): data/abstention_comparison.json holds three designed netting \

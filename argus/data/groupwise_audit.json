@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-28T17:49:21+00:00",
+  "generated_at": "2026-09-28T22:39:29+00:00",
   "method": "Mind2Web metric.py:236-259 (MIT): per-group mean and count, macro average, 0/1/2/3/>3 histogram; read by argus.eval.groupwise into four flags (carried_by_one_group, single_group, macro_disagrees, flips_across_halves)",
   "register_artefacts": [
     "data/abstention_comparison.json",
@@ -34,6 +34,7 @@
     "data/general_abstention_comparison.json",
     "data/general_arb_comparison.json",
     "data/general_coint_comparison.json",
+    "data/general_delib_comparison.json",
     "data/general_grammar_comparison.json",
     "data/general_overfitgates_comparison.json",
     "data/general_rotation_comparison.json",
@@ -48,9 +49,11 @@
     "data/lui_rematch_inputs.json",
     "data/mandate_comparison.json",
     "data/nco_bakeoff.json",
+    "data/openbb_breadth_raw.json",
     "data/overfit_gates.json",
     "data/overnight_comparison.json",
     "data/paper_ledger.jsonl",
+    "data/perception_breadth.json",
     "data/pit_rivals.json",
     "data/profile_divergence.json",
     "data/protocol_commitments.jsonl",
@@ -78,10 +81,10 @@
     "data/xa_arena.json"
   ],
   "counts": {
-    "checked": 52,
+    "checked": 53,
     "designed_cases": 28,
-    "aggregate_without_rows": 15,
-    "no_rows": 4
+    "aggregate_without_rows": 16,
+    "no_rows": 5
   },
   "flagged": [
     {
@@ -210,13 +213,11 @@
       "role": "context",
       "flags": [
         "carried_by_one_group:symbol=COINUSDT",
-        "carried_by_one_group:phase=rth",
-        "flips_across_halves:chronological halves"
+        "carried_by_one_group:phase=rth"
       ],
       "readings": [
-        "COINUSDT carries the headline: without it the other 11 symbol group(s) total -5868.5023, which does not point the same way",
-        "rth carries the headline: without it the other 2 phase group(s) total -5734.4031, which does not point the same way",
-        "chronological halves: the halves disagree \u2014 first 21.621194, second -11.845031 (full 4.971331)"
+        "COINUSDT carries the headline: without it the other 11 symbol group(s) total -4261.8508, which does not point the same way",
+        "rth carries the headline: without it the other 2 phase group(s) total -4527.3782, which does not point the same way"
       ]
     },
     {
@@ -705,7 +706,8 @@
           "role_reason": "the rival's claimed effect, measured; ARGUS's side is the holiday phase existing, a property with no per-session measurement",
           "source": "base_case.blind_long_backtest.sessions",
           "split_ran": true,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -914,7 +916,8 @@
           "role_reason": "a research study",
           "source": "profiles",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -1007,7 +1010,8 @@
           "role_reason": "the comparison's primary",
           "source": "rows[graded]",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -1728,7 +1732,8 @@
           "role_reason": "the corrected verdict the capability claims",
           "source": "pairs + survivors_fdr",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": true
         },
         {
           "name": "naive 5% rejections in excess of chance",
@@ -2455,7 +2460,8 @@
           "role_reason": "the uncorrected selection the correction refuses",
           "source": "pairs.in_sample",
           "split_ran": true,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -2642,7 +2648,8 @@
           "role_reason": "the comparison's primary",
           "source": "per_name",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -2897,7 +2904,8 @@
           "role_reason": "the pre-registered primary",
           "source": "rows",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         },
         {
           "name": "post-trade beta: ARGUS vs beta = 1",
@@ -3144,7 +3152,8 @@
           "role_reason": "the naive floor the register records ARGUS does not beat significantly",
           "source": "rows",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -3339,7 +3348,8 @@
           "role_reason": "the preregistered primary and its Entropy Pooling sibling",
           "source": "per_day",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         },
         {
           "name": "stress-move error: ARGUS's open-hours beta vs skfolio_ep",
@@ -3526,7 +3536,8 @@
           "role_reason": "the preregistered primary and its Entropy Pooling sibling",
           "source": "per_day",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -3797,7 +3808,8 @@
           "role_reason": "the evaluation's own verdict",
           "source": "results.dsr_all_trials",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": true
         },
         {
           "name": "cross-sectional factors' mean net Sharpe",
@@ -4064,7 +4076,8 @@
           "role_reason": "the factors the evaluation judges",
           "source": "results.mean_net_sharpe",
           "split_ran": true,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -4078,7 +4091,7 @@
     "data/desk_notes.jsonl": {
       "status": "no_rows",
       "reason": "free-text notes per live cycle; the feedlist harness reduces them to one distinct-source count and no per-cycle value is recorded",
-      "sha256": "fb21e6beaf0ddb4e69751244a324cc448e1e63199b30d7905a305ea283334076",
+      "sha256": "a602b63a7d77f4ec98373e428942c0710cde354a747926ba7cdc00034dd24a23",
       "flagged": false,
       "headlines": []
     },
@@ -4189,7 +4202,8 @@
           "role_reason": "ARGUS's own answers over five issuers' filings",
           "source": "answers[answerable]",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -4347,7 +4361,8 @@
           "role_reason": "the reproduction over the real anchor universe",
           "source": "baseline_reproduced.results",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -4584,7 +4599,8 @@
           "role_reason": "a research study",
           "source": "reactions",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -4839,7 +4855,8 @@
           "role_reason": "the out-of-sample trades the gate declined and the rival took",
           "source": "walk_forward.test_trades.no_gate_follow",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         },
         {
           "name": "ARGUS's significance gate (no trade taken) vs ballast_pooled_t",
@@ -5046,7 +5063,8 @@
           "role_reason": "the out-of-sample trades the gate declined and the rival took",
           "source": "walk_forward.test_trades.ballast_pooled_t",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -5229,7 +5247,8 @@
           "role_reason": "the schedule the console now prints against Bitget's own TWAP",
           "source": "by_size",
           "split_ran": false,
-          "favours": "rival"
+          "favours": "rival",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -5312,7 +5331,8 @@
           "role_reason": "the funding-aware routing property on real legs",
           "source": "leg_pair_sweep.results",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -5405,7 +5425,8 @@
           "role_reason": "the measured divergence the capability reports",
           "source": "oos_check",
           "split_ran": true,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -5692,7 +5713,8 @@
           "role_reason": "the factor library the discovery agent searches",
           "source": "libraries[].factors[].split_half",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -5848,7 +5870,8 @@
           "role_reason": "MetaPM.decide's invariance under a meaning-preserving edit",
           "source": "cells",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -6400,7 +6423,8 @@
           "role_reason": "the engine's answers; abstentions are not scored here",
           "source": "answers",
           "split_ran": true,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -6480,7 +6504,8 @@
           "role_reason": "a research study",
           "source": "by_phase",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -7401,7 +7426,8 @@
           "role_reason": "the general-purpose rival on the same books",
           "source": "per_snapshot",
           "split_ran": true,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         },
         {
           "name": "the deployed decomposition against the truth",
@@ -8300,7 +8326,8 @@
           "role_reason": "what the desk runs, which the artefact records false accepts for",
           "source": "per_snapshot",
           "split_ran": true,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -8308,6 +8335,13 @@
       "status": "aggregate_without_rows",
       "reason": "160 simulated universes reduced to FDR, FWER and power per pipeline; eval/general_coint_comparison.py would need to record each universe's discoveries",
       "sha256": "e3ad80222016741c5325196e2f31f1d9105f6747bf5cd3d4ec7634e347200259",
+      "flagged": false,
+      "headlines": []
+    },
+    "data/general_delib_comparison.json": {
+      "status": "aggregate_without_rows",
+      "reason": "23,003 real decision instants reduced to MSE per contender, horizon, book and phase, with a block-bootstrap interval on each difference; the per-instant predictions are hashed (instants_sha256), not stored",
+      "sha256": "556c02e19125d2bba928e43b7fb694a15a610f763ea08017736fa255c00da206",
       "flagged": false,
       "headlines": []
     },
@@ -8479,7 +8513,8 @@
           "role_reason": "the general-purpose rival on the same filings",
           "source": "alignment.anchor_detail",
           "split_ran": false,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -8552,7 +8587,8 @@
           "role_reason": "the real-market half of the parity claim",
           "source": "swept_real_market_cases",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -8683,7 +8719,8 @@
           "role_reason": "ARGUS's own resolution on live SEC XBRL",
           "source": "designed_cases.cases",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -8874,7 +8911,8 @@
           "role_reason": "the preregistered sealed comparison",
           "source": "sealed_rows()",
           "split_ran": false,
-          "favours": "rival"
+          "favours": "rival",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -9058,7 +9096,8 @@
           "role_reason": "the rematch's paired comparison",
           "source": "paired_rows",
           "split_ran": false,
-          "favours": "rival"
+          "favours": "rival",
+          "zero_is_no_effect": false
         },
         {
           "name": "ARGUS's cascade vs Rasa's default pipeline, out of scope",
@@ -9143,7 +9182,8 @@
           "role_reason": "the rematch's paired comparison",
           "source": "paired_rows",
           "split_ran": false,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         },
         {
           "name": "ARGUS's cascade vs Rasa's default pipeline, perturbed held-out",
@@ -9266,7 +9306,8 @@
           "role_reason": "the rematch's paired comparison",
           "source": "paired_rows",
           "split_ran": false,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -9386,7 +9427,8 @@
           "role_reason": "the bake-off's decisive comparison, picked on the selection period",
           "source": "holdout.results.*.oos_vol_bps",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         },
         {
           "name": "held-out volatility: ARGUS's pick vs riskfolio_minvar[hist]",
@@ -9470,7 +9512,8 @@
           "role_reason": "the bake-off's decisive comparison, picked on the selection period",
           "source": "holdout.results.*.oos_vol_bps",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         },
         {
           "name": "held-out volatility: ARGUS's pick vs skfolio_nco[default]",
@@ -9554,7 +9597,8 @@
           "role_reason": "the bake-off's decisive comparison, picked on the selection period",
           "source": "holdout.results.*.oos_vol_bps",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         },
         {
           "name": "held-out volatility: ARGUS's pick vs skfolio_nco[cv=ignore]",
@@ -9641,9 +9685,17 @@
           "role_reason": "the bake-off's decisive comparison, picked on the selection period",
           "source": "holdout.results.*.oos_vol_bps",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         }
       ]
+    },
+    "data/openbb_breadth_raw.json": {
+      "status": "no_rows",
+      "reason": "the rival's raw per-call record (provider, endpoint, ticker, rows, latency); the comparison built on it is data/perception_breadth.json, audited there",
+      "sha256": "04897efe8ff28fbf454565cefde084ddb870a16c26b1a433efb1f6f02bd80163",
+      "flagged": false,
+      "headlines": []
     },
     "data/overfit_gates.json": {
       "status": "checked",
@@ -9817,7 +9869,8 @@
           "role_reason": "the gates' own verdicts on real market data",
           "source": "detail",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -10271,7 +10324,8 @@
           "role_reason": "a research study",
           "source": "grid.rows",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -11576,7 +11630,8 @@
           "role_reason": "the comparison's primary: the perpetual-implied open against gloaming's best variant on the same nights",
           "source": "regenerated: overnight_comparison.predict(nights(h2h_gloaming/inputs.json)), fitted rows; MAE of argus_perp, the best gloaming variant and zero reproduce the artefact's summary to the published two decimals",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         },
         {
           "name": "overnight gap: ARGUS vs no gap",
@@ -12873,40 +12928,40 @@
           "role_reason": "the comparison's floor",
           "source": "regenerated: overnight_comparison.predict(nights(h2h_gloaming/inputs.json)), fitted rows; MAE of argus_perp, the best gloaming variant and zero reproduce the artefact's summary to the published two decimals",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         }
       ]
     },
     "data/paper_ledger.jsonl": {
       "status": "checked",
       "reason": "one row per graded abstention on the live paper ledger",
-      "sha256": "f4b9c6e5ee046992b6b3e367a2ad2aaa041ae494499edd1a661c96f73fb98494",
+      "sha256": "e6b3e8246ad5e8883090bc401891da91af7cc079ad9d837adaf06050316ef476",
       "flagged": true,
       "headlines": [
         {
           "name": "value of standing aside",
           "headline": "abstention value, bps net of the fee never paid (observatory.AbstentionOutcome.value_bps via scorecard.score_ledger)",
           "orientation": "positive = the abstention avoided a loss",
-          "items": 603,
-          "micro_mean": 4.971331,
-          "total": 2997.7124,
+          "items": 626,
+          "micro_mean": 6.716833,
+          "total": 4204.7373,
           "broken_down": true,
           "flags": [
             "carried_by_one_group:symbol=COINUSDT",
-            "carried_by_one_group:phase=rth",
-            "flips_across_halves:chronological halves"
+            "carried_by_one_group:phase=rth"
           ],
           "flagged": true,
           "tables": [
             {
               "key": "symbol",
               "groups": 12,
-              "micro_mean": 4.971331,
-              "macro_mean": 4.097154,
+              "micro_mean": 6.716833,
+              "macro_mean": 6.510545,
               "direction": 1,
               "largest_contributor": "COINUSDT",
-              "largest_share_of_total": 2.9577,
-              "total_without_largest": -5868.5023,
+              "largest_share_of_total": 2.0136,
+              "total_without_largest": -4261.8508,
               "loss_histogram": {
                 "0": 0.0,
                 "1": 0.0,
@@ -12917,139 +12972,139 @@
               "carried_by_one_group": true,
               "single_group": false,
               "macro_disagrees": false,
-              "reading": "COINUSDT carries the headline: without it the other 11 symbol group(s) total -5868.5023, which does not point the same way",
+              "reading": "COINUSDT carries the headline: without it the other 11 symbol group(s) total -4261.8508, which does not point the same way",
               "per_group": [
                 {
                   "group": "COINUSDT",
-                  "rows": 51,
-                  "weight": 51.0,
-                  "total": 8866.2147,
-                  "mean": 173.847347,
-                  "mean_se": 77.180293,
-                  "share_of_total": 2.9577,
-                  "opposing": 18
+                  "rows": 53,
+                  "weight": 53.0,
+                  "total": 8466.5881,
+                  "mean": 159.746945,
+                  "mean_se": 74.893666,
+                  "share_of_total": 2.0136,
+                  "opposing": 20
                 },
                 {
                   "group": "MSFTUSDT",
-                  "rows": 54,
-                  "weight": 54.0,
-                  "total": 2158.6073,
-                  "mean": 39.974209,
-                  "mean_se": 22.122889,
-                  "share_of_total": 0.7201,
+                  "rows": 56,
+                  "weight": 56.0,
+                  "total": 2520.9818,
+                  "mean": 45.017532,
+                  "mean_se": 21.616374,
+                  "share_of_total": 0.5996,
                   "opposing": 15
                 },
                 {
                   "group": "AMZNUSDT",
-                  "rows": 53,
-                  "weight": 53.0,
-                  "total": 1237.4401,
-                  "mean": 23.347926,
-                  "mean_se": 19.091195,
-                  "share_of_total": 0.4128,
+                  "rows": 55,
+                  "weight": 55.0,
+                  "total": 1561.541,
+                  "mean": 28.391655,
+                  "mean_se": 18.727315,
+                  "share_of_total": 0.3714,
                   "opposing": 24
                 },
                 {
-                  "group": "TSLAUSDT",
+                  "group": "GOOGLUSDT",
                   "rows": 55,
                   "weight": 55.0,
-                  "total": 934.3431,
-                  "mean": 16.988056,
-                  "mean_se": 20.132012,
-                  "share_of_total": 0.3117,
-                  "opposing": 23
-                },
-                {
-                  "group": "GOOGLUSDT",
-                  "rows": 53,
-                  "weight": 53.0,
-                  "total": 878.7753,
-                  "mean": 16.580666,
-                  "mean_se": 24.307738,
-                  "share_of_total": 0.2931,
+                  "total": 1022.6682,
+                  "mean": 18.593967,
+                  "mean_se": 23.458788,
+                  "share_of_total": 0.2432,
                   "opposing": 22
                 },
                 {
+                  "group": "TSLAUSDT",
+                  "rows": 57,
+                  "weight": 57.0,
+                  "total": 959.3689,
+                  "mean": 16.831033,
+                  "mean_se": 21.990578,
+                  "share_of_total": 0.2282,
+                  "opposing": 24
+                },
+                {
                   "group": "SQQQUSDT",
-                  "rows": 31,
-                  "weight": 31.0,
-                  "total": 464.9627,
-                  "mean": 14.998797,
-                  "mean_se": 63.716765,
-                  "share_of_total": 0.1551,
+                  "rows": 32,
+                  "weight": 32.0,
+                  "total": 811.3812,
+                  "mean": 25.355663,
+                  "mean_se": 62.556788,
+                  "share_of_total": 0.193,
                   "opposing": 14
                 },
                 {
                   "group": "AAPLUSDT",
-                  "rows": 55,
-                  "weight": 55.0,
-                  "total": 379.8205,
-                  "mean": 6.905827,
-                  "mean_se": 12.385257,
+                  "rows": 57,
+                  "weight": 57.0,
+                  "total": 532.6859,
+                  "mean": 9.345367,
+                  "mean_se": 12.068528,
                   "share_of_total": 0.1267,
                   "opposing": 23
                 },
                 {
                   "group": "QQQUSDT",
-                  "rows": 48,
-                  "weight": 48.0,
-                  "total": -530.107,
-                  "mean": -11.043896,
-                  "mean_se": 13.916823,
-                  "share_of_total": -0.1768,
+                  "rows": 50,
+                  "weight": 50.0,
+                  "total": -258.1651,
+                  "mean": -5.163302,
+                  "mean_se": 13.974365,
+                  "share_of_total": -0.0614,
                   "opposing": 21
                 },
                 {
                   "group": "NVDAUSDT",
-                  "rows": 56,
-                  "weight": 56.0,
-                  "total": -1719.9067,
-                  "mean": -30.71262,
-                  "mean_se": 19.515973,
-                  "share_of_total": -0.5737,
-                  "opposing": 33
-                },
-                {
-                  "group": "METAUSDT",
-                  "rows": 55,
-                  "weight": 55.0,
-                  "total": -2711.5482,
-                  "mean": -49.300876,
-                  "mean_se": 40.921401,
-                  "share_of_total": -0.9045,
-                  "opposing": 28
+                  "rows": 58,
+                  "weight": 58.0,
+                  "total": -1971.6655,
+                  "mean": -33.994233,
+                  "mean_se": 18.978043,
+                  "share_of_total": -0.4689,
+                  "opposing": 35
                 },
                 {
                   "group": "TQQQUSDT",
-                  "rows": 41,
-                  "weight": 41.0,
-                  "total": -3331.2895,
-                  "mean": -81.250963,
-                  "mean_se": 48.279763,
-                  "share_of_total": -1.1113,
+                  "rows": 43,
+                  "weight": 43.0,
+                  "total": -2601.9145,
+                  "mean": -60.50964,
+                  "mean_se": 48.23586,
+                  "share_of_total": -0.6188,
                   "opposing": 20
                 },
                 {
+                  "group": "METAUSDT",
+                  "rows": 57,
+                  "weight": 57.0,
+                  "total": -2676.7939,
+                  "mean": -46.961296,
+                  "mean_se": 40.819631,
+                  "share_of_total": -0.6366,
+                  "opposing": 29
+                },
+                {
                   "group": "MSTRUSDT",
-                  "rows": 51,
-                  "weight": 51.0,
-                  "total": -3629.5999,
-                  "mean": -71.168625,
-                  "mean_se": 83.290659,
-                  "share_of_total": -1.2108,
-                  "opposing": 25
+                  "rows": 53,
+                  "weight": 53.0,
+                  "total": -4161.9388,
+                  "mean": -78.527147,
+                  "mean_se": 80.286853,
+                  "share_of_total": -0.9898,
+                  "opposing": 27
                 }
               ]
             },
             {
               "key": "phase",
               "groups": 3,
-              "micro_mean": 4.971331,
-              "macro_mean": 37.126973,
+              "micro_mean": 6.716833,
+              "macro_mean": 40.31543,
               "direction": 1,
               "largest_contributor": "rth",
-              "largest_share_of_total": 2.9129,
-              "total_without_largest": -5734.4031,
+              "largest_share_of_total": 2.0767,
+              "total_without_largest": -4527.3782,
               "loss_histogram": {
                 "0": 0.3333,
                 "1": 0.0,
@@ -13060,7 +13115,7 @@
               "carried_by_one_group": true,
               "single_group": false,
               "macro_disagrees": false,
-              "reading": "rth carries the headline: without it the other 2 phase group(s) total -5734.4031, which does not point the same way",
+              "reading": "rth carries the headline: without it the other 2 phase group(s) total -4527.3782, which does not point the same way",
               "per_group": [
                 {
                   "group": "rth",
@@ -13069,7 +13124,7 @@
                   "total": 8732.1155,
                   "mean": 20.741367,
                   "mean_se": 14.825707,
-                  "share_of_total": 2.9129,
+                  "share_of_total": 2.0767,
                   "opposing": 200
                 },
                 {
@@ -13079,42 +13134,42 @@
                   "total": 123.0009,
                   "mean": 123.0009,
                   "mean_se": null,
-                  "share_of_total": 0.041,
+                  "share_of_total": 0.0293,
                   "opposing": 0
                 },
                 {
                   "group": "weekend",
-                  "rows": 181,
-                  "weight": 181.0,
-                  "total": -5857.404,
-                  "mean": -32.361348,
-                  "mean_se": 22.106428,
-                  "share_of_total": -1.954,
-                  "opposing": 66
+                  "rows": 204,
+                  "weight": 204.0,
+                  "total": -4650.3791,
+                  "mean": -22.795976,
+                  "mean_se": 20.55747,
+                  "share_of_total": -1.106,
+                  "opposing": 74
                 }
               ]
             }
           ],
           "split_half": {
             "label": "chronological halves",
-            "cut": "2026-09-20T17:40:42.163742+00:00",
-            "first_items": 303,
-            "second_items": 300,
-            "first_mean": 21.621194,
-            "second_mean": -11.845031,
-            "full_mean": 4.971331,
-            "flips_across_halves": true,
+            "cut": "2026-09-20T19:41:14.160382+00:00",
+            "first_items": 315,
+            "second_items": 311,
+            "first_mean": 10.949586,
+            "second_mean": 2.429639,
+            "full_mean": 6.716833,
+            "flips_across_halves": false,
             "contradicts_full_sample": false,
-            "reading": "chronological halves: the halves disagree \u2014 first 21.621194, second -11.845031 (full 4.971331)"
+            "reading": "chronological halves: both halves point the same way as the full sample \u2014 first 10.949586, second 2.429639, full 6.716833"
           },
           "split_half_note": "",
           "notes": [],
           "interval": {
-            "low": -45.330896,
-            "high": 46.351071,
+            "low": -42.896277,
+            "high": 47.371945,
             "method": "stationary bootstrap over order values",
-            "units": 58,
-            "block_length": 3.759,
+            "units": 60,
+            "block_length": 3.801,
             "spans_zero": true,
             "resamples": 2000
           },
@@ -13122,7 +13177,8 @@
           "role_reason": "the desk's abstention record; the capability claims the scoring is honest, not that abstaining paid",
           "source": "paper_ledger.jsonl",
           "split_ran": true,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -13348,7 +13404,324 @@
           "role_reason": "a research study",
           "source": "trades",
           "split_ran": true,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
+        }
+      ]
+    },
+    "data/perception_breadth.json": {
+      "status": "checked",
+      "reason": "one row per underlying, from perception_breadth.py's own per-symbol category lists",
+      "sha256": "b4b22e713a1623bc8f53944585bd72a3871121e3a15cf59666cfd41dbf73c747",
+      "flagged": false,
+      "headlines": [
+        {
+          "name": "per-symbol data categories: ARGUS's live desk vs OpenBB keyless",
+          "headline": "categories answered with data, ARGUS minus OpenBB",
+          "orientation": "positive = ARGUS's desk received more categories for this symbol",
+          "items": 10,
+          "micro_mean": -6.2,
+          "total": -62.0,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "symbol",
+              "groups": 10,
+              "micro_mean": -6.2,
+              "macro_mean": -6.2,
+              "direction": -1,
+              "largest_contributor": "AAPL",
+              "largest_share_of_total": 0.1129,
+              "total_without_largest": -55.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single symbol carries the headline: without the largest contributor (AAPL, 11.3% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "AAPL",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": -7.0,
+                  "mean": -7.0,
+                  "mean_se": null,
+                  "share_of_total": 0.1129,
+                  "opposing": 0
+                },
+                {
+                  "group": "GOOGL",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": -7.0,
+                  "mean": -7.0,
+                  "mean_se": null,
+                  "share_of_total": 0.1129,
+                  "opposing": 0
+                },
+                {
+                  "group": "META",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": -7.0,
+                  "mean": -7.0,
+                  "mean_se": null,
+                  "share_of_total": 0.1129,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSFT",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": -7.0,
+                  "mean": -7.0,
+                  "mean_se": null,
+                  "share_of_total": 0.1129,
+                  "opposing": 0
+                },
+                {
+                  "group": "QQQ",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": -7.0,
+                  "mean": -7.0,
+                  "mean_se": null,
+                  "share_of_total": 0.1129,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMZN",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": -6.0,
+                  "mean": -6.0,
+                  "mean_se": null,
+                  "share_of_total": 0.0968,
+                  "opposing": 0
+                },
+                {
+                  "group": "COIN",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": -6.0,
+                  "mean": -6.0,
+                  "mean_se": null,
+                  "share_of_total": 0.0968,
+                  "opposing": 0
+                },
+                {
+                  "group": "NVDA",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": -6.0,
+                  "mean": -6.0,
+                  "mean_se": null,
+                  "share_of_total": 0.0968,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSLA",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": -5.0,
+                  "mean": -5.0,
+                  "mean_se": null,
+                  "share_of_total": 0.0806,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSTR",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": -4.0,
+                  "mean": -4.0,
+                  "mean_se": null,
+                  "share_of_total": 0.0645,
+                  "opposing": 0
+                }
+              ]
+            }
+          ],
+          "split_half": null,
+          "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
+          "notes": [],
+          "interval": {
+            "low": -6.8,
+            "high": -5.5,
+            "method": "bootstrap over rows (no order recorded)",
+            "units": 10,
+            "block_length": 1.0,
+            "spans_zero": false,
+            "resamples": 2000
+          },
+          "role": "argus_vs_rival",
+          "role_reason": "the breadth axis Track 3 names, against 19-*.toml's named baseline",
+          "source": "per_symbol",
+          "split_ran": false,
+          "favours": "rival",
+          "zero_is_no_effect": false
+        },
+        {
+          "name": "per-symbol data categories: ARGUS's research workbench vs OpenBB keyless",
+          "headline": "categories answered with data, workbench minus OpenBB",
+          "orientation": "positive = the workbench answered more categories for this symbol",
+          "items": 10,
+          "micro_mean": 3.6,
+          "total": 36.0,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "symbol",
+              "groups": 10,
+              "micro_mean": 3.6,
+              "macro_mean": 3.6,
+              "direction": 1,
+              "largest_contributor": "MSTR",
+              "largest_share_of_total": 0.1389,
+              "total_without_largest": 31.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single symbol carries the headline: without the largest contributor (MSTR, 13.9% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "MSTR",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 5.0,
+                  "mean": 5.0,
+                  "mean_se": null,
+                  "share_of_total": 0.1389,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSLA",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 5.0,
+                  "mean": 5.0,
+                  "mean_se": null,
+                  "share_of_total": 0.1389,
+                  "opposing": 0
+                },
+                {
+                  "group": "AAPL",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 4.0,
+                  "mean": 4.0,
+                  "mean_se": null,
+                  "share_of_total": 0.1111,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMZN",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 4.0,
+                  "mean": 4.0,
+                  "mean_se": null,
+                  "share_of_total": 0.1111,
+                  "opposing": 0
+                },
+                {
+                  "group": "COIN",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 4.0,
+                  "mean": 4.0,
+                  "mean_se": null,
+                  "share_of_total": 0.1111,
+                  "opposing": 0
+                },
+                {
+                  "group": "GOOGL",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 4.0,
+                  "mean": 4.0,
+                  "mean_se": null,
+                  "share_of_total": 0.1111,
+                  "opposing": 0
+                },
+                {
+                  "group": "META",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 4.0,
+                  "mean": 4.0,
+                  "mean_se": null,
+                  "share_of_total": 0.1111,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSFT",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 3.0,
+                  "mean": 3.0,
+                  "mean_se": null,
+                  "share_of_total": 0.0833,
+                  "opposing": 0
+                },
+                {
+                  "group": "NVDA",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 3.0,
+                  "mean": 3.0,
+                  "mean_se": null,
+                  "share_of_total": 0.0833,
+                  "opposing": 0
+                },
+                {
+                  "group": "QQQ",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": null,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                }
+              ]
+            }
+          ],
+          "split_half": null,
+          "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
+          "notes": [],
+          "interval": {
+            "low": 2.7,
+            "high": 4.3,
+            "method": "bootstrap over rows (no order recorded)",
+            "units": 10,
+            "block_length": 1.0,
+            "spans_zero": false,
+            "resamples": 2000
+          },
+          "role": "argus_vs_rival",
+          "role_reason": "the same axis for the research workbench, the Track 3 surface",
+          "source": "per_symbol",
+          "split_ran": false,
+          "favours": "argus",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -13504,7 +13877,8 @@
           "role_reason": "MetaPM.decide's invariance under a meaning-preserving edit",
           "source": "cells",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -13719,7 +14093,8 @@
           "role_reason": "the gate's own answer on every question",
           "source": "rows_argus",
           "split_ran": true,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         },
         {
           "name": "ARGUS vs vibe_trading_pit on the same questions",
@@ -13926,7 +14301,8 @@
           "role_reason": "the rival scored from its own output on the same questions",
           "source": "rows_rivals.vibe_trading_pit",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         },
         {
           "name": "ARGUS vs vibe_trading_research on the same questions",
@@ -14133,7 +14509,8 @@
           "role_reason": "the rival scored from its own output on the same questions",
           "source": "rows_rivals.vibe_trading_research",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         },
         {
           "name": "ARGUS vs openbb_pit on the same questions",
@@ -14320,7 +14697,8 @@
           "role_reason": "the rival scored from its own output on the same questions",
           "source": "rows_rivals.openbb_pit",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         },
         {
           "name": "ARGUS vs openbb_default on the same questions",
@@ -14507,7 +14885,8 @@
           "role_reason": "the rival scored from its own output on the same questions",
           "source": "rows_rivals.openbb_default",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         },
         {
           "name": "ARGUS vs langalpha_yfinance on the same questions",
@@ -14714,7 +15093,8 @@
           "role_reason": "the rival scored from its own output on the same questions",
           "source": "rows_rivals.langalpha_yfinance",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         },
         {
           "name": "ARGUS vs openalice_yfinance on the same questions",
@@ -14921,7 +15301,8 @@
           "role_reason": "the rival scored from its own output on the same questions",
           "source": "rows_rivals.openalice_yfinance",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         },
         {
           "name": "ARGUS vs qlib_pit on the same questions",
@@ -15128,7 +15509,8 @@
           "role_reason": "the rival scored from its own output on the same questions",
           "source": "rows_rivals.qlib_pit",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         },
         {
           "name": "ARGUS vs edgartools_asof on the same questions",
@@ -15335,7 +15717,8 @@
           "role_reason": "the rival scored from its own output on the same questions",
           "source": "rows_rivals.edgartools_asof",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -15525,7 +15908,8 @@
           "role_reason": "the measured effect of the mandate over real frames",
           "source": "by_symbol",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         },
         {
           "name": "profiles diverge, by rung",
@@ -15632,7 +16016,8 @@
           "role_reason": "the same effect by the dimension the register names as its source",
           "source": "rungs",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -15753,7 +16138,8 @@
           "role_reason": "the comparison's primary",
           "source": "out_of_sample",
           "split_ran": true,
-          "favours": "rival"
+          "favours": "rival",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -15774,7 +16160,7 @@
     "data/refusal_alpha.json": {
       "status": "aggregate_without_rows",
       "reason": "per-horizon aggregates bootstrapped over decision cycles; per-mark rows are not kept",
-      "sha256": "5bcaf8372211dbadce8944534237fd532a793c093485ab60620720ff3a266c55",
+      "sha256": "aaca94eca23b307f9b82d6e2177658a5f0f8221958047603f04ad087bc381e88",
       "flagged": false,
       "headlines": []
     },
@@ -15877,7 +16263,8 @@
           "role_reason": "the tool that moved the capability to TIED",
           "source": "trials",
           "split_ran": false,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         },
         {
           "name": "boundaries: FLUSS vs ruptures",
@@ -15970,7 +16357,8 @@
           "role_reason": "ARGUS's original segmenter, the recorded loss",
           "source": "trials",
           "split_ran": false,
-          "favours": "rival"
+          "favours": "rival",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -16087,7 +16475,8 @@
           "role_reason": "the review's out-of-sample result",
           "source": "detail",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -16321,7 +16710,8 @@
           "role_reason": "the real-record primary 22-self-evolving-review-rules.toml's blocker names: the deployed lifecycle against the best rival on the aggregate",
           "source": "real_record.rows",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -16463,7 +16853,8 @@
           "role_reason": "the decomposable form of the published precision-at-full-recall comparison",
           "source": "regenerated: risk_layer_comparison._combined_book_checkpoints(frozen=True); ARGUS precision and every freqtrade curve point reproduce measurement_architecture to four decimals",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -16711,7 +17102,8 @@
           "role_reason": "the parity-and-refusal claim over real instruments",
           "source": "baseline_reproduced.results + oos_wider_universe.results",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -16796,7 +17188,8 @@
           "role_reason": "the rule-proposal experiment (not yet a capability row's claim)",
           "source": "checklist_comparison.induction_all_pairs",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         },
         {
           "name": "hand-written rules on the held-out half",
@@ -16861,7 +17254,8 @@
           "role_reason": "the standing checklist, same record",
           "source": "checklist_comparison.hand_written",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -17053,7 +17447,8 @@
           "role_reason": "the comparison's out-of-sample result",
           "source": "out_of_sample",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -17191,7 +17586,8 @@
           "role_reason": "a research bake-off",
           "source": "results",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -17455,7 +17851,8 @@
           "role_reason": "the adversarial comparison",
           "source": "narratives",
           "split_ran": false,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         },
         {
           "name": "corroborated events: ARGUS vs finBERT",
@@ -17530,7 +17927,8 @@
           "role_reason": "the refusal-is-not-blanket control",
           "source": "truth_cases",
           "split_ran": false,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -17732,7 +18130,8 @@
           "role_reason": "the desk's shadow record",
           "source": "calls[scored]",
           "split_ran": true,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -17746,7 +18145,7 @@
     "data/skill_matrix.json": {
       "status": "checked",
       "reason": "one row per tool",
-      "sha256": "aa814650cdb445e391e7a0ffb006be167416a25e5677965ffe7bf6a6fe38bec9",
+      "sha256": "8504c5ce4fbe7a8c9b15f87beb86246285e0051b899c05aed010c6c0902bc69f",
       "flagged": false,
       "headlines": [
         {
@@ -17953,7 +18352,8 @@
           "role_reason": "the upstream services' reliability",
           "source": "rows",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -18074,7 +18474,8 @@
           "role_reason": "the upstream service's reliability, not ARGUS's",
           "source": "results",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -18189,7 +18590,8 @@
           "role_reason": "the comparison's only metric",
           "source": "rows",
           "split_ran": false,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -18425,7 +18827,8 @@
           "role_reason": "the comparison's primary",
           "source": "calibration.rows",
           "split_ran": false,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -18606,7 +19009,8 @@
           "role_reason": "the gate's own verdict, the thing the overfitting-gates capability claims",
           "source": "per_symbol.dsr_all_trials",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": true
         },
         {
           "name": "best variant beats buy-and-hold",
@@ -18779,7 +19183,8 @@
           "role_reason": "the strategies the gate judges, not the gate",
           "source": "per_symbol",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         },
         {
           "name": "best variant's net Sharpe, in and out of sample",
@@ -18963,7 +19368,8 @@
           "role_reason": "the strategies the gate judges",
           "source": "per_symbol.out_of_sample_decay",
           "split_ran": true,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -19119,7 +19525,8 @@
           "role_reason": "MetaPM.decide's invariance under a meaning-preserving edit",
           "source": "cells",
           "split_ran": false,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -19409,7 +19816,8 @@
           "role_reason": "nocturne's best model on its own question",
           "source": "regenerated: void_comparison.predictions() (nocturne's own walk-forward from its clone); ARGUS, MF and M0 MAE reproduce the artefact's summary",
           "split_ran": true,
-          "favours": "rival"
+          "favours": "rival",
+          "zero_is_no_effect": false
         },
         {
           "name": "rToken Monday price: ARGUS vs no change",
@@ -19691,7 +20099,8 @@
           "role_reason": "nocturne's floor",
           "source": "regenerated: void_comparison.predictions() (nocturne's own walk-forward from its clone); ARGUS, MF and M0 MAE reproduce the artefact's summary",
           "split_ran": true,
-          "favours": "argus"
+          "favours": "argus",
+          "zero_is_no_effect": false
         }
       ]
     },
@@ -19895,7 +20304,8 @@
           "role_reason": "a research study, not a capability",
           "source": "test_3_per_symbol + test_2_train_test_split",
           "split_ran": true,
-          "favours": "neither"
+          "favours": "neither",
+          "zero_is_no_effect": false
         }
       ]
     },

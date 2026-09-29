@@ -285,6 +285,23 @@ def _json(name: str) -> Any:
     return json.loads((DATA / name).read_text(encoding="utf-8"))
 
 
+def workbench_breadth() -> tuple[Number, Number]:
+    """Data categories per stock: the research workbench, and OpenBB's keyless providers, on the
+    same stocks the same day (eval/perception_breadth.py)."""
+    blob = _json("perception_breadth.json")
+    if not blob.get("workbench_summary"):
+        raise ClaimError("perception_breadth.json carries no workbench run")
+    return (float(blob["workbench_summary"]["mean_workbench_categories"]),
+            float(blob["summary"]["mean_openbb_categories"]))
+
+
+def desk_breadth() -> tuple[Number, Number]:
+    """The same count for the trading desk's evidence panel, against the same OpenBB run."""
+    blob = _json("perception_breadth.json")
+    return (float(blob["summary"]["mean_argus_categories"]),
+            float(blob["summary"]["mean_openbb_categories"]))
+
+
 def _ratio(text: str) -> int:
     """'11/12' -> 11."""
     return int(text.split("/", 1)[0])
@@ -830,6 +847,12 @@ CLAIMS: tuple[Claim, ...] = (
           refusal_accuracy_2h, ("readme", "public-readme")),
     Claim("refusal_forgone_2h", rf"forgave\s+(?P<q>[-{chr(0x2212)}]?[\d.]+)\s*bps of net edge",
           refusal_forgone_2h, ("readme", "public-readme")),
+    Claim("workbench_breadth",
+          r"workbench answers \*\*(?P<q1>[\d.]+) per stock against\s+OpenBB's "
+          r"(?P<q2>[\d.]+)\*\*", workbench_breadth, ("public-readme",)),
+    Claim("desk_breadth",
+          r"evidence panel is still narrower, \*\*(?P<q1>[\d.]+) against (?P<q2>[\d.]+)\*\*",
+          desk_breadth, ("public-readme",)),
     Claim("standing_owned", r"(?P<q1>\d+) of (?P<q2>\d+) capabilities are OWNED",
           standing_counts, ("readme", "public-readme", "submission", "explained",
                             "architecture")),

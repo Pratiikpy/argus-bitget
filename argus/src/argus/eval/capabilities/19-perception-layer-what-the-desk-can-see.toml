@@ -5,6 +5,7 @@ modules = [
     "argus/market/volatility.py",
     "argus/market/macro.py",
     "argus/eval/feedlist_comparison.py",
+    "argus/eval/perception_breadth.py",
     "argus/eval/baselines/tradingagents_feedlist_loader.py",
     "argus/eval/baselines/tradingagents_feedlist_interface.py",
     "argus/eval/baselines/tradingagents_feedlist_errors.py",
@@ -21,9 +22,25 @@ modules = [
 # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
 # proof now needs a groupwise check on the capability's own artefact, and this
 # row's does not pass it. The reason and the route back are its first blocker.
-state = "implemented"
+state = "lost"
 baseline = "OpenBB-finance/OpenBB provider set; TauricResearch/TradingAgents feed list"
 blockers = [
+    """\
+        RE-GRADED 2026-09-29 from IMPLEMENTED to LOST (Activity/28_CAPABILITY_CLOSE_PLAN_2.md \
+        §19) on the breadth axis Track 3 names, against the named baseline, run for the first \
+        time on the same inputs (eval/perception_breadth.py, data/perception_breadth.json). \
+        Every keyless OpenBB provider (cboe, finra, finviz, sec, tmx, yfinance answering; \
+        stockgrid, seeking_alpha and wsj installed but not answering per symbol) was called \
+        through OpenBB's own interface for the same underlyings on 2026-09-28, beside ARGUS's \
+        last live cycle that day. Counted as data categories that returned data, OpenBB answered \
+        12.4 per symbol and ARGUS's desk received 6.2, and OpenBB is ahead on 10 of 10 symbols. \
+        OpenBB has options chains, dark-pool volume, analyst price targets, ownership, dividends \
+        and company profiles that the desk never receives; ARGUS has social text (X and Reddit) \
+        that OpenBB's keyless set does not. ARGUS is read strictly (only evidence the \
+        decision-maker received, so a quiet EDGAR week counts as no filings) and OpenBB \
+        generously (any call returning a row). Twelve keyed OpenBB providers are excluded and \
+        named. Effectiveness, what each feed changes in a decision, is not measured. The route \
+        back is to absorb the keyless categories the desk lacks.""",
     """\
         RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate \
         (data/groupwise_audit.json): data/feedlist_comparison.json holds designed vendor-failure \
@@ -94,6 +111,7 @@ how = """\
     path broken, and an optional-equivalent source with its one path broken — TradingAgents \
     raises on the former, ARGUS returns cleanly on both"""
 test = "test_feedlist_comparison.py::TestCoreVsOptionalCategoryHandling"
+artefact = "data/perception_breadth.json"
 
 [[proofs]]
 condition = "statistically_valid_evaluation"
