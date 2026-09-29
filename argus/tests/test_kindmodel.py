@@ -127,7 +127,7 @@ def test_a_failing_language_model_falls_back_to_the_kind_model(
         def complete_json(self, *args: Any, **kwargs: Any) -> Any:
             raise TimeoutError("rate limited")
 
-    monkeypatch.setattr(server, "_model_for", lambda visitor: _Broken())
+    monkeypatch.setattr(server, "_model_for", lambda visitor, count=True: _Broken())
     # The routing is under test, not the execution plan it reaches: its live reads are refused.
     monkeypatch.setattr(bitget, "fetch_tickers", _no_venue)
     monkeypatch.setattr(depth, "fetch_orderbook", _no_venue)

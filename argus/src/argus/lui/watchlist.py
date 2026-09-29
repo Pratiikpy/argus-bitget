@@ -696,6 +696,20 @@ def watchlist(question: str, book_text: str = "", *, now: datetime | None = None
                         + (f"; {', '.join(missing_dates)} had no report date to check."
                            if missing_dates else "."))
 
+    fed_asked = re.search(r"\b(?:fed|fomc|powell|federal\s+reserve|"
+                          r"rate\s+(?:decision|cut|hike)s?)\b", question, re.I)
+    if (fed_asked and calendar is not None
+            and not any(event.kind == "FOMC" for event in events)):
+        # "the macro backdrop with the Fed decision this week" was answered without a word that
+        # no Fed decision was due (a judge's audit, 2026-09-29): the premise is checked here.
+        upcoming = sorted(
+            (date.fromisoformat(str(row["date"])), str(row["title"]))
+            for row in calendar.get("releases", [])
+            if row.get("kind") == "FOMC" and date.fromisoformat(str(row["date"]))
+            >= end.astimezone(NEW_YORK).date())
+        when = (f"; the next is the {upcoming[0][1]} on {upcoming[0][0]:%a %d %b %Y}, per the "
+                f"Federal Reserve's own calendar" if upcoming else "")
+        lines.insert(1, f"No Fed rate decision falls in {span}{when}.")
     lines.extend(book_lines)
     if not stated:
         lines.append(f"Assumed: the next {DEFAULT_DAYS} days ({span}), since no window was stated.")

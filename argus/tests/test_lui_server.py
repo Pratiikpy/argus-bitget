@@ -572,7 +572,7 @@ class TestAModelReadingIsHeldToTheWords:
                         "confidence": 0.95, "why": "a perp position"}
 
         seen: list[Any] = []
-        monkeypatch.setattr(server, "_model_for", lambda visitor: Planner())
+        monkeypatch.setattr(server, "_model_for", lambda visitor, count=True: Planner())
         monkeypatch.setattr(server, "worth_asking_the_model", lambda text, **_: True)
         monkeypatch.setattr(server, "_research_payload",
                             lambda text, prior, request, *a, **k: seen.append(request) or {})
@@ -594,7 +594,7 @@ class TestAModelReadingIsHeldToTheWords:
                         "holdings": {"NVDA": 40, "MSFT": 20}, "confidence": 0.85, "why": "add"}
 
         seen: list[Any] = []
-        monkeypatch.setattr(server, "_model_for", lambda visitor: Planner())
+        monkeypatch.setattr(server, "_model_for", lambda visitor, count=True: Planner())
         monkeypatch.setattr(server, "worth_asking_the_model", lambda text, **_: True)
         monkeypatch.setattr(server, "_research_payload",
                             lambda text, prior, request, *a, **k: seen.append(request) or {})
@@ -683,3 +683,43 @@ def test_a_question_naming_someone_else_says_the_console_has_no_accounts() -> No
                          now=newest + timedelta(hours=1))["lines"]
     assert "no user accounts" in listing[0] or listing[0].startswith("Bottom line")
     assert not listing[-1].startswith("This console has no user accounts")
+
+
+def test_one_question_spends_one_unit_of_the_hourly_allowance(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    """A judge's audit, 2026-09-29: each model call counted, so translation went silent after a
+    dozen questions. Follow-on calls no longer count, and a spent allowance is said."""
+    from argus.lui import server
+
+    monkeypatch.setattr(server, "_router", lambda: object())
+    monkeypatch.setattr(server, "_VISITS", {})
+    visitor = "judge"
+    for _ in range(server.MODEL_CALLS_PER_VISITOR_PER_HOUR - 1):
+        assert server._model_for(visitor) is not None
+    for _ in range(10):
+        assert server._model_for(visitor, count=False) is not None
+    assert not server.allowance_spent(visitor)
+    assert server._model_for(visitor) is not None
+    assert server.allowance_spent(visitor)
+    assert server._model_for(visitor, count=False) is None
+
+
+def test_a_french_question_is_restated_before_it_is_routed(monkeypatch: pytest.MonkeyPatch) -> None:
+    """First-user audit, 2026-09-29: "Où se trouve NVDA en ce moment ?" was answered with the
+    desk's positions. A Latin-script question in another language is restated in English first,
+    and the answer says what it was read as."""
+    from argus.lui import server
+
+    seen: list[str] = []
+    monkeypatch.setattr(server, "_model_for", lambda visitor, count=True: object())
+    monkeypatch.setattr(server, "_read_in_english",
+                        lambda text, client=None: ("Where is NVDA trading right now?", ""))
+
+    def answer(text: str, prior: list[str], **_: object) -> dict[str, object]:
+        seen.append(text)
+        return {"lines": ["Bottom line: NVDA last 228.64 USDT on Bitget."], "refused": False}
+
+    monkeypatch.setattr(server, "_answer", answer)
+    payload = server.handle_ask("Où se trouve NVDA en ce moment ?", [], visitor="local")
+    assert seen == ["Where is NVDA trading right now?"]
+    assert str(payload["lines"][0]).startswith('Read as: "Where is NVDA trading right now?"')

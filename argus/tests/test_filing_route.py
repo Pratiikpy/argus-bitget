@@ -35,7 +35,7 @@ def filings(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(dq.EdgarDocuments, "latest",
                         lambda self, ticker: [doc] if ticker == "NVDA" else [])
     monkeypatch.setattr(server, "_filing_model", lambda: _Cites())
-    monkeypatch.setattr(server, "_model_for", lambda visitor: object())
+    monkeypatch.setattr(server, "_model_for", lambda visitor, count=True: object())
     server._FILINGS.clear()
 
 

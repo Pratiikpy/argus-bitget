@@ -1249,3 +1249,38 @@ def test_what_to_trim_reads_the_book(text: str) -> None:
 
     request = with_book(detect(text), "40% NVDA, 30% MSFT, 30% AAPL", text)
     assert request is not None and request.kind is ResearchKind.BOOK
+
+
+@pytest.mark.parametrize(("text", "kind"), [
+    ("Wie hoch ist das Long-Short-Verhältnis bei SOL?", "sentiment"),
+    ("SOL的多空比是多少", "sentiment"),
+    ("is nvda a buy rn", "impact"),
+])
+def test_the_patterns_reading_stands_over_the_hosted_models(text: str, kind: str) -> None:
+    """Live, 2026-09-29: with the hosted model reading first, the German and Chinese long/short
+    questions were answered as a quote and "is nvda a buy rn" was declined, although the
+    patterns read all three. Each has one engine that answers it, so the patterns' reading wins."""
+    from argus.lui.research import detect, pattern_reading_wins
+
+    request = detect(text)
+    assert request is not None and request.kind.value == kind
+    assert pattern_reading_wins(request, text)
+
+
+def test_a_loss_over_a_period_is_read_as_the_odds_question_and_led_by_the_loss() -> None:
+    """First-user audit, 2026-09-29: "how much can i lose on tsla this week" was answered as a
+    book of 100% TSLA stressed through the Nasdaq; "and nvda?" then asked for holdings."""
+    from argus.lui.research import ResearchKind, ResearchRequest, detect
+    from argus.lui.research.dispatch import _loss_lead
+
+    request = detect("how much can i lose on tsla this week")
+    assert request is not None and request.kind is ResearchKind.ANALOGUE
+    assert request.horizon_hours == 168
+    odds = {"side": "long", "p10_bps": -575.0, "p90_bps": 702.0, "adverse_p90_bps": -871.0}
+    lines = _loss_lead(["Bottom line: no one can know.", "other"], odds,
+                       ResearchRequest(kind=ResearchKind.ANALOGUE, symbols=("TSLAUSDT",),
+                                       horizon_hours=168))
+    assert lines[0].startswith("Bottom line: one week in ten, a long TSLA position lost more "
+                               "than 5.8% by the end, and at its worst point inside the week it "
+                               "was more than 8.7% under water — on $10,000, about $575 and $871.")
+    assert lines[1] == "No one can know."

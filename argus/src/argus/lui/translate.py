@@ -106,20 +106,25 @@ _COMMON: dict[str, frozenset[str]] = {
     "fr": frozenset({
         "le", "la", "les", "est", "sont", "quel", "quelle", "quels", "quelles", "sur", "pour",
         "mon", "ma", "mes", "que", "qui", "une", "des", "du", "avec", "dans", "combien", "prix",
-        "cours", "faut", "dois", "acheter", "vendre"
+        "cours", "faut", "dois", "acheter", "vendre",
+        "où", "se", "trouve", "ce", "moment", "je", "puis", "perdre", "cette", "semaine",
+        "maintenant", "actuellement", "devrais", "risque"
     }),
     "de": frozenset({
         "der", "die", "das", "ist", "sind", "wie", "hoch", "bei", "mein", "meine", "was", "welche",
         "welcher", "warum", "und", "mit", "für", "nicht", "soll", "sollte", "kaufen", "verkaufen",
-        "preis", "kurs", "wird", "kostet", "kosten", "aktie", "aktuell", "steht", "gerade"
+        "preis", "kurs", "wird", "kostet", "kosten", "aktie", "aktuell", "steht", "gerade",
+        "ich", "kann", "diese", "woche", "verlieren", "jetzt", "heute", "wo"
     }),
     "es": frozenset({
         "el", "la", "los", "las", "es", "son", "cuál", "cuánto", "cómo", "para", "mi", "mis", "que",
-        "en", "con", "precio", "debo", "comprar", "vender", "está"
+        "en", "con", "precio", "debo", "comprar", "vender", "está",
+        "dónde", "esta", "semana", "puedo", "perder", "ahora", "hoy"
     }),
     "pt": frozenset({
         "o", "a", "os", "as", "é", "são", "qual", "quanto", "como", "para", "meu", "minha", "que",
-        "em", "com", "preço", "devo", "comprar", "vender", "está"
+        "em", "com", "preço", "devo", "comprar", "vender", "está",
+        "onde", "esta", "semana", "posso", "perder", "agora", "hoje"
     }),
 }
 """Each language's most common short words, for :func:`target_language`'s last test. Words two

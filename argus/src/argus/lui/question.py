@@ -442,6 +442,13 @@ _WORD = re.compile(r"[A-Za-z]{2,12}")
 
 
 _TICKER_SHAPED = re.compile(r"(?<![A-Za-z])[A-Z]{2,5}(?![A-Za-z])")
+_NAMED_CONTRACT = re.compile(
+    r"(?<![A-Za-z])([A-Z]|[A-Z]{6,10})(?=\s+(?:perps?|perpetuals?|futures|coins?|tokens?|"
+    r"stocks?|shares|contracts?)\b)|\b(?:on|for|of)\s+([A-Z]|[A-Z]{6,10})(?![A-Za-z])")
+"""A one-letter or long all-capitals name that the question marks as a contract: "the funding rate
+on X perpetuals" was answered "No open positions" (a judge's audit, 2026-09-29), because a single
+capital and a six-letter one are not ticker-shaped on their own. Taken only beside a market noun
+or after "on/for/of", so "I" and "A" in prose never count."""
 """An all-capitals token in the user's own text, which is how a ticker is written and ordinary
 prose is not. Case is read from the raw question deliberately: `GME` is a ticker and `gme` is a
 typo, and calling the second an instrument would refuse real questions over a stray shift key."""
@@ -553,8 +560,12 @@ def extract_symbols(text: str) -> tuple[tuple[str, ...], str]:
         # were refused the same way (2026-09-25 rematch, `eval/lui_rematch.py`). Named tickers and
         # company names still resolve above; only the unknown-capitals guess is withheld.
         return (), ""
-    for token in _TICKER_SHAPED.findall(text):
+    shaped = [*_TICKER_SHAPED.findall(text),
+              *(m.group(1) or m.group(2) for m in _NAMED_CONTRACT.finditer(text))]
+    for token in shaped:
         if token in _NOT_A_TICKER or token in TRADED_SYMBOLS or token in _TICKER_TO_SYMBOL:
+            continue
+        if len(token) == 1 and token in ("I", "A"):
             continue
         if not _listed_on_bitget(token):
             # "I have $25,000 to put into JNJ shares, what's the safest way to place that order"

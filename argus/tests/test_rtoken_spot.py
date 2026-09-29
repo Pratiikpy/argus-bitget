@@ -149,7 +149,7 @@ def test_the_spot_holding_survives_a_model_reading_of_the_same_kind(
         captured["request"] = request
         return {}
 
-    monkeypatch.setattr(server, "_model_for", lambda visitor: Hedger())
+    monkeypatch.setattr(server, "_model_for", lambda visitor, count=True: Hedger())
     monkeypatch.setattr(server, "worth_asking_the_model", lambda text, now=None: True)
     monkeypatch.setattr(server, "_research_payload", fake_payload)
     server.handle_ask("I hold RNVDAUSDT, how do I protect it over the weekend?", [])

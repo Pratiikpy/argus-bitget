@@ -564,3 +564,30 @@ class TestAQuestionThatIsNotAboutAddingIsAnsweredFirst:
 
         html = render_task(research_task(reading=reading, asked=text), "")
         assert "<h3>Your question</h3>" in html and "<h3>If you add BTC to your book</h3>" in html
+
+
+class TestAQuestionAboutNoSingleNameRunsAsATask:
+    """A judge's audit, 2026-09-29: a whole-book question and a week's-calendar question were
+    refused on the research page while the console answered both."""
+
+    def test_the_consoles_answer_leads_and_the_book_exposure_follows(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui.task import ASKED_TITLE, BOOK_EXPOSURE_TITLE, question_task
+
+        monkeypatch.setattr(exposures, "exposures_answer",
+                            lambda book, proposed=None, **_: (["Technology 50%"], [], {}))
+        task = question_task(
+            "what should I do with a book that is 50% NVDA and 50% TSLA",
+            ask=lambda text, **_: {"lines": ["Bottom line: the risk is concentrated in TSLA."],
+                                   "refused": False, "classified_by": "research-patterns"})
+        assert task is not None and task.name == ""
+        assert [s.title for s in task.steps] == [ASKED_TITLE, BOOK_EXPOSURE_TITLE]
+        assert task.weighing is None and task.verdict is None
+        assert task.conclusion[0] == (ASKED_TITLE, "the risk is concentrated in TSLA.")
+
+    def test_a_question_the_console_refuses_stays_refused(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui.task import question_task
+
+        assert question_task("hello there", ask=lambda text, **_: {
+            "lines": ["I did not recognise that question."], "refused": True}) is None

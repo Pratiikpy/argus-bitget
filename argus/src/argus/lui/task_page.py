@@ -247,7 +247,8 @@ def _conclusion(task: Task) -> str:
         # around it says about owning the name, and is headed so (judge's probe, 2026-09-29).
         parts.append(f"<h3>Your question</h3><p class='call'>"
                      f"{design.linked(asked.actionable or (asked.lines[0] if asked.lines else ''))}"
-                     f"</p><h3>If you add {esc(task.name)} to your book</h3>")
+                     f"</p>" + (f"<h3>If you add {esc(task.name)} to your book</h3>"
+                                if task.name else ""))
     if weighed is not None:
         parts.append(f"<p class='call'>{esc(weighed.call)}</p><p>{esc(weighed.reason)}</p>")
     if task.tested:

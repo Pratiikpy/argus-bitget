@@ -72,6 +72,7 @@ _DISCLAIMER = " This is analysis, not advice — you make the call."
 
 IMPACT_TITLE = "What the trade does to your book"
 EXPOSURE_TITLE = "Sector and factor exposure, before and after"
+BOOK_EXPOSURE_TITLE = "Your book's sector and factor exposure"
 EXECUTION_TITLE = "How to execute the size"
 
 STEP_DEADLINE_S = 60.0
@@ -106,7 +107,7 @@ ASKED_TITLE = "Your question, answered"
 the name (a judge's probe, 2026-09-29: "What is the long/short ratio on SOL?" ran the add-to-book
 template and ended in a buy plan, with the ratio nowhere on the page)."""
 
-CONCLUSION_ORDER = (ASKED_TITLE, IMPACT_TITLE, EXPOSURE_TITLE, EXECUTION_TITLE,
+CONCLUSION_ORDER = (ASKED_TITLE, IMPACT_TITLE, EXPOSURE_TITLE, BOOK_EXPOSURE_TITLE, EXECUTION_TITLE,
                     "Earnings, analysts and the surprise", "News, filings and today's move",
                     "Has it been here before?", "The technical picture",
                     "Where it trades and what a trade costs")
@@ -309,8 +310,9 @@ class Task:
     @property
     def weighing(self) -> Weighing | None:
         """Whether to enter, from the engines' figures set against each other
-        (`lui/weigh.py`): the verdict above says how much, this says whether."""
-        return weighing(self)
+        (`lui/weigh.py`): the verdict above says how much, this says whether. None for a task
+        about no single name, which has nothing to enter."""
+        return weighing(self) if self.name else None
 
     @property
     def conclusion(self) -> list[tuple[str, str]]:
@@ -621,6 +623,49 @@ def _invalidation(name: str, weight: float, ceiling: float) -> str:
             f"{outrun:.0%}, it drifts past {ceiling:.0%} of the book and back over the budget; "
             f"trim it to {weight:.0%} then. A jump in its correlation with the book lowers that "
             f"ceiling, so re-ask after a large move.")
+
+
+def question_task(asked: str, saved_book: str = "", memory: str = "", *,
+                  ask: Callable[..., dict[str, Any]]) -> Task | None:
+    """A research task for a question about no single name: the whole book, the week's calendar, a
+    market-wide what-if. None when the console itself cannot answer it.
+
+    "what should I do with a book that is 50% NVDA and 50% TSLA" and "what economic events matter
+    this week" were refused here with "open the console and ask it there" while the console
+    answered both (a judge's audit, 2026-09-29). The page is the demo of one research task, so it
+    runs the console's own answer as its first step and, when a book is known, the book's sector
+    and factor exposure beside it; with no name there is no add-to-book call to make, and none is
+    shown.
+
+    ``ask`` is the console's own answer, passed in by the server that owns it: this module sits
+    below the channels and imports none of them (`tests/test_lui_concerns.py`)."""
+    started = time.perf_counter()
+    payload = ask(asked, book=saved_book, memory=memory)
+    if payload.get("refused"):
+        return None
+    lines = [str(line).replace(_DISCLAIMER, "").rstrip() for line in payload.get("lines") or []]
+    steps = [Step(title=ASKED_TITLE, engine=f"the console ({payload.get('classified_by', '')})",
+                  lines=lines, seconds=time.perf_counter() - started,
+                  data=dict(payload.get("data") or {}))]
+    request = with_book(detect(asked), saved_book, asked)
+    book = dict(request.book) if request is not None and request.book else {}
+    if not book:
+        book, _cash = _saved(saved_book)
+    if book:
+        began = time.perf_counter()
+        from argus.lui.exposures import exposures_answer
+
+        try:
+            found, _, data = exposures_answer(book)
+            steps.append(Step(title=BOOK_EXPOSURE_TITLE, engine="Yahoo sector classification and a "
+                              "four-factor regression", lines=list(found),
+                              seconds=time.perf_counter() - began, data=dict(data)))
+        except Exception as exc:  # the answered question stands without it
+            steps.append(Step(title=BOOK_EXPOSURE_TITLE, engine="exposures", refused=True,
+                              lines=[f"This step could not run just now ({type(exc).__name__})."],
+                              seconds=time.perf_counter() - began))
+    return Task(question=asked, name="", size_pct=0.0, book=book, steps=steps,
+                seconds=time.perf_counter() - started, asked=asked)
 
 
 def unread_task(asked: str, reason: str) -> Task:

@@ -159,7 +159,7 @@ def _translated(payload: dict[str, Any], question: str, book: str, visitor: str)
 
     lines = [str(line) for line in payload.get("lines") or []]
     skip = int(offer["skip"])
-    done = translate.translate(lines[skip:], str(offer["lang"]), _model_for(visitor))
+    done = translate.translate(lines[skip:], str(offer["lang"]), _model_for(visitor, count=False))
     if len(done["kept_english"]) == len(lines) - skip:
         return None
     head = [done["note"]] if done.get("note") else lines[:skip]

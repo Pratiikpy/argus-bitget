@@ -1,0 +1,70 @@
+{
+ "graded": true,
+ "recorded_at": "2026-09-25T05:16:27.319572+00:00",
+ "graded_at": "2026-09-29T15:58:23.249197+00:00",
+ "rows": [
+  {
+   "symbol": "AAPLUSDT",
+   "last": 335.35,
+   "window_low": 334.72,
+   "rook_stop": 334.9,
+   "rook_touched": true,
+   "argus_stop": 329.18935917892105,
+   "argus_touched": false,
+   "close_after_24h": 341.03
+  },
+  {
+   "symbol": "COINUSDT",
+   "last": 198.47,
+   "window_low": 192.91,
+   "rook_stop": 197.7,
+   "rook_touched": true,
+   "argus_stop": 186.28513449811064,
+   "argus_touched": false,
+   "close_after_24h": 195.48
+  },
+  {
+   "symbol": "METAUSDT",
+   "last": 778.27,
+   "window_low": 744.28,
+   "rook_stop": 764.9,
+   "rook_touched": true,
+   "argus_stop": 758.7080387009557,
+   "argus_touched": true,
+   "close_after_24h": 745.96
+  },
+  {
+   "symbol": "MSTRUSDT",
+   "last": 161.84,
+   "window_low": 157.04,
+   "rook_stop": 159.8,
+   "rook_touched": true,
+   "argus_stop": 151.15548959608324,
+   "argus_touched": false,
+   "close_after_24h": 159.08
+  },
+  {
+   "symbol": "NVDAUSDT",
+   "last": 224.55,
+   "window_low": 223.41,
+   "rook_stop": 222,
+   "rook_touched": false,
+   "argus_stop": 217.21656485979514,
+   "argus_touched": false,
+   "close_after_24h": 224.76
+  },
+  {
+   "symbol": "TSLAUSDT",
+   "last": 379.29,
+   "window_low": 368.48,
+   "rook_stop": 375.6,
+   "rook_touched": true,
+   "argus_stop": 364.6221800527452,
+   "argus_touched": false,
+   "close_after_24h": 372.41
+  }
+ ],
+ "rook_touched": 5,
+ "argus_touched": 1,
+ "names": 6
+}

@@ -241,7 +241,7 @@ _DOMAIN = re.compile(
     r"log|ledger|record|calibrat\w*|confiden\w*|abstain\w*|abstention|pass(?:ed|es)?|skip\w*|"
     r"nothing|evidence|sources?|thesis|signals?|strateg\w*|model|hash\w*|tamper\w*|anchor\w*|"
     r"block\w*|kernel|guard\w*|weekend|sessions?|hours|market\w*|prices?|stocks?|shares?|"
-    r"crypto\w*|coins?|bitcoin|hedg\w*|portfolio|book|fees?|costs?|win\s+rate|exposure|"
+    r"crypto\w*|coins?|bitcoin|hedg\w*|portfolio|book|fees?|costs?|funding|win\s+rate|exposure|"
     r"leverage|long|short|buy\w*|sell\w*|bought|sold|calls?|bets?|accura\w*|wrong|right|"
     r"perform\w*|history|past|latest|recent|last\s+(?:call|decision|trade|week|month)|why|"
     r"rtokens?|perp\w*|futures|equit\w*|index|nasdaq|volatil\w*|beta|you|your|yours|"

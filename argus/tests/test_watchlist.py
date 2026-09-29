@@ -224,3 +224,19 @@ def test_missing_calendar_is_said_not_estimated(tmp_path: Path) -> None:
     assert any("could not be read" in line for line in lines)
     assert data["events"] == []
     assert lines[0].startswith("Bottom line: nothing on the official US macro calendar")
+
+
+def test_a_fed_decision_asked_for_when_none_is_due_is_said() -> None:
+    """A judge's audit, 2026-09-29: "the macro backdrop with the Fed decision this week" was
+    answered without saying no Fed decision fell in the week (the next was 28 Oct)."""
+    from datetime import UTC, datetime
+
+    from argus.lui.watchlist import watchlist
+
+    lines, _, _ = watchlist("what's the macro backdrop with the Fed decision this week",
+                            now=datetime(2026, 9, 29, 16, 0, tzinfo=UTC),
+                            earnings_lookup=lambda symbol, day: None,
+                            filings_lookup=lambda symbols, since: {})
+    assert lines[1].startswith("No Fed rate decision falls in Tue 29 Sep to Tue 06 Oct; the next "
+                               "is the FOMC rate decision")
+    assert "Wed 28 Oct 2026" in lines[1]

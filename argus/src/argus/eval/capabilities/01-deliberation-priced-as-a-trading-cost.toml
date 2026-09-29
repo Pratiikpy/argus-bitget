@@ -64,10 +64,10 @@ blockers = [
         2.34 / 9.99, significant under a paired block bootstrap at every horizon; production's \
         rank correlation with the realised move is negative (-0.43 to -0.48). Its depth multiplier \
         points the wrong way: off-hours moves are 0.48x (extended), 0.32x (overnight) and 0.22x \
-        (weekend) of regular hours, where it charges 2x, 3x and 3x. The report \
-        (data/general_delib_comparison.json) was not written, because the Chronos-2 arm stopped at \
-        512 of 23,003 instants, and the Tardis quotes it read are no longer on this machine \
-        (Tardis answers 403 from this network), so the figures stand on the run's log only. \
+        (weekend) of regular hours, where it charges 2x, 3x and 3x. SUPERSEDED 2026-09-29: this \
+        run wrote no report because its Chronos-2 arm stopped at 512 of 23,003 instants; the \
+        re-run without that arm wrote data/general_delib_comparison.json, which the blocker \
+        above quotes and which reproduces byte for byte. \
         agents/delay_cost.py, the estimator that replaces the charge, is not yet wired into \
         meta_pm.""",
 ]

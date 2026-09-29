@@ -290,6 +290,17 @@ _PRICE_BEFORE_CJK_VERB = re.compile(
 _BARE_NUMBER = re.compile(
     rf"(?<![A-Za-z0-9_.%/]){_NUM}\s*(k\b)?(?!\s*(?:%|x\b|percent|pct|倍|个百分点))", re.I)
 
+_SIZE_BEFORE_AT = re.compile(
+    rf"^\D*?(?<![\d.$]){_NUM}\s*(k)?\s+(?:more\s+|of\s+(?:it|them)\s+)?(?=(?:at\b|@)\s*\$?\d)",
+    re.I)
+"""A size written before its price with no unit: "sold 150 at 255", "bought 100 more at 260"."""
+
+_BARE_FILL = re.compile(
+    rf"^\s*(?:and\s+|then\s+|another\s+|plus\s+)?{_NUM}\s*(k)?\s+(?:more\s+|shares?\s+|"
+    rf"units?\s+)?(?:at\b|@)\s*\$?{_NUM}", re.I)
+"""A clause that is only a size and a price, repeating the verb before it: the "100 at 260" of
+"bought 200 TSLA at 245, 100 at 260"."""
+
 _FLAGS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("stopped", re.compile(r"\bstopped\s+out\b|\bgot\s+stopped\b|\bstop(?:\s*-?\s*loss)?\s+"
                            r"(?:got\s+)?(?:hit|triggered|filled)\b|\bhit\s+my\s+stop\b|止损",
@@ -441,6 +452,14 @@ def _leg_from(action: str, window: str, context_symbol: str | None, now: date,
         if before is not None and _PRICE_AT.search(rest[symbols[0][0]:]):
             qty = _number(before.group(1), before.group(2))
             spans.append(before.span())
+    if qty is None:
+        # "sold 150 at 255": the first number, straight before "at", is the size and the one
+        # after it the price. The size was dropped and the sale read as closing everything
+        # (a judge's audit, 2026-09-29).
+        sized = _SIZE_BEFORE_AT.search(rest)
+        if sized is not None:
+            qty = _number(sized.group(1), sized.group(2))
+            spans.append(sized.span(1))
     masked = rest
     for a, b in spans:
         masked = masked[:a] + " " * (b - a) + masked[b:]
@@ -493,6 +512,13 @@ def parse_text(text: str, *, now: date | None = None) -> tuple[list[Leg], list[s
         if not clause.strip():
             continue
         verbs = list(_VERB.finditer(clause))
+        bare = _BARE_FILL.match(clause) if not verbs else None
+        if bare is not None and legs and legs[-1].action in ("buy", "sell", "short", "cover"):
+            # The previous verb carries on, with its name: "bought 200 TSLA at 245, 100 at 260".
+            legs.append(Leg(legs[-1].action, legs[-1].symbol, _number(bare.group(3)),
+                            qty=_number(bare.group(1), bare.group(2)), day=legs[-1].day,
+                            text=clause.strip()))
+            continue
         if not verbs:
             found = _symbols_in(clause)
             if found:
@@ -1390,6 +1416,119 @@ def gate_lines(trades: Sequence[Trade]) -> tuple[list[str], dict[str, Any] | Non
         lines.append(f"Held-out rule ({row.get('status')}): {row.get('rule') or row.get('name')}; "
                      f"lift {row.get('lift')}.")
     return lines, report
+
+
+POSITION_Q = re.compile(
+    r"\b(?:position|holdings?|p\s*&\s*l|pnl|profit|realized|realised|unrealized|unrealised|"
+    r"cost\s+basis|average\s+(?:cost|price)|break[\s-]?even|up\s+or\s+down|how\s+much\s+"
+    r"(?:did\s+i|have\s+i)\s+(?:make|made|lose|lost))\b|持仓|盈亏|成本价|赚了多少|亏了多少", re.I)
+"""A question about where the trader's own fills leave them: the position and its profit."""
+
+
+def _money(value: float) -> str:
+    """+$750.00 / -$1,204.50: the sign before the dollar, as a trader writes it."""
+    return f"{'+' if value >= 0 else '-'}${abs(value):,.2f}"
+
+
+def position_and_pnl(text: str, *, now: datetime | None = None,
+                     price: Callable[[str], float] | None = None,
+                     ) -> tuple[list[str], list[Source], dict[str, Any]] | None:
+    """The position and profit a trader's typed fills leave, or None when the message is not that.
+
+    "I bought 200 TSLA at 245, 100 at 260, then sold 150 at 255, what's my current position and
+    pnl" was answered with an execution plan for a new order (a judge's audit, 2026-09-29). Every
+    fill here carries a size and a price, so the arithmetic is exact, and it is given two ways
+    because brokers differ: average cost (the realised profit is each sale against the average
+    price paid so far) and first in, first out (each sale closes the oldest lots, as tax lots
+    usually do). Long positions only; a sale larger than the holding is said, not guessed at.
+    """
+    if not POSITION_Q.search(text):
+        return None
+    clock = now or datetime.now(UTC)
+    legs, _notes = parse_text(text, now=clock.date())
+    fills = [leg for leg in legs if leg.symbol and leg.price and leg.qty
+             and leg.action in ("buy", "sell")]
+    if len(fills) < 2:
+        return None
+    lines: list[str] = []
+    data: dict[str, Any] = {}
+    leads: list[str] = []
+    for symbol in dict.fromkeys(leg.symbol for leg in fills if leg.symbol):
+        own = [leg for leg in fills if leg.symbol == symbol]
+        name = symbol.removesuffix("USDT")
+        held, cost, realised_avg = 0.0, 0.0, 0.0
+        lots: list[list[float]] = []
+        realised_fifo = 0.0
+        oversold = False
+        for leg in own:
+            qty, px = float(leg.qty or 0.0), float(leg.price or 0.0)
+            if leg.action == "buy":
+                held += qty
+                cost += qty * px
+                lots.append([qty, px])
+                continue
+            if qty > held + 1e-9:
+                oversold = True
+                break
+            average = cost / held
+            realised_avg += (px - average) * qty
+            cost -= average * qty
+            held -= qty
+            left = qty
+            while left > 1e-9 and lots:
+                take = min(left, lots[0][0])
+                realised_fifo += (px - lots[0][1]) * take
+                lots[0][0] -= take
+                left -= take
+                if lots[0][0] <= 1e-9:
+                    lots.pop(0)
+        if oversold:
+            lines.append(f"{name}: a sale is larger than the {held:g} held at that point, which "
+                         f"would open a short; this reads long positions only, so {name} is "
+                         f"left out.")
+            continue
+        average = cost / held if held > 1e-9 else 0.0
+        fifo_cost = sum(q * px for q, px in lots)
+        fifo_average = fifo_cost / held if held > 1e-9 else 0.0
+        mark: float | None = None
+        if price is not None and held > 1e-9:
+            try:
+                mark = price(symbol)
+            except Exception:
+                mark = None
+        sold = sum(float(leg.qty or 0.0) for leg in own if leg.action == "sell")
+        lead = (f"you hold {held:g} {name}" + (f" at an average cost of ${average:,.2f}"
+                                                 if held > 1e-9 else " (flat)")
+                + (f"; the {sold:g} sold realised {_money(realised_avg)} at average cost "
+                   f"({_money(realised_fifo)} first in, first out)" if sold else ""))
+        leads.append(lead)
+        lines.append(f"{name} fills read: " + "; ".join(
+            f"{leg.action} {float(leg.qty or 0):g} at {float(leg.price or 0):g}" for leg in own)
+            + ".")
+        if held > 1e-9 and abs(fifo_average - average) > 1e-9:
+            lines.append(f"{name} first in, first out: the {held:g} left cost ${fifo_average:,.2f} "
+                         f"each (the oldest lots were sold first), against ${average:,.2f} at "
+                         f"average cost.")
+        if mark is not None:
+            lines.append(f"{name} unrealised at Bitget's live {mark:,.2f}: "
+                         f"{_money((mark - average) * held)} at average cost, "
+                         f"{_money((mark - fifo_average) * held)} first in, first out.")
+        data[symbol] = {"held": held, "average_cost": average, "fifo_average_cost": fifo_average,
+                        "realised_average": realised_avg, "realised_fifo": realised_fifo,
+                        "mark": mark}
+    if not leads:
+        return None if not lines else (
+            lines, [Source("computation", "argus.lui.journal:position_and_pnl",
+                           "the typed fills open a short, which this does not read")],
+            {"position": data})
+    lines.insert(0, "Bottom line: " + "; ".join(leads) + ".")
+    lines.append("Fees are not in these figures unless you typed them; this reads the fills you "
+                 "wrote, not your Bitget account.")
+    sources = [Source("computation", "argus.lui.journal:position_and_pnl",
+                      "average-cost and first-in-first-out arithmetic on the typed fills")]
+    if any(v.get("mark") is not None for v in data.values()):
+        sources.append(Source("venue", "Bitget v2 tickers", "live last price for the mark"))
+    return lines, sources, {"position": data}
 
 
 def review_trades(text: str, *, now: datetime | None = None, explicit: bool = False,

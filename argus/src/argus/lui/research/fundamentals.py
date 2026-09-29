@@ -44,6 +44,7 @@ from argus.lui.research.parse import (
     _WEEKEND_GAP_Q,
     ADD_VERB,
     CRYPTO_ETF_QUESTION,
+    LONG_SHORT_QUESTION,
     OPEN_INTEREST_QUESTION,
     OWNERSHIP_Q,
     POSITIONING_Q,
@@ -251,7 +252,10 @@ reading them as news would return headlines without the repetition discount."""
 
 _SHOULD_I_TRADE = re.compile(
     r"\b(?:should|shall|would|do)\s+(?:i|we)\s+(?:buy|sell|add|short|long|go\s+(?:long|short)|"
-    r"get\s+into|take\s+a\s+position\s+in)\b", re.I)
+    r"get\s+into|take\s+a\s+position\s+in)\b|"
+    # "is nvda a buy rn": the hosted model declined it as a request for a recommendation, while
+    # "should I buy NVDA" is answered by sizing the position (live, 2026-09-29).
+    r"\b(?:is|are)\s+[\w.$-]+\s+(?:still\s+)?(?:a\s+)?(?:good\s+|strong\s+)?buy\b", re.I)
 
 
 _HOW_TO_EXECUTE = re.compile(
@@ -294,6 +298,10 @@ def pattern_reading_wins(request: ResearchRequest | None, text: str) -> bool:
     if leveraged_fund_asked(text) is not None and request.kind is not ResearchKind.COMPARE:
         return True
     if request.kind is ResearchKind.SENTIMENT and CRYPTO_ETF_QUESTION.search(text):
+        return True
+    if request.kind is ResearchKind.SENTIMENT and LONG_SHORT_QUESTION.search(text):
+        # One engine answers the crowd's long/short split; the hosted model read the German and
+        # Chinese forms as a quote (live, 2026-09-29).
         return True
     if request.kind is ResearchKind.STRESS and request.shock_pct is not None:
         # "what does a 10% drop in gold do to my book?" — the model's plan shocked the Nasdaq by

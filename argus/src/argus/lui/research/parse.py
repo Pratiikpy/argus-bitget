@@ -2316,6 +2316,20 @@ def read_request(text: str) -> ResearchRequest | None:
     if ORDER_CJK.search(raw):
         return None  # an instruction to trade, in Chinese; refused as an order, never researched
     symbols, _ = research_symbols(raw)
+    if (len(symbols) == 1 and _LOSS_OVER_PERIOD.search(raw) and _LOSS_PERIOD.search(raw)
+            and not is_an_order(raw)
+            and not re.search(r"\b(?:i\s+hold|my\s+(?:book|portfolio))\b", raw, re.I)):
+        # "how much can i lose on tsla this week" was answered as a book of 100% TSLA stressed
+        # through a Nasdaq drop and hedged with QQQ, while "and nvda?" asked for holdings
+        # (first-user audit, 2026-09-29). A loss over a period is the odds engine's question: how
+        # far against a long position past windows of that length went.
+        hours, weekend, assumed = _horizon(raw)
+        return ResearchRequest(
+            kind=ResearchKind.ANALOGUE, symbols=symbols[:1], horizon_hours=hours, weekend=weekend,
+            side="short" if re.search(r"\bshort", raw, re.I) else "long",
+            notes=(*((assumed,) if assumed else ()),
+                   "a loss over a period was asked for; this is how far past windows of that "
+                   "length went against the position, not a prediction"))
     if _FUNDING_EXPLAIN_Q.search(raw) and not symbols:
         # "is the funding rate annualized or per interval" names no contract: BTC is the example
         return ResearchRequest(kind=ResearchKind.QUOTE, symbols=("BTCUSDT",), notes=(
@@ -2346,6 +2360,10 @@ def read_request(text: str) -> ResearchRequest | None:
         # the sentiment answer (`lui/research/positioning.py`). "NVDA put/call ratio" reached the
         # decision log, and "show me dark pool activity for TSLA" the desk's track record
         # (stranger QA, 2026-09-29).
+        return ResearchRequest(kind=ResearchKind.SENTIMENT, symbols=symbols[:1])
+    if symbols and LONG_SHORT_QUESTION.search(raw) and not is_an_order(raw):
+        # The crowd's long/short split, in any language the console reads: the German and Chinese
+        # forms were read as a quote and answered with the round trip (live, 2026-09-29).
         return ResearchRequest(kind=ResearchKind.SENTIMENT, symbols=symbols[:1])
     if symbols and _LIQUIDITY_TIME_Q.search(raw) and not is_an_order(raw):
         return ResearchRequest(kind=ResearchKind.QUOTE, symbols=symbols[:1])
@@ -3632,6 +3650,20 @@ def plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, dic
 
 _VAR = re.compile(r"\bvar\b(?!\s*\()|\bvalue[\s-]+at[\s-]+risk\b|\bexpected\s+shortfall\b|\bcvar\b",
                   re.I)
+
+
+_LOSS_OVER_PERIOD = re.compile(
+    r"\bhow\s+much\s+(?:can|could|might|would|will|do|should)\s+(?:i|we|you|one)\s+(?:\w+\s+)?"
+    r"(?:lose|risk)\b|\bhow\s+much\s+(?:money\s+)?(?:am\s+i|are\s+we)\s+risking\b|"
+    r"\b(?:max(?:imum)?|worst[\s-]case|biggest)\s+(?:loss|downside)\b|\bhow\s+(?:bad|far)\s+"
+    r"(?:can|could)\s+(?:it|\w+)\s+(?:get|go|fall|drop)\b", re.I)
+"""A loss asked about over a stated period, on one name: "how much can I lose on TSLA this week"."""
+
+_LOSS_PERIOD = re.compile(
+    r"\bthis\s+(?:week|month)\b|\btoday\b|\btomorrow\b|\bovernight\b|\bover(?:\s+the)?\s+"
+    r"(?:weekend|week|night|month)\b|\b(?:next|coming)\s+(?:week|month|few\s+days)\b|"
+    r"\b(?:for|over|in)\s+(?:a|one|\d+)\s+(?:days?|weeks?|months?)\b", re.I)
+"""The period a loss question names, which the odds engine reads as its horizon."""
 
 
 _EVENT_REACTION = re.compile(

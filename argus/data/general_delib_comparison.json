@@ -1,0 +1,1691 @@
+{
+  "generated_at": "2026-09-28T20:30:38.748342+00:00",
+  "question": "E|ln mid(t+h) - ln mid(t)| in bps at ARGUS's three thinking delays",
+  "horizons_s": [
+    3,
+    8,
+    40
+  ],
+  "production_vol": "0.45",
+  "trail_s": 1800,
+  "context_s": 512,
+  "stride_s": 60,
+  "instants": 23003,
+  "instants_by_book_phase": {
+    "tape-2026-09-24/rth": 2650,
+    "tape-2026-09-24/extended": 619,
+    "tardis-2026-09-01/overnight": 3150,
+    "tardis-2026-09-01/extended": 3990,
+    "tardis-2026-09-01/rth": 2730,
+    "tardis-2026-08-01/overnight": 1470,
+    "tardis-2026-08-01/weekend": 8394
+  },
+  "instants_sha256": "fbe2ad00a9fdb4849cf670b169cbb127d6c6d83729cc4d794ad3f5c06529b41a",
+  "provenance": {
+    "tape": {
+      "directory": "data/tape/2026-09-24",
+      "files": {
+        "14.jsonl.gz": "e397ccd1de6299937c9d8ca4a2b9468edee937dbefe588db4f44c95614dece8f",
+        "15.jsonl.gz": "838354d60148c3a9f3f8e406fb72109df28d43493577383de0f1be677e8cff4c",
+        "16.jsonl.gz": "31d203e1f3dee97d258c13344fc2e640cc9bfc6ff6cb5bd3f472481d057ee77e",
+        "17.jsonl.gz": "1b416c1ff0919da35323f06b07af33c3d213b7f34cc3c79990f0109714361d28",
+        "18.jsonl.gz": "a99368e2cba88b2d4b9169ac6fec341390584ec293d579683a9854e57b191c78",
+        "19.jsonl.gz": "6022b49bccc5e7469258d49b76056628665c8f0ecf3debf4985b085ba68613af",
+        "20.jsonl.gz": "b98db4289790ad764d9917fd46a7953081cbb8bf7d785852599cd60b816d787c",
+        "21.jsonl.gz": "2651f5f822de61c0088111b929fed15237d33e7e58389ac8d7fafd5d15d351a3"
+      },
+      "lines": 830664,
+      "corrupt_gzip_spans_skipped": 1,
+      "outages": [
+        [
+          1790262249.656,
+          1790262274.442
+        ],
+        [
+          1790283708.715,
+          1790283719.715
+        ]
+      ]
+    },
+    "tardis": {
+      "url": "https://datasets.tardis.dev/v1/bitget-futures/quotes/{y}/{m}/{d}/{symbol}.csv.gz",
+      "files": {
+        "2026-09-01_NVDAUSDT.csv.gz": "c943d7a1d2473d7742faf10082f2d517ae4954a6cea0607f87ac1a10718fb79b",
+        "2026-09-01_TSLAUSDT.csv.gz": "2b575ee6dfc99aefaaf287340c0775509ba8dff8e87ed17ac9fae68308153615",
+        "2026-09-01_AAPLUSDT.csv.gz": "719978995a7d4b390c241095acf576bc3e608e5ceed147db0deae22abeea8bdd",
+        "2026-09-01_METAUSDT.csv.gz": "33924377619738810741dba2ae7f30677e65fec4ba086c0a16de5e9610c085f9",
+        "2026-09-01_MSTRUSDT.csv.gz": "fc1240ac2f38703de2e8c5c40af53c43d8e9bb676d01e201dc68298d41c35f79",
+        "2026-09-01_COINUSDT.csv.gz": "f7f7ee3232a1a3ebecf94213e47fbd34c4d6b3191c0385336859be33e14433d3",
+        "2026-09-01_QQQUSDT.csv.gz": "fe1b851e47c462d789cff942da18d4d6e15fa88ca0a65e38e17c8ae282bdcbd3",
+        "2026-08-01_NVDAUSDT.csv.gz": "bda52de91534702f1a1f95ee6ee3edaaaf74feffcc9f98349527dc73f24da7cf",
+        "2026-08-01_TSLAUSDT.csv.gz": "a4957a9b78f712b7d21f1d6310fc3e6dfc1d3149201af024b0fd17e7231127df",
+        "2026-08-01_AAPLUSDT.csv.gz": "0ed323bd9e6a3cb77e706ca24fc888ff9bca5270f3c01f15b6843f1fbd3d6559",
+        "2026-08-01_METAUSDT.csv.gz": "fd91dd597a2478e977bafc3cb4495c9f0f7e99deb43c7e483b30e4a6eb1c030f",
+        "2026-08-01_MSTRUSDT.csv.gz": "bb727e1f334b3b50bc40b8289f24991bbd50d22564a30ee1df432ef9f23271e5",
+        "2026-08-01_COINUSDT.csv.gz": "97c4ab9e4afb8b4a1fcec25043265a67fc2ca36e49b85428ef8b1fc0395c9ada",
+        "2026-08-01_QQQUSDT.csv.gz": "9d99134c7ea9409f1ea86d25e1e570d36f67e134e6b9489751a1c2322e44b5f5"
+      }
+    }
+  },
+  "rival": {
+    "status": "absent"
+  },
+  "full_comparison": {
+    "n": 23003,
+    "reference": "argus_production",
+    "by_horizon": {
+      "3s": {
+        "pooled": {
+          "argus_production": {
+            "n": 23003,
+            "mse": 10.85,
+            "rmse": 3.2939,
+            "mae": 2.9747,
+            "mean_predicted_bps": 3.2354,
+            "mean_realised_bps": 0.5222,
+            "bias_ratio": 6.1951,
+            "spearman": -0.4293
+          },
+          "argus_adapted": {
+            "n": 23003,
+            "mse": 0.959,
+            "rmse": 0.9793,
+            "mae": 0.4994,
+            "mean_predicted_bps": 0.4857,
+            "mean_realised_bps": 0.5222,
+            "bias_ratio": 0.9301,
+            "spearman": 0.5375
+          },
+          "argus_adapted_bars": {
+            "n": 23003,
+            "mse": 1.0149,
+            "rmse": 1.0074,
+            "mae": 0.6177,
+            "mean_predicted_bps": 0.712,
+            "mean_realised_bps": 0.5222,
+            "bias_ratio": 1.3634,
+            "spearman": 0.5015
+          },
+          "trailing_rv_sqrt": {
+            "n": 23003,
+            "mse": 0.995,
+            "rmse": 0.9975,
+            "mae": 0.6204,
+            "mean_predicted_bps": 0.7197,
+            "mean_realised_bps": 0.5222,
+            "bias_ratio": 1.378,
+            "spearman": 0.5085
+          },
+          "latencybench_linear": {
+            "n": 23003,
+            "mse": 544.0757,
+            "rmse": 23.3254,
+            "mae": 15.645,
+            "mean_predicted_bps": 16.1651,
+            "mean_realised_bps": 0.5222,
+            "bias_ratio": 30.9532,
+            "spearman": 0.4897
+          },
+          "ablation_argus_without_depth": {
+            "n": 23003,
+            "mse": 2.0691,
+            "rmse": 1.4384,
+            "mae": 1.2278,
+            "mean_predicted_bps": 1.3875,
+            "mean_realised_bps": 0.5222,
+            "bias_ratio": 2.6567,
+            "spearman": null
+          },
+          "ablation_measured_vol_with_depth": {
+            "n": 23003,
+            "mse": 2.1005,
+            "rmse": 1.4493,
+            "mae": 1.1181,
+            "mean_predicted_bps": 1.367,
+            "mean_realised_bps": 0.5222,
+            "bias_ratio": 2.6176,
+            "spearman": 0.3185
+          }
+        },
+        "vs_reference": {
+          "argus_adapted": {
+            "point": 9.891,
+            "ci95_low": 9.2027,
+            "ci95_high": 10.571,
+            "blocks": 406.0,
+            "contender_beats_reference": true,
+            "reference_beats_contender": false
+          },
+          "argus_adapted_bars": {
+            "point": 9.8352,
+            "ci95_low": 9.1375,
+            "ci95_high": 10.5103,
+            "blocks": 406.0,
+            "contender_beats_reference": true,
+            "reference_beats_contender": false
+          },
+          "trailing_rv_sqrt": {
+            "point": 9.8551,
+            "ci95_low": 9.1682,
+            "ci95_high": 10.5342,
+            "blocks": 406.0,
+            "contender_beats_reference": true,
+            "reference_beats_contender": false
+          },
+          "latencybench_linear": {
+            "point": -533.2257,
+            "ci95_low": -654.6892,
+            "ci95_high": -429.7601,
+            "blocks": 406.0,
+            "contender_beats_reference": false,
+            "reference_beats_contender": true
+          },
+          "ablation_argus_without_depth": {
+            "point": 8.7809,
+            "ci95_low": 8.1403,
+            "ci95_high": 9.399,
+            "blocks": 406.0,
+            "contender_beats_reference": true,
+            "reference_beats_contender": false
+          },
+          "ablation_measured_vol_with_depth": {
+            "point": 8.7495,
+            "ci95_low": 8.0564,
+            "ci95_high": 9.4195,
+            "blocks": 406.0,
+            "contender_beats_reference": true,
+            "reference_beats_contender": false
+          }
+        },
+        "by_phase": {
+          "extended": {
+            "argus_production": {
+              "n": 4609,
+              "mse": 6.1346,
+              "rmse": 2.4768,
+              "mae": 2.3674,
+              "mean_predicted_bps": 2.7749,
+              "mean_realised_bps": 0.5556,
+              "bias_ratio": 4.9948,
+              "spearman": null
+            },
+            "argus_adapted": {
+              "n": 4609,
+              "mse": 0.9564,
+              "rmse": 0.978,
+              "mae": 0.5375,
+              "mean_predicted_bps": 0.534,
+              "mean_realised_bps": 0.5556,
+              "bias_ratio": 0.9612,
+              "spearman": 0.4868
+            },
+            "argus_adapted_bars": {
+              "n": 4609,
+              "mse": 1.0113,
+              "rmse": 1.0057,
+              "mae": 0.6315,
+              "mean_predicted_bps": 0.7179,
+              "mean_realised_bps": 0.5556,
+              "bias_ratio": 1.2923,
+              "spearman": 0.4552
+            },
+            "trailing_rv_sqrt": {
+              "n": 4609,
+              "mse": 1.0188,
+              "rmse": 1.0094,
+              "mae": 0.6552,
+              "mean_predicted_bps": 0.7735,
+              "mean_realised_bps": 0.5556,
+              "bias_ratio": 1.3923,
+              "spearman": 0.4688
+            },
+            "latencybench_linear": {
+              "n": 4609,
+              "mse": 478.9578,
+              "rmse": 21.8851,
+              "mae": 16.8211,
+              "mean_predicted_bps": 17.3745,
+              "mean_realised_bps": 0.5556,
+              "bias_ratio": 31.2738,
+              "spearman": 0.4185
+            },
+            "ablation_argus_without_depth": {
+              "n": 4609,
+              "mse": 1.9011,
+              "rmse": 1.3788,
+              "mae": 1.1802,
+              "mean_predicted_bps": 1.3875,
+              "mean_realised_bps": 0.5556,
+              "bias_ratio": 2.4974,
+              "spearman": null
+            },
+            "ablation_measured_vol_with_depth": {
+              "n": 4609,
+              "mse": 2.2808,
+              "rmse": 1.5102,
+              "mae": 1.1779,
+              "mean_predicted_bps": 1.5471,
+              "mean_realised_bps": 0.5556,
+              "bias_ratio": 2.7847,
+              "spearman": 0.4688
+            }
+          },
+          "overnight": {
+            "argus_production": {
+              "n": 4620,
+              "mse": 15.2523,
+              "rmse": 3.9054,
+              "mae": 3.8448,
+              "mean_predicted_bps": 4.1624,
+              "mean_realised_bps": 0.3401,
+              "bias_ratio": 12.2405,
+              "spearman": null
+            },
+            "argus_adapted": {
+              "n": 4620,
+              "mse": 0.5021,
+              "rmse": 0.7086,
+              "mae": 0.3682,
+              "mean_predicted_bps": 0.2955,
+              "mean_realised_bps": 0.3401,
+              "bias_ratio": 0.869,
+              "spearman": 0.4115
+            },
+            "argus_adapted_bars": {
+              "n": 4620,
+              "mse": 0.5437,
+              "rmse": 0.7373,
+              "mae": 0.4886,
+              "mean_predicted_bps": 0.5087,
+              "mean_realised_bps": 0.3401,
+              "bias_ratio": 1.4958,
+              "spearman": 0.371
+            },
+            "trailing_rv_sqrt": {
+              "n": 4620,
+              "mse": 0.5352,
+              "rmse": 0.7316,
+              "mae": 0.4866,
+              "mean_predicted_bps": 0.5083,
+              "mean_realised_bps": 0.3401,
+              "bias_ratio": 1.4949,
+              "spearman": 0.3691
+            },
+            "latencybench_linear": {
+              "n": 4620,
+              "mse": 230.1306,
+              "rmse": 15.1701,
+              "mae": 10.5976,
+              "mean_predicted_bps": 10.9377,
+              "mean_realised_bps": 0.3401,
+              "bias_ratio": 32.1648,
+              "spearman": 0.3659
+            },
+            "ablation_argus_without_depth": {
+              "n": 4620,
+              "mse": 1.7391,
+              "rmse": 1.3187,
+              "mae": 1.2315,
+              "mean_predicted_bps": 1.3875,
+              "mean_realised_bps": 0.3401,
+              "bias_ratio": 4.0802,
+              "spearman": null
+            },
+            "ablation_measured_vol_with_depth": {
+              "n": 4620,
+              "mse": 2.5978,
+              "rmse": 1.6118,
+              "mae": 1.2653,
+              "mean_predicted_bps": 1.525,
+              "mean_realised_bps": 0.3401,
+              "bias_ratio": 4.4847,
+              "spearman": 0.3691
+            }
+          },
+          "rth": {
+            "argus_production": {
+              "n": 5380,
+              "mse": 2.9961,
+              "rmse": 1.7309,
+              "mae": 1.1909,
+              "mean_predicted_bps": 1.3875,
+              "mean_realised_bps": 1.156,
+              "bias_ratio": 1.2003,
+              "spearman": null
+            },
+            "argus_adapted": {
+              "n": 5380,
+              "mse": 2.3478,
+              "rmse": 1.5322,
+              "mae": 0.9397,
+              "mean_predicted_bps": 1.1288,
+              "mean_realised_bps": 1.156,
+              "bias_ratio": 0.9765,
+              "spearman": 0.4334
+            },
+            "argus_adapted_bars": {
+              "n": 5380,
+              "mse": 2.4246,
+              "rmse": 1.5571,
+              "mae": 1.0333,
+              "mean_predicted_bps": 1.4052,
+              "mean_realised_bps": 1.156,
+              "bias_ratio": 1.2156,
+              "spearman": 0.4234
+            },
+            "trailing_rv_sqrt": {
+              "n": 5380,
+              "mse": 2.3444,
+              "rmse": 1.5312,
+              "mae": 1.009,
+              "mean_predicted_bps": 1.3617,
+              "mean_realised_bps": 1.156,
+              "bias_ratio": 1.178,
+              "spearman": 0.4317
+            },
+            "latencybench_linear": {
+              "n": 5380,
+              "mse": 1566.4131,
+              "rmse": 39.5779,
+              "mae": 31.5124,
+              "mean_predicted_bps": 32.667,
+              "mean_realised_bps": 1.156,
+              "bias_ratio": 28.2597,
+              "spearman": 0.3813
+            },
+            "ablation_argus_without_depth": {
+              "n": 5380,
+              "mse": 2.9961,
+              "rmse": 1.7309,
+              "mae": 1.1909,
+              "mean_predicted_bps": 1.3875,
+              "mean_realised_bps": 1.156,
+              "bias_ratio": 1.2003,
+              "spearman": null
+            },
+            "ablation_measured_vol_with_depth": {
+              "n": 5380,
+              "mse": 2.3444,
+              "rmse": 1.5312,
+              "mae": 1.009,
+              "mean_predicted_bps": 1.3617,
+              "mean_realised_bps": 1.156,
+              "bias_ratio": 1.178,
+              "spearman": 0.4317
+            }
+          },
+          "weekend": {
+            "argus_production": {
+              "n": 8394,
+              "mse": 16.0501,
+              "rmse": 4.0063,
+              "mae": 3.9726,
+              "mean_predicted_bps": 4.1624,
+              "mean_realised_bps": 0.1981,
+              "bias_ratio": 21.0156,
+              "spearman": null
+            },
+            "argus_adapted": {
+              "n": 8394,
+              "mse": 0.3218,
+              "rmse": 0.5673,
+              "mae": 0.2684,
+              "mean_predicted_bps": 0.1517,
+              "mean_realised_bps": 0.1981,
+              "bias_ratio": 0.7661,
+              "spearman": 0.1659
+            },
+            "argus_adapted_bars": {
+              "n": 8394,
+              "mse": 0.3726,
+              "rmse": 0.6104,
+              "mae": 0.4147,
+              "mean_predicted_bps": 0.3765,
+              "mean_realised_bps": 0.1981,
+              "bias_ratio": 1.9007,
+              "spearman": 0.1214
+            },
+            "trailing_rv_sqrt": {
+              "n": 8394,
+              "mse": 0.3701,
+              "rmse": 0.6083,
+              "mae": 0.4258,
+              "mean_predicted_bps": 0.3949,
+              "mean_realised_bps": 0.1981,
+              "bias_ratio": 1.9937,
+              "spearman": 0.1335
+            },
+            "latencybench_linear": {
+              "n": 8394,
+              "mse": 97.3733,
+              "rmse": 9.8678,
+              "mae": 7.6074,
+              "mean_predicted_bps": 7.8017,
+              "mean_realised_bps": 0.1981,
+              "bias_ratio": 39.39,
+              "spearman": 0.1299
+            },
+            "ablation_argus_without_depth": {
+              "n": 8394,
+              "mse": 1.7489,
+              "rmse": 1.3225,
+              "mae": 1.2755,
+              "mean_predicted_bps": 1.3875,
+              "mean_realised_bps": 0.1981,
+              "bias_ratio": 7.0052,
+              "spearman": null
+            },
+            "ablation_measured_vol_with_depth": {
+              "n": 8394,
+              "mse": 1.5715,
+              "rmse": 1.2536,
+              "mae": 1.0742,
+              "mean_predicted_bps": 1.1846,
+              "mean_realised_bps": 0.1981,
+              "bias_ratio": 5.981,
+              "spearman": 0.1335
+            }
+          }
+        }
+      },
+      "8s": {
+        "pooled": {
+          "argus_production": {
+            "n": 23003,
+            "mse": 28.1637,
+            "rmse": 5.3069,
+            "mae": 4.762,
+            "mean_predicted_bps": 5.2834,
+            "mean_realised_bps": 0.951,
+            "bias_ratio": 5.5558,
+            "spearman": -0.477
+          },
+          "argus_adapted": {
+            "n": 23003,
+            "mse": 2.303,
+            "rmse": 1.5176,
+            "mae": 0.7993,
+            "mean_predicted_bps": 0.9113,
+            "mean_realised_bps": 0.951,
+            "bias_ratio": 0.9583,
+            "spearman": 0.5968
+          },
+          "argus_adapted_bars": {
+            "n": 23003,
+            "mse": 2.3964,
+            "rmse": 1.548,
+            "mae": 0.9153,
+            "mean_predicted_bps": 1.1627,
+            "mean_realised_bps": 0.951,
+            "bias_ratio": 1.2227,
+            "spearman": 0.5591
+          },
+          "trailing_rv_sqrt": {
+            "n": 23003,
+            "mse": 2.3388,
+            "rmse": 1.5293,
+            "mae": 0.9179,
+            "mean_predicted_bps": 1.1752,
+            "mean_realised_bps": 0.951,
+            "bias_ratio": 1.2358,
+            "spearman": 0.5635
+          },
+          "latencybench_linear": {
+            "n": 23003,
+            "mse": 519.0734,
+            "rmse": 22.7832,
+            "mae": 15.2243,
+            "mean_predicted_bps": 16.1651,
+            "mean_realised_bps": 0.951,
+            "bias_ratio": 16.9986,
+            "spearman": 0.5447
+          },
+          "ablation_argus_without_depth": {
+            "n": 23003,
+            "mse": 5.0912,
+            "rmse": 2.2564,
+            "mae": 1.8853,
+            "mean_predicted_bps": 2.2657,
+            "mean_realised_bps": 0.951,
+            "bias_ratio": 2.3825,
+            "spearman": null
+          },
+          "ablation_measured_vol_with_depth": {
+            "n": 23003,
+            "mse": 5.1547,
+            "rmse": 2.2704,
+            "mae": 1.7203,
+            "mean_predicted_bps": 2.2323,
+            "mean_realised_bps": 0.951,
+            "bias_ratio": 2.3474,
+            "spearman": 0.3452
+          }
+        },
+        "vs_reference": {
+          "argus_adapted": {
+            "point": 25.8607,
+            "ci95_low": 24.021,
+            "ci95_high": 27.638,
+            "blocks": 406.0,
+            "contender_beats_reference": true,
+            "reference_beats_contender": false
+          },
+          "argus_adapted_bars": {
+            "point": 25.7673,
+            "ci95_low": 23.9214,
+            "ci95_high": 27.5501,
+            "blocks": 406.0,
+            "contender_beats_reference": true,
+            "reference_beats_contender": false
+          },
+          "trailing_rv_sqrt": {
+            "point": 25.8249,
+            "ci95_low": 23.9997,
+            "ci95_high": 27.596,
+            "blocks": 406.0,
+            "contender_beats_reference": true,
+            "reference_beats_contender": false
+          },
+          "latencybench_linear": {
+            "point": -490.9098,
+            "ci95_low": -606.3911,
+            "ci95_high": -392.1947,
+            "blocks": 406.0,
+            "contender_beats_reference": false,
+            "reference_beats_contender": true
+          },
+          "ablation_argus_without_depth": {
+            "point": 23.0725,
+            "ci95_low": 21.3835,
+            "ci95_high": 24.7088,
+            "blocks": 406.0,
+            "contender_beats_reference": true,
+            "reference_beats_contender": false
+          },
+          "ablation_measured_vol_with_depth": {
+            "point": 23.009,
+            "ci95_low": 21.1344,
+            "ci95_high": 24.7629,
+            "blocks": 406.0,
+            "contender_beats_reference": true,
+            "reference_beats_contender": false
+          }
+        },
+        "by_phase": {
+          "extended": {
+            "argus_production": {
+              "n": 4609,
+              "mse": 15.1993,
+              "rmse": 3.8986,
+              "mae": 3.7183,
+              "mean_predicted_bps": 4.5314,
+              "mean_realised_bps": 0.9926,
+              "bias_ratio": 4.5653,
+              "spearman": null
+            },
+            "argus_adapted": {
+              "n": 4609,
+              "mse": 2.077,
+              "rmse": 1.4412,
+              "mae": 0.8301,
+              "mean_predicted_bps": 0.9901,
+              "mean_realised_bps": 0.9926,
+              "bias_ratio": 0.9975,
+              "spearman": 0.5383
+            },
+            "argus_adapted_bars": {
+              "n": 4609,
+              "mse": 2.1699,
+              "rmse": 1.4731,
+              "mae": 0.9177,
+              "mean_predicted_bps": 1.1724,
+              "mean_realised_bps": 0.9926,
+              "bias_ratio": 1.1811,
+              "spearman": 0.5046
+            },
+            "trailing_rv_sqrt": {
+              "n": 4609,
+              "mse": 2.1702,
+              "rmse": 1.4731,
+              "mae": 0.946,
+              "mean_predicted_bps": 1.2632,
+              "mean_realised_bps": 0.9926,
+              "bias_ratio": 1.2726,
+              "spearman": 0.5229
+            },
+            "latencybench_linear": {
+              "n": 4609,
+              "mse": 459.1302,
+              "rmse": 21.4273,
+              "mae": 16.3935,
+              "mean_predicted_bps": 17.3745,
+              "mean_realised_bps": 0.9926,
+              "bias_ratio": 17.5042,
+              "spearman": 0.4679
+            },
+            "ablation_argus_without_depth": {
+              "n": 4609,
+              "mse": 4.2968,
+              "rmse": 2.0729,
+              "mae": 1.774,
+              "mean_predicted_bps": 2.2657,
+              "mean_realised_bps": 0.9926,
+              "bias_ratio": 2.2826,
+              "spearman": null
+            },
+            "ablation_measured_vol_with_depth": {
+              "n": 4609,
+              "mse": 5.3748,
+              "rmse": 2.3184,
+              "mae": 1.7849,
+              "mean_predicted_bps": 2.5264,
+              "mean_realised_bps": 0.9926,
+              "bias_ratio": 2.5452,
+              "spearman": 0.5229
+            }
+          },
+          "overnight": {
+            "argus_production": {
+              "n": 4620,
+              "mse": 39.6586,
+              "rmse": 6.2975,
+              "mae": 6.2023,
+              "mean_predicted_bps": 6.7971,
+              "mean_realised_bps": 0.6269,
+              "bias_ratio": 10.8417,
+              "spearman": null
+            },
+            "argus_adapted": {
+              "n": 4620,
+              "mse": 1.2003,
+              "rmse": 1.0956,
+              "mae": 0.588,
+              "mean_predicted_bps": 0.5869,
+              "mean_realised_bps": 0.6269,
+              "bias_ratio": 0.9361,
+              "spearman": 0.4578
+            },
+            "argus_adapted_bars": {
+              "n": 4620,
+              "mse": 1.3127,
+              "rmse": 1.1457,
+              "mae": 0.7092,
+              "mean_predicted_bps": 0.8306,
+              "mean_realised_bps": 0.6269,
+              "bias_ratio": 1.3249,
+              "spearman": 0.4119
+            },
+            "trailing_rv_sqrt": {
+              "n": 4620,
+              "mse": 1.2762,
+              "rmse": 1.1297,
+              "mae": 0.7039,
+              "mean_predicted_bps": 0.8301,
+              "mean_realised_bps": 0.6269,
+              "bias_ratio": 1.3241,
+              "spearman": 0.3994
+            },
+            "latencybench_linear": {
+              "n": 4620,
+              "mse": 220.5624,
+              "rmse": 14.8513,
+              "mae": 10.3277,
+              "mean_predicted_bps": 10.9377,
+              "mean_realised_bps": 0.6269,
+              "bias_ratio": 17.446,
+              "spearman": 0.4103
+            },
+            "ablation_argus_without_depth": {
+              "n": 4620,
+              "mse": 4.2728,
+              "rmse": 2.0671,
+              "mae": 1.8833,
+              "mean_predicted_bps": 2.2657,
+              "mean_realised_bps": 0.6269,
+              "bias_ratio": 3.6139,
+              "spearman": null
+            },
+            "ablation_measured_vol_with_depth": {
+              "n": 4620,
+              "mse": 6.5547,
+              "rmse": 2.5602,
+              "mae": 1.9606,
+              "mean_predicted_bps": 2.4904,
+              "mean_realised_bps": 0.6269,
+              "bias_ratio": 3.9722,
+              "spearman": 0.3994
+            }
+          },
+          "rth": {
+            "argus_production": {
+              "n": 5380,
+              "mse": 7.6686,
+              "rmse": 2.7692,
+              "mae": 1.8005,
+              "mean_predicted_bps": 2.2657,
+              "mean_realised_bps": 2.1088,
+              "bias_ratio": 1.0744,
+              "spearman": null
+            },
+            "argus_adapted": {
+              "n": 5380,
+              "mse": 6.0134,
+              "rmse": 2.4522,
+              "mae": 1.4975,
+              "mean_predicted_bps": 2.0292,
+              "mean_realised_bps": 2.1088,
+              "bias_ratio": 0.9622,
+              "spearman": 0.4213
+            },
+            "argus_adapted_bars": {
+              "n": 5380,
+              "mse": 6.0708,
+              "rmse": 2.4639,
+              "mae": 1.5705,
+              "mean_predicted_bps": 2.2947,
+              "mean_realised_bps": 2.1088,
+              "bias_ratio": 1.0881,
+              "spearman": 0.4177
+            },
+            "trailing_rv_sqrt": {
+              "n": 5380,
+              "mse": 5.8616,
+              "rmse": 2.4211,
+              "mae": 1.5355,
+              "mean_predicted_bps": 2.2236,
+              "mean_realised_bps": 2.1088,
+              "bias_ratio": 1.0544,
+              "spearman": 0.4244
+            },
+            "latencybench_linear": {
+              "n": 5380,
+              "mse": 1489.8811,
+              "rmse": 38.599,
+              "mae": 30.5585,
+              "mean_predicted_bps": 32.667,
+              "mean_realised_bps": 2.1088,
+              "bias_ratio": 15.4908,
+              "spearman": 0.3835
+            },
+            "ablation_argus_without_depth": {
+              "n": 5380,
+              "mse": 7.6686,
+              "rmse": 2.7692,
+              "mae": 1.8005,
+              "mean_predicted_bps": 2.2657,
+              "mean_realised_bps": 2.1088,
+              "bias_ratio": 1.0744,
+              "spearman": null
+            },
+            "ablation_measured_vol_with_depth": {
+              "n": 5380,
+              "mse": 5.8616,
+              "rmse": 2.4211,
+              "mae": 1.5355,
+              "mean_predicted_bps": 2.2236,
+              "mean_realised_bps": 2.1088,
+              "bias_ratio": 1.0544,
+              "spearman": 0.4244
+            }
+          },
+          "weekend": {
+            "argus_production": {
+              "n": 8394,
+              "mse": 42.0914,
+              "rmse": 6.4878,
+              "mae": 6.4404,
+              "mean_predicted_bps": 6.7971,
+              "mean_realised_bps": 0.3644,
+              "bias_ratio": 18.6547,
+              "spearman": null
+            },
+            "argus_adapted": {
+              "n": 8394,
+              "mse": 0.6557,
+              "rmse": 0.8098,
+              "mae": 0.4513,
+              "mean_predicted_bps": 0.3302,
+              "mean_realised_bps": 0.3644,
+              "bias_ratio": 0.9061,
+              "spearman": 0.2257
+            },
+            "argus_adapted_bars": {
+              "n": 8394,
+              "mse": 0.762,
+              "rmse": 0.873,
+              "mae": 0.6076,
+              "mean_predicted_bps": 0.6147,
+              "mean_realised_bps": 0.3644,
+              "bias_ratio": 1.6872,
+              "spearman": 0.191
+            },
+            "trailing_rv_sqrt": {
+              "n": 8394,
+              "mse": 0.7584,
+              "rmse": 0.8709,
+              "mae": 0.6245,
+              "mean_predicted_bps": 0.6448,
+              "mean_realised_bps": 0.3644,
+              "bias_ratio": 1.7697,
+              "spearman": 0.2036
+            },
+            "latencybench_linear": {
+              "n": 8394,
+              "mse": 94.062,
+              "rmse": 9.6986,
+              "mae": 7.4492,
+              "mean_predicted_bps": 7.8017,
+              "mean_realised_bps": 0.3644,
+              "bias_ratio": 21.4116,
+              "spearman": 0.1823
+            },
+            "ablation_argus_without_depth": {
+              "n": 8394,
+              "mse": 4.3259,
+              "rmse": 2.0799,
+              "mae": 2.0017,
+              "mean_predicted_bps": 2.2657,
+              "mean_realised_bps": 0.3644,
+              "bias_ratio": 6.2182,
+              "spearman": null
+            },
+            "ablation_measured_vol_with_depth": {
+              "n": 8394,
+              "mse": 3.8102,
+              "rmse": 1.952,
+              "mae": 1.671,
+              "mean_predicted_bps": 1.9345,
+              "mean_realised_bps": 0.3644,
+              "bias_ratio": 5.3091,
+              "spearman": 0.2036
+            }
+          }
+        }
+      },
+      "40s": {
+        "pooled": {
+          "argus_production": {
+            "n": 23003,
+            "mse": 135.5606,
+            "rmse": 11.643,
+            "mae": 10.4549,
+            "mean_predicted_bps": 11.8139,
+            "mean_realised_bps": 2.3022,
+            "bias_ratio": 5.1316,
+            "spearman": -0.4468
+          },
+          "argus_adapted": {
+            "n": 23003,
+            "mse": 10.0833,
+            "rmse": 3.1754,
+            "mae": 1.6979,
+            "mean_predicted_bps": 2.3266,
+            "mean_realised_bps": 2.3022,
+            "bias_ratio": 1.0106,
+            "spearman": 0.5888
+          },
+          "argus_adapted_bars": {
+            "n": 23003,
+            "mse": 10.3508,
+            "rmse": 3.2173,
+            "mae": 1.8094,
+            "mean_predicted_bps": 2.6,
+            "mean_realised_bps": 2.3022,
+            "bias_ratio": 1.1293,
+            "spearman": 0.5679
+          },
+          "trailing_rv_sqrt": {
+            "n": 23003,
+            "mse": 9.9871,
+            "rmse": 3.1602,
+            "mae": 1.812,
+            "mean_predicted_bps": 2.6278,
+            "mean_realised_bps": 2.3022,
+            "bias_ratio": 1.1414,
+            "spearman": 0.5698
+          },
+          "latencybench_linear": {
+            "n": 23003,
+            "mse": 451.8166,
+            "rmse": 21.256,
+            "mae": 13.9384,
+            "mean_predicted_bps": 16.1651,
+            "mean_realised_bps": 2.3022,
+            "bias_ratio": 7.0216,
+            "spearman": 0.5412
+          },
+          "ablation_argus_without_depth": {
+            "n": 23003,
+            "mse": 22.7675,
+            "rmse": 4.7715,
+            "mae": 3.9827,
+            "mean_predicted_bps": 5.0663,
+            "mean_realised_bps": 2.3022,
+            "bias_ratio": 2.2006,
+            "spearman": null
+          },
+          "ablation_measured_vol_with_depth": {
+            "n": 23003,
+            "mse": 23.4021,
+            "rmse": 4.8376,
+            "mae": 3.598,
+            "mean_predicted_bps": 4.9916,
+            "mean_realised_bps": 2.3022,
+            "bias_ratio": 2.1682,
+            "spearman": 0.3787
+          }
+        },
+        "vs_reference": {
+          "argus_adapted": {
+            "point": 125.4772,
+            "ci95_low": 116.6246,
+            "ci95_high": 134.2244,
+            "blocks": 406.0,
+            "contender_beats_reference": true,
+            "reference_beats_contender": false
+          },
+          "argus_adapted_bars": {
+            "point": 125.2098,
+            "ci95_low": 116.3867,
+            "ci95_high": 133.8929,
+            "blocks": 406.0,
+            "contender_beats_reference": true,
+            "reference_beats_contender": false
+          },
+          "trailing_rv_sqrt": {
+            "point": 125.5734,
+            "ci95_low": 116.8332,
+            "ci95_high": 134.2211,
+            "blocks": 406.0,
+            "contender_beats_reference": true,
+            "reference_beats_contender": false
+          },
+          "latencybench_linear": {
+            "point": -316.2561,
+            "ci95_low": -417.707,
+            "ci95_high": -227.6666,
+            "blocks": 406.0,
+            "contender_beats_reference": false,
+            "reference_beats_contender": true
+          },
+          "ablation_argus_without_depth": {
+            "point": 112.793,
+            "ci95_low": 104.5049,
+            "ci95_high": 120.7847,
+            "blocks": 406.0,
+            "contender_beats_reference": true,
+            "reference_beats_contender": false
+          },
+          "ablation_measured_vol_with_depth": {
+            "point": 112.1584,
+            "ci95_low": 103.1929,
+            "ci95_high": 120.7408,
+            "blocks": 406.0,
+            "contender_beats_reference": true,
+            "reference_beats_contender": false
+          }
+        },
+        "by_phase": {
+          "extended": {
+            "argus_production": {
+              "n": 4609,
+              "mse": 72.0123,
+              "rmse": 8.486,
+              "mae": 8.1371,
+              "mean_predicted_bps": 10.1326,
+              "mean_realised_bps": 2.3556,
+              "bias_ratio": 4.3015,
+              "spearman": null
+            },
+            "argus_adapted": {
+              "n": 4609,
+              "mse": 8.6715,
+              "rmse": 2.9447,
+              "mae": 1.7232,
+              "mean_predicted_bps": 2.4225,
+              "mean_realised_bps": 2.3556,
+              "bias_ratio": 1.0284,
+              "spearman": 0.5517
+            },
+            "argus_adapted_bars": {
+              "n": 4609,
+              "mse": 8.831,
+              "rmse": 2.9717,
+              "mae": 1.7988,
+              "mean_predicted_bps": 2.6215,
+              "mean_realised_bps": 2.3556,
+              "bias_ratio": 1.1129,
+              "spearman": 0.5387
+            },
+            "trailing_rv_sqrt": {
+              "n": 4609,
+              "mse": 8.8047,
+              "rmse": 2.9673,
+              "mae": 1.8683,
+              "mean_predicted_bps": 2.8246,
+              "mean_realised_bps": 2.3556,
+              "bias_ratio": 1.1991,
+              "spearman": 0.55
+            },
+            "latencybench_linear": {
+              "n": 4609,
+              "mse": 401.9696,
+              "rmse": 20.0492,
+              "mae": 15.0797,
+              "mean_predicted_bps": 17.3745,
+              "mean_realised_bps": 2.3556,
+              "bias_ratio": 7.3759,
+              "spearman": 0.4964
+            },
+            "ablation_argus_without_depth": {
+              "n": 4609,
+              "mse": 18.8783,
+              "rmse": 4.3449,
+              "mae": 3.7582,
+              "mean_predicted_bps": 5.0663,
+              "mean_realised_bps": 2.3556,
+              "bias_ratio": 2.1508,
+              "spearman": null
+            },
+            "ablation_measured_vol_with_depth": {
+              "n": 4609,
+              "mse": 24.0086,
+              "rmse": 4.8999,
+              "mae": 3.7403,
+              "mean_predicted_bps": 5.6491,
+              "mean_realised_bps": 2.3556,
+              "bias_ratio": 2.3982,
+              "spearman": 0.55
+            }
+          },
+          "overnight": {
+            "argus_production": {
+              "n": 4620,
+              "mse": 192.0251,
+              "rmse": 13.8573,
+              "mae": 13.6991,
+              "mean_predicted_bps": 15.1989,
+              "mean_realised_bps": 1.5405,
+              "bias_ratio": 9.866,
+              "spearman": null
+            },
+            "argus_adapted": {
+              "n": 4620,
+              "mse": 4.1319,
+              "rmse": 2.0327,
+              "mae": 1.2006,
+              "mean_predicted_bps": 1.6237,
+              "mean_realised_bps": 1.5405,
+              "bias_ratio": 1.054,
+              "spearman": 0.4549
+            },
+            "argus_adapted_bars": {
+              "n": 4620,
+              "mse": 4.6486,
+              "rmse": 2.1561,
+              "mae": 1.3207,
+              "mean_predicted_bps": 1.8574,
+              "mean_realised_bps": 1.5405,
+              "bias_ratio": 1.2057,
+              "spearman": 0.4199
+            },
+            "trailing_rv_sqrt": {
+              "n": 4620,
+              "mse": 4.3896,
+              "rmse": 2.0951,
+              "mae": 1.3053,
+              "mean_predicted_bps": 1.8562,
+              "mean_realised_bps": 1.5405,
+              "bias_ratio": 1.2049,
+              "spearman": 0.4069
+            },
+            "latencybench_linear": {
+              "n": 4620,
+              "mse": 196.2641,
+              "rmse": 14.0094,
+              "mae": 9.4518,
+              "mean_predicted_bps": 10.9377,
+              "mean_realised_bps": 1.5405,
+              "bias_ratio": 7.0999,
+              "spearman": 0.4054
+            },
+            "ablation_argus_without_depth": {
+              "n": 4620,
+              "mse": 17.9056,
+              "rmse": 4.2315,
+              "mae": 3.934,
+              "mean_predicted_bps": 5.0663,
+              "mean_realised_bps": 1.5405,
+              "bias_ratio": 3.2887,
+              "spearman": null
+            },
+            "ablation_measured_vol_with_depth": {
+              "n": 4620,
+              "mse": 30.9063,
+              "rmse": 5.5593,
+              "mae": 4.1472,
+              "mean_predicted_bps": 5.5686,
+              "mean_realised_bps": 1.5405,
+              "bias_ratio": 3.6147,
+              "spearman": 0.4069
+            }
+          },
+          "rth": {
+            "argus_production": {
+              "n": 5380,
+              "mse": 35.264,
+              "rmse": 5.9384,
+              "mae": 3.8449,
+              "mean_predicted_bps": 5.0663,
+              "mean_realised_bps": 4.8665,
+              "bias_ratio": 1.0411,
+              "spearman": null
+            },
+            "argus_adapted": {
+              "n": 5380,
+              "mse": 27.224,
+              "rmse": 5.2177,
+              "mae": 3.194,
+              "mean_predicted_bps": 4.8393,
+              "mean_realised_bps": 4.8665,
+              "bias_ratio": 0.9944,
+              "spearman": 0.4597
+            },
+            "argus_adapted_bars": {
+              "n": 5380,
+              "mse": 27.3725,
+              "rmse": 5.2319,
+              "mae": 3.2657,
+              "mean_predicted_bps": 5.1311,
+              "mean_realised_bps": 4.8665,
+              "bias_ratio": 1.0544,
+              "spearman": 0.4615
+            },
+            "trailing_rv_sqrt": {
+              "n": 5380,
+              "mse": 26.1133,
+              "rmse": 5.1101,
+              "mae": 3.1926,
+              "mean_predicted_bps": 4.9722,
+              "mean_realised_bps": 4.8665,
+              "bias_ratio": 1.0217,
+              "spearman": 0.4691
+            },
+            "latencybench_linear": {
+              "n": 5380,
+              "mse": 1288.2011,
+              "rmse": 35.8915,
+              "mae": 27.8731,
+              "mean_predicted_bps": 32.667,
+              "mean_realised_bps": 4.8665,
+              "bias_ratio": 6.7127,
+              "spearman": 0.4171
+            },
+            "ablation_argus_without_depth": {
+              "n": 5380,
+              "mse": 35.264,
+              "rmse": 5.9384,
+              "mae": 3.8449,
+              "mean_predicted_bps": 5.0663,
+              "mean_realised_bps": 4.8665,
+              "bias_ratio": 1.0411,
+              "spearman": null
+            },
+            "ablation_measured_vol_with_depth": {
+              "n": 5380,
+              "mse": 26.1133,
+              "rmse": 5.1101,
+              "mae": 3.1926,
+              "mean_predicted_bps": 4.9722,
+              "mean_realised_bps": 4.8665,
+              "bias_ratio": 1.0217,
+              "spearman": 0.4691
+            }
+          },
+          "weekend": {
+            "argus_production": {
+              "n": 8394,
+              "mse": 203.6596,
+              "rmse": 14.2709,
+              "mae": 14.1785,
+              "mean_predicted_bps": 15.1989,
+              "mean_realised_bps": 1.0485,
+              "bias_ratio": 14.4953,
+              "spearman": null
+            },
+            "argus_adapted": {
+              "n": 8394,
+              "mse": 3.1481,
+              "rmse": 1.7743,
+              "mae": 0.9989,
+              "mean_predicted_bps": 1.0502,
+              "mean_realised_bps": 1.0485,
+              "bias_ratio": 1.0016,
+              "spearman": 0.2847
+            },
+            "argus_adapted_bars": {
+              "n": 8394,
+              "mse": 3.4139,
+              "rmse": 1.8477,
+              "mae": 1.1508,
+              "mean_predicted_bps": 1.3746,
+              "mean_realised_bps": 1.0485,
+              "bias_ratio": 1.311,
+              "spearman": 0.2684
+            },
+            "trailing_rv_sqrt": {
+              "n": 8394,
+              "mse": 3.3814,
+              "rmse": 1.8389,
+              "mae": 1.175,
+              "mean_predicted_bps": 1.4419,
+              "mean_realised_bps": 1.0485,
+              "bias_ratio": 1.3751,
+              "spearman": 0.2778
+            },
+            "latencybench_linear": {
+              "n": 8394,
+              "mse": 83.7739,
+              "rmse": 9.1528,
+              "mae": 6.85,
+              "mean_predicted_bps": 7.8017,
+              "mean_realised_bps": 1.0485,
+              "bias_ratio": 7.4405,
+              "spearman": 0.2241
+            },
+            "ablation_argus_without_depth": {
+              "n": 8394,
+              "mse": 19.5696,
+              "rmse": 4.4238,
+              "mae": 4.2213,
+              "mean_predicted_bps": 5.0663,
+              "mean_realised_bps": 1.0485,
+              "bias_ratio": 4.8318,
+              "spearman": null
+            },
+            "ablation_measured_vol_with_depth": {
+              "n": 8394,
+              "mse": 17.2012,
+              "rmse": 4.1474,
+              "mae": 3.4774,
+              "mean_predicted_bps": 4.3256,
+              "mean_realised_bps": 1.0485,
+              "bias_ratio": 4.1253,
+              "spearman": 0.2778
+            }
+          }
+        }
+      }
+    }
+  },
+  "full_verdict": {
+    "3s": "lowest MSE: argus_adapted (0.959 vs argus_production 10.850); significantly better than argus_production: argus_adapted, argus_adapted_bars, trailing_rv_sqrt, ablation_argus_without_depth, ablation_measured_vol_with_depth",
+    "8s": "lowest MSE: argus_adapted (2.303 vs argus_production 28.164); significantly better than argus_production: argus_adapted, argus_adapted_bars, trailing_rv_sqrt, ablation_argus_without_depth, ablation_measured_vol_with_depth",
+    "40s": "lowest MSE: trailing_rv_sqrt (9.987 vs argus_production 135.561); significantly better than argus_production: argus_adapted, argus_adapted_bars, trailing_rv_sqrt, ablation_argus_without_depth, ablation_measured_vol_with_depth"
+  },
+  "adapted_parity": {
+    "instants_checked": 238,
+    "max_abs_diff_bps": 2.0543566847663897e-12,
+    "matches": true
+  },
+  "per_book_out_of_sample": {
+    "tape-2026-09-24": {
+      "3s": {
+        "argus_production": 3.2234,
+        "argus_adapted": 1.621,
+        "argus_adapted_bars": 1.6621,
+        "trailing_rv_sqrt": 1.6564,
+        "latencybench_linear": 1014.5727
+      },
+      "8s": {
+        "argus_production": 7.2815,
+        "argus_adapted": 3.4757,
+        "argus_adapted_bars": 3.5867,
+        "trailing_rv_sqrt": 3.5364,
+        "latencybench_linear": 968.9586
+      },
+      "40s": {
+        "argus_production": 31.7488,
+        "argus_adapted": 13.9663,
+        "argus_adapted_bars": 14.2434,
+        "trailing_rv_sqrt": 13.8102,
+        "latencybench_linear": 842.392
+      }
+    },
+    "tardis-2026-08-01": {
+      "3s": {
+        "argus_production": 16.0636,
+        "argus_adapted": 0.3234,
+        "argus_adapted_bars": 0.3816,
+        "trailing_rv_sqrt": 0.3752,
+        "latencybench_linear": 102.9838
+      },
+      "8s": {
+        "argus_production": 42.2108,
+        "argus_adapted": 0.7752,
+        "argus_adapted_bars": 0.9119,
+        "trailing_rv_sqrt": 0.8907,
+        "latencybench_linear": 99.9705
+      },
+      "40s": {
+        "argus_production": 203.7638,
+        "argus_adapted": 3.2197,
+        "argus_adapted_bars": 3.6302,
+        "trailing_rv_sqrt": 3.5043,
+        "latencybench_linear": 89.5954
+      }
+    },
+    "tardis-2026-09-01": {
+      "3s": {
+        "argus_production": 8.1656,
+        "argus_adapted": 1.3751,
+        "argus_adapted_bars": 1.4334,
+        "trailing_rv_sqrt": 1.3954,
+        "latencybench_linear": 829.0682
+      },
+      "8s": {
+        "argus_production": 21.0414,
+        "argus_adapted": 3.4414,
+        "argus_adapted_bars": 3.4857,
+        "trailing_rv_sqrt": 3.3894,
+        "latencybench_linear": 788.9171
+      },
+      "40s": {
+        "argus_production": 101.7818,
+        "argus_adapted": 15.6567,
+        "argus_adapted_bars": 15.7779,
+        "trailing_rv_sqrt": 15.1998,
+        "latencybench_linear": 684.4569
+      }
+    }
+  },
+  "split_halves": {
+    "first_half": {
+      "3s": {
+        "argus_production": 12.2609,
+        "argus_adapted": 0.7681,
+        "argus_adapted_bars": 0.798,
+        "trailing_rv_sqrt": 0.7947,
+        "latencybench_linear": 408.7011
+      },
+      "8s": {
+        "argus_production": 31.8276,
+        "argus_adapted": 1.7442,
+        "argus_adapted_bars": 1.833,
+        "trailing_rv_sqrt": 1.8104,
+        "latencybench_linear": 391.3629
+      },
+      "40s": {
+        "argus_production": 153.1283,
+        "argus_adapted": 6.7924,
+        "argus_adapted_bars": 7.1152,
+        "trailing_rv_sqrt": 6.9012,
+        "latencybench_linear": 342.1715
+      }
+    },
+    "second_half": {
+      "3s": {
+        "argus_production": 9.4405,
+        "argus_adapted": 1.1497,
+        "argus_adapted_bars": 1.2315,
+        "trailing_rv_sqrt": 1.1951,
+        "latencybench_linear": 679.3209
+      },
+      "8s": {
+        "argus_production": 24.5033,
+        "argus_adapted": 2.8612,
+        "argus_adapted_bars": 2.9592,
+        "trailing_rv_sqrt": 2.8667,
+        "latencybench_linear": 646.6619
+      },
+      "40s": {
+        "argus_production": 118.0096,
+        "argus_adapted": 13.3711,
+        "argus_adapted_bars": 13.5833,
+        "trailing_rv_sqrt": 13.0702,
+        "latencybench_linear": 561.357
+      }
+    }
+  },
+  "adversarial_after_a_jump": {
+    "selection": "|move over the previous 60s| in the top decile of its book",
+    "n": 2304,
+    "mse": {
+      "3s": {
+        "argus_production": 9.8312,
+        "argus_adapted": 2.7259,
+        "argus_adapted_bars": 2.683,
+        "trailing_rv_sqrt": 2.5808,
+        "latencybench_linear": 1416.7095
+      },
+      "8s": {
+        "argus_production": 25.7351,
+        "argus_adapted": 6.7105,
+        "argus_adapted_bars": 6.5056,
+        "trailing_rv_sqrt": 6.2565,
+        "latencybench_linear": 1344.8377
+      },
+      "40s": {
+        "argus_production": 122.4171,
+        "argus_adapted": 32.1072,
+        "argus_adapted_bars": 31.7793,
+        "trailing_rv_sqrt": 30.6974,
+        "latencybench_linear": 1167.6401
+      }
+    }
+  },
+  "ablation": {
+    "3s": {
+      "argus_production": {
+        "n": 23003,
+        "mse": 10.85,
+        "rmse": 3.2939,
+        "mae": 2.9747,
+        "mean_predicted_bps": 3.2354,
+        "mean_realised_bps": 0.5222,
+        "bias_ratio": 6.1951,
+        "spearman": -0.4293
+      },
+      "ablation_argus_without_depth": {
+        "n": 23003,
+        "mse": 2.0691,
+        "rmse": 1.4384,
+        "mae": 1.2278,
+        "mean_predicted_bps": 1.3875,
+        "mean_realised_bps": 0.5222,
+        "bias_ratio": 2.6567,
+        "spearman": null
+      },
+      "ablation_measured_vol_with_depth": {
+        "n": 23003,
+        "mse": 2.1005,
+        "rmse": 1.4493,
+        "mae": 1.1181,
+        "mean_predicted_bps": 1.367,
+        "mean_realised_bps": 0.5222,
+        "bias_ratio": 2.6176,
+        "spearman": 0.3185
+      }
+    },
+    "8s": {
+      "argus_production": {
+        "n": 23003,
+        "mse": 28.1637,
+        "rmse": 5.3069,
+        "mae": 4.762,
+        "mean_predicted_bps": 5.2834,
+        "mean_realised_bps": 0.951,
+        "bias_ratio": 5.5558,
+        "spearman": -0.477
+      },
+      "ablation_argus_without_depth": {
+        "n": 23003,
+        "mse": 5.0912,
+        "rmse": 2.2564,
+        "mae": 1.8853,
+        "mean_predicted_bps": 2.2657,
+        "mean_realised_bps": 0.951,
+        "bias_ratio": 2.3825,
+        "spearman": null
+      },
+      "ablation_measured_vol_with_depth": {
+        "n": 23003,
+        "mse": 5.1547,
+        "rmse": 2.2704,
+        "mae": 1.7203,
+        "mean_predicted_bps": 2.2323,
+        "mean_realised_bps": 0.951,
+        "bias_ratio": 2.3474,
+        "spearman": 0.3452
+      }
+    },
+    "40s": {
+      "argus_production": {
+        "n": 23003,
+        "mse": 135.5606,
+        "rmse": 11.643,
+        "mae": 10.4549,
+        "mean_predicted_bps": 11.8139,
+        "mean_realised_bps": 2.3022,
+        "bias_ratio": 5.1316,
+        "spearman": -0.4468
+      },
+      "ablation_argus_without_depth": {
+        "n": 23003,
+        "mse": 22.7675,
+        "rmse": 4.7715,
+        "mae": 3.9827,
+        "mean_predicted_bps": 5.0663,
+        "mean_realised_bps": 2.3022,
+        "bias_ratio": 2.2006,
+        "spearman": null
+      },
+      "ablation_measured_vol_with_depth": {
+        "n": 23003,
+        "mse": 23.4021,
+        "rmse": 4.8376,
+        "mae": 3.598,
+        "mean_predicted_bps": 4.9916,
+        "mean_realised_bps": 2.3022,
+        "bias_ratio": 2.1682,
+        "spearman": 0.3787
+      }
+    }
+  },
+  "depth_multiplier_check": {
+    "3s": {
+      "extended": {
+        "n": 4609,
+        "mean_realised_bps": 0.5556,
+        "realised_ratio_to_rth": 0.4806,
+        "argus_multiplier": 2.0
+      },
+      "overnight": {
+        "n": 4620,
+        "mean_realised_bps": 0.3401,
+        "realised_ratio_to_rth": 0.2942,
+        "argus_multiplier": 3.0
+      },
+      "rth": {
+        "n": 5380,
+        "mean_realised_bps": 1.156,
+        "realised_ratio_to_rth": 1.0,
+        "argus_multiplier": 1.0
+      },
+      "weekend": {
+        "n": 8394,
+        "mean_realised_bps": 0.1981,
+        "realised_ratio_to_rth": 0.1713,
+        "argus_multiplier": 3.0
+      }
+    },
+    "8s": {
+      "extended": {
+        "n": 4609,
+        "mean_realised_bps": 0.9926,
+        "realised_ratio_to_rth": 0.4707,
+        "argus_multiplier": 2.0
+      },
+      "overnight": {
+        "n": 4620,
+        "mean_realised_bps": 0.6269,
+        "realised_ratio_to_rth": 0.2973,
+        "argus_multiplier": 3.0
+      },
+      "rth": {
+        "n": 5380,
+        "mean_realised_bps": 2.1088,
+        "realised_ratio_to_rth": 1.0,
+        "argus_multiplier": 1.0
+      },
+      "weekend": {
+        "n": 8394,
+        "mean_realised_bps": 0.3644,
+        "realised_ratio_to_rth": 0.1728,
+        "argus_multiplier": 3.0
+      }
+    },
+    "40s": {
+      "extended": {
+        "n": 4609,
+        "mean_realised_bps": 2.3556,
+        "realised_ratio_to_rth": 0.484,
+        "argus_multiplier": 2.0
+      },
+      "overnight": {
+        "n": 4620,
+        "mean_realised_bps": 1.5405,
+        "realised_ratio_to_rth": 0.3166,
+        "argus_multiplier": 3.0
+      },
+      "rth": {
+        "n": 5380,
+        "mean_realised_bps": 4.8665,
+        "realised_ratio_to_rth": 1.0,
+        "argus_multiplier": 1.0
+      },
+      "weekend": {
+        "n": 8394,
+        "mean_realised_bps": 1.0485,
+        "realised_ratio_to_rth": 0.2155,
+        "argus_multiplier": 3.0
+      }
+    }
+  },
+  "hurdle_effect_full_budget": {
+    "round_trip_bps": 12.0,
+    "extended": {
+      "n": 4609,
+      "hurdle_today_bps": 22.133,
+      "hurdle_adapted_bps": 14.422,
+      "realised_mean_40s_move_bps": 2.356,
+      "overcharge_today_bps": 7.777
+    },
+    "overnight": {
+      "n": 4620,
+      "hurdle_today_bps": 27.199,
+      "hurdle_adapted_bps": 13.624,
+      "realised_mean_40s_move_bps": 1.541,
+      "overcharge_today_bps": 13.658
+    },
+    "rth": {
+      "n": 5380,
+      "hurdle_today_bps": 17.066,
+      "hurdle_adapted_bps": 16.839,
+      "realised_mean_40s_move_bps": 4.866,
+      "overcharge_today_bps": 0.2
+    },
+    "weekend": {
+      "n": 8394,
+      "hurdle_today_bps": 27.199,
+      "hurdle_adapted_bps": 13.05,
+      "realised_mean_40s_move_bps": 1.049,
+      "overcharge_today_bps": 14.15
+    }
+  },
+  "reproducibility": {
+    "first_sha256": "cad92878f323d7642d754f6d1a5fc6125fd8ca407df952f6364be951b8a2340c",
+    "second_sha256": "cad92878f323d7642d754f6d1a5fc6125fd8ca407df952f6364be951b8a2340c",
+    "identical": true
+  }
+}

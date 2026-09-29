@@ -106,3 +106,15 @@ def test_the_long_short_question_is_recognised_in_every_language(text: str) -> N
     from argus.lui.research.parse import LONG_SHORT_QUESTION
 
     assert LONG_SHORT_QUESTION.search(text)
+
+
+@pytest.mark.parametrize(("text", "lang"), [
+    ("Où se trouve NVDA en ce moment ?", "fr"),
+    ("Combien puis-je perdre sur TSLA cette semaine ?", "fr"),
+    ("¿Dónde está NVDA ahora?", "es"),
+    ("what is the moment of truth for NVDA", None),
+])
+def test_everyday_questions_a_first_user_typed(text: str, lang: str | None) -> None:
+    """First-user audit, 2026-09-29: the first two were refused or answered with the desk's
+    positions, because nothing read them as French."""
+    assert tr.target_language(text) == lang

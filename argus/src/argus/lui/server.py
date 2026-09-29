@@ -317,10 +317,17 @@ const collapseLines = (divs, refused) => {
   if (refused || divs.length <= 8) return divs.join('');
   const id = 'more-' + (++cardSeq);
   const label = `Show all ${divs.length} lines`;
+  // A source link in the folded lines is repeated under the button, so the answer's citation is
+  // one click away whatever is folded (first-user audit, 2026-09-29: the only link sat at line 20
+  // of 20, hidden until expanded).
+  const folded = [...new Set([...divs.slice(6).join('')
+    .matchAll(/<a href="[^"]+"[^>]*>[^<]+<\\/a>/g)].map(m => m[0]))];
+  const cite = folded.length
+    ? `<div class="line fine">Sources in the folded lines: ${folded.join(' · ')}</div>` : '';
   return divs.slice(0, 6).join('') +
     `<div class="rest" id="${id}" hidden>${divs.slice(6).join('')}</div>` +
     `<button type="button" class="more" aria-expanded="false" aria-controls="${id}" ` +
-    `data-label="${escA(label)}">${label}</button>`;
+    `data-label="${escA(label)}">${label}</button>` + cite;
 };
 
 fetch('status').then(r => r.json()).then(s => {
@@ -649,10 +656,18 @@ RESTATE_PROMPT = (
     "and date unchanged. Do not answer it. Reply as JSON: {\"english\": \"...\"}.")
 
 
-def _read_in_english(text: str) -> tuple[str | None, str]:
+RESTATED_LATIN = frozenset({"fr", "de", "es", "pt", "vi"})
+"""Languages in Latin script that are restated in English before routing. The patterns read a few
+of their words ("prix", "Preis") and nothing else: "Où se trouve NVDA en ce moment ?" was answered
+with the desk's positions and "Combien puis-je perdre sur TSLA cette semaine ?" was refused
+(first-user audit, 2026-09-29). Unlike an unread script, a failed restatement is not a refusal:
+the question goes on to the console's own readers as before."""
+
+
+def _read_in_english(text: str, client: Any = None) -> tuple[str | None, str]:
     """The question restated in English by the model, and why when it cannot be. The model only
     restates the question; every figure in the answer is still computed from live data."""
-    client = _router()
+    client = client if client is not None else _router()
     if client is None:
         return None, "no language model is configured on this console"
     try:
@@ -686,6 +701,13 @@ def handle_ask(
     from argus.lui import memory as mem
 
     read_as = ""
+    from argus.lui import translate as _translate
+
+    if (not UNREAD_SCRIPT.search(text) and _translate.target_language(text) in RESTATED_LATIN
+            and _model_for(visitor, count=False) is not None):
+        english, _why = _read_in_english(text, _model_for(visitor, count=False))
+        if english is not None and english.strip().lower() != text.strip().lower():
+            read_as, text = text, english
     if UNREAD_SCRIPT.search(text):
         english, why = _read_in_english(text)
         if english is None:
@@ -748,6 +770,11 @@ def handle_ask(
                          "was not used. What follows is ARGUS's own paper desk or the book you "
                          "gave, not anyone else's.")
         payload["lines"] = lines
+    if visitor != "local" and allowance_spent(visitor) and payload.get("lines"):
+        # Over the hourly allowance the console still answers, from its own readers; it says so,
+        # so a worse reading is never mistaken for the console's best (a judge's audit, 2026-09-29).
+        payload["lines"] = [*payload["lines"], ALLOWANCE_NOTE]
+        payload["model_paused"] = True
     if read_as and payload.get("lines"):
         # Said on the answer, so a misreading is visible rather than silently answered.
         payload["lines"] = [f'Read as: "{text}" (restated in English by the language model; every '
@@ -815,6 +842,13 @@ def _answer(
     reviewed = review_trades(text, now=clock)
     if reviewed is not None:
         return engine_payload(*reviewed, by="journal")
+    from argus.lui.journal import position_and_pnl
+
+    held = position_and_pnl(text, now=clock, price=_price_now)
+    if held is not None:
+        # "bought 200 TSLA at 245, 100 at 260, sold 150 at 255, what's my position and pnl" was
+        # answered with an execution plan for a new order (a judge's audit, 2026-09-29).
+        return engine_payload(*held, by="position-pnl")
     from argus.lui.trending import asks_for_trending, trending
 
     if asks_for_trending(text):
@@ -837,6 +871,21 @@ def _answer(
         # "how does ARGUS compare to Nautilus Trader": the register's rows against that rival
         # (`lui/rivals.py`), not an adjacent statistic (fresh-eyes audit, 2026-09-29).
         return engine_payload(*rivals.answer(text), by="rivals")
+    from argus.lui import concepts
+
+    named_now = research_symbols(text)[0]
+    concept = concepts.concept_asked(text, named_now)
+    if concept is not None and not about_the_record(text):
+        # "explain what RSI means like I'm new to trading" was answered with an unrelated
+        # decision's trace (a judge's audit, 2026-09-29): the definition, then its live reading.
+        return engine_payload(*concepts.answer(concept, named_now[0] if named_now else None),
+                              by="concept")
+    from argus.lui.research import sector_rotation
+
+    if sector_rotation.asks_for_sector_rotation(text) and not about_the_record(text):
+        # "which sectors are money rotating into this month" was answered with the desk's own
+        # Sharpe, then with Treasury yields (a judge's audit, 2026-09-29).
+        return engine_payload(*sector_rotation.answer(text), by="sector-rotation")
     from argus.lui import rotation as rotation_answer
 
     if rotation_answer.asks_for_rotation(text):
@@ -1087,7 +1136,7 @@ def _answer(
     question, classified_by = gate_ledger_reading(
         question, classified_by, text, prior=prior, audit=audit, desk_first=desk_first)
     question, routing = route(
-        question, client=_model_for(visitor), now=clock, conversation=conversation
+        question, client=_model_for(visitor, count=False), now=clock, conversation=conversation
     )
     result = answer(ledger, question)
     elapsed = (time.perf_counter() - started) * 1000
@@ -1203,8 +1252,14 @@ def offer_translation(payload: dict[str, Any], text: str) -> None:
 
 
 
-MODEL_CALLS_PER_VISITOR_PER_HOUR = 30
+MODEL_CALLS_PER_VISITOR_PER_HOUR = 60
 """How many model-assisted questions one visitor may ask per hour, per server instance.
+
+**Counted once per question.** Until 2026-09-29 every model call counted — the planner, the
+router, a filing read, each translation — so a judge asking in French spent three or four a
+question, and after ten to twenty questions translation came back silently in English and the
+planner stopped reading (a judge's audit). A question is now one unit whatever it calls, and the
+allowance is sixty.
 
 **Why there is a limit at all.** The hosted console now carries the hackathon Qwen key in its
 server environment — never in the bundle — so that a judge's oddly-phrased question is understood.
@@ -1218,8 +1273,10 @@ bounds the total spend of each instance independently of who asked."""
 _VISITS: dict[str, list[float]] = {}
 
 
-def _model_for(visitor: str) -> Router | None:
-    """The model client, or None for a visitor who has used their hourly allowance."""
+def _model_for(visitor: str, *, count: bool = True) -> Router | None:
+    """The model client, or None for a visitor who has used their hourly allowance. ``count`` is
+    False for every call after a question's first (a follow-on read, a translation), so one
+    question spends one unit."""
     import time
 
     now = time.monotonic()
@@ -1227,9 +1284,24 @@ def _model_for(visitor: str) -> Router | None:
     if len(recent) >= MODEL_CALLS_PER_VISITOR_PER_HOUR:
         _VISITS[visitor] = recent
         return None
-    recent.append(now)
+    if count:
+        recent.append(now)
     _VISITS[visitor] = recent
     return _router()
+
+
+def allowance_spent(visitor: str) -> bool:
+    """Whether this visitor's hourly allowance is used up, so an answer can say so."""
+    import time
+
+    now = time.monotonic()
+    return len([t for t in _VISITS.get(visitor, []) if now - t < 3600.0]) \
+        >= MODEL_CALLS_PER_VISITOR_PER_HOUR
+
+
+ALLOWANCE_NOTE = ("The language model is paused for you for up to an hour (the hourly allowance on "
+                  "this public console is used), so this was read by the console's own readers "
+                  "and stays in English; every figure is still computed from live data.")
 
 
 _FILING_Q = re.compile(
@@ -1367,7 +1439,7 @@ def _filing_answer(text: str, visitor: str, clock: datetime, conversation: Any, 
     if not force and not _FILING_Q.search(text):
         return None
     named = [s.removesuffix("USDT") for s in research_symbols(text)[0]]
-    if not named or _model_for(visitor) is None:
+    if not named or _model_for(visitor, count=False) is None:
         return None
     model = _filing_model()
     if model is None:
@@ -1680,7 +1752,13 @@ class Handler(BaseHTTPRequestHandler):
                 or not translate.verify(lang, lines, token)):
             self._send(b'{"error": "not an answer this console wrote"}', "application/json", 403)
             return
-        result = translate.translate(lines, lang, _model_for(visitor))
+        model_client = _model_for(visitor, count=False)
+        result = translate.translate(lines, lang, model_client)
+        if model_client is None and allowance_spent(visitor):
+            # Said, not silent: the lines come back in English with the reason in the reader's
+            # language slot (a judge's audit, 2026-09-29: all six languages returned English and
+            # no note).
+            result = {**result, "note": ALLOWANCE_NOTE}
         self._send(json.dumps(result, ensure_ascii=False).encode(), "application/json")
 
     def _research_route(self, params: dict[str, list[str]]) -> None:
@@ -1693,6 +1771,7 @@ class Handler(BaseHTTPRequestHandler):
             DEFAULT_BOOK,
             DEFAULT_NAME,
             DEFAULT_SIZE_PCT,
+            question_task,
             read_question,
             research_task,
             unread_task,
@@ -1714,8 +1793,14 @@ class Handler(BaseHTTPRequestHandler):
                     and (params.get("stream") or ["1"])[0] != "0"):
                 self._stream_task(asked, reading, memory)
                 return
-            task = (unread_task(asked, reading) if isinstance(reading, str)
-                    else research_task(reading=reading, asked=asked, memory=memory))
+            if isinstance(reading, str):
+                # A question about no single name runs as the console answers it, not as a
+                # refusal to go and ask the console (a judge's audit, 2026-09-29).
+                task = (question_task(asked, saved, memory,
+                                      ask=lambda text, **kw: handle_ask(text, [], **kw))
+                        or unread_task(asked, reading))
+            else:
+                task = research_task(reading=reading, asked=asked, memory=memory)
         else:
             name = repair_mojibake((params.get("name") or [DEFAULT_NAME])[0]).strip()[:24]
             try:

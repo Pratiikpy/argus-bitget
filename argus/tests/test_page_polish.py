@@ -311,6 +311,9 @@ class TestTheResearchFormSendsTheSavedBook:
             return "not read in this test"
 
         monkeypatch.setattr(task, "read_question", read)
+        # An unread question now runs as the console answers it (`task.question_task`); this test
+        # is about which book is read, so that answer is stubbed.
+        monkeypatch.setattr(task, "question_task", lambda *a, **k: None)
         body = urlencode({"q": "should I add 15% TSLA?", "saved": "",
                           "memory": "[]", "book": task.DEFAULT_BOOK}).encode()
         with urlopen(Request(f"{base_url}/research", data=body), timeout=10) as reply:

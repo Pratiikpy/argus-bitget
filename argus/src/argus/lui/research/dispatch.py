@@ -96,6 +96,7 @@ from argus.lui.research.news import (
     tone_asked,
 )
 from argus.lui.research.parse import (
+    _LOSS_OVER_PERIOD,
     _ROUND_TRIP,
     _SINGLE_NAME,
     _STOP_QUESTION,
@@ -265,6 +266,34 @@ DEFAULT_HEDGED_BOOK = "SPYUSDT"
 BETA_TIE = 0.05
 """Two session betas closer than this are said as the same market risk: an hourly beta over 30
 days carries a standard error of several hundredths, so a gap inside it names no winner."""
+
+
+def _loss_lead(lines: list[str], odds: Mapping[str, Any] | None,
+               request: ResearchRequest) -> list[str]:
+    """A loss question's own answer as the lead: how much a position lost over the period one time
+    in ten, at the close and at the worst point inside it, in percent and on $10,000.
+
+    "how much can i lose on tsla this week" led with whether TSLA would be higher, a question it
+    did not ask (first-user audit, 2026-09-29). The figures are the odds engine's own tenth
+    percentile and worst-point percentile; nothing new is computed here."""
+    if not odds or odds.get("adverse_p90_bps") is None or not request.symbols:
+        return lines
+    short = odds.get("side") == "short"
+    close_bps = float(odds["p90_bps"] if short else odds["p10_bps"])
+    worst_bps = abs(float(odds["adverse_p90_bps"]))
+    hours = request.horizon_hours or 24
+    span = {24: "day", 72: "weekend", 168: "week", 720: "month"}.get(hours, f"{hours}-hour")
+    # A long loses when the price falls and a short when it rises; a tenth percentile on the
+    # winning side means no loss at the end one time in ten.
+    close_loss = max(0.0, close_bps if short else -close_bps) / 100.0
+    name = request.symbols[0].removesuffix("USDT")
+    side = "short" if short else "long"
+    lead = (f"Bottom line: one {span} in ten, a {side} {name} position lost more than "
+            f"{close_loss:.1f}% by the end, and at its worst point inside the {span} it was more "
+            f"than {worst_bps / 100:.1f}% under water — on $10,000, about ${close_loss * 100:,.0f} "
+            f"and ${worst_bps:,.0f}. That is how often in the past, not a forecast; the loss "
+            f"beyond it is the one-in-ten tail, not a cap.")
+    return [lead, *(unlead(line) if i == 0 else line for i, line in enumerate(lines))]
 
 
 def _compare_lead(rows: Sequence[Mapping[str, Any]]) -> str:
@@ -1299,6 +1328,8 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                         lines = _lead_with(lines, "Where a take-profit sits")
                     elif _STOP_QUESTION.search(raw_text):
                         lines = _lead_with(lines, "Where a stop sits")
+                    elif _LOSS_OVER_PERIOD.search(raw_text):
+                        lines = _loss_lead(lines, odds_dict, request)
                     elif _WEEKEND_GAP_Q.search(raw_text):
                         lines = _lead_with(lines, "Typical ")
 

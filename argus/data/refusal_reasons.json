@@ -1,12 +1,12 @@
 {
-  "as_of": "2026-09-29T16:08:11.514813+00:00",
-  "refusals": 853,
-  "refusals_with_a_gradeable_claim": 432,
+  "as_of": "2026-09-29T18:17:56.942114+00:00",
+  "refusals": 864,
+  "refusals_with_a_gradeable_claim": 433,
   "hours_tolerance": 1.5,
   "round_trip_bps": 12.0,
   "base_clearance_about_2h": {
-    "cleared": 316,
-    "marks": 456
+    "cleared": 324,
+    "marks": 465
   },
   "by_claim": {
     "session_closed": {
@@ -35,9 +35,9 @@
       "ungradeable": 0
     },
     "moves_enough": {
-      "consistent": 57,
+      "consistent": 58,
       "contradicted": 24,
-      "ungradeable": 31
+      "ungradeable": 34
     },
     "move_too_small": {
       "consistent": 0,
@@ -48,10 +48,10 @@
   "forward_against_base": {
     "move_too_small": null,
     "moves_enough": {
-      "borne_out": 57,
-      "graded": 81,
-      "base_rate": 0.693,
-      "p_one_sided": 0.4708
+      "borne_out": 58,
+      "graded": 82,
+      "base_rate": 0.6968,
+      "p_one_sided": 0.4714
     }
   },
   "forward_claims": [
@@ -252,6 +252,6 @@
       "verdict": "contradicted"
     }
   ],
-  "verdict": "853 refusal(s) on record; 432 carried at least one reason the record can check. Of 913 decision-time reason(s) graded, 913 agreed with the record and 0 contradicted it. `moves_enough` claims were borne out by the next ~2h move 57 of 81 time(s) (70%), against 69% for every ~2h refusal mark (one-sided exact binomial p = 0.47); no evidence the stated reason says more than the base rate does.",
+  "verdict": "864 refusal(s) on record; 433 carried at least one reason the record can check. Of 913 decision-time reason(s) graded, 913 agreed with the record and 0 contradicted it. `moves_enough` claims were borne out by the next ~2h move 58 of 82 time(s) (71%), against 70% for every ~2h refusal mark (one-sided exact binomial p = 0.47); no evidence the stated reason says more than the base rate does.",
   "method": "Each checkable reason in a no_trade thesis is matched by a fixed pattern and set beside the record: session_phase and hours_to_discovery from the ledger, the desk's own hedge-menu note, the risk ruling, and the next ~2h mark for claims about the size of the coming move. Question and binary verdict from VisualWebArena's llm_ua_match (evaluation_harness/helper_functions.py:610-642, MIT); graded here by the record, not by a model."
 }
