@@ -46,3 +46,6 @@ coverage.xml
 .coverage
 .coverage.*
 htmlcov/
+
+# other people's posts, re-fetched for the sentiment-integrity measurement: kept local, never published
+argus/data/sentiment_integrity_real_posts.jsonl

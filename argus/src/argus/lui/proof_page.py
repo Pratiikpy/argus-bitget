@@ -111,8 +111,6 @@ IN_THE_CONSOLE: dict[str, tuple[str, str]] = {
     "Path-shape matching with a calibrated null": ("has NVDA been here before", ""),
     "Session-aware execution that refuses to solve through a boundary":
         ("how should I split a $250k order in NVDA", ""),
-    "Decision-latency pricing vs. hftbacktest's real, network-only LatencyModel":
-        ("how should I split a $250k order in NVDA", ""),
     "Per-profile mandate that changes the verdict":
         ("I'm an aggressive trader, should I buy 10% COIN", ""),
     "Structured filing extraction vs. FinanceBench's real, published LLM measurement":

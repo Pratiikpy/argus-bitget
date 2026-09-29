@@ -507,12 +507,22 @@ class TestTheLiveRegisterIsHonest:
         # pip-installed edgartools run on a seeded 309-filer sample (21 against 1).
         # 2026-09-29: research workbench breadth OWNED against OpenBB's keyless providers on two
         # days, +3.6 [3.1, 4.1], and +1.0 to +1.2 on the categories OpenBB can reach at all.
+        # 2026-09-29: the perpetual-implied open OWNED against gloaming, nocturne and the
+        # pre-market general tool; costs_included scored as a trade net of the 12bps round trip,
+        # +53.37bps [41.61, 67.59] over gloaming's best variant, ahead on all eight stocks.
+        # 2026-09-29: this set was found short one row already OWNED and earned on the live
+        # register -- point-in-time correctness vs. OpenBB, not touched by today's work -- and is
+        # corrected here rather than left drifted, since this assertion exists to catch exactly
+        # that gap.
         owned_names = {c.name for c in audit().owned}
         assert owned_names == {
             "Per-profile mandate that changes the verdict",
             "Risk layer proved by domain sweep",
             "Refusal-first earnings surprise ranking vs. a silently-exploding factor",
             "Research workbench data breadth vs. OpenBB's keyless providers",
+            "Where a shut stock should open: the perpetual-implied open, against gloaming and "
+            "nocturne",
+            "Point-in-time correctness vs. OpenBB's real, ungated live-API agent",
         }
         for cap in audit().owned:
             assert cap.conditions_missing == (), cap.name
@@ -893,8 +903,10 @@ class TestDemotionsCarryTheirRouteBack:
                    if c.blockers and "by the groupwise gate" in c.blockers[0]]
         # twelve on 2026-09-25; numeric grounding on 2026-09-27, once its designed cases were
         # filed as designed (audit finding 95). Rows that have since taken a route back lead with
-        # that re-grade instead, and are checked below.
-        assert len(demoted) == 1
+        # that re-grade instead, and are checked below. The last one still demoted, holiday-aware
+        # closed-session pricing, was removed on 2026-09-29 (it serves no flow and belongs to
+        # Track 1), with its reason in data/removed_capabilities.json.
+        assert len(demoted) == 0
         for cap in demoted:
             assert cap.state is State.IMPLEMENTED, cap.name
             assert re.match(r"RE-GRADED 2026-09-2[57] from OWNED to IMPLEMENTED by the "
@@ -904,7 +916,7 @@ class TestDemotionsCarryTheirRouteBack:
     def test_a_row_that_left_the_gates_demotion_leads_with_its_measured_regrade(self) -> None:
         # Net executable arbitrage on 2026-09-28; eleven more on 2026-09-29
         # (Activity/28_CAPABILITY_CLOSE_PLAN_2.md), seven TIED and four LOST. Every row the gate
-        # ever demoted is in exactly one of the two lists: 13 in all.
+        # ever demoted is in one of the two lists or in data/removed_capabilities.json: 13 in all.
         moved = [c for c in REGISTER
                  if len(c.blockers) > 1 and "by the groupwise gate" in c.blockers[1]]
         assert len(moved) == 12
@@ -1111,3 +1123,15 @@ def test_every_blocker_reads_as_prose() -> None:
     padded = [(c.name, b[:40]) for c in REGISTER for b in c.blockers
               if b != b.strip() or "   " in b]
     assert not padded, padded
+
+
+def test_every_removed_row_is_out_of_the_register_and_says_why() -> None:
+    """A row removed from the register is listed with its last state and the reason, so a removal
+    is never a loss quietly going away (data/removed_capabilities.json, read by /wrong)."""
+    import json
+
+    record = json.loads((standing.DATA / "removed_capabilities.json").read_text("utf-8"))
+    names = {c.name for c in REGISTER}
+    for row in record["removed"]:
+        assert row["name"] not in names, row["name"]
+        assert row["reason"] and row["last_state"] in {s.value for s in State}

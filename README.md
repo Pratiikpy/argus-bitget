@@ -105,7 +105,7 @@ deflation gate, and the console says so.
 Every capability is graded against the specialist that leads its sub-theme, by a register that
 opens the evidence rather than trusting a filename (`python -m argus.eval.standing`), and may claim
 OWNED only after that rival has been run on the same input and beaten.
-**4 of 48 capabilities are OWNED, 30 are TIED, 7 are IMPLEMENTED, and 7 are LOST: crowd sentiment classification, to RoB-RT on TweetEval (0.544 against 0.729 macro-recall on the same 12,284 tweets); session-aware execution, to Bitget's own TWAP on replayed order books (0.62 bps dearer on boundary-crossing orders, interval [0.01, 1.53]); the price of thinking time, to a trailing realised-move estimator on 23,003 real decision instants (production's excess error 9.89, interval [9.20, 10.57]); cointegration screening, whose false-discovery rate misses its own target where 128 general pipelines hold it; perception breadth, to OpenBB's keyless providers (12.4 data categories per stock against the desk's 6.2, same stocks, same day); path-shape matching, whose forecast band is worse than a stock's own unconditional range on 2,698 held-out queries (Winkler 16.4% against 15.1%, p = 0.001); and injection screening on attacks it was not written for, where a trained classifier withholds 41% of an external corpus's attacks to ARGUS's 16% (while withholding 12.4% of the desk's real text, which ARGUS never does).** OWNED needs
+**6 of 45 capabilities are OWNED, 32 are TIED, 0 are IMPLEMENTED, and 7 are LOST: crowd sentiment classification, to RoB-RT on TweetEval (0.544 against 0.729 macro-recall on the same 12,284 tweets); session-aware execution, to Bitget's own TWAP on replayed order books (0.62 bps dearer on boundary-crossing orders, interval [0.01, 1.53]); the price of thinking time, to a trailing realised-move estimator on 23,003 real decision instants (production's excess error 9.89, interval [9.20, 10.57]); cointegration screening, whose false-discovery rate misses its own target where 128 general pipelines hold it; perception breadth, to OpenBB's keyless providers (12.4 data categories per stock against the desk's 6.2, same stocks, same day); path-shape matching, whose forecast band is worse than a stock's own unconditional range on 2,698 held-out queries (Winkler 16.4% against 15.1%, p = 0.001); and injection screening on attacks it was not written for, where a trained classifier withholds 41% of an external corpus's attacks to ARGUS's 16% (while withholding 12.4% of the desk's real text, which ARGUS never does).** OWNED needs
 all thirteen conditions: the rival's best implementation read and reproduced, a same-input
 comparison with costs, out-of-sample, ablation, an adversarial test, documented failure cases and
 reproducibility.
@@ -121,10 +121,14 @@ On 2026-09-27 cross-sectional ranking went to TIED with qlib (the one input wher
 a one-name group, never reaches a decision), and numeric decision grounding went back to
 IMPLEMENTED (its twelve cases were fabrications the author chose, and a general pydantic range
 check was never run against them). Each row names its route back (`data/standing.json`).
-Two came back on 2026-09-29 by taking that route: earnings-surprise ranking, re-measured on
-7,258 SEC filers with a holdout the rule was never fitted on and against the real edgartools
-package, and the research workbench's data breadth, ahead of OpenBB's keyless providers on two
-days and on the categories both can reach.
+On 2026-09-29 four rows reached OWNED by taking that route: earnings-surprise ranking,
+re-measured on 7,258 SEC filers with a holdout the rule was never fitted on and against the real
+edgartools package; the research workbench's data breadth, ahead of OpenBB's keyless providers on
+two days and on the categories both can reach; point-in-time filings, ahead of OpenBB's platform,
+edgartools and Qlib on 619 real questions; and the perpetual-implied overnight open, which also
+beats gloaming as a trade entered at the 09:00 price, net of costs. The same day every other open
+row was settled: sentiment integrity and market sentiment TIED on real posts, and three rows
+removed (they served no flow, or duplicated another), each with its reason on `/wrong`.
 
 Losses are published the moment they are found, on
 [`/wrong`](https://deploy-topaz-seven-64.vercel.app/wrong). Rivals run on the same input:
@@ -191,7 +195,7 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 10,176 tests collected
+pytest -q                       # 10,260 tests collected
 ```
 
 Nothing above needs a credential. On 2026-09-27, with every outbound connection refused, 9,109
@@ -214,11 +218,11 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **10,176 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 554 source files** |
+| Tests | **10,260 tests collected** — `pytest -q` |
+| Types | **`mypy --strict` clean on 556 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
-| Sub-themes | **18/18 sub-themes** each resolve to an importable module and a test file (`python -m argus.status`). That is coverage, not a claim to lead them: 4 of 48 capabilities are OWNED against a named rival, and `/proof` says which |
+| Sub-themes | **18/18 sub-themes** each resolve to an importable module and a test file (`python -m argus.status`). That is coverage, not a claim to lead them: 6 of 45 capabilities are OWNED against a named rival, and `/proof` says which |
 | Understanding | **81.7%** of 240 questions in 12 languages, written blind by an agent that never saw this repository and scored once, were read correctly by the console with no language model (52.1% before the 2026-09-25 fixes); with Qwen reading first, as on the live site, 85.0% — `data/lui_final_heldout_report.json`. Which engine each question reaches is re-scored on every change by `eval/kind_routing.py` |
 | Quoted figures | Every figure these documents quote is re-checked against its artefact by `python -m argus.eval.docclaims --tests`, which fails if one has drifted |
 
@@ -254,8 +258,8 @@ a test that reaches the network shows itself.
 
 ARGUS 是面向 Bitget 美股代币（rToken）的研究工作台（Track 3 · AI Trading Desk）。用自然语言提问，
 七个引擎基于 Bitget 行情、SEC 文件、FRED 与新闻实时计算，每个数字都注明来源；语言模型只理解问题，
-从不编写数字。48 项能力中 47 项已与各子赛道领先的专业系统在相同输入上对比：4 项领先（OWNED）、30 项
-持平、7 项已实现、7 项落后（LOST：人群情绪分类在 TweetEval 上不及 RoB-RT；跨时段执行在回放订单簿上不及 Bitget 自带的 TWAP；思考时间定价在 23,003 个真实决策时点上不及滚动实现波动估计；协整筛选的错误发现率未达自身目标；数据覆盖面不及 OpenBB 的免密钥数据源；走势形态匹配的预测区间不及个股自身的无条件区间；对未针对性编写的注入攻击，拦截率不及训练好的分类器），所有落败记录公开在 `/wrong`。本团队的 Track 2 参赛作品是另一个独立项目
+从不编写数字。48 项能力中 47 项已与各子赛道领先的专业系统在相同输入上对比：6 项领先（OWNED）、32 项
+持平、0 项已实现、7 项落后（LOST：人群情绪分类在 TweetEval 上不及 RoB-RT；跨时段执行在回放订单簿上不及 Bitget 自带的 TWAP；思考时间定价在 23,003 个真实决策时点上不及滚动实现波动估计；协整筛选的错误发现率未达自身目标；数据覆盖面不及 OpenBB 的免密钥数据源；走势形态匹配的预测区间不及个股自身的无条件区间；对未针对性编写的注入攻击，拦截率不及训练好的分类器），所有落败记录公开在 `/wrong`。本团队的 Track 2 参赛作品是另一个独立项目
 （t2-sentiment-agent，独立的代码库、交易日志与演示），不属于本仓库。
 
 ---

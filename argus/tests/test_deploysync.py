@@ -272,3 +272,21 @@ class TestTheConsoleArtefactCheck:
             if (SOURCE_DATA / name).is_file() and not (DEPLOY_DATA / name).is_file()
         ]
         assert not absent, f"the hosted console would show these as unreadable: {absent}"
+
+
+def test_every_data_file_a_page_reads_is_in_the_bundle() -> None:
+    """Every artefact a hosted page reads by name ships in the bundle. On 2026-09-29 /architecture,
+    /policy and /factors rendered "could not be read" on the hosted console while answering in full
+    locally: their files were never listed."""
+    import re
+    from pathlib import Path
+
+    from argus.demo import deploysync
+
+    lui = Path(deploysync.SOURCE_PACKAGE) / "lui"
+    pages = [*lui.glob("*_page.py"), lui / "corrections.py", lui / "server.py"]
+    named = {m.group(1) for page in pages
+             for m in re.finditer(r'"([a-z0-9_]+\.jsonl?)"', page.read_text("utf-8"))}
+    present = {n for n in named if (deploysync.SOURCE_DATA / n).exists()}
+    assert present <= set(deploysync.CONSOLE_ARTEFACTS), sorted(
+        present - set(deploysync.CONSOLE_ARTEFACTS))

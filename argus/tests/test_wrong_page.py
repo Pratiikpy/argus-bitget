@@ -79,3 +79,15 @@ class TestTheLivePageKeepsItsPromises:
     def test_it_renders(self) -> None:
         page = render(collect(DATA))
         assert page.count("a baseline beat us") >= 10
+
+
+def test_a_removed_capability_is_listed_with_its_reason() -> None:
+    from argus.lui.corrections import register_removals
+
+    out = register_removals({"removed": [{
+        "name": "A row", "removed_on": "2026-09-29", "last_state": "implemented",
+        "reason": "It serves no flow.", "revive_by": "a flow that uses it"}]})
+    assert len(out) == 1
+    assert out[0].headline == "Removed from the register on 2026-09-29 (IMPLEMENTED): A row"
+    assert "It serves no flow." in out[0].detail and "a flow that uses it" in out[0].detail
+    assert out[0].kind == "withdrawn"

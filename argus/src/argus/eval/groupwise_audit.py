@@ -211,15 +211,34 @@ def _overnight(path: str) -> Entry:
     for name in ("argus_perp", best, "zero"):
         _parity(f"{path} {name} MAE", round(mae(name), 2), _f(blob["summary"][name]["mae_bps"]))
 
+    # costs_included: a trade on the estimate, net of Bitget's round-trip taker fee
+    # (`overnight_comparison.trade_comparison`), parity-checked the same way as the MAE above
+    # before its own rows are broken down.
+    trade = oc.trade_comparison(rows, best)
+    published_trade = blob.get("costs_net") or {}
+    for arm in ("argus_perp", best, "zero"):
+        _parity(f"{path} costs_net {arm} mean_pnl_bps",
+                round(_f(trade["summary"][arm]["mean_pnl_bps"]), 3),
+                _f(published_trade["summary"][arm]["mean_pnl_bps"]))
+
     def items(rival: str) -> list[Item]:
         return [Item(value=(abs(r["estimates"][rival] - r["gap"])
                             - abs(r["estimates"]["argus_perp"] - r["gap"])) * 1e4,
                      groups={"symbol": str(r["stock"]), "night": str(r["opened"])},
                      order=str(r["opened"])) for r in rows]
 
+    def trade_items() -> list[Item]:
+        return [Item(value=r["trade_pnl_bps"]["argus_perp"] - r["trade_pnl_bps"][best],
+                     groups={"symbol": str(r["stock"]), "night": str(r["opened"])},
+                     order=str(r["opened"])) for r in trade["rows"]]
+
     source = ("regenerated: overnight_comparison.predict(nights(h2h_gloaming/inputs.json)), "
               "fitted rows; MAE of argus_perp, the best gloaming variant and zero reproduce the "
               "artefact's summary to the published two decimals")
+    trade_source = ("regenerated: overnight_comparison.trade_comparison(predict(nights("
+                    "h2h_gloaming/inputs.json)), best_gloaming); mean net P&L of argus_perp, "
+                    f"{best} and zero reproduce the artefact's costs_net.summary to the "
+                    "published three decimals")
     return Entry(path, CHECKED, "per-night rows regenerated from the saved inputs", (
         _headline("overnight gap: ARGUS vs gloaming's best variant", items(best),
                   ("symbol", "night"), headline=f"MAE argus_perp vs {best}, bps per night-stock",
@@ -230,6 +249,13 @@ def _overnight(path: str) -> Entry:
                   headline="MAE argus_perp vs the last close (no gap), bps",
                   orientation="|zero error| - |argus_perp error|, bps: positive = ARGUS better",
                   role=VS_RIVAL, role_reason="the comparison's floor", source=source),
+        _headline("overnight gap: net P&L, ARGUS's trade vs gloaming's trade", trade_items(),
+                  ("symbol", "night"), headline=f"net P&L argus_perp trade vs {best} trade, bps "
+                  "per night-stock, 12bps round-trip cost charged only when a position opens",
+                  orientation=f"pnl(argus_perp) - pnl({best}), bps: positive = ARGUS better",
+                  role=VS_RIVAL, role_reason="costs_included: the estimate scored as a trade, "
+                  "net of the round-trip cost, against gloaming's own best variant traded the "
+                  "same way", source=trade_source),
     ))
 
 
@@ -577,6 +603,52 @@ def _sentiment(path: str) -> Entry:
                                  source="truth_cases"))
     return Entry(path, DESIGNED, f"{len(rows)} designed coordinated-posting narratives and "
                  f"{len(truth)} designed corroborated events", tuple(reports))
+
+
+def _sentiment_integrity_real(path: str) -> Entry:
+    """Capability 20's route to ``statistically_valid_evaluation``/``out_of_sample_test`` on REAL
+    posts (:mod:`argus.eval.sentiment_integrity_real`), not the designed cases :func:`_sentiment`
+    audits. The gating claim is against the fair rival named in the plan — dedup, then finBERT, not
+    finBERT's naive per-post vote count, which the module's own docstring already calls "the
+    weakest version of the general tool". The naive arm and the uncoordinated control population are
+    reported as ``context``: real findings, never the thing that gates this capability's state."""
+    blob = _load(path)
+    coordinated = blob["rows"]["coordinated"]
+    control = blob["rows"]["uncoordinated_control"]
+
+    def items(rows: list[dict[str, Any]], rival_key: str) -> list[Item]:
+        return [Item(value=float(r["argus_resisted"]) - float(r[rival_key]),
+                     groups={"symbol": str(r["symbol"])}, order=None)
+                for r in rows]
+
+    reports = [
+        _headline("real coordinated posting: ARGUS vs finBERT (dedup, the fair rival)",
+                  items(coordinated, "finbert_dedup_resisted"), ("symbol",),
+                  headline="real clusters on which repetition alone did not commit the reader "
+                  "harder than the lone post did",
+                  orientation="ARGUS resisted - finBERT(dedup) resisted: positive = ARGUS",
+                  role=VS_RIVAL, role_reason="the plan's pre-registered primary comparison",
+                  source="rows.coordinated"),
+        _headline("real coordinated posting: ARGUS vs finBERT (naive per-post vote)",
+                  items(coordinated, "finbert_naive_resisted"), ("symbol",),
+                  headline="same real clusters, against the weaker naive-vote rival",
+                  orientation="ARGUS resisted - finBERT(naive) resisted: positive = ARGUS",
+                  role=CONTEXT, role_reason="the naive vote count is not the fair rival the plan "
+                  "named; reported for completeness, never gating", source="rows.coordinated"),
+    ]
+    if control:
+        reports.append(_headline(
+            "real uncoordinated posts (control): ARGUS vs finBERT (dedup)",
+            items(control, "finbert_dedup_resisted"), ("symbol",),
+            headline="the matched, non-coordinated population: ordinary repetition, not this "
+            "capability's claim",
+            orientation="ARGUS resisted - finBERT(dedup) resisted: positive = ARGUS",
+            role=CONTEXT, role_reason="a control on ordinary repetition, not the capability's "
+            "own claim about coordinated posting", source="rows.uncoordinated_control"))
+    return Entry(path, CHECKED,
+                f"{len(coordinated)} real coordinated story clusters from Track 2 run 1's own "
+                f"published ledger (mechanically flagged, not model-labelled) and "
+                f"{len(control)} matched real uncoordinated controls", tuple(reports))
 
 
 def _profile_divergence(path: str) -> Entry:
@@ -1532,6 +1604,50 @@ def _factor_quality_rivals(path: str) -> Entry:
     ))
 
 
+def _sentiment_signal(path: str) -> Entry:
+    """`eval/sentiment_signal_comparison.py`: the desk's sentiment analyst, VADER and finBERT on
+    the identical social evidence of each settled decision, each lean traded over the ledger's
+    horizon net of the 12bps round trip. The per-cycle rows are rescored here from the lean and
+    the move and must reproduce the artefact's own totals."""
+    blob = _load(path)
+    cycles = blob["cycles"]
+    cost = 12.0
+
+    def net(lean: int, move: float) -> float:
+        return 0.0 if lean == 0 else lean * move - cost
+
+    for arm, score in blob["scores"].items():
+        rows = [c for c in cycles if c["arms"].get(arm) is not None]
+        if not rows or "total_net_bps" not in score:
+            continue
+        _parity(f"{path} {arm} total_net_bps",
+                round(sum(net(int(c["arms"][arm]["lean"]), float(c["move_bps"]))
+                          for c in rows), 2), round(_f(score["total_net_bps"]), 2))
+    asked = [c for c in cycles if c["arms"].get("argus") is not None]
+
+    def items(rival: str) -> list[Item]:
+        return [Item(value=net(int(c["arms"]["argus"]["lean"]), float(c["move_bps"]))
+                     - net(int(c["arms"][rival]["lean"]), float(c["move_bps"])),
+                     groups={"date": str(c["date"]), "symbol": str(c["symbol"])},
+                     order=str(c["decided_at"])) for c in asked]
+
+    common: dict[str, Any] = {
+        "headline": "per settled decision: net bps of trading ARGUS's sentiment lean minus the "
+                    "rival's, 12bps round trip",
+        "orientation": "positive = ARGUS's lean earned more net of costs",
+    }
+    return Entry(path, CHECKED, "one row per settled decision whose evidence the sentiment "
+                 "analyst was asked about, every arm on the same posts", (
+        _headline("sentiment lean traded: ARGUS vs VADER", items("vader"), ("date", "symbol"),
+                  role=VS_RIVAL, role_reason="the general lexicon scorer on the same posts",
+                  source="cycles[].arms", **common),
+        _headline("sentiment lean traded: ARGUS vs finBERT", items("finbert"),
+                  ("date", "symbol"), role=VS_RIVAL,
+                  role_reason="the finance-tuned classifier on the same posts",
+                  source="cycles[].arms", **common),
+    ))
+
+
 def _not_checkable(status: str, reason: str) -> Callable[[str], Entry]:
     def build(path: str) -> Entry:
         return Entry(path, status, reason)
@@ -1557,6 +1673,7 @@ ADAPTERS: dict[str, Callable[[str], Entry]] = {
     "data/infoextract_comparison.json": _infoextract,
     "data/grammar_comparison.json": _grammar,
     "data/sentiment_comparison.json": _sentiment,
+    "data/sentiment_integrity_real.json": _sentiment_integrity_real,
     "data/profile_divergence.json": _profile_divergence,
     "data/factor_divergence_comparison.json": _factor_divergence,
     "data/track1_study.json": _track1,
@@ -1589,6 +1706,7 @@ ADAPTERS: dict[str, Callable[[str], Entry]] = {
     "data/perception_breadth.json": _perception_breadth,
     "data/injection_classifier_rival.json": _injection_rival,
     "data/factor_quality_rivals.json": _factor_quality_rivals,
+    "data/sentiment_signal_comparison.json": _sentiment_signal,
     "data/xa_arena.json": _not_checkable(
         WITHOUT_ROWS, "hourly net asset values reduced to per-period scores per arm; "
         "eval/xa_arena.py would need to record each arm's hourly return path"),

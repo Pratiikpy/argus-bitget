@@ -4,16 +4,42 @@ modules = [
     "argus/agents/analysts.py",
     "argus/agents/desk.py",
     "argus/lui/research/sentiment.py",
+    "argus/eval/sentiment_signal_comparison.py",
 ]
-state = "implemented"
+state = "tied"
 baseline = """\
     Santiment crowd-sentiment contrarian signals; Augmento; Bitget's own bitget-signal \
     sentiment-analyst Skill; TauricResearch/TradingAgents v0.4 sentiment analyst; the S2 entry \
     Jfash-cmd/sentinel-bitget-hackathon"""
 blockers = [
     """\
+        RE-GRADED 2026-09-29 from IMPLEMENTED to TIED on a measurement \
+        (eval/sentiment_signal_comparison.py, data/sentiment_signal_comparison.json). The desk's \
+        own sentiment analyst, run with its production prompt on the exact social evidence of 30 \
+        settled decisions (an evenly spaced sample of the 89 that can be joined; 33 Qwen calls, \
+        225k tokens), against VADER and finBERT on the same posts for all 89, each lean traded \
+        over the ledger's horizon (26.8 hours on average) net of the 12bps round trip. No arm \
+        shows an edge: the analyst leaned on 11 of 30 and was right on 2 of 7 moves that cleared \
+        the cost, -80.1bps per trade; VADER 37.3% and -83.2bps; finBERT 54.3% and -34.9bps; a \
+        seeded coin flip 59.7% and -13.2bps. Paired, ARGUS minus VADER and ARGUS minus finBERT \
+        both have intervals that include zero (groupwise audit), so it is level with the general \
+        tools, not ahead and not shown behind. Why it cannot be won now: the evidence the desk \
+        kept begins on 2026-09-26, so every decision falls on two dates and no test can separate \
+        the arms; more model calls would not change that, more days of recorded evidence would. \
+        Not run: Santiment and Augmento (paid), the bitget-signal sentiment-analyst Skill (live \
+        only, cannot be replayed on past posts), TradingAgents' sentiment analyst, and the S2 \
+        entry sentinel-bitget-hackathon.""",
+    """\
         The sub-theme asks how real-time social sentiment becomes a position signal. What is \
         proven is narrower (the integrity row above: coordinated posting does not move the desk's \
         analyst). The desk has opened no position from a sentiment read, and the rivals that lead \
         the sub-theme have not been run on the same input (rival review of 2026-09-24)""",
 ]
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    the desk's sentiment analyst, VADER and finBERT on the identical social evidence of each \
+    settled decision, scored on the same realised move net of the same round trip"""
+artefact = "data/sentiment_signal_comparison.json"
+test = "test_sentiment_signal_comparison.py"

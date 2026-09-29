@@ -5,11 +5,27 @@ modules = [
     "argus/market/fundamentals.py",
     "argus/eval/workbench_comparison.py",
 ]
-state = "implemented"
+state = "owned"
 baseline = """\
-    OpenBB's real, published agent (openbb-finance/openbb-agents) and data platform \
-    (openbb-finance/OpenBBTerminal), both read in full and neither vendored"""
+    OpenBB ODP (openbb_core, the platform openbb-mcp-server wraps and Agent Rita reads), with \
+    edgartools FactQuery.as_of as the best general-purpose tool and microsoft/qlib's PIT store \
+    as the category's source; OpenBB's archived openbb-agents read in full"""
 blockers = [
+    """\
+        GRADED OWNED 2026-09-29, the one open scope decision taken by the owner. Agent Rita \
+        (openbb-finance/agent-rita, source read at commit f673c1f) has no point-in-time logic of \
+        its own: no as-of, filing-date or acceptance gate anywhere in src/ or mcp-server/; its \
+        financial data comes from OpenBB Workspace widgets, which are OpenBB's ODP (measured \
+        here: 7/493 right), and from ungated web fetches (fetch-webpage.ts, a Tavily web \
+        search). Running it would reproduce ODP's numbers, so it is scoped out by that reading \
+        rather than run. On the same 619 real questions ARGUS answers 619 with 0 leaks; the best \
+        general-purpose tool, edgartools FactQuery.as_of, 369 (paired McNemar p = 1.1e-75, \
+        ARGUS-only right 250, rival-only right 0); the category's chosen source, Qlib PIT, 51 \
+        exact; the named baseline ODP 7/493. The nine held-out tickers agree (553/553 against \
+        336 and 44). Scope: one concept, latest-quarter revenue, on ten tickers; ARGUS's truth \
+        labels and its gate both read EDGAR's acceptance second, so the evidence is in how the \
+        rivals err, which the rows record. OpenBB leads on data breadth, outside this row (row \
+        48 measures breadth).""",
     """\
         RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: openbb-agents is an archived 2024 \
         repository. Run on the same 619 questions since (2026-09-26, eval/pit_rivals.py, \
@@ -65,10 +81,8 @@ blockers = [
         both the route and the direct fetcher, and the snapshot has no file for that ticker) — \
         the identical failure is itself further confirmation the two paths are the same code, \
         not weaker evidence. research/pit_rivals/outputs/openbb_mcp_verify.json has the full \
-        row-for-row record. Agent Rita: still not run — no fetcher of its own, it reads OpenBB \
-        Workspace widgets and needs a Workspace account. Whether to supply one or to drop it \
-        from the OWNED condition is an open scope decision, not something to guess at \
-        (Activity/27_CAPABILITY_CLOSE_PLAN.md §4).""",
+        row-for-row record. Agent Rita: scoped out 2026-09-29 (first blocker): no point-in-time \
+        logic of its own; its answers are ODP's, which is measured.""",
     """\
         OpenBB genuinely wins on raw data-source breadth (32 real providers, 21 keyless, vs \
         ARGUS's 12 live-verified) — closing that gap is a separate, already-named, unimplemented \

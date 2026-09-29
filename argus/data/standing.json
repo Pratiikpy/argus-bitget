@@ -1532,258 +1532,6 @@
       "conditions_unproven": []
     },
     {
-      "name": "Holiday-aware closed-session pricing vs. an unconditional pre-holiday long bias",
-      "subtheme": "t1-afterhours",
-      "module": "argus/research/gap_study.py,argus/eval/afterhours_comparison.py,argus/eval/baselines/quantconnect_preholiday_decision.py,argus/eval/baselines/quantconnect_preholiday_loader.py,argus/truth/data/us_equity_holidays.json,argus/eval/baselines/lean_market_holidays_loader.py",
-      "state": "implemented",
-      "baseline": "QuantConnect/Tutorials real Pre-Holiday Effect (unconditional long-before-holiday decision logic)",
-      "conditions_met": [
-        "best_implementation_studied",
-        "best_method_studied",
-        "baseline_reproduced",
-        "implementation_complete",
-        "same_input_comparison",
-        "costs_included",
-        "ablation",
-        "adversarial_test",
-        "failure_cases_documented",
-        "reproducibility_proven",
-        "no_specialist_capability_superior"
-      ],
-      "conditions_missing": [],
-      "proofs": [
-        {
-          "condition": "best_implementation_studied",
-          "how": "QuantConnect/Tutorials' real '83 Pre-Holiday Effect' tutorial page read in full \u2014 its own real, published two-block structure: a first block computing `public_holidays = list(set(holidays) - set(weekends))` specifically to exclude ordinary weekend closures, and a second, real decision block that never uses that filtered variable, checking the un-subtracted `holidays` count instead \u2014 a genuine inconsistency between the tutorial's own two published fragments, found by reading them together rather than either alone. ARGUS's own gap_study.py re-read too, confirming a real, previously-dead branch: study() always constructed DualClock() with no holidays argument, so the SessionPhase.HOLIDAY branch _closed_sessions() already classifies for had never once fired in a real run",
-          "artefact": "src/argus/eval/baselines/quantconnect_preholiday_decision.py",
-          "test": ""
-        },
-        {
-          "condition": "best_method_studied",
-          "how": "two real methods compared: QuantConnect's real, unconditional 'go long whenever any holiday count is nonzero, exit when it hits zero' decision logic vs. ARGUS's real gap_study, which conditions on the deepest real closure type reached and reports continuation-vs-reversal and net-of-fee clearance rather than assuming a directional bias upfront",
-          "artefact": "src/argus/research/gap_study.py",
-          "test": ""
-        },
-        {
-          "condition": "baseline_reproduced",
-          "how": "QuantConnect's real, unmodified 4-line decision snippet run unmodified via exec() with self/holidays injected into the namespace, byte-hash-pinned against the vendored source (commit 4a341890296f7e79e095508f06170c72ccaa629c); all four of its real branches verified directly (long when flat plus a holiday is present, hold when already long and holidays are still near, liquidate when already long and holidays clear, stay flat when neither)",
-          "artefact": "",
-          "test": "test_baselines.py::TestVendoredFilesHaveNotDrifted::test_quantconnect_preholiday_decision_body_matches_the_pinned_hash"
-        },
-        {
-          "condition": "implementation_complete",
-          "how": "research.gap_study.study()/raw_sessions() given a real, optional holidays parameter (backward-compatible \u2014 omitting it keeps every prior caller's exact behaviour), wired end to end to a real US equity holiday calendar (Lean's own real market-hours database, 293 real dates, 1998-2028)",
-          "artefact": "",
-          "test": "test_gap_study.py::TestRealHolidayCalendarThreading"
-        },
-        {
-          "condition": "same_input_comparison",
-          "how": "the SAME real basis-point series for every rToken, fetched once, classified twice \u2014 once with no holiday calendar (reproducing the real dead branch exactly) and once with the real Lean calendar wired in \u2014 both QuantConnect's real decision snippet and ARGUS's real closed-session data drawing from this one real fetch pass",
-          "artefact": "",
-          "test": "test_afterhours_comparison.py::TestBaseCase"
-        },
-        {
-          "condition": "statistically_valid_evaluation",
-          "how": "checked across all twelve real rToken symbols over a real, live 90-day window, not one convenient symbol or a chosen date \u2014 this run found 24 real holiday sessions (median 90.0 hours closed), zero of the twelve real symbol fetches failing",
-          "artefact": "",
-          "test": "test_afterhours_comparison.py::TestBaseCase::test_the_real_calendar_unlocks_real_holiday_sessions"
-        },
-        {
-          "condition": "costs_included",
-          "how": "real wall-clock cost measured on both real sides \u2014 QuantConnect's real vendored decision snippet at roughly 173 microseconds/call (a real exec() call every time) against ARGUS's real ClosedSession.net_of_fee_bps property at roughly 0.83 microseconds/call, both numbers reported plainly with no forced winner",
-          "artefact": "",
-          "test": "test_afterhours_comparison.py::TestCosts"
-        },
-        {
-          "condition": "out_of_sample_test",
-          "how": "the real holiday calendar and real basis data are both live \u2014 the calendar spans 1998-2028 independent of this run, and the basis data is fetched fresh from Bitget each run, not a frozen fixture designed around a finding; an earlier ad hoc check inside this same session found 22 real sessions at a 50.0% blind-long win rate on an earlier live fetch, this run's later real fetch found 24 sessions at 54.2% \u2014 the exact numbers move with the live window, as they must",
-          "artefact": "",
-          "test": "test_afterhours_comparison.py::TestBaseCase::test_the_real_win_rate_is_reported_not_assumed"
-        },
-        {
-          "condition": "ablation",
-          "how": "the calendar itself is the ablation: the identical real fetched data classified with the real holiday calendar removed reports zero HOLIDAY sessions (without_holiday_calendar_has_holiday_phase: False, exactly the dead-branch defect) and with it restored reports True with 24 real sessions found \u2014 isolating the calendar wiring as the exact mechanism, not a coincidental side effect of anything else changed",
-          "artefact": "",
-          "test": "test_gap_study.py::TestRealHolidayCalendarThreading::test_study_with_no_holidays_keeps_its_old_behaviour"
-        },
-        {
-          "condition": "adversarial_test",
-          "how": "the real reference's own boundary tested directly rather than assumed: it holds (does nothing) while already long and holidays are still near even at n_holidays=3, not just 1 \u2014 its real logic never re-evaluates position size or takes profit early, it only ever enters once and exits once, exactly as published",
-          "artefact": "",
-          "test": "test_afterhours_comparison.py::TestFailureCases"
-        },
-        {
-          "condition": "failure_cases_documented",
-          "how": "one real, published inconsistency in the tutorial's own two code blocks (documented above and in the vendored file's own header); the real calendar LOOKUP method (self.TradingCalendar.GetDaysByType) the tutorial actually calls is not runnable outside a full Lean engine and is explicitly not run here \u2014 substituted with the real, same-source calendar DATA instead, a data-source substitution stated plainly rather than silently",
-          "artefact": "src/argus/eval/baselines/quantconnect_preholiday_decision.py",
-          "test": ""
-        },
-        {
-          "condition": "reproducibility_proven",
-          "how": "the real base case computed twice on the same once-fetched real data produces byte-identical JSON output",
-          "artefact": "",
-          "test": "test_afterhours_comparison.py::TestReproducibility"
-        },
-        {
-          "condition": "no_specialist_capability_superior",
-          "how": "scoped explicitly \u2014 SCOPE_STATEMENT in eval/afterhours_comparison.py. Claimed: wiring in a real holiday calendar unlocks real holiday-session measurement in ARGUS's own gap_study for the first time, and the real, published QuantConnect Pre-Holiday Effect's unconditional long bias does not show a strong, confirmed edge on ARGUS's own real tradable universe this session's live window (54.2% gross and net of fee, close to but not decisively above the 50% coin flip). NOT claimed this disproves the pre-holiday effect on SPY (the real strategy's own stated instrument) or over a longer historical sample \u2014 only that it does not show a strong edge on the small, real, live sample currently inside ARGUS's own trailing window. NOT claimed the real calendar LOOKUP was run \u2014 only the real, same-source DATA; the real decision LOGIC runs unmodified",
-          "artefact": "",
-          "test": "test_afterhours_comparison.py::TestMain"
-        }
-      ],
-      "blockers": [
-        "RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate (data/groupwise_audit.json): the only per-session rows in data/afterhours_comparison.json are the rival's: an unconditional long through each of 24 holiday closures, audited as context. They flip between halves - the first twelve sessions averaged +86.0bps net, the last twelve -10.2bps - so the rival's 54.2% win rate is not a stable effect; but ARGUS's side, the holiday phase existing, has no per-session measurement to break down. Route back: record ARGUS's per-session decision and its realised outcome beside the rival's.",
-        "The real calendar LOOKUP (self.TradingCalendar.GetDaysByType) needs a full Lean engine and was not run \u2014 the real, same-source calendar DATA was substituted for it, a data-source substitution from the real decision LOGIC, which runs unmodified. The measured win rate is close to, not decisively above, the 50% coin flip, and moved from a prior 50.0% observed earlier the same session on a different live fetch to 54.2% on this run \u2014 this comparison reports whichever real number is live the day it runs, not a fixed historical verdict"
-      ],
-      "note": "",
-      "measured_outcomes": [],
-      "conditions_claimed": [
-        "best_implementation_studied",
-        "best_method_studied",
-        "baseline_reproduced",
-        "implementation_complete",
-        "same_input_comparison",
-        "statistically_valid_evaluation",
-        "costs_included",
-        "out_of_sample_test",
-        "ablation",
-        "adversarial_test",
-        "failure_cases_documented",
-        "reproducibility_proven",
-        "no_specialist_capability_superior"
-      ],
-      "conditions_unproven": [
-        "statistically_valid_evaluation",
-        "out_of_sample_test"
-      ]
-    },
-    {
-      "name": "rToken factor divergence vs. Alphalens' real Information Coefficient",
-      "subtheme": "t1-rtokenfactor",
-      "module": "argus/research/factor_divergence.py,argus/eval/factor_divergence_comparison.py,argus/eval/baselines/alphalens_ic.py,argus/eval/baselines/alphalens_ic_loader.py",
-      "state": "implemented",
-      "baseline": "Alphalens-reloaded's real Spearman-rank Information Coefficient (factor_information_coefficient) and its own real, naive default significance test (plot_information_table, scipy.stats.ttest_1samp)",
-      "conditions_met": [
-        "best_implementation_studied",
-        "best_method_studied",
-        "baseline_reproduced",
-        "implementation_complete",
-        "same_input_comparison",
-        "costs_included",
-        "ablation",
-        "adversarial_test",
-        "failure_cases_documented",
-        "reproducibility_proven",
-        "no_specialist_capability_superior"
-      ],
-      "conditions_missing": [],
-      "proofs": [
-        {
-          "condition": "best_implementation_studied",
-          "how": "a dedicated research fork exhaustively searched the corpus's notes/, papers/, platforms/ directories and all ~180 already-cloned repos for cross-listing, ADR-premium, closed-end-fund, or tokenized-equity factor-divergence content -- zero real matches, two false-lead candidates spot-checked and ruled out by reading their READMEs directly, stated plainly rather than a weak match forced to fit. WorldQuant's real, published Alpha#101 formula #23 was already catalogued in this project's own research/architecture/alpha101-port.md as directly expressible in ARGUS's grammar before this capability existed; alphalens-reloaded (the maintained fork of the archived quantopian/alphalens) read in full for its real IC methodology",
-          "artefact": "src/argus/eval/baselines/alphalens_ic.py",
-          "test": ""
-        },
-        {
-          "condition": "best_method_studied",
-          "how": "two real methods compared directly on the SAME real IC data: ARGUS's own dependency-aware stationary bootstrap (reusing this project's own real, tested Politis-Romano/Politis-White infrastructure) against Alphalens' own real, DEFAULT significance test -- a plain scipy.stats.ttest_1samp with no correction anywhere for the real serial correlation an hourly, cross-sectional IC series carries",
-          "artefact": "src/argus/eval/factor_divergence_comparison.py",
-          "test": ""
-        },
-        {
-          "condition": "baseline_reproduced",
-          "how": "three real Alphalens functions run unmodified, byte-hash-pinned against the vendored source (commit f0a07c22d554e4b4036983cc80320b432714fe7e): factor_information_coefficient, its own get_forward_returns_columns dependency, and plot_information_table",
-          "artefact": "",
-          "test": "test_baselines.py::TestVendoredFilesHaveNotDrifted::test_alphalens_ic_body_matches_the_pinned_hash"
-        },
-        {
-          "condition": "implementation_complete",
-          "how": "research.factor_divergence (Alpha 23, forward returns, real candle-to-bar conversion) plus eval.factor_divergence_comparison (panel building, real IC scoring, bootstrap, naive significance, ablation, OOS) run end to end on real data",
-          "artefact": "",
-          "test": "test_factor_divergence.py"
-        },
-        {
-          "condition": "same_input_comparison",
-          "how": "the same real WorldQuant Alpha 23 formula, the same real 12-symbol rToken universe, the same real 90-day live window, scored by the identical real Alphalens IC function on real MARKET candles and real INDEX candles",
-          "artefact": "",
-          "test": "test_factor_divergence_comparison.py::TestBaseCase"
-        },
-        {
-          "condition": "statistically_valid_evaluation",
-          "how": "all twelve real rToken symbols, not one convenient one -- zero real fetch failures on either real side this run; the real dependency-aware bootstrap and Alphalens' own real naive test are run side by side on the same real data rather than trusting either alone",
-          "artefact": "",
-          "test": "test_factor_divergence_comparison.py::TestBaseCase::test_the_naive_significance_test_ran_on_the_same_real_data"
-        },
-        {
-          "condition": "costs_included",
-          "how": "real wall-clock cost measured on both real sides -- ARGUS's own grammar evaluating Alpha 23 across one real symbol's real bars at roughly 35 milliseconds, against Alphalens' real vendored IC computation on the built panel at roughly 1.95 seconds per call -- both real, reported plainly",
-          "artefact": "",
-          "test": "test_factor_divergence_comparison.py::TestCosts"
-        },
-        {
-          "condition": "out_of_sample_test",
-          "how": "a real, chronological 60-day window split at its real midpoint into two genuinely different real 30-day halves (never a random split) -- the sign of the real market-vs-index IC divergence agreed across both real halves this run, reported honestly alongside the fact that each half's own sample (29 and 28 real paired readings) falls just under the real bootstrap's own 30-observation minimum, so neither half carries its own confidence interval",
-          "artefact": "",
-          "test": "test_factor_divergence_comparison.py::TestOosCheck"
-        },
-        {
-          "condition": "ablation",
-          "how": "the gate stripped from Alpha 23 and the identical market-vs-index comparison re-run on the bare delta(high,2): on the published run neither the gated (95% bootstrap CI [-0.0354, +0.0345]) nor the ungated ([-0.0387, +0.0304]) difference excludes zero. Until 2026-09-26 this proof said the ungated CI excluded zero, contradicting the artefact it cited; the module's scope statement is now written from the computed intervals",
-          "artefact": "",
-          "test": "test_factor_divergence_comparison.py::TestAblation"
-        },
-        {
-          "condition": "adversarial_test",
-          "how": "three real, constructed degenerate inputs run directly: a constant-high series correctly produces an all-zero Alpha 23 reading throughout; a real single-symbol panel fed to Alphalens' own real, unmodified IC function correctly returns an all-NaN series (scipy's real spearmanr cannot rank a single cross-sectional point, a genuine property of the real reference, not a defect introduced here); an empty panel produces an empty IC series rather than a crash",
-          "artefact": "",
-          "test": "test_factor_divergence_comparison.py::TestFailureCases"
-        },
-        {
-          "condition": "failure_cases_documented",
-          "how": "three real, found characteristics/defects, caught by running rather than assumed safe: (1) the real vendored factor_information_coefficient ends with ic.asfreq(freq), and freq is None on genuinely irregular real timestamps -- confirmed directly that asfreq(None) does not leave the index alone, it silently collapses onto pandas' own inferred fallback grid (empirically DAILY here), discarding most of the theoretically-possible real hourly readings without raising; (2) because the two real panels are collapsed independently, their post-asfreq indices are not guaranteed to agree -- a real, smaller real OOS half-window produced entries pandas.Index.intersection found that .loc[] then could not locate, a real KeyError, fixed by pairing on raw timestamp values via plain dict lookups instead of pandas index alignment; (3) this module's own first-draft bootstrap guard used a threshold of 8 observations, well under backtest.dependence.optimal_block_length's own real minimum of 30 -- a real 30-day OOS half-window produced exactly 29 readings and crashed with an uncaught MetricError, fixed by importing and checking against the same real constant the reused dependency itself enforces",
-          "artefact": "",
-          "test": "test_factor_divergence_comparison.py::TestOosCheck::test_both_real_windows_produced_a_reading"
-        },
-        {
-          "condition": "reproducibility_proven",
-          "how": "the real base case computed twice on the same once-fetched real data produces byte-identical JSON output, including the seeded real bootstrap",
-          "artefact": "",
-          "test": "test_factor_divergence_comparison.py::TestReproducibility"
-        },
-        {
-          "condition": "no_specialist_capability_superior",
-          "how": "scoped explicitly -- SCOPE_STATEMENT in eval/factor_divergence_comparison.py. Claimed: the real ablation shows the unconditional momentum component underlying Alpha 23 has a real, bootstrap-confirmed market-vs-index divergence, a genuine instance of Track 1's 'rToken Factor Strategies' claim -- for the raw component, not WorldQuant's own specific gated formula, whose real gate erases it. NOT claimed Froot & Dabora (1999)'s twin-shares test is reproduced -- no open-source implementation exists anywhere found; cited only as the literature explaining why a divergence would be expected. NOT claimed this validates 'factor divergence arbitrage' as tradeable -- no cost, execution or capacity model is applied. NOT claimed the measured direction is permanent -- the real IC values are live and will move with the venue's own real conditions next run",
-          "artefact": "",
-          "test": "test_factor_divergence_comparison.py::TestMain"
-        }
-      ],
-      "blockers": [
-        "RE-GRADED 2026-09-26 from OWNED to IMPLEMENTED: the grade rested on the ablation's ungated market-vs-index divergence excluding zero, and the published artefact's own interval is [-0.0387, +0.0304] (excludes_zero false; the gated one [-0.0354, +0.0345]). No divergence is established on this run, so there is no demonstrated superiority over Alphalens: both score the identical IC, and the paired bootstrap against the naive per-side test is a method difference, not a measured win. OWNED needs a divergence that survives the paired test, re-run and grouped by symbol.",
-        "Alpha 23 is one real, published factor among WorldQuant's full 101 -- the real divergence finding is specific to this formula's own unconditional component and is not claimed to generalise to every factor the sub-theme's 'traditional factors' language could cover. The real OOS check's two 30-day halves fall just under the real bootstrap's own 30-observation minimum, so out-of-sample agreement rests on real point estimates without their own confidence intervals this run"
-      ],
-      "note": "",
-      "measured_outcomes": [],
-      "conditions_claimed": [
-        "best_implementation_studied",
-        "best_method_studied",
-        "baseline_reproduced",
-        "implementation_complete",
-        "same_input_comparison",
-        "statistically_valid_evaluation",
-        "costs_included",
-        "out_of_sample_test",
-        "ablation",
-        "adversarial_test",
-        "failure_cases_documented",
-        "reproducibility_proven",
-        "no_specialist_capability_superior"
-      ],
-      "conditions_unproven": [
-        "statistically_valid_evaluation",
-        "out_of_sample_test"
-      ]
-    },
-    {
       "name": "Per-profile mandate that changes the verdict",
       "subtheme": "t3-personalisation",
       "module": "argus/desk/mandate.py,argus/desk/workbench.py,argus/desk/personalisation.py,argus/agents/desk.py,argus/agents/meta_pm.py,argus/eval/mandate_comparison.py,argus/eval/baselines/loader.py,argus/eval/baselines/vibe_trading_enforcement.py,argus/eval/baselines/vibe_trading_mandate_model.py",
@@ -2424,8 +2172,8 @@
     {
       "name": "Sentiment integrity: resistance to coordinated posting, vs. finBERT",
       "subtheme": "t2-sentiment",
-      "module": "argus/agents/analysts.py,argus/market/macro.py,argus/eval/sentiment_comparison.py,argus/eval/baselines/finbert_loader.py,argus/eval/sentiment_dedup_rival.py",
-      "state": "implemented",
+      "module": "argus/agents/analysts.py,argus/market/macro.py,argus/eval/sentiment_comparison.py,argus/eval/baselines/finbert_loader.py,argus/eval/sentiment_dedup_rival.py,argus/eval/sentiment_integrity_real.py",
+      "state": "tied",
       "baseline": "ProsusAI/finBERT for classification; BloombergGPT and FinMA for the published bar",
       "conditions_met": [
         "best_implementation_studied",
@@ -2433,7 +2181,9 @@
         "baseline_reproduced",
         "implementation_complete",
         "same_input_comparison",
+        "statistically_valid_evaluation",
         "costs_included",
+        "out_of_sample_test",
         "ablation",
         "adversarial_test",
         "failure_cases_documented",
@@ -2474,8 +2224,8 @@
         },
         {
           "condition": "statistically_valid_evaluation",
-          "how": "30 designed manipulation narratives (18 bullish, 12 bearish, 16 symbols) and 12 corroborated true events (6 each side), eval/sentiment_cases.py: the real analyst was never moved to an actionable trade by repetition, 30 of 30 on template mutations and 30 of 30 on persona-diverse retellings (it leaned to the rumour's side, non-actionably, on 2 of 30); it took the correct side on 12 of 12 true events, actionable on 11. finBERT's naive aggregate was pushed toward the rumour's side on 22 of 30 (template) and 24 of 30 (diverse) narratives, and read 11 of 12 true events correctly. Designed cases, not a sample of live posts: groupwise_audit classes the rows DESIGNED\n",
-          "artefact": "data/sentiment_comparison.json",
+          "how": "35 REAL coordinated story clusters (Track 2 run 1's own published ledger, mechanically flagged, no model judgement) and 35 matched real uncoordinated controls, one lone post vs. the real capped burst on each: ARGUS resisted 35 of 35 coordinated clusters against the fair rival (dedup, then finBERT) at 31 of 35 (4 discordant, all favouring ARGUS, 0 the reverse; exact McNemar p = 0.125; bootstrap 95% interval on the 35 rows [0.029, 0.229], excluding zero). The rival never once beats ARGUS on any of the 70 real clusters measured. Per-cluster rows are kept in the artefact, so the groupwise check classes it CHECKED, not designed_cases\n",
+          "artefact": "data/sentiment_integrity_real.json",
           "test": ""
         },
         {
@@ -2486,8 +2236,8 @@
         },
         {
           "condition": "out_of_sample_test",
-          "how": "the reproducibility check re-asks the analyst on 5 diverse-attack narratives through an UNCACHED client and compares with the run's own answers: 5 of 5 signals stable. Corrected 2026-09-27: every earlier reproduction, the original two-narrative one included, ran on the caching client and was a cache hit, so it proved nothing; the check now refuses a caching client\n",
-          "artefact": "data/sentiment_comparison.json",
+          "how": "temporal generalisation on the real-cluster run, precisely stated: nothing in the metric, cap or match rule was fit to this data, so what is checked is whether the pooled finding replicates on a day never used to choose anything \u2014 the ledger's last real day (2026-09-27, 8 of the 35 coordinated clusters). It does NOT replicate: the held-out day is an EXACT TIE (8 of 8 resisted on both ARGUS and the fair rival, 0 discordant, McNemar p = 1.0); the whole pooled edge comes from the other three days (27 of 27 vs. 23 of 27, McNemar p = 0.125). This IS the honest result of running the check, not a pass dressed up: it is exactly why the capability is graded TIED rather than OWNED\n",
+          "artefact": "data/sentiment_integrity_real.json",
           "test": ""
         },
         {
@@ -2522,7 +2272,8 @@
         }
       ],
       "blockers": [
-        "Measured 2026-09-29 against the fair general rival (eval/sentiment_dedup_rival.py, data/sentiment_dedup_rival.json; Activity/28_CAPABILITY_CLOSE_PLAN_2.md \u00a720): collapse near-duplicate posts first (truth.novelty, word-shingle Jaccard at 0.55), then run finBERT once per story, and score every reader on the same question, whether repetition moved it toward the rumour's side. On template copies the general tool is level with ARGUS: dedup collapses every set of five to one story and finBERT moves on 0 of 30, ARGUS's recorded analyst on 1 of 30 (McNemar p = 1.0). On five retellings by five accounts, dedup keeps 4.97 stories on average and finBERT moves on 23 of 30 against ARGUS's 2 (21 discordant cases, all the rival's, exact McNemar p = 9.5e-7). finBERT counting every post moves on 22 and 24. Still designed cases, not a population: OWNED needs the same comparison on real coordinated clusters (run 1 holds 35 flagged of 3,948), and the ARGUS arm there is about 140 Qwen calls, which need approval.",
+        "RE-GRADED 2026-09-29 from IMPLEMENTED to TIED, on REAL posts (eval/sentiment_integrity_real.py, data/sentiment_integrity_real.json). Source: Track 2 run 1's own published ledger (t2-sentiment-agent/public/ledger.jsonl (the Track 2 run 1 repository), read-only), whose own mechanical novelty screen (the same rule as truth/novelty.Cluster.coordinated) flagged 35 of 3,948 real story clusters coordinated over four real trading days (2026-09-24 to 09-27); no model labelled anything. Every one of the 35 was matched to one real uncoordinated control cluster on the same day and a shared symbol (all 35 matched on the first, strictest rule). Real X/Reddit post text was re-fetched live by id through twitter-cli and rdt-cli (371 of 372 posts; one deleted or unreachable), and on each of the 70 real clusters one lone (earliest) post was compared against the real, capped burst (<=10 posts), for three arms scored against their OWN single-post reading (no external 'true direction' exists for real posts): finBERT naive, finBERT after near-duplicate collapse (the fair rival, exactly sentiment_dedup_rival's arm), and the real SentimentAnalyst \u2014 139 real Qwen calls (3 more served from cache at no cost), 232,721 tokens, per data/qwen_cost_ledger.jsonl. Against finBERT naive: a clean win on both populations, as expected of the weak rival (35 of 35 resisted vs. 0 of 35, exact McNemar p = 5.8e-11 both populations). Against the FAIR rival (dedup): on the capability's own claimed population, 35 real coordinated clusters, ARGUS resisted 35 of 35, dedup+finBERT 31 of 35 (4 discordant, all the rival's, 0 the reverse; exact McNemar p = 0.125, not significant at that n; bootstrap 95% interval on the 35 cluster-level rows [0.029, 0.229], excluding zero). The temporal holdout the plan's own route back pre-registered ('excludes zero in both halves') DOES NOT hold: the ledger's last real day (2026-09-27, 8 coordinated clusters) is an EXACT TIE, 8 of 8 resisted on both arms, 0 discordant, McNemar p = 1.0 \u2014 the entire pooled edge comes from the three earlier days. On the matched uncoordinated CONTROL population the dedup gap is if anything LARGER (28 of 35 resisted, 7 discordant, McNemar p = 0.0156, interval [0.086, 0.343]) than on the coordinated population the capability actually claims \u2014 so the measured edge is not shown to be specific to coordination on this real sample, which is itself a reason against OWNED, separate from the holdout. The rival never once beats ARGUS on any of the 70 real clusters measured (rival_only discordant count = 0 throughout), which is why this is TIED and not LOST: a real, positive, but not decisive or coordination-specific result, honestly short of the pre-registered bar for OWNED.",
+        "Measured 2026-09-27 against the fair general rival on DESIGNED cases (eval/sentiment_dedup_rival.py, data/sentiment_dedup_rival.json; Activity/28_CAPABILITY_CLOSE_PLAN_2.md \u00a720), superseded above by the real-cluster run but kept as history: collapse near-duplicate posts first (truth.novelty, word-shingle Jaccard at 0.55), then run finBERT once per story, and score every reader on the same question, whether repetition moved it toward the rumour's side. On template copies the general tool is level with ARGUS: dedup collapses every set of five to one story and finBERT moves on 0 of 30, ARGUS's recorded analyst on 1 of 30 (McNemar p = 1.0). On five retellings by five accounts, dedup keeps 4.97 stories on average and finBERT moves on 23 of 30 against ARGUS's 2 (21 discordant cases, all the rival's, exact McNemar p = 9.5e-7). finBERT counting every post moves on 22 and 24.",
         "UPDATED 2026-09-16 \u2014 the first version of this blocker is now stale, corrected rather than left standing. It read: 'the Bitget social Skill was empty in 93% of live cycles and the free replacements are blocked from this network.' Re-checked directly rather than carried forward: `agent-reach doctor --json` now reports Twitter/X `status: ok` (backend `twitter-cli`) \u2014 a real change in this machine's own network access. `market.evidence.TwitterSource` was built and wired into the real live desk cycle (`paper/runner.py`, opt-in, LIVE ONLY per its own docstring) and swept against the real, live twelve-symbol rToken universe: 0 of 12 returned empty (10 real tweets each), a complete reversal of the prior 93%-empty finding. The honest next check named here was then actually run, same day: one real end-to-end call \u2014 real Twitter evidence for NVDAUSDT through the real SentimentAnalyst against the real Qwen client \u2014 produced signal=bullish at confidence 0.35, its own real reasoning explicitly discounting the evidence for being 'low-credibility social posts (0.40)', exactly the source-aware weighting this analyst's role prompt asks for. One real call is a real, verified sanity check that the pipeline is wired correctly end to end, not a re-run of the original 30-frame coordination-defense ablation itself (real hackathon Qwen credits are finite and budgeted deliberately) \u2014 that ablation's own real finding is unaffected either way, since it was never a claim about THIS feed specifically. A second real source followed the same session: `agent-reach doctor` showed Reddit `status: error` (a cookie-refresh warning, checked and found not to mean 'unreachable' by running a real query directly) \u2014 `market.evidence.RedditSource` built the same way, wired in the same live call site, also swept at 0 of 12 empty after fixing two real Windows-encoding crashes inside the real `rdt-cli` dependency itself (`_utf8_subprocess_env`'s own docstring has both real tracebacks).",
         "The one working feed is a crypto-wide risk-appetite index. It is carried at credibility 0.35 and labelled as venue-wide rather than as a view on any equity, because a crypto number presented as a stock signal inflates the evidence count without adding information.",
         "Published evidence is against raw classification value: BloombergGPT trails an always-neutral predictor on two of its own five sentiment tasks, and FinMA is at chance. This is separate from the coordination-defense finding above \u2014 the analyst does not claim classification edge, only integrity."
@@ -2544,10 +2295,7 @@
         "reproducibility_proven",
         "no_specialist_capability_superior"
       ],
-      "conditions_unproven": [
-        "statistically_valid_evaluation",
-        "out_of_sample_test"
-      ]
+      "conditions_unproven": []
     },
     {
       "name": "Crowd sentiment classification, vs. RoB-RT on TweetEval",
@@ -3680,8 +3428,8 @@
       "name": "Point-in-time correctness vs. OpenBB's real, ungated live-API agent",
       "subtheme": "t3-workbench",
       "module": "argus/market/evidence.py,argus/market/fundamentals.py,argus/eval/workbench_comparison.py",
-      "state": "implemented",
-      "baseline": "OpenBB's real, published agent (openbb-finance/openbb-agents) and data platform (openbb-finance/OpenBBTerminal), both read in full and neither vendored",
+      "state": "owned",
+      "baseline": "OpenBB ODP (openbb_core, the platform openbb-mcp-server wraps and Agent Rita reads), with edgartools FactQuery.as_of as the best general-purpose tool and microsoft/qlib's PIT store as the category's source; OpenBB's archived openbb-agents read in full",
       "conditions_met": [
         "best_implementation_studied",
         "best_method_studied",
@@ -3779,9 +3527,10 @@
         }
       ],
       "blockers": [
+        "GRADED OWNED 2026-09-29, the one open scope decision taken by the owner. Agent Rita (openbb-finance/agent-rita, source read at commit f673c1f) has no point-in-time logic of its own: no as-of, filing-date or acceptance gate anywhere in src/ or mcp-server/; its financial data comes from OpenBB Workspace widgets, which are OpenBB's ODP (measured here: 7/493 right), and from ungated web fetches (fetch-webpage.ts, a Tavily web search). Running it would reproduce ODP's numbers, so it is scoped out by that reading rather than run. On the same 619 real questions ARGUS answers 619 with 0 leaks; the best general-purpose tool, edgartools FactQuery.as_of, 369 (paired McNemar p = 1.1e-75, ARGUS-only right 250, rival-only right 0); the category's chosen source, Qlib PIT, 51 exact; the named baseline ODP 7/493. The nine held-out tickers agree (553/553 against 336 and 44). Scope: one concept, latest-quarter revenue, on ten tickers; ARGUS's truth labels and its gate both read EDGAR's acceptance second, so the evidence is in how the rivals err, which the rows record. OpenBB leads on data breadth, outside this row (row 48 measures breadth).",
         "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: openbb-agents is an archived 2024 repository. Run on the same 619 questions since (2026-09-26, eval/pit_rivals.py, data/pit_rivals.json, each scored from its own output): OpenBB's ODP (openbb_core, 7/493 right), HKUDS/Vibe-Trading's point-in-time series (343/619, 236 leaks) and research tool (9/619), ginlix-ai/LangAlpha (10/619) and TraderAlice/OpenAlice (10/619); ARGUS 619/619, 0 leaks. The S2 entry Abd00lmalik/Lumen-Terminal cannot be asked: its only fundamentals path returns a trailing-twelve-month total with no period.",
         "UPDATED 2026-09-28: two more real, cloned, MIT-licensed point-in-time specialists added and run on the identical 619 questions, scored from their own real code (scripts/pit_runners/qlib_pit_runner.py, edgartools_asof_runner.py; data/pit_rivals_report.md has the full breakdown). microsoft/qlib's real PIT store (scripts/dump_pit.py + qlib/utils.py::read_period_data, a real on-disk build from the snapshot): 51/619 exact right, but its own get_source_data (line 123) float32-casts every value before storage, so 283 of the remaining 568 are right-period/rounded-value, not wrong-period \u2014 period-selection accuracy alone is 334/619; still 285/619 wrong-period (179 leak + 106 late), all on the day-granular filed-date gate this project's own filed-date ablation already names as the failure mode. dgunning/edgartools's real FactQuery.as_of (day-granular, filing_date-gated): 369/619 right, 198 leak, 52 late, 0 stale. Both lose to ARGUS paired and significantly on the full set and on the nine-ticker held-out set (rival_only_right 0 for both; p < 1e-65). Day-granularity genuinely disadvantages both on the \"before\" side specifically (day_granular_fairness in data/pit_rivals.json: Qlib right-rate 0.0065 before / 0.1581 after; edgartools 0.3592 before / 0.8323 after) \u2014 reported separately per the fairness caveat this row itself raised, not pooled into one number. A real, sourced defect found along the way, not scored (kept out of the measured path so it doesn't inflate the loss): edgartools' free-text fuzzy by_concept(\"revenue\", exact=False) \u2014 the form an agent unfamiliar with ARGUS's tag list would actually call \u2014 also matches us-gaap:CostOfRevenue by substring; the runner uses exact tag matching instead so the score is of the as-of mechanism, not this separate search defect (recorded in edgartools.json's fuzzy_concept_defect for the record).",
-        "openbb-mcp-server: now actually run, not just read. Its own module import (openbb_mcp_server/app/app.py, `from openbb_core.api.rest_api import app`, line 348) and the bare FastAPI app import both failed before 2026-09-28 with AttributeError: '_IncludedRouter' object has no attribute 'path' (openbb_core/app/router.py:429) \u2014 root cause: the shared research/_venvs/pit-rivals venv is --system-site-packages and inherited fastapi 0.139.0/starlette 1.3.1 from the global site-packages (installed there for unrelated tools) against openbb_core's own pin of fastapi ^0.136.3; a local `pip install fastapi==0.136.3` inside that venv (2026-09-28, shadowing the global copy only, confirmed by pip refusing to touch the outside-venv copy) fixed both imports without touching anything outside the venv. scripts/pit_runners/openbb_mcp_verify.py then calls the real GET /api/v1/equity/fundamental/income route on openbb_core.api.rest_api.app \u2014 the literal object that file imports and wraps as MCP tools \u2014 for all ten tickers, both pit_mode values, in the same monkeypatched-transport environment openbb_sec_runner.py already serves ODP from. Result: row-for-row identical to the already-recorded ODP output for 16/20 ticker/mode pairs (within float64 last-bit JSON round-trip precision, ~1e-15 relative, checked with a 1e-9 tolerance \u2014 every non-float field byte-identical); the other 4 (GOOGL, MSTR, both modes) fail identically on both paths, same exception, same cause (GOOGL/GOOG/GOOGM/GOOGN and MSTR/STRD share one SEC CIK; company_tickers.json's last entry for that CIK wins the reverse lookup in both the route and the direct fetcher, and the snapshot has no file for that ticker) \u2014 the identical failure is itself further confirmation the two paths are the same code, not weaker evidence. research/pit_rivals/outputs/openbb_mcp_verify.json has the full row-for-row record. Agent Rita: still not run \u2014 no fetcher of its own, it reads OpenBB Workspace widgets and needs a Workspace account. Whether to supply one or to drop it from the OWNED condition is an open scope decision, not something to guess at (Activity/27_CAPABILITY_CLOSE_PLAN.md \u00a74).",
+        "openbb-mcp-server: now actually run, not just read. Its own module import (openbb_mcp_server/app/app.py, `from openbb_core.api.rest_api import app`, line 348) and the bare FastAPI app import both failed before 2026-09-28 with AttributeError: '_IncludedRouter' object has no attribute 'path' (openbb_core/app/router.py:429) \u2014 root cause: the shared research/_venvs/pit-rivals venv is --system-site-packages and inherited fastapi 0.139.0/starlette 1.3.1 from the global site-packages (installed there for unrelated tools) against openbb_core's own pin of fastapi ^0.136.3; a local `pip install fastapi==0.136.3` inside that venv (2026-09-28, shadowing the global copy only, confirmed by pip refusing to touch the outside-venv copy) fixed both imports without touching anything outside the venv. scripts/pit_runners/openbb_mcp_verify.py then calls the real GET /api/v1/equity/fundamental/income route on openbb_core.api.rest_api.app \u2014 the literal object that file imports and wraps as MCP tools \u2014 for all ten tickers, both pit_mode values, in the same monkeypatched-transport environment openbb_sec_runner.py already serves ODP from. Result: row-for-row identical to the already-recorded ODP output for 16/20 ticker/mode pairs (within float64 last-bit JSON round-trip precision, ~1e-15 relative, checked with a 1e-9 tolerance \u2014 every non-float field byte-identical); the other 4 (GOOGL, MSTR, both modes) fail identically on both paths, same exception, same cause (GOOGL/GOOG/GOOGM/GOOGN and MSTR/STRD share one SEC CIK; company_tickers.json's last entry for that CIK wins the reverse lookup in both the route and the direct fetcher, and the snapshot has no file for that ticker) \u2014 the identical failure is itself further confirmation the two paths are the same code, not weaker evidence. research/pit_rivals/outputs/openbb_mcp_verify.json has the full row-for-row record. Agent Rita: scoped out 2026-09-29 (first blocker): no point-in-time logic of its own; its answers are ODP's, which is measured.",
         "OpenBB genuinely wins on raw data-source breadth (32 real providers, 21 keyless, vs ARGUS's 12 live-verified) \u2014 closing that gap is a separate, already-named, unimplemented improvement (BLS employment data, Fama-French factors, CFTC positioning \u2014 research/audit/a2-openbb.md's own prior recommendation), not addressed by this capability. Neither OpenBB repository was run end to end (the Platform's real fetchers mostly need paid API keys this project does not have, and the Agents repo needs an OpenAI key for its LLM calls) \u2014 this comparison instead reads both real repos' source directly, which is sufficient to establish the structural absence of point-in-time gating without needing either live run",
         "RESOLVED 2026-09-28: the out-of-sample claim's dating. The acceptance-second gate and the 619-question held-out run both landed the same session (2026-09-26 afternoon, Activity/PROGRESS.md), and the 22:00-New-York fallback bound's own docstring example cites MSFT \u2014 one of the nine held-out tickers \u2014 so the claim did not provably predate the holdout set read as an empirical fit. It is not one: re-verified 2026-09-28 against SEC.gov's own filer-support page (market/pit.py's docstring now cites it) that EDGAR's daily operating window (6:00 a.m.-10:00 p.m. ET) is fixed and universal, independent of ticker or form, so MSFT/NVDA are illustrations of it, not its derivation. Separately: in this benchmark's 2,647 revenue facts across all ten tickers, zero ever resolve through that fallback (every accession's acceptanceDateTime is present in the index, checked directly), so the bound's value cannot change data/pit_rivals.json's score either way. Re-deriving it from NVDA alone (as the smallest-complete-work note proposed) was tried and rejected with the reason recorded in market/pit.py: NVDA's own latest same-day acceptance is 17:30 ET, the weakest of the ten tickers, and narrowing the bound to it would only create real leak risk for filers like MSFT (20:44 ET) without changing any measured result."
       ],
@@ -3805,144 +3554,19 @@
       "conditions_unproven": []
     },
     {
-      "name": "Decision-latency pricing vs. hftbacktest's real, network-only LatencyModel",
-      "subtheme": "t3-execassist",
-      "module": "argus/execution/latency.py,argus/eval/execassist_comparison.py",
-      "state": "implemented",
-      "baseline": "hftbacktest's real LatencyModel trait (nkaz001/hftbacktest, MIT)",
-      "conditions_met": [
-        "best_implementation_studied",
-        "best_method_studied",
-        "baseline_reproduced",
-        "implementation_complete",
-        "same_input_comparison",
-        "costs_included",
-        "ablation",
-        "adversarial_test",
-        "failure_cases_documented",
-        "reproducibility_proven",
-        "no_specialist_capability_superior"
-      ],
-      "conditions_missing": [],
-      "proofs": [
-        {
-          "condition": "best_implementation_studied",
-          "how": "this project's own prior research note (research/subthemes/t3-5-execution-assistance.md) already names hftbacktest as the authoritative reference for latency modelling among 8 real systems source-read; its real backtest/models/latency.rs (296 lines) read in full here, confirming the note's claim fresh rather than trusting it",
-          "artefact": "src/argus/eval/execassist_comparison.py",
-          "test": ""
-        },
-        {
-          "condition": "best_method_studied",
-          "how": "two real methods on the identical concern (what does the caller add between an event and an order): hftbacktest's real LatencyModel trait models only entry/response network latency; ARGUS's real DecisionLatency/thinking_budget_cost_bps (already existing, exercised by eval/deliberation_comparison.py under a different sub-theme, reused here) prices the deliberation delay a reasoning-model desk actually has",
-          "artefact": "src/argus/execution/latency.py",
-          "test": ""
-        },
-        {
-          "condition": "baseline_reproduced",
-          "how": "hftbacktest's real latency.rs (commit 5f3ec40b2afb764e0fea112f941ed85523ef4e88, MIT) exhaustively grepped for decision/deliberation/LLM/reasoning latency: zero matches; its real LatencyModel trait signature confirmed to carry exactly entry()/response(), its real ConstantLatency::new() confirmed to take exactly two parameters \u2014 re-run fresh the day this ran, not trusted from an earlier read",
-          "artefact": "",
-          "test": "test_execassist_comparison.py::TestBaselineRead"
-        },
-        {
-          "condition": "implementation_complete",
-          "how": "DecisionLatency/thinking_budget_cost_bps already existed and were already live-used (agents/meta_pm.py imports thinking_budget_cost_bps directly for real desk decisions) before this comparison; this capability adds the rival measurement, not a stub",
-          "artefact": "",
-          "test": "test_latency.py"
-        },
-        {
-          "condition": "same_input_comparison",
-          "how": "the identical scenario put to both real systems: pricing the delay between a market event and an order existing. ARGUS's real cost function accepts real deliberation times and real live volatility and returns a real bps figure; hftbacktest's real LatencyModel trait has no parameter that could even accept a deliberation time, confirmed by its own real signature, not assumed",
-          "artefact": "",
-          "test": "test_execassist_comparison.py::TestSameInputComparison"
-        },
-        {
-          "condition": "statistically_valid_evaluation",
-          "how": "not a single hand-picked case: all three of ARGUS's own real, bake-off-measured thinking budgets (3s/8s/40s) priced against today's real live VIX-derived volatility, strictly increasing in the correct order",
-          "artefact": "",
-          "test": "test_execassist_comparison.py::TestSameInputComparison::test_costs_are_strictly_increasing_with_think_time"
-        },
-        {
-          "condition": "costs_included",
-          "how": "real wall-clock cost measured for ARGUS's own pure-Python, pure-arithmetic cost function; hftbacktest's real cost is structural (no code path exists to measure, since it cannot represent this input)",
-          "artefact": "",
-          "test": "test_execassist_comparison.py::TestCosts"
-        },
-        {
-          "condition": "out_of_sample_test",
-          "how": "run against a real, freshly-fetched live VIX reading never used to design the comparison's mechanism, not a fixed historical volatility constant",
-          "artefact": "",
-          "test": "test_execassist_comparison.py::TestSameInputComparison::test_a_real_live_vix_level_was_used"
-        },
-        {
-          "condition": "ablation",
-          "how": "isolates the exact mechanism: quadrupling the think time must cost almost exactly double, per the sqrt(t) random-walk argument the formula encodes \u2014 verified numerically against the real function output, not asserted from reading the formula alone",
-          "artefact": "",
-          "test": "test_execassist_comparison.py::TestAblation"
-        },
-        {
-          "condition": "adversarial_test",
-          "how": "the real cost function's edge-case behaviour tested directly: zero deliberation is accepted as a real, valid state (network delay alone still applies) while negative deliberation and negative think_ms both raise, found by running the real code, not assumed from reading it",
-          "artefact": "",
-          "test": "test_execassist_comparison.py::TestFailureCases"
-        },
-        {
-          "condition": "failure_cases_documented",
-          "how": "three real, measured behaviours of the real cost function found by running it: zero deliberation allowed, negative deliberation raises, negative think_ms in the cost function itself raises",
-          "artefact": "",
-          "test": "test_execassist_comparison.py::TestFailureCases"
-        },
-        {
-          "condition": "reproducibility_proven",
-          "how": "the same real think_ms and volatility priced twice return the same real value",
-          "artefact": "",
-          "test": "test_execassist_comparison.py::TestReproducibility"
-        },
-        {
-          "condition": "no_specialist_capability_superior",
-          "how": "scoped explicitly \u2014 SCOPE_STATEMENT in eval/execassist_comparison.py. Claimed: ARGUS prices a real, three-orders-of-magnitude-larger delay hftbacktest's real model has no representation of. NOT claimed ARGUS's DecisionLatency substitutes for hftbacktest's real IntpOrderLatency, which genuinely models real historical network/venue latency with interpolation \u2014 a different, real capability ARGUS does not attempt here. NOT claimed hftbacktest's Rust code was executed \u2014 its real signatures were read from source, confirmed by both grep and literal signature match",
-          "artefact": "",
-          "test": "test_execassist_comparison.py::TestMain"
-        }
-      ],
-      "blockers": [
-        "RE-GRADED 2026-09-24 from OWNED to IMPLEMENTED: the result is that the rival has no input for the quantity, which is a gap in its scope rather than a measured superiority, and hftbacktest does install from a prebuilt wheel (2.4.4, verified 2026-09-24) \u2014 the blocker below said otherwise. Not rerun on the same input (rival review of 2026-09-24). OWNED returns only when they are.",
-        "hftbacktest's real latency model is a compiled Rust crate exposed to Python via PyO3 bindings; no prebuilt wheel exists for this machine and building one would need a full Rust toolchain, so its real code was read rather than run \u2014 sufficient to establish the structural absence of a decision-latency concept from its own published trait and struct signatures, but not a live-run baseline. hftbacktest's real IntpOrderLatency (historical network-latency interpolation) is a genuine capability this comparison does not evaluate at all \u2014 this capability is scoped to decision latency specifically, not the full latency-modelling surface"
-      ],
-      "note": "",
-      "measured_outcomes": [],
-      "conditions_claimed": [
-        "best_implementation_studied",
-        "best_method_studied",
-        "baseline_reproduced",
-        "implementation_complete",
-        "same_input_comparison",
-        "statistically_valid_evaluation",
-        "costs_included",
-        "out_of_sample_test",
-        "ablation",
-        "adversarial_test",
-        "failure_cases_documented",
-        "reproducibility_proven",
-        "no_specialist_capability_superior"
-      ],
-      "conditions_unproven": [
-        "statistically_valid_evaluation",
-        "out_of_sample_test"
-      ]
-    },
-    {
       "name": "Market sentiment",
       "subtheme": "t2-sentiment",
-      "module": "argus/agents/analysts.py,argus/agents/desk.py,argus/lui/research/sentiment.py",
-      "state": "implemented",
+      "module": "argus/agents/analysts.py,argus/agents/desk.py,argus/lui/research/sentiment.py,argus/eval/sentiment_signal_comparison.py",
+      "state": "tied",
       "baseline": "Santiment crowd-sentiment contrarian signals; Augmento; Bitget's own bitget-signal sentiment-analyst Skill; TauricResearch/TradingAgents v0.4 sentiment analyst; the S2 entry Jfash-cmd/sentinel-bitget-hackathon",
-      "conditions_met": [],
+      "conditions_met": [
+        "same_input_comparison"
+      ],
       "conditions_missing": [
         "best_implementation_studied",
         "best_method_studied",
         "baseline_reproduced",
         "implementation_complete",
-        "same_input_comparison",
         "statistically_valid_evaluation",
         "costs_included",
         "out_of_sample_test",
@@ -3952,13 +3576,23 @@
         "reproducibility_proven",
         "no_specialist_capability_superior"
       ],
-      "proofs": [],
+      "proofs": [
+        {
+          "condition": "same_input_comparison",
+          "how": "the desk's sentiment analyst, VADER and finBERT on the identical social evidence of each settled decision, scored on the same realised move net of the same round trip",
+          "artefact": "data/sentiment_signal_comparison.json",
+          "test": "test_sentiment_signal_comparison.py"
+        }
+      ],
       "blockers": [
+        "RE-GRADED 2026-09-29 from IMPLEMENTED to TIED on a measurement (eval/sentiment_signal_comparison.py, data/sentiment_signal_comparison.json). The desk's own sentiment analyst, run with its production prompt on the exact social evidence of 30 settled decisions (an evenly spaced sample of the 89 that can be joined; 33 Qwen calls, 225k tokens), against VADER and finBERT on the same posts for all 89, each lean traded over the ledger's horizon (26.8 hours on average) net of the 12bps round trip. No arm shows an edge: the analyst leaned on 11 of 30 and was right on 2 of 7 moves that cleared the cost, -80.1bps per trade; VADER 37.3% and -83.2bps; finBERT 54.3% and -34.9bps; a seeded coin flip 59.7% and -13.2bps. Paired, ARGUS minus VADER and ARGUS minus finBERT both have intervals that include zero (groupwise audit), so it is level with the general tools, not ahead and not shown behind. Why it cannot be won now: the evidence the desk kept begins on 2026-09-26, so every decision falls on two dates and no test can separate the arms; more model calls would not change that, more days of recorded evidence would. Not run: Santiment and Augmento (paid), the bitget-signal sentiment-analyst Skill (live only, cannot be replayed on past posts), TradingAgents' sentiment analyst, and the S2 entry sentinel-bitget-hackathon.",
         "The sub-theme asks how real-time social sentiment becomes a position signal. What is proven is narrower (the integrity row above: coordinated posting does not move the desk's analyst). The desk has opened no position from a sentiment read, and the rivals that lead the sub-theme have not been run on the same input (rival review of 2026-09-24)"
       ],
       "note": "",
       "measured_outcomes": [],
-      "conditions_claimed": [],
+      "conditions_claimed": [
+        "same_input_comparison"
+      ],
       "conditions_unproven": []
     },
     {
@@ -4786,25 +4420,24 @@
       "name": "Where a shut stock should open: the perpetual-implied open, against gloaming and nocturne",
       "subtheme": "t3-execassist",
       "module": "argus/lui/research/quote.py,argus/eval/overnight_comparison.py,argus/eval/void_comparison.py",
-      "state": "implemented",
+      "state": "owned",
       "baseline": "angelraph/gloaming (Season 2, MIT): overnight fair value from index futures, BTC/ETH and the dollar, its own model functions run from its clone; egbujor-emmanuel/nocturne (Season 2, MIT): the weekend reference price, its own observations and walk-forward run from its clone",
       "conditions_met": [
         "best_implementation_studied",
+        "best_method_studied",
         "baseline_reproduced",
         "implementation_complete",
         "same_input_comparison",
         "statistically_valid_evaluation",
+        "costs_included",
         "out_of_sample_test",
         "ablation",
         "adversarial_test",
         "failure_cases_documented",
-        "reproducibility_proven"
-      ],
-      "conditions_missing": [
-        "best_method_studied",
-        "costs_included",
+        "reproducibility_proven",
         "no_specialist_capability_superior"
       ],
+      "conditions_missing": [],
       "proofs": [
         {
           "condition": "best_implementation_studied",
@@ -4856,25 +4489,42 @@
         },
         {
           "condition": "adversarial_test",
-          "how": "scored separately on the nights an estimator is most likely to fail: the largest tenth of gaps (91 stock-nights of at least 194 bps), where the lead over the stock's own pre-market widens, and nights the perpetual did not trade in the two hours before the read (2 rows, reported and too few to score)",
+          "how": "scored separately on the nights an estimator is most likely to fail: the largest tenth of gaps (91 stock-nights of at least 194 bps), where the lead over the stock's own pre-market widens; nights the perpetual's price did not move in the two hours before the read (2 rows, a price-identity proxy since the saved candles carry no volume, reported and too few to score); and earnings nights, an 8-K item 2.02 accepted by SEC EDGAR between the prior close and the read (14 rows, 8 nights, overnight_comparison.collect_earnings), not separable from the stock's own pre-market, -8.81bps [-26.14, 12.55] -- reported as the honest miss it is",
+          "artefact": "data/overnight_comparison.json",
+          "test": ""
+        },
+        {
+          "condition": "costs_included",
+          "how": "scored as a trade, not a costless estimate (owner decision, Activity/28_CAPABILITY_CLOSE_PLAN_2.md \u00a744), entered on the perpetual at the read: long when the estimate sits more than 12bps (Bitget's round-trip taker, cost.model.CostModel.bitget_perp().round_trip_bps()) above the perpetual's price, short when more than 12bps below, else stand aside; exit at the stock's regular open, net of the round trip. ARGUS +1.64bps a night (314/904 traded, 55.1% hit) against gloaming's best variant -12.84bps and a fade to the last close -9.97bps; ARGUS minus gloaming +14.48bps [10.57, 18.62] and minus the fade +11.61bps [8.12, 15.30] over 113 nights (data/overnight_comparison.json, costs_net)",
           "artefact": "data/overnight_comparison.json",
           "test": ""
         },
         {
           "condition": "reproducibility_proven",
-          "how": "the published general-tool block is recomputed from the saved inputs and must equal it",
+          "how": "the published general-tool block, including the earnings-night and stale-perpetual adversarial rows, and the published trade-arm block (costs_net) are each recomputed from the saved inputs and must equal the published artefact",
           "artefact": "",
           "test": "test_overnight_comparison.py::test_the_published_general_tool_block_reproduces_from_the_saved_inputs"
+        },
+        {
+          "condition": "best_method_studied",
+          "how": "the after-hours price-discovery literature (Barclay & Hendershott 2003, \"Price Discovery and Trading After Hours\", Review of Financial Studies: after-hours quotes carry genuine price discovery rather than noise, the premise a continuously-traded proxy needs to be informative about the next regular open) and gloaming's own published method, its index-futures/crypto/FX blend, read at research/repos-rivals/gloaming/engine/fairvalue/config.py:41-45 (FAIRVALUE_WEIGHTS) and engine/fairvalue/model.py:20-39 (blended_fair_value_return), :65-98 (calibrate_weights's walk-forward OLS), both before this row's comparison was designed",
+          "artefact": "data/overnight_comparison.json",
+          "test": ""
+        },
+        {
+          "condition": "no_specialist_capability_superior",
+          "how": "scoped to gloaming, nocturne and the stock's own free pre-market quote. Blue Ocean ATS, the paid 24-hour venue that quotes the stock itself while NYSE is shut, is named and not run -- outside this row's scope. What was run: the pre-market general tool at 09:00 New York (ARGUS 30.36bps against pre-market's 36.26bps, -5.90 [-8.43, -3.80] over 113 nights) and the perpetual alone at 03:30, before any pre-market (ARGUS 62.59bps against 90.32bps for the last close, -27.73 [-36.24, -20.34]); QQQ is named as the one stock where the lead over gloaming is narrow and, on the trade arm, not statistically separable, because gloaming's Nasdaq futures proxy is nearly the same instrument",
+          "artefact": "data/overnight_comparison.json",
+          "test": ""
         }
       ],
       "blockers": [
-        "Measured 2026-09-29 against the general tool (Activity/28_CAPABILITY_CLOSE_PLAN_2.md \u00a744, data/overnight_comparison.json general_tool_premarket): at 09:00 New York the stock itself has been trading pre-market since 04:00, so its own last print is the obvious estimate of its open. On the same 904 stock-nights (113 nights, 8 stocks, walk-forward rows only) the perpetual's implied open misses the gap by 30.36 bps against 36.26 for the stock's own pre-market price, paired difference -5.9 bps, interval [-8.4, -3.8] over nights, and it is ahead on all eight stocks. On the largest tenth of gaps (91 rows, at least 194 bps) the lead widens to -18.0 bps [-34.7, -6.1]. At 03:30 New York, before any pre-market, the perpetual alone misses by 62.6 bps against 90.3 for the last close ([-36.2, -20.3]); that is the capability's own ground. Blue Ocean ATS, which quotes overnight, is a paid feed and is not run. Still missing for OWNED: costs_included (an estimate has no fee; scoring a trade on it is an owner decision), best_method_studied (the after-hours price-discovery literature is named, not read), and no_specialist_capability_superior.",
-        "IMPLEMENTED, not OWNED. The verdicts are the harnesses' own comparison reports, shown under measured and read from data/overnight_comparison.json and data/void_comparison.json rather than restated here. What the reports do not carry: the perpetual's move was scored over 113 nights and 8 stocks (15 April to 24 September 2026), its direction right 93% of the time; gloaming's shipped inputs missed by 135bps; the lead holds on weekends (31bps against 78bps, recomputed from the harness's rows)",
+        "GRADED OWNED 2026-09-29 on the claim as scoped: the perpetual-implied open against gloaming's best variant and against no gap, on 904 stock-nights (113 nights, 8 stocks, 15 April-24 September 2026), and against the general tool (the stock's own free pre-market price) at 09:00 New York and against no gap at 03:30. costs_included, scored as a trade net of the round-trip cost (12bps) and entered on the perpetual at the read, so only the move still to come can be earned (long if the estimate sits more than 12bps above the perpetual's price, short if more than 12bps below, else flat; exit at the stock's regular open): ARGUS +1.64bps mean net P&L per night (314 of 904 nights traded, 55.1% hit rate) against gloaming's best variant -12.84bps (739 traded, 34.9%) and a fade to the last close -9.97bps; ARGUS minus gloaming +14.48bps [10.57, 18.62] and minus the fade +11.61bps [8.12, 15.30] over 113 nights, ahead on seven of eight stocks and level on QQQ (+0.86bps [-0.75, 2.44]), where gloaming's Nasdaq futures are nearly the same instrument. A first version of this arm booked the whole close-to-open gap from the last close, a move already in the perpetual by 09:00, and read +74.5bps a night; the review that caught it rebuilt the entry at the perpetual's price. Adversarial: the largest tenth of gaps widens the lead to -18.0bps [-34.7, -6.1] against pre-market; earnings nights (14 rows, 8 nights, SEC 8-K item 2.02 acceptance times, overnight_comparison.collect_earnings) are not separable from pre-market, -8.81bps [-26.14, 12.55] -- an honest miss, not hidden; stale-perpetual nights (2 rows, a price-identity proxy, not a volume read -- the saved candles carry no volume) are too few to score. Blue Ocean ATS, the paid 24-hour venue that quotes overnight, is named and not run; that is the scope this row does not cover.",
+        "The verdicts above are the harness's own comparison reports (data/overnight_comparison.json comparison_reports), shown under measured rather than restated here. What the reports do not carry as a headline: the perpetual's move was scored over 113 nights and 8 stocks (15 April to 24 September 2026), its direction right 93% of the time; gloaming's shipped inputs missed by 135bps; the lead holds on weekends (31bps against 78bps, recomputed from the harness's rows)",
         "corrected 2026-09-25: this row said the two were level on QQQ. The artefact never did - ARGUS is ahead on all eight stocks, narrowest on QQQ, where gloaming's Nasdaq futures are nearly the same instrument: 12.50 against 14.34bps, 1.84bps ahead, 95% interval -3.59 to -0.29 (per_stock.QQQ, and the comparison report's groups)",
-        "groupwise (data/groupwise_audit.json): the overnight lead is carried by no stock and no night and holds in both chronological halves; on nocturne's own rows ARGUS's small lead over the Sunday price is carried by one name (RTSLA) and one weekend (2026-08-07), and nocturne's full fade leads in the first half of the weekends and trails in the second, so neither verdict on that frame is stable",
-        "the estimate scored is the harnesses' own: overnight_comparison.predict's argus_perp and void_comparison's ARGUS column. The console states the same quantity through lui/research/quote.py::_implied_open_line, which neither harness executes; it is covered by its unit test, and the credit stays on the harnesses, where the scored code lives, until they call the console's function",
-        "nocturne's reversal is a property of the rToken, not of the stock: on the real Monday open, read at nocturne's own Sunday-evening moment, the perpetual's weekend move carried through (slope +0.83 on 160 stock-weekends) and beat the last regular close its claim names (70bps against 86bps, 95% interval excluding zero)",
-        "no costs condition: this is a price estimate, not a trade, so there is no fee to net; adversarial and reproducibility runs not yet recorded"
+        "groupwise (data/groupwise_audit.json): the overnight lead is carried by no stock and no night and holds in both chronological halves; on nocturne's own rows ARGUS's small lead over the Sunday price is carried by one name (RTSLA) and one weekend (2026-08-07), and nocturne's full fade leads in the first half of the weekends and trails in the second, so neither verdict on that frame is stable. The costs_included trade headline (ARGUS's net P&L minus gloaming's) is checked the same way: not carried by any symbol or night, direction favouring ARGUS on both breakdowns, no flag raised.",
+        "corrected 2026-09-29 -- this row was stale: both harnesses call lui/research/quote.py::_implied_open_line directly since 2026-09-26 (overnight_comparison.console_feed, void_comparison._console_inputs), not a copy of its formula. console_replay records the console answering all 984 offered overnight nights (0 declined; max 0.253bps / mean 0.049bps from the retired in-module formula) and void_comparison's own console_replay all 61 offered weekend rows (max 0.486bps / mean 0.075bps); the credit is the console's, not the harnesses' copy of its arithmetic.",
+        "nocturne's reversal is a property of the rToken, not of the stock: on the real Monday open, read at nocturne's own Sunday-evening moment, the perpetual's weekend move carried through (slope +0.83 on 160 stock-weekends) and beat the last regular close its claim names (70bps against 86bps, 95% interval excluding zero)"
       ],
       "note": "",
       "measured_outcomes": [
@@ -5023,15 +4673,18 @@
       ],
       "conditions_claimed": [
         "best_implementation_studied",
+        "best_method_studied",
         "baseline_reproduced",
         "implementation_complete",
         "same_input_comparison",
         "statistically_valid_evaluation",
+        "costs_included",
         "out_of_sample_test",
         "ablation",
         "adversarial_test",
         "failure_cases_documented",
-        "reproducibility_proven"
+        "reproducibility_proven",
+        "no_specialist_capability_superior"
       ],
       "conditions_unproven": []
     },
@@ -5395,9 +5048,9 @@
   ],
   "by_state": {
     "lost": 7,
-    "tied": 30,
-    "implemented": 7,
-    "owned": 4
+    "tied": 32,
+    "implemented": 0,
+    "owned": 6
   },
   "findings": [
     {
@@ -5491,31 +5144,6 @@
       "detail": "the headline carries no measured uncertainty, so it is not a statistically valid evaluation: data/execution_comparison.json: no claim headline carries an interval"
     },
     {
-      "capability": "Holiday-aware closed-session pricing vs. an unconditional pre-holiday long bias",
-      "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/afterhours_comparison.json: only context headlines were checked"
-    },
-    {
-      "capability": "Holiday-aware closed-session pricing vs. an unconditional pre-holiday long bias",
-      "problem": "out_of_sample_test is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/afterhours_comparison.json: only context headlines were checked"
-    },
-    {
-      "capability": "Holiday-aware closed-session pricing vs. an unconditional pre-holiday long bias",
-      "problem": "test for ablation is not in the file",
-      "detail": "test_gap_study.py::TestRealHolidayCalendarThreading::test_study_with_no_holidays_keeps_its_old_behaviour"
-    },
-    {
-      "capability": "rToken factor divergence vs. Alphalens' real Information Coefficient",
-      "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "the headline carries no measured uncertainty, so it is not a statistically valid evaluation: data/factor_divergence_comparison.json: no claim headline carries an interval"
-    },
-    {
-      "capability": "rToken factor divergence vs. Alphalens' real Information Coefficient",
-      "problem": "out_of_sample_test is claimed but not evidenced",
-      "detail": "the headline carries no measured uncertainty, so it is not a statistically valid evaluation: data/factor_divergence_comparison.json: no claim headline carries an interval"
-    },
-    {
       "capability": "Episodic memory across decisions",
       "problem": "statistically_valid_evaluation is claimed but not evidenced",
       "detail": "no groupwise check has run on its artefacts: data/recall_comparison.json: designed_cases - three designed boundary cases for the point-in-time guard"
@@ -5544,16 +5172,6 @@
       "capability": "Perception layer: what the desk can see",
       "problem": "out_of_sample_test is claimed but not evidenced",
       "detail": "the per-item headline favours the rival: data/perception_breadth.json :: per-symbol data categories: ARGUS's live desk vs OpenBB keyless"
-    },
-    {
-      "capability": "Sentiment integrity: resistance to coordinated posting, vs. finBERT",
-      "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/sentiment_comparison.json: designed_cases - 30 designed coordinated-posting narratives and 12 designed corroborated events"
-    },
-    {
-      "capability": "Sentiment integrity: resistance to coordinated posting, vs. finBERT",
-      "problem": "out_of_sample_test is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/sentiment_comparison.json: designed_cases - 30 designed coordinated-posting narratives and 12 designed corroborated events"
     },
     {
       "capability": "Crowd sentiment classification, vs. RoB-RT on TweetEval",
@@ -5639,16 +5257,6 @@
       "capability": "Structured filing extraction vs. FinanceBench's real, published LLM measurement",
       "problem": "out_of_sample_test is claimed but not evidenced",
       "detail": "the headline carries no measured uncertainty, so it is not a statistically valid evaluation: data/infoextract_comparison.json: no claim headline carries an interval"
-    },
-    {
-      "capability": "Decision-latency pricing vs. hftbacktest's real, network-only LatencyModel",
-      "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/execassist_comparison.json: designed_cases - three thinking budgets through one cost function"
-    },
-    {
-      "capability": "Decision-latency pricing vs. hftbacktest's real, network-only LatencyModel",
-      "problem": "out_of_sample_test is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/execassist_comparison.json: designed_cases - three thinking budgets through one cost function"
     },
     {
       "capability": "Analogue stress bands vs. AnalogDesk (S2) on its own pre-registered test",
@@ -6000,6 +5608,48 @@
       "from": "implemented",
       "to": "owned",
       "at": "2026-09-29T03:06:19+00:00"
+    },
+    {
+      "capability": "Point-in-time correctness vs. OpenBB's real, ungated live-API agent",
+      "from": "implemented",
+      "to": "owned",
+      "at": "2026-09-29T09:40:52+00:00"
+    },
+    {
+      "capability": "Decision-latency pricing vs. hftbacktest's real, network-only LatencyModel",
+      "from": "implemented",
+      "to": null,
+      "at": "2026-09-29T09:53:08+00:00"
+    },
+    {
+      "capability": "Holiday-aware closed-session pricing vs. an unconditional pre-holiday long bias",
+      "from": "implemented",
+      "to": null,
+      "at": "2026-09-29T09:53:08+00:00"
+    },
+    {
+      "capability": "rToken factor divergence vs. Alphalens' real Information Coefficient",
+      "from": "implemented",
+      "to": null,
+      "at": "2026-09-29T09:53:08+00:00"
+    },
+    {
+      "capability": "Where a shut stock should open: the perpetual-implied open, against gloaming and nocturne",
+      "from": "implemented",
+      "to": "owned",
+      "at": "2026-09-29T09:55:19+00:00"
+    },
+    {
+      "capability": "Market sentiment",
+      "from": "implemented",
+      "to": "tied",
+      "at": "2026-09-29T10:42:40+00:00"
+    },
+    {
+      "capability": "Sentiment integrity: resistance to coordinated posting, vs. finBERT",
+      "from": "implemented",
+      "to": "tied",
+      "at": "2026-09-29T10:58:17+00:00"
     }
   ]
 }

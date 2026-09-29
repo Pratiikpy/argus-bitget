@@ -146,3 +146,29 @@ class TestThePublishedArtefact:
 
         walk(blob)
         assert found >= 2, f"expected several medians in the artefact, found {found}"
+
+
+class TestAMondayHolidayIsAHoliday:
+    """A closure that reaches a weekend before a Monday holiday is a holiday closure. At equal
+    depth the weekend label won, so Labor Day 2026 was read as a plain 90-hour weekend
+    (Activity/28_CAPABILITY_CLOSE_PLAN_2.md §13); offline, on hourly points, against
+    exchange_calendars' own XNYS calendar."""
+
+    def test_labor_day_week_is_one_holiday_closure(self) -> None:
+        from datetime import UTC, datetime
+
+        import exchange_calendars as xcals
+
+        from argus.market.history import BasisPoint
+        from argus.research.gap_study import _closed_sessions
+        from argus.truth.clocks import DualClock
+
+        labor_day = date(2026, 9, 7)
+        assert not xcals.get_calendar("XNYS").is_session(labor_day.isoformat())
+        start = datetime(2026, 9, 4, 12, tzinfo=UTC)
+        points = [BasisPoint(ts=start + timedelta(hours=h), market=Decimal("100"),
+                             index=Decimal("100"), premium=Decimal("0")) for h in range(110)]
+        sessions = _closed_sessions(points, "NVDAUSDT", DualClock())
+        spanning = [s for s in sessions if s.start.date() <= labor_day <= s.end.date()]
+        assert len(spanning) == 1
+        assert spanning[0].phase is SessionPhase.HOLIDAY, spanning[0]

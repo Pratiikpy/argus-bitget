@@ -1,0 +1,29 @@
+{
+ "note": "Capability rows taken out of the register, each with its last state and the reason. The register's transition log records each disappearance (to: null); this file says why, so a removal is never a loss quietly going away. Read by lui/corrections.py for /wrong.",
+ "removed": [
+  {
+   "name": "Holiday-aware closed-session pricing vs. an unconditional pre-holiday long bias",
+   "subtheme": "t1-afterhours",
+   "removed_on": "2026-09-29",
+   "last_state": "implemented",
+   "reason": "Serves no flow (research/gap_study has no caller outside eval and an unused module), belongs to Track 1, which this project does not enter, and its comparison rests on two holiday dates, which can be neither won nor lost. Removing it found and fixed a real defect: a closure reaching a weekend before a Monday holiday was labelled a weekend, so MLK, Presidents, Memorial and Labor Day were misread; fixed in research/gap_study.py and tested against exchange_calendars' XNYS calendar.",
+   "revive_by": "a longer history than two holiday dates, and a flow that uses the reading"
+  },
+  {
+   "name": "rToken factor divergence vs. Alphalens' real Information Coefficient",
+   "subtheme": "t1-rtokenfactor",
+   "removed_on": "2026-09-29",
+   "last_state": "implemented",
+   "reason": "Serves no flow (research/factor_divergence has no caller outside eval), belongs to Track 1, and both arms score with the same vendored Alphalens information-coefficient function, so the comparison can only ever tie; the ablation's intervals include zero on both factors.",
+   "revive_by": "a divergence Alphalens cannot compute, measured on frozen candles"
+  },
+  {
+   "name": "Decision-latency pricing vs. hftbacktest's real, network-only LatencyModel",
+   "subtheme": "t3-execassist",
+   "removed_on": "2026-09-29",
+   "last_state": "implemented",
+   "reason": "A duplicate: the function it claims, execution/latency.thinking_budget_cost_bps, is the one row 01 (deliberation priced as a trading cost) claims, and row 01 records the measured loss of that charge against a trailing realised-move estimator on 23,003 decision instants. The named rival has no input for the quantity, so no same-input comparison can exist. The sub-theme stays covered by row 38 (order splitting against Bitget's own TWAP).",
+   "revive_by": "none; the claim lives on row 01"
+  }
+ ]
+}

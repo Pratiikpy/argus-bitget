@@ -122,8 +122,11 @@ def _closed_sessions(
         # Classify by the DEEPEST closure reached, not the first bar. A run beginning Friday
         # 16:00 starts in EXTENDED and becomes a weekend; labelling it "extended" collapsed all
         # 832 sessions into one bucket and hid the weekend/overnight distinction entirely.
+        # HOLIDAY outranks WEEKEND: at equal depth a weekend reached before a Monday holiday kept
+        # the weekend label, so MLK, Presidents, Memorial and Labor Day were all read as plain
+        # weekends (verified on Labor Day 2026, Activity/28_CAPABILITY_CLOSE_PLAN_2.md §13).
         depth = {SessionPhase.EXTENDED: 1, SessionPhase.OVERNIGHT: 2,
-                 SessionPhase.WEEKEND: 3, SessionPhase.HOLIDAY: 3}
+                 SessionPhase.WEEKEND: 3, SessionPhase.HOLIDAY: 4}
         deepest = SessionPhase.EXTENDED
         while i < n and not clock.phase(points[i].ts).has_price_discovery:
             ph = clock.phase(points[i].ts)

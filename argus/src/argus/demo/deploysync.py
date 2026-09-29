@@ -105,6 +105,19 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     "agenthub_preview.json",
     # Read by cross-asset hedge answers (`lui/crossasset.py`, `market/crossasset_feed.py`).
     "crossasset_snapshot.json",
+    # Read by /architecture, /policy, /factors, /status and /wrong. Missing until 2026-09-29: the
+    # three pages rendered "could not be read" on the hosted site while answering in full locally,
+    # and two /wrong entries showed as unreadable. `tests/test_deploysync.py` now fails when a page
+    # reads a data file this list lacks.
+    "architecture.json",
+    "risk_policy.json",
+    "risk_policy_live.json",
+    "factor_lab.json",
+    "factor_quality_rivals.json",
+    "removed_capabilities.json",
+    "risk_layer_comparison.json",
+    "skill_matrix_history.jsonl",
+    "status_history.jsonl",
 )
 """Artefacts the hosted console's own pages read at request time.
 

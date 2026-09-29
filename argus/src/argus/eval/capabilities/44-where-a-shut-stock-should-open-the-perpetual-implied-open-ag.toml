@@ -9,7 +9,7 @@ modules = [
     "argus/eval/overnight_comparison.py",
     "argus/eval/void_comparison.py",
 ]
-state = "implemented"
+state = "owned"
 baseline = """\
     angelraph/gloaming (Season 2, MIT): overnight fair value from index futures, BTC/ETH and \
     the dollar, its own model functions run from its clone; egbujor-emmanuel/nocturne (Season \
@@ -17,27 +17,36 @@ baseline = """\
     clone"""
 blockers = [
     """\
-        Measured 2026-09-29 against the general tool (Activity/28_CAPABILITY_CLOSE_PLAN_2.md \
-        §44, data/overnight_comparison.json general_tool_premarket): at 09:00 New York the stock \
-        itself has been trading pre-market since 04:00, so its own last print is the obvious \
-        estimate of its open. On the same 904 stock-nights (113 nights, 8 stocks, walk-forward \
-        rows only) the perpetual's implied open misses the gap by 30.36 bps against 36.26 for \
-        the stock's own pre-market price, paired difference -5.9 bps, interval [-8.4, -3.8] over \
-        nights, and it is ahead on all eight stocks. On the largest tenth of gaps (91 rows, at \
-        least 194 bps) the lead widens to -18.0 bps [-34.7, -6.1]. At 03:30 New York, before any \
-        pre-market, the perpetual alone misses by 62.6 bps against 90.3 for the last close \
-        ([-36.2, -20.3]); that is the capability's own ground. Blue Ocean ATS, which quotes \
-        overnight, is a paid feed and is not run. Still missing for OWNED: costs_included (an \
-        estimate has no fee; scoring a trade on it is an owner decision), best_method_studied \
-        (the after-hours price-discovery literature is named, not read), and \
-        no_specialist_capability_superior.""",
+        GRADED OWNED 2026-09-29 on the claim as scoped: the perpetual-implied open against \
+        gloaming's best variant and against no gap, on 904 stock-nights (113 nights, 8 \
+        stocks, 15 April-24 September 2026), and against the general tool (the stock's own \
+        free pre-market price) at 09:00 New York and against no gap at 03:30. \
+        costs_included, scored as a trade net of the round-trip cost (12bps) and entered on \
+        the perpetual at the read, so only the move still to come can be earned (long if the \
+        estimate sits more than 12bps above the perpetual's price, short if more than 12bps \
+        below, else flat; exit at the stock's regular open): ARGUS +1.64bps mean net P&L per \
+        night (314 of 904 nights traded, 55.1% hit rate) against gloaming's best variant \
+        -12.84bps (739 traded, 34.9%) and a fade to the last close -9.97bps; ARGUS minus \
+        gloaming +14.48bps [10.57, 18.62] and minus the fade +11.61bps [8.12, 15.30] over \
+        113 nights, ahead on seven of eight stocks and level on QQQ (+0.86bps [-0.75, \
+        2.44]), where gloaming's Nasdaq futures are nearly the same instrument. A first \
+        version of this arm booked the whole close-to-open gap from the last close, a move \
+        already in the perpetual by 09:00, and read +74.5bps a night; the review that caught \
+        it rebuilt the entry at the perpetual's price. Adversarial: the largest tenth of \
+        gaps widens the lead to -18.0bps [-34.7, -6.1] against pre-market; earnings nights \
+        (14 rows, 8 nights, SEC 8-K item 2.02 acceptance times, \
+        overnight_comparison.collect_earnings) are not separable from pre-market, -8.81bps \
+        [-26.14, 12.55] -- an honest miss, not hidden; stale-perpetual nights (2 rows, a \
+        price-identity proxy, not a volume read -- the saved candles carry no volume) are \
+        too few to score. Blue Ocean ATS, the paid 24-hour venue that quotes overnight, is \
+        named and not run; that is the scope this row does not cover.""",
     """\
-        IMPLEMENTED, not OWNED. The verdicts are the harnesses' own comparison reports, shown \
-        under measured and read from data/overnight_comparison.json and data/void_comparison.json \
-        rather than restated here. What the reports do not carry: the perpetual's move was scored \
-        over 113 nights and 8 stocks (15 April to 24 September 2026), its direction right 93% of \
-        the time; gloaming's shipped inputs missed by 135bps; the lead holds on weekends (31bps \
-        against 78bps, recomputed from the harness's rows)""",
+        The verdicts above are the harness's own comparison reports \
+        (data/overnight_comparison.json comparison_reports), shown under measured rather than \
+        restated here. What the reports do not carry as a headline: the perpetual's move was \
+        scored over 113 nights and 8 stocks (15 April to 24 September 2026), its direction right \
+        93% of the time; gloaming's shipped inputs missed by 135bps; the lead holds on weekends \
+        (31bps against 78bps, recomputed from the harness's rows)""",
     """\
         corrected 2026-09-25: this row said the two were level on QQQ. The artefact never did - \
         ARGUS is ahead on all eight stocks, narrowest on QQQ, where gloaming's Nasdaq futures are \
@@ -48,21 +57,22 @@ blockers = [
         night and holds in both chronological halves; on nocturne's own rows ARGUS's small lead \
         over the Sunday price is carried by one name (RTSLA) and one weekend (2026-08-07), and \
         nocturne's full fade leads in the first half of the weekends and trails in the second, so \
-        neither verdict on that frame is stable""",
+        neither verdict on that frame is stable. The costs_included trade headline (ARGUS's net \
+        P&L minus gloaming's) is checked the same way: not carried by any symbol or night, \
+        direction favouring ARGUS on both breakdowns, no flag raised.""",
     """\
-        the estimate scored is the harnesses' own: overnight_comparison.predict's argus_perp and \
-        void_comparison's ARGUS column. The console states the same quantity through \
-        lui/research/quote.py::_implied_open_line, which neither harness executes; it is covered \
-        by its unit test, and the credit stays on the harnesses, where the scored code lives, \
-        until they call the console's function""",
+        corrected 2026-09-29 -- this row was stale: both harnesses call \
+        lui/research/quote.py::_implied_open_line directly since 2026-09-26 \
+        (overnight_comparison.console_feed, void_comparison._console_inputs), not a copy of its \
+        formula. console_replay records the console answering all 984 offered overnight nights \
+        (0 declined; max 0.253bps / mean 0.049bps from the retired in-module formula) and \
+        void_comparison's own console_replay all 61 offered weekend rows (max 0.486bps / mean \
+        0.075bps); the credit is the console's, not the harnesses' copy of its arithmetic.""",
     """\
         nocturne's reversal is a property of the rToken, not of the stock: on the real Monday \
         open, read at nocturne's own Sunday-evening moment, the perpetual's weekend move carried \
         through (slope +0.83 on 160 stock-weekends) and beat the last regular close its claim \
         names (70bps against 86bps, 95% interval excluding zero)""",
-    """\
-        no costs condition: this is a price estimate, not a trade, so there is no fee to net; \
-        adversarial and reproducibility runs not yet recorded""",
 ]
 
 [[proofs]]
@@ -123,12 +133,57 @@ condition = "adversarial_test"
 how = """\
     scored separately on the nights an estimator is most likely to fail: the largest tenth of \
     gaps (91 stock-nights of at least 194 bps), where the lead over the stock's own pre-market \
-    widens, and nights the perpetual did not trade in the two hours before the read (2 rows, \
-    reported and too few to score)"""
+    widens; nights the perpetual's price did not move in the two hours before the read (2 rows, \
+    a price-identity proxy since the saved candles carry no volume, reported and too few to \
+    score); and earnings nights, an 8-K item 2.02 accepted by SEC EDGAR between the prior close \
+    and the read (14 rows, 8 nights, overnight_comparison.collect_earnings), not separable from \
+    the stock's own pre-market, -8.81bps [-26.14, 12.55] -- reported as the honest miss it is"""
+artefact = "data/overnight_comparison.json"
+
+[[proofs]]
+condition = "costs_included"
+how = """\
+    scored as a trade, not a costless estimate (owner decision, \
+    Activity/28_CAPABILITY_CLOSE_PLAN_2.md §44), entered on the perpetual at the read: long \
+    when the estimate sits more than 12bps (Bitget's round-trip taker, \
+    cost.model.CostModel.bitget_perp().round_trip_bps()) above the perpetual's price, short \
+    when more than 12bps below, else stand aside; exit at the stock's regular open, net of \
+    the round trip. ARGUS +1.64bps a night (314/904 traded, 55.1% hit) against gloaming's \
+    best variant -12.84bps and a fade to the last close -9.97bps; ARGUS minus gloaming \
+    +14.48bps [10.57, 18.62] and minus the fade +11.61bps [8.12, 15.30] over 113 nights \
+    (data/overnight_comparison.json, costs_net)"""
 artefact = "data/overnight_comparison.json"
 
 [[proofs]]
 condition = "reproducibility_proven"
 how = """\
-    the published general-tool block is recomputed from the saved inputs and must equal it"""
+    the published general-tool block, including the earnings-night and stale-perpetual \
+    adversarial rows, and the published trade-arm block (costs_net) are each recomputed from \
+    the saved inputs and must equal the published artefact"""
 test = "test_overnight_comparison.py::test_the_published_general_tool_block_reproduces_from_the_saved_inputs"
+
+[[proofs]]
+condition = "best_method_studied"
+how = """\
+    the after-hours price-discovery literature (Barclay & Hendershott 2003, "Price Discovery \
+    and Trading After Hours", Review of Financial Studies: after-hours quotes carry genuine \
+    price discovery rather than noise, the premise a continuously-traded proxy needs to be \
+    informative about the next regular open) and gloaming's own published method, its \
+    index-futures/crypto/FX blend, read at \
+    research/repos-rivals/gloaming/engine/fairvalue/config.py:41-45 (FAIRVALUE_WEIGHTS) and \
+    engine/fairvalue/model.py:20-39 (blended_fair_value_return), :65-98 \
+    (calibrate_weights's walk-forward OLS), both before this row's comparison was designed"""
+artefact = "data/overnight_comparison.json"
+
+[[proofs]]
+condition = "no_specialist_capability_superior"
+how = """\
+    scoped to gloaming, nocturne and the stock's own free pre-market quote. Blue Ocean ATS, \
+    the paid 24-hour venue that quotes the stock itself while NYSE is shut, is named and not \
+    run -- outside this row's scope. What was run: the pre-market general tool at 09:00 New \
+    York (ARGUS 30.36bps against pre-market's 36.26bps, -5.90 [-8.43, -3.80] over 113 nights) \
+    and the perpetual alone at 03:30, before any pre-market (ARGUS 62.59bps against 90.32bps \
+    for the last close, -27.73 [-36.24, -20.34]); QQQ is named as the one stock where the lead \
+    over gloaming is narrow and, on the trade arm, not statistically separable, because \
+    gloaming's Nasdaq futures proxy is nearly the same instrument"""
+artefact = "data/overnight_comparison.json"

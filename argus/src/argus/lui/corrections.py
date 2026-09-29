@@ -304,6 +304,11 @@ def collect(data_dir: Path) -> list[Correction]:
     if standing is not None:
         out.extend(register_losses(standing))
         out.extend(register_regrades(standing))
+    # 10b. Rows taken out of the register, each with the reason (`data/removed_capabilities.json`):
+    #      the transition log records that a row went; this says why, on the page a reader checks.
+    removed = _read(data_dir, "removed_capabilities.json")
+    if removed is not None:
+        out.extend(register_removals(removed))
 
     # 11. Sentiment classification, lost to every published baseline. Since 2026-09-26 the
     #     register grades it (a LOST row), so it is already listed with the register's losses
@@ -380,6 +385,19 @@ def register_losses(standing: dict[str, Any]) -> list[Correction]:
         }.get(state, f"Lost to a rival, still open: {name}")
         out.append(Correction(headline=headline, detail=" ".join(found[:3]),
                               artefact="data/standing.json", kind="loss"))
+    return out
+
+
+def register_removals(record: dict[str, Any]) -> list[Correction]:
+    """One entry per capability row removed from the register, with its last state and why."""
+    out: list[Correction] = []
+    for row in record.get("removed", []):
+        out.append(Correction(
+            headline=(f"Removed from the register on {row.get('removed_on')} "
+                      f"({str(row.get('last_state', '')).upper()}): {row.get('name')}"),
+            detail=f"{row.get('reason')} Brought back by: {row.get('revive_by')}.",
+            artefact="data/removed_capabilities.json", kind="withdrawn",
+        ))
     return out
 
 

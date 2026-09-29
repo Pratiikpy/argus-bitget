@@ -306,6 +306,10 @@ class TestTheGeneralTool:
 
 def test_the_published_general_tool_block_reproduces_from_the_saved_inputs(
         monkeypatch: pytest.MonkeyPatch) -> None:
+    """Covers reproducibility_proven for the pre-market/03:30 general tool, its earnings-night and
+    stale-perpetual adversarial rows, and the costs_included trade arm (costs_net) -- every block
+    of data/overnight_comparison.json this capability's OWNED proofs cite, recomputed offline from
+    the saved inputs and checked against what was published."""
     from argus.eval.overnight_comparison import UNIVERSE as _  # noqa: F401
 
     monkeypatch.undo()   # the whole universe, not the autouse NVDA-only one
@@ -315,10 +319,22 @@ def test_the_published_general_tool_block_reproduces_from_the_saved_inputs(
     inputs = json.loads(path.read_text("utf-8"))
     if "premarket" not in inputs:
         pytest.skip("inputs carry no pre-market series")
-    published = json.loads(oc.REPORT.read_text("utf-8"))["general_tool_premarket"]
+    full_published = json.loads(oc.REPORT.read_text("utf-8"))
+    published = full_published["general_tool_premarket"]
     rows = [r for r in oc.predict(oc.nights(inputs)) if r["fitted"]]
     again = oc.general_tool(inputs, rows)
     assert again is not None
     for key in ("at_0900", "at_0330"):
         assert again[key]["paired"] == published[key]["paired"]
         assert again[key]["summary"] == published[key]["summary"]
+    assert again["adversarial"]["stale_perpetual"] == published["adversarial"]["stale_perpetual"]
+    if "earnings_dates" in inputs:
+        assert (again["adversarial"]["earnings_nights"]
+                == published["adversarial"]["earnings_nights"])
+
+    published_trade = full_published["costs_net"]
+    again_trade = oc.trade_comparison(rows, full_published["best_gloaming"])
+    assert again_trade["summary"] == published_trade["summary"]
+    assert again_trade["argus_vs_gloaming"] == published_trade["argus_vs_gloaming"]
+    assert again_trade["argus_vs_zero"] == published_trade["argus_vs_zero"]
+    assert again_trade["per_stock"] == published_trade["per_stock"]

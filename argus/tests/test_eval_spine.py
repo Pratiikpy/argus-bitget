@@ -194,7 +194,9 @@ CONSOLE_CALLED = {
     "void": ({"console_replay"}, {"summary", "per_weekend"}),
     # general_tool_premarket: the stock's own pre-market price scored as the general-purpose
     # rival (2026-09-29), a block added after the migration, not a figure it moved.
-    "overnight": ({"console_replay", "general_tool_premarket"},
+    # costs_net: the costs_included trade arm (2026-09-29), likewise added after the migration --
+    # a new block scored from the same rows, not a figure the migration moved.
+    "overnight": ({"console_replay", "general_tool_premarket", "costs_net"},
                   {"summary", "paired", "per_stock", "ablation",
                    "sunday_evening_vs_nocturne_claim"}),
 }

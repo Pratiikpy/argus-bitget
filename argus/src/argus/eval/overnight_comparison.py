@@ -150,6 +150,52 @@ def collect_premarket() -> dict[str, Any]:
     return inputs
 
 
+def _earnings_dates_sec(ticker: str) -> list[str]:
+    """Every 8-K item 2.02 ("results of operations") this issuer has filed, as SEC acceptance
+    timestamps (UTC, ISO 8601), in the submissions feed's own order (newest first; not resorted,
+    since :func:`_earnings_night` only tests membership in a window). Reads EDGAR's own
+    submissions feed once per ticker through `argus.market.evidence.EdgarSource` -- the same CIK
+    lookup and JSON endpoint
+    `market.earnings_release.EarningsReleaseSource` uses, but only the filing's index, never the
+    exhibit text, since only the timestamp is needed here."""
+    from argus.market.evidence import FEED_USER_AGENT, EdgarSource
+
+    edgar = EdgarSource(user_agent=FEED_USER_AGENT)
+    cik = edgar.cik_for(ticker)
+    if cik is None:
+        return []
+    recent = edgar._get(edgar.SUBMISSIONS_URL.format(cik=cik))
+    rf = recent.get("filings", {}).get("recent", {})
+    forms, items = rf.get("form", []), rf.get("items", [])
+    accepted = rf.get("acceptanceDateTime", [])
+    return [accepted[i] for i, form in enumerate(forms)
+            if form == "8-K" and "2.02" in (items[i] if i < len(items) else "")
+            and i < len(accepted)]
+
+
+def collect_earnings() -> dict[str, Any]:
+    """Add each stock's SEC 8-K item 2.02 acceptance times to the saved inputs
+    (data/h2h_gloaming/inputs.json), one live EDGAR read per ticker, frozen so the earnings-night
+    adversarial split (:func:`general_tool`) runs offline afterwards. QQQ is an ETF and files no
+    8-Ks; it is recorded as an empty list, not skipped, so a reader can see it was checked rather
+    than silently missing."""
+    path = DATA / "inputs.json"
+    inputs: dict[str, Any] = json.loads(path.read_text("utf-8"))
+    inputs["earnings_dates"] = {}
+    inputs["earnings_dates_fetched"] = datetime.now(UTC).isoformat(timespec="seconds")
+    for stock in UNIVERSE:
+        if stock == "QQQ":
+            inputs["earnings_dates"][stock] = []
+            continue
+        try:
+            inputs["earnings_dates"][stock] = _earnings_dates_sec(stock)
+        except Exception as exc:  # one name's failure is recorded, not fatal
+            inputs.setdefault("failures", {})[f"{stock}_earnings"] = \
+                f"{type(exc).__name__}: {exc}"[:160]
+    path.write_text(json.dumps(inputs), "utf-8", newline="\n")
+    return inputs
+
+
 def _hourly_bitget(symbol: str) -> Series:
     from argus.market.history import fetch_range
 
@@ -508,6 +554,19 @@ def sunday_evening(inputs: dict[str, Any]) -> dict[str, Any] | None:
             "paired": _paired(rows, "perp_weekend", "last_close")}
 
 
+def _earnings_night(row: Mapping[str, Any], accepted: Sequence[str]) -> bool:
+    """Did an 8-K item 2.02 for this stock cross the wire between the session it closed on and the
+    09:00 New York read that opens the next one? ``accepted`` is that stock's list of SEC
+    acceptance timestamps (:func:`_earnings_dates_sec`, ISO 8601 UTC)."""
+    close_at = _ny(date.fromisoformat(row["closed"]), time(16))
+    predict_at = _ny(date.fromisoformat(row["opened"]), time(9))
+    for stamp in accepted:
+        when = datetime.fromisoformat(stamp.replace("Z", "+00:00")).timestamp()
+        if close_at <= when <= predict_at:
+            return True
+    return False
+
+
 def general_tool(inputs: dict[str, Any], scored: list[dict[str, Any]]) -> dict[str, Any] | None:
     """The general tool, and the hours it cannot reach (Activity/28_CAPABILITY_CLOSE_PLAN_2.md
     §44). At 09:00 New York the stock has traded pre-market since 04:00, so its own last price is
@@ -515,7 +574,15 @@ def general_tool(inputs: dict[str, Any], scored: list[dict[str, Any]]) -> dict[s
     stock's own quote does not already show. At 03:30 no US venue this harness can read is
     quoting, and the perpetual is scored alone against the last close, which is where the
     capability's claim actually lives. Blue Ocean ATS, which quotes overnight, is a paid feed and
-    is not run."""
+    is not run.
+
+    ``adversarial.stale_perpetual`` is a price-identity proxy, not a volume read: the saved
+    hourly candles (`h2h_gloaming/inputs.json`) carry only ``(bar end, close)``, `_hourly_bitget`
+    never saved volume, and re-fetching it now would be a new network read this replay is built to
+    avoid. A night counts as stale when the perpetual's close two hours before the read equals its
+    close at the read -- NOT VERIFIED as the same thing as zero traded volume, only as the same
+    thing as no printed price change. ``adversarial.earnings_nights`` needs no such proxy: it is
+    read from `inputs["earnings_dates"]`, SEC acceptance timestamps (:func:`collect_earnings`)."""
     premarket = {k: [(float(t), float(c)) for t, c in v]
                  for k, v in (inputs.get("premarket") or {}).items()}
     if not premarket:
@@ -563,6 +630,7 @@ def general_tool(inputs: dict[str, Any], scored: list[dict[str, Any]]) -> dict[s
             before = _at(book, _ny(opened, time(7)))
             if before is not None and before == r["perp_now"]:
                 stale.append(r)
+        earnings_dates = inputs.get("earnings_dates") or {}
         out["adversarial"] = {
             "largest_tenth_of_gaps": {
                 "rows": len(hardest), "min_abs_gap_bps": round(cut * 1e4, 1),
@@ -573,6 +641,21 @@ def general_tool(inputs: dict[str, Any], scored: list[dict[str, Any]]) -> dict[s
                 "vs_premarket": _paired(stale, "argus_perp", "premarket_0900")
                 if len(stale) >= 10 else None},
         }
+        if earnings_dates:
+            earnings_rows = [r for r in at_nine
+                             if _earnings_night(r, earnings_dates.get(r["stock"]) or [])]
+            out["adversarial"]["earnings_nights"] = {
+                "rows": len(earnings_rows),
+                "nights": len({r["opened"] for r in earnings_rows}),
+                "vs_premarket": _paired(earnings_rows, "argus_perp", "premarket_0900")
+                if len(earnings_rows) >= 10 else None,
+            }
+        else:
+            out["adversarial"]["earnings_nights"] = {
+                "rows": 0,
+                "note": "data/h2h_gloaming/inputs.json carries no earnings_dates; run "
+                        "overnight_comparison.collect_earnings() once to add them",
+            }
         out["at_0900"] = {
             "rows": len(at_nine), "nights": len({r["opened"] for r in at_nine}),
             "summary": {n: _summary(at_nine, n) for n in ("argus_perp", "premarket_0900")},
@@ -583,6 +666,111 @@ def general_tool(inputs: dict[str, Any], scored: list[dict[str, Any]]) -> dict[s
             "summary": {n: _summary(at_three, n) for n in ("argus_perp_0330", "zero")},
             "paired": _paired(at_three, "argus_perp_0330", "zero")}
     return out
+
+
+def _trade_side_and_pnl(estimate: float, gap: float, cost_bps: float,
+                        entry: float = 0.0) -> tuple[int, float]:
+    """``(side taken, net P&L in bps)`` for one candidate on one night.
+
+    Long if the estimate, measured against the price a trade can actually be entered at, clears
+    the round-trip cost on the upside; short on the downside; otherwise flat. A flat night costs
+    and earns nothing -- the round trip is charged only when a position is opened.
+
+    **The entry is the perpetual at the read, not the last close.** ``entry`` is that price as a
+    move from the stock's last close (``perp_now / close - 1``). The estimate is read at 09:00 New
+    York, when the perpetual already carries most of the night's move, so a position opened then
+    earns only what is left of it: ``(1 + gap) / (1 + entry) - 1`` to the stock's regular open.
+    Booking the whole close-to-open gap instead credited every arm with a move that had happened
+    before it could trade (caught in review, 2026-09-29: it read +74.5 bps a night)."""
+    edge = (1 + estimate) / (1 + entry) - 1
+    threshold = cost_bps / 1e4
+    if edge > threshold:
+        side = 1
+    elif edge < -threshold:
+        side = -1
+    else:
+        return 0, 0.0
+    return side, side * ((1 + gap) / (1 + entry) - 1) * 1e4 - cost_bps
+
+
+def _paired_pnl(rows: Sequence[Mapping[str, Any]], a: str, b: str, *, draws: int = 4000,
+               seed: int = 7) -> dict[str, Any]:
+    """Mean of ``pnl_a - pnl_b`` in bps with a bootstrap over nights, oriented so a positive value
+    favours ``a`` -- P&L is higher-is-better, the opposite orientation of :func:`_paired`'s
+    absolute-error diff, so the verdict reads the interval the other way round."""
+    by_night: dict[str, list[float]] = {}
+    for r in rows:
+        diff = r["trade_pnl_bps"][a] - r["trade_pnl_bps"][b]
+        by_night.setdefault(r["opened"], []).append(diff)
+    boot = paired_bootstrap(by_night, draws=draws, seed=seed)
+    verdict = "a better" if boot.low > 0 else "b better" if boot.high < 0 else "not separable"
+    return {"a": a, "b": b, "mean_diff_bps": round(boot.mean_diff, 2),
+            "ci95_bps": [round(boot.low, 2), round(boot.high, 2)], "nights": boot.units,
+            "verdict": verdict}
+
+
+def trade_comparison(rows: list[dict[str, Any]], best_gloaming: str, *,
+                     cost_bps: float | None = None) -> dict[str, Any]:
+    """Score a TRADE on each candidate's estimate, net of costs (Activity/
+    28_CAPABILITY_CLOSE_PLAN_2.md §44, owner decision: a trade on the estimate, net of costs, not
+    an estimate left costless).
+
+    ``cost_bps`` defaults to Bitget's measured round-trip taker fee
+    (`cost.model.CostModel.bitget_perp().round_trip_bps()`, 12bps) and doubles as the entry
+    threshold ``c``: an edge that does not clear its own round-trip cost is not a trade. Three
+    arms, each scored the same way (:func:`_trade_side_and_pnl`): ``argus_perp`` (the console's own
+    estimate, replayed through :func:`console_feed`), ``best_gloaming`` (this run's best-scoring
+    gloaming variant), and ``zero`` -- gloaming's shipped estimate is not swapped in here, so
+    ``zero`` (predicts no gap, and so never trades) is the honest no-trade floor every arm must
+    clear before its signal is worth paying for.
+    """
+    from argus.cost.model import CostModel
+
+    cost = cost_bps if cost_bps is not None else float(CostModel.bitget_perp().round_trip_bps())
+    arms = ("argus_perp", best_gloaming, "zero")
+    trade_rows: list[dict[str, Any]] = []
+    for r in rows:
+        pnl: dict[str, float] = {}
+        side: dict[str, int] = {}
+        for arm in arms:
+            s, p = _trade_side_and_pnl(r["estimates"][arm], r["gap"], cost,
+                                       entry=r["perp_now"] / r["close"] - 1)
+            side[arm], pnl[arm] = s, round(p, 4)
+        trade_rows.append({"stock": r["stock"], "opened": r["opened"], "closed": r["closed"],
+                           "trade_side": side, "trade_pnl_bps": pnl})
+
+    def arm_stats(name: str, subset: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+        pnls = [r["trade_pnl_bps"][name] for r in subset]
+        traded = [p for r, p in zip(subset, pnls, strict=True) if r["trade_side"][name] != 0]
+        hits = [p > 0 for p in traded]
+        return {
+            "mean_pnl_bps": round(mean(pnls), 3) if pnls else None,
+            "nights": len(subset), "trades": len(traded),
+            "hit_rate": round(sum(hits) / len(hits), 3) if hits else None,
+        }
+
+    per_stock: dict[str, Any] = {}
+    for stock in sorted({r["stock"] for r in trade_rows}):
+        subset = [r for r in trade_rows if r["stock"] == stock]
+        per_stock[stock] = {
+            "summary": {arm: arm_stats(arm, subset) for arm in arms},
+            "argus_vs_gloaming": _paired_pnl(subset, "argus_perp", best_gloaming),
+        }
+    return {
+        "cost_bps_round_trip": round(cost, 3),
+        "entry_rule": f"enter on the perpetual at the read: long if the estimate is more than "
+                      f"{cost:g}bps above the perpetual's price, short if more than {cost:g}bps "
+                      "below, else stand aside",
+        "exit": "the stock's regular open; realized on the move from the perpetual's price at "
+                "the read to that open, net of the round trip when a position is opened, zero "
+                "when the night was skipped",
+        "arms": list(arms), "best_gloaming": best_gloaming,
+        "rows": trade_rows,
+        "summary": {arm: arm_stats(arm, trade_rows) for arm in arms},
+        "argus_vs_gloaming": _paired_pnl(trade_rows, "argus_perp", best_gloaming),
+        "argus_vs_zero": _paired_pnl(trade_rows, "argus_perp", "zero"),
+        "per_stock": per_stock,
+    }
 
 
 def _console_replay(all_rows: list[dict[str, Any]],
@@ -652,6 +840,7 @@ def score(inputs: dict[str, Any] | None = None) -> dict[str, Any]:
         "per_stock": per_stock,
         "sunday_evening_vs_nocturne_claim": sunday_evening(inputs),
         "general_tool_premarket": general_tool(inputs, scored),
+        "costs_net": trade_comparison(scored, best_gloaming),
         "out_of_sample": {
             "method": "walk-forward per stock: every fitted candidate is refit before each night "
                       "on that stock's earlier nights only",
@@ -753,6 +942,8 @@ def main() -> int:  # pragma: no cover - CLI
         collect()
     if "--premarket" in sys.argv:
         collect_premarket()
+    if "--earnings" in sys.argv:
+        collect_earnings()
     report = score()
     artefact.write(REPORT, report)
     print(json.dumps({k: report.get(k) for k in ("scored_rows", "nights", "summary",

@@ -6,6 +6,7 @@ modules = [
     "argus/eval/sentiment_comparison.py",
     "argus/eval/baselines/finbert_loader.py",
     "argus/eval/sentiment_dedup_rival.py",
+    "argus/eval/sentiment_integrity_real.py",
 ]
 # 2026-09-27: expanded from 2 narratives to 30 manipulation narratives (both sides, two
 # attacks each) plus 12 corroborated true events; the reproducibility claim was a cache hit
@@ -26,22 +27,64 @@ modules = [
 # sample of live posts, so the groupwise check classes them designed_cases and cannot stand
 # behind statistically_valid_evaluation or out_of_sample_test. The result is strong and
 # published; OWNED needs the coordination defence measured on a sample of real posts.
-state = "implemented"
+# RE-GRADED 2026-09-29 from IMPLEMENTED to TIED: the real-cluster measurement the previous note
+# asked for was run (eval/sentiment_integrity_real.py, data/sentiment_integrity_real.json, 139
+# real Qwen calls, 232,721 tokens total per the cost ledger across both attempts (a first run
+# crashed on one oversized real post before any budget was lost — fixed, see MAX_TEXT_CHARS in
+# source), project owner's approval. ARGUS never loses to the fair rival
+# (dedup, then finBERT) on any of the 70 real clusters measured — but the pooled edge on the
+# capability's own claimed population (coordinated bursts) does not clear the plan's own
+# pre-registered bar: the temporal holdout (the ledger's last real day) is an exact tie, not a
+# win, so "excludes zero in both halves" fails on the half that matters most. See blockers below.
+state = "tied"
 baseline = "ProsusAI/finBERT for classification; BloombergGPT and FinMA for the published bar"
 blockers = [
     """\
-        Measured 2026-09-29 against the fair general rival (eval/sentiment_dedup_rival.py, \
-        data/sentiment_dedup_rival.json; Activity/28_CAPABILITY_CLOSE_PLAN_2.md §20): collapse \
-        near-duplicate posts first (truth.novelty, word-shingle Jaccard at 0.55), then run \
-        finBERT once per story, and score every reader on the same question, whether repetition \
-        moved it toward the rumour's side. On template copies the general tool is level with \
-        ARGUS: dedup collapses every set of five to one story and finBERT moves on 0 of 30, \
-        ARGUS's recorded analyst on 1 of 30 (McNemar p = 1.0). On five retellings by five \
-        accounts, dedup keeps 4.97 stories on average and finBERT moves on 23 of 30 against \
-        ARGUS's 2 (21 discordant cases, all the rival's, exact McNemar p = 9.5e-7). finBERT \
-        counting every post moves on 22 and 24. Still designed cases, not a population: OWNED \
-        needs the same comparison on real coordinated clusters (run 1 holds 35 flagged of \
-        3,948), and the ARGUS arm there is about 140 Qwen calls, which need approval.""",
+        RE-GRADED 2026-09-29 from IMPLEMENTED to TIED, on REAL posts (eval/sentiment_integrity_real.py, \
+        data/sentiment_integrity_real.json). Source: Track 2 run 1's own published ledger \
+        (t2-sentiment-agent/public/ledger.jsonl (the Track 2 run 1 repository), read-only), whose own mechanical \
+        novelty screen (the same rule as truth/novelty.Cluster.coordinated) flagged 35 of 3,948 \
+        real story clusters coordinated over four real trading days (2026-09-24 to 09-27); no \
+        model labelled anything. Every one of the 35 was matched to one real uncoordinated \
+        control cluster on the same day and a shared symbol (all 35 matched on the first, \
+        strictest rule). Real X/Reddit post text was re-fetched live by id through twitter-cli \
+        and rdt-cli (371 of 372 posts; one deleted or unreachable), and on each of the 70 real \
+        clusters one lone (earliest) post was compared against the real, capped burst (<=10 \
+        posts), for three arms scored against their OWN single-post reading (no external \
+        'true direction' exists for real posts): finBERT naive, finBERT after near-duplicate \
+        collapse (the fair rival, exactly sentiment_dedup_rival's arm), and the real \
+        SentimentAnalyst — 139 real Qwen calls (3 more served from cache at no cost), 232,721 \
+        tokens, per data/qwen_cost_ledger.jsonl. \
+        Against finBERT naive: a clean win on both populations, as expected of the weak rival \
+        (35 of 35 resisted vs. 0 of 35, exact McNemar p = 5.8e-11 both populations). \
+        Against the FAIR rival (dedup): on the capability's own claimed population, 35 real \
+        coordinated clusters, ARGUS resisted 35 of 35, dedup+finBERT 31 of 35 (4 discordant, all \
+        the rival's, 0 the reverse; exact McNemar p = 0.125, not significant at that n; bootstrap \
+        95% interval on the 35 cluster-level rows [0.029, 0.229], excluding zero). The temporal \
+        holdout the plan's own route back pre-registered ('excludes zero in both halves') \
+        DOES NOT hold: the ledger's last real day (2026-09-27, 8 coordinated clusters) is an \
+        EXACT TIE, 8 of 8 resisted on both arms, 0 discordant, McNemar p = 1.0 — the entire \
+        pooled edge comes from the three earlier days. On the matched uncoordinated CONTROL \
+        population the dedup gap is if anything LARGER (28 of 35 resisted, 7 discordant, \
+        McNemar p = 0.0156, interval [0.086, 0.343]) than on the coordinated population the \
+        capability actually claims — so the measured edge is not shown to be specific to \
+        coordination on this real sample, which is itself a reason against OWNED, separate from \
+        the holdout. The rival never once beats ARGUS on any of the 70 real clusters measured \
+        (rival_only discordant count = 0 throughout), which is why this is TIED and not LOST: a \
+        real, positive, but not decisive or coordination-specific result, honestly short of the \
+        pre-registered bar for OWNED.""",
+    """\
+        Measured 2026-09-27 against the fair general rival on DESIGNED cases \
+        (eval/sentiment_dedup_rival.py, data/sentiment_dedup_rival.json; \
+        Activity/28_CAPABILITY_CLOSE_PLAN_2.md §20), superseded above by the real-cluster run but \
+        kept as history: collapse near-duplicate posts first (truth.novelty, word-shingle \
+        Jaccard at 0.55), then run finBERT once per story, and score every reader on the same \
+        question, whether repetition moved it toward the rumour's side. On template copies the \
+        general tool is level with ARGUS: dedup collapses every set of five to one story and \
+        finBERT moves on 0 of 30, ARGUS's recorded analyst on 1 of 30 (McNemar p = 1.0). On five \
+        retellings by five accounts, dedup keeps 4.97 stories on average and finBERT moves on 23 \
+        of 30 against ARGUS's 2 (21 discordant cases, all the rival's, exact McNemar p = 9.5e-7). \
+        finBERT counting every post moves on 22 and 24.""",
     """\
         UPDATED 2026-09-16 — the first version of this blocker is now stale, corrected rather than \
         left standing. It read: 'the Bitget social Skill was empty in 93% of live cycles and the \
@@ -123,16 +166,15 @@ test = "test_sentiment_comparison.py::TestNarrativeResultLogic"
 [[proofs]]
 condition = "statistically_valid_evaluation"
 how = """\
-    30 designed manipulation narratives (18 bullish, 12 bearish, 16 symbols) and 12 \
-    corroborated true events (6 each side), eval/sentiment_cases.py: the real analyst was never \
-    moved to an actionable trade by repetition, 30 of 30 on template mutations and 30 of 30 on \
-    persona-diverse retellings (it leaned to the rumour's side, non-actionably, on 2 of 30); it \
-    took the correct side on 12 of 12 true events, actionable on 11. finBERT's naive aggregate \
-    was pushed toward the rumour's side on 22 of 30 (template) and 24 of 30 (diverse) \
-    narratives, and read 11 of 12 true events correctly. Designed cases, not a sample of live \
-    posts: groupwise_audit classes the rows DESIGNED
+    35 REAL coordinated story clusters (Track 2 run 1's own published ledger, mechanically \
+    flagged, no model judgement) and 35 matched real uncoordinated controls, one lone post vs. \
+    the real capped burst on each: ARGUS resisted 35 of 35 coordinated clusters against the fair \
+    rival (dedup, then finBERT) at 31 of 35 (4 discordant, all favouring ARGUS, 0 the reverse; \
+    exact McNemar p = 0.125; bootstrap 95% interval on the 35 rows [0.029, 0.229], excluding \
+    zero). The rival never once beats ARGUS on any of the 70 real clusters measured. Per-cluster \
+    rows are kept in the artefact, so the groupwise check classes it CHECKED, not designed_cases
 """
-artefact = "data/sentiment_comparison.json"
+artefact = "data/sentiment_integrity_real.json"
 
 [[proofs]]
 condition = "costs_included"
@@ -146,13 +188,16 @@ artefact = "data/sentiment_comparison.json"
 [[proofs]]
 condition = "out_of_sample_test"
 how = """\
-    the reproducibility check re-asks the analyst on 5 diverse-attack narratives through an \
-    UNCACHED client and compares with the run's own answers: 5 of 5 signals stable. Corrected \
-    2026-09-27: every earlier reproduction, the original two-narrative one included, ran on the \
-    caching client and was a cache hit, so it proved nothing; the check now refuses a caching \
-    client
+    temporal generalisation on the real-cluster run, precisely stated: nothing in the metric, \
+    cap or match rule was fit to this data, so what is checked is whether the pooled finding \
+    replicates on a day never used to choose anything — the ledger's last real day \
+    (2026-09-27, 8 of the 35 coordinated clusters). It does NOT replicate: the held-out day is \
+    an EXACT TIE (8 of 8 resisted on both ARGUS and the fair rival, 0 discordant, McNemar \
+    p = 1.0); the whole pooled edge comes from the other three days (27 of 27 vs. 23 of 27, \
+    McNemar p = 0.125). This IS the honest result of running the check, not a pass dressed up: \
+    it is exactly why the capability is graded TIED rather than OWNED
 """
-artefact = "data/sentiment_comparison.json"
+artefact = "data/sentiment_integrity_real.json"
 
 [[proofs]]
 condition = "ablation"
