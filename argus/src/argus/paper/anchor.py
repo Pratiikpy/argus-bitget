@@ -40,6 +40,7 @@ which is the point: an anchor a third party can only verify with our own softwar
 from __future__ import annotations
 
 import binascii
+import hashlib
 import json
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -209,6 +210,38 @@ def anchor(
     if result.anchored:
         _store(result, directory=directory)
     return result
+
+
+def ledger_digest(path: Path | None = None) -> tuple[bytes, int, str]:
+    """The paper ledger's commitment: SHA-256 over the chain hashes of its rows, in file order,
+    one per line. Returns the digest, the row count and the head hash.
+
+    Chain hashes, not file bytes: settlement fills fields on a row in place, and those fields are
+    kept out of the row's hash on purpose and sealed by rows appended after it
+    (``ledger.py``, ``content_hash`` and ``settlement_content_hash``). A digest of the bytes would
+    change with every settlement; this one changes only if a decision or a seal does. It is
+    recomputed from the first ``n`` rows of any later copy of the file."""
+    from argus.paper.ledger import PaperLedger
+
+    ledger = PaperLedger(path=path or DATA_DIR / "paper_ledger.jsonl")
+    rows = ledger._raw_entries  # every row, decisions and seals, in the order the chain links them
+    joined = "".join(f"{row.content_hash}\n" for row in rows).encode()
+    return hashlib.sha256(joined).digest(), len(rows), ledger.head_hash
+
+
+def anchor_ledger(path: Path | None = None, **kwargs: Any) -> Anchor:
+    """Anchor the paper ledger's head as it stands (:func:`ledger_digest`).
+
+    The ledger is hash-chained, and a chain its own author writes can be rewritten and rehashed by
+    that author; it was, once, on 2026-09-12, when two concurrent runs duplicated sequence numbers
+    and the repair recomputed seven links (``data/paper_ledger_incidents.json``). A hostile review
+    of 2026-09-29 made the point that the chain alone cannot rule that out after the fact. Only the
+    protocol commitments at 94 and 126 entries had gone to a calendar; from here the ledger's head
+    goes out with every register anchor, so a later rewrite of any anchored row shows as a digest
+    that no longer matches a Bitcoin-dated proof.
+    """
+    digest, rows, head = ledger_digest(path)
+    return anchor(digest, subject=f"paper ledger, first {rows} rows, head {head}", **kwargs)
 
 
 def _detached_file_bytes(digest: bytes, receipt_proof: bytes) -> bytes:

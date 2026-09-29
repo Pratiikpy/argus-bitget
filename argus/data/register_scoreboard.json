@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-09-29T14:20:31.938564+00:00",
-  "registered": 336,
-  "resolved": 173,
-  "pending": 161,
+  "generated_at": "2026-09-29T16:08:08.985775+00:00",
+  "registered": 341,
+  "resolved": 176,
+  "pending": 163,
   "unresolvable": 2,
   "claimants": [
     {
       "claimant": "argus",
-      "resolved": 173,
-      "correct": 121,
-      "hit_rate": 0.6994,
-      "brier": 0.22,
-      "mean_confidence": 0.5873
+      "resolved": 176,
+      "correct": 124,
+      "hit_rate": 0.7045,
+      "brier": 0.21898,
+      "mean_confidence": 0.5875
     }
   ],
   "wall": [

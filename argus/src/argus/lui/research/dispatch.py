@@ -259,6 +259,9 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
     return answer
 
 
+DEFAULT_HEDGED_BOOK = "SPYUSDT"
+"""The book a hedge question is measured against when it names no holdings: the S&P 500."""
+
 BETA_TIE = 0.05
 """Two session betas closer than this are said as the same market risk: an hourly beta over 30
 days carries a standard error of several hundredths, so a gap inside it names no winner."""
@@ -610,6 +613,15 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
         request = replace(request, book={s: 1.0 / len(named) for s in named}, notes=(
             *request.notes, f"no weights were given, so {', '.join(_t(s) for s in named)} "
                             f"{'is' if len(named) == 1 else 'are'} hedged as the whole position"))
+    if request.kind is ResearchKind.HEDGE and not request.book and not request.symbols:
+        # "Should I hedge with gold or with TLT?" names only the hedges, and the README lists it
+        # as a question to try verbatim; it was refused for want of holdings (judge audit,
+        # 2026-09-29). The honest default is the broad US stock market, stated on the answer.
+        request = replace(request, book={DEFAULT_HEDGED_BOOK: 1.0},
+                          symbols=(DEFAULT_HEDGED_BOOK,), notes=(
+            *request.notes, f"no holdings were stated, so the hedges are measured against a "
+                            f"position in the S&P 500 ({_t(DEFAULT_HEDGED_BOOK)}) — say what you "
+                            f"hold, or fill in My book, for your own figures"))
     if (request.kind is ResearchKind.HEDGE and len(request.symbols) == 1
             and _WITH_ITS_PERP.search(raw_text)):
         same = _same_name_perp_hedge(request.symbols[0], raw_text)

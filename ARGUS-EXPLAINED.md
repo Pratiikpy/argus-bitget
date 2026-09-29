@@ -711,7 +711,7 @@ python -m argus.market.skills --symbol NVDAUSDT
 And to check the whole thing is what this document says it is:
 
 ```bash
-pytest                    # 10,288 tests
+pytest                    # 10,300 tests
 python -m argus.status    # 152/152 modules importable, 18/18 sub-themes, artefacts on disk
 ```
 
@@ -1198,7 +1198,7 @@ why.
 
 ## Part 11 — The quantitative half, brutally
 
-**The paper-trading log has 847 decisions on record (2026-09-29). One is a live position — seq 797, BUY 1 NVDAUSDT at 232.45, opened 2026-09-28 13:47 UTC and not yet settled. Every other one is a refusal, and 794 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
+**The paper-trading log has 856 decisions on record (2026-09-29). One is a live position — seq 797, BUY 1 NVDAUSDT at 232.45, opened 2026-09-28 13:47 UTC and not yet settled. Every other one is a refusal, and 803 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
 
 Track 2 is 50% scored on Sharpe ratio, maximum drawdown and win rate computed from that log. With
 zero settled trades, those three numbers **do not exist**. Not "are zero" — do not exist. Half of the track
@@ -1766,9 +1766,9 @@ takes, and every artefact the system writes.
 |---|---|
 | Source modules | **559** files across **20 packages** (2026-09-27) |
 | Registered and importable | **152/152** (`python -m argus.status` checks this at runtime) |
-| Test files / tests | **353 files**, **10,288 tests collected** |
+| Test files / tests | **353 files**, **10,300 tests collected** |
 | Type and lint | `ruff` clean, `mypy --strict` clean on **556 source files** |
-| Artefacts written | **798** files under `argus/data/` |
+| Artefacts written | **804** files under `argus/data/` |
 | Code-level teardowns of other people's systems | **56** under `research/architecture/` |
 | Runtime dependencies | **two**: `pydantic`, `python-dateutil`. No numpy, no pandas, no scipy |
 
@@ -2008,7 +2008,7 @@ Also in this package, each described by the first sentence of its own docstring:
 `resolve` — the auto-resolver and the scoreboard, structurally unable to answer early.
 `open_register` — commits a batch and submits its head to four Bitcoin calendars.
 
-Live: **336 claims across all twelve stock perpetuals** (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — what the chain's head was when that proof was taken, so it timestamps the first 36 claims and not the 120 added after. Each scheduled cycle appends and re-anchors; the live head is `41f21e5d743cbb46`. Anchored
+Live: **341 claims across all twelve stock perpetuals** (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — what the chain's head was when that proof was taken, so it timestamps the first 36 claims and not the 120 added after. Each scheduled cycle appends and re-anchors; the live head is `41f21e5d743cbb46`. Anchored
 2026-09-14. The resolver runs on every scheduled cycle.
 
 Also in this package, each described by the first sentence of its own docstring:
@@ -2415,9 +2415,9 @@ source is a build failure, not a typo.
 | Source modules | 559 files, 20 packages; `mypy --strict` clean on 556 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 152/152 modules importable |
-| Tests | 10,288 tests collected, `ruff` clean |
+| Tests | 10,300 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
-| Artefacts on disk | 798 files under `argus/data/`, every one produced by running something |
+| Artefacts on disk | 804 files under `argus/data/`, every one produced by running something |
 | Code-level teardowns of other systems | 62, each citing file and line |
 | Competitor entries read at source | 5, each cloned and verified or refuted |
 | Live data sources reaching a decision | 15 |
@@ -3016,7 +3016,7 @@ and anchored. That opening head is `bc36478291a06bc3`, submitted to four indepen
 calendars: `a.pool.opentimestamps.org`, `b.pool.opentimestamps.org`,
 `alice.btc.calendar.opentimestamps.org` and `finney.calendar.eternitywall.com`. The `.ots` proofs
 are in `argus/data/anchors/`, and anyone can verify them with the reference OpenTimestamps client
-without our cooperation. **76 of the 124 carry a Bitcoin block-header attestation** (blocks
+without our cooperation. **76 of the 128 carry a Bitcoin block-header attestation** (blocks
 966,822–967,736); the other 18 are still calendar-pending, which is what a proof honestly
 says until Bitcoin has confirmed it. `python -m argus.register.anchorcheck` re-counts both.
 

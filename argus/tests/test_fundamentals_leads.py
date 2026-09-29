@@ -39,3 +39,26 @@ def test_a_sector_question_leads_with_the_sector_line() -> None:
     lines = ["Valuation on 2026-09-28: P/E 38.6.", "Against its sector (Technology, XLK): x."]
     lead = _fundamentals_focus(lines, "AAPL's P/E compared to its sector", "AAPL")[0]
     assert lead.startswith("Bottom line: Against its sector")
+
+
+def test_a_three_part_question_gets_one_bottom_line_answering_each_part() -> None:
+    """Live re-check, 2026-09-29: the price and the date came third and fourth."""
+    from argus.lui.research.fundamentals import _compound_lead
+
+    lines = ["Bottom line: Against its sector (Technology, measured by the SPDR fund XLK): NVDA is "
+             "priced below its sector on earnings: trailing P/E 28.6 against 33.0 (-13%).",
+             "NVDA last 230.74 USDT on Bitget (+0.22% over 24h).",
+             "Bottom line: NVDA reports in 49 day(s), on 17 Nov — no earnings gap inside 7 days."]
+    led = _compound_lead(lines, "Where is NVDA trading, when does it report and is it expensive",
+                         "NVDA")
+    assert led[0] == ("Bottom line: NVDA last 230.74 USDT on Bitget (+0.22% over 24h); reports on "
+                      "17 Nov, in 49 days; priced below its sector on earnings (P/E 28.6 against "
+                      "33.0).")
+    assert len(led) == 4 and not any(line.startswith("Bottom line") for line in led[1:])
+
+
+def test_a_one_part_question_keeps_its_lead() -> None:
+    from argus.lui.research.fundamentals import _compound_lead
+
+    lines = ["Bottom line: NVDA reports in 49 day(s), on 17 Nov — no earnings gap inside 7 days."]
+    assert _compound_lead(lines, "when does NVDA report", "NVDA") == lines

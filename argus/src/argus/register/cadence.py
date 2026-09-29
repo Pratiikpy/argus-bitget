@@ -163,6 +163,14 @@ def run_cadence(
         proof = submit_anchor(head, subject=f"register cadence cycle {position}")
         result["anchored"] = proof.anchored
         result["calendars"] = [r.calendar for r in proof.receipts]
+        # The paper ledger's head goes out on the same schedule (paper/anchor.py, anchor_ledger).
+        from argus.paper.anchor import anchor_ledger
+
+        try:
+            result["ledger_anchored"] = anchor_ledger().anchored
+        except OSError as exc:
+            result["ledger_anchored"] = False
+            result["ledger_anchor_failure"] = f"{type(exc).__name__}: {exc}"
     return result
 
 

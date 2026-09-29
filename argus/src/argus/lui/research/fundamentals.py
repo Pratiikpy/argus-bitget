@@ -5,7 +5,7 @@ from __future__ import annotations
 import contextlib
 import itertools
 import re
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
@@ -1011,7 +1011,45 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
                             f"({float(live.change_24h) * 100:+.2f}% over 24h).")
             sources.append(Source(kind="venue", ref="Bitget v2 tickers",
                                   detail=f"{symbol} last price, live"))
-    return _fundamentals_focus(lines, raw_text, ticker), sources
+    return _compound_lead(_fundamentals_focus(lines, raw_text, ticker), raw_text, ticker), sources
+
+
+_ASKS_DATE = re.compile(r"\b(?:reports?|earnings)\b", re.I)
+
+
+def _compound_lead(lines: list[str], question: str, ticker: str) -> list[str]:
+    """One bottom line for a question that asks two or more of: the price, the report date, whether
+    it is expensive.
+
+    "Where is NVDA trading, when does it report and is it expensive" led with the sector verdict
+    and put the price third and the date fourth (live re-check, 2026-09-29): each part was answered,
+    but only one of them first. Each part is read from the line that already states it, so the lead
+    carries no figure the lines below do not; a part whose line is missing is left out, and with
+    fewer than two found the answer is returned as it was."""
+    asks = (bool(_QUOTE.search(question)), bool(_ASKS_DATE.search(question)),
+            bool(_VALUE_Q.search(question)))
+    if sum(asks) < 2:
+        return lines
+    plain = [unlead(line) for line in lines]
+    name = re.escape(ticker)
+    patterns: tuple[tuple[bool, re.Pattern[str], Callable[[re.Match[str]], str]], ...] = (
+        (asks[0], re.compile(rf"^{name} last (\S+) USDT on Bitget \(([+-][\d.]+%) over 24h\)"),
+         lambda m: f"{ticker} last {m[1]} USDT on Bitget ({m[2]} over 24h)"),
+        (asks[1], re.compile(rf"^{name} reports in (\d+) day(?:s|\(s\)), on "
+                             r"([^—.]+?)\s*(?:—|\.|$)"),
+         lambda m: f"reports on {m[2]}, in {m[1]} days"),
+        (asks[2], re.compile(r"is priced (above|below|in line with) its sector on earnings: "
+                             r"trailing P/E ([\d.]+) against ([\d.]+)"),
+         lambda m: f"priced {m[1]} its sector on earnings (P/E {m[2]} against {m[3]})"),
+    )
+    parts = []
+    for wanted, pattern, say in patterns:
+        found = next((hit for line in plain if wanted and (hit := pattern.search(line))), None)
+        if found is not None:
+            parts.append(say(found))
+    if len(parts) < 2:
+        return lines
+    return [f"Bottom line: {'; '.join(parts)}.", *plain]
 
 
 _VALUE_Q = re.compile(r"\b(?:expensive|cheap|pricey|valuation|(?:over|under)[\s-]?valued|p/?e\b|"

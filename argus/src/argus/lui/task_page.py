@@ -101,7 +101,8 @@ def _line_class(line: str) -> str:
 
 def _card(n: int, step: Step, chart: str = "") -> str:
     esc = html.escape
-    body = "".join(f"<p class='{_line_class(line)}'>{esc(line)}</p>" for line in step.lines)
+    body = "".join(f"<p class='{_line_class(line)}'>{design.linked(line)}</p>"
+                   for line in step.lines)
     classes = "s" + (" r" if step.refused else "") + ("" if step.applicable else " na")
     return (f"<article class='{classes}'><div class='h'><span class='n'>{n}"
             f"</span><h2>{esc(step.title)}</h2><span class='e'>{esc(step.engine)} · "

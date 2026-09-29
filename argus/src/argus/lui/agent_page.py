@@ -21,7 +21,11 @@ from typing import Any
 from argus.lui import design
 from argus.truth import http
 
-RECORD = "https://t2-sentiment-agent-live.vercel.app"
+RECORD = "https://t2-sentiment-agent-run2.vercel.app"
+"""Run 2, the scored run. This page read run 1's record until 2026-09-29, two days after run 1
+closed and run 2 began, so it showed a finished run as the live one (first-user audit)."""
+RUN_1_RECORD = "https://t2-sentiment-agent-live.vercel.app"
+"""Run 1: disclosed, not scored."""
 REPO = "https://github.com/Pratiikpy/t2-sentiment-agent"
 CACHE_SECONDS = 300.0
 """The record republishes hourly; five minutes keeps a busy page from refetching on every view
@@ -101,15 +105,20 @@ def _decision(row: Mapping[str, Any]) -> str:
     kernel = row.get("changed_by_kernel")
     pill = ("<span class='pill red'>kernel changed it</span>" if kernel
             else "<span class='pill'>kernel passed it</span>" if kernel is not None else "")
-    detail = legs or (f"Flat: {reasons}" if reasons else "")
+    # Targets read plainly and stay in view; the logged reasons for standing flat are the
+    # kernel's own field names and values, so they sit behind a control rather than in the prose
+    # (first-user audit, 2026-09-29: "raw telemetry with no plain summary").
+    detail = (f"<p class='dim'>{escape(legs)}</p>" if legs else
+              f"<details><summary>The logged reasons, as the kernel records them</summary>"
+              f"<p class='dim mono'>{escape(reasons)}</p></details>" if reasons else "")
     when = escape(str(row.get("decided_at", ""))[:16])
-    stance = escape(str(row.get("stance") or row.get("outcome")))
+    stance = escape(str(row.get("stance") or row.get("outcome")).replace("_", " "))
     seq = escape(str(row.get("seq", "—")))
     return (f"<li><div class='dh'><span class='mono'>{when}Z</span>"
             f"<span class='pill proof'>{stance}</span>{pill}"
             f"<span class='mono dim'>seq {seq}</span></div>"
             f"<p>{escape(str(row.get('summary') or ''))}</p>"
-            + (f"<p class='dim'>{escape(detail)}</p>" if detail else "") + "</li>")
+            + detail + "</li>")
 
 
 def render(fetch: Fetch = fetch_json) -> str:
@@ -121,6 +130,7 @@ def render(fetch: Fetch = fetch_json) -> str:
                 f"<a href='{RECORD}'>{RECORD}</a>.</p></div>")
     else:
         ledger = summary.get("ledger") or {}
+        envelope_source = (summary.get("expected_envelope") or {}).get("source")
         genesis = str(ledger.get("genesis_hash") or "")
         rows = list((decisions or {}).get("decisions") or [])[-8:][::-1]
         recent = ("<ol class='dec'>" + "".join(_decision(r) for r in rows) + "</ol>" if rows else
@@ -138,8 +148,9 @@ def render(fetch: Fetch = fetch_json) -> str:
             f"<h2>Scored so far</h2>"
             f"{_metrics(summary.get('metrics') or {}, summary.get('expected_envelope') or {})}"
             f"<p class='dim'>The right-hand column was committed in the genesis event before the "
-            f"first decision: what a book with no edge produces over the same window, measured "
-            f"across 17,400 72-hour windows. The agent is judged against it, not against zero.</p>"
+            f"first decision: what a book with no edge produces over the same window"
+            + (f" ({escape(str(envelope_source))})" if envelope_source else "")
+            + ". The agent is judged against it, not against zero.</p>"
             f"<h2>What it has done</h2><div class='funnel'>{_funnel(summary.get('counts') or {})}"
             f"</div><h2>Latest decisions</h2>{recent}")
     return f"""<!doctype html><html lang="en"><head>{design.head(
@@ -180,9 +191,11 @@ now, never places an order.</div>
 <p class="sub">ARGUS researches; its sibling project trades. Qwen decides, a risk kernel that can
 only reduce stands between it and the venue, and Bitget's Agent Hub places every order on Bitget
 Demo. Everything below is read live from the agent's own record, recomputed hourly from its
-hash-chained log — <a href="{RECORD}">full record</a> · <a href="{REPO}">source</a>.</p>
+hash-chained log — <a href="{RECORD}">full record</a> · <a href="{REPO}">source</a>. This is run 2,
+the scored run; run 1, which came before it, is disclosed and not scored —
+<a href="{RUN_1_RECORD}">its record</a>.</p>
 {body}
 </div>{design.footer()}</body></html>"""
 
 
-__all__ = ["RECORD", "fetch_json", "render"]
+__all__ = ["RECORD", "RUN_1_RECORD", "fetch_json", "render"]

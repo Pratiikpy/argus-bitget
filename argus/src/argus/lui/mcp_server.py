@@ -388,6 +388,10 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
                     f"characters were read.\n\n{text}")
         if payload.get("memory") and payload.get("memory") != "[]":
             text += f"\n\nMemory (pass back as `memory` next time): {payload['memory']}"
+        # A refusal is the tool not delivering its answer, so it is reported as ``isError``: the
+        # specification sends tool errors back to the model with their content, which here says
+        # what can be asked instead. Reporting it as success would let an agent take a refusal
+        # for an answer (weighed and kept after the judge audit of 2026-09-29).
         return text, bool(payload.get("refused"))
     if name == "argus_quote":
         symbols = [_symbol(s) for s in (args.get("symbols") or [])][:4]

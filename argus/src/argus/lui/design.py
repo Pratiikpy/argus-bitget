@@ -28,6 +28,9 @@ the page.
 
 from __future__ import annotations
 
+import html
+import re
+
 FONTS = (
     '<link rel="preconnect" href="https://fonts.googleapis.com">'
     '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
@@ -239,3 +242,24 @@ def head(title: str, description: str, path: str = "/") -> str:
 
 __all__ = ["BASE_CSS", "FONTS", "LINKS", "PALETTE", "TOKENS_CSS", "favicon", "footer", "head",
            "mark_svg", "nav"]
+
+
+_URL = re.compile(r"https?://[^\s<>\"']*[^\s<>\"'.,;:!?)\]]")
+_HOST = re.compile(r"^https?://(?:www\.)?([^/?#]+)")
+
+
+def linked(text: str) -> str:
+    """``text`` escaped for HTML, with each address in it made a link that reads its host.
+
+    The same rule as the console's ``linked`` in ``lui/server.py``: a citation that can only be
+    read, not opened, was the first-user audit's top finding (2026-09-29)."""
+    out, at = [], 0
+    for match in _URL.finditer(text):
+        url = match.group(0)
+        host = _HOST.match(url)
+        out.append(html.escape(text[at:match.start()]))
+        out.append(f'<a href="{html.escape(url)}" rel="noopener noreferrer" target="_blank">'
+                   f"{html.escape(host.group(1) if host else url)} &#8599;</a>")
+        at = match.end()
+    out.append(html.escape(text[at:]))
+    return "".join(out)

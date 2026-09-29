@@ -42,7 +42,8 @@ def test_renders_the_record_metrics_envelope_and_decisions() -> None:
     assert "median -2.3, p05 -20.2, p95 +16.8" in html
     assert "kernel changed it" in html and "bound by gross_cap" in html
     assert "proposed 30%, approved 20%" in html
-    assert "Flat: no edge after costs" in html
+    # The logged reasons are kept, behind a control (first-user audit, 2026-09-29).
+    assert "<details><summary>The logged reasons" in html and "no edge after costs" in html
     assert "<b>nothing</b>" not in html and "&lt;b&gt;nothing&lt;/b&gt;" in html
     # newest first
     assert html.index("seq 44") < html.index("seq 40")

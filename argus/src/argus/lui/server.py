@@ -97,7 +97,7 @@ PAGE = """<!doctype html>
   .chip { border:1px solid var(--line); background:var(--panel); color:var(--dim);
     border-radius:999px; padding:5px 11px; font-size:12.5px; cursor:pointer }
   .chip:hover { color:var(--ink); border-color:var(--accent) }
-  .card { background:var(--panel); border:1px solid var(--line);
+  .card { scroll-margin-top:84px; background:var(--panel); border:1px solid var(--line);
     padding:14px 16px; margin-bottom:12px }
   .q { font-weight:600; margin-bottom:8px }
   .meta { font:11.5px/1.4 var(--mono); color:var(--dim); margin-bottom:9px;
@@ -341,6 +341,12 @@ fetch('status').then(r => r.json()).then(s => {
 
 const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const escA = s => esc(s).replace(/"/g, '&quot;');
+// A source's address becomes a link reading its host (first-user audit, 2026-09-29: every
+// citation was plain text, so "every number comes with its source" could be read, not opened).
+const linked = s => esc(s).replace(
+  /https?:\\/\\/[^\\s<>"']*[^\\s<>"'.,;:!?)\\]]/g,
+  u => `<a href="${u}" rel="noopener noreferrer" target="_blank">` +
+    `${u.replace(/^https?:\\/\\/(?:www\\.)?([^\\/?#]+).*$/, '$1')} &#8599;</a>`);
 
 document.getElementById('f').addEventListener('submit', async ev => {
   ev.preventDefault();
@@ -348,6 +354,22 @@ document.getElementById('f').addEventListener('submit', async ev => {
   qEl.value = ''; grow(); document.getElementById('go').disabled = true;
   if (first) { out.innerHTML = ''; first = false; }
   const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), ASK_LIMIT_MS);
+  // The question stays on screen with a running count while the desk works: a slow answer showed
+  // only a greyed-out button and an empty box, and read as stuck (first-user audit, 2026-09-29).
+  out.insertAdjacentHTML('afterbegin', `<div class="card pending" id="pending">` +
+    `<div class="q">${esc(text)}</div><div class="meta"><span class="tag">working · ` +
+    `<span id="tick">0</span> s</span></div></div>`);
+  // Brought into view when it lands below the screen, as it does on a phone under the examples;
+  // the answer replaces it in place, so the reader is already looking at where it arrives.
+  const inFlight = document.getElementById('pending');
+  if (inFlight.getBoundingClientRect().top > innerHeight - 96) {
+    inFlight.scrollIntoView({block: 'start', behavior:
+      matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+  }
+  const t0 = Date.now(), ticker = setInterval(() => {
+    const tick = document.getElementById('tick');
+    if (tick) tick.textContent = String(Math.round((Date.now() - t0) / 1000));
+  }, 1000);
   try {
     const r = await post('ask', {q: text, turns: JSON.stringify(turns),
       book: bookEl.value.trim(), memory: JSON.stringify(memory)}, ctl.signal);
@@ -365,12 +387,12 @@ document.getElementById('f').addEventListener('submit', async ev => {
           ${a.refused ? '<span class="tag over">refused</span>' : ''}
         </div>
         <div class="lines">${collapseLines(a.lines.map((l, i) =>
-          `<div class="${lineClass(l)}">${pv((a.line_labels || [])[i])}${esc(l)}</div>`),
+          `<div class="${lineClass(l)}">${pv((a.line_labels || [])[i])}${linked(l)}</div>`),
           a.refused)}</div>
         ${a.sources.length ? `<div class="src"><span class="rk">Receipt · ${a.sources.length}` +
           ` source${a.sources.length === 1 ? '' : 's'}</span>` +
-          a.sources.map(s => `&nbsp;&nbsp;<b>${esc(s.kind)}</b>:${esc(s.ref)}` +
-            (s.detail ? ' — ' + esc(s.detail) : '')).join('<br>') + `</div>` : ''}
+          a.sources.map(s => `&nbsp;&nbsp;<b>${esc(s.kind)}</b>:${linked(s.ref)}` +
+            (s.detail ? ' — ' + linked(s.detail) : '')).join('<br>') + `</div>` : ''}
         ${a.research_task ? `<form class="deep" method="post" action="/research">` +
           `<input type="hidden" name="q" value="${escA(text)}">` +
           `<input type="hidden" name="book" value="${escA(bookEl.value.trim())}">` +
@@ -393,9 +415,9 @@ document.getElementById('f').addEventListener('submit', async ev => {
           const lines = card.querySelector('.lines');
           lines.lang = a.translate.lang;
           lines.innerHTML =
-            note.map(l => `<div class="line fine">${esc(l)}</div>`).join('') +
+            note.map(l => `<div class="line fine">${linked(l)}</div>`).join('') +
             collapseLines(t.lines.map((l, i) => `<div class="${lineClass(body[i])}">` +
-              `${pv((a.line_labels || [])[a.translate.skip + i])}${esc(l)}</div>`), a.refused);
+              `${pv((a.line_labels || [])[a.translate.skip + i])}${linked(l)}</div>`), a.refused);
         }).catch(() => {});
     }
   } catch (e) {
@@ -412,7 +434,9 @@ document.getElementById('f').addEventListener('submit', async ev => {
        narrower.</div></div>`);
     if (!qEl.value) { qEl.value = text; grow(); }
   } finally {
-    clearTimeout(timer); document.getElementById('go').disabled = false; qEl.focus();
+    clearTimeout(timer); clearInterval(ticker);
+    const pending = document.getElementById('pending'); if (pending) pending.remove();
+    document.getElementById('go').disabled = false; qEl.focus();
   }
 });
 // "Show all N lines": a real button toggled by a click or, natively, by Enter/Space on it, with
