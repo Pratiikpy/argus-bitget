@@ -1,0 +1,8 @@
+{
+  "measured_at": "2026-09-29",
+  "how": "serenity-guardrails' ChainedJournal, vendored at eval/baselines/serenity_journal.py, run through eval/journal_comparison.run_serenity_crlf_case and run_serenity_tamper_case on Linux (WSL2 Ubuntu 22.04, argus-publish commit 143265e)",
+  "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "crlf_case": {"system": "serenity_guardrails_chained_journal", "disk_bytes_contain_crlf": false, "verify_reports_clean": true, "detail": "verify() reported the chain clean"},
+  "tamper_detected": true,
+  "finding": "on Linux serenity writes LF and its untampered chain verifies clean; the failure recorded in data/journal_comparison.json is Windows text-mode I/O only, so on the property both implement the two are level"
+}

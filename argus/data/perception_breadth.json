@@ -1428,6 +1428,968 @@
     "symbols_tied": 1,
     "verdict": "mixed"
   },
+  "workbench_design_day": {
+    "all_categories": {
+      "symbols": 10,
+      "mean_workbench": 16.0,
+      "mean_openbb": 12.4,
+      "mean_difference": 3.6,
+      "ahead": 9,
+      "behind": 0,
+      "tied": 1,
+      "rows": [
+        {
+          "symbol": "AAPL",
+          "workbench": 17,
+          "openbb": 13,
+          "difference": 4,
+          "only_workbench": [
+            "earnings_calendar",
+            "prediction_markets",
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "AMZN",
+          "workbench": 16,
+          "openbb": 12,
+          "difference": 4,
+          "only_workbench": [
+            "corporate_actions",
+            "earnings_calendar",
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "COIN",
+          "workbench": 16,
+          "openbb": 12,
+          "difference": 4,
+          "only_workbench": [
+            "earnings_calendar",
+            "prediction_markets",
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "GOOGL",
+          "workbench": 17,
+          "openbb": 13,
+          "difference": 4,
+          "only_workbench": [
+            "earnings_calendar",
+            "prediction_markets",
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "META",
+          "workbench": 17,
+          "openbb": 13,
+          "difference": 4,
+          "only_workbench": [
+            "earnings_calendar",
+            "prediction_markets",
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "MSFT",
+          "workbench": 16,
+          "openbb": 13,
+          "difference": 3,
+          "only_workbench": [
+            "earnings_calendar",
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "MSTR",
+          "workbench": 17,
+          "openbb": 12,
+          "difference": 5,
+          "only_workbench": [
+            "corporate_actions",
+            "earnings_calendar",
+            "prediction_markets",
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "NVDA",
+          "workbench": 16,
+          "openbb": 13,
+          "difference": 3,
+          "only_workbench": [
+            "earnings_calendar",
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "QQQ",
+          "workbench": 11,
+          "openbb": 11,
+          "difference": 0,
+          "only_workbench": [
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": [
+            "estimates",
+            "filings"
+          ]
+        },
+        {
+          "symbol": "TSLA",
+          "workbench": 17,
+          "openbb": 12,
+          "difference": 5,
+          "only_workbench": [
+            "corporate_actions",
+            "earnings_calendar",
+            "prediction_markets",
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": []
+        }
+      ]
+    },
+    "adversarial": {
+      "reading": "only categories OpenBB's keyless catalogue has an endpoint for",
+      "dropped_categories": [
+        "social",
+        "venue_derivatives",
+        "prediction_markets"
+      ],
+      "symbols": 10,
+      "mean_workbench": 13.4,
+      "mean_openbb": 12.4,
+      "mean_difference": 1.0,
+      "ahead": 9,
+      "behind": 1,
+      "tied": 0,
+      "rows": [
+        {
+          "symbol": "AAPL",
+          "workbench": 14,
+          "openbb": 13,
+          "difference": 1,
+          "only_workbench": [
+            "earnings_calendar"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "AMZN",
+          "workbench": 14,
+          "openbb": 12,
+          "difference": 2,
+          "only_workbench": [
+            "corporate_actions",
+            "earnings_calendar"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "COIN",
+          "workbench": 13,
+          "openbb": 12,
+          "difference": 1,
+          "only_workbench": [
+            "earnings_calendar"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "GOOGL",
+          "workbench": 14,
+          "openbb": 13,
+          "difference": 1,
+          "only_workbench": [
+            "earnings_calendar"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "META",
+          "workbench": 14,
+          "openbb": 13,
+          "difference": 1,
+          "only_workbench": [
+            "earnings_calendar"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "MSFT",
+          "workbench": 14,
+          "openbb": 13,
+          "difference": 1,
+          "only_workbench": [
+            "earnings_calendar"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "MSTR",
+          "workbench": 14,
+          "openbb": 12,
+          "difference": 2,
+          "only_workbench": [
+            "corporate_actions",
+            "earnings_calendar"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "NVDA",
+          "workbench": 14,
+          "openbb": 13,
+          "difference": 1,
+          "only_workbench": [
+            "earnings_calendar"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "QQQ",
+          "workbench": 9,
+          "openbb": 11,
+          "difference": -2,
+          "only_workbench": [],
+          "only_openbb": [
+            "estimates",
+            "filings"
+          ]
+        },
+        {
+          "symbol": "TSLA",
+          "workbench": 14,
+          "openbb": 12,
+          "difference": 2,
+          "only_workbench": [
+            "corporate_actions",
+            "earnings_calendar"
+          ],
+          "only_openbb": []
+        }
+      ]
+    },
+    "ablation": {
+      "reading": "every category, with one workbench source removed at a time",
+      "without": {
+        "argus": {
+          "symbols": 10,
+          "mean_workbench": 16.0,
+          "mean_openbb": 12.4,
+          "mean_difference": 3.6,
+          "ahead": 9,
+          "behind": 0,
+          "tied": 1
+        },
+        "bitget": {
+          "symbols": 10,
+          "mean_workbench": 15.0,
+          "mean_openbb": 12.4,
+          "mean_difference": 2.6,
+          "ahead": 9,
+          "behind": 1,
+          "tied": 0
+        },
+        "bitget+yahoo": {
+          "symbols": 10,
+          "mean_workbench": 15.0,
+          "mean_openbb": 12.4,
+          "mean_difference": 2.6,
+          "ahead": 9,
+          "behind": 1,
+          "tied": 0
+        },
+        "bitget-mcp": {
+          "symbols": 10,
+          "mean_workbench": 11.3,
+          "mean_openbb": 12.4,
+          "mean_difference": -1.1,
+          "ahead": 0,
+          "behind": 7,
+          "tied": 3
+        },
+        "bitget-mcp+sec": {
+          "symbols": 10,
+          "mean_workbench": 15.3,
+          "mean_openbb": 12.4,
+          "mean_difference": 2.9,
+          "ahead": 9,
+          "behind": 0,
+          "tied": 1
+        },
+        "bitget-skill": {
+          "symbols": 10,
+          "mean_workbench": 16.0,
+          "mean_openbb": 12.4,
+          "mean_difference": 3.6,
+          "ahead": 9,
+          "behind": 0,
+          "tied": 1
+        },
+        "cboe": {
+          "symbols": 10,
+          "mean_workbench": 15.0,
+          "mean_openbb": 12.4,
+          "mean_difference": 2.6,
+          "ahead": 9,
+          "behind": 1,
+          "tied": 0
+        },
+        "finra": {
+          "symbols": 10,
+          "mean_workbench": 14.0,
+          "mean_openbb": 12.4,
+          "mean_difference": 1.6,
+          "ahead": 9,
+          "behind": 1,
+          "tied": 0
+        },
+        "polymarket": {
+          "symbols": 10,
+          "mean_workbench": 15.4,
+          "mean_openbb": 12.4,
+          "mean_difference": 3.0,
+          "ahead": 9,
+          "behind": 0,
+          "tied": 1
+        },
+        "rss+edgar": {
+          "symbols": 10,
+          "mean_workbench": 15.0,
+          "mean_openbb": 12.4,
+          "mean_difference": 2.6,
+          "ahead": 9,
+          "behind": 1,
+          "tied": 0
+        },
+        "sec-edgar": {
+          "symbols": 10,
+          "mean_workbench": 15.1,
+          "mean_openbb": 12.4,
+          "mean_difference": 2.7,
+          "ahead": 9,
+          "behind": 0,
+          "tied": 1
+        },
+        "sosovalue": {
+          "symbols": 10,
+          "mean_workbench": 16.0,
+          "mean_openbb": 12.4,
+          "mean_difference": 3.6,
+          "ahead": 9,
+          "behind": 0,
+          "tied": 1
+        },
+        "withheld": {
+          "symbols": 10,
+          "mean_workbench": 16.0,
+          "mean_openbb": 12.4,
+          "mean_difference": 3.6,
+          "ahead": 9,
+          "behind": 0,
+          "tied": 1
+        },
+        "x+reddit": {
+          "symbols": 10,
+          "mean_workbench": 15.0,
+          "mean_openbb": 12.4,
+          "mean_difference": 2.6,
+          "ahead": 9,
+          "behind": 1,
+          "tied": 0
+        },
+        "yahoo": {
+          "symbols": 10,
+          "mean_workbench": 14.1,
+          "mean_openbb": 12.4,
+          "mean_difference": 1.7,
+          "ahead": 9,
+          "behind": 1,
+          "tied": 0
+        }
+      }
+    },
+    "costs": {
+      "money_usd": {
+        "openbb_keyless": 0.0,
+        "argus_workbench": 0.0,
+        "note": "keyless on both sides; no model is called by either"
+      },
+      "seconds_per_symbol": {
+        "openbb": {
+          "AAPL": 116.57,
+          "AMZN": 123.37,
+          "COIN": 111.21,
+          "GOOGL": 115.4,
+          "META": 119.64,
+          "MSFT": 126.08,
+          "MSTR": 115.7,
+          "NVDA": 124.91,
+          "QQQ": 112.62,
+          "SQQQ": 103.68,
+          "TQQQ": 108.84,
+          "TSLA": 119.41
+        },
+        "argus_workbench": {
+          "AAPL": 18.37,
+          "AMZN": 12.02,
+          "COIN": 15.76,
+          "GOOGL": 12.77,
+          "META": 10.91,
+          "MSFT": 12.65,
+          "MSTR": 14.68,
+          "NVDA": 15.74,
+          "QQQ": 11.14,
+          "SQQQ": 12.71,
+          "TQQQ": 12.17,
+          "TSLA": 11.01
+        }
+      },
+      "mean_seconds_per_symbol": {
+        "openbb": 116.45,
+        "argus_workbench": 13.33
+      }
+    }
+  },
+  "held_out": {
+    "openbb_as_of": "2026-09-29T03:02:11.421355+00:00",
+    "workbench_as_of": "2026-09-29T02:46:35.339208+00:00",
+    "symbols": [
+      "AAPL",
+      "AMZN",
+      "COIN",
+      "GOOGL",
+      "META",
+      "MSFT",
+      "MSTR",
+      "NVDA",
+      "QQQ",
+      "SQQQ",
+      "TQQQ",
+      "TSLA"
+    ],
+    "all_categories": {
+      "symbols": 12,
+      "mean_workbench": 15.333,
+      "mean_openbb": 11.667,
+      "mean_difference": 3.667,
+      "ahead": 12,
+      "behind": 0,
+      "tied": 0,
+      "rows": [
+        {
+          "symbol": "AAPL",
+          "workbench": 17,
+          "openbb": 13,
+          "difference": 4,
+          "only_workbench": [
+            "earnings_calendar",
+            "prediction_markets",
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "AMZN",
+          "workbench": 16,
+          "openbb": 12,
+          "difference": 4,
+          "only_workbench": [
+            "corporate_actions",
+            "earnings_calendar",
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "COIN",
+          "workbench": 16,
+          "openbb": 12,
+          "difference": 4,
+          "only_workbench": [
+            "earnings_calendar",
+            "prediction_markets",
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "GOOGL",
+          "workbench": 17,
+          "openbb": 13,
+          "difference": 4,
+          "only_workbench": [
+            "earnings_calendar",
+            "prediction_markets",
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "META",
+          "workbench": 17,
+          "openbb": 13,
+          "difference": 4,
+          "only_workbench": [
+            "earnings_calendar",
+            "prediction_markets",
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "MSFT",
+          "workbench": 16,
+          "openbb": 13,
+          "difference": 3,
+          "only_workbench": [
+            "earnings_calendar",
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "MSTR",
+          "workbench": 17,
+          "openbb": 12,
+          "difference": 5,
+          "only_workbench": [
+            "corporate_actions",
+            "earnings_calendar",
+            "prediction_markets",
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "NVDA",
+          "workbench": 16,
+          "openbb": 13,
+          "difference": 3,
+          "only_workbench": [
+            "earnings_calendar",
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "QQQ",
+          "workbench": 12,
+          "openbb": 11,
+          "difference": 1,
+          "only_workbench": [
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": [
+            "estimates"
+          ]
+        },
+        {
+          "symbol": "SQQQ",
+          "workbench": 11,
+          "openbb": 8,
+          "difference": 3,
+          "only_workbench": [
+            "dark_pool",
+            "ownership",
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": [
+            "etf_composition"
+          ]
+        },
+        {
+          "symbol": "TQQQ",
+          "workbench": 12,
+          "openbb": 8,
+          "difference": 4,
+          "only_workbench": [
+            "dark_pool",
+            "ownership",
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "TSLA",
+          "workbench": 17,
+          "openbb": 12,
+          "difference": 5,
+          "only_workbench": [
+            "corporate_actions",
+            "earnings_calendar",
+            "prediction_markets",
+            "social",
+            "venue_derivatives"
+          ],
+          "only_openbb": []
+        }
+      ]
+    },
+    "adversarial": {
+      "reading": "only categories OpenBB's keyless catalogue has an endpoint for",
+      "dropped_categories": [
+        "social",
+        "venue_derivatives",
+        "prediction_markets"
+      ],
+      "symbols": 12,
+      "mean_workbench": 12.833,
+      "mean_openbb": 11.667,
+      "mean_difference": 1.167,
+      "ahead": 11,
+      "behind": 1,
+      "tied": 0,
+      "rows": [
+        {
+          "symbol": "AAPL",
+          "workbench": 14,
+          "openbb": 13,
+          "difference": 1,
+          "only_workbench": [
+            "earnings_calendar"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "AMZN",
+          "workbench": 14,
+          "openbb": 12,
+          "difference": 2,
+          "only_workbench": [
+            "corporate_actions",
+            "earnings_calendar"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "COIN",
+          "workbench": 13,
+          "openbb": 12,
+          "difference": 1,
+          "only_workbench": [
+            "earnings_calendar"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "GOOGL",
+          "workbench": 14,
+          "openbb": 13,
+          "difference": 1,
+          "only_workbench": [
+            "earnings_calendar"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "META",
+          "workbench": 14,
+          "openbb": 13,
+          "difference": 1,
+          "only_workbench": [
+            "earnings_calendar"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "MSFT",
+          "workbench": 14,
+          "openbb": 13,
+          "difference": 1,
+          "only_workbench": [
+            "earnings_calendar"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "MSTR",
+          "workbench": 14,
+          "openbb": 12,
+          "difference": 2,
+          "only_workbench": [
+            "corporate_actions",
+            "earnings_calendar"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "NVDA",
+          "workbench": 14,
+          "openbb": 13,
+          "difference": 1,
+          "only_workbench": [
+            "earnings_calendar"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "QQQ",
+          "workbench": 10,
+          "openbb": 11,
+          "difference": -1,
+          "only_workbench": [],
+          "only_openbb": [
+            "estimates"
+          ]
+        },
+        {
+          "symbol": "SQQQ",
+          "workbench": 9,
+          "openbb": 8,
+          "difference": 1,
+          "only_workbench": [
+            "dark_pool",
+            "ownership"
+          ],
+          "only_openbb": [
+            "etf_composition"
+          ]
+        },
+        {
+          "symbol": "TQQQ",
+          "workbench": 10,
+          "openbb": 8,
+          "difference": 2,
+          "only_workbench": [
+            "dark_pool",
+            "ownership"
+          ],
+          "only_openbb": []
+        },
+        {
+          "symbol": "TSLA",
+          "workbench": 14,
+          "openbb": 12,
+          "difference": 2,
+          "only_workbench": [
+            "corporate_actions",
+            "earnings_calendar"
+          ],
+          "only_openbb": []
+        }
+      ]
+    },
+    "ablation": {
+      "reading": "every category, with one workbench source removed at a time",
+      "without": {
+        "argus": {
+          "symbols": 12,
+          "mean_workbench": 15.333,
+          "mean_openbb": 11.667,
+          "mean_difference": 3.667,
+          "ahead": 12,
+          "behind": 0,
+          "tied": 0
+        },
+        "bitget": {
+          "symbols": 12,
+          "mean_workbench": 14.333,
+          "mean_openbb": 11.667,
+          "mean_difference": 2.667,
+          "ahead": 11,
+          "behind": 0,
+          "tied": 1
+        },
+        "bitget+yahoo": {
+          "symbols": 12,
+          "mean_workbench": 14.333,
+          "mean_openbb": 11.667,
+          "mean_difference": 2.667,
+          "ahead": 11,
+          "behind": 0,
+          "tied": 1
+        },
+        "bitget-mcp": {
+          "symbols": 12,
+          "mean_workbench": 10.917,
+          "mean_openbb": 11.667,
+          "mean_difference": -0.75,
+          "ahead": 1,
+          "behind": 7,
+          "tied": 4
+        },
+        "bitget-mcp+sec": {
+          "symbols": 12,
+          "mean_workbench": 14.75,
+          "mean_openbb": 11.667,
+          "mean_difference": 3.083,
+          "ahead": 12,
+          "behind": 0,
+          "tied": 0
+        },
+        "bitget-skill": {
+          "symbols": 12,
+          "mean_workbench": 15.333,
+          "mean_openbb": 11.667,
+          "mean_difference": 3.667,
+          "ahead": 12,
+          "behind": 0,
+          "tied": 0
+        },
+        "cboe": {
+          "symbols": 12,
+          "mean_workbench": 14.333,
+          "mean_openbb": 11.667,
+          "mean_difference": 2.667,
+          "ahead": 11,
+          "behind": 0,
+          "tied": 1
+        },
+        "finra": {
+          "symbols": 12,
+          "mean_workbench": 13.333,
+          "mean_openbb": 11.667,
+          "mean_difference": 1.667,
+          "ahead": 11,
+          "behind": 1,
+          "tied": 0
+        },
+        "polymarket": {
+          "symbols": 12,
+          "mean_workbench": 14.833,
+          "mean_openbb": 11.667,
+          "mean_difference": 3.167,
+          "ahead": 12,
+          "behind": 0,
+          "tied": 0
+        },
+        "rss+edgar": {
+          "symbols": 12,
+          "mean_workbench": 14.333,
+          "mean_openbb": 11.667,
+          "mean_difference": 2.667,
+          "ahead": 11,
+          "behind": 0,
+          "tied": 1
+        },
+        "sec-edgar": {
+          "symbols": 12,
+          "mean_workbench": 14.333,
+          "mean_openbb": 11.667,
+          "mean_difference": 2.667,
+          "ahead": 11,
+          "behind": 0,
+          "tied": 1
+        },
+        "sosovalue": {
+          "symbols": 12,
+          "mean_workbench": 15.333,
+          "mean_openbb": 11.667,
+          "mean_difference": 3.667,
+          "ahead": 12,
+          "behind": 0,
+          "tied": 0
+        },
+        "withheld": {
+          "symbols": 12,
+          "mean_workbench": 15.333,
+          "mean_openbb": 11.667,
+          "mean_difference": 3.667,
+          "ahead": 12,
+          "behind": 0,
+          "tied": 0
+        },
+        "x+reddit": {
+          "symbols": 12,
+          "mean_workbench": 14.333,
+          "mean_openbb": 11.667,
+          "mean_difference": 2.667,
+          "ahead": 11,
+          "behind": 0,
+          "tied": 1
+        },
+        "yahoo": {
+          "symbols": 12,
+          "mean_workbench": 13.667,
+          "mean_openbb": 11.667,
+          "mean_difference": 2.0,
+          "ahead": 11,
+          "behind": 0,
+          "tied": 1
+        }
+      }
+    },
+    "costs": {
+      "money_usd": {
+        "openbb_keyless": 0.0,
+        "argus_workbench": 0.0,
+        "note": "keyless on both sides; no model is called by either"
+      },
+      "seconds_per_symbol": {
+        "openbb": {
+          "AAPL": 126.14,
+          "AMZN": 129.65,
+          "COIN": 129.95,
+          "GOOGL": 124.13,
+          "META": 139.66,
+          "MSFT": 143.53,
+          "MSTR": 119.86,
+          "NVDA": 149.37,
+          "QQQ": 123.08,
+          "SQQQ": 111.16,
+          "TQQQ": 116.44,
+          "TSLA": 124.29
+        },
+        "argus_workbench": {
+          "AAPL": 21.79,
+          "AMZN": 10.95,
+          "COIN": 14.36,
+          "GOOGL": 11.22,
+          "META": 10.38,
+          "MSFT": 13.56,
+          "MSTR": 15.23,
+          "NVDA": 11.92,
+          "QQQ": 9.88,
+          "SQQQ": 11.23,
+          "TQQQ": 11.93,
+          "TSLA": 12.9
+        }
+      },
+      "mean_seconds_per_symbol": {
+        "openbb": 128.1,
+        "argus_workbench": 12.95
+      }
+    },
+    "sign_agreement_with_design_day": {
+      "all_categories": "9/10",
+      "adversarial": "10/10"
+    }
+  },
   "baseline": {
     "system": "OpenBB keyless providers, run through OpenBB's own obb interface",
     "calls": 720,

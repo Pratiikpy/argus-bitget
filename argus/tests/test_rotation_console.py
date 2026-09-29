@@ -37,12 +37,18 @@ def _book(text: str) -> dict[str, float]:
 
 @pytest.mark.parametrize("text", ["should I be risk-on or risk-off right now?",
                                   "rotate between stocks, crypto and gold?",
-                                  "which asset class should I hold, stocks or crypto or gold?"])
+                                  "which asset class should I hold, stocks or crypto or gold?",
+                                  "are we in a risk on market?", "is it risk off today"])
 def test_rotation_questions_are_recognised(text: str) -> None:
     assert rotation.asks_for_rotation(text)
 
 
-@pytest.mark.parametrize("text", ["is NVDA overbought?", "what does a 10% drop do to my book"])
+@pytest.mark.parametrize("text", [
+    "is NVDA overbought?", "what does a 10% drop do to my book",
+    # the risk carried on a name, and a one-holding trade, are not the asset-class rule's
+    # questions (kind_routing blind set, 2026-09-29); phrased differently from the set's rows
+    "how much risk on tsla do I carry", "what is the overnight risk on my nvda position",
+    "sell half of my tsla and rotate into gold, what happens to my book"])
 def test_other_questions_are_not(text: str) -> None:
     assert not rotation.asks_for_rotation(text)
 

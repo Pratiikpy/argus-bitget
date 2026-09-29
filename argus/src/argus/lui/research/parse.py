@@ -438,7 +438,10 @@ _FUNDAMENTALS = re.compile(
     r"(?:beat|miss(?:ed)?)\b[^?]{0,30}\b(?:quarter|q[1-4]|estimates?|expectations?|consensus|"
     r"street|numbers)|did\s+\w+\s+(?:beat|miss)|quarterly\s+results|last\s+quarter|"
     r"analysts?|price\s+target|consensus|(?:analyst|eps|earnings|revenue|consensus)\s+"
-    r"estimates?|13f|institution\w*|who\s+owns|holders?|"
+    r"estimates?|13f|institution\w*|who\s+owns|holders?|shareholders?|ownership|"
+    # "what hedge funds own NVDA", "which funds hold TSLA": public 13F and 5% holders
+    r"(?:hedge\s+|mutual\s+|index\s+|pension\s+)?funds?\s+(?:own|owns|owning|hold|holds|"
+    r"holding|bought|buying|sold|selling)|"
     r"fundamental\w*|revenue|valuation|market\s+cap|p/?e\b|premium\s+to|discount\s+to|"
     r"vs\.?\s+the\s+stock|against\s+the\s+stock|"
     # "what's the dividend yield on AAPL", "does COIN own bitcoin on its balance sheet", "is AAPL
@@ -770,6 +773,39 @@ _SENTIMENT = re.compile(
     r"(?:saying|posts?|talk))\b",
     re.I,
 )
+
+
+DARK_POOL_Q = re.compile(r"\bdark[\s-]?pools?\b|\bats\s+(?:volume|trades?|prints?)\b|"
+                         r"\boff[\s-]?exchange\b", re.I)
+"""Off-exchange (FINRA ATS) volume, which the sentiment answer reads for a listed underlying."""
+
+SHORT_FLOW_Q = re.compile(r"\bshort\s+(?:interest|volume|sales?|selling|float)\b|"
+                          r"\bshorted\b|\bhow\s+much\s+(?:is\s+)?(?:being\s+)?shorted\b", re.I)
+"""Short selling: FINRA's daily short volume is read; the twice-monthly short interest is not."""
+
+OPTIONS_POSITIONING_Q = re.compile(
+    r"\bput[\s/-]*(?:to[\s-]*)?call\b|\bcall[\s/-]*(?:to[\s-]*)?put\b|"
+    r"\boptions?\s+(?:flow|activity|volume|open\s+interest|oi|skew|positioning|market|"
+    r"sentiment|chain|pricing)\b|\bimplied\s+(?:vol\w*|move)\b|\biv\s*(?:rank|percentile)?\b|"
+    r"\b(?:25[\s-]?delta\s+)?skew\b|\bstraddle\s+(?:implies|prices|pricing)\b|"
+    r"\bunusual\s+options\b", re.I)
+"""The listed options chain as positioning (Cboe's delayed chain): implied move and vol, skew,
+put/call. A question about buying or pricing one contract is `_OPTIONS_Q`, answered with the
+chain read and the limit stated (`analogue._scope_lead`)."""
+
+OWNERSHIP_Q = re.compile(
+    r"\b(?:hedge\s+|mutual\s+|index\s+|pension\s+)?funds?\s+(?:own|owns|owning|hold|holds|"
+    r"holding|bought|buying|sold|selling)\b|\bwho\s+owns\b|\b(?:biggest|largest|top|major|main)\s+"
+    r"(?:holders|owners|shareholders|investors)\b|\binstitutional\s+(?:ownership|holders?|"
+    r"investors?|owners?)\b|\bownership\b|\b13f\b", re.I)
+"""Who owns a listed stock: public 13F filings and 5% holders, read by the fundamentals answer.
+"what hedge funds own NVDA" was read as a hedge and "which funds own TSLA" as a refusal
+(stranger QA, 2026-09-29)."""
+
+POSITIONING_Q = re.compile("|".join(p.pattern for p in (DARK_POOL_Q, SHORT_FLOW_Q,
+                                                         OPTIONS_POSITIONING_Q)), re.I)
+"""Any listed-market positioning question: routed to the sentiment answer, which leads with the
+line asked for (`dispatch._run`)."""
 
 
 _WHY_MOVE = re.compile(r"\bwhy\s+(?:is|are|was|were|did|has|have)\b", re.I)
@@ -1596,7 +1632,10 @@ execution plan, which walks it."""
 
 
 _HEDGE = re.compile(
-    r"\bhedg\w*\b|\bprotect\s+(?:my|the|this)\s+(?:book|portfolio|downside|positions?)\b",
+    # "hedge fund(s)" is a kind of holder, not a request to hedge: "what hedge funds own NVDA"
+    # was answered with a QQQ hedge-sizing plan (stranger QA, 2026-09-29).
+    r"\bhedg\w*\b(?![\s-]+funds?\b)|\bprotect\s+(?:my|the|this)\s+(?:book|portfolio|downside|"
+    r"positions?)\b",
     re.I,
 )
 
@@ -2283,10 +2322,11 @@ def read_request(text: str) -> ResearchRequest | None:
 
         return ResearchRequest(kind=ResearchKind.QUOTE, symbols=symbols[:1] or (
             f"{FUNDS[fund][0]}USDT",))
-    if symbols and _OPTIONS_Q.search(raw) and re.search(r"put\s*/\s*call|options?\s+(?:flow|"
-                                                        r"volume|open\s+interest|skew)", raw, re.I):
-        # "NVDA put/call ratio" reached the decision log; the answer says options are not read
-        # here (`_scope_lead`) and gives the positioning that is
+    if symbols and POSITIONING_Q.search(raw) and not is_an_order(raw):
+        # Listed-market positioning — the options chain, dark pools, short volume — is read by
+        # the sentiment answer (`lui/research/positioning.py`). "NVDA put/call ratio" reached the
+        # decision log, and "show me dark pool activity for TSLA" the desk's track record
+        # (stranger QA, 2026-09-29).
         return ResearchRequest(kind=ResearchKind.SENTIMENT, symbols=symbols[:1])
     if symbols and _LIQUIDITY_TIME_Q.search(raw) and not is_an_order(raw):
         return ResearchRequest(kind=ResearchKind.QUOTE, symbols=symbols[:1])

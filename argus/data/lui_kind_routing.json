@@ -1,7 +1,7 @@
 {
  "final": {
   "corpus": "lui_final_heldout_2026-09-25.jsonl",
-  "correct": 212,
+  "correct": 213,
   "rows": 240,
   "by_language": {
    "ar": [
@@ -49,7 +49,7 @@
     60
    ],
    "zh-Hant": [
-    5,
+    6,
     7
    ]
   },
@@ -107,12 +107,12 @@
     14
    ],
    "technicals": [
-    11,
+    12,
     14
    ]
   },
   "wrong_by_layer": {
-   "research": 12,
+   "research": 11,
    "patterns": 5,
    "declined": 6,
    "declined-off-topic": 2,
@@ -862,9 +862,9 @@
     "lang": "zh-Hant",
     "text": "現在比特幣是不是處於超賣區間,技術指標怎麼看？",
     "expected": "technicals",
-    "got": "sentiment",
+    "got": "technicals",
     "by": "research",
-    "right": false
+    "right": true
    },
    {
     "id": 84,

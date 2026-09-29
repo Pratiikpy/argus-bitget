@@ -95,6 +95,113 @@ def console_stop_distance(bars: list[Bar]) -> float | None:
     return abs(odds.adverse_p90_bps) / 10_000
 
 
+# ---------------------------------------------------------------------------------------------
+# The general tool, and what a stop costs (Activity/28_CAPABILITY_CLOSE_PLAN_2.md §43).
+#
+# Hit rate alone rewards width: any wider stop is "hit less often", so ARGUS's lead over Rook's
+# 0.1-1.7% stops is true by construction. The general-purpose answer to "where does the noise
+# end" is a volatility-scaled stop, the ATR stop and LeBeau's chandelier (22-day high minus three
+# ATR), formulas as TA-Lib computes them (`research/repos-themed/TA-Lib~ta-lib`, Wilder's ATR).
+# Every arm trades the same long on every held-out window: bought at the prior close, sold at the
+# stop if the day's low reaches it, otherwise at the close, 12bps round trip taker. The saved bars
+# carry no open, so a gap through the stop is filled at the stop, which flatters every stop arm
+# equally; that is stated in the report rather than hidden.
+
+ATR_PERIOD = 14
+CHANDELIER_LOOKBACK = 22
+QUANTILE_GRID = (0.80, 0.90, 0.95)
+ARMS = ("argus", "atr_1x", "atr_2x", "chandelier", "rook", "no_stop")
+
+
+def atr(bars: list[Bar], period: int = ATR_PERIOD) -> list[float | None]:
+    """Wilder's average true range at each bar, using only that bar and earlier ones; ``None``
+    until ``period`` true ranges exist. True range: max(high - low, |high - prior close|,
+    |low - prior close|)."""
+    out: list[float | None] = [None]
+    trs: list[float] = []
+    value: float | None = None
+    for (_, prev_close, _, _), (_, _, low, high) in itertools.pairwise(bars):
+        tr = max(high - low, abs(high - prev_close), abs(low - prev_close))
+        trs.append(tr)
+        if value is None:
+            value = sum(trs) / period if len(trs) == period else None
+        else:
+            value = (value * (period - 1) + tr) / period
+        out.append(value)
+    return out
+
+
+def _quantile_distance(bars: list[Bar], q: float) -> float | None:
+    """The ``q`` quantile of the prior-close-to-low drop on ``bars``, linearly interpolated, the
+    same shape of figure ``directional_odds`` reports at 0.9."""
+    drops = sorted(1 - low / prev_close for (_, prev_close, _, _), (_, _, low, _)
+                   in itertools.pairwise(bars) if prev_close > 0)
+    if len(drops) < 20:
+        return None
+    pos = q * (len(drops) - 1)
+    lo = int(pos)
+    hi = min(lo + 1, len(drops) - 1)
+    return drops[lo] + (drops[hi] - drops[lo]) * (pos - lo)
+
+
+def window_rows(symbol: str, bars: list[Bar], cut: int, argus_d: float | None,
+                rook_d: float | None, *, grid: dict[float, float | None] | None = None,
+                cost_bps: float = 12.0) -> list[dict[str, Any]]:
+    """One row per held-out 24h window: every arm's stop distance, whether ordinary movement hit
+    it, and the long's net return in bps. Nothing after the window's prior close is used to set a
+    stop: ATR and the chandelier high are read at the prior bar."""
+    ranges = atr(bars)
+    rows: list[dict[str, Any]] = []
+    for i in range(max(cut, CHANDELIER_LOOKBACK), len(bars)):
+        _, prev_close, _, _ = bars[i - 1]
+        stamp, close, low, _ = bars[i]
+        prior_atr = ranges[i - 1]
+        if prev_close <= 0 or prior_atr is None:
+            continue
+        top = max(high for _, _, _, high in bars[i - CHANDELIER_LOOKBACK:i])
+        chandelier_stop = top - 3 * prior_atr
+        distances: dict[str, float | None] = {
+            "argus": argus_d, "rook": rook_d,
+            "atr_1x": prior_atr / prev_close, "atr_2x": 2 * prior_atr / prev_close,
+            "chandelier": (1 - chandelier_stop / prev_close)
+            if chandelier_stop < prev_close else None,
+            "no_stop": None,
+        }
+        for q, d in (grid or {}).items():
+            distances[f"argus_q{int(q * 100)}"] = d
+        row: dict[str, Any] = {"symbol": symbol, "date": stamp.date().isoformat(),
+                               "prior_close": prev_close, "low": low, "close": close,
+                               "atr_pct": round(prior_atr / prev_close, 6)}
+        for arm, d in distances.items():
+            hit = d is not None and low <= prev_close * (1 - d)
+            exit_price = prev_close * (1 - d) if hit and d is not None else close
+            row[f"{arm}_distance"] = None if d is None else round(d, 6)
+            row[f"{arm}_hit"] = hit
+            row[f"{arm}_net_bps"] = round((exit_price / prev_close - 1) * 1e4 - cost_bps, 3)
+        rows.append(row)
+    return rows
+
+
+def kupiec(hits: int, n: int, target: float) -> dict[str, Any]:
+    """Kupiec's proportion-of-failures likelihood-ratio test: is ``hits`` in ``n`` consistent with
+    a stop meant to be hit a ``target`` share of the time? Chi-square, one degree of freedom."""
+    import math
+
+    if n == 0:
+        return {"hits": 0, "n": 0, "rate": None, "lr": None, "p_value": None}
+    rate = hits / n
+
+    def loglik(p: float) -> float:
+        a = hits * math.log(p) if hits else 0.0
+        b = (n - hits) * math.log(1 - p) if n - hits else 0.0
+        return a + b
+
+    lr = -2 * (loglik(target) - loglik(rate)) if 0 < rate < 1 else 0.0
+    p_value = math.erfc(math.sqrt(max(lr, 0.0) / 2))
+    return {"hits": hits, "n": n, "rate": round(rate, 4), "target": target,
+            "lr": round(lr, 4), "p_value": round(p_value, 4)}
+
+
 def collect(*, fetch: Any = None) -> dict[str, Any]:
     """Save each name's daily bars once (``data/h2h_rook/bars/<symbol>.json``), the console's own
     fetch: Bitget market candles, 1D, the last :data:`DAYS` days."""
@@ -126,6 +233,7 @@ def score(*, fetch: Any = None) -> dict[str, Any]:
     """Score every saved Rook run against the saved bars (``fetch``, given, replaces the files:
     it returns objects with ``ts``, ``close``, ``low`` and ``high``)."""
     rows: list[dict[str, Any]] = []
+    windows: list[dict[str, Any]] = []
     for path in sorted(DATA.glob("*USDT.json")):
         # Rook logs its fetches to stdout ("[bitget] ticker v2 ok ...") before its result line;
         # the capture keeps both, the log as lines and the result as parsed JSON.
@@ -142,6 +250,8 @@ def score(*, fetch: Any = None) -> dict[str, Any]:
         argus_d = console_stop_distance(fit)
         rook_d = (1 - float(stop) / float(last)) if stop and last and float(stop) < float(last) \
             else None
+        grid = {q: _quantile_distance(fit, q) for q in QUANTILE_GRID}
+        windows.extend(window_rows(symbol, bars, cut, argus_d, rook_d, grid=grid))
         rows.append({
             "symbol": symbol, "rook_bias": report.get("bias"), "rook_last": last,
             "rook_invalidation": stop, "rook_distance": rook_d,
@@ -183,9 +293,49 @@ def score(*, fetch: Any = None) -> dict[str, Any]:
         "not_covered": "whether either stop leaves the right trades on: the thesis outcome needs "
                        "the next 24 hours; six names only",
         "prospective": prospective,
+        "arms": _arms(windows),
+        "windows": windows,
     }
     artefact.write(REPORT, report_out, indent=1)
     return report_out
+
+
+def _arms(windows: list[dict[str, Any]]) -> dict[str, Any]:
+    """Every arm on the same held-out windows: hit rate and mean net return, the ablation grid on
+    ARGUS's quantile, ARGUS's coverage against its own 10% target, and the most volatile fifth of
+    windows on their own."""
+    from statistics import fmean
+
+    def block(rows: list[dict[str, Any]], arms: tuple[str, ...]) -> dict[str, Any]:
+        out: dict[str, Any] = {"windows": len(rows)}
+        for arm in arms:
+            live = [r for r in rows if r.get(f"{arm}_distance") is not None or arm == "no_stop"]
+            out[arm] = {"windows": len(live),
+                        "hit_rate": round(fmean(r[f"{arm}_hit"] for r in live), 4)
+                        if live else None,
+                        "mean_net_bps": round(fmean(r[f"{arm}_net_bps"] for r in live), 3)
+                        if live else None}
+        return out
+
+    if not windows:
+        return {}
+    grid = tuple(f"argus_q{int(q * 100)}" for q in QUANTILE_GRID)
+    vols = sorted(r["atr_pct"] for r in windows)
+    cut = vols[int(len(vols) * 0.8)]
+    argus_rows = [r for r in windows if r["argus_distance"] is not None]
+    return {
+        "method": "a long bought at the prior close and sold at the stop if the day's low reaches "
+                  "it, else at the close; 12bps round trip; ATR is Wilder's 14-day, the "
+                  "chandelier is the 22-day high minus 3 ATR, both read at the prior bar; the "
+                  "bars carry no open, so a gap through a stop is filled at the stop",
+        "all": block(windows, ARMS),
+        "ablation_quantile": block(windows, grid),
+        "argus_coverage_vs_10pct": kupiec(sum(r["argus_hit"] for r in argus_rows),
+                                          len(argus_rows), 0.10),
+        "adversarial": {"most_volatile_fifth": {
+            "min_atr_pct": round(cut, 5),
+            **block([r for r in windows if r["atr_pct"] >= cut], ARMS)}},
+    }
 
 
 def main() -> int:  # pragma: no cover - CLI

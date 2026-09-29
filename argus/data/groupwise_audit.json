@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-28T22:39:29+00:00",
+  "generated_at": "2026-09-29T03:11:48+00:00",
   "method": "Mind2Web metric.py:236-259 (MIT): per-group mean and count, macro average, 0/1/2/3/>3 histogram; read by argus.eval.groupwise into four flags (carried_by_one_group, single_group, macro_disagrees, flips_across_halves)",
   "register_artefacts": [
     "data/abstention_comparison.json",
@@ -28,6 +28,7 @@
     "data/execution_comparison.json",
     "data/explainability_comparison.json",
     "data/factor_divergence_comparison.json",
+    "data/factor_quality_rivals.json",
     "data/feedlist_comparison.json",
     "data/financebench_xbrl.json",
     "data/garak_quarantine.json",
@@ -43,6 +44,7 @@
     "data/h2h_baserate/summary.json",
     "data/h2h_optic/summary.json",
     "data/infoextract_comparison.json",
+    "data/injection_classifier_rival.json",
     "data/journal_comparison.json",
     "data/lui_comparison.json",
     "data/lui_rematch.json",
@@ -70,6 +72,7 @@
     "data/rotation_comparison.json",
     "data/schedule_comparison.json",
     "data/sentiment_comparison.json",
+    "data/sentiment_dedup_rival.json",
     "data/sentiment_tweeteval.json",
     "data/shapematch_comparison.json",
     "data/skill_reliability.json",
@@ -81,8 +84,8 @@
     "data/xa_arena.json"
   ],
   "counts": {
-    "checked": 53,
-    "designed_cases": 28,
+    "checked": 55,
+    "designed_cases": 29,
     "aggregate_without_rows": 16,
     "no_rows": 5
   },
@@ -170,6 +173,17 @@
       ],
       "readings": [
         "the whole headline is one symbol (NVDAUSDT)"
+      ]
+    },
+    {
+      "artefact": "data/injection_classifier_rival.json",
+      "headline": "clean prompts wrongly withheld: classifier vs ARGUS",
+      "role": "context",
+      "flags": [
+        "carried_by_one_group:split=train"
+      ],
+      "readings": [
+        "train carries the headline: without it the other 1 split group(s) total 0.0, which does not point the same way"
       ]
     },
     {
@@ -312,6 +326,30 @@
       "readings": [
         "MSFTUSDT carries the headline: without it the other 11 symbol group(s) total 4.17235, which does not point the same way",
         "chronological halves: the halves disagree \u2014 first -0.032493, second 0.00773 (full -0.012931)"
+      ]
+    },
+    {
+      "artefact": "data/stopquality_comparison.json",
+      "headline": "net return with the stop: ARGUS vs a 1x ATR stop",
+      "role": "argus_vs_rival",
+      "flags": [
+        "flips_across_halves:chronological halves"
+      ],
+      "readings": [
+        "chronological halves: the halves disagree \u2014 first 0.433657, second -1.88154 (full -0.726358)"
+      ]
+    },
+    {
+      "artefact": "data/stress_search_comparison.json",
+      "headline": "breach probability out of sample: ARGUS vs a normal model",
+      "role": "context",
+      "flags": [
+        "carried_by_one_group:symbol=TQQQUSDT",
+        "carried_by_one_group:tolerance=3%"
+      ],
+      "readings": [
+        "TQQQUSDT carries the headline: without it the other 11 symbol group(s) total 0.039249, which does not point the same way",
+        "3% carries the headline: without it the other 2 tolerance group(s) total 0.028741, which does not point the same way"
       ]
     },
     {
@@ -476,6 +514,17 @@
       ],
       "readings": [
         "bullish carries the headline: without it the other 1 side group(s) total 0.0, which does not point the same way"
+      ]
+    },
+    {
+      "artefact": "data/stopquality_comparison.json",
+      "headline": "net return with the stop: ARGUS vs a 1x ATR stop",
+      "role": "argus_vs_rival",
+      "flags": [
+        "flips_across_halves:chronological halves"
+      ],
+      "readings": [
+        "chronological halves: the halves disagree \u2014 first 0.433657, second -1.88154 (full -0.726358)"
       ]
     },
     {
@@ -707,7 +756,8 @@
           "source": "base_case.blind_long_backtest.sessions",
           "split_ran": true,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -721,7 +771,7 @@
     "data/analogstress_comparison.json": {
       "status": "aggregate_without_rows",
       "reason": "2,698 test queries scored, but only per-predictor aggregates and date-clustered Diebold-Mariano tests are kept (eval/analogstress_comparison.py would need to record per-query Winkler scores with name and date)",
-      "sha256": "46d71ffc754f1ec1d43b20337e886e406b20bf222ef263bddb3d9243b207aca0",
+      "sha256": "a90dbdf2111374d031759939a3688dcd54cffe452813bc2b501e5d72ec931afd",
       "flagged": false,
       "headlines": []
     },
@@ -917,7 +967,8 @@
           "source": "profiles",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -1011,7 +1062,8 @@
           "source": "rows[graded]",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -1733,7 +1785,8 @@
           "source": "pairs + survivors_fdr",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": true
+          "zero_is_no_effect": true,
+          "claim_of": ""
         },
         {
           "name": "naive 5% rejections in excess of chance",
@@ -2461,7 +2514,8 @@
           "source": "pairs.in_sample",
           "split_ran": true,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -2649,7 +2703,8 @@
           "source": "per_name",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -2905,7 +2960,8 @@
           "source": "rows",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "post-trade beta: ARGUS vs beta = 1",
@@ -3153,7 +3209,8 @@
           "source": "rows",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -3349,7 +3406,8 @@
           "source": "per_day",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "stress-move error: ARGUS's open-hours beta vs skfolio_ep",
@@ -3537,7 +3595,8 @@
           "source": "per_day",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -3809,7 +3868,8 @@
           "source": "results.dsr_all_trials",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": true
+          "zero_is_no_effect": true,
+          "claim_of": ""
         },
         {
           "name": "cross-sectional factors' mean net Sharpe",
@@ -4077,7 +4137,8 @@
           "source": "results.mean_net_sharpe",
           "split_ran": true,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -4203,7 +4264,8 @@
           "source": "answers[answerable]",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -4362,7 +4424,8 @@
           "source": "baseline_reproduced.results",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -4600,7 +4663,8 @@
           "source": "reactions",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -4856,7 +4920,8 @@
           "source": "walk_forward.test_trades.no_gate_follow",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "ARGUS's significance gate (no trade taken) vs ballast_pooled_t",
@@ -5064,7 +5129,8 @@
           "source": "walk_forward.test_trades.ballast_pooled_t",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -5248,7 +5314,8 @@
           "source": "by_size",
           "split_ran": false,
           "favours": "rival",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -5332,14 +5399,15 @@
           "source": "leg_pair_sweep.results",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
     "data/explainability_comparison.json": {
       "status": "designed_cases",
       "reason": "twelve fabricated prices the author chose (four magnitudes on three live prices): a demonstration that the check catches what it is built to catch, not a measurement over the desk's decisions",
-      "sha256": "8233378e9ec9317522f8ee0a4ab44d8416b7f6b64e775032a1625a1054f292a8",
+      "sha256": "f877b526ea81ace79b0d11f1f6d8f0d11c3d5646411e4720c0b68198ca9d4215",
       "flagged": false,
       "headlines": []
     },
@@ -5426,14 +5494,837 @@
           "source": "oos_check",
           "split_ran": true,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
+        }
+      ]
+    },
+    "data/factor_quality_rivals.json": {
+      "status": "checked",
+      "reason": "one row per (family, factor, instrument): ARGUS's eight rules and FactorMiner's 109 scoreable paper factors, 12 Alpha101 and 60 adapted variants, each through the lab's cost, OOS and split-half gates",
+      "sha256": "ff955cd99426081d88999e436cff2bfe7d807b94750e69c80cd84473ee766c4a",
+      "flagged": false,
+      "headlines": [
+        {
+          "name": "ARGUS's rules against FactorMiner's catalogues, every gate passed",
+          "headline": "per instrument, ARGUS's pass-all-gates rate minus FactorMiner's (all three catalogues pooled, as written)",
+          "orientation": "positive = ARGUS's rules clear every gate more often on this instrument",
+          "items": 12,
+          "micro_mean": -0.000921,
+          "total": -0.01105,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "symbol",
+              "groups": 12,
+              "micro_mean": -0.000921,
+              "macro_mean": -0.000921,
+              "direction": -1,
+              "largest_contributor": "SQQQUSDT",
+              "largest_share_of_total": 0.5,
+              "total_without_largest": -0.005525,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single symbol carries the headline: without the largest contributor (SQQQUSDT, 50.0% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "SQQQUSDT",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": -0.005525,
+                  "mean": -0.005525,
+                  "mean_se": null,
+                  "share_of_total": 0.5,
+                  "opposing": 0
+                },
+                {
+                  "group": "TQQQUSDT",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": -0.005525,
+                  "mean": -0.005525,
+                  "mean_se": null,
+                  "share_of_total": 0.5,
+                  "opposing": 0
+                },
+                {
+                  "group": "AAPLUSDT",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": null,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMZNUSDT",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": null,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "COINUSDT",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": null,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "GOOGLUSDT",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": null,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "METAUSDT",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": null,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSFTUSDT",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": null,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSTRUSDT",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": null,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "NVDAUSDT",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": null,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "QQQUSDT",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": null,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSLAUSDT",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": null,
+                  "share_of_total": -0.0,
+                  "opposing": 0
+                }
+              ]
+            }
+          ],
+          "split_half": null,
+          "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
+          "notes": [],
+          "interval": {
+            "low": -0.002302,
+            "high": 0.0,
+            "method": "bootstrap over rows (no order recorded)",
+            "units": 12,
+            "block_length": 1.0,
+            "spans_zero": true,
+            "resamples": 2000
+          },
+          "role": "argus_vs_rival",
+          "role_reason": "the row-34 comparison: factor quality through identical gates",
+          "source": "rows[as_written].passes_all",
+          "split_ran": false,
+          "favours": "rival",
+          "zero_is_no_effect": false,
+          "claim_of": ""
+        },
+        {
+          "name": "every factor-instrument pair against the calibrated noise rate",
+          "headline": "share of pairs passing cost, OOS and split-half, minus the split-half noise rate",
+          "orientation": "positive = passes every gate more often than coin flips pass split-half alone",
+          "items": 2268,
+          "micro_mean": -0.051218,
+          "total": -116.1628,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "family",
+              "groups": 4,
+              "micro_mean": -0.051218,
+              "macro_mean": -0.051718,
+              "direction": -1,
+              "largest_contributor": "paper",
+              "largest_share_of_total": 0.5694,
+              "total_without_largest": -50.016,
+              "loss_histogram": {
+                "0": 0.75,
+                "1": 0.0,
+                "2": 0.25,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single family carries the headline: without the largest contributor (paper, 56.9% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "paper",
+                  "rows": 1308,
+                  "weight": 1308.0,
+                  "total": -66.1468,
+                  "mean": -0.050571,
+                  "mean_se": 0.001081,
+                  "share_of_total": 0.5694,
+                  "opposing": 2
+                },
+                {
+                  "group": "alpha101_adapted",
+                  "rows": 720,
+                  "weight": 720.0,
+                  "total": -37.512,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.3229,
+                  "opposing": 0
+                },
+                {
+                  "group": "alpha101",
+                  "rows": 144,
+                  "weight": 144.0,
+                  "total": -7.5024,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0646,
+                  "opposing": 0
+                },
+                {
+                  "group": "argus",
+                  "rows": 96,
+                  "weight": 96.0,
+                  "total": -5.0016,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0431,
+                  "opposing": 0
+                }
+              ]
+            },
+            {
+              "key": "category",
+              "groups": 15,
+              "micro_mean": -0.051218,
+              "macro_mean": -0.051507,
+              "direction": -1,
+              "largest_contributor": "Alpha101 Adapted",
+              "largest_share_of_total": 0.3229,
+              "total_without_largest": -78.6508,
+              "loss_histogram": {
+                "0": 0.8667,
+                "1": 0.1333,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single category carries the headline: without the largest contributor (Alpha101 Adapted, 32.3% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "Alpha101 Adapted",
+                  "rows": 720,
+                  "weight": 720.0,
+                  "total": -37.512,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.3229,
+                  "opposing": 0
+                },
+                {
+                  "group": "Volume",
+                  "rows": 300,
+                  "weight": 300.0,
+                  "total": -14.63,
+                  "mean": -0.048767,
+                  "mean_se": 0.003333,
+                  "share_of_total": 0.1259,
+                  "opposing": 1
+                },
+                {
+                  "group": "Mean-reversion",
+                  "rows": 192,
+                  "weight": 192.0,
+                  "total": -10.0032,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0861,
+                  "opposing": 0
+                },
+                {
+                  "group": "VWAP",
+                  "rows": 180,
+                  "weight": 180.0,
+                  "total": -8.378,
+                  "mean": -0.046544,
+                  "mean_se": 0.005556,
+                  "share_of_total": 0.0721,
+                  "opposing": 1
+                },
+                {
+                  "group": "Momentum",
+                  "rows": 156,
+                  "weight": 156.0,
+                  "total": -8.1276,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.07,
+                  "opposing": 0
+                },
+                {
+                  "group": "Alpha101 Classic",
+                  "rows": 144,
+                  "weight": 144.0,
+                  "total": -7.5024,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0646,
+                  "opposing": 0
+                },
+                {
+                  "group": "Volatility",
+                  "rows": 108,
+                  "weight": 108.0,
+                  "total": -5.6268,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0484,
+                  "opposing": 0
+                },
+                {
+                  "group": "Regime-switching",
+                  "rows": 96,
+                  "weight": 96.0,
+                  "total": -5.0016,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0431,
+                  "opposing": 0
+                },
+                {
+                  "group": "session/time-series",
+                  "rows": 96,
+                  "weight": 96.0,
+                  "total": -5.0016,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0431,
+                  "opposing": 0
+                },
+                {
+                  "group": "Higher-moment",
+                  "rows": 48,
+                  "weight": 48.0,
+                  "total": -2.5008,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0215,
+                  "opposing": 0
+                },
+                {
+                  "group": "Intraday",
+                  "rows": 48,
+                  "weight": 48.0,
+                  "total": -2.5008,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0215,
+                  "opposing": 0
+                },
+                {
+                  "group": "Risk",
+                  "rows": 48,
+                  "weight": 48.0,
+                  "total": -2.5008,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0215,
+                  "opposing": 0
+                },
+                {
+                  "group": "Trend",
+                  "rows": 48,
+                  "weight": 48.0,
+                  "total": -2.5008,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0215,
+                  "opposing": 0
+                },
+                {
+                  "group": "Turnover",
+                  "rows": 48,
+                  "weight": 48.0,
+                  "total": -2.5008,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0215,
+                  "opposing": 0
+                },
+                {
+                  "group": "Overnight",
+                  "rows": 36,
+                  "weight": 36.0,
+                  "total": -1.8756,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0161,
+                  "opposing": 0
+                }
+              ]
+            },
+            {
+              "key": "symbol",
+              "groups": 12,
+              "micro_mean": -0.051218,
+              "macro_mean": -0.051218,
+              "direction": -1,
+              "largest_contributor": "AAPLUSDT",
+              "largest_share_of_total": 0.0848,
+              "total_without_largest": -106.3159,
+              "loss_histogram": {
+                "0": 0.8333,
+                "1": 0.1667,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single symbol carries the headline: without the largest contributor (AAPLUSDT, 8.5% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "AAPLUSDT",
+                  "rows": 189,
+                  "weight": 189.0,
+                  "total": -9.8469,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0848,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMZNUSDT",
+                  "rows": 189,
+                  "weight": 189.0,
+                  "total": -9.8469,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0848,
+                  "opposing": 0
+                },
+                {
+                  "group": "COINUSDT",
+                  "rows": 189,
+                  "weight": 189.0,
+                  "total": -9.8469,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0848,
+                  "opposing": 0
+                },
+                {
+                  "group": "GOOGLUSDT",
+                  "rows": 189,
+                  "weight": 189.0,
+                  "total": -9.8469,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0848,
+                  "opposing": 0
+                },
+                {
+                  "group": "METAUSDT",
+                  "rows": 189,
+                  "weight": 189.0,
+                  "total": -9.8469,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0848,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSFTUSDT",
+                  "rows": 189,
+                  "weight": 189.0,
+                  "total": -9.8469,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0848,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSTRUSDT",
+                  "rows": 189,
+                  "weight": 189.0,
+                  "total": -9.8469,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0848,
+                  "opposing": 0
+                },
+                {
+                  "group": "NVDAUSDT",
+                  "rows": 189,
+                  "weight": 189.0,
+                  "total": -9.8469,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0848,
+                  "opposing": 0
+                },
+                {
+                  "group": "QQQUSDT",
+                  "rows": 189,
+                  "weight": 189.0,
+                  "total": -9.8469,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0848,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSLAUSDT",
+                  "rows": 189,
+                  "weight": 189.0,
+                  "total": -9.8469,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0848,
+                  "opposing": 0
+                },
+                {
+                  "group": "SQQQUSDT",
+                  "rows": 189,
+                  "weight": 189.0,
+                  "total": -8.8469,
+                  "mean": -0.046809,
+                  "mean_se": 0.005291,
+                  "share_of_total": 0.0762,
+                  "opposing": 1
+                },
+                {
+                  "group": "TQQQUSDT",
+                  "rows": 189,
+                  "weight": 189.0,
+                  "total": -8.8469,
+                  "mean": -0.046809,
+                  "mean_se": 0.005291,
+                  "share_of_total": 0.0762,
+                  "opposing": 1
+                }
+              ]
+            }
+          ],
+          "split_half": null,
+          "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
+          "notes": [],
+          "interval": {
+            "low": -0.0521,
+            "high": -0.049895,
+            "method": "bootstrap over rows (no order recorded)",
+            "units": 2268,
+            "block_length": 1.0,
+            "spans_zero": false,
+            "resamples": 2000
+          },
+          "role": "context",
+          "role_reason": "what the TIED/LOST rule reads, broken down by FactorMiner's own categories (the fairness caveat)",
+          "source": "rows[as_written].passes_all, noise.rate",
+          "split_ran": false,
+          "favours": "neither",
+          "zero_is_no_effect": false,
+          "claim_of": ""
+        },
+        {
+          "name": "FactorMiner's factors rotated against the returns (placebo)",
+          "headline": "share of placebo pairs passing every gate, minus the noise rate",
+          "orientation": "positive = the all-gates null passes more often than coin flips",
+          "items": 2172,
+          "micro_mean": -0.050258,
+          "total": -109.1612,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "family",
+              "groups": 3,
+              "micro_mean": -0.050258,
+              "macro_mean": -0.051081,
+              "direction": -1,
+              "largest_contributor": "paper",
+              "largest_share_of_total": 0.5876,
+              "total_without_largest": -45.0144,
+              "loss_histogram": {
+                "0": 0.6667,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.3333
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single family carries the headline: without the largest contributor (paper, 58.8% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "paper",
+                  "rows": 1308,
+                  "weight": 1308.0,
+                  "total": -64.1468,
+                  "mean": -0.049042,
+                  "mean_se": 0.001527,
+                  "share_of_total": 0.5876,
+                  "opposing": 4
+                },
+                {
+                  "group": "alpha101_adapted",
+                  "rows": 720,
+                  "weight": 720.0,
+                  "total": -37.512,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.3436,
+                  "opposing": 0
+                },
+                {
+                  "group": "alpha101",
+                  "rows": 144,
+                  "weight": 144.0,
+                  "total": -7.5024,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0687,
+                  "opposing": 0
+                }
+              ]
+            },
+            {
+              "key": "symbol",
+              "groups": 12,
+              "micro_mean": -0.050258,
+              "macro_mean": -0.050258,
+              "direction": -1,
+              "largest_contributor": "AAPLUSDT",
+              "largest_share_of_total": 0.0864,
+              "total_without_largest": -99.7311,
+              "loss_histogram": {
+                "0": 0.75,
+                "1": 0.1667,
+                "2": 0.0833,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single symbol carries the headline: without the largest contributor (AAPLUSDT, 8.6% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "AAPLUSDT",
+                  "rows": 181,
+                  "weight": 181.0,
+                  "total": -9.4301,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0864,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMZNUSDT",
+                  "rows": 181,
+                  "weight": 181.0,
+                  "total": -9.4301,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0864,
+                  "opposing": 0
+                },
+                {
+                  "group": "GOOGLUSDT",
+                  "rows": 181,
+                  "weight": 181.0,
+                  "total": -9.4301,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0864,
+                  "opposing": 0
+                },
+                {
+                  "group": "METAUSDT",
+                  "rows": 181,
+                  "weight": 181.0,
+                  "total": -9.4301,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0864,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSFTUSDT",
+                  "rows": 181,
+                  "weight": 181.0,
+                  "total": -9.4301,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0864,
+                  "opposing": 0
+                },
+                {
+                  "group": "NVDAUSDT",
+                  "rows": 181,
+                  "weight": 181.0,
+                  "total": -9.4301,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0864,
+                  "opposing": 0
+                },
+                {
+                  "group": "QQQUSDT",
+                  "rows": 181,
+                  "weight": 181.0,
+                  "total": -9.4301,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0864,
+                  "opposing": 0
+                },
+                {
+                  "group": "SQQQUSDT",
+                  "rows": 181,
+                  "weight": 181.0,
+                  "total": -9.4301,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0864,
+                  "opposing": 0
+                },
+                {
+                  "group": "TQQQUSDT",
+                  "rows": 181,
+                  "weight": 181.0,
+                  "total": -9.4301,
+                  "mean": -0.0521,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0864,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSLAUSDT",
+                  "rows": 181,
+                  "weight": 181.0,
+                  "total": -8.4301,
+                  "mean": -0.046575,
+                  "mean_se": 0.005525,
+                  "share_of_total": 0.0772,
+                  "opposing": 1
+                },
+                {
+                  "group": "COINUSDT",
+                  "rows": 181,
+                  "weight": 181.0,
+                  "total": -8.4301,
+                  "mean": -0.046575,
+                  "mean_se": 0.005525,
+                  "share_of_total": 0.0772,
+                  "opposing": 1
+                },
+                {
+                  "group": "MSTRUSDT",
+                  "rows": 181,
+                  "weight": 181.0,
+                  "total": -7.4301,
+                  "mean": -0.04105,
+                  "mean_se": 0.007792,
+                  "share_of_total": 0.0681,
+                  "opposing": 2
+                }
+              ]
+            }
+          ],
+          "split_half": null,
+          "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
+          "notes": [],
+          "interval": {
+            "low": -0.05164,
+            "high": -0.048417,
+            "method": "bootstrap over rows (no order recorded)",
+            "units": 2172,
+            "block_length": 1.0,
+            "spans_zero": false,
+            "resamples": 2000
+          },
+          "role": "context",
+          "role_reason": "the empirical null for all three gates together",
+          "source": "rows[placebo].passes_all",
+          "split_ran": false,
+          "favours": "neither",
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
     "data/factor_split_half.json": {
       "status": "checked",
       "reason": "one row per (instrument, factor)",
-      "sha256": "4e4736b30caefc13075a51a4168ee3d52f55a0295c70405e06abc15f1a3c802f",
+      "sha256": "9bb1dd17822d6d059d57d1f9540ace051850b3387233c9535ebd223f17b85361",
       "flagged": true,
       "headlines": [
         {
@@ -5714,7 +6605,8 @@
           "source": "libraries[].factors[].split_half",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -5871,7 +6763,8 @@
           "source": "cells",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -6424,7 +7317,8 @@
           "source": "answers",
           "split_ran": true,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -6505,7 +7399,8 @@
           "source": "by_phase",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -7427,7 +8322,8 @@
           "source": "per_snapshot",
           "split_ran": true,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "the deployed decomposition against the truth",
@@ -8327,7 +9223,8 @@
           "source": "per_snapshot",
           "split_ran": true,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -8368,33 +9265,305 @@
     },
     "data/general_sue_comparison.json": {
       "status": "checked",
-      "reason": "one row per real anchor symbol",
-      "sha256": "0e705b23c73db3bd190e5170b1a0756a0e28b0c08aac6bf136f988976e0f86fd",
+      "reason": "one row per SEC filer: design frames, holdout frames and a seeded companyfacts sample, recounted against the published correct counts",
+      "sha256": "a149d6e84772846dff2d6adf0cc4f3beb6933c1eb3f4562e051c713d13141dc0",
       "flagged": false,
       "headlines": [
         {
-          "name": "SUE: dated alignment answers where pandas' lenient period index refuses",
-          "headline": "(ARGUS answers) - (pandas answers) per anchor",
-          "orientation": "+1 = only ARGUS aligned the filings, 0 = both did",
-          "items": 9,
-          "micro_mean": 0.222222,
-          "total": 2.0,
+          "name": "SUE alignment per filer: ARGUS dated vs pandas_period_lenient, design and holdout",
+          "headline": "(ARGUS dated correct) - (rival correct) per filer; correct = a finite SUE from pairs that are all year-over-year",
+          "orientation": "+1 = only ARGUS correct, -1 = only the rival correct, 0 = tie",
+          "items": 7258,
+          "micro_mean": 0.056903,
+          "total": 413.0,
           "broken_down": true,
           "flags": [],
           "flagged": false,
           "tables": [
             {
-              "key": "symbol",
-              "groups": 9,
-              "micro_mean": 0.222222,
-              "macro_mean": 0.222222,
+              "key": "universe",
+              "groups": 2,
+              "micro_mean": 0.056903,
+              "macro_mean": 0.057,
               "direction": 1,
-              "largest_contributor": "AAPL",
-              "largest_share_of_total": 0.5,
-              "total_without_largest": 1.0,
+              "largest_contributor": "design_2022_2026",
+              "largest_share_of_total": 0.5424,
+              "total_without_largest": 189.0,
               "loss_histogram": {
-                "0": 1.0,
+                "0": 0.0,
                 "1": 0.0,
+                "2": 0.0,
+                "3": 0.5,
+                ">3": 0.5
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single universe carries the headline: without the largest contributor (design_2022_2026, 54.2% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "design_2022_2026",
+                  "rows": 3997,
+                  "weight": 3997.0,
+                  "total": 224.0,
+                  "mean": 0.056042,
+                  "mean_se": 0.00369,
+                  "share_of_total": 0.5424,
+                  "opposing": 3
+                },
+                {
+                  "group": "holdout_2016_2021",
+                  "rows": 3261,
+                  "weight": 3261.0,
+                  "total": 189.0,
+                  "mean": 0.057958,
+                  "mean_se": 0.005538,
+                  "share_of_total": 0.4576,
+                  "opposing": 74
+                }
+              ]
+            },
+            {
+              "key": "newest_end_month",
+              "groups": 12,
+              "micro_mean": 0.056903,
+              "macro_mean": 0.119852,
+              "direction": 1,
+              "largest_contributor": "06",
+              "largest_share_of_total": 0.2833,
+              "total_without_largest": 296.0,
+              "loss_histogram": {
+                "0": 0.25,
+                "1": 0.1667,
+                "2": 0.3333,
+                "3": 0.0833,
+                ">3": 0.1667
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single newest_end_month carries the headline: without the largest contributor (06, 28.3% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "06",
+                  "rows": 3199,
+                  "weight": 3199.0,
+                  "total": 117.0,
+                  "mean": 0.036574,
+                  "mean_se": 0.003407,
+                  "share_of_total": 0.2833,
+                  "opposing": 3
+                },
+                {
+                  "group": "10",
+                  "rows": 182,
+                  "weight": 182.0,
+                  "total": 95.0,
+                  "mean": 0.521978,
+                  "mean_se": 0.037129,
+                  "share_of_total": 0.23,
+                  "opposing": 0
+                },
+                {
+                  "group": "07",
+                  "rows": 211,
+                  "weight": 211.0,
+                  "total": 88.0,
+                  "mean": 0.417062,
+                  "mean_se": 0.034025,
+                  "share_of_total": 0.2131,
+                  "opposing": 0
+                },
+                {
+                  "group": "01",
+                  "rows": 145,
+                  "weight": 145.0,
+                  "total": 49.0,
+                  "mean": 0.337931,
+                  "mean_se": 0.041777,
+                  "share_of_total": 0.1186,
+                  "opposing": 2
+                },
+                {
+                  "group": "12",
+                  "rows": 798,
+                  "weight": 798.0,
+                  "total": 47.0,
+                  "mean": 0.058897,
+                  "mean_se": 0.01005,
+                  "share_of_total": 0.1138,
+                  "opposing": 10
+                },
+                {
+                  "group": "03",
+                  "rows": 405,
+                  "weight": 405.0,
+                  "total": 11.0,
+                  "mean": 0.02716,
+                  "mean_se": 0.009479,
+                  "share_of_total": 0.0266,
+                  "opposing": 2
+                },
+                {
+                  "group": "04",
+                  "rows": 43,
+                  "weight": 43.0,
+                  "total": 6.0,
+                  "mean": 0.139535,
+                  "mean_se": 0.053467,
+                  "share_of_total": 0.0145,
+                  "opposing": 0
+                },
+                {
+                  "group": "09",
+                  "rows": 1995,
+                  "weight": 1995.0,
+                  "total": 6.0,
+                  "mean": 0.003008,
+                  "mean_se": 0.005353,
+                  "share_of_total": 0.0145,
+                  "opposing": 54
+                },
+                {
+                  "group": "05",
+                  "rows": 78,
+                  "weight": 78.0,
+                  "total": -1.0,
+                  "mean": -0.012821,
+                  "mean_se": 0.012821,
+                  "share_of_total": -0.0024,
+                  "opposing": 1
+                },
+                {
+                  "group": "11",
+                  "rows": 78,
+                  "weight": 78.0,
+                  "total": -1.0,
+                  "mean": -0.012821,
+                  "mean_se": 0.012821,
+                  "share_of_total": -0.0024,
+                  "opposing": 1
+                },
+                {
+                  "group": "02",
+                  "rows": 36,
+                  "weight": 36.0,
+                  "total": -2.0,
+                  "mean": -0.055556,
+                  "mean_se": 0.038718,
+                  "share_of_total": -0.0048,
+                  "opposing": 2
+                },
+                {
+                  "group": "08",
+                  "rows": 88,
+                  "weight": 88.0,
+                  "total": -2.0,
+                  "mean": -0.022727,
+                  "mean_se": 0.015978,
+                  "share_of_total": -0.0048,
+                  "opposing": 2
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "design frames CY2022Q1-CY2026Q2 vs holdout frames CY2016Q1-CY2021Q4",
+            "cut": "",
+            "first_items": 3997,
+            "second_items": 3261,
+            "first_mean": 0.056042,
+            "second_mean": 0.057958,
+            "full_mean": 0.056903,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "design frames CY2022Q1-CY2026Q2 vs holdout frames CY2016Q1-CY2021Q4: both halves point the same way as the full sample \u2014 first 0.056042, second 0.057958, full 0.056903"
+          },
+          "split_half_note": "halves as the artefact recorded them",
+          "notes": [],
+          "interval": {
+            "low": 0.05084,
+            "high": 0.062827,
+            "method": "bootstrap over rows (no order recorded)",
+            "units": 7258,
+            "block_length": 1.0,
+            "spans_zero": false,
+            "resamples": 2000
+          },
+          "role": "argus_vs_rival",
+          "role_reason": "pandas' lenient PeriodIndex, the general-purpose rival on the same filings",
+          "source": "alignment.frames_filer_rows + holdout.filer_rows",
+          "split_ran": true,
+          "favours": "argus",
+          "zero_is_no_effect": false,
+          "claim_of": ""
+        },
+        {
+          "name": "SUE alignment per filer: ARGUS dated vs argus_positional_before, design and holdout",
+          "headline": "(ARGUS dated correct) - (rival correct) per filer; correct = a finite SUE from pairs that are all year-over-year",
+          "orientation": "+1 = only ARGUS correct, -1 = only the rival correct, 0 = tie",
+          "items": 7258,
+          "micro_mean": 0.743455,
+          "total": 5396.0,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "universe",
+              "groups": 2,
+              "micro_mean": 0.743455,
+              "macro_mean": 0.721196,
+              "direction": 1,
+              "largest_contributor": "design_2022_2026",
+              "largest_share_of_total": 0.6968,
+              "total_without_largest": 1636.0,
+              "loss_histogram": {
+                "0": 0.5,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.5
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single universe carries the headline: without the largest contributor (design_2022_2026, 69.7% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "design_2022_2026",
+                  "rows": 3997,
+                  "weight": 3997.0,
+                  "total": 3760.0,
+                  "mean": 0.940706,
+                  "mean_se": 0.003736,
+                  "share_of_total": 0.6968,
+                  "opposing": 0
+                },
+                {
+                  "group": "holdout_2016_2021",
+                  "rows": 3261,
+                  "weight": 3261.0,
+                  "total": 1636.0,
+                  "mean": 0.501687,
+                  "mean_se": 0.0088,
+                  "share_of_total": 0.3032,
+                  "opposing": 4
+                }
+              ]
+            },
+            {
+              "key": "newest_end_month",
+              "groups": 12,
+              "micro_mean": 0.743455,
+              "macro_mean": 0.73283,
+              "direction": 1,
+              "largest_contributor": "06",
+              "largest_share_of_total": 0.5526,
+              "total_without_largest": 2414.0,
+              "loss_histogram": {
+                "0": 0.6667,
+                "1": 0.3333,
                 "2": 0.0,
                 "3": 0.0,
                 ">3": 0.0
@@ -8402,30 +9571,505 @@
               "carried_by_one_group": false,
               "single_group": false,
               "macro_disagrees": false,
-              "reading": "no single symbol carries the headline: without the largest contributor (AAPL, 50.0% of the total) the rest still point the same way",
+              "reading": "no single newest_end_month carries the headline: without the largest contributor (06, 55.3% of the total) the rest still point the same way",
               "per_group": [
                 {
-                  "group": "AAPL",
-                  "rows": 1,
-                  "weight": 1.0,
+                  "group": "06",
+                  "rows": 3199,
+                  "weight": 3199.0,
+                  "total": 2982.0,
+                  "mean": 0.932166,
+                  "mean_se": 0.004447,
+                  "share_of_total": 0.5526,
+                  "opposing": 0
+                },
+                {
+                  "group": "09",
+                  "rows": 1995,
+                  "weight": 1995.0,
+                  "total": 1187.0,
+                  "mean": 0.594987,
+                  "mean_se": 0.011016,
+                  "share_of_total": 0.22,
+                  "opposing": 1
+                },
+                {
+                  "group": "03",
+                  "rows": 405,
+                  "weight": 405.0,
+                  "total": 323.0,
+                  "mean": 0.797531,
+                  "mean_se": 0.019992,
+                  "share_of_total": 0.0599,
+                  "opposing": 0
+                },
+                {
+                  "group": "12",
+                  "rows": 798,
+                  "weight": 798.0,
+                  "total": 264.0,
+                  "mean": 0.330827,
+                  "mean_se": 0.016666,
+                  "share_of_total": 0.0489,
+                  "opposing": 0
+                },
+                {
+                  "group": "07",
+                  "rows": 211,
+                  "weight": 211.0,
+                  "total": 192.0,
+                  "mean": 0.909953,
+                  "mean_se": 0.019753,
+                  "share_of_total": 0.0356,
+                  "opposing": 0
+                },
+                {
+                  "group": "10",
+                  "rows": 182,
+                  "weight": 182.0,
+                  "total": 100.0,
+                  "mean": 0.549451,
+                  "mean_se": 0.036982,
+                  "share_of_total": 0.0185,
+                  "opposing": 0
+                },
+                {
+                  "group": "01",
+                  "rows": 145,
+                  "weight": 145.0,
+                  "total": 84.0,
+                  "mean": 0.57931,
+                  "mean_se": 0.041139,
+                  "share_of_total": 0.0156,
+                  "opposing": 0
+                },
+                {
+                  "group": "08",
+                  "rows": 88,
+                  "weight": 88.0,
+                  "total": 75.0,
+                  "mean": 0.852273,
+                  "mean_se": 0.041333,
+                  "share_of_total": 0.0139,
+                  "opposing": 1
+                },
+                {
+                  "group": "05",
+                  "rows": 78,
+                  "weight": 78.0,
+                  "total": 68.0,
+                  "mean": 0.871795,
+                  "mean_se": 0.038099,
+                  "share_of_total": 0.0126,
+                  "opposing": 0
+                },
+                {
+                  "group": "11",
+                  "rows": 78,
+                  "weight": 78.0,
+                  "total": 55.0,
+                  "mean": 0.705128,
+                  "mean_se": 0.055075,
+                  "share_of_total": 0.0102,
+                  "opposing": 1
+                },
+                {
+                  "group": "04",
+                  "rows": 43,
+                  "weight": 43.0,
+                  "total": 36.0,
+                  "mean": 0.837209,
+                  "mean_se": 0.056965,
+                  "share_of_total": 0.0067,
+                  "opposing": 0
+                },
+                {
+                  "group": "02",
+                  "rows": 36,
+                  "weight": 36.0,
+                  "total": 30.0,
+                  "mean": 0.833333,
+                  "mean_se": 0.074536,
+                  "share_of_total": 0.0056,
+                  "opposing": 1
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "design frames CY2022Q1-CY2026Q2 vs holdout frames CY2016Q1-CY2021Q4",
+            "cut": "",
+            "first_items": 3997,
+            "second_items": 3261,
+            "first_mean": 0.940706,
+            "second_mean": 0.501687,
+            "full_mean": 0.743455,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "design frames CY2022Q1-CY2026Q2 vs holdout frames CY2016Q1-CY2021Q4: both halves point the same way as the full sample \u2014 first 0.940706, second 0.501687, full 0.743455"
+          },
+          "split_half_note": "halves as the artefact recorded them",
+          "notes": [],
+          "interval": {
+            "low": 0.733673,
+            "high": 0.753238,
+            "method": "bootstrap over rows (no order recorded)",
+            "units": 7258,
+            "block_length": 1.0,
+            "spans_zero": false,
+            "resamples": 2000
+          },
+          "role": "argus_vs_rival",
+          "role_reason": "QuantConnect's positional quarters[i + 4] pairing (ARGUS before 2026-09-25), the named rival",
+          "source": "alignment.frames_filer_rows + holdout.filer_rows",
+          "split_ran": true,
+          "favours": "argus",
+          "zero_is_no_effect": false,
+          "claim_of": ""
+        },
+        {
+          "name": "SUE alignment per filer: ARGUS dated vs pandas_period_strict, design and holdout",
+          "headline": "(ARGUS dated correct) - (rival correct) per filer; correct = a finite SUE from pairs that are all year-over-year",
+          "orientation": "+1 = only ARGUS correct, -1 = only the rival correct, 0 = tie",
+          "items": 7258,
+          "micro_mean": 0.764673,
+          "total": 5550.0,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "universe",
+              "groups": 2,
+              "micro_mean": 0.764673,
+              "macro_mean": 0.74447,
+              "direction": 1,
+              "largest_contributor": "design_2022_2026",
+              "largest_share_of_total": 0.6796,
+              "total_without_largest": 1778.0,
+              "loss_histogram": {
+                "0": 0.5,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.5
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single universe carries the headline: without the largest contributor (design_2022_2026, 68.0% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "design_2022_2026",
+                  "rows": 3997,
+                  "weight": 3997.0,
+                  "total": 3772.0,
+                  "mean": 0.943708,
+                  "mean_se": 0.003646,
+                  "share_of_total": 0.6796,
+                  "opposing": 0
+                },
+                {
+                  "group": "holdout_2016_2021",
+                  "rows": 3261,
+                  "weight": 3261.0,
+                  "total": 1778.0,
+                  "mean": 0.545232,
+                  "mean_se": 0.008764,
+                  "share_of_total": 0.3204,
+                  "opposing": 4
+                }
+              ]
+            },
+            {
+              "key": "newest_end_month",
+              "groups": 12,
+              "micro_mean": 0.764673,
+              "macro_mean": 0.780508,
+              "direction": 1,
+              "largest_contributor": "06",
+              "largest_share_of_total": 0.5384,
+              "total_without_largest": 2562.0,
+              "loss_histogram": {
+                "0": 0.6667,
+                "1": 0.3333,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single newest_end_month carries the headline: without the largest contributor (06, 53.8% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "06",
+                  "rows": 3199,
+                  "weight": 3199.0,
+                  "total": 2988.0,
+                  "mean": 0.934042,
+                  "mean_se": 0.004389,
+                  "share_of_total": 0.5384,
+                  "opposing": 0
+                },
+                {
+                  "group": "09",
+                  "rows": 1995,
+                  "weight": 1995.0,
+                  "total": 1214.0,
+                  "mean": 0.608521,
+                  "mean_se": 0.010953,
+                  "share_of_total": 0.2187,
+                  "opposing": 1
+                },
+                {
+                  "group": "03",
+                  "rows": 405,
+                  "weight": 405.0,
+                  "total": 324.0,
+                  "mean": 0.8,
+                  "mean_se": 0.019901,
+                  "share_of_total": 0.0584,
+                  "opposing": 0
+                },
+                {
+                  "group": "12",
+                  "rows": 798,
+                  "weight": 798.0,
+                  "total": 301.0,
+                  "mean": 0.377193,
+                  "mean_se": 0.017168,
+                  "share_of_total": 0.0542,
+                  "opposing": 0
+                },
+                {
+                  "group": "07",
+                  "rows": 211,
+                  "weight": 211.0,
+                  "total": 197.0,
+                  "mean": 0.933649,
+                  "mean_se": 0.017175,
+                  "share_of_total": 0.0355,
+                  "opposing": 0
+                },
+                {
+                  "group": "10",
+                  "rows": 182,
+                  "weight": 182.0,
+                  "total": 150.0,
+                  "mean": 0.824176,
+                  "mean_se": 0.028295,
+                  "share_of_total": 0.027,
+                  "opposing": 0
+                },
+                {
+                  "group": "01",
+                  "rows": 145,
+                  "weight": 145.0,
+                  "total": 111.0,
+                  "mean": 0.765517,
+                  "mean_se": 0.035306,
+                  "share_of_total": 0.02,
+                  "opposing": 0
+                },
+                {
+                  "group": "08",
+                  "rows": 88,
+                  "weight": 88.0,
+                  "total": 75.0,
+                  "mean": 0.852273,
+                  "mean_se": 0.041333,
+                  "share_of_total": 0.0135,
+                  "opposing": 1
+                },
+                {
+                  "group": "05",
+                  "rows": 78,
+                  "weight": 78.0,
+                  "total": 68.0,
+                  "mean": 0.871795,
+                  "mean_se": 0.038099,
+                  "share_of_total": 0.0123,
+                  "opposing": 0
+                },
+                {
+                  "group": "11",
+                  "rows": 78,
+                  "weight": 78.0,
+                  "total": 55.0,
+                  "mean": 0.705128,
+                  "mean_se": 0.055075,
+                  "share_of_total": 0.0099,
+                  "opposing": 1
+                },
+                {
+                  "group": "04",
+                  "rows": 43,
+                  "weight": 43.0,
+                  "total": 37.0,
+                  "mean": 0.860465,
+                  "mean_se": 0.053467,
+                  "share_of_total": 0.0067,
+                  "opposing": 0
+                },
+                {
+                  "group": "02",
+                  "rows": 36,
+                  "weight": 36.0,
+                  "total": 30.0,
+                  "mean": 0.833333,
+                  "mean_se": 0.074536,
+                  "share_of_total": 0.0054,
+                  "opposing": 1
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "design frames CY2022Q1-CY2026Q2 vs holdout frames CY2016Q1-CY2021Q4",
+            "cut": "",
+            "first_items": 3997,
+            "second_items": 3261,
+            "first_mean": 0.943708,
+            "second_mean": 0.545232,
+            "full_mean": 0.764673,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "design frames CY2022Q1-CY2026Q2 vs holdout frames CY2016Q1-CY2021Q4: both halves point the same way as the full sample \u2014 first 0.943708, second 0.545232, full 0.764673"
+          },
+          "split_half_note": "halves as the artefact recorded them",
+          "notes": [],
+          "interval": {
+            "low": 0.754891,
+            "high": 0.77418,
+            "method": "bootstrap over rows (no order recorded)",
+            "units": 7258,
+            "block_length": 1.0,
+            "spans_zero": false,
+            "resamples": 2000
+          },
+          "role": "context",
+          "role_reason": "pandas' strict rolling window: NaN whenever a fiscal Q4 is missing, a straw man",
+          "source": "alignment.frames_filer_rows + holdout.filer_rows",
+          "split_ran": true,
+          "favours": "neither",
+          "zero_is_no_effect": false,
+          "claim_of": ""
+        },
+        {
+          "name": "SUE alignment per filer: ARGUS dated vs edgartools_fiscal, seeded companyfacts sample",
+          "headline": "(ARGUS dated correct) - (rival correct) per filer; correct = a finite SUE from pairs that are all year-over-year",
+          "orientation": "+1 = only ARGUS correct, -1 = only the rival correct, 0 = tie",
+          "items": 309,
+          "micro_mean": 0.064725,
+          "total": 20.0,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "fiscal_year_end_month",
+              "groups": 12,
+              "micro_mean": 0.064725,
+              "macro_mean": 0.065724,
+              "direction": 1,
+              "largest_contributor": "12",
+              "largest_share_of_total": 0.65,
+              "total_without_largest": 7.0,
+              "loss_histogram": {
+                "0": 0.9167,
+                "1": 0.0833,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single fiscal_year_end_month carries the headline: without the largest contributor (12, 65.0% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "12",
+                  "rows": 240,
+                  "weight": 240.0,
+                  "total": 13.0,
+                  "mean": 0.054167,
+                  "mean_se": 0.015787,
+                  "share_of_total": 0.65,
+                  "opposing": 1
+                },
+                {
+                  "group": "9",
+                  "rows": 15,
+                  "weight": 15.0,
+                  "total": 4.0,
+                  "mean": 0.266667,
+                  "mean_se": 0.118187,
+                  "share_of_total": 0.2,
+                  "opposing": 0
+                },
+                {
+                  "group": "10",
+                  "rows": 5,
+                  "weight": 5.0,
                   "total": 1.0,
-                  "mean": 1.0,
-                  "mean_se": null,
-                  "share_of_total": 0.5,
+                  "mean": 0.2,
+                  "mean_se": 0.2,
+                  "share_of_total": 0.05,
                   "opposing": 0
                 },
                 {
-                  "group": "NVDA",
-                  "rows": 1,
-                  "weight": 1.0,
+                  "group": "3",
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 1.0,
-                  "mean": 1.0,
-                  "mean_se": null,
-                  "share_of_total": 0.5,
+                  "mean": 0.125,
+                  "mean_se": 0.125,
+                  "share_of_total": 0.05,
                   "opposing": 0
                 },
                 {
-                  "group": "AMZN",
+                  "group": "4",
+                  "rows": 7,
+                  "weight": 7.0,
+                  "total": 1.0,
+                  "mean": 0.142857,
+                  "mean_se": 0.142857,
+                  "share_of_total": 0.05,
+                  "opposing": 0
+                },
+                {
+                  "group": "1",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "11",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "2",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "5",
                   "rows": 1,
                   "weight": 1.0,
                   "total": 0.0,
@@ -8435,7 +10079,110 @@
                   "opposing": 0
                 },
                 {
-                  "group": "COIN",
+                  "group": "6",
+                  "rows": 12,
+                  "weight": 12.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "7",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "8",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                }
+              ]
+            },
+            {
+              "key": "newest_end_month",
+              "groups": 9,
+              "micro_mean": 0.064725,
+              "macro_mean": 0.062151,
+              "direction": 1,
+              "largest_contributor": "06",
+              "largest_share_of_total": 0.65,
+              "total_without_largest": 7.0,
+              "loss_histogram": {
+                "0": 0.8889,
+                "1": 0.1111,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single newest_end_month carries the headline: without the largest contributor (06, 65.0% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "06",
+                  "rows": 228,
+                  "weight": 228.0,
+                  "total": 13.0,
+                  "mean": 0.057018,
+                  "mean_se": 0.016598,
+                  "share_of_total": 0.65,
+                  "opposing": 1
+                },
+                {
+                  "group": "07",
+                  "rows": 15,
+                  "weight": 15.0,
+                  "total": 3.0,
+                  "mean": 0.2,
+                  "mean_se": 0.106904,
+                  "share_of_total": 0.15,
+                  "opposing": 0
+                },
+                {
+                  "group": "09",
+                  "rows": 14,
+                  "weight": 14.0,
+                  "total": 2.0,
+                  "mean": 0.142857,
+                  "mean_se": 0.097052,
+                  "share_of_total": 0.1,
+                  "opposing": 0
+                },
+                {
+                  "group": "03",
+                  "rows": 29,
+                  "weight": 29.0,
+                  "total": 1.0,
+                  "mean": 0.034483,
+                  "mean_se": 0.034483,
+                  "share_of_total": 0.05,
+                  "opposing": 0
+                },
+                {
+                  "group": "04",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": 1.0,
+                  "mean": 0.125,
+                  "mean_se": 0.125,
+                  "share_of_total": 0.05,
+                  "opposing": 0
+                },
+                {
+                  "group": "02",
                   "rows": 1,
                   "weight": 1.0,
                   "total": 0.0,
@@ -8445,47 +10192,27 @@
                   "opposing": 0
                 },
                 {
-                  "group": "GOOGL",
-                  "rows": 1,
-                  "weight": 1.0,
+                  "group": "05",
+                  "rows": 8,
+                  "weight": 8.0,
                   "total": 0.0,
                   "mean": 0.0,
-                  "mean_se": null,
+                  "mean_se": 0.0,
                   "share_of_total": 0.0,
                   "opposing": 0
                 },
                 {
-                  "group": "META",
-                  "rows": 1,
-                  "weight": 1.0,
+                  "group": "08",
+                  "rows": 5,
+                  "weight": 5.0,
                   "total": 0.0,
                   "mean": 0.0,
-                  "mean_se": null,
+                  "mean_se": 0.0,
                   "share_of_total": 0.0,
                   "opposing": 0
                 },
                 {
-                  "group": "MSFT",
-                  "rows": 1,
-                  "weight": 1.0,
-                  "total": 0.0,
-                  "mean": 0.0,
-                  "mean_se": null,
-                  "share_of_total": 0.0,
-                  "opposing": 0
-                },
-                {
-                  "group": "MSTR",
-                  "rows": 1,
-                  "weight": 1.0,
-                  "total": 0.0,
-                  "mean": 0.0,
-                  "mean_se": null,
-                  "share_of_total": 0.0,
-                  "opposing": 0
-                },
-                {
-                  "group": "TSLA",
+                  "group": "11",
                   "rows": 1,
                   "weight": 1.0,
                   "total": 0.0,
@@ -8501,20 +10228,309 @@
           "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
           "notes": [],
           "interval": {
-            "low": 0.0,
-            "high": 0.555556,
+            "low": 0.038835,
+            "high": 0.093851,
             "method": "bootstrap over rows (no order recorded)",
-            "units": 9,
+            "units": 309,
             "block_length": 1.0,
-            "spans_zero": true,
+            "spans_zero": false,
             "resamples": 2000
           },
           "role": "argus_vs_rival",
-          "role_reason": "the general-purpose rival on the same filings",
-          "source": "alignment.anchor_detail",
+          "role_reason": "edgartools' (fiscal year - 1, same fiscal period) pairing on the same companyfacts rows, the strongest general-purpose SEC tool",
+          "source": "edgartools_fiscal.filer_rows",
           "split_ran": false,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
+        },
+        {
+          "name": "SUE alignment per filer: ARGUS dated vs companyfacts_raw_fy_fp, seeded companyfacts sample",
+          "headline": "(ARGUS dated correct) - (rival correct) per filer; correct = a finite SUE from pairs that are all year-over-year",
+          "orientation": "+1 = only ARGUS correct, -1 = only the rival correct, 0 = tie",
+          "items": 309,
+          "micro_mean": 0.967638,
+          "total": 299.0,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "fiscal_year_end_month",
+              "groups": 12,
+              "micro_mean": 0.967638,
+              "macro_mean": 0.963095,
+              "direction": 1,
+              "largest_contributor": "12",
+              "largest_share_of_total": 0.7826,
+              "total_without_largest": 65.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single fiscal_year_end_month carries the headline: without the largest contributor (12, 78.3% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "12",
+                  "rows": 240,
+                  "weight": 240.0,
+                  "total": 234.0,
+                  "mean": 0.975,
+                  "mean_se": 0.010099,
+                  "share_of_total": 0.7826,
+                  "opposing": 0
+                },
+                {
+                  "group": "9",
+                  "rows": 15,
+                  "weight": 15.0,
+                  "total": 14.0,
+                  "mean": 0.933333,
+                  "mean_se": 0.066667,
+                  "share_of_total": 0.0468,
+                  "opposing": 0
+                },
+                {
+                  "group": "6",
+                  "rows": 12,
+                  "weight": 12.0,
+                  "total": 11.0,
+                  "mean": 0.916667,
+                  "mean_se": 0.083333,
+                  "share_of_total": 0.0368,
+                  "opposing": 0
+                },
+                {
+                  "group": "3",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": 8.0,
+                  "mean": 1.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0268,
+                  "opposing": 0
+                },
+                {
+                  "group": "1",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": 7.0,
+                  "mean": 0.875,
+                  "mean_se": 0.125,
+                  "share_of_total": 0.0234,
+                  "opposing": 0
+                },
+                {
+                  "group": "4",
+                  "rows": 7,
+                  "weight": 7.0,
+                  "total": 6.0,
+                  "mean": 0.857143,
+                  "mean_se": 0.142857,
+                  "share_of_total": 0.0201,
+                  "opposing": 0
+                },
+                {
+                  "group": "10",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 5.0,
+                  "mean": 1.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0167,
+                  "opposing": 0
+                },
+                {
+                  "group": "7",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 5.0,
+                  "mean": 1.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0167,
+                  "opposing": 0
+                },
+                {
+                  "group": "11",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 3.0,
+                  "mean": 1.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.01,
+                  "opposing": 0
+                },
+                {
+                  "group": "8",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 3.0,
+                  "mean": 1.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.01,
+                  "opposing": 0
+                },
+                {
+                  "group": "2",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0067,
+                  "opposing": 0
+                },
+                {
+                  "group": "5",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "mean_se": null,
+                  "share_of_total": 0.0033,
+                  "opposing": 0
+                }
+              ]
+            },
+            {
+              "key": "newest_end_month",
+              "groups": 9,
+              "micro_mean": 0.967638,
+              "macro_mean": 0.971254,
+              "direction": 1,
+              "largest_contributor": "06",
+              "largest_share_of_total": 0.7458,
+              "total_without_largest": 76.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single newest_end_month carries the headline: without the largest contributor (06, 74.6% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "06",
+                  "rows": 228,
+                  "weight": 228.0,
+                  "total": 223.0,
+                  "mean": 0.97807,
+                  "mean_se": 0.009721,
+                  "share_of_total": 0.7458,
+                  "opposing": 0
+                },
+                {
+                  "group": "03",
+                  "rows": 29,
+                  "weight": 29.0,
+                  "total": 26.0,
+                  "mean": 0.896552,
+                  "mean_se": 0.057553,
+                  "share_of_total": 0.087,
+                  "opposing": 0
+                },
+                {
+                  "group": "09",
+                  "rows": 14,
+                  "weight": 14.0,
+                  "total": 14.0,
+                  "mean": 1.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0468,
+                  "opposing": 0
+                },
+                {
+                  "group": "07",
+                  "rows": 15,
+                  "weight": 15.0,
+                  "total": 13.0,
+                  "mean": 0.866667,
+                  "mean_se": 0.090851,
+                  "share_of_total": 0.0435,
+                  "opposing": 0
+                },
+                {
+                  "group": "04",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": 8.0,
+                  "mean": 1.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0268,
+                  "opposing": 0
+                },
+                {
+                  "group": "05",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": 8.0,
+                  "mean": 1.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0268,
+                  "opposing": 0
+                },
+                {
+                  "group": "08",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 5.0,
+                  "mean": 1.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0167,
+                  "opposing": 0
+                },
+                {
+                  "group": "02",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "mean_se": null,
+                  "share_of_total": 0.0033,
+                  "opposing": 0
+                },
+                {
+                  "group": "11",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "mean_se": null,
+                  "share_of_total": 0.0033,
+                  "opposing": 0
+                }
+              ]
+            }
+          ],
+          "split_half": null,
+          "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
+          "notes": [],
+          "interval": {
+            "low": 0.94822,
+            "high": 0.987055,
+            "method": "bootstrap over rows (no order recorded)",
+            "units": 309,
+            "block_length": 1.0,
+            "spans_zero": false,
+            "resamples": 2000
+          },
+          "role": "context",
+          "role_reason": "the SEC's raw (fy, fp) labels, which edgartools itself does not trust",
+          "source": "edgartools_fiscal.filer_rows",
+          "split_ran": false,
+          "favours": "neither",
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -8588,7 +10604,8 @@
           "source": "swept_real_market_cases",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -8720,7 +10737,168 @@
           "source": "designed_cases.cases",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
+        }
+      ]
+    },
+    "data/injection_classifier_rival.json": {
+      "status": "checked",
+      "reason": "one row per deepset prompt, both detectors",
+      "sha256": "e9d116d5a4a916c3d567b9df6f5a15b6ec37970fc6b0d176e55b13f89ee93077",
+      "flagged": true,
+      "headlines": [
+        {
+          "name": "attacks withheld: ARGUS rules vs a trained injection classifier",
+          "headline": "per attack: ARGUS withheld minus classifier withheld",
+          "orientation": "positive = ARGUS caught an attack the classifier missed",
+          "items": 263,
+          "micro_mean": -0.258555,
+          "total": -68.0,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "split",
+              "groups": 2,
+              "micro_mean": -0.258555,
+              "macro_mean": -0.255542,
+              "direction": -1,
+              "largest_contributor": "train",
+              "largest_share_of_total": 0.7794,
+              "total_without_largest": -15.0,
+              "loss_histogram": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 1.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single split carries the headline: without the largest contributor (train, 77.9% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "train",
+                  "rows": 203,
+                  "weight": 203.0,
+                  "total": -53.0,
+                  "mean": -0.261084,
+                  "mean_se": 0.040471,
+                  "share_of_total": 0.7794,
+                  "opposing": 14
+                },
+                {
+                  "group": "test",
+                  "rows": 60,
+                  "weight": 60.0,
+                  "total": -15.0,
+                  "mean": -0.25,
+                  "mean_se": 0.073742,
+                  "share_of_total": 0.2206,
+                  "opposing": 4
+                }
+              ]
+            }
+          ],
+          "split_half": null,
+          "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
+          "notes": [],
+          "interval": {
+            "low": -0.330798,
+            "high": -0.186312,
+            "method": "bootstrap over rows (no order recorded)",
+            "units": 263,
+            "block_length": 1.0,
+            "spans_zero": false,
+            "resamples": 2000
+          },
+          "role": "argus_vs_rival",
+          "role_reason": "attacks neither was written against, the row's claim",
+          "source": "deepset_rows",
+          "split_ran": false,
+          "favours": "rival",
+          "zero_is_no_effect": false,
+          "claim_of": ""
+        },
+        {
+          "name": "clean prompts wrongly withheld: classifier vs ARGUS",
+          "headline": "per clean prompt: classifier withheld minus ARGUS withheld",
+          "orientation": "positive = the classifier withheld clean text ARGUS passed",
+          "items": 399,
+          "micro_mean": 0.005013,
+          "total": 2.0,
+          "broken_down": true,
+          "flags": [
+            "carried_by_one_group:split=train"
+          ],
+          "flagged": true,
+          "tables": [
+            {
+              "key": "split",
+              "groups": 2,
+              "micro_mean": 0.005013,
+              "macro_mean": 0.002915,
+              "direction": 1,
+              "largest_contributor": "train",
+              "largest_share_of_total": 1.0,
+              "total_without_largest": 0.0,
+              "loss_histogram": {
+                "0": 0.5,
+                "1": 0.0,
+                "2": 0.5,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": true,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "train carries the headline: without it the other 1 split group(s) total 0.0, which does not point the same way",
+              "per_group": [
+                {
+                  "group": "train",
+                  "rows": 343,
+                  "weight": 343.0,
+                  "total": 2.0,
+                  "mean": 0.005831,
+                  "mean_se": 0.007145,
+                  "share_of_total": 1.0,
+                  "opposing": 2
+                },
+                {
+                  "group": "test",
+                  "rows": 56,
+                  "weight": 56.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                }
+              ]
+            }
+          ],
+          "split_half": null,
+          "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
+          "notes": [],
+          "interval": {
+            "low": -0.007519,
+            "high": 0.017544,
+            "method": "bootstrap over rows (no order recorded)",
+            "units": 399,
+            "block_length": 1.0,
+            "spans_zero": true,
+            "resamples": 2000
+          },
+          "role": "context",
+          "role_reason": "the false-withhold side of the same corpus",
+          "source": "deepset_rows",
+          "split_ran": false,
+          "favours": "neither",
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -8912,7 +11090,8 @@
           "source": "sealed_rows()",
           "split_ran": false,
           "favours": "rival",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -9097,7 +11276,8 @@
           "source": "paired_rows",
           "split_ran": false,
           "favours": "rival",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "ARGUS's cascade vs Rasa's default pipeline, out of scope",
@@ -9183,7 +11363,8 @@
           "source": "paired_rows",
           "split_ran": false,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "ARGUS's cascade vs Rasa's default pipeline, perturbed held-out",
@@ -9307,7 +11488,8 @@
           "source": "paired_rows",
           "split_ran": false,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -9428,7 +11610,8 @@
           "source": "holdout.results.*.oos_vol_bps",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "held-out volatility: ARGUS's pick vs riskfolio_minvar[hist]",
@@ -9513,7 +11696,8 @@
           "source": "holdout.results.*.oos_vol_bps",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "held-out volatility: ARGUS's pick vs skfolio_nco[default]",
@@ -9598,7 +11782,8 @@
           "source": "holdout.results.*.oos_vol_bps",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "held-out volatility: ARGUS's pick vs skfolio_nco[cv=ignore]",
@@ -9686,7 +11871,8 @@
           "source": "holdout.results.*.oos_vol_bps",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -9870,7 +12056,8 @@
           "source": "detail",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -10325,14 +12512,15 @@
           "source": "grid.rows",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
     "data/overnight_comparison.json": {
       "status": "checked",
       "reason": "per-night rows regenerated from the saved inputs",
-      "sha256": "7d6c8445c0b3eb0087396fbe466b36da1e458734f0c944d80bdb0a365b159b2b",
+      "sha256": "2b297147c37ea9169e454c665a4eecb237c643e9fd08f7503fa03cc6fca18ab2",
       "flagged": false,
       "headlines": [
         {
@@ -11631,7 +13819,8 @@
           "source": "regenerated: overnight_comparison.predict(nights(h2h_gloaming/inputs.json)), fitted rows; MAE of argus_perp, the best gloaming variant and zero reproduce the artefact's summary to the published two decimals",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "overnight gap: ARGUS vs no gap",
@@ -12929,7 +15118,8 @@
           "source": "regenerated: overnight_comparison.predict(nights(h2h_gloaming/inputs.json)), fitted rows; MAE of argus_perp, the best gloaming variant and zero reproduce the artefact's summary to the published two decimals",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -13178,7 +15368,8 @@
           "source": "paper_ledger.jsonl",
           "split_ran": true,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -13405,14 +15596,15 @@
           "source": "trades",
           "split_ran": true,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
     "data/perception_breadth.json": {
       "status": "checked",
       "reason": "one row per underlying, from perception_breadth.py's own per-symbol category lists",
-      "sha256": "b4b22e713a1623bc8f53944585bd72a3871121e3a15cf59666cfd41dbf73c747",
+      "sha256": "b41a8d4404892cb4225277b5bf9960894d856a3899bb7bb165e1c7d59ae50325",
       "flagged": false,
       "headlines": [
         {
@@ -13567,7 +15759,8 @@
           "source": "per_symbol",
           "split_ran": false,
           "favours": "rival",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": "Perception layer: what the desk can see"
         },
         {
           "name": "per-symbol data categories: ARGUS's research workbench vs OpenBB keyless",
@@ -13721,7 +15914,466 @@
           "source": "per_symbol",
           "split_ran": false,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": "Research workbench data breadth vs. OpenBB's keyless providers"
+        },
+        {
+          "name": "workbench vs OpenBB keyless, every category, design and held-out day",
+          "headline": "categories answered with data, workbench minus OpenBB, per symbol and day",
+          "orientation": "positive = the workbench answered more categories",
+          "items": 22,
+          "micro_mean": 3.636364,
+          "total": 80.0,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "symbol",
+              "groups": 12,
+              "micro_mean": 3.636364,
+              "macro_mean": 3.625,
+              "direction": 1,
+              "largest_contributor": "MSTR",
+              "largest_share_of_total": 0.125,
+              "total_without_largest": 70.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single symbol carries the headline: without the largest contributor (MSTR, 12.5% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "MSTR",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 10.0,
+                  "mean": 5.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.125,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSLA",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 10.0,
+                  "mean": 5.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.125,
+                  "opposing": 0
+                },
+                {
+                  "group": "AAPL",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 8.0,
+                  "mean": 4.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.1,
+                  "opposing": 0
+                },
+                {
+                  "group": "AMZN",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 8.0,
+                  "mean": 4.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.1,
+                  "opposing": 0
+                },
+                {
+                  "group": "COIN",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 8.0,
+                  "mean": 4.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.1,
+                  "opposing": 0
+                },
+                {
+                  "group": "GOOGL",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 8.0,
+                  "mean": 4.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.1,
+                  "opposing": 0
+                },
+                {
+                  "group": "META",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 8.0,
+                  "mean": 4.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.1,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSFT",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 6.0,
+                  "mean": 3.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.075,
+                  "opposing": 0
+                },
+                {
+                  "group": "NVDA",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 6.0,
+                  "mean": 3.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.075,
+                  "opposing": 0
+                },
+                {
+                  "group": "TQQQ",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 4.0,
+                  "mean": 4.0,
+                  "mean_se": null,
+                  "share_of_total": 0.05,
+                  "opposing": 0
+                },
+                {
+                  "group": "SQQQ",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 3.0,
+                  "mean": 3.0,
+                  "mean_se": null,
+                  "share_of_total": 0.0375,
+                  "opposing": 0
+                },
+                {
+                  "group": "QQQ",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 1.0,
+                  "mean": 0.5,
+                  "mean_se": 0.5,
+                  "share_of_total": 0.0125,
+                  "opposing": 0
+                }
+              ]
+            },
+            {
+              "key": "day",
+              "groups": 2,
+              "micro_mean": 3.636364,
+              "macro_mean": 3.633333,
+              "direction": 1,
+              "largest_contributor": "held_out",
+              "largest_share_of_total": 0.55,
+              "total_without_largest": 36.0,
+              "loss_histogram": {
+                "0": 1.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single day carries the headline: without the largest contributor (held_out, 55.0% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "held_out",
+                  "rows": 12,
+                  "weight": 12.0,
+                  "total": 44.0,
+                  "mean": 3.666667,
+                  "mean_se": 0.309773,
+                  "share_of_total": 0.55,
+                  "opposing": 0
+                },
+                {
+                  "group": "design",
+                  "rows": 10,
+                  "weight": 10.0,
+                  "total": 36.0,
+                  "mean": 3.6,
+                  "mean_se": 0.452155,
+                  "share_of_total": 0.45,
+                  "opposing": 0
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "design day 2026-09-28 vs held-out day 2026-09-29",
+            "cut": "",
+            "first_items": 10,
+            "second_items": 12,
+            "first_mean": 3.6,
+            "second_mean": 3.666667,
+            "full_mean": 3.636364,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "design day 2026-09-28 vs held-out day 2026-09-29: both halves point the same way as the full sample \u2014 first 3.6, second 3.666667, full 3.636364"
+          },
+          "split_half_note": "halves as the artefact recorded them",
+          "notes": [],
+          "interval": {
+            "low": 3.136364,
+            "high": 4.090909,
+            "method": "bootstrap over rows (no order recorded)",
+            "units": 22,
+            "block_length": 1.0,
+            "spans_zero": false,
+            "resamples": 2000
+          },
+          "role": "argus_vs_rival",
+          "role_reason": "row 48's claim, re-read on a day the comparison was not built on",
+          "source": "workbench_design_day.all_categories + held_out.all_categories",
+          "split_ran": true,
+          "favours": "argus",
+          "zero_is_no_effect": false,
+          "claim_of": "Research workbench data breadth vs. OpenBB's keyless providers"
+        },
+        {
+          "name": "workbench vs OpenBB keyless, only categories OpenBB's keyless catalogue can reach, design and held-out day",
+          "headline": "categories answered with data, workbench minus OpenBB, per symbol and day",
+          "orientation": "positive = the workbench answered more categories",
+          "items": 22,
+          "micro_mean": 1.090909,
+          "total": 24.0,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "symbol",
+              "groups": 12,
+              "micro_mean": 1.090909,
+              "macro_mean": 1.125,
+              "direction": 1,
+              "largest_contributor": "AMZN",
+              "largest_share_of_total": 0.1667,
+              "total_without_largest": 20.0,
+              "loss_histogram": {
+                "0": 0.9167,
+                "1": 0.0,
+                "2": 0.0833,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single symbol carries the headline: without the largest contributor (AMZN, 16.7% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "AMZN",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 4.0,
+                  "mean": 2.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.1667,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSTR",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 4.0,
+                  "mean": 2.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.1667,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSLA",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 4.0,
+                  "mean": 2.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.1667,
+                  "opposing": 0
+                },
+                {
+                  "group": "AAPL",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0833,
+                  "opposing": 0
+                },
+                {
+                  "group": "COIN",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0833,
+                  "opposing": 0
+                },
+                {
+                  "group": "GOOGL",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0833,
+                  "opposing": 0
+                },
+                {
+                  "group": "META",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0833,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSFT",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0833,
+                  "opposing": 0
+                },
+                {
+                  "group": "NVDA",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 2.0,
+                  "mean": 1.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0833,
+                  "opposing": 0
+                },
+                {
+                  "group": "TQQQ",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 2.0,
+                  "mean": 2.0,
+                  "mean_se": null,
+                  "share_of_total": 0.0833,
+                  "opposing": 0
+                },
+                {
+                  "group": "SQQQ",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 1.0,
+                  "mean": 1.0,
+                  "mean_se": null,
+                  "share_of_total": 0.0417,
+                  "opposing": 0
+                },
+                {
+                  "group": "QQQ",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": -3.0,
+                  "mean": -1.5,
+                  "mean_se": 0.5,
+                  "share_of_total": -0.125,
+                  "opposing": 2
+                }
+              ]
+            },
+            {
+              "key": "day",
+              "groups": 2,
+              "micro_mean": 1.090909,
+              "macro_mean": 1.083333,
+              "direction": 1,
+              "largest_contributor": "held_out",
+              "largest_share_of_total": 0.5833,
+              "total_without_largest": 10.0,
+              "loss_histogram": {
+                "0": 0.0,
+                "1": 1.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single day carries the headline: without the largest contributor (held_out, 58.3% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "held_out",
+                  "rows": 12,
+                  "weight": 12.0,
+                  "total": 14.0,
+                  "mean": 1.166667,
+                  "mean_se": 0.241,
+                  "share_of_total": 0.5833,
+                  "opposing": 1
+                },
+                {
+                  "group": "design",
+                  "rows": 10,
+                  "weight": 10.0,
+                  "total": 10.0,
+                  "mean": 1.0,
+                  "mean_se": 0.365148,
+                  "share_of_total": 0.4167,
+                  "opposing": 1
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "design day 2026-09-28 vs held-out day 2026-09-29",
+            "cut": "",
+            "first_items": 10,
+            "second_items": 12,
+            "first_mean": 1.0,
+            "second_mean": 1.166667,
+            "full_mean": 1.090909,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "design day 2026-09-28 vs held-out day 2026-09-29: both halves point the same way as the full sample \u2014 first 1.0, second 1.166667, full 1.090909"
+          },
+          "split_half_note": "halves as the artefact recorded them",
+          "notes": [],
+          "interval": {
+            "low": 0.681818,
+            "high": 1.454545,
+            "method": "bootstrap over rows (no order recorded)",
+            "units": 22,
+            "block_length": 1.0,
+            "spans_zero": false,
+            "resamples": 2000
+          },
+          "role": "argus_vs_rival",
+          "role_reason": "the lead without the categories the rival has no endpoint for",
+          "source": "workbench_design_day.adversarial + held_out.adversarial",
+          "split_ran": true,
+          "favours": "argus",
+          "zero_is_no_effect": false,
+          "claim_of": "Research workbench data breadth vs. OpenBB's keyless providers"
         }
       ]
     },
@@ -13878,14 +16530,15 @@
           "source": "cells",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
     "data/pit_rivals.json": {
       "status": "checked",
       "reason": "one row per question: ten tickers' filings since 2017, one hour before and after each acceptance",
-      "sha256": "a7eb2c3ce4325bb4a505b4109d999bbf00df0dcf4b8e9b723fd927650a4e3181",
+      "sha256": "f54932313160d3d8241dbf79a39d1c48b42270c8aeb317b323c2aadc07b71ac1",
       "flagged": false,
       "headlines": [
         {
@@ -14094,7 +16747,8 @@
           "source": "rows_argus",
           "split_ran": true,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "ARGUS vs vibe_trading_pit on the same questions",
@@ -14302,7 +16956,8 @@
           "source": "rows_rivals.vibe_trading_pit",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "ARGUS vs vibe_trading_research on the same questions",
@@ -14510,7 +17165,8 @@
           "source": "rows_rivals.vibe_trading_research",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "ARGUS vs openbb_pit on the same questions",
@@ -14698,7 +17354,8 @@
           "source": "rows_rivals.openbb_pit",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "ARGUS vs openbb_default on the same questions",
@@ -14886,7 +17543,8 @@
           "source": "rows_rivals.openbb_default",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "ARGUS vs langalpha_yfinance on the same questions",
@@ -15094,7 +17752,8 @@
           "source": "rows_rivals.langalpha_yfinance",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "ARGUS vs openalice_yfinance on the same questions",
@@ -15302,7 +17961,8 @@
           "source": "rows_rivals.openalice_yfinance",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "ARGUS vs qlib_pit on the same questions",
@@ -15510,7 +18170,8 @@
           "source": "rows_rivals.qlib_pit",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "ARGUS vs edgartools_asof on the same questions",
@@ -15718,7 +18379,8 @@
           "source": "rows_rivals.edgartools_asof",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -15909,7 +18571,8 @@
           "source": "by_symbol",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "profiles diverge, by rung",
@@ -16017,7 +18680,8 @@
           "source": "rungs",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -16139,7 +18803,8 @@
           "source": "out_of_sample",
           "split_ran": true,
           "favours": "rival",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -16264,7 +18929,8 @@
           "source": "trials",
           "split_ran": false,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "boundaries: FLUSS vs ruptures",
@@ -16358,7 +19024,8 @@
           "source": "trials",
           "split_ran": false,
           "favours": "rival",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -16476,7 +19143,8 @@
           "source": "detail",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -16711,7 +19379,8 @@
           "source": "real_record.rows",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -16854,7 +19523,8 @@
           "source": "regenerated: risk_layer_comparison._combined_book_checkpoints(frozen=True); ARGUS precision and every freqtrade curve point reproduce measurement_architecture to four decimals",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -17103,7 +19773,8 @@
           "source": "baseline_reproduced.results + oos_wider_universe.results",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -17189,7 +19860,8 @@
           "source": "checklist_comparison.induction_all_pairs",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "hand-written rules on the held-out half",
@@ -17255,7 +19927,8 @@
           "source": "checklist_comparison.hand_written",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -17448,7 +20121,8 @@
           "source": "out_of_sample",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -17587,7 +20261,8 @@
           "source": "results",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -17852,7 +20527,8 @@
           "source": "narratives",
           "split_ran": false,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "corroborated events: ARGUS vs finBERT",
@@ -17928,9 +20604,17 @@
           "source": "truth_cases",
           "split_ran": false,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
+    },
+    "data/sentiment_dedup_rival.json": {
+      "status": "designed_cases",
+      "reason": "the 30 designed manipulation narratives of eval/sentiment_cases.py, scored for dedup-then-finBERT against ARGUS's recorded analyst; a comparison on designed cases, not a population",
+      "sha256": "170ebbc01b75b35761eac179d87974f29c78615406553842f388f74ede60d697",
+      "flagged": false,
+      "headlines": []
     },
     "data/sentiment_tweeteval.json": {
       "status": "aggregate_without_rows",
@@ -18131,7 +20815,8 @@
           "source": "calls[scored]",
           "split_ran": true,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -18145,7 +20830,7 @@
     "data/skill_matrix.json": {
       "status": "checked",
       "reason": "one row per tool",
-      "sha256": "8504c5ce4fbe7a8c9b15f87beb86246285e0051b899c05aed010c6c0902bc69f",
+      "sha256": "6461098c4641ad2a9129f80548aa4cfc826472ad5ae80dd38ace5c5be9ec682c",
       "flagged": false,
       "headlines": [
         {
@@ -18353,7 +21038,8 @@
           "source": "rows",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -18475,15 +21161,16 @@
           "source": "results",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
     "data/stopquality_comparison.json": {
       "status": "checked",
-      "reason": "one row per name",
-      "sha256": "44f07c2cef3294ab4fcd92ff8f36cdb6eb90e5dd10a808504ecd228609460037",
-      "flagged": false,
+      "reason": "one row per name, and one per held-out window",
+      "sha256": "49d4e7d6d36f7d3c2c716643e84544e05cba8ff00a6483985fb2eb996bb4348b",
+      "flagged": true,
       "headlines": [
         {
           "name": "stop hit by noise: ARGUS vs Rook",
@@ -18582,188 +21269,38 @@
           ],
           "split_half": null,
           "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
-          "notes": [
-            "the ARGUS distance scored here is the harness's own _p90_adverse, not desk/odds.py (data/harness_validity.json: desk/odds.py never executes in this harness)"
-          ],
+          "notes": [],
           "interval": null,
-          "role": "argus_vs_rival",
-          "role_reason": "the comparison's only metric",
+          "role": "context",
+          "role_reason": "hit rate falls with stop width, so a wider stop wins it by construction; kept as context, not as the claim (Activity/28_CAPABILITY_CLOSE_PLAN_2.md \u00a743)",
           "source": "rows",
           "split_ran": false,
-          "favours": "argus",
-          "zero_is_no_effect": false
-        }
-      ]
-    },
-    "data/stress_search_comparison.json": {
-      "status": "checked",
-      "reason": "one row per name and loss tolerance",
-      "sha256": "8eba54f6521defd06db8e38f5fc9913aafafd0b3a37ef878cc00617a2714a450",
-      "flagged": false,
-      "headlines": [
+          "favours": "neither",
+          "zero_is_no_effect": false,
+          "claim_of": ""
+        },
         {
-          "name": "breach probability out of sample: ARGUS vs a normal model",
-          "headline": "mean absolute error of the predicted breach probability",
-          "orientation": "normal-model error - ARGUS error per row: positive = ARGUS closer",
-          "items": 36,
-          "micro_mean": 0.014323,
-          "total": 0.515637,
+          "name": "net return with the stop: ARGUS vs a 1x ATR stop",
+          "headline": "per held-out window, a long from the prior close, 12bps round trip",
+          "orientation": "ARGUS net bps - ATR-stop net bps: positive = ARGUS's stop kept more",
+          "items": 958,
+          "micro_mean": -0.726358,
+          "total": -695.851,
           "broken_down": true,
-          "flags": [],
-          "flagged": false,
+          "flags": [
+            "flips_across_halves:chronological halves"
+          ],
+          "flagged": true,
           "tables": [
             {
               "key": "symbol",
-              "groups": 12,
-              "micro_mean": 0.014323,
-              "macro_mean": 0.014323,
-              "direction": 1,
-              "largest_contributor": "METAUSDT",
-              "largest_share_of_total": 0.9419,
-              "total_without_largest": 0.029956,
-              "loss_histogram": {
-                "0": 0.1667,
-                "1": 0.5,
-                "2": 0.25,
-                "3": 0.0833,
-                ">3": 0.0
-              },
-              "carried_by_one_group": false,
-              "single_group": false,
-              "macro_disagrees": false,
-              "reading": "no single symbol carries the headline: without the largest contributor (METAUSDT, 94.2% of the total) the rest still point the same way",
-              "per_group": [
-                {
-                  "group": "METAUSDT",
-                  "rows": 3,
-                  "weight": 3.0,
-                  "total": 0.485681,
-                  "mean": 0.161894,
-                  "mean_se": 0.009349,
-                  "share_of_total": 0.9419,
-                  "opposing": 0
-                },
-                {
-                  "group": "SQQQUSDT",
-                  "rows": 3,
-                  "weight": 3.0,
-                  "total": 0.061139,
-                  "mean": 0.02038,
-                  "mean_se": 0.011779,
-                  "share_of_total": 0.1186,
-                  "opposing": 1
-                },
-                {
-                  "group": "MSTRUSDT",
-                  "rows": 3,
-                  "weight": 3.0,
-                  "total": 0.022353,
-                  "mean": 0.007451,
-                  "mean_se": 0.009453,
-                  "share_of_total": 0.0433,
-                  "opposing": 1
-                },
-                {
-                  "group": "TSLAUSDT",
-                  "rows": 3,
-                  "weight": 3.0,
-                  "total": 0.019341,
-                  "mean": 0.006447,
-                  "mean_se": 0.003759,
-                  "share_of_total": 0.0375,
-                  "opposing": 1
-                },
-                {
-                  "group": "MSFTUSDT",
-                  "rows": 3,
-                  "weight": 3.0,
-                  "total": 0.004696,
-                  "mean": 0.001565,
-                  "mean_se": 0.001035,
-                  "share_of_total": 0.0091,
-                  "opposing": 0
-                },
-                {
-                  "group": "COINUSDT",
-                  "rows": 3,
-                  "weight": 3.0,
-                  "total": 0.002641,
-                  "mean": 0.00088,
-                  "mean_se": 0.031951,
-                  "share_of_total": 0.0051,
-                  "opposing": 2
-                },
-                {
-                  "group": "AAPLUSDT",
-                  "rows": 3,
-                  "weight": 3.0,
-                  "total": -0.001908,
-                  "mean": -0.000636,
-                  "mean_se": 0.005788,
-                  "share_of_total": -0.0037,
-                  "opposing": 1
-                },
-                {
-                  "group": "NVDAUSDT",
-                  "rows": 3,
-                  "weight": 3.0,
-                  "total": -0.002447,
-                  "mean": -0.000816,
-                  "mean_se": 0.001819,
-                  "share_of_total": -0.0047,
-                  "opposing": 1
-                },
-                {
-                  "group": "GOOGLUSDT",
-                  "rows": 3,
-                  "weight": 3.0,
-                  "total": -0.009794,
-                  "mean": -0.003265,
-                  "mean_se": 0.004485,
-                  "share_of_total": -0.019,
-                  "opposing": 1
-                },
-                {
-                  "group": "AMZNUSDT",
-                  "rows": 3,
-                  "weight": 3.0,
-                  "total": -0.01062,
-                  "mean": -0.00354,
-                  "mean_se": 0.003407,
-                  "share_of_total": -0.0206,
-                  "opposing": 2
-                },
-                {
-                  "group": "QQQUSDT",
-                  "rows": 3,
-                  "weight": 3.0,
-                  "total": -0.015503,
-                  "mean": -0.005168,
-                  "mean_se": 0.003833,
-                  "share_of_total": -0.0301,
-                  "opposing": 2
-                },
-                {
-                  "group": "TQQQUSDT",
-                  "rows": 3,
-                  "weight": 3.0,
-                  "total": -0.039942,
-                  "mean": -0.013314,
-                  "mean_se": 0.007061,
-                  "share_of_total": -0.0775,
-                  "opposing": 3
-                }
-              ]
-            },
-            {
-              "key": "tolerance",
-              "groups": 3,
-              "micro_mean": 0.014323,
-              "macro_mean": 0.014323,
-              "direction": 1,
-              "largest_contributor": "5%",
-              "largest_share_of_total": 0.4242,
-              "total_without_largest": 0.296924,
+              "groups": 6,
+              "micro_mean": -0.726358,
+              "macro_mean": -0.726515,
+              "direction": -1,
+              "largest_contributor": "COINUSDT",
+              "largest_share_of_total": 0.6776,
+              "total_without_largest": -224.308,
               "loss_histogram": {
                 "0": 0.0,
                 "1": 0.0,
@@ -18774,61 +21311,568 @@
               "carried_by_one_group": false,
               "single_group": false,
               "macro_disagrees": false,
-              "reading": "no single tolerance carries the headline: without the largest contributor (5%, 42.4% of the total) the rest still point the same way",
+              "reading": "no single symbol carries the headline: without the largest contributor (COINUSDT, 67.8% of the total) the rest still point the same way",
               "per_group": [
                 {
-                  "group": "5%",
+                  "group": "COINUSDT",
+                  "rows": 158,
+                  "weight": 158.0,
+                  "total": -471.543,
+                  "mean": -2.984449,
+                  "mean_se": 5.688626,
+                  "share_of_total": 0.6776,
+                  "opposing": 4
+                },
+                {
+                  "group": "METAUSDT",
+                  "rows": 159,
+                  "weight": 159.0,
+                  "total": -459.018,
+                  "mean": -2.886906,
+                  "mean_se": 3.69998,
+                  "share_of_total": 0.6596,
+                  "opposing": 16
+                },
+                {
+                  "group": "NVDAUSDT",
+                  "rows": 162,
+                  "weight": 162.0,
+                  "total": -329.229,
+                  "mean": -2.032278,
+                  "mean_se": 1.860778,
+                  "share_of_total": 0.4731,
+                  "opposing": 6
+                },
+                {
+                  "group": "AAPLUSDT",
+                  "rows": 159,
+                  "weight": 159.0,
+                  "total": -166.439,
+                  "mean": -1.046786,
+                  "mean_se": 1.637704,
+                  "share_of_total": 0.2392,
+                  "opposing": 13
+                },
+                {
+                  "group": "TSLAUSDT",
+                  "rows": 162,
+                  "weight": 162.0,
+                  "total": 200.405,
+                  "mean": 1.237068,
+                  "mean_se": 2.592689,
+                  "share_of_total": -0.288,
+                  "opposing": 6
+                },
+                {
+                  "group": "MSTRUSDT",
+                  "rows": 158,
+                  "weight": 158.0,
+                  "total": 529.973,
+                  "mean": 3.354259,
+                  "mean_se": 3.482993,
+                  "share_of_total": -0.7616,
+                  "opposing": 14
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "chronological halves",
+            "cut": "2026-07-07",
+            "first_items": 478,
+            "second_items": 480,
+            "first_mean": 0.433657,
+            "second_mean": -1.88154,
+            "full_mean": -0.726358,
+            "flips_across_halves": true,
+            "contradicts_full_sample": false,
+            "reading": "chronological halves: the halves disagree \u2014 first 0.433657, second -1.88154 (full -0.726358)"
+          },
+          "split_half_note": "",
+          "notes": [],
+          "interval": {
+            "low": -3.176477,
+            "high": 2.035684,
+            "method": "stationary bootstrap over order values",
+            "units": 162,
+            "block_length": 1.0,
+            "spans_zero": true,
+            "resamples": 2000
+          },
+          "role": "argus_vs_rival",
+          "role_reason": "the general-purpose volatility stop, on the same windows and the same trade; the comparison 43-*.toml's blocker names",
+          "source": "windows",
+          "split_ran": true,
+          "favours": "rival",
+          "zero_is_no_effect": false,
+          "claim_of": ""
+        }
+      ]
+    },
+    "data/stress_search_comparison.json": {
+      "status": "checked",
+      "reason": "one row per name and loss tolerance",
+      "sha256": "9c67119e9f3417689e8ca23ddc65bfb0854c11f73d2c5987fec054b34a6c0277",
+      "flagged": true,
+      "headlines": [
+        {
+          "name": "breach probability out of sample: ARGUS vs a normal model",
+          "headline": "mean absolute error of the predicted breach probability",
+          "orientation": "normal-model error - ARGUS error per row: positive = ARGUS closer",
+          "items": 36,
+          "micro_mean": -0.000673,
+          "total": -0.024219,
+          "broken_down": true,
+          "flags": [
+            "carried_by_one_group:symbol=TQQQUSDT",
+            "carried_by_one_group:tolerance=3%"
+          ],
+          "flagged": true,
+          "tables": [
+            {
+              "key": "symbol",
+              "groups": 12,
+              "micro_mean": -0.000673,
+              "macro_mean": -0.000673,
+              "direction": -1,
+              "largest_contributor": "TQQQUSDT",
+              "largest_share_of_total": 2.6205,
+              "total_without_largest": 0.039249,
+              "loss_histogram": {
+                "0": 0.25,
+                "1": 0.3333,
+                "2": 0.1667,
+                "3": 0.25,
+                ">3": 0.0
+              },
+              "carried_by_one_group": true,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "TQQQUSDT carries the headline: without it the other 11 symbol group(s) total 0.039249, which does not point the same way",
+              "per_group": [
+                {
+                  "group": "TQQQUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": -0.063468,
+                  "mean": -0.021156,
+                  "mean_se": 0.013272,
+                  "share_of_total": 2.6205,
+                  "opposing": 0
+                },
+                {
+                  "group": "METAUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": -0.030869,
+                  "mean": -0.01029,
+                  "mean_se": 0.005534,
+                  "share_of_total": 1.2746,
+                  "opposing": 0
+                },
+                {
+                  "group": "QQQUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": -0.015502,
+                  "mean": -0.005167,
+                  "mean_se": 0.003833,
+                  "share_of_total": 0.6401,
+                  "opposing": 0
+                },
+                {
+                  "group": "GOOGLUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": -0.014463,
+                  "mean": -0.004821,
+                  "mean_se": 0.003711,
+                  "share_of_total": 0.5972,
+                  "opposing": 1
+                },
+                {
+                  "group": "AMZNUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": -0.010661,
+                  "mean": -0.003554,
+                  "mean_se": 0.003419,
+                  "share_of_total": 0.4402,
+                  "opposing": 1
+                },
+                {
+                  "group": "COINUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": -0.004108,
+                  "mean": -0.001369,
+                  "mean_se": 0.002028,
+                  "share_of_total": 0.1696,
+                  "opposing": 1
+                },
+                {
+                  "group": "AAPLUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": -0.0022,
+                  "mean": -0.000733,
+                  "mean_se": 0.00582,
+                  "share_of_total": 0.0908,
+                  "opposing": 1
+                },
+                {
+                  "group": "NVDAUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": -0.00167,
+                  "mean": -0.000557,
+                  "mean_se": 0.002038,
+                  "share_of_total": 0.069,
+                  "opposing": 2
+                },
+                {
+                  "group": "MSFTUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 0.00459,
+                  "mean": 0.00153,
+                  "mean_se": 0.001007,
+                  "share_of_total": -0.1895,
+                  "opposing": 3
+                },
+                {
+                  "group": "TSLAUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 0.019416,
+                  "mean": 0.006472,
+                  "mean_se": 0.003758,
+                  "share_of_total": -0.8017,
+                  "opposing": 3
+                },
+                {
+                  "group": "MSTRUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 0.02235,
+                  "mean": 0.00745,
+                  "mean_se": 0.009445,
+                  "share_of_total": -0.9228,
+                  "opposing": 2
+                },
+                {
+                  "group": "SQQQUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 0.072366,
+                  "mean": 0.024122,
+                  "mean_se": 0.008199,
+                  "share_of_total": -2.9879,
+                  "opposing": 3
+                }
+              ]
+            },
+            {
+              "key": "tolerance",
+              "groups": 3,
+              "micro_mean": -0.000673,
+              "macro_mean": -0.000673,
+              "direction": -1,
+              "largest_contributor": "3%",
+              "largest_share_of_total": 2.1867,
+              "total_without_largest": 0.028741,
+              "loss_histogram": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.0,
+                "3": 0.0,
+                ">3": 1.0
+              },
+              "carried_by_one_group": true,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "3% carries the headline: without it the other 2 tolerance group(s) total 0.028741, which does not point the same way",
+              "per_group": [
+                {
+                  "group": "3%",
                   "rows": 12,
                   "weight": 12.0,
-                  "total": 0.218713,
-                  "mean": 0.018226,
-                  "mean_se": 0.014221,
-                  "share_of_total": 0.4242,
+                  "total": -0.05296,
+                  "mean": -0.004413,
+                  "mean_se": 0.005861,
+                  "share_of_total": 2.1867,
                   "opposing": 4
                 },
                 {
                   "group": "10%",
                   "rows": 12,
                   "weight": 12.0,
-                  "total": 0.214658,
-                  "mean": 0.017888,
-                  "mean_se": 0.014955,
-                  "share_of_total": 0.4163,
-                  "opposing": 4
+                  "total": -0.005096,
+                  "mean": -0.000425,
+                  "mean_se": 0.001212,
+                  "share_of_total": 0.2104,
+                  "opposing": 7
                 },
                 {
-                  "group": "3%",
+                  "group": "5%",
                   "rows": 12,
                   "weight": 12.0,
-                  "total": 0.082266,
-                  "mean": 0.006856,
-                  "mean_se": 0.013806,
-                  "share_of_total": 0.1595,
-                  "opposing": 7
+                  "total": 0.033836,
+                  "mean": 0.00282,
+                  "mean_se": 0.003488,
+                  "share_of_total": -1.3971,
+                  "opposing": 6
                 }
               ]
             }
           ],
           "split_half": null,
           "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
-          "notes": [
-            "fit and test windows are chronological per name; no second split"
-          ],
+          "notes": [],
           "interval": {
-            "low": 0.000167,
-            "high": 0.032749,
+            "low": -0.005413,
+            "high": 0.003554,
             "method": "bootstrap over rows (no order recorded)",
             "units": 36,
             "block_length": 1.0,
-            "spans_zero": false,
+            "spans_zero": true,
+            "resamples": 2000
+          },
+          "role": "context",
+          "role_reason": "AgenticTrading's normal shock model, the named baseline",
+          "source": "calibration.rows",
+          "split_ran": false,
+          "favours": "neither",
+          "zero_is_no_effect": false,
+          "claim_of": ""
+        },
+        {
+          "name": "breach probability out of sample: ARGUS vs historical simulation",
+          "headline": "mean absolute error of the predicted breach probability, price-only truth",
+          "orientation": "historical error - ARGUS error per row: positive = ARGUS closer",
+          "items": 36,
+          "micro_mean": -0.000119,
+          "total": -0.004294,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "symbol",
+              "groups": 12,
+              "micro_mean": -0.000119,
+              "macro_mean": -0.000119,
+              "direction": -1,
+              "largest_contributor": "COINUSDT",
+              "largest_share_of_total": 0.9313,
+              "total_without_largest": -0.000295,
+              "loss_histogram": {
+                "0": 0.3333,
+                "1": 0.4167,
+                "2": 0.25,
+                "3": 0.0,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single symbol carries the headline: without the largest contributor (COINUSDT, 93.1% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "COINUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": -0.003998,
+                  "mean": -0.001333,
+                  "mean_se": 0.000712,
+                  "share_of_total": 0.9313,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSFTUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": -0.000832,
+                  "mean": -0.000277,
+                  "mean_se": 0.000274,
+                  "share_of_total": 0.1937,
+                  "opposing": 0
+                },
+                {
+                  "group": "SQQQUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": -0.000482,
+                  "mean": -0.000161,
+                  "mean_se": 0.000352,
+                  "share_of_total": 0.1123,
+                  "opposing": 1
+                },
+                {
+                  "group": "AMZNUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": -0.000224,
+                  "mean": -7.5e-05,
+                  "mean_se": 4.7e-05,
+                  "share_of_total": 0.0521,
+                  "opposing": 0
+                },
+                {
+                  "group": "AAPLUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": -0.000168,
+                  "mean": -5.6e-05,
+                  "mean_se": 2.8e-05,
+                  "share_of_total": 0.0391,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSLAUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": -6.3e-05,
+                  "mean": -2.1e-05,
+                  "mean_se": 2.5e-05,
+                  "share_of_total": 0.0147,
+                  "opposing": 1
+                },
+                {
+                  "group": "METAUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 0.000138,
+                  "mean": 4.6e-05,
+                  "mean_se": 8.1e-05,
+                  "share_of_total": -0.0322,
+                  "opposing": 1
+                },
+                {
+                  "group": "QQQUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 0.000161,
+                  "mean": 5.4e-05,
+                  "mean_se": 5.4e-05,
+                  "share_of_total": -0.0374,
+                  "opposing": 1
+                },
+                {
+                  "group": "MSTRUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 0.00021,
+                  "mean": 7e-05,
+                  "mean_se": 0.000116,
+                  "share_of_total": -0.0488,
+                  "opposing": 1
+                },
+                {
+                  "group": "TQQQUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 0.000245,
+                  "mean": 8.2e-05,
+                  "mean_se": 0.000146,
+                  "share_of_total": -0.057,
+                  "opposing": 2
+                },
+                {
+                  "group": "NVDAUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 0.000356,
+                  "mean": 0.000119,
+                  "mean_se": 7.8e-05,
+                  "share_of_total": -0.083,
+                  "opposing": 2
+                },
+                {
+                  "group": "GOOGLUSDT",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 0.000363,
+                  "mean": 0.000121,
+                  "mean_se": 7.1e-05,
+                  "share_of_total": -0.0847,
+                  "opposing": 2
+                }
+              ]
+            },
+            {
+              "key": "tolerance",
+              "groups": 3,
+              "micro_mean": -0.000119,
+              "macro_mean": -0.000119,
+              "direction": -1,
+              "largest_contributor": "3%",
+              "largest_share_of_total": 0.544,
+              "total_without_largest": -0.001958,
+              "loss_histogram": {
+                "0": 0.0,
+                "1": 0.0,
+                "2": 0.3333,
+                "3": 0.0,
+                ">3": 0.6667
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single tolerance carries the headline: without the largest contributor (3%, 54.4% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "3%",
+                  "rows": 12,
+                  "weight": 12.0,
+                  "total": -0.002336,
+                  "mean": -0.000195,
+                  "mean_se": 0.000141,
+                  "share_of_total": 0.544,
+                  "opposing": 5
+                },
+                {
+                  "group": "5%",
+                  "rows": 12,
+                  "weight": 12.0,
+                  "total": -0.002279,
+                  "mean": -0.00019,
+                  "mean_se": 0.000225,
+                  "share_of_total": 0.5307,
+                  "opposing": 4
+                },
+                {
+                  "group": "10%",
+                  "rows": 12,
+                  "weight": 12.0,
+                  "total": 0.000321,
+                  "mean": 2.7e-05,
+                  "mean_se": 3.5e-05,
+                  "share_of_total": -0.0747,
+                  "opposing": 2
+                }
+              ]
+            }
+          ],
+          "split_half": null,
+          "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
+          "notes": [],
+          "interval": {
+            "low": -0.000321,
+            "high": 2.3e-05,
+            "method": "bootstrap over rows (no order recorded)",
+            "units": 36,
+            "block_length": 1.0,
+            "spans_zero": true,
             "resamples": 2000
           },
           "role": "argus_vs_rival",
-          "role_reason": "the comparison's primary",
+          "role_reason": "the general-purpose method (plan \u00a746)",
           "source": "calibration.rows",
           "split_ran": false,
-          "favours": "argus",
-          "zero_is_no_effect": false
+          "favours": "rival",
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -19010,7 +22054,8 @@
           "source": "per_symbol.dsr_all_trials",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": true
+          "zero_is_no_effect": true,
+          "claim_of": ""
         },
         {
           "name": "best variant beats buy-and-hold",
@@ -19184,7 +22229,8 @@
           "source": "per_symbol",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "best variant's net Sharpe, in and out of sample",
@@ -19369,7 +22415,8 @@
           "source": "per_symbol.out_of_sample_decay",
           "split_ran": true,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -19526,7 +22573,8 @@
           "source": "cells",
           "split_ran": false,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -19817,7 +22865,8 @@
           "source": "regenerated: void_comparison.predictions() (nocturne's own walk-forward from its clone); ARGUS, MF and M0 MAE reproduce the artefact's summary",
           "split_ran": true,
           "favours": "rival",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         },
         {
           "name": "rToken Monday price: ARGUS vs no change",
@@ -20100,7 +23149,8 @@
           "source": "regenerated: void_comparison.predictions() (nocturne's own walk-forward from its clone); ARGUS, MF and M0 MAE reproduce the artefact's summary",
           "split_ran": true,
           "favours": "argus",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },
@@ -20305,7 +23355,8 @@
           "source": "test_3_per_symbol + test_2_train_test_split",
           "split_ran": true,
           "favours": "neither",
-          "zero_is_no_effect": false
+          "zero_is_no_effect": false,
+          "claim_of": ""
         }
       ]
     },

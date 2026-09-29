@@ -120,8 +120,17 @@ BASE_CSS = """
   .nav .links a:hover { color:var(--ink); background:var(--veil) }
   .nav .links a.on { color:var(--ink); background:var(--veil) }
   @media (max-width: 720px) {
-    .nav { flex-direction:column; align-items:flex-start; padding:12px 16px }
-    .nav .links { justify-content:flex-start }
+    /* One scrollable row, not three wrapped ones: the bar is sticky, and wrapped it held a fifth
+       of a phone screen (155px at 390px wide, seen 2026-09-29). The fade says there is more. */
+    .nav { flex-direction:column; align-items:flex-start; gap:8px; padding:10px 16px 6px }
+    .nav .links { justify-content:flex-start; flex-wrap:nowrap; overflow-x:auto; width:100%;
+      scrollbar-width:none; -webkit-overflow-scrolling:touch;
+      mask-image:linear-gradient(to right, #000 85%, transparent) }
+    .nav .links::-webkit-scrollbar { display:none }
+    .nav .links a { white-space:nowrap; flex:none }
+    /* the current page leads the row, so it is never scrolled out of sight (no script: the
+       proof pages ship none) */
+    .nav .links a.on { order:-1 }
     .wrap { padding:28px 16px 56px }
   }
   .foot { border-top:1px solid var(--line); margin-top:56px; padding:22px 24px 36px;
@@ -180,9 +189,13 @@ def nav(active: str = "/") -> str:
 
 
 def footer() -> str:
+    """Every page's foot. The pages outside the top bar are linked here: /architecture, /policy,
+    /factors and /agent returned 200 but nothing linked to them (fresh-eyes audit, 2026-09-29)."""
     return ('<footer class="foot"><span>ARGUS · every figure computed, every source named, every '
             'loss published.</span><span>Analysis, not advice. Data: Bitget, SEC EDGAR, FRED, '
-            'public news. <a href="/brand">Brand</a></span></footer>')
+            'public news. <a href="/architecture">Architecture</a> · <a href="/policy">Risk '
+            'policy</a> · <a href="/factors">Factors</a> · <a href="/agent">Track 2 agent</a> · '
+            '<a href="/brand">Brand</a></span></footer>')
 
 
 PUBLIC_URL = "https://deploy-topaz-seven-64.vercel.app"

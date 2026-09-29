@@ -10,119 +10,134 @@
       {
         "symbol": "NVDAUSDT",
         "factor": 7.3,
-        "fabricated_entry_price": 1660.677,
-        "real_current_price": 227.49,
+        "fabricated_entry_price": 1670.24,
+        "real_current_price": 228.8,
         "tradingagents_real_validator_raised": false,
+        "band_validator_raised": true,
         "argus_grounding_flags_it": true
       },
       {
         "symbol": "NVDAUSDT",
         "factor": 0.03,
-        "fabricated_entry_price": 6.8247,
-        "real_current_price": 227.49,
+        "fabricated_entry_price": 6.864,
+        "real_current_price": 228.8,
         "tradingagents_real_validator_raised": false,
+        "band_validator_raised": true,
         "argus_grounding_flags_it": true
       },
       {
         "symbol": "NVDAUSDT",
         "factor": -1.0,
-        "fabricated_entry_price": -227.49,
-        "real_current_price": 227.49,
+        "fabricated_entry_price": -228.8,
+        "real_current_price": 228.8,
         "tradingagents_real_validator_raised": false,
+        "band_validator_raised": true,
         "argus_grounding_flags_it": true
       },
       {
         "symbol": "NVDAUSDT",
         "factor": 1000.0,
-        "fabricated_entry_price": 227490.0,
-        "real_current_price": 227.49,
+        "fabricated_entry_price": 228800.0,
+        "real_current_price": 228.8,
         "tradingagents_real_validator_raised": false,
+        "band_validator_raised": true,
         "argus_grounding_flags_it": true
       },
       {
         "symbol": "AAPLUSDT",
         "factor": 7.3,
-        "fabricated_entry_price": 2478.131,
-        "real_current_price": 339.47,
+        "fabricated_entry_price": 2470.393,
+        "real_current_price": 338.41,
         "tradingagents_real_validator_raised": false,
+        "band_validator_raised": true,
         "argus_grounding_flags_it": true
       },
       {
         "symbol": "AAPLUSDT",
         "factor": 0.03,
-        "fabricated_entry_price": 10.1841,
-        "real_current_price": 339.47,
+        "fabricated_entry_price": 10.1523,
+        "real_current_price": 338.41,
         "tradingagents_real_validator_raised": false,
+        "band_validator_raised": true,
         "argus_grounding_flags_it": true
       },
       {
         "symbol": "AAPLUSDT",
         "factor": -1.0,
-        "fabricated_entry_price": -339.47,
-        "real_current_price": 339.47,
+        "fabricated_entry_price": -338.41,
+        "real_current_price": 338.41,
         "tradingagents_real_validator_raised": false,
+        "band_validator_raised": true,
         "argus_grounding_flags_it": true
       },
       {
         "symbol": "AAPLUSDT",
         "factor": 1000.0,
-        "fabricated_entry_price": 339470.0,
-        "real_current_price": 339.47,
+        "fabricated_entry_price": 338410.0,
+        "real_current_price": 338.41,
         "tradingagents_real_validator_raised": false,
+        "band_validator_raised": true,
         "argus_grounding_flags_it": true
       },
       {
         "symbol": "MSFTUSDT",
         "factor": 7.3,
-        "fabricated_entry_price": 3664.454,
-        "real_current_price": 501.98,
+        "fabricated_entry_price": 3716.357,
+        "real_current_price": 509.09,
         "tradingagents_real_validator_raised": false,
+        "band_validator_raised": true,
         "argus_grounding_flags_it": true
       },
       {
         "symbol": "MSFTUSDT",
         "factor": 0.03,
-        "fabricated_entry_price": 15.0594,
-        "real_current_price": 501.98,
+        "fabricated_entry_price": 15.2727,
+        "real_current_price": 509.09,
         "tradingagents_real_validator_raised": false,
+        "band_validator_raised": true,
         "argus_grounding_flags_it": true
       },
       {
         "symbol": "MSFTUSDT",
         "factor": -1.0,
-        "fabricated_entry_price": -501.98,
-        "real_current_price": 501.98,
+        "fabricated_entry_price": -509.09,
+        "real_current_price": 509.09,
         "tradingagents_real_validator_raised": false,
+        "band_validator_raised": true,
         "argus_grounding_flags_it": true
       },
       {
         "symbol": "MSFTUSDT",
         "factor": 1000.0,
-        "fabricated_entry_price": 501980.0,
-        "real_current_price": 501.98,
+        "fabricated_entry_price": 509090.0,
+        "real_current_price": 509.09,
         "tradingagents_real_validator_raised": false,
+        "band_validator_raised": true,
         "argus_grounding_flags_it": true
       }
     ],
     "n_cases": 12,
     "n_tradingagents_catches": 0,
-    "n_argus_catches": 12
+    "n_argus_catches": 12,
+    "n_band_validator_catches": 12,
+    "band_validator_real_figures_refused": 0,
+    "band_validator": "pydantic v2 field_validator: entry > 0 and within 20% of the live price"
   },
   "positive_control": {
     "results": [
       {
         "symbol": "NVDAUSDT",
-        "real_price": 227.48,
+        "real_price": 228.78,
         "argus_resolves_the_real_figure": true
       },
       {
         "symbol": "AAPLUSDT",
-        "real_price": 339.51,
+        "real_price": 338.41,
         "argus_resolves_the_real_figure": true
       },
       {
         "symbol": "MSFTUSDT",
-        "real_price": 501.98,
+        "real_price": 509.09,
         "argus_resolves_the_real_figure": true
       }
     ],
@@ -153,8 +168,8 @@
   },
   "costs": {
     "repeats": 200,
-    "tradingagents_validator_seconds_per_call": 2.348999842070043e-06,
-    "argus_grounding_seconds_per_call": 2.025499998126179e-05
+    "tradingagents_validator_seconds_per_call": 1.866999955382198e-06,
+    "argus_grounding_seconds_per_call": 1.8412499921396376e-05
   },
   "reproducibility": {
     "identical": true

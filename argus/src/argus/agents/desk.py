@@ -559,12 +559,13 @@ class TradingDesk:
                 # than in a document a reader may never open. A demoted analyst whose demotion is
                 # invisible in the decision trail is the same as an undemoted one.
                 notes.append(
-                    f"[standing] sentiment is DEMOTED and contributes at that weight: its equity "
-                    f"feed is dead (Bitget social empty in 93% of cycles; StockTwits 403, CNN "
-                    f"418 on 2026-09-13), and the one live reading is crypto-wide risk appetite "
-                    f"carried at credibility 0.35. It reasoned over "
-                    f"{len(social_evidence)} item(s) here. Promotion needs an ablation that "
-                    f"HELPS over 30 differing paired frames — see argus.eval.standing"
+                    f"[standing] sentiment is DEMOTED and contributes at that weight. It was "
+                    f"demoted when its equity feeds were dead (Bitget social empty in 93% of "
+                    f"cycles, StockTwits 403, CNN 418 on 2026-09-13); per-stock text now comes "
+                    f"from X and Reddit, and it reasoned over {len(social_evidence)} item(s) "
+                    f"here. The demotion stands because no measurement has shown it helps: "
+                    f"promotion needs an ablation that HELPS over 30 differing paired frames — "
+                    f"see argus.eval.standing"
                 )
             else:
                 view, earnings_read = got
@@ -675,6 +676,13 @@ class TradingDesk:
         for view in panel.views:
             grounding_facts[f"{view.analyst}_magnitude_bps"] = float(view.magnitude_bps)
             grounding_facts[f"{view.analyst}_confidence"] = float(view.confidence)
+        # Kept in the desk note, so the grounding check can be re-run on history and its flags
+        # labelled: 289 of 774 cycles to 2026-09-28 carry an unattributable-figure flag, and none
+        # can be re-checked, because these facts were never stored (29-*.toml, plan §29 step 1).
+        import json as _json
+
+        notes.append("[grounding-facts] " + _json.dumps(
+            {k: round(v, 6) for k, v in sorted(grounding_facts.items())}, separators=(",", ":")))
 
         # --- 2. the decision. The model sees the panel as evidence, and decides. ---
         # The mandate is built here rather than after the decision so the model can reason inside

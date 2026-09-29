@@ -359,8 +359,117 @@ def per_symbol(cells: Sequence[Cell], symbols: Sequence[str]) -> list[dict[str, 
     return rows
 
 
+def rival_blind_categories() -> tuple[str, ...]:
+    """Categories OpenBB's keyless catalogue has no endpoint for at all (social posts, the venue's
+    own perpetual derivatives, prediction markets). A lead built only on these is a lead the rival
+    was never able to contest, so the adversarial reading scores without them."""
+    reachable = set(OPENBB_CATEGORY.values())
+    return tuple(c for c in CATEGORIES if c not in reachable)
+
+
+def workbench_rows(cells: Sequence[Cell], symbols: Sequence[str],
+                   *, drop_categories: Sequence[str] = (),
+                   drop_source: str | None = None) -> list[dict[str, Any]]:
+    """Per symbol: the workbench's scored categories minus OpenBB's, optionally without some
+    categories (the adversarial reading) or without one workbench source (the ablation)."""
+    drop = set(drop_categories) | set(NOT_SCORED)
+    rows: list[dict[str, Any]] = []
+    for symbol in symbols:
+        wb = {c.category for c in cells if c.symbol == symbol and c.system == "argus_workbench"
+              and c.answered and c.category not in drop and c.source != drop_source}
+        ob = {c.category for c in cells if c.symbol == symbol and c.system == "openbb"
+              and c.answered and c.category not in drop}
+        rows.append({"symbol": symbol, "workbench": len(wb), "openbb": len(ob),
+                     "difference": len(wb) - len(ob), "only_workbench": sorted(wb - ob),
+                     "only_openbb": sorted(ob - wb)})
+    return rows
+
+
+def _reading(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    diffs = [int(r["difference"]) for r in rows]
+    return {"symbols": len(rows),
+            "mean_workbench": round(sum(int(r["workbench"]) for r in rows) / len(rows), 3),
+            "mean_openbb": round(sum(int(r["openbb"]) for r in rows) / len(rows), 3),
+            "mean_difference": round(sum(diffs) / len(diffs), 3),
+            "ahead": sum(1 for d in diffs if d > 0), "behind": sum(1 for d in diffs if d < 0),
+            "tied": sum(1 for d in diffs if d == 0), "rows": list(rows)}
+
+
+def workbench_readings(ob: Sequence[Cell], wb: Sequence[Cell],
+                       symbols: Sequence[str]) -> dict[str, Any]:
+    """The workbench against OpenBB three ways on one day's cells: every category, only the
+    categories OpenBB can reach (adversarial), and without each workbench source (ablation)."""
+    cells = [*ob, *wb]
+    blind = rival_blind_categories()
+    sources = sorted({c.source for c in wb if c.answered})
+    return {
+        "all_categories": _reading(workbench_rows(cells, symbols)),
+        "adversarial": {
+            "reading": "only categories OpenBB's keyless catalogue has an endpoint for",
+            "dropped_categories": list(blind),
+            **_reading(workbench_rows(cells, symbols, drop_categories=blind)),
+        },
+        "ablation": {
+            "reading": "every category, with one workbench source removed at a time",
+            "without": {src: {k: v for k, v in _reading(
+                workbench_rows(cells, symbols, drop_source=src)).items() if k != "rows"}
+                for src in sources},
+        },
+    }
+
+
+def costs(raw: Mapping[str, Any], workbench: Mapping[str, Any]) -> dict[str, Any]:
+    """What each side cost to read on one day: money (both keyless, so none) and the summed
+    wall-clock seconds of its calls per symbol, as each side's own runner timed them. OpenBB's
+    calls are timed one endpoint at a time; the workbench's per research answer, which reads its
+    sources in parallel, so the two are the time a user waits, not the same unit of work."""
+    def per_symbol(rows: Iterable[tuple[str, float]]) -> dict[str, float]:
+        out: dict[str, float] = {}
+        for symbol, seconds in rows:
+            out[symbol] = round(out.get(symbol, 0.0) + seconds, 2)
+        return out
+
+    ob = per_symbol((str(r["ticker"]), float(r.get("latency_s") or 0.0))
+                    for r in raw["per_symbol"])
+    wb = per_symbol((str(r["symbol"]), float(r.get("seconds") or 0.0))
+                    for r in workbench["rows"])
+    shared = sorted(set(ob) & set(wb))
+    return {
+        "money_usd": {"openbb_keyless": 0.0, "argus_workbench": 0.0,
+                      "note": "keyless on both sides; no model is called by either"},
+        "seconds_per_symbol": {"openbb": {k: ob[k] for k in shared},
+                               "argus_workbench": {k: wb[k] for k in shared}},
+        "mean_seconds_per_symbol": {
+            "openbb": round(sum(ob[k] for k in shared) / len(shared), 2),
+            "argus_workbench": round(sum(wb[k] for k in shared) / len(shared), 2)},
+    }
+
+
+def held_out_day(raw: Mapping[str, Any], workbench: Mapping[str, Any],
+                 design: Mapping[str, Any]) -> dict[str, Any]:
+    """The same comparison read again on a later day, nothing refitted: the category map, the
+    scoring and the rival's providers are the design day's. Only the workbench and OpenBB arms
+    are re-read; the desk arm needs a live cycle on that day and is not part of this claim."""
+    ob, wb = openbb_cells(raw), workbench_cells(workbench)
+    symbols = sorted({c.symbol for c in ob} & {c.symbol for c in wb})
+    readings = workbench_readings(ob, wb, symbols)
+    same = [s for s in symbols if s in {r["symbol"] for r in design["all_categories"]["rows"]}]
+
+    def sign(rows: Sequence[Mapping[str, Any]], symbol: str) -> int:
+        d = next(int(r["difference"]) for r in rows if r["symbol"] == symbol)
+        return (d > 0) - (d < 0)
+
+    agree = {name: sum(1 for s in same if sign(readings[name]["rows"], s)
+                       == sign(design[name]["rows"], s))
+             for name in ("all_categories", "adversarial")}
+    return {"openbb_as_of": raw["as_of_utc"], "workbench_as_of": workbench["as_of_utc"],
+            "symbols": symbols, **readings, "costs": costs(raw, workbench),
+            "sign_agreement_with_design_day": {k: f"{v}/{len(same)}" for k, v in agree.items()}}
+
+
 def run(raw: Mapping[str, Any], notes: Iterable[Mapping[str, Any]],
-        workbench: Mapping[str, Any] | None = None) -> dict[str, Any]:
+        workbench: Mapping[str, Any] | None = None,
+        day2: tuple[Mapping[str, Any], Mapping[str, Any]] | None = None) -> dict[str, Any]:
     as_of = datetime.fromisoformat(str(raw["as_of_utc"]))
     cycles = last_cycle(notes, day=as_of.date().isoformat(), before=as_of)
     if not cycles:
@@ -394,6 +503,10 @@ def run(raw: Mapping[str, Any], notes: Iterable[Mapping[str, Any]],
     }
     verdict = ("rival_better" if all(d < 0 for d in diffs) else
                "argus_better" if all(d > 0 for d in diffs) else "mixed")
+    design = ({**workbench_readings(ob, wb, both), "costs": costs(raw, workbench)}
+              if workbench is not None else None)
+    held_out = (held_out_day(day2[0], day2[1], design)
+                if day2 is not None and design is not None else None)
     return {
         "question": "per-symbol data categories that answered with data, same underlyings, same "
                     "day: ARGUS's live desk against every keyless OpenBB provider",
@@ -426,6 +539,8 @@ def run(raw: Mapping[str, Any], notes: Iterable[Mapping[str, Any]],
             "verdict": verdict,
         },
         "workbench_summary": workbench_summary,
+        "workbench_design_day": design,
+        "held_out": held_out,
         "baseline": {
             "system": "OpenBB keyless providers, run through OpenBB's own obb interface",
             "calls": len(ob), "answered": sum(1 for c in ob if c.answered),
@@ -462,7 +577,11 @@ def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - CLI
         artefact.write(WORKBENCH_PATH, read_workbench(perps))
     workbench = (json.loads(WORKBENCH_PATH.read_text(encoding="utf-8"))
                  if WORKBENCH_PATH.exists() else None)
-    report = run(raw, notes, workbench)
+    day2_paths = (DATA / "openbb_breadth_raw_day2.json",
+                  DATA / "perception_workbench_raw_day2.json")
+    day2 = (tuple(json.loads(path.read_text(encoding="utf-8")) for path in day2_paths)
+            if all(path.exists() for path in day2_paths) else None)
+    report = run(raw, notes, workbench, day2)
     artefact.write(REPORT_PATH, report)
     s = report["summary"]
     print(f"{s['symbols']} symbols: ARGUS {s['mean_argus_categories']} categories per symbol, "
@@ -473,6 +592,11 @@ def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - CLI
         print(f"workbench: {w['mean_workbench_categories']} categories per symbol; ahead on "
               f"{w['symbols_workbench_ahead']}, behind on {w['symbols_openbb_ahead']}, tied "
               f"{w['symbols_tied']} ({w['verdict']})")
+    for name, reading in (("design day", report["workbench_design_day"]),
+                          ("held-out day", report["held_out"])):
+        if reading is not None:
+            print(f"{name}: all {reading['all_categories']['mean_difference']:+}, "
+                  f"adversarial {reading['adversarial']['mean_difference']:+}")
     for cat, n in report["by_category"].items():
         print(f"  {cat:18} desk {n['argus']:2}  workbench {n['argus_workbench']:2}  "
               f"openbb {n['openbb']:2}")

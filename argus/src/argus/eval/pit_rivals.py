@@ -343,8 +343,14 @@ def first_public(facts: Sequence[PitFact]) -> dict[date, datetime]:
 def _classify(shown_end: date, shown_value: float, truth: tuple[date, float],
              public: Mapping[date, datetime], as_of: datetime) -> str:
     """``right``, ``leak`` (a quarter not yet public), ``late`` (an older quarter although a newer
-    one was public) or ``stale`` (the right quarter with a superseded value) — the one outcome
-    rule shared by every rival, real-series or native-as-of alike."""
+    one was public), ``rounded`` (the right quarter, its value off by storage precision alone) or
+    ``stale`` (the right quarter with a superseded value) — the one outcome rule shared by every
+    rival, real-series or native-as-of alike.
+
+    ``rounded`` was split out on 2026-09-29: Qlib stores values as float32, and 283 of its answers
+    that differ from the filed figure by under 1e-5 relative were being published as "stale after
+    restatement", an error of a different kind (Activity/28_CAPABILITY_CLOSE_PLAN_2.md, findings).
+    They are still not ``right``, so no score moves."""
     became = public.get(shown_end)
     if became is None or became > as_of:
         return "leak"
@@ -352,7 +358,14 @@ def _classify(shown_end: date, shown_value: float, truth: tuple[date, float],
         return "late"
     if shown_end == truth[0] and shown_value == truth[1]:
         return "right"
+    if shown_end == truth[0] and abs(shown_value - truth[1]) <= ROUNDING_REL * abs(truth[1]):
+        return "rounded"
     return "stale"
+
+
+ROUNDING_REL = 1e-5
+"""float32 carries about seven significant digits; a right-period value this close to the filed one
+differs by storage precision, not by which filing it came from."""
 
 
 def rival_outcomes(system: str, ticker: str, facts: Sequence[PitFact], probes: Sequence[Probe],
@@ -404,9 +417,11 @@ def native_outcomes(system: str, ticker: str, facts: Sequence[PitFact], probes: 
 
 
 def _count(rows: Sequence[Mapping[str, Any]]) -> dict[str, int]:
-    count = {k: sum(r["outcome"] == k for r in rows) for k in ("right", "leak", "late", "stale")}
+    count = {k: sum(r["outcome"] == k for r in rows)
+             for k in ("right", "leak", "late", "stale", "rounded")}
     return {"questions": len(rows), "right": count["right"], "leak": count["leak"],
-            "late": count["late"], "stale_after_restatement": count["stale"]}
+            "late": count["late"], "stale_after_restatement": count["stale"],
+            "rounded_by_storage": count["rounded"]}
 
 
 def score_rival(system: str, ticker: str, facts: Sequence[PitFact], probes: Sequence[Probe],
@@ -428,10 +443,11 @@ def by_side(rows: Sequence[Mapping[str, Any]]) -> dict[str, dict[str, int]]:
     for side in ("before", "after"):
         side_rows = [r for r in rows if r["side"] == side]
         counts = {k: sum(r["outcome"] == k for r in side_rows)
-                  for k in ("right", "leak", "late", "stale")}
+                  for k in ("right", "leak", "late", "stale", "rounded")}
         n = len(side_rows)
         out[side] = {"questions": n, "right": counts["right"], "leak": counts["leak"],
                      "late": counts["late"], "stale_after_restatement": counts["stale"],
+                     "rounded_by_storage": counts["rounded"],
                      "right_rate": round(counts["right"] / n, 4) if n else None}
     return out
 

@@ -102,6 +102,11 @@ class Headline:
     # `standing.groupwise_verdict` holds it against the row; elsewhere [0, 0] is an exact tie or
     # a perfect score, and is not.
     zero_is_no_effect: bool = False
+    # The one capability whose claim this headline is, by register name, when an artefact carries
+    # more than one capability's claim: perception_breadth.json holds the desk's loss (19) and the
+    # workbench's lead (48), and without this each row's gate read the other's headline as its
+    # own. Empty means the headline is the claim of every row that cites the artefact.
+    claim_of: str = ""
 
     def as_dict(self) -> dict[str, Any]:
         blob = self.report.as_dict()
@@ -114,6 +119,7 @@ class Headline:
             "split_ran": self.report.split is not None,
             "favours": favours,
             "zero_is_no_effect": self.zero_is_no_effect,
+            "claim_of": self.claim_of,
         })
         return blob
 
@@ -172,11 +178,12 @@ def _f(value: Any) -> float:
 def _headline(name: str, items: Sequence[Item], keys: Sequence[str], *, headline: str,
               orientation: str, role: str, role_reason: str, source: str,
               halves: Any = None, notes: Sequence[str] = (),
-              zero_is_no_effect: bool = False) -> Headline:
+              zero_is_no_effect: bool = False, claim_of: str = "") -> Headline:
     return Headline(
         report=audit(name, items, keys, headline=headline, orientation=orientation,
                      halves=halves, notes=notes),
-        role=role, role_reason=role_reason, source=source, zero_is_no_effect=zero_is_no_effect)
+        role=role, role_reason=role_reason, source=source, zero_is_no_effect=zero_is_no_effect,
+        claim_of=claim_of)
 
 
 def _parity(what: str, regenerated: float, published: float) -> None:
@@ -268,20 +275,38 @@ def _claimcheck(path: str) -> Entry:
 
 
 def _stopquality(path: str) -> Entry:
-    rows = [r for r in _load(path)["rows"]
+    blob = _load(path)
+    rows = [r for r in blob["rows"]
             if r["rook_noise_hit_rate_oos"] is not None
             and r["argus_noise_hit_rate_oos"] is not None]
     items = [Item(value=_f(r["rook_noise_hit_rate_oos"]) - _f(r["argus_noise_hit_rate_oos"]),
                   groups={"symbol": str(r["symbol"])}) for r in rows]
-    return Entry(path, CHECKED, "one row per name", (
-        _headline("stop hit by noise: ARGUS vs Rook", items, ("symbol",),
-                  headline="share of held-out 24h windows whose low reached the stop",
-                  orientation="Rook hit rate - ARGUS hit rate: positive = ARGUS's stop is hit "
-                  "less often by ordinary movement", role=VS_RIVAL,
-                  role_reason="the comparison's only metric", source="rows",
-                  notes=("the ARGUS distance scored here is the harness's own _p90_adverse, not "
-                         "desk/odds.py (data/harness_validity.json: desk/odds.py never "
-                         "executes in this harness)",)),))
+    heads = [_headline(
+        "stop hit by noise: ARGUS vs Rook", items, ("symbol",),
+        headline="share of held-out 24h windows whose low reached the stop",
+        orientation="Rook hit rate - ARGUS hit rate: positive = ARGUS's stop is hit less often "
+        "by ordinary movement", role=CONTEXT,
+        role_reason="hit rate falls with stop width, so a wider stop wins it by construction; "
+        "kept as context, not as the claim (Activity/28_CAPABILITY_CLOSE_PLAN_2.md §43)",
+        source="rows")]
+    windows = blob.get("windows") or []
+    if windows:
+        all_arms = blob["arms"]["all"]
+        for arm in ("argus", "atr_1x"):
+            regenerated = round(sum(_f(w[f"{arm}_net_bps"]) for w in windows) / len(windows), 3)
+            _parity(f"{path} {arm} mean net bps", regenerated, _f(all_arms[arm]["mean_net_bps"]))
+        heads.append(_headline(
+            "net return with the stop: ARGUS vs a 1x ATR stop", [
+                Item(value=_f(w["argus_net_bps"]) - _f(w["atr_1x_net_bps"]),
+                     groups={"symbol": str(w["symbol"]), "date": str(w["date"])},
+                     order=str(w["date"])) for w in windows], ("symbol",),
+            headline="per held-out window, a long from the prior close, 12bps round trip",
+            orientation="ARGUS net bps - ATR-stop net bps: positive = ARGUS's stop kept more",
+            role=VS_RIVAL,
+            role_reason="the general-purpose volatility stop, on the same windows and the same "
+            "trade; the comparison 43-*.toml's blocker names",
+            source="windows"))
+    return Entry(path, CHECKED, "one row per name, and one per held-out window", tuple(heads))
 
 
 def _copilot_rivals(path: str) -> Entry:
@@ -953,6 +978,10 @@ def _review_rivals(path: str) -> Entry:
             source="real_record.rows"),))
 
 
+DESK_PERCEPTION = "Perception layer: what the desk can see"
+WORKBENCH_BREADTH = "Research workbench data breadth vs. OpenBB's keyless providers"
+
+
 def _perception_breadth(path: str) -> Entry:
     """`eval/perception_breadth.py`'s per-symbol rows: the number of data categories ARGUS's last
     live cycle received minus the number OpenBB's keyless providers answered, same underlyings,
@@ -971,7 +1000,7 @@ def _perception_breadth(path: str) -> Entry:
         orientation="positive = ARGUS's desk received more categories for this symbol",
         role=VS_RIVAL,
         role_reason="the breadth axis Track 3 names, against 19-*.toml's named baseline",
-        source="per_symbol")]
+        source="per_symbol", claim_of=DESK_PERCEPTION)]
     if all("workbench_difference" in r for r in rows) and blob.get("workbench_summary"):
         for r in rows:
             _parity(f"{path} {r['symbol']} workbench difference",
@@ -985,7 +1014,45 @@ def _perception_breadth(path: str) -> Entry:
             orientation="positive = the workbench answered more categories for this symbol",
             role=VS_RIVAL,
             role_reason="the same axis for the research workbench, the Track 3 surface",
-            source="per_symbol"))
+            source="per_symbol", claim_of=WORKBENCH_BREADTH))
+    design, held = blob.get("workbench_design_day"), blob.get("held_out")
+    if design and held:
+        # The held-out day re-reads both arms with nothing refitted; each day's per-symbol
+        # difference is recomputed from its own category counts.
+        for day, reading in (("design", design), ("held_out", held)):
+            for name in ("all_categories", "adversarial"):
+                for r in reading[name]["rows"]:
+                    _parity(f"{path} {day} {name} {r['symbol']}",
+                            float(r["workbench"] - r["openbb"]), _f(r["difference"]))
+
+        def both_days(name: str) -> tuple[list[Item], Any]:
+            a = [Item(value=_f(r["difference"]), groups={"symbol": str(r["symbol"]),
+                                                         "day": "design"})
+                 for r in design[name]["rows"]]
+            b = [Item(value=_f(r["difference"]), groups={"symbol": str(r["symbol"]),
+                                                         "day": "held_out"})
+                 for r in held[name]["rows"]]
+            return [*a, *b], halves_from(
+                sum(i.value for i in a) / len(a), sum(i.value for i in b) / len(b),
+                first_items=len(a), second_items=len(b),
+                label=f"design day {str(blob['openbb_as_of'])[:10]} vs held-out day "
+                      f"{str(held['openbb_as_of'])[:10]}")
+
+        for name, title, reason in (
+                ("all_categories", "every category",
+                 "row 48's claim, re-read on a day the comparison was not built on"),
+                ("adversarial", "only categories OpenBB's keyless catalogue can reach",
+                 "the lead without the categories the rival has no endpoint for")):
+            rows, halves = both_days(name)
+            heads.append(_headline(
+                f"workbench vs OpenBB keyless, {title}, design and held-out day", rows,
+                ("symbol", "day"), halves=halves,
+                headline="categories answered with data, workbench minus OpenBB, per symbol "
+                         "and day",
+                orientation="positive = the workbench answered more categories",
+                role=VS_RIVAL, role_reason=reason,
+                source=f"workbench_design_day.{name} + held_out.{name}",
+                claim_of=WORKBENCH_BREADTH))
     return Entry(path, CHECKED, "one row per underlying, from perception_breadth.py's own "
                  "per-symbol category lists", tuple(heads))
 
@@ -1154,21 +1221,81 @@ def _eventdriven_agents(path: str) -> Entry:
 
 
 def _general_sue(path: str) -> Entry:
-    rows = _load(path)["alignment"]["anchor_detail"]
+    """eval/general_sue_comparison.py: one row per SEC filer and alignment method, on the design
+    frames (CY2022Q1-CY2026Q2), a holdout the dated rule was never fitted on (CY2016Q1-CY2021Q4)
+    and a seeded companyfacts sample run against edgartools' fiscal-label pairing. A filer is
+    correct for a method when it returned a finite SUE from pairs that are all year-over-year.
+    The rows are recounted here and must reproduce the artefact's own correct counts."""
+    blob = _load(path)
+    argus = "argus_dated_after"
+    frames = blob["alignment"]["frames_filer_rows"]
+    holdout = blob["holdout"]["filer_rows"]
+    sample = blob["edgartools_fiscal"]["filer_rows"]
+    for label, rows, published in (
+            ("frames", frames, blob["alignment"]["frames_correct"]),
+            ("holdout", holdout, blob["holdout"]["correct"]),
+            ("edgartools sample", sample, blob["edgartools_fiscal"]["correct"])):
+        for arm, summary in published.items():
+            got = sum(1 for r in rows if r["arms"][arm]["correct"])
+            if got != summary["correct"] or len(rows) != summary["filers"]:
+                raise AuditError(f"{path}: {label} rows give {got}/{len(rows)} correct for {arm}, "
+                                 f"the artefact publishes {summary['correct']}/"
+                                 f"{summary['filers']}")
 
-    def answered(arm: dict[str, Any]) -> bool:
-        return arm.get("sue") is not None
+    def ok(row: dict[str, Any], arm: str) -> float:
+        return 1.0 if row["arms"][arm]["correct"] else 0.0
 
-    items = [Item(value=(1.0 if answered(r["argus_dated_after"]) else 0.0)
-                  - (1.0 if answered(r["pandas_period_lenient"]) else 0.0),
-                  groups={"symbol": str(r["symbol"])}) for r in rows]
-    return Entry(path, CHECKED, "one row per real anchor symbol", (
-        _headline("SUE: dated alignment answers where pandas' lenient period index refuses",
-                  items, ("symbol",),
-                  headline="(ARGUS answers) - (pandas answers) per anchor",
-                  orientation="+1 = only ARGUS aligned the filings, 0 = both did",
-                  role=VS_RIVAL, role_reason="the general-purpose rival on the same filings",
-                  source="alignment.anchor_detail"),))
+    def month(row: dict[str, Any]) -> str:
+        return str(row["newest_end"])[5:7]
+
+    def items(rows: Sequence[dict[str, Any]], rival: str, universe: str) -> list[Item]:
+        return [Item(value=ok(r, argus) - ok(r, rival),
+                     groups={"universe": universe, "newest_end_month": month(r)})
+                for r in rows]
+
+    def design_vs_holdout(rival: str) -> tuple[list[Item], Any]:
+        a, b = items(frames, rival, "design_2022_2026"), items(holdout, rival, "holdout_2016_2021")
+        return [*a, *b], halves_from(
+            sum(i.value for i in a) / len(a), sum(i.value for i in b) / len(b),
+            first_items=len(a), second_items=len(b),
+            label="design frames CY2022Q1-CY2026Q2 vs holdout frames CY2016Q1-CY2021Q4")
+
+    common: dict[str, Any] = {
+        "headline": "(ARGUS dated correct) - (rival correct) per filer; correct = a finite SUE "
+                    "from pairs that are all year-over-year",
+        "orientation": "+1 = only ARGUS correct, -1 = only the rival correct, 0 = tie",
+    }
+    heads = []
+    for rival, role, reason in (
+            ("pandas_period_lenient", VS_RIVAL,
+             "pandas' lenient PeriodIndex, the general-purpose rival on the same filings"),
+            ("argus_positional_before", VS_RIVAL,
+             "QuantConnect's positional quarters[i + 4] pairing (ARGUS before 2026-09-25), the "
+             "named rival"),
+            ("pandas_period_strict", CONTEXT,
+             "pandas' strict rolling window: NaN whenever a fiscal Q4 is missing, a straw man")):
+        rows, halves = design_vs_holdout(rival)
+        heads.append(_headline(
+            f"SUE alignment per filer: ARGUS dated vs {rival}, design and holdout", rows,
+            ("universe", "newest_end_month"), role=role, role_reason=reason,
+            source="alignment.frames_filer_rows + holdout.filer_rows", halves=halves, **common))
+    for rival, role, reason in (
+            ("edgartools_fiscal", VS_RIVAL,
+             "edgartools' (fiscal year - 1, same fiscal period) pairing on the same companyfacts "
+             "rows, the strongest general-purpose SEC tool"),
+            ("companyfacts_raw_fy_fp", CONTEXT,
+             "the SEC's raw (fy, fp) labels, which edgartools itself does not trust")):
+        heads.append(_headline(
+            f"SUE alignment per filer: ARGUS dated vs {rival}, seeded companyfacts sample",
+            [Item(value=ok(r, argus) - ok(r, rival),
+                  groups={"fiscal_year_end_month": str(r["edgartools_fiscal_year_end_month"]),
+                          "newest_end_month": month(r)})
+             for r in sample],
+            ("fiscal_year_end_month", "newest_end_month"), role=role, role_reason=reason,
+            source="edgartools_fiscal.filer_rows", **common))
+    return Entry(path, CHECKED, "one row per SEC filer: design frames, holdout frames and a "
+                 "seeded companyfacts sample, recounted against the published correct counts",
+                 tuple(heads))
 
 
 def _copilot_stress(path: str) -> Entry:
@@ -1288,23 +1415,121 @@ def _pit_rivals(path: str) -> Entry:
 
 
 def _stress_search(path: str) -> Entry:
-    """desk/stress_search.py's out-of-sample calibration: one row per name and loss tolerance, the
-    searched probability of breaching it against a normal model, each scored on held-out windows
-    (eval/stress_search_comparison.py)."""
+    """desk/stress_search.py's out-of-sample calibration: one row per name and loss tolerance,
+    scored against the price-only truth on non-overlapping held-out windows, against historical
+    simulation (the general tool) and a normal model (context); eval/stress_search_comparison.py."""
     blob = _load(path)["calibration"]
     rows = blob["rows"]
-    items = [Item(value=_f(r["normal_error"]) - _f(r["argus_error"]),
-                  groups={"symbol": str(r["symbol"]), "tolerance": f"{_f(r['tolerance_pct']):g}%"})
-             for r in rows]
     _parity("stress search: ARGUS mean absolute error",
             sum(_f(r["argus_error"]) for r in rows) / len(rows), _f(blob["argus_mae"]))
-    return Entry(path, CHECKED, "one row per name and loss tolerance", (
-        _headline("breach probability out of sample: ARGUS vs a normal model", items,
-                  ("symbol", "tolerance"),
-                  headline="mean absolute error of the predicted breach probability",
-                  orientation="normal-model error - ARGUS error per row: positive = ARGUS closer",
-                  role=VS_RIVAL, role_reason="the comparison's primary", source="calibration.rows",
-                  notes=("fit and test windows are chronological per name; no second split",)),))
+
+    def items(rival: str) -> list[Item]:
+        return [Item(value=_f(r[f"{rival}_error"]) - _f(r["argus_error"]),
+                     groups={"symbol": str(r["symbol"]),
+                             "tolerance": f"{_f(r['tolerance_pct']):g}%"}) for r in rows]
+
+    heads = [_headline(
+        "breach probability out of sample: ARGUS vs a normal model", items("normal"),
+        ("symbol", "tolerance"), headline="mean absolute error of the predicted breach probability",
+        orientation="normal-model error - ARGUS error per row: positive = ARGUS closer",
+        role=CONTEXT if "historical_error" in rows[0] else VS_RIVAL,
+        role_reason="AgenticTrading's normal shock model, the named baseline",
+        source="calibration.rows")]
+    if "historical_error" in rows[0]:
+        heads.append(_headline(
+            "breach probability out of sample: ARGUS vs historical simulation",
+            items("historical"), ("symbol", "tolerance"),
+            headline="mean absolute error of the predicted breach probability, price-only truth",
+            orientation="historical error - ARGUS error per row: positive = ARGUS closer",
+            role=VS_RIVAL, role_reason="the general-purpose method (plan §46)",
+            source="calibration.rows"))
+    return Entry(path, CHECKED, "one row per name and loss tolerance", tuple(heads))
+
+
+def _injection_rival(path: str) -> Entry:
+    """`eval/injection_classifier_rival.py`'s deepset rows: ARGUS's rules and ProtectAI's
+    classifier on the same 662 externally sampled prompts (263 attacks, 399 clean)."""
+    blob = _load(path)
+    rows = blob["deepset_rows"]
+    summary = blob["corpora"]["deepset"]
+    _parity(f"{path} argus deepset recall",
+            sum(1 for r in rows if r["label"] == 1 and r["argus"]) / max(
+                1, sum(1 for r in rows if r["label"] == 1)),
+            _f(summary["argus"]["recall"]))
+    attacks = [Item(value=float(r["argus"]) - float(r["deberta"]),
+                    groups={"split": str(r["split"])}) for r in rows if r["label"] == 1]
+    clean = [Item(value=float(r["deberta"]) - float(r["argus"]),
+                  groups={"split": str(r["split"])}) for r in rows if r["label"] == 0]
+    return Entry(path, CHECKED, "one row per deepset prompt, both detectors", (
+        _headline("attacks withheld: ARGUS rules vs a trained injection classifier", attacks,
+                  ("split",), headline="per attack: ARGUS withheld minus classifier withheld",
+                  orientation="positive = ARGUS caught an attack the classifier missed",
+                  role=VS_RIVAL, role_reason="attacks neither was written against, the row's "
+                  "claim", source="deepset_rows"),
+        _headline("clean prompts wrongly withheld: classifier vs ARGUS", clean, ("split",),
+                  headline="per clean prompt: classifier withheld minus ARGUS withheld",
+                  orientation="positive = the classifier withheld clean text ARGUS passed",
+                  role=CONTEXT, role_reason="the false-withhold side of the same corpus",
+                  source="deepset_rows"),
+    ))
+
+
+def _factor_quality_rivals(path: str) -> Entry:
+    """`eval/factor_quality_rivals.py`: ARGUS's eight rules and FactorMiner's catalogues (its
+    109 scoreable paper factors, 12 Alpha101 and 60 adapted variants) through the factor lab's
+    cost, out-of-sample and split-half gates on the same frozen bars, with a placebo arm that
+    rotates each factor against the returns. The pass-all counts are recounted from the rows."""
+    blob = _load(path)
+    rows = blob["rows"]
+    noise = float(blob["noise"]["rate"])
+    for family, arms in blob["summary"]["by_family"].items():
+        for arm, block in arms.items():
+            _parity(f"{path} {family}/{arm} pass_all",
+                    float(sum(1 for r in rows if r["family"] == family and r[arm]["passes_all"])),
+                    float(block["pass_all"]))
+    rival = [r for r in rows if r["family"] != "argus"]
+    symbols = sorted({str(r["symbol"]) for r in rows})
+
+    def rate(rs: list[dict[str, Any]]) -> float:
+        return sum(1.0 for r in rs if r["as_written"]["passes_all"]) / len(rs)
+
+    per_symbol = [Item(
+        value=rate([r for r in rows if r["family"] == "argus" and r["symbol"] == s])
+        - rate([r for r in rival if r["symbol"] == s]),
+        groups={"symbol": s}) for s in symbols]
+    pairs = [Item(value=(1.0 if r["as_written"]["passes_all"] else 0.0) - noise,
+                  groups={"family": str(r["family"]), "category": str(r["category"]),
+                          "symbol": str(r["symbol"])}) for r in rows]
+    placebo = [Item(value=(1.0 if r["placebo"]["passes_all"] else 0.0) - noise,
+                    groups={"family": str(r["family"]), "symbol": str(r["symbol"])})
+               for r in rival]
+    return Entry(path, CHECKED, "one row per (family, factor, instrument): ARGUS's eight rules "
+                 "and FactorMiner's 109 scoreable paper factors, 12 Alpha101 and 60 adapted "
+                 "variants, each through the lab's cost, OOS and split-half gates", (
+        _headline("ARGUS's rules against FactorMiner's catalogues, every gate passed",
+                  per_symbol, ("symbol",),
+                  headline="per instrument, ARGUS's pass-all-gates rate minus FactorMiner's "
+                  "(all three catalogues pooled, as written)",
+                  orientation="positive = ARGUS's rules clear every gate more often on this "
+                  "instrument", role=VS_RIVAL,
+                  role_reason="the row-34 comparison: factor quality through identical gates",
+                  source="rows[as_written].passes_all"),
+        _headline("every factor-instrument pair against the calibrated noise rate", pairs,
+                  ("family", "category", "symbol"),
+                  headline="share of pairs passing cost, OOS and split-half, minus the "
+                  "split-half noise rate",
+                  orientation="positive = passes every gate more often than coin flips pass "
+                  "split-half alone", role=CONTEXT,
+                  role_reason="what the TIED/LOST rule reads, broken down by FactorMiner's "
+                  "own categories (the fairness caveat)",
+                  source="rows[as_written].passes_all, noise.rate"),
+        _headline("FactorMiner's factors rotated against the returns (placebo)", placebo,
+                  ("family", "symbol"),
+                  headline="share of placebo pairs passing every gate, minus the noise rate",
+                  orientation="positive = the all-gates null passes more often than coin flips",
+                  role=CONTEXT, role_reason="the empirical null for all three gates together",
+                  source="rows[placebo].passes_all"),
+    ))
 
 
 def _not_checkable(status: str, reason: str) -> Callable[[str], Entry]:
@@ -1362,6 +1587,8 @@ ADAPTERS: dict[str, Callable[[str], Entry]] = {
         "eval/general_coint_comparison.py would need to record each universe's discoveries"),
     "data/review_rivals.json": _review_rivals,
     "data/perception_breadth.json": _perception_breadth,
+    "data/injection_classifier_rival.json": _injection_rival,
+    "data/factor_quality_rivals.json": _factor_quality_rivals,
     "data/xa_arena.json": _not_checkable(
         WITHOUT_ROWS, "hourly net asset values reduced to per-period scores per arm; "
         "eval/xa_arena.py would need to record each arm's hourly return path"),
@@ -1433,6 +1660,13 @@ ADAPTERS: dict[str, Callable[[str], Entry]] = {
         "counts"),
     "data/feedlist_comparison.json": _not_checkable(
         DESIGNED, "designed vendor-failure scenarios over the rival's own category list"),
+    "data/deepset_prompt_injections.json": _not_checkable(
+        NO_ROWS, "the rival corpus as fetched (text and label); scored in "
+        "data/injection_classifier_rival.json"),
+    "data/sentiment_dedup_rival.json": _not_checkable(
+        DESIGNED, "the 30 designed manipulation narratives of eval/sentiment_cases.py, scored for "
+        "dedup-then-finBERT against ARGUS's recorded analyst; a comparison on designed cases, "
+        "not a population"),
     "data/openbb_breadth_raw.json": _not_checkable(
         NO_ROWS, "the rival's raw per-call record (provider, endpoint, ticker, rows, latency); "
         "the comparison built on it is data/perception_breadth.json, audited there"),
@@ -1547,6 +1781,14 @@ def run(paths: Iterable[str] | None = None) -> dict[str, Any]:
     if unhandled:
         raise AuditError(f"no groupwise decision for: {', '.join(unhandled)}")
     entries = {path: ADAPTERS[path](path) for path in targets}
+    from argus.eval.standing import REGISTER
+
+    names = {cap.name for cap in REGISTER}
+    orphans = sorted({f"{path}: {h.claim_of!r}" for path, e in entries.items()
+                      for h in e.headlines if h.claim_of and h.claim_of not in names})
+    if orphans:
+        raise AuditError("headline(s) claimed for a capability the register does not hold: "
+                         + "; ".join(orphans))
     flagged: list[dict[str, Any]] = []
     for path, entry in entries.items():
         for h in entry.headlines:
@@ -1579,13 +1821,16 @@ def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - CLI
     parser.add_argument("--only", action="append", default=None)
     args = parser.parse_args(argv)
     report = run(args.only)
-    artefact.write(REPORT_PATH, report)
+    # A partial run is printed, never written: standing.py reads REPORT_PATH as the whole audit,
+    # and a one-artefact report there would leave every other proof unaudited.
+    if not args.only:
+        artefact.write(REPORT_PATH, report)
     for item in report["flagged"]:
         print(f"FLAG {item['role']:15s} {item['artefact']} :: {item['headline']} "
               f"{item['flags']}")
     print(f"counts {report['counts']}; flagged {len(report['flagged'])} "
           f"({len(report['flagged_gating'])} on a capability's own claim)")
-    print(f"written to {REPORT_PATH}")
+    print(f"written to {REPORT_PATH}" if not args.only else "partial run (--only): not written")
     return 0
 
 

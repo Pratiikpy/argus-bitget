@@ -19,7 +19,7 @@ from __future__ import annotations
 import json
 import threading
 from collections.abc import Iterator
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from http.server import ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
@@ -207,6 +207,12 @@ class TestTheAskEndpoint:
         with pytest.raises(urllib.error.HTTPError) as caught:
             _get(base_url + "/ask?q=%20")
         assert caught.value.code == 400
+        # ...in the envelope every answer uses (stranger QA, 2026-09-29): a client reading
+        # `refused` and `lines` must not break on the one reply that lacked them.
+        body = json.loads(caught.value.read())
+        assert body["refused"] is True and body["reason"] == "empty question"
+        assert body["lines"] and "Ask a question in words" in body["lines"][0]
+        assert body["sources"] == [] and body["error"] == "empty question"
 
     def test_an_unknown_route_is_a_clean_404(self, base_url: str) -> None:
         import urllib.error
@@ -609,3 +615,16 @@ def test_a_500_names_the_error_class_and_an_incident_but_never_its_message(
     assert body["error"] == "ValueError"
     assert "s3cret" not in json.dumps(body)
     assert body["incident"] in caplog.text and "s3cret" in caplog.text
+
+
+def test_a_book_naming_what_bitget_does_not_list_is_said_not_dropped() -> None:
+    """Fresh-eyes audit, 2026-09-29: "50% ZZZZ" in the book field vanished without a word."""
+    from argus.lui.server import _ledger_path
+    from argus.paper.ledger import PaperLedger
+
+    newest = max(datetime.fromisoformat(e.decided_at)
+                 for e in PaperLedger(path=_ledger_path()).entries)
+    payload = handle_ask("why did you do nothing all weekend", [],
+                         now=newest + timedelta(hours=1), book="50% ZZZZ, 50% NVDA")
+    assert payload["lines"][1] == ("Not read from your book: ZZZZ (50%) — not a contract Bitget "
+                                   "lists, so it is left out of this answer.")

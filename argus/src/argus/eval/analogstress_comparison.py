@@ -336,7 +336,9 @@ def compare(grid: dict[str, Any], rival_results: dict[str, Any] | None = None) -
     blend = scored.get(selection["chosen"])
     best_rival = min((scored[k] for k in RIVAL if k in scored), key=lambda s: s.winkler)
     tests = {}
-    for mine in (best_argus, blend):
+    # Every ARGUS arm against every rival, not only the best one: argusShape (desk/shapematch)
+    # ranked 7th of 8 with no test written for it (Activity/28_CAPABILITY_CLOSE_PLAN_2.md §23).
+    for mine in (*(scored[k] for k in ARGUS if k in scored), blend):
         if mine is None:
             continue
         for key in RIVAL:

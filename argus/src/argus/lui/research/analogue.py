@@ -6,6 +6,7 @@ import itertools
 import json
 import math
 import re
+from collections.abc import Sequence
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -27,6 +28,7 @@ from argus.lui.research.kinds import (
 )
 from argus.lui.research.parse import (
     _OPTIONS_Q,
+    OPTIONS_POSITIONING_Q,
 )
 from argus.lui.research.quote import (
     _daily_closes,
@@ -422,12 +424,17 @@ def _stress_band(symbol: str) -> str | None:
 
 def _shape_line(closes: list[tuple[datetime, float]], symbol: str,
                 span: int) -> tuple[str, dict[str, Any]] | None:
-    """The same question asked of the path rather than its summary: `desk/shapematch.py`, OWNED
-    against stumpy's matrix profile for the calibrated null stumpy does not have. A state vector
-    cannot tell a steady grind from a crash that fully retraced; the path can, and the null says
-    whether the closest past path is closer than this name's own shuffled returns get by chance.
-    Until 2026-09-24 the console answered "has this happened before" with the state vector
-    alone."""
+    """The same question asked of the path rather than its summary: `desk/shapematch.py`. A state
+    vector cannot tell a steady grind from a crash that fully retraced; the path can, and the null
+    says whether the closest past path is closer than this name's own shuffled returns get by
+    chance. Until 2026-09-24 the console answered "has this happened before" with the state vector
+    alone.
+
+    **What it is worth, measured (2026-09-29, 23-*.toml LOST).** On AnalogDesk's grid of 2,698
+    held-out queries at five sessions, a band built from the path matches scored a Winkler of 16.4%
+    against 15.1% for the name's own unconditional band, significantly worse (Diebold-Mariano p =
+    0.001, clustered by date). So a path match is shown as history and the line says so; it is not
+    offered as a better base rate than the name's own record (:func:`_shape_caveat`)."""
     from argus.desk.shapematch import AnalogueError
     from argus.desk.shapematch import find as find_shape
 
@@ -458,7 +465,31 @@ def _shape_line(closes: list[tuple[datetime, float]], symbol: str,
     else:
         text = (f"Path match: the closest past stretch (ended {when}) is too far from the last 24 "
                 f"hours to count as a precedent — this path has no close match in {span} days.")
+    if shape.has_precedent:
+        text += _shape_caveat()
     return text, shape.as_dict()
+
+
+def _shape_caveat() -> str:
+    """The measured value of a path match as a forecast, read from its artefact, or nothing."""
+    import json as _json
+
+    from argus.lui.answer import desk_notes_path
+
+    try:
+        report = _json.loads((desk_notes_path().parent / "analogstress_comparison.json")
+                             .read_text(encoding="utf-8"))
+        mine = report["predictors"]["argusShape"]["winkler_pct"]
+        naive = report["predictors"]["uncondNamePIT"]["winkler_pct"]
+        test = report["diebold_mariano"]["argusShape vs uncondNamePIT"]
+    except (OSError, ValueError, KeyError, TypeError):
+        return ""
+    if test["p"] >= 0.05 or mine <= naive:
+        return ""
+    return (f" Measured on {test['paired_queries']:,} past queries, a band built from path "
+            f"matches was worse than this name's own unconditional range (Winkler {mine:.1f}% "
+            f"against {naive:.1f}%, p = {test['p']:.3f}), so read the match as history, not as a "
+            f"better guide than the name's own record.")
 
 
 ANALOGUE_OLDER_WAIT_S = 9.0
@@ -622,10 +653,10 @@ _NO_CANDLES: dict[ResearchKind, MarketData] = {
     ResearchKind.NEWS: _no_candles("Bitget live tickers and hourly candles, headlines from Yahoo "
                                    "Finance and eight outlet feeds, SEC EDGAR filings, live",
                                    "bitget + RSS + SEC EDGAR", "headlines, 8-K, 24h move"),
-    ResearchKind.FUNDAMENTALS: _no_candles("Bitget's bitget-mcp-server (US equity data) and the "
-                                           "company's SEC filings, live",
+    ResearchKind.FUNDAMENTALS: _no_candles("Bitget's bitget-mcp-server (US equity data), Yahoo "
+                                           "Finance and SEC EDGAR, live",
                                            "bitget-mcp-server", "earnings calendar, consensus, "
-                                           "13F, quote"),
+                                           "13F, quote, profile, holders, dividends, filings"),
 }
 """The kinds answered without thirty days of candles, each with the source it really uses — the
 data line once said "Bitget live 24h ticker" under a technical-analysis answer."""
@@ -641,12 +672,54 @@ _ALL_IN_Q = re.compile(
     r"\bi\s*(?:'m|am)\s+\d{2}\b", re.I)
 
 
-def _scope_lead(raw: str, symbol: str) -> list[str]:
+def _scope_lead(raw: str, symbol: str,
+                lines: Sequence[str] = ()) -> tuple[list[str], list[Source]]:
     """Questions whose real subject is outside what this desk measures get that said first, then
     the measured part. "Should I buy NVDA calls?", "can I take a loan against my BTC?" and "I am 62,
     should I put all my savings in BTC?" were each answered with a position-sizing line as if the
-    question had been something else (2026-09-25 audit, round 2)."""
+    question had been something else (2026-09-25 audit, round 2).
+
+    Returns the lead lines and any source they read. ``lines`` is the answer below them."""
     ticker = _t(symbol) if symbol else "it"
+    if (not _ALL_IN_Q.search(raw) and _OPTIONS_Q.search(raw)
+            and not re.search(r"\bmargin\s+call|\bcall\s+(?:me|it)\b", raw, re.I)):
+        return _options_scope(raw, symbol, ticker, lines)
+    return _other_scope(raw, symbol, ticker), []
+
+
+def _options_scope(raw: str, symbol: str, ticker: str,
+                   lines: Sequence[str]) -> tuple[list[str], list[Source]]:
+    """An options question leads with the listed chain as read from Cboe, and says what is not
+    judged. Until 2026-09-29 it opened "options are outside what this desk reads — it has no
+    options chain", and on the same answer a later line gave the chain's put/call ratio (stranger
+    QA): the positioning answer had begun reading Cboe's delayed chain that day."""
+    from argus.market.bitget import ANCHOR_OF
+
+    listed = ANCHOR_OF.get(symbol, "")
+    prefix = f"Options on {listed} (Cboe" if listed else ""
+    chain = next((line for line in (LEAD.sub("", x, count=1) for x in lines)
+                  if prefix and line.startswith(prefix)), None)
+    sources: list[Source] = []
+    if chain is None and listed:
+        from argus.lui.research.positioning import _options_line
+
+        read = _options_line(listed)
+        if read is not None:
+            chain, source, _figures = read
+            sources.append(source)
+    asks_positioning = OPTIONS_POSITIONING_Q.search(raw) is not None
+    limit = (f"Single contracts are not priced here — whether one {ticker} call or put is cheap "
+             f"at its strike and expiry is not judged; the perpetual is the leveraged instrument "
+             f"this desk can assess, measured below.")
+    if chain is not None:
+        return ([f"Bottom line: {chain}"] + ([] if asks_positioning else [limit])), sources
+    why = ("Cboe's options chain did not answer just now" if listed else
+           f"{ticker} has no US-listed options chain this desk reads — Cboe's chain is read only "
+           f"for the US-listed underlying of a Bitget stock perpetual")
+    return [f"Bottom line: {why}, so nothing about {ticker} options is stated. {limit}"], sources
+
+
+def _other_scope(raw: str, symbol: str, ticker: str) -> list[str]:
     if _ALL_IN_Q.search(raw):
         lines = [f"Bottom line: that is a decision about your whole financial life, and I am not a "
                  f"licensed adviser and do not know your circumstances — take it to one. What "
@@ -669,11 +742,6 @@ def _scope_lead(raw: str, symbol: str) -> list[str]:
                              f"stretch {worst_month:.0%} — on $100,000 of savings, "
                              f"${-deepest * 100_000:,.0f} and ${-worst_month * 100_000:,.0f}.")
         return lines
-    if _OPTIONS_Q.search(raw) and not re.search(r"\bmargin\s+call|\bcall\s+(?:me|it)\b", raw, re.I):
-        return [f"Bottom line: options are outside what this desk reads — it has no options chain, "
-                f"implied volatility or greeks, so it cannot say whether {ticker} calls or puts "
-                f"are priced well. What it measures for {ticker} itself is below; the "
-                f"perpetual is the leveraged instrument it can assess."]
     if _LOAN_Q.search(raw) and not re.search(r"\bfunding\b", raw, re.I):
         return [f"Bottom line: borrowing against {ticker} is outside what this desk reads — "
                 f"a lender's rates, loan-to-value and liquidation terms are not read here, so "

@@ -37,6 +37,14 @@ class TestTheTopBar:
         assert all(path != "/brand" for path, _ in design.LINKS)
         assert 'href="/brand"' in design.footer()
 
+    def test_every_served_page_is_reachable_by_a_link(self) -> None:
+        """Fresh-eyes audit, 2026-09-29: four pages answered 200 and nothing linked to them."""
+        linked = {path for path, _ in design.LINKS} | {
+            href for href in ("/architecture", "/policy", "/factors", "/agent", "/brand")
+            if f'href="{href}"' in design.footer()}
+        assert {"/", "/research", "/proof", "/wrong", "/status", "/materials", "/architecture",
+                "/policy", "/factors", "/agent", "/brand"} <= linked
+
 
 class TestTheConsoleCard:
     def test_a_correct_answer_is_not_stamped_over_budget(self) -> None:

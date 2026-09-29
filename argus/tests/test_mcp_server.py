@@ -134,9 +134,14 @@ def test_invalid_arguments_are_a_tool_error_the_agent_can_read() -> None:
                                 "arguments": {"symbol": "NVDA", "usd": "lots"}})
     assert reply["result"]["isError"] is True
     assert reply["result"]["content"][0]["text"] == (
-        "invalid arguments for argus_execution_plan: usd must be a number, not str")
+        "invalid arguments for argus_execution_plan: usd must be a number, not str. A call "
+        'that works: {"symbol": "NVDA", "usd": 50000}')
     missing = _rpc("tools/call", {"name": "argus_quote", "arguments": {}})
     assert "symbols is required" in missing["result"]["content"][0]["text"]
+    # A blank question is refused as the /ask page refuses it, with a worked example.
+    blank = _rpc("tools/call", {"name": "argus_ask", "arguments": {"question": "   "}})
+    assert blank["result"]["isError"] is True
+    assert "Ask a question in words" in blank["result"]["content"][0]["text"]
 
 
 def test_a_size_of_zero_is_refused_rather_than_read_as_twenty_percent() -> None:
@@ -343,3 +348,21 @@ class TestAFailedCallSaysWhetherToRetry:
         reply = _rpc("tools/call", {"name": "argus_quote", "arguments": {"symbols": ["NVDA"]}},
                      tool=lambda n, a: ("ok", False))
         assert "_meta" not in reply["result"]
+
+
+def test_every_worked_example_is_a_valid_call() -> None:
+    specs = {tool["name"]: tool for tool in mcp.TOOLS}
+    for name, arguments in mcp.EXAMPLE_ARGUMENTS.items():
+        assert mcp.schema_errors(specs[name]["inputSchema"], arguments) == [], name
+    assert {t["name"] for t in mcp.TOOLS if t["inputSchema"].get("required")} <= set(
+        mcp.EXAMPLE_ARGUMENTS)
+
+
+def test_an_invalid_call_shows_a_call_that_works() -> None:
+    _, body = mcp.handle_body(json.dumps({
+        "jsonrpc": "2.0", "id": 9, "method": "tools/call",
+        "params": {"name": "argus_stress", "arguments": {}}}).encode())
+    result = json.loads(body)["result"]
+    assert result["isError"] is True
+    text = result["content"][0]["text"]
+    assert "book is required" in text and "A call that works:" in text and '"NVDA": 40' in text

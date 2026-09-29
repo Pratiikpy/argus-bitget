@@ -44,12 +44,25 @@ def test_the_failure_probability_counts_failing_pairs() -> None:
     assert result.worst is not None and result.worst.move_pct == D("-12")
 
 
-def test_a_book_that_cannot_absorb_the_exit_is_a_failure_on_its_own() -> None:
-    result = search("X", moves(["1", "2"]), [book(0, "1")], quantity=D("5000"),
+def test_a_book_too_shallow_to_price_the_exit_is_unknown_not_a_breach() -> None:
+    # Until 2026-09-29 a truncated book counted as a certain breach on every move, even a
+    # favourable one (META: 17.9% at a 10% tolerance, all of it from truncated books).
+    shallow, deep = book(0, "1"), book(1, "10000")
+    result = search("X", moves(["1", "2"]), [shallow, deep], quantity=D("5000"),
                     tolerance_pct=D("50"))
-    assert result.failure_probability == 1
-    assert result.most_likely is not None and not result.most_likely.exitable
-    assert "cannot absorb" in result.sentence()
+    assert result.failure_probability == 0 and result.unknown_depth_books == 1
+    assert result.books == 1
+    assert "deeper than the 50 levels stored" in result.sentence()
+
+
+def test_no_book_deep_enough_refuses_rather_than_guesses() -> None:
+    import pytest
+
+    from argus.desk.stress import StressError
+
+    with pytest.raises(StressError, match="enough depth"):
+        search("X", moves(["1", "2"]), [book(0, "1")], quantity=D("5000"),
+               tolerance_pct=D("50"))
 
 
 def test_a_short_fails_on_rises() -> None:

@@ -192,8 +192,11 @@ written, before this migration; the re-scored text is the current source's, the 
 CONSOLE_CALLED = {
     "claimcheck": ({"replay"}, set()),
     "void": ({"console_replay"}, {"summary", "per_weekend"}),
-    "overnight": ({"console_replay"}, {"summary", "paired", "per_stock", "ablation",
-                                       "sunday_evening_vs_nocturne_claim"}),
+    # general_tool_premarket: the stock's own pre-market price scored as the general-purpose
+    # rival (2026-09-29), a block added after the migration, not a figure it moved.
+    "overnight": ({"console_replay", "general_tool_premarket"},
+                  {"summary", "paired", "per_stock", "ablation",
+                   "sunday_evening_vs_nocturne_claim"}),
 }
 """(keys added, keys whose figures moved) when the three harnesses stopped scoring their own copy
 of the console's arithmetic and started calling `lui/research` itself (2026-09-26). claimcheck's
@@ -219,7 +222,10 @@ def test_the_migrated_harness_reproduces_its_pre_migration_artefact_and_verdict(
     assert set(new) - set(old) == {"comparison_reports"} | added
     from_old = [r.outcome for r in module.comparison_reports(old)]
     from_new = [ComparisonReport.from_dict(r).outcome for r in new["comparison_reports"]]
-    assert from_old == from_new == expected
+    # Reports added after the migration (overnight's general-tool reads, 2026-09-29) follow the
+    # migrated ones; the migrated verdicts must not move.
+    assert from_old == from_new[:len(from_old)] == expected
+    assert len(from_new) == len(from_old) + {"overnight": 2}.get(name, 0)
     assert all(r["valid"] for r in new["comparison_reports"])
 
 

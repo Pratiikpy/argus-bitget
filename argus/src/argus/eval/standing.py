@@ -833,7 +833,9 @@ def groupwise_verdict(capability: Capability, proof: Proof,
         if entry.get("status") != "checked":
             missing.append(f"{ref}: {entry.get('status')} - {entry.get('reason', '')}")
             continue
-        claims = [h for h in entry.get("headlines", []) if h.get("role") in GATING_ROLES]
+        # A headline claimed for another row (``claim_of``) is that row's evidence, not this one's.
+        claims = [h for h in entry.get("headlines", []) if h.get("role") in GATING_ROLES
+                  and h.get("claim_of", "") in ("", capability.name)]
         if not claims:
             missing.append(f"{ref}: only context headlines were checked")
             continue

@@ -48,6 +48,14 @@ EXIT_FEE_BPS = Decimal("6")
 """Bitget's taker fee on the exit (`cost/model.CostModel.bitget_perp`)."""
 INDEPENDENCE = ("the move and the book are treated as independent; their dependence has not been "
                 "measured")
+UNKNOWN_DEPTH = ("the recorded books store 50 levels a side; where this exit is deeper than that, "
+                 "its cost is unknown and counts neither as a breach nor as safe")
+"""Until 2026-09-29 an exit deeper than the stored levels counted as a certain breach, whatever
+the move: on 12 of 67 META books and 5 of 67 COIN books a $50k exit ran past level 50, so META's
+and COIN's breach chances at a 10% tolerance were those shares (17.9% and 7.6%) even on moves in the
+position's favour, while the slippage where the book did fill had a median of 10 and 13bps
+(Activity/28_CAPABILITY_CLOSE_PLAN_2.md §46). A truncated snapshot says nothing past its last level,
+so those books now leave the calculation and are counted on their own."""
 
 
 def tape_books(symbol: str, path: Path = TAPE_PATH) -> list[OrderBook]:
@@ -124,11 +132,13 @@ class SearchResult:
     books: int
     evaluated: int
     failure_probability: Decimal
-    """Share of (move, book) pairs that fail: the probability of breaking the limit over the
-    horizon, under independence."""
+    """Share of (move, book) pairs that fail, over the books deep enough to price the exit: the
+    probability of breaking the limit over the horizon, under independence."""
     most_likely: Scenario | None
     worst: Scenario | None
     assumption: str = INDEPENDENCE
+    unknown_depth_books: int = 0
+    """Recorded books whose stored levels end before this exit is filled (:data:`UNKNOWN_DEPTH`)."""
 
     def as_dict(self) -> dict[str, Any]:
         return {"symbol": self.symbol, "quantity": str(self.quantity), "long": self.long,
@@ -137,19 +147,29 @@ class SearchResult:
                 "failure_probability": f"{self.failure_probability:.6f}",
                 "most_likely": None if self.most_likely is None else self.most_likely.as_dict(),
                 "worst": None if self.worst is None else self.worst.as_dict(),
-                "assumption": self.assumption}
+                "assumption": self.assumption,
+                "unknown_depth_books": self.unknown_depth_books}
+
+    def _depth_note(self) -> str:
+        if not self.unknown_depth_books:
+            return ""
+        total = self.books + self.unknown_depth_books
+        return (f" On {self.unknown_depth_books} of {total} recorded books this exit is deeper "
+                f"than the 50 levels stored, so its cost there is unknown and is left out.")
 
     def sentence(self) -> str:
         side = "long" if self.long else "short"
         if self.most_likely is None:
             return (f"No combination of the {self.moves} observed moves and {self.books} recorded "
-                    f"books takes this {side} past a {self.tolerance_pct}% loss.")
+                    f"books takes this {side} past a {self.tolerance_pct}% loss."
+                    + self._depth_note())
         m = self.most_likely
         how = ("the book cannot absorb the exit" if not m.exitable
                else f"a {m.loss_pct:.2f}% loss including {m.slippage_bps:.1f}bps of slippage")
         return (f"Chance of losing more than {self.tolerance_pct}% over the horizon: "
                 f"{self.failure_probability:.1%}. Most likely way: a {m.move_pct:+.2f}% move "
-                f"into a book like {m.book_at:%Y-%m-%d %H:%M} UTC — {how} ({INDEPENDENCE}).")
+                f"into a book like {m.book_at:%Y-%m-%d %H:%M} UTC — {how} ({INDEPENDENCE})."
+                + self._depth_note())
 
 
 def _loss_pct(move_pct: Decimal, slippage_bps: Decimal, *, long: bool) -> Decimal:
@@ -186,7 +206,12 @@ def search(symbol: str, moves: Sequence[Move], books: Sequence[OrderBook], *,
         raise StressError(f"no recorded order books for {symbol} in {TAPE_PATH.name}")
     if quantity <= 0 or tolerance_pct <= 0:
         raise StressError("quantity and the loss tolerance must be positive")
-    move_p, book_p = _grid(moves, exit_costs(books, quantity, long=long), long=long)
+    costs = exit_costs(books, quantity, long=long)
+    known = [c for c in costs if c.complete]
+    if not known:
+        raise StressError(f"none of the {len(costs)} recorded {symbol} books holds enough depth "
+                          f"to price this exit ({UNKNOWN_DEPTH})")
+    move_p, book_p = _grid(moves, known, long=long)
     failing = 0
     most: Scenario | None = None
     worst: Scenario | None = None
@@ -204,7 +229,7 @@ def search(symbol: str, moves: Sequence[Move], books: Sequence[OrderBook], *,
     return SearchResult(symbol=symbol, quantity=quantity, long=long, tolerance_pct=tolerance_pct,
                         moves=len(move_p), books=len(book_p), evaluated=total,
                         failure_probability=Decimal(failing) / total, most_likely=most,
-                        worst=worst)
+                        worst=worst, unknown_depth_books=len(costs) - len(known))
 
 
 def random_search(symbol: str, moves: Sequence[Move], books: Sequence[OrderBook], *,
@@ -212,7 +237,10 @@ def random_search(symbol: str, moves: Sequence[Move], books: Sequence[OrderBook]
                   long: bool = True) -> Scenario | None:
     """The non-adaptive baseline the study requires: ``budget`` pairs drawn uniformly, the most
     likely failure among them. Kept to measure what enumeration buys, not to be used."""
-    move_p, book_p = _grid(moves, exit_costs(books, quantity, long=long), long=long)
+    known = [c for c in exit_costs(books, quantity, long=long) if c.complete]
+    if not known:
+        return None
+    move_p, book_p = _grid(moves, known, long=long)
     rng = random.Random(seed)
     best: Scenario | None = None
     for _ in range(budget):
@@ -226,5 +254,5 @@ def random_search(symbol: str, moves: Sequence[Move], books: Sequence[OrderBook]
     return best
 
 
-__all__ = ["EXIT_FEE_BPS", "INDEPENDENCE", "ExitCost", "Scenario", "SearchResult",
+__all__ = ["EXIT_FEE_BPS", "INDEPENDENCE", "UNKNOWN_DEPTH", "ExitCost", "Scenario", "SearchResult",
            "exit_costs", "random_search", "search", "tape_books"]

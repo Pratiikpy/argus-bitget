@@ -11,9 +11,21 @@ modules = [
 # Demoted 2026-09-25 by the groupwise gate (S18): a statistical or out-of-sample
 # proof now needs a groupwise check on the capability's own artefact, and this
 # row's does not pass it. The reason and the route back are its first blocker.
-state = "implemented"
+state = "tied"
 baseline = "serenity-guardrails (Apache-2.0) hash-chained journal with a head anchor"
 blockers = [
+    """\
+        RE-GRADED 2026-09-29 from IMPLEMENTED to TIED (Activity/28_CAPABILITY_CLOSE_PLAN_2.md \
+        §18) with serenity-guardrails on the hash chain, the property both implement. The only \
+        difference ever measured was platform I/O: on Windows serenity's text-mode writes turn \
+        LF into CRLF and its own untampered chain then fails to verify, while ARGUS's hashes the \
+        parsed content. Run on Linux the same day (data/journal_comparison_posix.json, WSL2 \
+        Ubuntu 22.04), serenity writes LF, verifies its untampered chain clean and detects the \
+        tamper, so the earlier lead is a Windows bug in the rival, not a better method. What \
+        ARGUS has beyond it is scope, not a contest: an external anchor on Bitcoin through \
+        OpenTimestamps (the category's general tool, used as is) and sealed settlements, which \
+        serenity has no notion of. The live ledger verifies: 836 entries, chain and links \
+        intact, anchor agrees.""",
     """\
         RE-GRADED 2026-09-25 from OWNED to IMPLEMENTED by the groupwise gate \
         (data/groupwise_audit.json): data/journal_comparison.json holds a designed CRLF case, one \
@@ -97,7 +109,7 @@ artefact = "data/journal_comparison.json"
 condition = "out_of_sample_test"
 how = """\
     verified against the REAL, live production paper-trading ledger this session has been \
-    writing to — 248 real entries, written before this comparison existed, chain_intact=True"""
+    writing to, 836 real entries on 2026-09-29, chain and links intact, anchor agreeing"""
 test = "test_journal_comparison.py::TestOutOfSample"
 
 [[proofs]]

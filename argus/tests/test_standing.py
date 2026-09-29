@@ -502,10 +502,17 @@ class TestTheLiveRegisterIsHonest:
         # classes them DESIGNED and cannot stand in for a population result.
         # 2026-09-28: earnings surprise ranking to IMPLEMENTED (tracker 195). Its own headline
         # against pandas is 2 wins, 7 ties, 0 losses over 9 filers; the 95% interval includes zero.
+        # 2026-09-29: earnings surprise ranking back to OWNED, its route taken: 7,258 SEC filers on
+        # design and holdout frames, +0.057 [0.051, 0.063] per filer against pandas, and the
+        # pip-installed edgartools run on a seeded 309-filer sample (21 against 1).
+        # 2026-09-29: research workbench breadth OWNED against OpenBB's keyless providers on two
+        # days, +3.6 [3.1, 4.1], and +1.0 to +1.2 on the categories OpenBB can reach at all.
         owned_names = {c.name for c in audit().owned}
         assert owned_names == {
             "Per-profile mandate that changes the verdict",
             "Risk layer proved by domain sweep",
+            "Refusal-first earnings surprise ranking vs. a silently-exploding factor",
+            "Research workbench data breadth vs. OpenBB's keyless providers",
         }
         for cap in audit().owned:
             assert cap.conditions_missing == (), cap.name
@@ -887,7 +894,7 @@ class TestDemotionsCarryTheirRouteBack:
         # twelve on 2026-09-25; numeric grounding on 2026-09-27, once its designed cases were
         # filed as designed (audit finding 95). Rows that have since taken a route back lead with
         # that re-grade instead, and are checked below.
-        assert len(demoted) == 4
+        assert len(demoted) == 1
         for cap in demoted:
             assert cap.state is State.IMPLEMENTED, cap.name
             assert re.match(r"RE-GRADED 2026-09-2[57] from OWNED to IMPLEMENTED by the "
@@ -895,11 +902,12 @@ class TestDemotionsCarryTheirRouteBack:
             assert "oute back" in cap.blockers[0], cap.name
 
     def test_a_row_that_left_the_gates_demotion_leads_with_its_measured_regrade(self) -> None:
-        # Net executable arbitrage on 2026-09-28; eight more on 2026-09-29
-        # (Activity/28_CAPABILITY_CLOSE_PLAN_2.md), five TIED and three LOST.
+        # Net executable arbitrage on 2026-09-28; eleven more on 2026-09-29
+        # (Activity/28_CAPABILITY_CLOSE_PLAN_2.md), seven TIED and four LOST. Every row the gate
+        # ever demoted is in exactly one of the two lists: 13 in all.
         moved = [c for c in REGISTER
                  if len(c.blockers) > 1 and "by the groupwise gate" in c.blockers[1]]
-        assert len(moved) == 9
+        assert len(moved) == 12
         for cap in moved:
             assert cap.state in (State.TIED, State.LOST), cap.name
             assert re.match(r"RE-GRADED 2026-09-2[89] from IMPLEMENTED to "
@@ -1065,6 +1073,23 @@ class TestAnIntervalThatIncludesZeroIsNotAValidEvaluation:
         cap = standing.REGISTER[0]
         ok, _ = standing.groupwise_verdict(cap, cap.proofs[0], blob)
         assert ok
+
+    def test_another_rows_claim_in_a_shared_artefact_is_not_this_rows_evidence(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        # perception_breadth.json carries the desk's loss (19) and the workbench's lead (48).
+        import argus.eval.standing as standing
+
+        monkeypatch.setattr(standing, "proof_scope", lambda cap, proof: ("data/x.json",))
+        cap = standing.REGISTER[0]
+        blob = self._audit({"low": 0.1, "high": 0.4, "spans_zero": False})
+        heads = blob["artefacts"]["data/x.json"]["headlines"]
+        heads[0]["claim_of"] = cap.name
+        heads.append({**heads[0], "name": "someone else's loss", "favours": "rival",
+                      "claim_of": "another row"})
+        assert standing.groupwise_verdict(cap, cap.proofs[0], blob)[0]
+        heads[1]["claim_of"] = cap.name
+        ok, why = standing.groupwise_verdict(cap, cap.proofs[0], blob)
+        assert not ok and "favours the rival" in why
 
 
 def test_the_published_register_counts_only_conditions_that_survived_the_audit() -> None:

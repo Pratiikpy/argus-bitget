@@ -39,28 +39,37 @@ SCOPE, stated explicitly: :data:`SCOPE_STATEMENT`.
 
 from __future__ import annotations
 
+import argparse
+import gzip
 import hashlib
 import json
 import math
+import random
 import statistics
 import sys
 import time
+import urllib.error
 import urllib.request
 import warnings
+from collections import Counter
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from decimal import Decimal, localcontext
+from pathlib import Path
 from typing import Any
 
 import numpy as np
 
+from argus.market import sue as sue_module
 from argus.market.evidence import FEED_USER_AGENT
-from argus.market.fundamentals import FundamentalsSource
+from argus.market.fundamentals import Fact, FundamentalsSource, latest_per_period
 from argus.market.sue import (
     MAX_DELTA_SPAN_DAYS,
     MIN_QUARTERS,
     N_DELTAS,
+    NOISE_ULPS,
+    YOY_DAY_RANGE,
     SueError,
     read,
     read_dated,
@@ -72,6 +81,20 @@ from argus.truth.paths import DATA_DIR
 
 ARTEFACT = DATA_DIR / "general_sue_comparison.json"
 
+FRAMES_SNAPSHOT = DATA_DIR / "general_sue_frames_snapshot.json"
+"""The eighteen design frames (CY2022Q1-CY2026Q2) exactly as the SEC served them, frozen so the
+run is reproducible offline. ``--fetch`` refreshes it."""
+
+HOLDOUT_SNAPSHOT = DATA_DIR / "general_sue_frames_snapshot_holdout.json"
+"""The twenty-four holdout frames (CY2016Q1-CY2021Q4), frozen the same way."""
+
+ANCHORS_SNAPSHOT = DATA_DIR / "general_sue_frames_snapshot_anchors.json"
+"""The nine anchors' quarterly diluted EPS as the desk's own fetch returned it."""
+
+COMPANYFACTS_SNAPSHOT = DATA_DIR / "general_sue_frames_snapshot_companyfacts.json"
+"""``us-gaap:EarningsPerShareDiluted`` (USD/shares) rows from each sampled filer's companyfacts,
+with the fiscal labels (``fy``/``fp``), forms and filing dates the edgartools arm pairs by."""
+
 FRAMES_URL = (
     "https://data.sec.gov/api/xbrl/frames/us-gaap/EarningsPerShareDiluted/USD-per-shares/"
     "CY{year}Q{quarter}.json"
@@ -81,6 +104,28 @@ FRAME_QUARTERS: tuple[tuple[int, int], ...] = tuple(
     if (year, quarter) <= (2026, 2)
 )
 """Eighteen calendar quarters, the SEC's own frames (one fact per filer per calendar quarter)."""
+
+HOLDOUT_QUARTERS: tuple[tuple[int, int], ...] = tuple(
+    (year, quarter) for year in range(2016, 2022) for quarter in range(1, 5)
+)
+"""Twenty-four calendar quarters before the design window. The dated rule was fixed on 2026-09-25
+after the design frames exposed the positional defect; these frames were never looked at while it
+was written, and are scored with the rule exactly as it stood then (the report records the SHA-256
+of `market/sue.py` and its constants)."""
+
+COMPANYFACTS_URL = "https://data.sec.gov/api/xbrl/companyfacts/CIK{cik:010d}.json"
+TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
+SEC_MIN_INTERVAL_SECONDS = 0.12
+"""The SEC's fair-access limit is ten requests a second; every fetch here waits at least this long
+between requests."""
+
+SAMPLE_SEED = 20260929
+SAMPLE_SIZE = 300
+"""The edgartools arm needs one companyfacts request per filer, so it runs on a seeded random
+sample of the design frames' eligible filers (twelve or more quarters) plus the nine anchors."""
+
+EPS_CONCEPT = "EarningsPerShareDiluted"
+EPS_UNIT = "USD/shares"
 
 ANCHORS: tuple[str, ...] = (
     "NVDA", "TSLA", "AAPL", "MSFT", "META", "GOOGL", "AMZN", "COIN", "MSTR",
@@ -133,32 +178,110 @@ Panel = dict[str, list[Point]]
 
 def _get_json(url: str) -> dict[str, Any]:
     request = urllib.request.Request(
-        url, headers={"User-Agent": FEED_USER_AGENT, "Accept": "application/json"}
+        url, headers={"User-Agent": FEED_USER_AGENT, "Accept": "application/json",
+                      "Accept-Encoding": "gzip"}
     )
-    with urllib.request.urlopen(request, timeout=60) as response:
+    with urllib.request.urlopen(request, timeout=120) as response:
         body: bytes = response.read()
+        if response.headers.get("Content-Encoding") == "gzip":
+            body = gzip.decompress(body)
     loaded: dict[str, Any] = json.loads(body, parse_float=Decimal)
     return loaded
 
 
-def fetch_frames_panel() -> tuple[Panel, dict[str, str]]:
-    """Every filer's quarterly diluted EPS across :data:`FRAME_QUARTERS`, newest first, as the
-    exact decimals the SEC serves (``parse_float=Decimal`` — never through a float). Returns
-    ``(panel, names)`` keyed by CIK."""
+FrameRows = dict[str, list[list[str]]]
+"""One frame label (``CY2022Q1``) -> its rows ``[cik, entityName, end, val]``, ``val`` the exact
+decimal string the SEC served."""
+
+
+def frame_label(year: int, quarter: int) -> str:
+    return f"CY{year}Q{quarter}"
+
+
+def fetch_frames_raw(quarters: Sequence[tuple[int, int]]) -> FrameRows:
+    """The SEC's quarterly XBRL frames for ``quarters``, row for row, values kept as the exact
+    decimal strings served (``parse_float=Decimal`` — never through a float)."""
+    out: FrameRows = {}
+    for year, quarter in quarters:
+        payload = _get_json(FRAMES_URL.format(year=year, quarter=quarter))
+        out[frame_label(year, quarter)] = [
+            [str(row["cik"]), str(row.get("entityName", "")), str(row["end"]), str(row["val"])]
+            for row in payload.get("data", [])
+        ]
+        time.sleep(SEC_MIN_INTERVAL_SECONDS)
+    return out
+
+
+def panel_from_frames(raw: Mapping[str, Sequence[Sequence[str]]]) -> tuple[Panel, dict[str, str]]:
+    """``(panel, names)`` keyed by CIK, each filer's points newest first."""
     panel: Panel = {}
     names: dict[str, str] = {}
-    for year, quarter in FRAME_QUARTERS:
-        payload = _get_json(FRAMES_URL.format(year=year, quarter=quarter))
-        for row in payload.get("data", []):
-            cik = str(row["cik"])
-            names.setdefault(cik, str(row.get("entityName", "")))
+    for label in sorted(raw):
+        for cik, name, end, val in raw[label]:
+            names.setdefault(cik, name)
             panel.setdefault(cik, []).append(
-                Point(end=date.fromisoformat(row["end"]), value=Decimal(str(row["val"])))
-            )
-        time.sleep(0.12)  # the SEC's fair-access limit is 10 requests a second
+                Point(end=date.fromisoformat(end), value=Decimal(val)))
     for points in panel.values():
         points.sort(key=lambda p: p.end, reverse=True)
     return panel, names
+
+
+def fetch_frames_panel() -> tuple[Panel, dict[str, str]]:
+    """Every filer's quarterly diluted EPS across :data:`FRAME_QUARTERS`, newest first, as the
+    exact decimals the SEC serves. Returns ``(panel, names)`` keyed by CIK."""
+    return panel_from_frames(fetch_frames_raw(FRAME_QUARTERS))
+
+
+def _write_snapshot(path: Path, blob: Mapping[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(blob, separators=(",", ":"), sort_keys=True) + "\n",
+                    encoding="utf-8", newline="\n")
+
+
+def _read_snapshot(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        raise FileNotFoundError(
+            f"{path} is missing; run `python -m argus.eval.general_sue_comparison --fetch` once "
+            "to freeze the SEC inputs")
+    loaded: dict[str, Any] = json.loads(path.read_text("utf-8"))
+    return loaded
+
+
+def frames_snapshot_blob(raw: FrameRows, quarters: Sequence[tuple[int, int]]) -> dict[str, Any]:
+    return {
+        "source": FRAMES_URL, "fetched_at": datetime.now(UTC).isoformat(),
+        "quarters": [frame_label(y, q) for y, q in quarters],
+        "columns": ["cik", "entityName", "end", "val"], "frames": raw,
+    }
+
+
+def load_frames_snapshot(path: Path) -> tuple[Panel, dict[str, str], dict[str, Any]]:
+    """``(panel, names, meta)`` from a frozen frames snapshot."""
+    blob = _read_snapshot(path)
+    panel, names = panel_from_frames(blob["frames"])
+    meta = {"path": path.name, "fetched_at": blob["fetched_at"], "quarters": blob["quarters"],
+            "rows": sum(len(v) for v in blob["frames"].values())}
+    return panel, names, meta
+
+
+def anchors_snapshot_blob(anchors: Panel) -> dict[str, Any]:
+    return {
+        "source": "market/fundamentals.py FundamentalsSource.facts(concept='eps_diluted')",
+        "fetched_at": datetime.now(UTC).isoformat(),
+        "anchors": {k: [[p.end.isoformat(), str(p.value)] for p in v]
+                    for k, v in anchors.items()},
+    }
+
+
+def load_anchors_snapshot(path: Path) -> tuple[Panel, dict[str, Any]]:
+    blob = _read_snapshot(path)
+    stored: dict[str, Any] = blob["anchors"]
+    order = [k for k in ANCHORS if k in stored] + sorted(k for k in stored if k not in ANCHORS)
+    panel: Panel = {
+        k: [Point(end=date.fromisoformat(e), value=Decimal(v)) for e, v in stored[k]]
+        for k in order
+    }
+    return panel, {"path": path.name, "fetched_at": blob["fetched_at"]}
 
 
 def fetch_anchor_panel() -> Panel:
@@ -471,6 +594,7 @@ def run_alignment(
     """Part 1: which methods' "year-over-year" changes are actually a year apart. ``frames`` is
     the filers with at least :data:`MIN_QUARTERS` quarters; ``frames_readings`` each end-to-end
     method's readings of them (computed once, shared with :func:`run_ranking`)."""
+    rows = filer_rows(frames, {name: frames_readings[name] for name in ALIGNMENT_METHODS})
     return {
         "pandas_calendar_collisions_anchors": pandas_collisions(anchors, {a: a for a in anchors}),
         "pandas_calendar_collisions_frames": pandas_collisions(frames, names),
@@ -482,7 +606,154 @@ def run_alignment(
         "frames": {name: _alignment_row(frames_readings[name]) for name in ALIGNMENT_METHODS},
         "argus_dated_vs_pandas_lenient": pandas_agreement(
             frames_readings["pandas_period_lenient"], frames_readings["argus_dated_after"]),
+        "correctness_definition": CORRECTNESS_DEFINITION,
+        "frames_correct": correct_summary(rows, tuple(ALIGNMENT_METHODS)),
+        "frames_paired_vs_argus_dated": paired_vs_argus(rows, tuple(ALIGNMENT_METHODS)),
+        "frames_filer_rows": rows,
     }
+
+
+# --- per-filer rows -------------------------------------------------------------------------------
+
+
+CORRECTNESS_DEFINITION = (
+    "A filer is answered correctly by a method when the method returned a finite SUE and every "
+    "quarter pair it used is genuinely year-over-year (period ends 320-410 days apart). A refusal, "
+    "a crash, inf/nan, or any non-year-over-year pair is not correct. Deliberately strict against "
+    "ARGUS: on an exactly-degenerate filer ARGUS's refusal is the right answer but is not counted "
+    "as correct here (the row's `truth` field says `degenerate`)."
+)
+
+ARGUS_ARM = "argus_dated_after"
+
+
+def reading_status(reading: Reading) -> str:
+    """``value``, ``refused``, ``crashed`` or ``non_finite`` — every reading is exactly one."""
+    if reading.crashed:
+        return "crashed"
+    if reading.value is None:
+        return "refused"
+    if not math.isfinite(reading.value):
+        return "non_finite"
+    return "value"
+
+
+def all_pairs_yoy(reading: Reading) -> bool:
+    """True when the reading used at least one pair and every pair is genuinely year-over-year."""
+    return bool(reading.pairs) and all(is_true_yoy(a, b) for a, b in reading.pairs)
+
+
+def is_correct(reading: Reading) -> bool:
+    """:data:`CORRECTNESS_DEFINITION`."""
+    return reading_status(reading) == "value" and all_pairs_yoy(reading)
+
+
+def _cik_order(key: str) -> tuple[int, str]:
+    return (int(key), key) if key.isdigit() else (sys.maxsize, key)
+
+
+def filer_rows(
+    panel: Mapping[str, Sequence[Point]],
+    readings: Mapping[str, Mapping[str, Reading]],
+    extra: Mapping[str, Mapping[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
+    """One row per filer: its exact-truth SUE (exact rational arithmetic over the genuine
+    year-over-year window, ``None`` when there is no such window or its variance is exactly zero)
+    and, per method, the status, the SUE, whether every pair is year-over-year, the pairs' day
+    gaps and the correctness verdict. ``extra`` adds per-filer fields (the edgartools arm's
+    fiscal-label diagnostics)."""
+    rows: list[dict[str, Any]] = []
+    for key in sorted(panel, key=_cik_order):
+        points = panel[key]
+        window = _dated_window(key, points)
+        truth = window.truth if window is not None else None
+        row: dict[str, Any] = {
+            "cik": key,
+            "quarters": len(points),
+            "newest_end": points[0].end.isoformat() if points else None,
+            "truth": "no_window" if window is None else "degenerate" if truth is None else "value",
+            "exact_sue": float(truth) if truth is not None else None,
+            "arms": {},
+        }
+        for name, by_key in readings.items():
+            reading = by_key[key]
+            row["arms"][name] = {
+                "status": reading_status(reading),
+                "sue": reading.value,
+                "all_pairs_yoy": all_pairs_yoy(reading),
+                "pair_gaps_days": [(a - b).days for a, b in reading.pairs],
+                "correct": is_correct(reading),
+            }
+        if extra is not None and key in extra:
+            row.update(extra[key])
+        rows.append(row)
+    return rows
+
+
+def correct_summary(rows: Sequence[Mapping[str, Any]], methods: Sequence[str]) -> dict[str, Any]:
+    """Per method: filers, correct count and share, and the status breakdown."""
+    out: dict[str, Any] = {}
+    for name in methods:
+        arms = [r["arms"][name] for r in rows]
+        correct = sum(1 for a in arms if a["correct"])
+        statuses = Counter(str(a["status"]) for a in arms)
+        out[name] = {
+            "filers": len(arms),
+            "correct": correct,
+            "correct_share": correct / len(arms) if arms else None,
+            "status": {s: statuses.get(s, 0) for s in ("value", "refused", "crashed",
+                                                       "non_finite")},
+            "value_with_a_non_year_over_year_pair": sum(
+                1 for a in arms if a["status"] == "value" and not a["all_pairs_yoy"]),
+        }
+    return out
+
+
+def mcnemar_exact(only_argus: int, only_rival: int) -> dict[str, Any]:
+    """Exact two-sided McNemar test on the discordant pairs: under the null each discordant filer
+    is a fair coin, so ``p = min(1, 2 * P(Binomial(n, 1/2) <= min(b, c)))``. Computed in integer
+    arithmetic; ``log10_p`` stays finite where ``p`` itself underflows a float."""
+    n = only_argus + only_rival
+    if n == 0:
+        return {"discordant": 0, "p": 1.0, "log10_p": 0.0}
+    tail = sum(math.comb(n, i) for i in range(min(only_argus, only_rival) + 1))
+    numerator = 2 * tail
+    if numerator >= 2 ** n:
+        return {"discordant": n, "p": 1.0, "log10_p": 0.0}
+    log10_p = math.log10(numerator) - n * math.log10(2)
+    return {"discordant": n, "p": 10.0 ** log10_p, "log10_p": log10_p}
+
+
+def paired_counts(
+    rows: Sequence[Mapping[str, Any]], argus: str, rival: str,
+) -> dict[str, Any]:
+    """Filer-level 2x2 table of correctness, ARGUS arm against one rival, with the exact McNemar
+    p-value and the paired difference in correct share."""
+    both = only_a = only_r = neither = 0
+    for r in rows:
+        a, b = bool(r["arms"][argus]["correct"]), bool(r["arms"][rival]["correct"])
+        if a and b:
+            both += 1
+        elif a:
+            only_a += 1
+        elif b:
+            only_r += 1
+        else:
+            neither += 1
+    n = len(rows)
+    return {
+        "filers": n,
+        "both_correct": both, "only_argus_correct": only_a, "only_rival_correct": only_r,
+        "neither_correct": neither,
+        "difference_in_correct_share": (only_a - only_r) / n if n else None,
+        "mcnemar_exact": mcnemar_exact(only_a, only_r),
+    }
+
+
+def paired_vs_argus(
+    rows: Sequence[Mapping[str, Any]], methods: Sequence[str], argus: str = ARGUS_ARM,
+) -> dict[str, Any]:
+    return {name: paired_counts(rows, argus, name) for name in methods if name != argus}
 
 
 # --- part 2: degenerate scale ---------------------------------------------------------------------
@@ -853,6 +1124,358 @@ def _spearman(a: Mapping[str, float], b: Mapping[str, float]) -> dict[str, Any]:
     return {"n": len(common), "rho": float(rho)}
 
 
+# --- holdout: frames the dated rule was never fitted on ------------------------------------------
+
+
+def rule_fingerprint() -> dict[str, Any]:
+    """What "the rule, unchanged" means, recorded so a later edit to `market/sue.py` is visible
+    against this run: the source file's SHA-256 and the constants the dated rule reads."""
+    source = Path(sue_module.__file__).read_bytes().replace(b"\r\n", b"\n")
+    return {
+        "market_sue_py_sha256": hashlib.sha256(source).hexdigest(),
+        "yoy_day_range": list(YOY_DAY_RANGE),
+        "max_delta_span_days": MAX_DELTA_SPAN_DAYS,
+        "noise_ulps": NOISE_ULPS,
+        "n_deltas": N_DELTAS,
+    }
+
+
+def run_holdout(frames: Panel, names: Mapping[str, str]) -> dict[str, Any]:
+    """The same alignment scoring on :data:`HOLDOUT_QUARTERS`: every method, the per-filer rows,
+    the correct counts, and the paired comparison against ARGUS's dated arm."""
+    eligible = {k: v for k, v in frames.items() if len(v) >= MIN_QUARTERS}
+    readings = {name: read_all(eligible, m) for name, m in ALIGNMENT_METHODS.items()}
+    rows = filer_rows(eligible, readings)
+    return {
+        "quarters": [frame_label(y, q) for y, q in HOLDOUT_QUARTERS],
+        "frames_filers": len(frames),
+        "filers_with_12_or_more_quarters": len(eligible),
+        "pandas_calendar_collisions": pandas_collisions(eligible, names)["filers"],
+        "alignment": {name: _alignment_row(readings[name]) for name in ALIGNMENT_METHODS},
+        "argus_dated_vs_pandas_lenient": pandas_agreement(
+            readings["pandas_period_lenient"], readings[ARGUS_ARM]),
+        "correct": correct_summary(rows, tuple(ALIGNMENT_METHODS)),
+        "paired_vs_argus_dated": paired_vs_argus(rows, tuple(ALIGNMENT_METHODS)),
+        "filer_rows": rows,
+    }
+
+
+# --- edgartools: pairing by fiscal-period label -------------------------------------------------
+#
+# edgartools (dgunning/edgartools, MIT, Copyright (c) 2022-present Dwight Gunning; notice at
+# licenses/edgartools-MIT.txt) is the most
+# widely used general-purpose Python library for SEC XBRL. It is not installed in this venv, so its
+# quarterly pipeline is rebuilt here from the clone at research/repos-themed/dgunning~edgartools
+# (commit 9d6bc98, 2026-09-08), copying its logic with attribution. Every step cites file:line:
+#
+# * Duration buckets — `edgar/ttm/calculator.py:30-43`: a discrete quarter is a duration fact of
+#   70-120 days (QUARTER_MIN_DAYS/QUARTER_MAX_DAYS), classified in `_classify_duration`
+#   (calculator.py:402-435).
+# * No derived quarters for EPS — `_is_additive_concept` (calculator.py:507-554) returns False for
+#   per-share units (`USD/shares` is in `UnitNormalizer.PER_SHARE_MAPPINGS`,
+#   `edgar/entity/unit_handling.py:127-130`), and each derivation (`_derive_q2_from_ytd6`,
+#   `_derive_q3_from_ytd9`, `_derive_q4_from_fy`, calculator.py:678-870) skips non-additive facts.
+#   So `quarterize()` (calculator.py:219, 613-676) of diluted EPS is the reported 70-120-day facts,
+#   filtered to quarter length and de-duplicated.
+# * De-duplication — `_deduplicate_by_period_end` (calculator.py:1221-1257): one fact per
+#   period_end, preferring a periodic form (`_PERIODIC_FORMS`, calculator.py:1210-1214: 10-K,
+#   10-Q, 20-F, 40-F, 6-K and amendments) and then the latest filing date; a tie keeps the first.
+# * Fiscal labels — the fiscal period is the kept fact's own `fp` (`edgar/entity/parser.py:194`,
+#   the TTM trend's `fiscal_period`, calculator.py:337). The fiscal year is NOT the raw `fy`:
+#   edgartools derives it from period_end and the fiscal-year-end month, because the SEC tags
+#   comparative facts with the filing's fiscal year (GH #793, calculator.py:284-291, 327-331):
+#   `detect_fiscal_year_end` (`edgar/entity/enhanced_statement.py:1308-1326`, most common month of
+#   the `fp == 'FY'` facts' period ends, default 12) and `calculate_fiscal_year_for_label`
+#   (enhanced_statement.py:1361-1415).
+#
+# The pairing itself — each quarter against the quarter labelled (fiscal year - 1, same fiscal
+# period) — is how a user of edgartools computes a year-over-year change from those labels; the
+# library's own `calculate_ttm_trend` compares TTM sums positionally four quarters back
+# (calculator.py:315-325), which for EPS (no derived Q4) is the positional defect again, so the
+# label pairing is the stronger rival and is the one run. Where two kept quarters carry the same
+# label, the later period end wins (a dict filled in edgartools' ascending order); the collision is
+# counted on the row. Not rebuilt: edgartools' stock-split restatement (`edgar/ttm/splits.py`,
+# values only, not pairing), its forward-looking-schedule filter (`entity_facts.py:1600-1626`, which
+# removes facts whose period runs ahead of their label and does not touch reported quarters), and
+# `derive_eps_for_quarter` (calculator.py:872-937, a Q4 EPS from net income and shares, which is a
+# different input, not a pairing).
+
+EDGARTOOLS_QUARTER_DAYS: tuple[int, int] = (70, 120)
+"""`edgar/ttm/calculator.py:30-31`."""
+
+EDGARTOOLS_PERIODIC_FORMS = frozenset({
+    "10-K", "10-K/A", "10-KSB", "10-KSB/A",
+    "10-Q", "10-Q/A", "10-QSB", "10-QSB/A",
+    "20-F", "20-F/A", "40-F", "40-F/A", "6-K", "6-K/A",
+})
+"""`edgar/ttm/calculator.py:1210-1214`."""
+
+
+@dataclass(frozen=True, slots=True)
+class CompanyFact:
+    """One companyfacts row for the EPS concept, with the SEC's own fiscal labels."""
+
+    start: date | None
+    end: date
+    value: Decimal
+    fy: int
+    fp: str
+    form: str
+    filed: date | None
+    accn: str = ""
+
+
+def _opt_date(raw: str | None) -> date | None:
+    if not raw:
+        return None
+    try:
+        return date.fromisoformat(raw)
+    except ValueError:
+        return None
+
+
+def _fy(raw: Any) -> int:
+    """`edgar/entity/parser.py:281-289` `_parse_fiscal_year`: missing or unparsable -> 0."""
+    if not raw:
+        return 0
+    try:
+        return int(raw)
+    except (TypeError, ValueError):
+        return 0
+
+
+COMPANYFACTS_COLUMNS = ("start", "end", "val", "fy", "fp", "form", "filed", "accn")
+
+
+def companyfacts_rows(payload: Mapping[str, Any]) -> list[list[str]] | None:
+    """The EPS concept's ``USD/shares`` rows from one companyfacts response, in the SEC's order,
+    as strings (``val`` the exact decimal served). ``None`` when the filer never reported it."""
+    concept = ((payload.get("facts") or {}).get("us-gaap") or {}).get(EPS_CONCEPT)
+    if not concept:
+        return None
+    rows = (concept.get("units") or {}).get(EPS_UNIT)
+    if rows is None:
+        return None
+    return [
+        ["" if r.get(c) is None else str(r.get(c)) for c in COMPANYFACTS_COLUMNS]
+        for r in rows if r.get("end") and r.get("val") is not None
+    ]
+
+
+def parse_companyfacts_rows(rows: Sequence[Sequence[str]]) -> list[CompanyFact]:
+    out: list[CompanyFact] = []
+    for start, end, val, fy, fp, form, filed, accn in rows:
+        end_date = _opt_date(end)
+        if end_date is None:
+            continue
+        out.append(CompanyFact(start=_opt_date(start), end=end_date, value=Decimal(val),
+                               fy=_fy(fy), fp=fp, form=form, filed=_opt_date(filed), accn=accn))
+    return out
+
+
+def edgartools_quarterize(facts: Sequence[CompanyFact]) -> list[CompanyFact]:
+    """Discrete quarters as edgartools' `quarterize()` returns them for a per-share concept:
+    70-120-day facts, one per period_end (periodic form first, then latest filing date, first seen
+    on a tie), ascending by period_end. `edgar/ttm/calculator.py:613-676, 1221-1257`."""
+    low, high = EDGARTOOLS_QUARTER_DAYS
+    quarters = [f for f in facts if f.start is not None and low <= (f.end - f.start).days <= high]
+
+    def rank(fact: CompanyFact) -> tuple[int, date]:
+        return (1 if fact.form in EDGARTOOLS_PERIODIC_FORMS else 0, fact.filed or date.min)
+
+    by_end: dict[date, CompanyFact] = {}
+    for fact in quarters:
+        held = by_end.get(fact.end)
+        if held is None or rank(fact) > rank(held):
+            by_end[fact.end] = fact
+    return sorted(by_end.values(), key=lambda f: f.end)
+
+
+def edgartools_fiscal_year_end(facts: Sequence[CompanyFact]) -> int:
+    """`edgar/entity/enhanced_statement.py:1308-1326` `detect_fiscal_year_end`."""
+    months = [f.end.month for f in facts if f.fp == "FY"]
+    if not months:
+        return 12
+    return Counter(months).most_common(1)[0][0]
+
+
+def edgartools_fiscal_year_label(period_end: date, fiscal_year_end_month: int) -> int:
+    """`edgar/entity/enhanced_statement.py:1361-1415` `calculate_fiscal_year_for_label`."""
+    if period_end.month == 1 and period_end.day <= 7:
+        return period_end.year - 1
+    if period_end.month > fiscal_year_end_month:
+        return period_end.year + 1
+    return period_end.year
+
+
+@dataclass(frozen=True, slots=True)
+class LabelledReading:
+    reading: Reading
+    fiscal_year_end_month: int
+    quarters: int
+    label_collisions: int
+
+
+def _pair_by_label(
+    quarters: Sequence[CompanyFact], labels: Sequence[tuple[int, str]],
+) -> tuple[Reading, int]:
+    """SUE from quarters paired by fiscal label (year - 1, same period); the general-tool
+    convention used throughout this module — no refusal beyond a missing partner, a zero spread
+    divides."""
+    index: dict[tuple[int, str], CompanyFact] = {}
+    collisions = 0
+    for quarter, label in zip(quarters, labels, strict=True):
+        if label in index:
+            collisions += 1
+        index[label] = quarter
+    if not quarters:
+        return Reading(None, (), refusal="no quarters"), collisions
+    changes: list[tuple[CompanyFact, CompanyFact]] = []
+    for quarter, (fy, fp) in reversed(list(zip(quarters, labels, strict=True))):
+        partner = index.get((fy - 1, fp))
+        if partner is not None:
+            changes.append((quarter, partner))
+        elif quarter is quarters[-1]:
+            return (Reading(None, (), refusal="newest quarter has no (fy - 1, fp) partner"),
+                    collisions)
+    window = changes[:N_DELTAS]
+    if len(window) < N_DELTAS:
+        return Reading(None, (), refusal="fewer than eight labelled changes"), collisions
+    deltas = np.array([float(a.value) - float(b.value) for a, b in window])
+    with np.errstate(divide="ignore", invalid="ignore"):
+        value = float(np.float64(deltas[0]) / np.float64(np.std(deltas)))
+    return Reading(value, tuple((a.end, b.end) for a, b in window)), collisions
+
+
+def run_edgartools_fiscal(facts: Sequence[CompanyFact]) -> LabelledReading:
+    """The edgartools arm: quarterize, label each quarter (edgartools' fiscal year from period end
+    and fiscal-year-end month, the fact's own ``fp``), pair (fy - 1, same fp)."""
+    quarters = edgartools_quarterize(facts)
+    fye = edgartools_fiscal_year_end(facts)
+    labels = [(edgartools_fiscal_year_label(q.end, fye), q.fp) for q in quarters]
+    reading, collisions = _pair_by_label(quarters, labels)
+    return LabelledReading(reading, fye, len(quarters), collisions)
+
+
+def run_raw_fiscal_labels(facts: Sequence[CompanyFact]) -> LabelledReading:
+    """Diagnostic: the same pairing on the SEC's raw ``(fy, fp)`` labels, which edgartools itself
+    does not trust (comparatives carry the filing's fiscal year, GH #793)."""
+    quarters = edgartools_quarterize(facts)
+    labels = [(q.fy, q.fp) for q in quarters]
+    reading, collisions = _pair_by_label(quarters, labels)
+    return LabelledReading(reading, edgartools_fiscal_year_end(facts), len(quarters), collisions)
+
+
+def argus_desk_points(facts: Sequence[CompanyFact]) -> list[Point]:
+    """The same rows through the desk's own path (`market/fundamentals.py`): quarterly-duration
+    facts (``Fact.is_quarterly``, 80-100 days), the latest filing per period
+    (``latest_per_period``), values as the desk holds them (floats, whose shortest repr is the
+    filed decimal). Newest first."""
+    desk = [
+        Fact(concept="eps_diluted", tag=EPS_CONCEPT, value=float(f.value), unit=EPS_UNIT,
+             start=f.start, end=f.end, filed=f.filed, form=f.form, fiscal_year=f.fy or None,
+             fiscal_period=f.fp or None, frame=None, accn=f.accn)
+        for f in facts if f.filed is not None
+    ]
+    resolved, _superseded = latest_per_period([f for f in desk if f.is_quarterly])
+    return [Point(end=f.end, value=Decimal(repr(f.value))) for f in resolved]
+
+
+EDGARTOOLS_ARMS = (ARGUS_ARM, "edgartools_fiscal", "companyfacts_raw_fy_fp")
+
+
+def draw_sample(frames: Panel, exclude: Iterable[str]) -> list[str]:
+    """:data:`SAMPLE_SIZE` CIKs drawn with :data:`SAMPLE_SEED` from the design frames' filers with
+    twelve or more quarters (sorted numerically first, so the draw depends only on the panel)."""
+    excluded = set(exclude)
+    pool = sorted((k for k, v in frames.items() if len(v) >= MIN_QUARTERS and k not in excluded),
+                  key=_cik_order)
+    return sorted(random.Random(SAMPLE_SEED).sample(pool, min(SAMPLE_SIZE, len(pool))),
+                  key=_cik_order)
+
+
+def run_edgartools_comparison(companyfacts: Mapping[str, Any]) -> dict[str, Any]:
+    """ARGUS's dated pairing against edgartools' fiscal-label pairing on the same companyfacts
+    rows, for the sampled filers plus the anchors. ``companyfacts`` is the frozen snapshot."""
+    anchor_ciks: dict[str, str] = companyfacts["anchor_ciks"]
+    sample: list[str] = companyfacts["sample"]
+    ordered = [*sample, *[c for c in anchor_ciks.values() if c not in set(sample)]]
+    missing: dict[str, str] = {}
+    panel: Panel = {}
+    readings: dict[str, dict[str, Reading]] = {arm: {} for arm in EDGARTOOLS_ARMS}
+    extra: dict[str, dict[str, Any]] = {}
+    role = {c: "anchor" for c in anchor_ciks.values()} | {c: "random" for c in sample}
+    ticker_of = {c: t for t, c in anchor_ciks.items()}
+    for cik in ordered:
+        entry = companyfacts["filers"].get(cik) or {"status": "not_fetched", "rows": []}
+        if entry["status"] != "ok":
+            missing[cik] = str(entry["status"])
+            continue
+        facts = parse_companyfacts_rows(entry["rows"])
+        points = argus_desk_points(facts)
+        panel[cik] = points
+        readings[ARGUS_ARM][cik] = run_argus_dated(points)
+        labelled = run_edgartools_fiscal(facts)
+        raw = run_raw_fiscal_labels(facts)
+        readings["edgartools_fiscal"][cik] = labelled.reading
+        readings["companyfacts_raw_fy_fp"][cik] = raw.reading
+        extra[cik] = {
+            "sample": role[cik], "ticker": ticker_of.get(cik),
+            "companyfacts_rows": len(facts),
+            "edgartools_quarters": labelled.quarters,
+            "edgartools_fiscal_year_end_month": labelled.fiscal_year_end_month,
+            "edgartools_label_collisions": labelled.label_collisions,
+            "raw_label_collisions": raw.label_collisions,
+            "argus_refusal": readings[ARGUS_ARM][cik].refusal or None,
+            "edgartools_refusal": labelled.reading.refusal or None,
+        }
+    rows = filer_rows(panel, readings, extra)
+    return {
+        "rival": "edgartools (dgunning/edgartools, MIT) fiscal-period pairing, rebuilt from "
+                 "edgar/ttm/calculator.py and edgar/entity/enhanced_statement.py (the package is "
+                 "not installed in this venv); see the module's edgartools section for file:line",
+        "input": f"companyfacts us-gaap:{EPS_CONCEPT} ({EPS_UNIT}) rows, one SEC request per "
+                 "filer; both arms read exactly the same rows",
+        "sample": {
+            "seed": SAMPLE_SEED, "size": len(sample),
+            "drawn_from": "design-frames filers with >= 12 quarters, anchors excluded, CIKs "
+                          "sorted numerically, random.Random(seed).sample",
+            "anchors": anchor_ciks, "ciks": sample,
+        },
+        "filers_requested": len(ordered),
+        "filers_without_the_concept": missing,
+        "filers_scored": len(rows),
+        "correct": correct_summary(rows, EDGARTOOLS_ARMS),
+        "paired_vs_argus_dated": paired_vs_argus(rows, EDGARTOOLS_ARMS),
+        "paired_vs_argus_dated_random_sample_only": paired_vs_argus(
+            [r for r in rows if r.get("sample") == "random"], EDGARTOOLS_ARMS),
+        "filer_rows": rows,
+    }
+
+
+def fetch_companyfacts(ciks: Sequence[str]) -> dict[str, Any]:
+    """One companyfacts request per CIK, keeping only the EPS concept's USD/shares rows."""
+    out: dict[str, Any] = {}
+    for cik in ciks:
+        try:
+            payload = _get_json(COMPANYFACTS_URL.format(cik=int(cik)))
+        except urllib.error.HTTPError as exc:
+            out[cik] = {"status": f"http_{exc.code}", "rows": []}
+        else:
+            rows = companyfacts_rows(payload)
+            out[cik] = ({"status": "no_concept", "rows": []} if rows is None
+                        else {"status": "ok", "rows": rows})
+        time.sleep(SEC_MIN_INTERVAL_SECONDS)
+    return out
+
+
+def fetch_anchor_ciks() -> dict[str, str]:
+    raw = _get_json(TICKERS_URL)
+    by_ticker = {str(v["ticker"]).upper(): str(int(v["cik_str"])) for v in raw.values()}
+    time.sleep(SEC_MIN_INTERVAL_SECONDS)
+    return {t: by_ticker[t] for t in ANCHORS if t in by_ticker}
+
+
 # --- costs, reproducibility, report ---------------------------------------------------------------
 
 
@@ -906,13 +1529,47 @@ SCOPE_STATEMENT = (
 )
 
 
-def main() -> int:  # pragma: no cover - CLI
+def refresh_snapshots() -> None:  # pragma: no cover - network
+    """``--fetch``: 18 + 24 frames requests, the anchors through the desk's fetch, the ticker map,
+    and one companyfacts request per sampled filer — every request at most ten a second."""
+    design = fetch_frames_raw(FRAME_QUARTERS)
+    _write_snapshot(FRAMES_SNAPSHOT, frames_snapshot_blob(design, FRAME_QUARTERS))
+    holdout = fetch_frames_raw(HOLDOUT_QUARTERS)
+    _write_snapshot(HOLDOUT_SNAPSHOT, frames_snapshot_blob(holdout, HOLDOUT_QUARTERS))
+    _write_snapshot(ANCHORS_SNAPSHOT, anchors_snapshot_blob(fetch_anchor_panel()))
+    anchor_ciks = fetch_anchor_ciks()
+    frames, _names = panel_from_frames(design)
+    sample = draw_sample(frames, anchor_ciks.values())
+    wanted = [*sample, *[c for c in anchor_ciks.values() if c not in set(sample)]]
+    _write_snapshot(COMPANYFACTS_SNAPSHOT, {
+        "source": COMPANYFACTS_URL, "fetched_at": datetime.now(UTC).isoformat(),
+        "concept": f"us-gaap:{EPS_CONCEPT}", "unit": EPS_UNIT,
+        "columns": list(COMPANYFACTS_COLUMNS), "anchor_ciks": anchor_ciks,
+        "sample_seed": SAMPLE_SEED, "sample": sample, "filers": fetch_companyfacts(wanted),
+    })
+
+
+def _file_digest(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - CLI
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-    anchors = fetch_anchor_panel()
-    frames, names = fetch_frames_panel()
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--fetch", action="store_true",
+                        help="refetch every SEC input and rewrite the frozen snapshots first")
+    args = parser.parse_args(argv)
+    if args.fetch:
+        refresh_snapshots()
+    anchors, anchors_meta = load_anchors_snapshot(ANCHORS_SNAPSHOT)
+    frames, names, frames_meta = load_frames_snapshot(FRAMES_SNAPSHOT)
+    holdout_frames, holdout_names, holdout_meta = load_frames_snapshot(HOLDOUT_SNAPSHOT)
+    companyfacts = _read_snapshot(COMPANYFACTS_SNAPSHOT)
     first = compute(anchors, frames, names)
     second = compute(anchors, frames, names)
+    holdout = run_holdout(holdout_frames, holdout_names)
+    edgartools = run_edgartools_comparison(companyfacts)
     report = {
         "generated_at": datetime.now(UTC).isoformat(),
         "inputs": {
@@ -922,15 +1579,31 @@ def main() -> int:  # pragma: no cover - CLI
             "anchors_digest_sha256": panel_digest(anchors),
             "truth_yoy_days": list(TRUTH_YOY_DAYS),
             "max_delta_span_days": MAX_DELTA_SPAN_DAYS,
+            "snapshots": {
+                "frames": {**frames_meta, "sha256": _file_digest(FRAMES_SNAPSHOT)},
+                "holdout": {**holdout_meta, "sha256": _file_digest(HOLDOUT_SNAPSHOT),
+                            "digest_sha256": panel_digest(holdout_frames)},
+                "anchors": {**anchors_meta, "sha256": _file_digest(ANCHORS_SNAPSHOT)},
+                "companyfacts": {"path": COMPANYFACTS_SNAPSHOT.name,
+                                 "fetched_at": companyfacts["fetched_at"],
+                                 "sha256": _file_digest(COMPANYFACTS_SNAPSHOT)},
+                "refetched_this_run": bool(args.fetch),
+            },
+            "rule": rule_fingerprint(),
         },
         **first,
+        "holdout": holdout,
+        "edgartools_fiscal": edgartools,
         "costs": measure_costs(frames),
         "reproducibility": {
             "identical_on_same_fetched_inputs": artefact.dumps(first) == artefact.dumps(second),
+            "inputs_frozen_offline": "every number above is recomputed from the four snapshot "
+                                     "files named in inputs.snapshots, with no network",
         },
         "scope_statement": SCOPE_STATEMENT,
     }
-    undefined = artefact.write(ARTEFACT, report)
+    # Compact: the per-filer rows (about 8,000 filers x 4 arms) would be ~4x larger indented.
+    undefined = artefact.write(ARTEFACT, report, indent=None)  # type: ignore[arg-type]
     print(render(report))
     print(f"\nwritten to {ARTEFACT}" + (f" ({len(undefined)} non-finite -> null)" if undefined
                                       else ""))
@@ -947,6 +1620,24 @@ def render(report: Mapping[str, Any]) -> str:
                 f"    {name:26s} readings={row['readings']:5d}  YoY pairs="
                 f"{'n/a' if share is None else f'{share:.1%}'}"
             )
+    blocks = [("frames", report["alignment"].get("frames_correct"),
+               report["alignment"].get("frames_paired_vs_argus_dated"))]
+    if "holdout" in report:
+        blocks.append(("holdout", report["holdout"]["correct"],
+                       report["holdout"]["paired_vs_argus_dated"]))
+    if "edgartools_fiscal" in report:
+        blocks.append(("edgartools sample", report["edgartools_fiscal"]["correct"],
+                       report["edgartools_fiscal"]["paired_vs_argus_dated"]))
+    for label, correct, paired in blocks:
+        if not correct:
+            continue
+        lines.append(f"  correct per filer on {label} (finite and every pair year-over-year):")
+        for name, row in correct.items():
+            vs = (paired or {}).get(name)
+            tail = "" if vs is None else (
+                f"  vs ARGUS: only ARGUS {vs['only_argus_correct']}, only rival "
+                f"{vs['only_rival_correct']}, McNemar p={vs['mcnemar_exact']['p']:.3g}")
+            lines.append(f"    {name:26s} {row['correct']:5d}/{row['filers']:<5d}{tail}")
     lines.append("  degenerate-scale detection (constant yearly step at real EPS levels):")
     for name, row in report["degeneracy"]["constant_step_degenerate"].items():
         lines.append(
@@ -964,37 +1655,65 @@ __all__ = [
     "AGREEMENT_REL_TOL",
     "ALIGNMENT_METHODS",
     "ANCHORS",
+    "ARGUS_ARM",
+    "CORRECTNESS_DEFINITION",
     "DEGENERACY_METHODS",
+    "EDGARTOOLS_ARMS",
     "END_TO_END",
+    "HOLDOUT_QUARTERS",
     "RANKING_METHODS",
     "SCOPE_STATEMENT",
+    "CompanyFact",
+    "LabelledReading",
     "Point",
     "Reading",
     "Verdict",
     "Window",
+    "all_pairs_yoy",
+    "argus_desk_points",
     "classify",
+    "companyfacts_rows",
     "compute",
     "constructed_windows",
+    "correct_summary",
+    "draw_sample",
+    "edgartools_fiscal_year_end",
+    "edgartools_fiscal_year_label",
+    "edgartools_quarterize",
     "exact_spread",
     "exact_sue",
     "fabricated_magnitudes",
     "fetch_anchor_panel",
     "fetch_frames_panel",
+    "filer_rows",
+    "is_correct",
     "is_true_yoy",
+    "load_frames_snapshot",
     "main",
+    "mcnemar_exact",
     "measure_costs",
+    "paired_counts",
+    "paired_vs_argus",
     "pandas_agreement",
     "pandas_collisions",
     "panel_digest",
+    "panel_from_frames",
+    "parse_companyfacts_rows",
     "read_all",
+    "reading_status",
     "render",
+    "rule_fingerprint",
     "run_alignment",
     "run_argus_dated",
     "run_argus_positional",
     "run_degeneracy",
+    "run_edgartools_comparison",
+    "run_edgartools_fiscal",
+    "run_holdout",
     "run_pandas_lenient",
     "run_pandas_strict",
     "run_ranking",
+    "run_raw_fiscal_labels",
     "step_windows",
     "unit_sweep",
     "value_tolerance",

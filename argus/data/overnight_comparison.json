@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-27T09:03:24+00:00",
+  "generated": "2026-09-29T01:06:30+00:00",
   "inputs_fetched": "2026-09-25T08:00:07+00:00",
   "target": "gap from the last regular close to the next regular open, per stock",
   "predicted_at": "09:00 New York time on the opening day",
@@ -316,6 +316,105 @@
       "verdict": "a better"
     }
   },
+  "general_tool_premarket": {
+    "premarket_fetched": "2026-09-29T01:05:03+00:00",
+    "method": "the stock's own last pre-market print at or before 09:00 New York (Yahoo, includePrePost), over the prior regular close; and the console's implied open at 03:30 New York, before any pre-market, over the same close",
+    "not_run": "Blue Ocean ATS overnight quotes (paid feed)",
+    "adversarial": {
+      "largest_tenth_of_gaps": {
+        "rows": 91,
+        "min_abs_gap_bps": 194.4,
+        "vs_premarket": {
+          "a": "argus_perp",
+          "b": "premarket_0900",
+          "mean_diff_bps": -17.97,
+          "ci95_bps": [
+            -34.72,
+            -6.11
+          ],
+          "nights": 48,
+          "verdict": "a better"
+        },
+        "vs_zero": {
+          "a": "argus_perp",
+          "b": "zero",
+          "mean_diff_bps": -268.7,
+          "ci95_bps": [
+            -318.09,
+            -221.84
+          ],
+          "nights": 48,
+          "verdict": "a better"
+        }
+      },
+      "stale_perpetual": {
+        "rows": 2,
+        "vs_premarket": null
+      }
+    },
+    "at_0900": {
+      "rows": 904,
+      "nights": 113,
+      "summary": {
+        "argus_perp": {
+          "mae_bps": 30.36,
+          "median_abs_error_bps": 22.13,
+          "rmse_bps": 41.68,
+          "direction_hit_rate": 0.932,
+          "direction_scored": 795
+        },
+        "premarket_0900": {
+          "mae_bps": 36.26,
+          "median_abs_error_bps": 27.6,
+          "rmse_bps": 53.31,
+          "direction_hit_rate": 0.911,
+          "direction_scored": 795
+        }
+      },
+      "paired": {
+        "a": "argus_perp",
+        "b": "premarket_0900",
+        "mean_diff_bps": -5.9,
+        "ci95_bps": [
+          -8.43,
+          -3.8
+        ],
+        "nights": 113,
+        "verdict": "a better"
+      }
+    },
+    "at_0330": {
+      "rows": 904,
+      "nights": 113,
+      "summary": {
+        "argus_perp_0330": {
+          "mae_bps": 62.59,
+          "median_abs_error_bps": 45.43,
+          "rmse_bps": 90.45,
+          "direction_hit_rate": 0.752,
+          "direction_scored": 794
+        },
+        "zero": {
+          "mae_bps": 90.32,
+          "median_abs_error_bps": 64.91,
+          "rmse_bps": 144.46,
+          "direction_hit_rate": null,
+          "direction_scored": 0
+        }
+      },
+      "paired": {
+        "a": "argus_perp_0330",
+        "b": "zero",
+        "mean_diff_bps": -27.73,
+        "ci95_bps": [
+          -36.24,
+          -20.34
+        ],
+        "nights": 113,
+        "verdict": "a better"
+      }
+    }
+  },
   "out_of_sample": {
     "method": "walk-forward per stock: every fitted candidate is refit before each night on that stock's earlier nights only",
     "warmup_nights_excluded_per_stock": 10,
@@ -450,7 +549,7 @@
       },
       "errors": [],
       "artefact": "data/overnight_comparison.json",
-      "created_at": "2026-09-27T09:03:24+00:00"
+      "created_at": "2026-09-29T01:06:30+00:00"
     },
     {
       "comparison": "overnight",
@@ -527,7 +626,161 @@
       },
       "errors": [],
       "artefact": "data/overnight_comparison.json",
-      "created_at": "2026-09-27T09:03:24+00:00"
+      "created_at": "2026-09-29T01:06:30+00:00"
+    },
+    {
+      "comparison": "overnight",
+      "question": "the stock's overnight gap, read at 09:00 New York",
+      "argus": "argus_perp",
+      "rival": "the stock's own pre-market price at 09:00 (the general tool)",
+      "metric": "mean absolute error of the predicted close-to-open gap, bps",
+      "lower_is_better": true,
+      "argus_score": 30.36,
+      "rival_score": 36.26,
+      "n": 113,
+      "unit": "night",
+      "outcome": "argus_better",
+      "basis": "paired bootstrap over nights, 4000 draws, seed 7, on the rows where both estimates exist",
+      "ci95": [
+        -8.43,
+        -3.8
+      ],
+      "p_value": null,
+      "scored": 904,
+      "total": 904,
+      "groups": {},
+      "every_group": null,
+      "inputs_exist": true,
+      "valid": true,
+      "unvalidated_outcome": null,
+      "validity": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "inputs_exist",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "inputs were read",
+            "skipped": false
+          },
+          {
+            "name": "something_scored",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "n=113 night, 904 rows scored",
+            "skipped": false
+          },
+          {
+            "name": "coverage_declared",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "904 of 904 rows scored",
+            "skipped": false
+          },
+          {
+            "name": "both_sides_scored",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ARGUS 30.36, rival 36.26",
+            "skipped": false
+          },
+          {
+            "name": "outcome_agrees_with_its_evidence",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "interval [-8.43, -3.8] gives argus_better",
+            "skipped": false
+          }
+        ]
+      },
+      "errors": [],
+      "artefact": "data/overnight_comparison.json",
+      "created_at": "2026-09-29T01:06:30+00:00"
+    },
+    {
+      "comparison": "overnight",
+      "question": "the stock's overnight gap, read at 03:30 New York",
+      "argus": "argus_perp_0330",
+      "rival": "no gap (the last close), before pre-market",
+      "metric": "mean absolute error of the predicted close-to-open gap, bps",
+      "lower_is_better": true,
+      "argus_score": 62.59,
+      "rival_score": 90.32,
+      "n": 113,
+      "unit": "night",
+      "outcome": "argus_better",
+      "basis": "paired bootstrap over nights, 4000 draws, seed 7, on the rows where both estimates exist",
+      "ci95": [
+        -36.24,
+        -20.34
+      ],
+      "p_value": null,
+      "scored": 904,
+      "total": 904,
+      "groups": {},
+      "every_group": null,
+      "inputs_exist": true,
+      "valid": true,
+      "unvalidated_outcome": null,
+      "validity": {
+        "passed": true,
+        "score": 1.0,
+        "model_calls": 0,
+        "first_failure": null,
+        "checks": [
+          {
+            "name": "inputs_exist",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "inputs were read",
+            "skipped": false
+          },
+          {
+            "name": "something_scored",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "n=113 night, 904 rows scored",
+            "skipped": false
+          },
+          {
+            "name": "coverage_declared",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "904 of 904 rows scored",
+            "skipped": false
+          },
+          {
+            "name": "both_sides_scored",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "ARGUS 62.59, rival 90.32",
+            "skipped": false
+          },
+          {
+            "name": "outcome_agrees_with_its_evidence",
+            "tier": "rule",
+            "passed": true,
+            "score": 1.0,
+            "detail": "interval [-36.24, -20.34] gives argus_better",
+            "skipped": false
+          }
+        ]
+      },
+      "errors": [],
+      "artefact": "data/overnight_comparison.json",
+      "created_at": "2026-09-29T01:06:30+00:00"
     },
     {
       "comparison": "overnight",
@@ -604,7 +857,7 @@
       },
       "errors": [],
       "artefact": "data/overnight_comparison.json",
-      "created_at": "2026-09-27T09:03:24+00:00"
+      "created_at": "2026-09-29T01:06:30+00:00"
     }
   ]
 }

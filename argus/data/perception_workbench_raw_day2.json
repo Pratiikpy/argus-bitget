@@ -1,0 +1,2684 @@
+{
+  "as_of_utc": "2026-09-29T02:46:35.339208+00:00",
+  "kinds": [
+    "quote",
+    "fundamentals",
+    "news",
+    "sentiment",
+    "technicals",
+    "event"
+  ],
+  "rows": [
+    {
+      "symbol": "AAPL",
+      "kind": "quote",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget /api/v2/mix/market/tickers",
+          "detail": "last, bid, ask, 24h range, funding"
+        },
+        {
+          "kind": "venue",
+          "ref": "yahoo daily close",
+          "detail": "AAPL regular close 338.4; perpetual at the close 338.6"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.eval.overnight_comparison",
+          "detail": "AAPLUSDT 1H close at 2026-09-28 20:00 UTC 338.6; stock last 338.4"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.cost.model.CostModel.bitget_perp",
+          "detail": "round-trip taker fee"
+        }
+      ],
+      "seconds": 2.44,
+      "error": null
+    },
+    {
+      "symbol": "AAPL",
+      "kind": "fundamentals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "earnings calendar, consensus, 13F, quote, profile, holders, dividends, filings"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_calendar",
+          "detail": "AAPL report 2026-07-30"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server consensus",
+          "detail": "scraped 2024-02-02; withheld as too old"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_estimates_price_target",
+          "detail": "AAPL analyst targets, last 90 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "Yahoo Finance quoteSummary calendarEvents",
+          "detail": "AAPL next report 2026-10-29"
+        },
+        {
+          "kind": "venue",
+          "ref": "Yahoo Finance quoteSummary calendarEvents",
+          "detail": "AAPL EPS and revenue consensus"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.sue via SEC XBRL",
+          "detail": "AAPL eps_diluted, 12 quarters"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server quote",
+          "detail": "AAPL fundamentals snapshot"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_fundamental_dividends",
+          "detail": "AAPL dividend and split history"
+        },
+        {
+          "kind": "venue",
+          "ref": "SEC EDGAR submissions",
+          "detail": "AAPL 10-Q, 10-K and 8-K, last 400 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_fundamental_ratios",
+          "detail": "AAPL 2026-09-28"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_inst_position_summary",
+          "detail": "AAPL 2026-09-25"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_major_holders",
+          "detail": "AAPL 5% holders disclosed as of 2026-01-01"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_profile",
+          "detail": "AAPL company profile"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_insider_trading",
+          "detail": "AAPL Form 4, last 30 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "Polymarket (gamma-api public-search)",
+          "detail": "open markets naming AAPL, over $10,000 traded"
+        }
+      ],
+      "seconds": 5.69,
+      "error": null
+    },
+    {
+      "symbol": "AAPL",
+      "kind": "news",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget + RSS + SEC EDGAR",
+          "detail": "headlines, 8-K, 24h move"
+        },
+        {
+          "kind": "venue",
+          "ref": "RSS + Yahoo Finance + SEC EDGAR",
+          "detail": "3 headline(s), 0 filing(s); publishers' feeds read directly because bitget-signal's news_feed did not answer in time at 02:44 UTC"
+        },
+        {
+          "kind": "venue",
+          "ref": "Polymarket (gamma-api public-search)",
+          "detail": "open markets naming AAPL, over $10,000 traded"
+        }
+      ],
+      "seconds": 5.97,
+      "error": null
+    },
+    {
+      "symbol": "AAPL",
+      "kind": "sentiment",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "Bitget funding",
+          "detail": "AAPL's funding rate and 24h move, live"
+        },
+        {
+          "kind": "ledger",
+          "ref": "desk notes, decision 829",
+          "detail": "the analyst panel after the provenance discount"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.stories",
+          "detail": "3 headline(s) into 3 story(ies)"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "sentiment_market_fear_greed, long/short ratios, Hyperliquid whale positions, liquidations"
+        },
+        {
+          "kind": "venue",
+          "ref": "cboe delayed_quotes/options",
+          "detail": "AAPL listed chain, 2532 of 3534 contracts two-sided, 2026-09-28 22:43 New York"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra otcMarket weeklySummary",
+          "detail": "AAPL ATS volume, tier T1, 5 weeks"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra regsho daily short volume",
+          "detail": "AAPL 2026-09-28"
+        },
+        {
+          "kind": "computation",
+          "ref": "data/sentiment_comparison.json",
+          "detail": "finBERT vs the desk's sentiment analyst, coordinated posting"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.social_pulse",
+          "detail": "X and Reddit posts grouped into stories by the desk's coordination detector; a dated snapshot"
+        },
+        {
+          "kind": "venue",
+          "ref": "Polymarket (gamma-api public-search)",
+          "detail": "open markets naming AAPL, over $10,000 traded"
+        }
+      ],
+      "seconds": 5.33,
+      "error": null
+    },
+    {
+      "symbol": "AAPL",
+      "kind": "technicals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis",
+          "detail": "rsi, macd, support/resistance, atr"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.rsi",
+          "detail": "bitget:technical_analysis: ok"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.macd",
+          "detail": "bitget:technical_analysis: ok; signal/histogram swapped by the Skill, corrected against Bitget 4h candles"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.support_resistance",
+          "detail": "bitget:technical_analysis: ok"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.atr",
+          "detail": "bitget:technical_analysis: ok"
+        }
+      ],
+      "seconds": 2.36,
+      "error": null
+    },
+    {
+      "symbol": "AAPL",
+      "kind": "event",
+      "sources": [
+        {
+          "kind": "computation",
+          "ref": "argus.research.event_reactions",
+          "detail": "MacKinlay event study, hourly Bitget candles; proxy = the other traded names; computed 2026-09-28"
+        }
+      ],
+      "seconds": 0.0,
+      "error": null
+    },
+    {
+      "symbol": "AMZN",
+      "kind": "quote",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget /api/v2/mix/market/tickers",
+          "detail": "last, bid, ask, 24h range, funding"
+        },
+        {
+          "kind": "venue",
+          "ref": "yahoo daily close",
+          "detail": "AMZN regular close 246.15; perpetual at the close 246.57"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.eval.overnight_comparison",
+          "detail": "AMZNUSDT 1H close at 2026-09-28 20:00 UTC 246.57; stock last 246.15"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.cost.model.CostModel.bitget_perp",
+          "detail": "round-trip taker fee"
+        }
+      ],
+      "seconds": 1.58,
+      "error": null
+    },
+    {
+      "symbol": "AMZN",
+      "kind": "fundamentals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "earnings calendar, consensus, 13F, quote, profile, holders, dividends, filings"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_calendar",
+          "detail": "AMZN report 2026-07-30"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server consensus",
+          "detail": "scraped 2025-05-02; withheld as too old"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_estimates_price_target",
+          "detail": "AMZN analyst targets, last 90 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "Yahoo Finance quoteSummary calendarEvents",
+          "detail": "AMZN next report 2026-10-29"
+        },
+        {
+          "kind": "venue",
+          "ref": "Yahoo Finance quoteSummary calendarEvents",
+          "detail": "AMZN EPS and revenue consensus"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.sue via SEC XBRL",
+          "detail": "AMZN eps_diluted, 12 quarters"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server quote",
+          "detail": "AMZN fundamentals snapshot"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_fundamental_dividends",
+          "detail": "AMZN dividend and split history"
+        },
+        {
+          "kind": "venue",
+          "ref": "SEC EDGAR submissions",
+          "detail": "AMZN 10-Q, 10-K and 8-K, last 400 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_fundamental_ratios",
+          "detail": "AMZN 2026-09-28"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_inst_position_summary",
+          "detail": "AMZN 2026-09-25"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_major_holders",
+          "detail": "AMZN 5% holders disclosed as of 2026-02-23"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_profile",
+          "detail": "AMZN company profile"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_insider_trading",
+          "detail": "AMZN Form 4, last 30 days"
+        }
+      ],
+      "seconds": 3.62,
+      "error": null
+    },
+    {
+      "symbol": "AMZN",
+      "kind": "news",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget + RSS + SEC EDGAR",
+          "detail": "headlines, 8-K, 24h move"
+        },
+        {
+          "kind": "venue",
+          "ref": "RSS + Yahoo Finance + SEC EDGAR",
+          "detail": "6 headline(s), 0 filing(s); publishers' feeds read directly because bitget-signal's news_feed did not answer in time when last asked at 02:44 UTC"
+        }
+      ],
+      "seconds": 1.36,
+      "error": null
+    },
+    {
+      "symbol": "AMZN",
+      "kind": "sentiment",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "Bitget funding",
+          "detail": "AMZN's funding rate and 24h move, live"
+        },
+        {
+          "kind": "ledger",
+          "ref": "desk notes, decision 833",
+          "detail": "the analyst panel after the provenance discount"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.stories",
+          "detail": "6 headline(s) into 6 story(ies)"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "sentiment_market_fear_greed, long/short ratios, Hyperliquid whale positions, liquidations"
+        },
+        {
+          "kind": "venue",
+          "ref": "cboe delayed_quotes/options",
+          "detail": "AMZN listed chain, 2125 of 2480 contracts two-sided, 2026-09-28 22:43 New York"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra otcMarket weeklySummary",
+          "detail": "AMZN ATS volume, tier T1, 5 weeks"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra regsho daily short volume",
+          "detail": "AMZN 2026-09-28"
+        },
+        {
+          "kind": "computation",
+          "ref": "data/sentiment_comparison.json",
+          "detail": "finBERT vs the desk's sentiment analyst, coordinated posting"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.social_pulse",
+          "detail": "X and Reddit posts grouped into stories by the desk's coordination detector; a dated snapshot"
+        }
+      ],
+      "seconds": 2.53,
+      "error": null
+    },
+    {
+      "symbol": "AMZN",
+      "kind": "technicals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis",
+          "detail": "rsi, macd, support/resistance, atr"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.rsi",
+          "detail": "bitget:technical_analysis: ok"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.macd",
+          "detail": "bitget:technical_analysis: ok; signal/histogram swapped by the Skill, corrected against Bitget 4h candles"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.support_resistance",
+          "detail": "bitget:technical_analysis: ok"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.atr",
+          "detail": "bitget:technical_analysis: ok"
+        }
+      ],
+      "seconds": 1.84,
+      "error": null
+    },
+    {
+      "symbol": "AMZN",
+      "kind": "event",
+      "sources": [
+        {
+          "kind": "computation",
+          "ref": "argus.research.event_reactions",
+          "detail": "MacKinlay event study, hourly Bitget candles; proxy = the other traded names; computed 2026-09-28"
+        }
+      ],
+      "seconds": 0.02,
+      "error": null
+    },
+    {
+      "symbol": "COIN",
+      "kind": "quote",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget /api/v2/mix/market/tickers",
+          "detail": "last, bid, ask, 24h range, funding"
+        },
+        {
+          "kind": "venue",
+          "ref": "yahoo daily close",
+          "detail": "COIN regular close 191.79; perpetual at the close 192.07"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.eval.overnight_comparison",
+          "detail": "COINUSDT 1H close at 2026-09-28 20:00 UTC 192.07; stock last 191.79"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.cost.model.CostModel.bitget_perp",
+          "detail": "round-trip taker fee"
+        }
+      ],
+      "seconds": 1.52,
+      "error": null
+    },
+    {
+      "symbol": "COIN",
+      "kind": "fundamentals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "earnings calendar, consensus, 13F, quote, profile, holders, dividends, filings"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_calendar",
+          "detail": "COIN report 2026-07-30"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server consensus",
+          "detail": "scraped 2026-02-10; withheld as too old"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_estimates_price_target",
+          "detail": "COIN analyst targets, last 90 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "Yahoo Finance quoteSummary calendarEvents",
+          "detail": "COIN next report 2026-10-29"
+        },
+        {
+          "kind": "venue",
+          "ref": "Yahoo Finance quoteSummary calendarEvents",
+          "detail": "COIN EPS and revenue consensus"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.sue via SEC XBRL",
+          "detail": "COIN eps_diluted, 12 quarters"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server quote",
+          "detail": "COIN fundamentals snapshot"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server crypto_institutional_company_flow",
+          "detail": "COIN bitcoin holding"
+        },
+        {
+          "kind": "venue",
+          "ref": "SEC EDGAR submissions",
+          "detail": "COIN 10-Q, 10-K and 8-K, last 400 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_fundamental_ratios",
+          "detail": "COIN 2026-09-28"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_inst_position_summary",
+          "detail": "COIN 2026-09-25"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_major_holders",
+          "detail": "COIN 5% holders disclosed as of 2026-03-30"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_profile",
+          "detail": "COIN company profile"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_insider_trading",
+          "detail": "COIN Form 4, last 30 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "Polymarket (gamma-api public-search)",
+          "detail": "open markets naming COIN, over $10,000 traded"
+        }
+      ],
+      "seconds": 4.02,
+      "error": null
+    },
+    {
+      "symbol": "COIN",
+      "kind": "news",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget + RSS + SEC EDGAR",
+          "detail": "headlines, 8-K, 24h move"
+        },
+        {
+          "kind": "venue",
+          "ref": "RSS + Yahoo Finance + SEC EDGAR",
+          "detail": "15 headline(s), 0 filing(s); publishers' feeds read directly because bitget-signal's news_feed did not answer in time when last asked at 02:44 UTC"
+        },
+        {
+          "kind": "venue",
+          "ref": "Polymarket (gamma-api public-search)",
+          "detail": "open markets naming COIN, over $10,000 traded"
+        }
+      ],
+      "seconds": 1.75,
+      "error": null
+    },
+    {
+      "symbol": "COIN",
+      "kind": "sentiment",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server crypto fear & greed + Bitget funding",
+          "detail": "crypto fear & greed from Bitget's data service and Bitget funding rates, live"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal crypto_derivatives.ticker_24h",
+          "detail": "a bitget-signal tool no SKILL.md names, live"
+        },
+        {
+          "kind": "ledger",
+          "ref": "desk notes, decision 834",
+          "detail": "the analyst panel after the provenance discount"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.stories",
+          "detail": "15 headline(s) into 13 story(ies)"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "sentiment_market_fear_greed, long/short ratios, Hyperliquid whale positions, liquidations"
+        },
+        {
+          "kind": "venue",
+          "ref": "cboe delayed_quotes/options",
+          "detail": "COIN listed chain, 2249 of 2856 contracts two-sided, 2026-09-28 22:44 New York"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra otcMarket weeklySummary",
+          "detail": "COIN ATS volume, tier T1, 5 weeks"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra regsho daily short volume",
+          "detail": "COIN 2026-09-28"
+        },
+        {
+          "kind": "computation",
+          "ref": "data/sentiment_comparison.json",
+          "detail": "finBERT vs the desk's sentiment analyst, coordinated posting"
+        },
+        {
+          "kind": "venue",
+          "ref": "SoSoValue US spot ETF flows",
+          "detail": "creations less redemptions, daily after the US close"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.social_pulse",
+          "detail": "X and Reddit posts grouped into stories by the desk's coordination detector; a dated snapshot"
+        },
+        {
+          "kind": "venue",
+          "ref": "Polymarket (gamma-api public-search)",
+          "detail": "open markets naming COIN, over $10,000 traded"
+        }
+      ],
+      "seconds": 5.27,
+      "error": null
+    },
+    {
+      "symbol": "COIN",
+      "kind": "technicals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis",
+          "detail": "rsi, macd, support/resistance, atr"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.rsi",
+          "detail": "bitget:technical_analysis: ok"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.macd",
+          "detail": "bitget:technical_analysis: ok; signal/histogram swapped by the Skill, corrected against Bitget 4h candles"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.support_resistance",
+          "detail": "bitget:technical_analysis: ok"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.atr",
+          "detail": "bitget:technical_analysis: ok"
+        }
+      ],
+      "seconds": 1.8,
+      "error": null
+    },
+    {
+      "symbol": "COIN",
+      "kind": "event",
+      "sources": [
+        {
+          "kind": "computation",
+          "ref": "argus.research.event_reactions",
+          "detail": "MacKinlay event study, hourly Bitget candles; proxy = the other traded names; computed 2026-09-28"
+        }
+      ],
+      "seconds": 0.0,
+      "error": null
+    },
+    {
+      "symbol": "GOOGL",
+      "kind": "quote",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget /api/v2/mix/market/tickers",
+          "detail": "last, bid, ask, 24h range, funding"
+        },
+        {
+          "kind": "venue",
+          "ref": "yahoo daily close",
+          "detail": "GOOGL regular close 342.75; perpetual at the close 343.18"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.eval.overnight_comparison",
+          "detail": "GOOGLUSDT 1H close at 2026-09-28 20:00 UTC 343.18; stock last 342.75"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.cost.model.CostModel.bitget_perp",
+          "detail": "round-trip taker fee"
+        }
+      ],
+      "seconds": 1.67,
+      "error": null
+    },
+    {
+      "symbol": "GOOGL",
+      "kind": "fundamentals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "earnings calendar, consensus, 13F, quote, profile, holders, dividends, filings"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_calendar",
+          "detail": "GOOGL report 2026-07-22"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server consensus",
+          "detail": "scraped 2019-02-16; withheld as too old"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_estimates_price_target",
+          "detail": "GOOGL analyst targets, last 90 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "Yahoo Finance quoteSummary calendarEvents",
+          "detail": "GOOGL next report 2026-10-28"
+        },
+        {
+          "kind": "venue",
+          "ref": "Yahoo Finance quoteSummary calendarEvents",
+          "detail": "GOOGL EPS and revenue consensus"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.sue via SEC XBRL",
+          "detail": "GOOGL eps_diluted, 12 quarters"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server quote",
+          "detail": "GOOGL fundamentals snapshot"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_fundamental_dividends",
+          "detail": "GOOGL dividend and split history"
+        },
+        {
+          "kind": "venue",
+          "ref": "SEC EDGAR submissions",
+          "detail": "GOOGL 10-Q, 10-K and 8-K, last 400 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_fundamental_ratios",
+          "detail": "GOOGL 2026-09-28"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_inst_position_summary",
+          "detail": "GOOGL 2026-09-25"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_major_holders",
+          "detail": "GOOGL 5% holders disclosed as of 2026-04-05"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_profile",
+          "detail": "GOOGL company profile"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_insider_trading",
+          "detail": "GOOGL Form 4, last 30 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "Polymarket (gamma-api public-search)",
+          "detail": "open markets naming GOOGL, over $10,000 traded"
+        }
+      ],
+      "seconds": 3.53,
+      "error": null
+    },
+    {
+      "symbol": "GOOGL",
+      "kind": "news",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget + RSS + SEC EDGAR",
+          "detail": "headlines, 8-K, 24h move"
+        },
+        {
+          "kind": "venue",
+          "ref": "RSS + Yahoo Finance + SEC EDGAR",
+          "detail": "2 headline(s), 0 filing(s); publishers' feeds read directly because bitget-signal's news_feed did not answer in time when last asked at 02:44 UTC"
+        },
+        {
+          "kind": "venue",
+          "ref": "Polymarket (gamma-api public-search)",
+          "detail": "open markets naming GOOGL, over $10,000 traded"
+        }
+      ],
+      "seconds": 1.41,
+      "error": null
+    },
+    {
+      "symbol": "GOOGL",
+      "kind": "sentiment",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "Bitget funding",
+          "detail": "GOOGL's funding rate and 24h move, live"
+        },
+        {
+          "kind": "ledger",
+          "ref": "desk notes, decision 832",
+          "detail": "the analyst panel after the provenance discount"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.stories",
+          "detail": "2 headline(s) into 2 story(ies)"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "sentiment_market_fear_greed, long/short ratios, Hyperliquid whale positions, liquidations"
+        },
+        {
+          "kind": "venue",
+          "ref": "cboe delayed_quotes/options",
+          "detail": "GOOGL listed chain, 3650 of 4754 contracts two-sided, 2026-09-28 22:44 New York"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra otcMarket weeklySummary",
+          "detail": "GOOGL ATS volume, tier T1, 5 weeks"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra regsho daily short volume",
+          "detail": "GOOGL 2026-09-28"
+        },
+        {
+          "kind": "computation",
+          "ref": "data/sentiment_comparison.json",
+          "detail": "finBERT vs the desk's sentiment analyst, coordinated posting"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.social_pulse",
+          "detail": "X and Reddit posts grouped into stories by the desk's coordination detector; a dated snapshot"
+        },
+        {
+          "kind": "venue",
+          "ref": "Polymarket (gamma-api public-search)",
+          "detail": "open markets naming GOOGL, over $10,000 traded"
+        }
+      ],
+      "seconds": 2.75,
+      "error": null
+    },
+    {
+      "symbol": "GOOGL",
+      "kind": "technicals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis",
+          "detail": "rsi, macd, support/resistance, atr"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.rsi",
+          "detail": "bitget:technical_analysis: ok"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.macd",
+          "detail": "bitget:technical_analysis: ok; signal/histogram swapped by the Skill, corrected against Bitget 4h candles"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.support_resistance",
+          "detail": "bitget:technical_analysis: ok"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.atr",
+          "detail": "bitget:technical_analysis: ok"
+        }
+      ],
+      "seconds": 1.86,
+      "error": null
+    },
+    {
+      "symbol": "GOOGL",
+      "kind": "event",
+      "sources": [
+        {
+          "kind": "computation",
+          "ref": "argus.research.event_reactions",
+          "detail": "MacKinlay event study, hourly Bitget candles; proxy = the other traded names; computed 2026-09-28"
+        }
+      ],
+      "seconds": 0.0,
+      "error": null
+    },
+    {
+      "symbol": "META",
+      "kind": "quote",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget /api/v2/mix/market/tickers",
+          "detail": "last, bid, ask, 24h range, funding"
+        },
+        {
+          "kind": "venue",
+          "ref": "yahoo daily close",
+          "detail": "META regular close 715.62; perpetual at the close 716.42"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.eval.overnight_comparison",
+          "detail": "METAUSDT 1H close at 2026-09-28 20:00 UTC 716.42; stock last 715.62"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.cost.model.CostModel.bitget_perp",
+          "detail": "round-trip taker fee"
+        }
+      ],
+      "seconds": 1.61,
+      "error": null
+    },
+    {
+      "symbol": "META",
+      "kind": "fundamentals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "earnings calendar, consensus, 13F, quote, profile, holders, dividends, filings"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_calendar",
+          "detail": "META report 2026-07-29"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server consensus",
+          "detail": "scraped 2021-01-28; withheld as too old"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_estimates_price_target",
+          "detail": "META analyst targets, last 90 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "Yahoo Finance quoteSummary calendarEvents",
+          "detail": "META next report 2026-10-28"
+        },
+        {
+          "kind": "venue",
+          "ref": "Yahoo Finance quoteSummary calendarEvents",
+          "detail": "META EPS and revenue consensus"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.sue via SEC XBRL",
+          "detail": "META eps_diluted, 12 quarters"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server quote",
+          "detail": "META fundamentals snapshot"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_fundamental_dividends",
+          "detail": "META dividend and split history"
+        },
+        {
+          "kind": "venue",
+          "ref": "SEC EDGAR submissions",
+          "detail": "META 10-Q, 10-K and 8-K, last 400 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_fundamental_ratios",
+          "detail": "META 2026-09-28"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_inst_position_summary",
+          "detail": "META 2026-09-25"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_major_holders",
+          "detail": "META 5% holders disclosed as of 2026-03-31"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_profile",
+          "detail": "META company profile"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_insider_trading",
+          "detail": "META Form 4, last 30 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "Polymarket (gamma-api public-search)",
+          "detail": "open markets naming META, over $10,000 traded"
+        }
+      ],
+      "seconds": 2.8,
+      "error": null
+    },
+    {
+      "symbol": "META",
+      "kind": "news",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget + RSS + SEC EDGAR",
+          "detail": "headlines, 8-K, 24h move"
+        },
+        {
+          "kind": "venue",
+          "ref": "RSS + Yahoo Finance + SEC EDGAR",
+          "detail": "13 headline(s), 0 filing(s); publishers' feeds read directly because bitget-signal's news_feed did not answer in time when last asked at 02:44 UTC"
+        },
+        {
+          "kind": "venue",
+          "ref": "Polymarket (gamma-api public-search)",
+          "detail": "open markets naming META, over $10,000 traded"
+        }
+      ],
+      "seconds": 1.38,
+      "error": null
+    },
+    {
+      "symbol": "META",
+      "kind": "sentiment",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "Bitget funding",
+          "detail": "META's funding rate and 24h move, live"
+        },
+        {
+          "kind": "ledger",
+          "ref": "desk notes, decision 831",
+          "detail": "the analyst panel after the provenance discount"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.stories",
+          "detail": "13 headline(s) into 13 story(ies)"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "sentiment_market_fear_greed, long/short ratios, Hyperliquid whale positions, liquidations"
+        },
+        {
+          "kind": "venue",
+          "ref": "cboe delayed_quotes/options",
+          "detail": "META listed chain, 5473 of 7566 contracts two-sided, 2026-09-28 22:44 New York"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra otcMarket weeklySummary",
+          "detail": "META ATS volume, tier T1, 5 weeks"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra regsho daily short volume",
+          "detail": "META 2026-09-28"
+        },
+        {
+          "kind": "computation",
+          "ref": "data/sentiment_comparison.json",
+          "detail": "finBERT vs the desk's sentiment analyst, coordinated posting"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.social_pulse",
+          "detail": "X and Reddit posts grouped into stories by the desk's coordination detector; a dated snapshot"
+        },
+        {
+          "kind": "venue",
+          "ref": "Polymarket (gamma-api public-search)",
+          "detail": "open markets naming META, over $10,000 traded"
+        }
+      ],
+      "seconds": 2.73,
+      "error": null
+    },
+    {
+      "symbol": "META",
+      "kind": "technicals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis",
+          "detail": "rsi, macd, support/resistance, atr"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.rsi",
+          "detail": "bitget:technical_analysis: ok"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.macd",
+          "detail": "bitget:technical_analysis: ok; signal/histogram swapped by the Skill, corrected against Bitget 4h candles"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.support_resistance",
+          "detail": "bitget:technical_analysis: ok"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.atr",
+          "detail": "bitget:technical_analysis: ok"
+        }
+      ],
+      "seconds": 1.86,
+      "error": null
+    },
+    {
+      "symbol": "META",
+      "kind": "event",
+      "sources": [
+        {
+          "kind": "computation",
+          "ref": "argus.research.event_reactions",
+          "detail": "MacKinlay event study, hourly Bitget candles; proxy = the other traded names; computed 2026-09-28"
+        }
+      ],
+      "seconds": 0.0,
+      "error": null
+    },
+    {
+      "symbol": "MSFT",
+      "kind": "quote",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget /api/v2/mix/market/tickers",
+          "detail": "last, bid, ask, 24h range, funding"
+        },
+        {
+          "kind": "venue",
+          "ref": "yahoo daily close",
+          "detail": "MSFT regular close 509.22; perpetual at the close 509.95"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.eval.overnight_comparison",
+          "detail": "MSFTUSDT 1H close at 2026-09-28 20:00 UTC 509.95; stock last 509.22"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.cost.model.CostModel.bitget_perp",
+          "detail": "round-trip taker fee"
+        }
+      ],
+      "seconds": 1.91,
+      "error": null
+    },
+    {
+      "symbol": "MSFT",
+      "kind": "fundamentals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "earnings calendar, consensus, 13F, quote, profile, holders, dividends, filings"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_calendar",
+          "detail": "MSFT report 2026-07-29"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server consensus",
+          "detail": "scraped 2018-10-25; withheld as too old"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_estimates_price_target",
+          "detail": "MSFT analyst targets, last 90 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "Yahoo Finance quoteSummary calendarEvents",
+          "detail": "MSFT next report 2026-10-28"
+        },
+        {
+          "kind": "venue",
+          "ref": "Yahoo Finance quoteSummary calendarEvents",
+          "detail": "MSFT EPS and revenue consensus"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.sue via SEC XBRL",
+          "detail": "MSFT eps_diluted, 12 quarters"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server quote",
+          "detail": "MSFT fundamentals snapshot"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_fundamental_dividends",
+          "detail": "MSFT dividend and split history"
+        },
+        {
+          "kind": "venue",
+          "ref": "SEC EDGAR submissions",
+          "detail": "MSFT 10-Q, 10-K and 8-K, last 400 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_fundamental_ratios",
+          "detail": "MSFT 2026-09-28"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_inst_position_summary",
+          "detail": "MSFT 2026-09-25"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_major_holders",
+          "detail": "MSFT 5% holders disclosed as of 2025-09-29"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_profile",
+          "detail": "MSFT company profile"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_insider_trading",
+          "detail": "MSFT Form 4, last 30 days"
+        }
+      ],
+      "seconds": 3.05,
+      "error": null
+    },
+    {
+      "symbol": "MSFT",
+      "kind": "news",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget + RSS + SEC EDGAR",
+          "detail": "headlines, 8-K, 24h move"
+        },
+        {
+          "kind": "venue",
+          "ref": "RSS + Yahoo Finance + SEC EDGAR",
+          "detail": "9 headline(s), 0 filing(s); publishers' feeds read directly because bitget-signal's news_feed did not answer in time when last asked at 02:44 UTC"
+        }
+      ],
+      "seconds": 1.47,
+      "error": null
+    },
+    {
+      "symbol": "MSFT",
+      "kind": "sentiment",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "Bitget funding",
+          "detail": "MSFT's funding rate and 24h move, live"
+        },
+        {
+          "kind": "ledger",
+          "ref": "desk notes, decision 830",
+          "detail": "the analyst panel after the provenance discount"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.stories",
+          "detail": "9 headline(s) into 9 story(ies)"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "sentiment_market_fear_greed, long/short ratios, Hyperliquid whale positions, liquidations"
+        },
+        {
+          "kind": "venue",
+          "ref": "cboe delayed_quotes/options",
+          "detail": "MSFT listed chain, 3128 of 3582 contracts two-sided, 2026-09-28 22:44 New York"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra otcMarket weeklySummary",
+          "detail": "MSFT ATS volume, tier T1, 5 weeks"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra regsho daily short volume",
+          "detail": "MSFT 2026-09-28"
+        },
+        {
+          "kind": "computation",
+          "ref": "data/sentiment_comparison.json",
+          "detail": "finBERT vs the desk's sentiment analyst, coordinated posting"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.social_pulse",
+          "detail": "X and Reddit posts grouped into stories by the desk's coordination detector; a dated snapshot"
+        }
+      ],
+      "seconds": 5.27,
+      "error": null
+    },
+    {
+      "symbol": "MSFT",
+      "kind": "technicals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis",
+          "detail": "rsi, macd, support/resistance, atr"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.rsi",
+          "detail": "bitget:technical_analysis: ok"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.macd",
+          "detail": "bitget:technical_analysis: ok; signal/histogram swapped by the Skill, corrected against Bitget 4h candles"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.support_resistance",
+          "detail": "bitget:technical_analysis: ok"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.atr",
+          "detail": "bitget:technical_analysis: ok"
+        }
+      ],
+      "seconds": 1.86,
+      "error": null
+    },
+    {
+      "symbol": "MSFT",
+      "kind": "event",
+      "sources": [
+        {
+          "kind": "computation",
+          "ref": "argus.research.event_reactions",
+          "detail": "MacKinlay event study, hourly Bitget candles; proxy = the other traded names; computed 2026-09-28"
+        }
+      ],
+      "seconds": 0.0,
+      "error": null
+    },
+    {
+      "symbol": "MSTR",
+      "kind": "quote",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget /api/v2/mix/market/tickers",
+          "detail": "last, bid, ask, 24h range, funding"
+        },
+        {
+          "kind": "venue",
+          "ref": "yahoo daily close",
+          "detail": "MSTR regular close 157.14; perpetual at the close 157.39"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.eval.overnight_comparison",
+          "detail": "MSTRUSDT 1H close at 2026-09-28 20:00 UTC 157.39; stock last 157.14"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.cost.model.CostModel.bitget_perp",
+          "detail": "round-trip taker fee"
+        }
+      ],
+      "seconds": 1.55,
+      "error": null
+    },
+    {
+      "symbol": "MSTR",
+      "kind": "fundamentals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "earnings calendar, consensus, 13F, quote, profile, holders, dividends, filings"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_calendar",
+          "detail": "MSTR report 2026-07-30"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server consensus",
+          "detail": "scraped 2019-02-09; withheld as too old"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_estimates_price_target",
+          "detail": "MSTR analyst targets, last 90 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "Yahoo Finance quoteSummary calendarEvents",
+          "detail": "MSTR next report 2026-10-29"
+        },
+        {
+          "kind": "venue",
+          "ref": "Yahoo Finance quoteSummary calendarEvents",
+          "detail": "MSTR EPS and revenue consensus"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.sue via SEC XBRL",
+          "detail": "MSTR eps_diluted, 12 quarters"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server quote",
+          "detail": "MSTR fundamentals snapshot"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server crypto_institutional_company_flow",
+          "detail": "MSTR bitcoin holding"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_fundamental_dividends",
+          "detail": "MSTR dividend and split history"
+        },
+        {
+          "kind": "venue",
+          "ref": "SEC EDGAR submissions",
+          "detail": "MSTR 10-Q, 10-K and 8-K, last 400 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_fundamental_ratios",
+          "detail": "MSTR 2026-09-28"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_inst_position_summary",
+          "detail": "MSTR 2026-09-25"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_major_holders",
+          "detail": "MSTR 5% holders disclosed as of 2026-03-31"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_profile",
+          "detail": "MSTR company profile"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_insider_trading",
+          "detail": "MSTR Form 4, last 30 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "Polymarket (gamma-api public-search)",
+          "detail": "open markets naming MSTR, over $10,000 traded"
+        }
+      ],
+      "seconds": 4.84,
+      "error": null
+    },
+    {
+      "symbol": "MSTR",
+      "kind": "news",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget + RSS + SEC EDGAR",
+          "detail": "headlines, 8-K, 24h move"
+        },
+        {
+          "kind": "venue",
+          "ref": "RSS + Yahoo Finance + SEC EDGAR",
+          "detail": "4 headline(s), 2 filing(s); publishers' feeds read directly because bitget-signal's news_feed did not answer in time when last asked at 02:44 UTC"
+        },
+        {
+          "kind": "venue",
+          "ref": "Polymarket (gamma-api public-search)",
+          "detail": "open markets naming MSTR, over $10,000 traded"
+        }
+      ],
+      "seconds": 1.44,
+      "error": null
+    },
+    {
+      "symbol": "MSTR",
+      "kind": "sentiment",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server crypto fear & greed + Bitget funding",
+          "detail": "crypto fear & greed from Bitget's data service and Bitget funding rates, live"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal crypto_derivatives.ticker_24h",
+          "detail": "a bitget-signal tool no SKILL.md names, live"
+        },
+        {
+          "kind": "ledger",
+          "ref": "desk notes, decision 835",
+          "detail": "the analyst panel after the provenance discount"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.stories",
+          "detail": "4 headline(s) into 4 story(ies)"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "sentiment_market_fear_greed, long/short ratios, Hyperliquid whale positions, liquidations"
+        },
+        {
+          "kind": "venue",
+          "ref": "cboe delayed_quotes/options",
+          "detail": "MSTR listed chain, 2788 of 3078 contracts two-sided, 2026-09-28 22:44 New York"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra otcMarket weeklySummary",
+          "detail": "MSTR ATS volume, tier T1, 5 weeks"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra regsho daily short volume",
+          "detail": "MSTR 2026-09-28"
+        },
+        {
+          "kind": "computation",
+          "ref": "data/sentiment_comparison.json",
+          "detail": "finBERT vs the desk's sentiment analyst, coordinated posting"
+        },
+        {
+          "kind": "venue",
+          "ref": "SoSoValue US spot ETF flows",
+          "detail": "creations less redemptions, daily after the US close"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.social_pulse",
+          "detail": "X and Reddit posts grouped into stories by the desk's coordination detector; a dated snapshot"
+        },
+        {
+          "kind": "venue",
+          "ref": "Polymarket (gamma-api public-search)",
+          "detail": "open markets naming MSTR, over $10,000 traded"
+        }
+      ],
+      "seconds": 5.52,
+      "error": null
+    },
+    {
+      "symbol": "MSTR",
+      "kind": "technicals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis",
+          "detail": "rsi, macd, support/resistance, atr"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.rsi",
+          "detail": "bitget:technical_analysis: ok"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.macd",
+          "detail": "bitget:technical_analysis: ok; signal/histogram swapped by the Skill, corrected against Bitget 4h candles"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.support_resistance",
+          "detail": "bitget:technical_analysis: ok"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.atr",
+          "detail": "bitget:technical_analysis: ok"
+        }
+      ],
+      "seconds": 1.88,
+      "error": null
+    },
+    {
+      "symbol": "MSTR",
+      "kind": "event",
+      "sources": [
+        {
+          "kind": "computation",
+          "ref": "argus.research.event_reactions",
+          "detail": "MacKinlay event study, hourly Bitget candles; proxy = the other traded names; computed 2026-09-28"
+        }
+      ],
+      "seconds": 0.0,
+      "error": null
+    },
+    {
+      "symbol": "NVDA",
+      "kind": "quote",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget /api/v2/mix/market/tickers",
+          "detail": "last, bid, ask, 24h range, funding"
+        },
+        {
+          "kind": "venue",
+          "ref": "yahoo daily close",
+          "detail": "NVDA regular close 228.86; perpetual at the close 229.16"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.eval.overnight_comparison",
+          "detail": "NVDAUSDT 1H close at 2026-09-28 20:00 UTC 229.16; stock last 228.86"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.cost.model.CostModel.bitget_perp",
+          "detail": "round-trip taker fee"
+        }
+      ],
+      "seconds": 1.67,
+      "error": null
+    },
+    {
+      "symbol": "NVDA",
+      "kind": "fundamentals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "earnings calendar, consensus, 13F, quote, profile, holders, dividends, filings"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_calendar",
+          "detail": "NVDA report 2026-08-26"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server consensus",
+          "detail": "scraped 2024-11-21; withheld as too old"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_estimates_price_target",
+          "detail": "NVDA analyst targets, last 90 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "Yahoo Finance quoteSummary calendarEvents",
+          "detail": "NVDA next report 2026-11-17"
+        },
+        {
+          "kind": "venue",
+          "ref": "Yahoo Finance quoteSummary calendarEvents",
+          "detail": "NVDA EPS and revenue consensus"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.sue via SEC XBRL",
+          "detail": "NVDA eps_diluted, 12 quarters"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server quote",
+          "detail": "NVDA fundamentals snapshot"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_fundamental_dividends",
+          "detail": "NVDA dividend and split history"
+        },
+        {
+          "kind": "venue",
+          "ref": "SEC EDGAR submissions",
+          "detail": "NVDA 10-Q, 10-K and 8-K, last 400 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_fundamental_ratios",
+          "detail": "NVDA 2026-09-28"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_inst_position_summary",
+          "detail": "NVDA 2026-09-25"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_major_holders",
+          "detail": "NVDA 5% holders disclosed as of 2026-03-22"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_profile",
+          "detail": "NVDA company profile"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_insider_trading",
+          "detail": "NVDA Form 4, last 30 days"
+        }
+      ],
+      "seconds": 4.25,
+      "error": null
+    },
+    {
+      "symbol": "NVDA",
+      "kind": "news",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget + RSS + SEC EDGAR",
+          "detail": "headlines, 8-K, 24h move"
+        },
+        {
+          "kind": "venue",
+          "ref": "RSS + Yahoo Finance + SEC EDGAR",
+          "detail": "9 headline(s), 0 filing(s); publishers' feeds read directly because bitget-signal's news_feed did not answer in time when last asked at 02:44 UTC"
+        }
+      ],
+      "seconds": 1.31,
+      "error": null
+    },
+    {
+      "symbol": "NVDA",
+      "kind": "sentiment",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "Bitget funding",
+          "detail": "NVDA's funding rate and 24h move, live"
+        },
+        {
+          "kind": "ledger",
+          "ref": "desk notes, decision 827",
+          "detail": "the analyst panel after the provenance discount"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.stories",
+          "detail": "9 headline(s) into 9 story(ies)"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "sentiment_market_fear_greed, long/short ratios, Hyperliquid whale positions, liquidations"
+        },
+        {
+          "kind": "venue",
+          "ref": "cboe delayed_quotes/options",
+          "detail": "NVDA listed chain, 2969 of 3840 contracts two-sided, 2026-09-28 22:45 New York"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra otcMarket weeklySummary",
+          "detail": "NVDA ATS volume, tier T1, 5 weeks"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra regsho daily short volume",
+          "detail": "NVDA 2026-09-28"
+        },
+        {
+          "kind": "computation",
+          "ref": "data/sentiment_comparison.json",
+          "detail": "finBERT vs the desk's sentiment analyst, coordinated posting"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.social_pulse",
+          "detail": "X and Reddit posts grouped into stories by the desk's coordination detector; a dated snapshot"
+        }
+      ],
+      "seconds": 2.77,
+      "error": null
+    },
+    {
+      "symbol": "NVDA",
+      "kind": "technicals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis",
+          "detail": "rsi, macd, support/resistance, atr"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.rsi",
+          "detail": "bitget:technical_analysis: ok"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.macd",
+          "detail": "bitget:technical_analysis: ok; signal/histogram swapped by the Skill, corrected against Bitget 4h candles"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.support_resistance",
+          "detail": "bitget:technical_analysis: ok"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.atr",
+          "detail": "bitget:technical_analysis: ok"
+        }
+      ],
+      "seconds": 1.92,
+      "error": null
+    },
+    {
+      "symbol": "NVDA",
+      "kind": "event",
+      "sources": [
+        {
+          "kind": "computation",
+          "ref": "argus.research.event_reactions",
+          "detail": "MacKinlay event study, hourly Bitget candles; proxy = the other traded names; computed 2026-09-28"
+        }
+      ],
+      "seconds": 0.0,
+      "error": null
+    },
+    {
+      "symbol": "QQQ",
+      "kind": "quote",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget /api/v2/mix/market/tickers",
+          "detail": "last, bid, ask, 24h range, funding"
+        },
+        {
+          "kind": "venue",
+          "ref": "yahoo daily close",
+          "detail": "QQQ regular close 736.53; perpetual at the close 737.19"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.eval.overnight_comparison",
+          "detail": "QQQUSDT 1H close at 2026-09-28 20:00 UTC 737.19; stock last 736.53"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.cost.model.CostModel.bitget_perp",
+          "detail": "round-trip taker fee"
+        }
+      ],
+      "seconds": 1.61,
+      "error": null
+    },
+    {
+      "symbol": "QQQ",
+      "kind": "fundamentals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "earnings calendar, consensus, 13F, quote, profile, holders, dividends, filings"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server 13F holdings",
+          "detail": "QQQ period 2026-06-30"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_fundamental_dividends",
+          "detail": "QQQ dividend and split history"
+        },
+        {
+          "kind": "venue",
+          "ref": "Yahoo Finance quoteSummary topHoldings",
+          "detail": "QQQ top holdings and sector weights"
+        },
+        {
+          "kind": "venue",
+          "ref": "SEC EDGAR submissions",
+          "detail": "QQQ fund reports (NPORT-P, N-PX, N-CSRS, N-CEN, 485BPOS, N-30B-2), last 400 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_profile",
+          "detail": "QQQ fund profile"
+        }
+      ],
+      "seconds": 2.95,
+      "error": null
+    },
+    {
+      "symbol": "QQQ",
+      "kind": "news",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget + RSS + SEC EDGAR",
+          "detail": "headlines, 8-K, 24h move"
+        },
+        {
+          "kind": "venue",
+          "ref": "RSS + Yahoo Finance + SEC EDGAR",
+          "detail": "39 headline(s), 0 filing(s); publishers' feeds read directly because bitget-signal's news_feed did not answer in time when last asked at 02:44 UTC"
+        }
+      ],
+      "seconds": 0.75,
+      "error": null
+    },
+    {
+      "symbol": "QQQ",
+      "kind": "sentiment",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server crypto fear & greed + Bitget funding",
+          "detail": "crypto fear & greed from Bitget's data service and Bitget funding rates, live"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal crypto_derivatives.ticker_24h",
+          "detail": "a bitget-signal tool no SKILL.md names, live"
+        },
+        {
+          "kind": "venue",
+          "ref": "cboe delayed_quotes/options",
+          "detail": "QQQ listed chain, 9456 of 11388 contracts two-sided, 2026-09-28 22:45 New York"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra otcMarket weeklySummary",
+          "detail": "QQQ ATS volume, tier T1, 5 weeks"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra regsho daily short volume",
+          "detail": "QQQ 2026-09-28"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "stock-market fear & greed, long/short ratios, Hyperliquid whale positions, liquidations"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.social_pulse",
+          "detail": "X and Reddit posts grouped into stories by the desk's coordination detector; a dated snapshot"
+        }
+      ],
+      "seconds": 2.66,
+      "error": null
+    },
+    {
+      "symbol": "QQQ",
+      "kind": "technicals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis",
+          "detail": "rsi, macd, support/resistance, atr"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.rsi",
+          "detail": "bitget:technical_analysis: ok"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.macd",
+          "detail": "bitget:technical_analysis: ok; signal/histogram swapped by the Skill, corrected against Bitget 4h candles"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.support_resistance",
+          "detail": "bitget:technical_analysis: ok"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.atr",
+          "detail": "bitget:technical_analysis: ok"
+        }
+      ],
+      "seconds": 1.91,
+      "error": null
+    },
+    {
+      "symbol": "QQQ",
+      "kind": "event",
+      "sources": [
+        {
+          "kind": "computation",
+          "ref": "argus.research.event_reactions",
+          "detail": "MacKinlay event study, hourly Bitget candles; proxy = the other traded names; computed 2026-09-28"
+        }
+      ],
+      "seconds": 0.0,
+      "error": null
+    },
+    {
+      "symbol": "SQQQ",
+      "kind": "quote",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget /api/v2/mix/market/tickers",
+          "detail": "last, bid, ask, 24h range, funding"
+        },
+        {
+          "kind": "venue",
+          "ref": "yahoo daily close",
+          "detail": "SQQQ regular close 34.83; perpetual at the close 34.87"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.eval.overnight_comparison",
+          "detail": "SQQQUSDT 1H close at 2026-09-28 20:00 UTC 34.87; stock last 34.83"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.cost.model.CostModel.bitget_perp",
+          "detail": "round-trip taker fee"
+        }
+      ],
+      "seconds": 1.67,
+      "error": null
+    },
+    {
+      "symbol": "SQQQ",
+      "kind": "fundamentals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "earnings calendar, consensus, 13F, quote, profile, holders, dividends, filings"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server 13F holdings",
+          "detail": "SQQQ period 2026-06-30"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_fundamental_dividends",
+          "detail": "SQQQ ex-dividend date"
+        },
+        {
+          "kind": "venue",
+          "ref": "SEC EDGAR submissions",
+          "detail": "SQQQ fund reports (485BPOS, N-PX, N-CEN, N-CSR, NPORT-P), last 400 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_profile",
+          "detail": "SQQQ fund profile"
+        }
+      ],
+      "seconds": 3.89,
+      "error": null
+    },
+    {
+      "symbol": "SQQQ",
+      "kind": "news",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget + RSS + SEC EDGAR",
+          "detail": "headlines, 8-K, 24h move"
+        },
+        {
+          "kind": "venue",
+          "ref": "RSS + Yahoo Finance + SEC EDGAR",
+          "detail": "0 headline(s), 0 filing(s); publishers' feeds read directly because bitget-signal's news_feed did not answer in time when last asked at 02:44 UTC"
+        }
+      ],
+      "seconds": 1.28,
+      "error": null
+    },
+    {
+      "symbol": "SQQQ",
+      "kind": "sentiment",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "Bitget funding",
+          "detail": "SQQQ's funding rate and 24h move, live"
+        },
+        {
+          "kind": "ledger",
+          "ref": "desk notes, decision 796",
+          "detail": "the analyst panel after the provenance discount"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.stories",
+          "detail": "0 headline(s) into 0 story(ies)"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "sentiment_market_fear_greed, long/short ratios, Hyperliquid whale positions, liquidations"
+        },
+        {
+          "kind": "venue",
+          "ref": "cboe delayed_quotes/options",
+          "detail": "SQQQ listed chain, 1088 of 1214 contracts two-sided, 2026-09-28 22:45 New York"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra otcMarket weeklySummary",
+          "detail": "SQQQ ATS volume, tier T2, 5 weeks"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra regsho daily short volume",
+          "detail": "SQQQ 2026-09-28"
+        },
+        {
+          "kind": "computation",
+          "ref": "data/sentiment_comparison.json",
+          "detail": "finBERT vs the desk's sentiment analyst, coordinated posting"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.social_pulse",
+          "detail": "X and Reddit posts grouped into stories by the desk's coordination detector; a dated snapshot"
+        }
+      ],
+      "seconds": 2.8,
+      "error": null
+    },
+    {
+      "symbol": "SQQQ",
+      "kind": "technicals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis",
+          "detail": "rsi, macd, support/resistance, atr"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.lui.research._indicators",
+          "detail": "SQQQUSDT 4H, 300 bars from Bitget"
+        }
+      ],
+      "seconds": 1.59,
+      "error": null
+    },
+    {
+      "symbol": "SQQQ",
+      "kind": "event",
+      "sources": [
+        {
+          "kind": "computation",
+          "ref": "argus.research.event_reactions",
+          "detail": "MacKinlay event study, hourly Bitget candles; proxy = the other traded names; computed 2026-09-28"
+        }
+      ],
+      "seconds": 0.0,
+      "error": null
+    },
+    {
+      "symbol": "TQQQ",
+      "kind": "quote",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget /api/v2/mix/market/tickers",
+          "detail": "last, bid, ask, 24h range, funding"
+        },
+        {
+          "kind": "venue",
+          "ref": "yahoo daily close",
+          "detail": "TQQQ regular close 77.04; perpetual at the close 77.05"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.eval.overnight_comparison",
+          "detail": "TQQQUSDT 1H close at 2026-09-28 20:00 UTC 77.05; stock last 77.04"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.cost.model.CostModel.bitget_perp",
+          "detail": "round-trip taker fee"
+        }
+      ],
+      "seconds": 1.53,
+      "error": null
+    },
+    {
+      "symbol": "TQQQ",
+      "kind": "fundamentals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "earnings calendar, consensus, 13F, quote, profile, holders, dividends, filings"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server 13F holdings",
+          "detail": "TQQQ period 2026-06-30"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_fundamental_dividends",
+          "detail": "TQQQ ex-dividend date"
+        },
+        {
+          "kind": "venue",
+          "ref": "Yahoo Finance quoteSummary topHoldings",
+          "detail": "TQQQ top holdings and sector weights"
+        },
+        {
+          "kind": "venue",
+          "ref": "SEC EDGAR submissions",
+          "detail": "TQQQ fund reports (485BPOS, N-PX, N-CEN, N-CSR, NPORT-P), last 400 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_profile",
+          "detail": "TQQQ fund profile"
+        }
+      ],
+      "seconds": 2.34,
+      "error": null
+    },
+    {
+      "symbol": "TQQQ",
+      "kind": "news",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget + RSS + SEC EDGAR",
+          "detail": "headlines, 8-K, 24h move"
+        },
+        {
+          "kind": "venue",
+          "ref": "RSS + Yahoo Finance + SEC EDGAR",
+          "detail": "0 headline(s), 0 filing(s); publishers' feeds read directly because bitget-signal's news_feed did not answer in time when last asked at 02:44 UTC"
+        }
+      ],
+      "seconds": 1.31,
+      "error": null
+    },
+    {
+      "symbol": "TQQQ",
+      "kind": "sentiment",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "Bitget funding",
+          "detail": "TQQQ's funding rate and 24h move, live"
+        },
+        {
+          "kind": "ledger",
+          "ref": "desk notes, decision 795",
+          "detail": "the analyst panel after the provenance discount"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.stories",
+          "detail": "0 headline(s) into 0 story(ies)"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "sentiment_market_fear_greed, long/short ratios, Hyperliquid whale positions, liquidations"
+        },
+        {
+          "kind": "venue",
+          "ref": "cboe delayed_quotes/options",
+          "detail": "TQQQ listed chain, 1553 of 1748 contracts two-sided, 2026-09-28 22:45 New York"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra otcMarket weeklySummary",
+          "detail": "TQQQ ATS volume, tier T2, 5 weeks"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra regsho daily short volume",
+          "detail": "TQQQ 2026-09-28"
+        },
+        {
+          "kind": "computation",
+          "ref": "data/sentiment_comparison.json",
+          "detail": "finBERT vs the desk's sentiment analyst, coordinated posting"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.social_pulse",
+          "detail": "X and Reddit posts grouped into stories by the desk's coordination detector; a dated snapshot"
+        }
+      ],
+      "seconds": 5.22,
+      "error": null
+    },
+    {
+      "symbol": "TQQQ",
+      "kind": "technicals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis",
+          "detail": "rsi, macd, support/resistance, atr"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.lui.research._indicators",
+          "detail": "TQQQUSDT 4H, 300 bars from Bitget"
+        }
+      ],
+      "seconds": 1.53,
+      "error": null
+    },
+    {
+      "symbol": "TQQQ",
+      "kind": "event",
+      "sources": [
+        {
+          "kind": "computation",
+          "ref": "argus.research.event_reactions",
+          "detail": "MacKinlay event study, hourly Bitget candles; proxy = the other traded names; computed 2026-09-28"
+        }
+      ],
+      "seconds": 0.0,
+      "error": null
+    },
+    {
+      "symbol": "TSLA",
+      "kind": "quote",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget /api/v2/mix/market/tickers",
+          "detail": "last, bid, ask, 24h range, funding"
+        },
+        {
+          "kind": "venue",
+          "ref": "yahoo daily close",
+          "detail": "TSLA regular close 357.45; perpetual at the close 357.85"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.eval.overnight_comparison",
+          "detail": "TSLAUSDT 1H close at 2026-09-28 20:00 UTC 357.85; stock last 357.45"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.cost.model.CostModel.bitget_perp",
+          "detail": "round-trip taker fee"
+        }
+      ],
+      "seconds": 1.61,
+      "error": null
+    },
+    {
+      "symbol": "TSLA",
+      "kind": "fundamentals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "earnings calendar, consensus, 13F, quote, profile, holders, dividends, filings"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_calendar",
+          "detail": "TSLA report 2026-07-22"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server consensus",
+          "detail": "scraped 2025-01-30; withheld as too old"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_estimates_price_target",
+          "detail": "TSLA analyst targets, last 90 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "Yahoo Finance quoteSummary calendarEvents",
+          "detail": "TSLA next report 2026-10-21"
+        },
+        {
+          "kind": "venue",
+          "ref": "Yahoo Finance quoteSummary calendarEvents",
+          "detail": "TSLA EPS and revenue consensus"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.sue via SEC XBRL",
+          "detail": "TSLA eps_diluted, 12 quarters"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server quote",
+          "detail": "TSLA fundamentals snapshot"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_fundamental_dividends",
+          "detail": "TSLA dividend and split history"
+        },
+        {
+          "kind": "venue",
+          "ref": "SEC EDGAR submissions",
+          "detail": "TSLA 10-Q, 10-K and 8-K, last 400 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_fundamental_ratios",
+          "detail": "TSLA 2026-09-28"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_inst_position_summary",
+          "detail": "TSLA 2026-09-25"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_major_holders",
+          "detail": "TSLA 5% holders disclosed as of 2025-12-30"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_profile",
+          "detail": "TSLA company profile"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server equity_ownership_insider_trading",
+          "detail": "TSLA Form 4, last 30 days"
+        },
+        {
+          "kind": "venue",
+          "ref": "Polymarket (gamma-api public-search)",
+          "detail": "open markets naming TSLA, over $10,000 traded"
+        }
+      ],
+      "seconds": 3.03,
+      "error": null
+    },
+    {
+      "symbol": "TSLA",
+      "kind": "news",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget + RSS + SEC EDGAR",
+          "detail": "headlines, 8-K, 24h move"
+        },
+        {
+          "kind": "venue",
+          "ref": "RSS + Yahoo Finance + SEC EDGAR",
+          "detail": "13 headline(s), 0 filing(s); publishers' feeds read directly because bitget-signal's news_feed did not answer in time when last asked at 02:44 UTC"
+        },
+        {
+          "kind": "venue",
+          "ref": "Polymarket (gamma-api public-search)",
+          "detail": "open markets naming TSLA, over $10,000 traded"
+        }
+      ],
+      "seconds": 1.52,
+      "error": null
+    },
+    {
+      "symbol": "TSLA",
+      "kind": "sentiment",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "Bitget funding",
+          "detail": "TSLA's funding rate and 24h move, live"
+        },
+        {
+          "kind": "ledger",
+          "ref": "desk notes, decision 828",
+          "detail": "the analyst panel after the provenance discount"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.stories",
+          "detail": "13 headline(s) into 13 story(ies)"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-mcp-server",
+          "detail": "sentiment_market_fear_greed, long/short ratios, Hyperliquid whale positions, liquidations"
+        },
+        {
+          "kind": "venue",
+          "ref": "cboe delayed_quotes/options",
+          "detail": "TSLA listed chain, 3978 of 4950 contracts two-sided, 2026-09-28 22:45 New York"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra otcMarket weeklySummary",
+          "detail": "TSLA ATS volume, tier T1, 5 weeks"
+        },
+        {
+          "kind": "venue",
+          "ref": "finra regsho daily short volume",
+          "detail": "TSLA 2026-09-28"
+        },
+        {
+          "kind": "computation",
+          "ref": "data/sentiment_comparison.json",
+          "detail": "finBERT vs the desk's sentiment analyst, coordinated posting"
+        },
+        {
+          "kind": "computation",
+          "ref": "argus.market.social_pulse",
+          "detail": "X and Reddit posts grouped into stories by the desk's coordination detector; a dated snapshot"
+        },
+        {
+          "kind": "venue",
+          "ref": "Polymarket (gamma-api public-search)",
+          "detail": "open markets naming TSLA, over $10,000 traded"
+        }
+      ],
+      "seconds": 4.86,
+      "error": null
+    },
+    {
+      "symbol": "TSLA",
+      "kind": "technicals",
+      "sources": [
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis",
+          "detail": "rsi, macd, support/resistance, atr"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.rsi",
+          "detail": "bitget:technical_analysis: ok"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.macd",
+          "detail": "bitget:technical_analysis: ok; signal/histogram swapped by the Skill, corrected against Bitget 4h candles"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.support_resistance",
+          "detail": "bitget:technical_analysis: ok"
+        },
+        {
+          "kind": "venue",
+          "ref": "bitget-signal technical_analysis.atr",
+          "detail": "bitget:technical_analysis: ok"
+        }
+      ],
+      "seconds": 1.88,
+      "error": null
+    },
+    {
+      "symbol": "TSLA",
+      "kind": "event",
+      "sources": [
+        {
+          "kind": "computation",
+          "ref": "argus.research.event_reactions",
+          "detail": "MacKinlay event study, hourly Bitget candles; proxy = the other traded names; computed 2026-09-28"
+        }
+      ],
+      "seconds": 0.0,
+      "error": null
+    }
+  ]
+}

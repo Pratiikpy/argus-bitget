@@ -3,13 +3,30 @@ subtheme = "t2-riskcontrol"
 modules = [
     "argus/agents/quarantine.py",
     "argus/eval/garak_quarantine.py",
+    "argus/eval/injection_classifier_rival.py",
 ]
-state = "implemented"
+state = "lost"
 baseline = """\
     NVIDIA garak @8d1259ef (Apache-2.0): its latent-injection probes as development and its \
     promptinject probes, built by its own resources/promptinject, as a held-out set scored once; \
     the quarantine's own rules as they stood before 2026-09-28 as the second arm"""
 blockers = [
+    """\
+        RE-GRADED 2026-09-29 from IMPLEMENTED to LOST (Activity/28_CAPABILITY_CLOSE_PLAN_2.md \
+        §47) on the row's own claim, attacks never written against, against a trained classifier \
+        (eval/injection_classifier_rival.py, data/injection_classifier_rival.json): ProtectAI's \
+        deberta-v3-base-prompt-injection-v2 (Apache-2.0, local) and ARGUS's rules on the same \
+        662 externally sampled deepset/prompt-injections prompts, a corpus neither was built \
+        from. The classifier withholds 109 of 263 attacks (41%) and ARGUS's rules 41 (16%); 86 \
+        attacks only the classifier caught against 18 only ARGUS caught, exact McNemar p = \
+        8e-12. Those attacks are direct injection and role-play jailbreaks, not the desk's \
+        threat model, and the trade-off runs the other way on everything the desk actually \
+        reads: on garak's latent injection ARGUS withholds 3,582 of 3,652 against the \
+        classifier's 322, on garak's held-out hijacks 2,100 of 2,100 against 2,052, and on 5,836 \
+        lines of real desk text (the ledger's theses and repository READMEs) ARGUS withholds \
+        none while the classifier withholds 724 (12.4%), so it cannot be dropped in front of the \
+        desk's evidence. Still a LOST on the claim as written. Meta's Prompt Guard 2 (gated \
+        licence) and Lakera Guard (paid) are not run.""",
     """\
         Development 3,582 of 3,652 withheld (before: 1,116), held out 2,100 of 2,100 (before: \
         1,680), with 0 of 109 clean garak documents, 0 of 796 real theses and 0 of 5,000 README \
@@ -44,3 +61,8 @@ artefact = "data/garak_quarantine.json"
 condition = "implementation_complete"
 how = "agents/quarantine.py screens every evidence item before a model reads it"
 test = "test_garak_quarantine.py::test_every_held_out_injection_is_withheld_and_no_clean_text_is"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """    ProtectAI's deberta-v3-base-prompt-injection-v2 run locally through transformers on every     item of every corpus, its own two-way decision"""
+artefact = "data/injection_classifier_rival.json"

@@ -5,11 +5,26 @@ modules = [
     "argus/research/grammar.py",
     "argus/research/factor_lab.py",
 ]
-state = "implemented"
+state = "tied"
 baseline = """\
     minihellboy/FactorMiner (arXiv 2602.14670); bigcan/sharpen Crucible; \
     rookiewu417/FactorZen; QuantaAlpha/QuantaAlpha; microsoft/RD-Agent fin_factor"""
 blockers = [
+    """\
+        RE-GRADED 2026-09-29 from IMPLEMENTED to TIED on factor quality, the blocker below, \
+        measured against FactorMiner (eval/factor_quality_rivals.py, \
+        data/factor_quality_rivals.json): its 109 scoreable paper factors, 12 Alpha101 and 60 \
+        adapted variants, run in FactorMiner's own engine at commit 201309cf, and ARGUS's eight \
+        rules, all through the factor lab's cost, out-of-sample and split-half gates on the same \
+        frozen 90-day bars. No family passes every gate more often than noise passes split-half \
+        alone (25 of 480, 5.2%): ARGUS 0 of 96 pairs, FactorMiner's paper factors 2 of 1,308 \
+        against 4 of 1,308 for the same factors rotated against the returns, Alpha101 0 of 144, \
+        adapted variants 0 of 720. FactorMiner's own gate agrees: 48 of 182 formulas clear its \
+        IC bar of 0.04 and none its ICIR bar of 0.5 (best 0.19). The one factor with a gross \
+        edge, High-Low Midpoint Reversion, turns a gross Sharpe of 1.5 to 5.4 into -8 to -26 net \
+        of 12 bps across about 1,950 rebalances. Neither side finds a factor these gates can \
+        see; level, not ahead. Not run: FactorMiner's correlation-admission stage and its LLM \
+        mining loop (Qwen), RD-Agent, and a pooled long-short book per factor.""",
     """\
         What is proven is the safety of the search (the row above). Factor quality — whether the \
         factors found carry out-of-sample edge after costs — has not been compared with the \
@@ -24,3 +39,32 @@ blockers = [
         an edge this test can see, not that none has an edge. Groupwise: the single pass is one \
         pair (AMZNUSDT, slow_fade)""",
 ]
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    FactorMiner's paper factors, Alpha101 and adapted variants evaluated by FactorMiner's own \
+    engine at commit 201309cf in its own Python 3.12 environment, run as a subprocess; its own \
+    count of 110 paper factors reproduced, one all-NaN in its engine"""
+test = "test_factor_quality_rivals.py::TestFactorMinerEngine"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    both sides on the same frozen 90-day bars (data/factor_split_half_bars.json, sha256 \
+    checked on load) through the same cost, out-of-sample and split-half gates; ARGUS's 96 rows \
+    match data/factor_split_half.json field for field or the run stops"""
+artefact = "data/factor_quality_rivals.json"
+
+[[proofs]]
+condition = "costs_included"
+how = """\
+    the cost gate charges the backtest engine's Bitget perp cost (12 bps round trip) on every \n    rebalance of every pair, the same for both sides"""
+test = "test_factor_quality_rivals.py::TestGates"
+
+[[proofs]]
+condition = "adversarial_test"
+how = """\
+    a placebo arm rotates every rival factor half the sample against its returns; it passes \
+    every gate on 4 paper pairs against 2 for the factors as written"""
+test = "test_factor_quality_rivals.py::TestCompare::test_placebo_is_the_factor_rotated_against_its_returns"

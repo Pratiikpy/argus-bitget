@@ -37,7 +37,7 @@ from typing import Any
 from urllib.parse import parse_qs, urlparse
 
 from argus.lui import design
-from argus.lui.answer import Answer, answer, unlead
+from argus.lui.answer import EMPTY_QUESTION_HINT, Answer, answer, unlead
 from argus.lui.arbiter import arbitrate, gate_ledger_reading
 from argus.lui.cli import BUDGET_MS
 from argus.lui.ngram import reclassify
@@ -561,6 +561,14 @@ variable rather than a parameter threaded through every answering path, and scop
 so one visitor's memory can never reach another's answer."""
 
 
+EMPTY_QUESTION: dict[str, Any] = {
+    "error": "empty question", "refused": True, "reason": "empty question",
+    "lines": [f"Nothing was asked. {EMPTY_QUESTION_HINT}"], "sources": [], "data": {},
+}
+"""The reply to a blank question on /ask: an HTTP 400, in the same envelope as every answer. The
+MCP ``argus_ask`` tool says the same in its ``isError`` result (`lui/mcp_server.py`)."""
+
+
 def handle_ask(
     text: str, prior: list[str], *, now: datetime | None = None, visitor: str = "local",
     book: str = "", memory: str = "",
@@ -587,6 +595,19 @@ def handle_ask(
             payload["lines"] = [prefix, *payload["lines"]]
     finally:
         _MEMORY.reset(token)
+    if book.strip() and payload.get("lines"):
+        from argus.lui.research.parse import unread_holdings
+
+        unread = [(name, weight) for name, weight in unread_holdings(book)
+                  if not any(name in str(line) for line in payload["lines"])]
+        if unread:
+            # "50% ZZZZ" in the book field was dropped without a word and the answer read as if
+            # no book had been given (fresh-eyes audit, 2026-09-29).
+            named = ", ".join(f"{name} ({weight:g}%)" for name, weight in unread)
+            payload["lines"] = [payload["lines"][0],
+                                f"Not read from your book: {named} — not a contract Bitget "
+                                f"lists, so it is left out of this answer.",
+                                *payload["lines"][1:]]
     by = str(payload.get("classified_by") or "")
     if by == "journal":
         # A review's checklist is kept, so the next entry the trader asks about is checked
@@ -679,6 +700,12 @@ def _answer(
         return engine_payload(*arbitrage.answer(text), by="arbitrage")
     if onchain.asks_for_gas(text):
         return engine_payload(*onchain.gas(text), by="eth-gas")
+    from argus.lui import rivals
+
+    if rivals.asks_about_a_rival(text):
+        # "how does ARGUS compare to Nautilus Trader": the register's rows against that rival
+        # (`lui/rivals.py`), not an adjacent statistic (fresh-eyes audit, 2026-09-29).
+        return engine_payload(*rivals.answer(text), by="rivals")
     from argus.lui import rotation as rotation_answer
 
     if rotation_answer.asks_for_rotation(text):
@@ -1474,8 +1501,10 @@ class Handler(BaseHTTPRequestHandler):
             except (ValueError, TypeError):
                 prior = []
             if not text.strip():
-                self._send(json.dumps({"error": "empty question"}).encode(),
-                           "application/json", 400)
+                # Still a 400 (nothing was asked), but in the envelope every other refusal uses,
+                # so a client reading `lines` and `refused` does not break on it (stranger QA,
+                # 2026-09-29: a bare {"error": ...} was the one reply without them).
+                self._send(json.dumps(EMPTY_QUESTION).encode(), "application/json", 400)
                 return
             book = repair_mojibake(first("book"))[:300]
             memory_text = first("memory")[:12000]

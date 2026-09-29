@@ -6,12 +6,26 @@ modules = [
     "argus/eval/baselines/tradingagents_trader.py",
     "argus/eval/baselines/tradingagents_trader_loader.py",
 ]
-state = "implemented"
+state = "tied"
 baseline = """\
     TradingAgents' real, unmodified TraderProposal (agents/schemas.py) — the structured-output \
     type its real Trader agent fills to produce every transaction proposal, including \
     entry_price and stop_loss"""
 blockers = [
+    """\
+        RE-GRADED 2026-09-29 from IMPLEMENTED to TIED (Activity/28_CAPABILITY_CLOSE_PLAN_2.md \
+        §29) with the best general-purpose tool for the measured job: a pydantic v2 field \
+        validator that refuses an entry price that is not positive or not within 20% of the live \
+        price. Run on the artefact's own twelve fabricated entry prices \
+        (data/explainability_comparison.json, factors 7.3, 0.03, -1 and 1000 on three live \
+        prices), it catches 12 of 12, the same as grounding.check, and refuses none of the nine \
+        real figures (live price, 24h high and low) on the same symbols. TradingAgents' \
+        TraderProposal catches 0 of 12, but it is a schema, not a checker. Gross fabrications \
+        are caught by any bound, so this set cannot separate the two; where ARGUS differs is \
+        every figure in a free-text thesis, which a two-field validator cannot see, and that has \
+        no measured precision or recall: 289 of 774 live cycles (2026-09-12 to 2026-09-28) carry \
+        an unattributable-figure flag nobody has labelled. Measuring it needs the grounding \
+        facts persisted per cycle and a labelled sample.""",
     """\
         RE-GRADED 2026-09-27 from OWNED to IMPLEMENTED by the groupwise gate \
         (data/groupwise_audit.json): its statistical and out-of-sample evidence is \

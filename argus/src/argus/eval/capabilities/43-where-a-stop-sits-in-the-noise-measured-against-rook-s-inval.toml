@@ -13,11 +13,27 @@ modules = [
     "argus/desk/odds.py",
     "argus/eval/stopquality_comparison.py",
 ]
-state = "implemented"
+state = "tied"
 baseline = """\
     iamsuperfly/Rook (Season 2, MIT): runDebate (bull/bear + judge) on the hackathon Qwen, \
     long side, 24h, six names, from its clone"""
 blockers = [
+    """\
+        RE-GRADED 2026-09-29 from IMPLEMENTED to TIED \
+        (Activity/28_CAPABILITY_CLOSE_PLAN_2.md §43) with the general-purpose volatility \
+        stop. Hit rate alone rewards width, so ARGUS's lead over Rook's 0.1-1.7% stops is \
+        true by construction and is kept as context only. Every arm now trades the same long \
+        on the same 958 held-out windows (bought at the prior close, sold at the stop or the \
+        close, 12bps round trip; data/stopquality_comparison.json arms and windows): ARGUS \
+        -2.28 bps a window with its stop hit 10.9% of the time, Wilder's 1x ATR(14) stop \
+        -1.56 at 11.9%, 2x ATR -1.52, LeBeau's chandelier -1.37 where defined, Rook -9.18, \
+        no stop -4.39. ARGUS minus the 1x ATR stop is -0.73 bps a window, interval [-3.18, \
+        +2.04] over 162 dates, and it flips between chronological halves: no difference. \
+        ARGUS's stop does what it says: hit on 104 of 958 windows against its 10% target, \
+        Kupiec p = 0.38. The quantile ablation trades hit rate for return as expected (80th \
+        percentile -4.91, 90th -2.28, 95th -1.31). On the most volatile fifth of windows \
+        ARGUS is +22.0 against +20.4 for the ATR stop. The saved bars carry no open, so a \
+        gap through a stop is filled at the stop for every arm.""",
     """\
         ahead on the one metric measured, not OWNED: ordinary movement reached Rook's stops on 62% \
         of held-out days on average (28% to 87% by name) and ARGUS's out-of-sample stop on 11% (8% \
@@ -25,13 +41,11 @@ blockers = [
         its thesis is wrong rather than where noise ends, so the comparison says how often each \
         line is hit by chance, not which desk trades better""",
     """\
-        prospective check pending: both stops were recorded at the run and are graded on the next \
-        24 hours""",
-    """\
-        the distance scored is the harness's own nearest-rank percentile, not the console's \
-        desk/odds.py, and the harness needs the network to run (it fetches the daily bars live and \
-        saves none), so the comparison cannot be reproduced offline. Both close the same way: \
-        score() taking the saved bars and calling desk.odds.directional_odds for ARGUS's distance""",
+        Closed 2026-09-29: the prospective check graded both stops on the 24 hours after the \
+        run (data/stopquality_prospective.json): Rook's was touched on 5 of 6 names, ARGUS's \
+        on 1 (META), using the former nearest-rank distance, which differs from \
+        directional_odds by at most 0.0004. The harness now scores desk/odds.py on bars \
+        saved once and runs offline.""",
 ]
 
 [[proofs]]
@@ -65,3 +79,34 @@ test = "test_odds.py::test_the_stop_line_reads_the_bars_lows_and_highs_not_the_c
 condition = "failure_cases_documented"
 how = "six names, one run; Rook's line is a thesis invalidation, not a noise stop"
 artefact = "data/stopquality_comparison.json"
+
+[[proofs]]
+condition = "statistically_valid_evaluation"
+how = """\
+    per-window net return, ARGUS against the 1x ATR stop, with a stationary bootstrap over \
+    dates in the groupwise audit; the interval includes zero, which is the TIED"""
+artefact = "data/stopquality_comparison.json"
+
+[[proofs]]
+condition = "costs_included"
+how = "every arm's return is net of the 12bps Bitget taker round trip"
+artefact = "data/stopquality_comparison.json"
+
+[[proofs]]
+condition = "ablation"
+how = """\
+    ARGUS's stop quantile at 0.80, 0.90 and 0.95 on the same windows, hit rate and net return \
+    for each"""
+artefact = "data/stopquality_comparison.json"
+
+[[proofs]]
+condition = "adversarial_test"
+how = """\
+    the most volatile fifth of held-out windows (ATR at least 5.4% of price) scored on its own, \
+    every arm"""
+artefact = "data/stopquality_comparison.json"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = "the arms are recomputed from the saved bars and must equal the published figures"
+test = "test_stopquality_comparison.py::test_the_published_arms_reproduce_from_the_saved_bars"

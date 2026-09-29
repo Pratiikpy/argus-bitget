@@ -8,26 +8,34 @@ modules = [
     "argus/market/fundamentals.py",
     "argus/eval/general_sue_comparison.py",
 ]
-state = "implemented"
+state = "owned"
 baseline = "QuantConnect/Tutorials real SUE factor (FineSelectionAndSueSorting)"
 blockers = [
     """\
-        RE-GRADED 2026-09-28 from OWNED to IMPLEMENTED (tracker 195). The register now reads the \
-        bootstrap interval the groupwise audit puts on each headline, and this capability's own \
-        claim against the general tool (data/general_sue_comparison.json: dated alignment \
-        answers where pandas' lenient period index refuses) is +0.22 per anchor with a 95% \
-        interval of [0.0, 0.56] over 9 real filers: ARGUS answers on 2, ties on 7, loses on \
-        none. An exact sign test on 2 wins and 0 losses gives p = 0.5. The mechanism is real and \
-        ahead; the sample does not establish it. Route back: extend the alignment comparison to \
-        enough filers that the interval clears zero, or show it does not.""",
+        RE-GRADED 2026-09-29 from IMPLEMENTED back to OWNED (tracker 195's route back, taken). \
+        data/general_sue_comparison.json now scores every SEC filer with twelve or more \
+        quarters, not nine anchors: on the design frames (CY2022Q1-CY2026Q2, 3,997 filers) \
+        ARGUS's dated pairing returns a finite SUE from all-year-over-year pairs for 3,919 \
+        (98.0%) against pandas' lenient period index 3,695 (227 only ARGUS, 3 only pandas, exact \
+        McNemar p = 2e-63), and on a holdout the rule was never fitted on (CY2016Q1-CY2021Q4, \
+        3,261 filers, market/sue.py pinned by hash) 3,082 against 2,893 (263 against 74, p = \
+        6e-26). Per filer the difference is +0.057 with a 95% interval of [0.051, 0.063], the \
+        same on both halves. Against edgartools 5.59.1, the pip-installed package run offline on \
+        a seeded 309-filer companyfacts sample (data/edgartools_real_check.json, verdicts \
+        identical to the rebuild filer for filer), ARGUS 299 and edgartools 279, 21 against 1, p \
+        = 1e-5. Every ARGUS value equals the exact-decimal SUE of its window. The 77 filers \
+        pandas answers and ARGUS refuses all lack eight year-over-year changes inside three \
+        years (gap years), where ARGUS declines to standardise by stale deltas by design; that \
+        is the stated reason, not a hidden loss.""",
     """\
         The real reference's exact `months_count`/`months_eps_change` defaults are not published \
         in the tutorial page's own inline code (only the surrounding prose states a '36-month \
         warm-up' and 'four quarters ago') — read from the real code's own slicing structure rather \
         than a literal Initialize() block, and real quarterly EPS is reshaped into the \
         monthly-cadence-with-repeats form the real RollingWindow expects rather than fed directly. \
-        The nine-anchor universe is ARGUS's own tradable set, not a broad-market cross-sectional \
-        universe of the kind SUE was originally published against""",
+        The QuantConnect replication runs on the nine anchors, ARGUS's own tradable set; the \
+        alignment comparison against the general tools has covered every SEC filer with twelve \
+        or more quarters since 2026-09-29""",
     """\
         General-purpose rivals run 2026-09-26 (data/general_sue_comparison.json): pandas beat the \
         ARGUS of before 2026-09-25 on quarter pairing, since fixed and matched. On degenerate \
@@ -75,22 +83,28 @@ test = "test_sue.py"
 [[proofs]]
 condition = "same_input_comparison"
 how = """\
-    both real systems scored on the same real, live SEC EDGAR quarterly EPS \
-    (market/fundamentals.py's real, point-in-time, restatement-resolved XBRL fetch) for all \
-    nine real rToken anchor companies, agreeing to floating-point identity. CORRECTION \
-    2026-09-25 (eval/general_sue_comparison.py): that agreement was between two positional \
-    quarters[i+4] computations, and SEC XBRL has no standalone fiscal Q4, so 0 of the 72 \
-    anchor pairs were really year-over-year (7.45% of 31,488 pairs across 3,997 filers). \
-    research.sue.read_dated now pairs by date, 100% year-over-year, and agrees with pandas \
-    PeriodIndex diff(4) to 1e-9 on 3,687 of 3,687 filers"""
+    every method on the same SEC filings: 7,258 filers across the design and holdout frames for \
+    pandas' period index and the positional pairing, and one seeded companyfacts sample of 309 \
+    filers for edgartools 5.59.1 run offline (data/general_sue_comparison.json, \
+    data/edgartools_real_check.json). Before that, both real systems scored on the same real, \
+    live SEC EDGAR quarterly EPS (market/fundamentals.py's real, point-in-time, \
+    restatement-resolved XBRL fetch) for all nine real rToken anchor companies, agreeing to \
+    floating-point identity. CORRECTION 2026-09-25 (eval/general_sue_comparison.py): that \
+    agreement was between two positional quarters[i+4] computations, and SEC XBRL has no \
+    standalone fiscal Q4, so 0 of the 72 anchor pairs were really year-over-year (7.45% of \
+    31,488 pairs across 3,997 filers). research.sue.read_dated now pairs by date, 100% \
+    year-over-year, and agrees with pandas PeriodIndex diff(4) to 1e-9 on 3,687 of 3,687 filers"""
 test = "test_earnings_comparison.py::TestBaselineReproduced"
 
 [[proofs]]
 condition = "statistically_valid_evaluation"
 how = """\
-    checked across all nine real rToken anchors, not one convenient company, plus a real \
-    cross-sectional ranking mixing a constructed artifact into the real universe to show the \
-    consequence of the reference's own unguarded denominator on an actual ranked list, not \
+    alignment scored per filer on 7,258 SEC filers (design and holdout frames) with exact \
+    McNemar tests against each rival and a groupwise bootstrap interval of [0.051, 0.063] on the \
+    per-filer difference against pandas (data/general_sue_comparison.json, \
+    eval/groupwise_audit.py); the refusal case checked across all nine real rToken anchors, plus \
+    a real cross-sectional ranking mixing a constructed artifact into the real universe to show \
+    the consequence of the reference's own unguarded denominator on an actual ranked list, not \
     just an isolated scalar"""
 test = "test_earnings_comparison.py::TestRankingCase"
 
@@ -106,9 +120,12 @@ test = "test_earnings_comparison.py::TestCosts"
 [[proofs]]
 condition = "out_of_sample_test"
 how = """\
-    the real EPS history is fetched live for the full real anchor universe each run, not a \
-    frozen fixture designed around the finding — SEC EDGAR's own data moves as new quarters \
-    are filed, and the comparison reports whichever real numbers are live the day it runs"""
+    a holdout the dated rule was never fitted on, CY2016Q1-CY2021Q4 frames with market/sue.py \
+    pinned by hash in the artefact: 3,082 of 3,261 filers against pandas' 2,893, p = 6e-26 \
+    (data/general_sue_comparison.json, holdout); and the real EPS history is fetched live for \
+    the full real anchor universe each run, not a frozen fixture designed around the finding — \
+    SEC EDGAR's own data moves as new quarters are filed, and the comparison reports whichever \
+    real numbers are live the day it runs"""
 test = """\
     test_earnings_comparison.py::TestBaselineReproduced::test_most_or_all_real_anchors_have_enough_history"""
 

@@ -75,3 +75,52 @@ def test_collected_bars_score_offline_and_the_recorded_prospective_block_is_kept
     assert row["argus_distance_former_copy"] == pytest.approx(0.03)
     assert out["prospective"] == recorded
     assert json.loads((tmp_path / "out.json").read_text("utf-8"))["prospective"] == recorded
+
+
+class TestTheGeneralToolArms:
+    """The ATR and chandelier stops, and what each arm's long returns (plan §43)."""
+
+    def test_wilders_atr_uses_only_earlier_bars(self) -> None:
+        from datetime import UTC, datetime, timedelta
+
+        start = datetime(2026, 1, 1, tzinfo=UTC)
+        bars = [(start + timedelta(days=i), 100.0 + i, 99.0 + i, 101.0 + i) for i in range(20)]
+        values = sq.atr(bars, period=3)
+        assert values[:3] == [None, None, None] and values[3] == pytest.approx(2.0)
+        # A shock on the last bar moves only the last value.
+        shocked = [*bars[:-1], (bars[-1][0], 90.0, 80.0, 130.0)]
+        assert sq.atr(shocked, period=3)[:-1] == values[:-1]
+
+    def test_a_hit_stop_exits_at_the_stop_and_pays_the_round_trip(self) -> None:
+        from datetime import UTC, datetime, timedelta
+
+        start = datetime(2026, 1, 1, tzinfo=UTC)
+        bars = [(start + timedelta(days=i), 100.0, 99.0, 101.0) for i in range(30)]
+        bars.append((start + timedelta(days=30), 101.0, 95.0, 102.0))   # a 5% flush
+        rows = sq.window_rows("X", bars, 25, 0.02, None)
+        last = rows[-1]
+        assert last["argus_hit"] and last["argus_net_bps"] == pytest.approx(-200.0 - 12.0)
+        assert not last["no_stop_hit"] and last["no_stop_net_bps"] == pytest.approx(100 - 12.0)
+
+    def test_kupiec_accepts_a_calibrated_stop_and_rejects_a_bad_one(self) -> None:
+        assert sq.kupiec(104, 958, 0.10)["p_value"] > 0.05
+        assert sq.kupiec(300, 958, 0.10)["p_value"] < 1e-6
+
+
+def test_the_published_arms_reproduce_from_the_saved_bars() -> None:
+    import json
+
+    if not sq.REPORT.exists() or not any(sq.BARS.glob("*.json")):
+        pytest.skip("the saved bars are not on this machine")
+    published = json.loads(sq.REPORT.read_text("utf-8"))
+    if "arms" not in published:
+        pytest.skip("the published report predates the arms")
+    windows: list = []
+    for row in published["rows"]:
+        bars = sq._saved_bars(row["symbol"])
+        cut = int(len(bars) * sq.FIT_SHARE)
+        grid = {q: sq._quantile_distance(bars[:cut], q) for q in sq.QUANTILE_GRID}
+        windows.extend(sq.window_rows(row["symbol"], bars, cut,
+                                      row["argus_distance_fit_on_first_60pct"],
+                                      row["rook_distance"], grid=grid))
+    assert sq._arms(windows)["all"] == published["arms"]["all"]

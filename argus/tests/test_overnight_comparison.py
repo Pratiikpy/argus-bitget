@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import itertools
 import json
 from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
@@ -279,3 +280,45 @@ def test_claimcheck_grades_the_consoles_own_premise_check(
         monkeypatch.setattr(_module, "_claim_check", broken)
     with pytest.raises(RuntimeError, match="console broken"):
         cc.console_answers(claims, tape)
+
+
+class TestTheGeneralTool:
+    """The stock's own pre-market price at 09:00, and the perpetual alone at 03:30
+    (Activity/28_CAPABILITY_CLOSE_PLAN_2.md §44)."""
+
+    def test_a_premarket_that_has_not_moved_loses_to_a_perpetual_that_has(self) -> None:
+        inputs = _inputs()
+        # The stock's pre-market sits at the prior close all night: the general tool says "no
+        # gap", and the perpetual, which carries the true gap here, must beat it.
+        sessions = inputs["sessions"]["NVDA"]
+        inputs["premarket"] = {"NVDA": sorted(
+            (oc._ny(date.fromisoformat(after["day"]), time(9)), before["close"])
+            for before, after in itertools.pairwise(sessions))}
+        rows = [r for r in oc.predict(oc.nights(inputs)) if r["fitted"]]
+        got = oc.general_tool(inputs, rows)
+        assert got is not None and got["at_0900"]["paired"]["verdict"] == "a better"
+
+    def test_no_premarket_series_means_no_general_tool_block(self) -> None:
+        inputs = _inputs()
+        rows = [r for r in oc.predict(oc.nights(inputs)) if r["fitted"]]
+        assert oc.general_tool(inputs, rows) is None
+
+
+def test_the_published_general_tool_block_reproduces_from_the_saved_inputs(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    from argus.eval.overnight_comparison import UNIVERSE as _  # noqa: F401
+
+    monkeypatch.undo()   # the whole universe, not the autouse NVDA-only one
+    path = oc.DATA / "inputs.json"
+    if not path.exists() or not oc.REPORT.exists():
+        pytest.skip("the saved inputs are not on this machine")
+    inputs = json.loads(path.read_text("utf-8"))
+    if "premarket" not in inputs:
+        pytest.skip("inputs carry no pre-market series")
+    published = json.loads(oc.REPORT.read_text("utf-8"))["general_tool_premarket"]
+    rows = [r for r in oc.predict(oc.nights(inputs)) if r["fitted"]]
+    again = oc.general_tool(inputs, rows)
+    assert again is not None
+    for key in ("at_0900", "at_0330"):
+        assert again[key]["paired"] == published[key]["paired"]
+        assert again[key]["summary"] == published[key]["summary"]

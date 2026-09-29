@@ -121,6 +121,18 @@ def underlying_ticker(symbol: str) -> str:
 
 EVENT_FORMS = frozenset({"8-K", "8-K/A"})
 FILING_FORMS = frozenset({"10-Q", "10-K", "10-Q/A", "10-K/A"})
+FUND_FORMS: dict[str, str] = {
+    "NPORT-P": "monthly portfolio holdings",
+    "N-CSR": "annual shareholder report",
+    "N-CSRS": "semi-annual shareholder report",
+    "N-CEN": "annual census report",
+    "N-PX": "proxy voting record",
+    "485BPOS": "prospectus update",
+    "N-30B-2": "periodic report to holders",
+}
+"""A fund files none of the 10-Q/10-K/8-K set; these are the reports that carry its holdings,
+financials and terms (SEC form index). QQQ's trust files NPORT-P, N-CSRS and 485BPOS; the
+ProShares trust behind TQQQ and SQQQ files N-CSR once for all its funds (seen 2026-09-29)."""
 
 # The complete 8-K item taxonomy, transcribed from the SEC's own Form 8-K instructions
 # (https://www.sec.gov/files/form8-k.pdf, fetched 2026-09-13). Thirty-three items.
@@ -316,11 +328,14 @@ class EdgarSource:
     """
 
     TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
+    FUND_TICKERS_URL = "https://www.sec.gov/files/company_tickers_mf.json"
     SUBMISSIONS_URL = "https://data.sec.gov/submissions/CIK{cik:010d}.json"
 
     def __init__(self, *, user_agent: str = FEED_USER_AGENT) -> None:
         self._ua = user_agent
         self._ciks: dict[str, int] | None = None
+        self._funds: dict[str, int] | None = None
+        self._fund_series: dict[int, int] = {}
 
     def _get(self, url: str) -> Any:
         return http.fetch_json(url, timeout=_TIMEOUT, headers={"User-Agent": self._ua})
@@ -331,18 +346,51 @@ class EdgarSource:
             self._ciks = {v["ticker"].upper(): int(v["cik_str"]) for v in raw.values()}
         return self._ciks.get(ticker.upper())
 
+    def fund_cik_for(self, ticker: str) -> tuple[int, int] | None:
+        """A fund's filer CIK and how many fund series file under it, from the SEC's mutual-fund
+        and ETF map (``company_tickers_mf.json``); ``company_tickers.json`` lists no funds."""
+        if self._funds is None:
+            raw = self._get(self.FUND_TICKERS_URL)
+            at = {name: i for i, name in enumerate(raw["fields"])}
+            series: dict[int, set[str]] = {}
+            self._funds = {}
+            for row in raw["data"]:
+                cik = int(row[at["cik"]])
+                self._funds[str(row[at["symbol"]]).upper()] = cik
+                series.setdefault(cik, set()).add(str(row[at["seriesId"]]))
+            self._fund_series = {cik: len(ids) for cik, ids in series.items()}
+        found = self._funds.get(ticker.upper())
+        return None if found is None else (found, self._fund_series.get(found, 1))
+
+    def fund_filings(self, ticker: str, *, since: datetime,
+                     limit: int = 20) -> tuple[str, int, list[Filing]]:
+        """A fund's report filings (:data:`FUND_FORMS`) accepted after ``since``, newest first,
+        with the filer's name and how many fund series share that filer."""
+        found = self.fund_cik_for(ticker)
+        if found is None:
+            return "", 0, []
+        cik, series = found
+        sub = self._get(self.SUBMISSIONS_URL.format(cik=cik))
+        return (str(sub.get("name") or ""), series,
+                self._recent(sub, frozenset(FUND_FORMS), since=since, limit=limit))
+
     def filings(self, ticker: str, *, since: datetime, limit: int = 20) -> list[Filing]:
         """Recent 8-K / 10-Q / 10-K filings accepted after ``since``, newest first."""
         cik = self.cik_for(ticker)
         if cik is None:
             return []
         sub = self._get(self.SUBMISSIONS_URL.format(cik=cik))
+        return self._recent(sub, EVENT_FORMS | FILING_FORMS, since=since, limit=limit)
+
+    @staticmethod
+    def _recent(sub: Any, forms: frozenset[str], *, since: datetime,
+                limit: int) -> list[Filing]:
         rf = sub.get("filings", {}).get("recent", {})
         out: list[Filing] = []
         n = len(rf.get("form", []))
         for i in range(n):
             form = rf["form"][i]
-            if form not in EVENT_FORMS and form not in FILING_FORMS:
+            if form not in forms:
                 continue
             accepted = _parse_iso(rf["acceptanceDateTime"][i])
             if accepted is None or accepted < since:

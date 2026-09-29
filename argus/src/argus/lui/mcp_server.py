@@ -249,6 +249,24 @@ def _echo(value: Any) -> str:
     return text if len(text) <= _ECHO else text[:_ECHO] + "..."
 
 
+EXAMPLE_ARGUMENTS: dict[str, dict[str, Any]] = {
+    "argus_ask": {"question": "where is NVDA trading right now"},
+    "argus_quote": {"symbols": ["NVDA", "TSLA"]},
+    "argus_portfolio_impact": {"add": "TSLA", "size_percent": 15,
+                               "book": {"NVDA": 50, "AAPL": 50}},
+    "argus_stress": {"book": {"NVDA": 40, "MSFT": 30, "AAPL": 30}, "shock_percent": -10},
+    "argus_execution_plan": {"symbol": "NVDA", "usd": 50000},
+    "argus_research_task": {"question": "I hold 40% NVDA, 30% MSFT, 30% AAPL - should I add "
+                                        "15% TSLA?"},
+    "argus_week_ahead": {"book": "50% NVDA, 50% BTC", "days": 7},
+    "argus_exposures": {"book": "40% NVDA, 30% MSFT, 30% AAPL", "add": "TSLA"},
+    "argus_review_trades": {"fills": "bought 10 NVDA at 180, sold 10 NVDA at 190"},
+}
+"""A working call for each tool that takes arguments, shown after an invalid one: the errors said
+what was wrong but never how to call it right (fresh-eyes audit, 2026-09-29). Each is exercised by
+`tests/test_mcp_server.py`, so an example that stops working fails the build."""
+
+
 def schema_errors(schema: Mapping[str, Any], value: Any, path: str = "") -> list[str]:
     """Violations of one tool's published ``inputSchema``, in words an agent can act on.
 
@@ -356,7 +374,9 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
 
         question = str(args.get("question") or "").strip()
         if not question:
-            raise ToolError("question is required")
+            from argus.lui.answer import EMPTY_QUESTION_HINT
+
+            raise ToolError(f"question is required. {EMPTY_QUESTION_HINT}")
         payload = server.handle_ask(question[:MAX_QUESTION], [], visitor="mcp",
                                     book=str(args.get("book") or "")[:300],
                                     memory=str(args.get("memory") or "")[:12000])
@@ -558,7 +578,10 @@ def handle(message: Any, *, tool: Callable[[str, Mapping[str, Any]], tuple[str, 
         if invalid:
             # A tool execution error, not a protocol error: the 2025-11-25 specification
             # (SEP-1303) asks for input validation to come back where the model will read it.
-            text = f"invalid arguments for {name}: " + "; ".join(invalid[:5])
+            text = (f"invalid arguments for {name}: " + "; ".join(invalid[:5])
+                    + f". A call that works: {json.dumps(EXAMPLE_ARGUMENTS[name])}"
+                    if name in EXAMPLE_ARGUMENTS else
+                    f"invalid arguments for {name}: " + "; ".join(invalid[:5]))
             return _result(message_id, {"content": [{"type": "text", "text": text}],
                                         "isError": True, "_meta": {ERROR_META: error_meta(None)}})
         failure: BaseException | None = None

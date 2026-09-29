@@ -353,6 +353,63 @@ class TestTheNewKindsAreDetected:
         assert req is not None and req.kind is kind
 
 
+class TestPositioningAndOwnershipAreNotMisread:
+    """Stranger QA, 2026-09-29: a dark-pool question reached the desk's track record, "what hedge
+    funds own NVDA" a hedge-sizing plan, and "which funds own TSLA" a refusal."""
+
+    @pytest.mark.parametrize("text", [
+        "show me dark pool activity for TSLA", "dark pools NVDA", "TSLA dark pool volume",
+        "TSLA short interest", "NVDA short volume", "is TSLA heavily shorted",
+        "NVDA options flow", "put call ratio for AAPL",
+        "what's the options put/call ratio for AAPL",
+        "what is the implied volatility on NVDA", "give me the put/call skew on QQQ",
+    ])
+    def test_listed_positioning_reaches_the_sentiment_answer(self, text: str) -> None:
+        req = detect(text)
+        assert req is not None and req.kind is ResearchKind.SENTIMENT, text
+
+    @pytest.mark.parametrize("text", [
+        "what hedge funds own NVDA", "which funds own TSLA",
+        "who are the biggest holders of AAPL", "institutional ownership of MSFT",
+    ])
+    def test_ownership_reaches_fundamentals(self, text: str) -> None:
+        req = detect(text)
+        assert req is not None and req.kind is ResearchKind.FUNDAMENTALS, text
+
+    @pytest.mark.parametrize("text", [
+        "hedge my NVDA", "how do I hedge 40% NVDA", "protect my book, I hold 60% NVDA 40% AAPL",
+    ])
+    def test_a_real_hedge_question_is_still_a_hedge(self, text: str) -> None:
+        req = detect(text)
+        assert req is not None and req.kind is ResearchKind.HEDGE, text
+
+    def test_which_funds_own_a_stock_is_not_other_traders_positions(self) -> None:
+        from argus.lui import honesty
+
+        assert honesty.honest_answer("which funds own TSLA", prior=[], book="") is None
+        assert honesty.honest_answer("which whales are long TSLA", prior=[], book="") is not None
+
+    def test_the_line_asked_for_leads_and_a_missing_one_is_said(self) -> None:
+        from argus.lui.research.dispatch import _positioning_lead
+
+        found = ["Bottom line: a position signal worth weighing on TSLA — funding is calm.",
+                 "Options on TSLA (Cboe, delayed): put/call 0.61 by today's volume.",
+                 "Dark pools (FINRA ATS, week of 2026-09-08): 41.0M TSLA shares traded "
+                 "off-exchange.",
+                 "Short volume (FINRA, 2026-09-26): 44% of 90.1M TSLA shares reported that "
+                 "session were sold short — a daily flow share, not short interest."]
+        led = _positioning_lead(found, "show me dark pool activity for TSLA", "TSLAUSDT")
+        assert led[0].startswith("Bottom line: Dark pools (FINRA")
+        short = _positioning_lead(found, "TSLA short interest", "TSLAUSDT")
+        assert short[0].startswith("Bottom line: Short volume (FINRA")
+        assert "Short interest itself" in short[1]
+        assert _positioning_lead(found, "put call ratio for TSLA", "TSLAUSDT")[0].startswith(
+            "Bottom line: Options on TSLA (Cboe")
+        crypto = _positioning_lead(found[:1], "BTC dark pool volume", "BTCUSDT")
+        assert crypto[0].startswith("Bottom line: Off-exchange (FINRA ATS) volume was not read")
+        assert _positioning_lead(found, "how bullish is TSLA", "TSLAUSDT") is found
+
+
 def _skills(rsi: float, hist: float) -> Any:
     def calls(calls: Any, timeout: int = 10) -> list[tuple[Any, str]]:
         payloads = {
@@ -402,7 +459,13 @@ class _FakeService:
 
 
 def _service(monkeypatch: pytest.MonkeyPatch, **kwargs: Any) -> None:
+    from argus.market.evidence import EdgarSource
+
     monkeypatch.setattr(bitget_mcp, "BitgetDataService", lambda: _FakeService(**kwargs))
+    # The filing record (a company's 10-Q/10-K/8-K, a fund's NPORT-P/N-CSR) is read from EDGAR
+    # beside the data service; these tests are about the service's own figures.
+    monkeypatch.setattr(EdgarSource, "filings", lambda self, *a, **k: [])
+    monkeypatch.setattr(EdgarSource, "fund_filings", lambda self, *a, **k: ("", 0, []))
 
 
 def _days_from_today(n: int) -> str:

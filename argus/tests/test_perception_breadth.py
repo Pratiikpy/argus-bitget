@@ -115,6 +115,63 @@ class TestTheWorkbenchArm:
             {"ref": "bitget + RSS + SEC EDGAR", "detail": "13 headline(s), 0 filing(s)"}]}]}
         assert {c.category for c in pb.workbench_cells(raw)} == {"news"}
 
+    @staticmethod
+    def _cells() -> list[pb.Cell]:
+        def cell(system: str, source: str, category: str, symbol: str = "NVDA") -> pb.Cell:
+            return pb.Cell(symbol=symbol, system=system, source=source, category=category,
+                           answered=True, items=1, detail="")
+
+        return [cell("openbb", "cboe", "options"), cell("openbb", "sec", "filings"),
+                cell("argus_workbench", "cboe", "options"),
+                cell("argus_workbench", "sec-edgar", "filings"),
+                cell("argus_workbench", "x+reddit", "social"),
+                cell("argus_workbench", "bitget", "venue_derivatives")]
+
+    def test_the_adversarial_reading_drops_what_the_rival_cannot_reach(self) -> None:
+        assert set(pb.rival_blind_categories()) == {"social", "venue_derivatives",
+                                                    "prediction_markets"}
+        readings = pb.workbench_readings(
+            [c for c in self._cells() if c.system == "openbb"],
+            [c for c in self._cells() if c.system == "argus_workbench"], ["NVDA"])
+        assert readings["all_categories"]["mean_difference"] == 2
+        assert readings["adversarial"]["mean_difference"] == 0
+
+    def test_the_ablation_removes_one_source_at_a_time(self) -> None:
+        readings = pb.workbench_readings(
+            [c for c in self._cells() if c.system == "openbb"],
+            [c for c in self._cells() if c.system == "argus_workbench"], ["NVDA"])
+        without = readings["ablation"]["without"]
+        assert without["sec-edgar"]["mean_difference"] == 1
+        assert without["x+reddit"]["mean_difference"] == 1
+        assert set(without) == {"cboe", "sec-edgar", "x+reddit", "bitget"}
+
+    def test_a_held_out_day_reports_sign_agreement_with_the_design_day(self) -> None:
+        cells = self._cells()
+        design = pb.workbench_readings([c for c in cells if c.system == "openbb"],
+                                       [c for c in cells if c.system == "argus_workbench"],
+                                       ["NVDA"])
+        raw2 = {"as_of_utc": "2026-09-29T03:00:00+00:00", "per_symbol": [
+            {"ticker": "NVDA", "provider": "cboe", "endpoint": "derivatives.options.chains",
+             "answered": True, "rows": 3}]}
+        wb2 = {"as_of_utc": "2026-09-29T03:00:00+00:00", "rows": [{
+            "symbol": "NVDA", "kind": "news", "sources": [
+                {"ref": "cboe delayed_quotes/options", "detail": "NVDA listed chain"},
+                {"ref": "RSS + Yahoo Finance + SEC EDGAR",
+                 "detail": "3 headline(s), 1 filing(s)"}]}]}
+        held = pb.held_out_day(raw2, wb2, design)
+        assert held["all_categories"]["mean_difference"] > 0
+        assert held["sign_agreement_with_design_day"]["all_categories"] == "1/1"
+
+    def test_costs_sum_each_sides_own_timings_per_symbol(self) -> None:
+        raw = {"per_symbol": [
+            {"ticker": "NVDA", "latency_s": 1.5}, {"ticker": "NVDA", "latency_s": 2.0},
+            {"ticker": "AAPL", "latency_s": 4.0}]}
+        wb = {"rows": [{"symbol": "NVDA", "seconds": 0.75}, {"symbol": "NVDA", "seconds": 0.25}]}
+        out = pb.costs(raw, wb)
+        assert out["seconds_per_symbol"] == {"openbb": {"NVDA": 3.5},
+                                             "argus_workbench": {"NVDA": 1.0}}
+        assert out["money_usd"]["openbb_keyless"] == out["money_usd"]["argus_workbench"] == 0.0
+
     def test_an_unmapped_workbench_source_refuses(self) -> None:
         raw = {"as_of_utc": "t", "rows": [{"symbol": "NVDA", "kind": "quote", "sources": [
             {"ref": "a brand new feed", "detail": ""}]}]}

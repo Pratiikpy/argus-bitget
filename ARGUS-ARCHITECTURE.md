@@ -8,11 +8,11 @@ that produced them.
 
 | | |
 |---|---|
-| Source | **552 source files**, 20 packages (measured 2026-09-27) |
+| Source | **557 source files**, 20 packages (measured 2026-09-27) |
 | Registered and importable at runtime | **152/152** (`python -m argus.status`) |
 | Tests | **353 files, 9,419 tests collected**; CI runs the 9,181 that need no network with every outbound connection refused (9,109 passed, 72 skipped, 0 failed on 2026-09-27), and the 238 that read a live venue, feed or model in a separate advisory job |
-| Static analysis | `ruff` clean; `mypy --strict` clean on the 549 files it checks (the three vendored files are excluded) |
-| Artefacts | **763** files under `argus/data/`; each one a document cites is written by a named command, and a test fails if a cited artefact has no writer |
+| Static analysis | `ruff` clean; `mypy --strict` clean on the 554 files it checks (the three vendored files are excluded) |
+| Artefacts | **781** files under `argus/data/`; each one a document cites is written by a named command, and a test fails if a cited artefact has no writer |
 | External systems torn down at code level | **57 code-level teardowns** under `research/architecture/`, each citing `file:line` |
 | Runtime dependencies | **two** — `pydantic`, `python-dateutil` |
 
@@ -429,8 +429,8 @@ the same inputs (counted 2026-09-27). The ones that judge the system itself:
 
 **The capability ladder** is enforced in code: LOST → TIED → IMPLEMENTED → OWNED, with OWNED requiring
 thirteen conditions including a reproduced baseline, same-input comparison, out-of-sample test,
-ablation and adversarial test. Live (`data/standing.json`): **2 of 48 capabilities are OWNED**,
-25 TIED, 16 IMPLEMENTED, 5 LOST — re-derived by `python -m argus.eval.standing` from the artefacts.
+ablation and adversarial test. Live (`data/standing.json`): **4 of 48 capabilities are OWNED**,
+30 TIED, 7 IMPLEMENTED, 7 LOST — re-derived by `python -m argus.eval.standing` from the artefacts.
 
 ---
 

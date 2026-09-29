@@ -15,27 +15,45 @@ from decimal import Decimal
 import pytest
 
 from argus.eval.general_sue_comparison import (
+    ALIGNMENT_METHODS,
+    ARGUS_ARM,
     DEGENERACY_METHODS,
     SCOPE_STATEMENT,
+    CompanyFact,
     Point,
     Reading,
     Verdict,
     Window,
+    argus_desk_points,
     classify,
+    companyfacts_rows,
     compute,
     constructed_windows,
+    correct_summary,
+    draw_sample,
+    edgartools_fiscal_year_end,
+    edgartools_fiscal_year_label,
+    edgartools_quarterize,
     exact_sue,
     fabricated_magnitudes,
     fetch_anchor_panel,
     fetch_frames_panel,
+    filer_rows,
+    is_correct,
     is_true_yoy,
+    mcnemar_exact,
+    paired_counts,
     pandas_agreement,
     pandas_collisions,
+    parse_companyfacts_rows,
+    reading_status,
     render,
     run_argus_dated,
     run_argus_positional,
+    run_edgartools_fiscal,
     run_pandas_lenient,
     run_pandas_strict,
+    run_raw_fiscal_labels,
     step_windows,
     unit_sweep,
 )
@@ -135,6 +153,198 @@ class TestAlignmentOffline:
         dated = run_argus_dated(points)
         assert dated.value is not None
         assert all(is_true_yoy(a, b) for a, b in dated.pairs)
+
+
+class TestFilerRowsOffline:
+    def _points(self) -> list[Point]:
+        return _points(_quarter_ends(date(2026, 6, 28), 16, skip_month=12), NVDA_SHAPED)
+
+    def test_every_reading_has_exactly_one_status(self) -> None:
+        assert reading_status(Reading(1.0, ())) == "value"
+        assert reading_status(Reading(float("inf"), ())) == "non_finite"
+        assert reading_status(Reading(float("nan"), ())) == "non_finite"
+        assert reading_status(Reading(None, (), refusal="short")) == "refused"
+        assert reading_status(Reading(None, (), crashed="ValueError: x")) == "crashed"
+
+    def test_correct_needs_a_finite_value_and_every_pair_year_over_year(self) -> None:
+        points = self._points()
+        dated, positional = run_argus_dated(points), run_argus_positional(points)
+        assert is_correct(dated)
+        assert not is_correct(positional)  # finite, but five quarters back
+        assert not is_correct(Reading(float("inf"), dated.pairs))
+        assert not is_correct(Reading(1.0, ()))  # no pairs cannot be "every pair"
+        one_wrong = Reading(dated.value, (*dated.pairs[:-1], positional.pairs[0]))
+        assert not is_correct(one_wrong)
+
+    def test_rows_carry_status_pairs_truth_and_verdict_per_method(self) -> None:
+        panel = {"42": self._points()}
+        readings = {name: {"42": m(panel["42"])} for name, m in ALIGNMENT_METHODS.items()}
+        (row,) = filer_rows(panel, readings)
+        assert row["cik"] == "42"
+        assert row["truth"] == "value"
+        assert row["exact_sue"] == pytest.approx(readings["argus_dated_after"]["42"].value,
+                                                 rel=1e-12)
+        dated = row["arms"]["argus_dated_after"]
+        assert dated["status"] == "value" and dated["correct"] and dated["all_pairs_yoy"]
+        assert all(365 <= gap <= 366 for gap in dated["pair_gaps_days"])
+        assert row["arms"]["argus_positional_before"]["correct"] is False
+        assert row["arms"]["pandas_period_strict"]["status"] == "refused"
+
+    def test_a_degenerate_filer_is_marked_and_a_refusal_is_not_counted_correct(self) -> None:
+        flat = _points(_quarter_ends(date(2026, 6, 28), 16, skip_month=12), ["0.5"] * 16)
+        readings = {ARGUS_ARM: {"7": run_argus_dated(flat)}}
+        (row,) = filer_rows({"7": flat}, readings)
+        assert row["truth"] == "degenerate" and row["exact_sue"] is None
+        assert row["arms"][ARGUS_ARM]["status"] == "refused"
+        assert row["arms"][ARGUS_ARM]["correct"] is False
+
+    def test_summary_and_paired_counts_add_up(self) -> None:
+        rows = [{"arms": {"a": {"correct": a, "status": "value", "all_pairs_yoy": a},
+                          "r": {"correct": r, "status": "value", "all_pairs_yoy": r}}}
+                for a, r in [(True, True), (True, False), (True, False), (False, True),
+                             (False, False)]]
+        summary = correct_summary(rows, ("a", "r"))
+        assert summary["a"]["correct"] == 3 and summary["r"]["correct"] == 2
+        assert summary["r"]["value_with_a_non_year_over_year_pair"] == 3
+        paired = paired_counts(rows, "a", "r")
+        assert (paired["both_correct"], paired["only_argus_correct"],
+                paired["only_rival_correct"], paired["neither_correct"]) == (1, 2, 1, 1)
+        assert paired["difference_in_correct_share"] == pytest.approx(0.2)
+
+    def test_mcnemar_exact_matches_the_binomial_tail(self) -> None:
+        assert mcnemar_exact(0, 0)["p"] == 1.0
+        assert mcnemar_exact(5, 0)["p"] == pytest.approx(2 / 32)
+        assert mcnemar_exact(3, 3)["p"] == 1.0
+        from scipy.stats import binomtest
+
+        assert mcnemar_exact(40, 12)["p"] == pytest.approx(binomtest(12, 52, 0.5).pvalue,
+                                                           rel=1e-9)
+        huge = mcnemar_exact(3000, 0)
+        assert huge["log10_p"] < -900  # finite where p itself underflows
+
+
+def _fact(start: date, end: date, val: str, fy: int, fp: str, form: str = "10-Q",
+          filed: date | None = None) -> CompanyFact:
+    return CompanyFact(start=start, end=end, value=Decimal(val), fy=fy, fp=fp, form=form,
+                       filed=filed or date(end.year + (end.month + 1) // 12,
+                                           (end.month + 1) % 12 + 1, 1))
+
+
+def _calendar_filer(years: range, values: dict[tuple[int, int], str]) -> list[CompanyFact]:
+    """A December-year-end filer: Q1-Q3 as 10-Q quarters (fp Q1-Q3), the year as a 10-K FY fact,
+    no standalone Q4 — the SEC XBRL norm."""
+    facts: list[CompanyFact] = []
+    for year in years:
+        for q, (start_month, end_month, end_day) in enumerate(
+                [(1, 3, 31), (4, 6, 30), (7, 9, 30)], start=1):
+            facts.append(_fact(date(year, start_month, 1), date(year, end_month, end_day),
+                               values[(year, q)], year, f"Q{q}"))
+        facts.append(_fact(date(year, 1, 1), date(year, 12, 31), "9.99", year, "FY",
+                           form="10-K", filed=date(year + 1, 2, 20)))
+    return facts
+
+
+class TestEdgartoolsPairingOffline:
+    def test_fiscal_year_label_matches_edgartools_docstring_examples(self) -> None:
+        """`edgar/entity/enhanced_statement.py:1375-1397`."""
+        assert edgartools_fiscal_year_label(date(2025, 10, 26), 1) == 2026  # NVIDIA Q3
+        assert edgartools_fiscal_year_label(date(2026, 1, 26), 1) == 2026  # NVIDIA Q4
+        assert edgartools_fiscal_year_label(date(2023, 12, 30), 9) == 2024  # Apple Q1
+        assert edgartools_fiscal_year_label(date(2024, 6, 28), 9) == 2024  # Apple Q3
+        assert edgartools_fiscal_year_label(date(2023, 1, 1), 12) == 2022  # 52/53-week edge
+
+    def test_fiscal_year_end_is_the_most_common_fy_month(self) -> None:
+        facts = _calendar_filer(range(2020, 2023), {(y, q): "1" for y in range(2020, 2023)
+                                                    for q in (1, 2, 3)})
+        assert edgartools_fiscal_year_end(facts) == 12
+        assert edgartools_fiscal_year_end([f for f in facts if f.fp != "FY"]) == 12  # default
+
+    def test_quarterize_keeps_quarter_durations_and_the_latest_periodic_filing(self) -> None:
+        q = _fact(date(2024, 1, 1), date(2024, 3, 31), "1.00", 2024, "Q1",
+                  filed=date(2024, 5, 1))
+        restated = _fact(date(2024, 1, 1), date(2024, 3, 31), "1.10", 2025, "Q1",
+                         filed=date(2025, 5, 1))
+        proxy = _fact(date(2024, 1, 1), date(2024, 3, 31), "9.00", 0, "", form="DEF 14A",
+                      filed=date(2026, 1, 1))
+        ytd = _fact(date(2024, 1, 1), date(2024, 6, 30), "2.00", 2024, "Q2")
+        kept = edgartools_quarterize([q, restated, proxy, ytd])
+        assert [f.value for f in kept] == [Decimal("1.10")]  # periodic over later non-periodic
+
+    def test_clean_calendar_pairs_year_over_year_and_equals_argus_dated(self) -> None:
+        years = range(2020, 2025)
+        values = {(y, q): str(Decimal("0.10") * (y - 2019) + Decimal(q) / 100
+                              + (Decimal("0.03") if (y, q) == (2024, 3) else 0))
+                  for y in years for q in (1, 2, 3)}
+        facts = _calendar_filer(years, values)
+        labelled = run_edgartools_fiscal(facts)
+        assert labelled.label_collisions == 0
+        assert is_correct(labelled.reading)
+        argus = run_argus_dated(argus_desk_points(facts))
+        assert set(labelled.reading.pairs) == set(argus.pairs)
+        assert labelled.reading.value == pytest.approx(argus.value, rel=1e-12)
+
+    def test_quarters_relabelled_fy_by_a_10k_collide_and_are_not_all_year_over_year(
+        self,
+    ) -> None:
+        """A filer whose 10-K also tags its quarters: the latest filing of each quarter is the
+        10-K (fp FY), so three quarters share one label and the fp pairing picks the wrong one."""
+        years = range(2020, 2025)
+        values = {(y, q): str(Decimal("0.10") * (y - 2019) + Decimal(q) / 100
+                              + (Decimal("0.03") if (y, q) == (2024, 3) else 0))
+                  for y in years for q in (1, 2, 3)}
+        facts = _calendar_filer(years, values)
+        for year in years:
+            for q, (start_month, end_month, end_day) in enumerate(
+                    [(1, 3, 31), (4, 6, 30), (7, 9, 30)], start=1):
+                facts.append(_fact(date(year, start_month, 1), date(year, end_month, end_day),
+                                   values[(year, q)], year, "FY", form="10-K",
+                                   filed=date(year + 1, 2, 20)))
+        labelled = run_edgartools_fiscal(facts)
+        assert labelled.label_collisions > 0
+        assert not is_correct(labelled.reading)
+        assert is_correct(run_argus_dated(argus_desk_points(facts)))
+
+    def test_raw_fy_labels_break_on_comparatives_the_derived_label_does_not(self) -> None:
+        """Comparative re-filing: each quarter's latest filing is next year's 10-Q, tagged with
+        next year's fy — raw (fy, fp) then pairs a quarter with itself-a-year-later's label."""
+        years = range(2020, 2025)
+        values = {(y, q): str(Decimal("0.10") * (y - 2019) + Decimal(q) / 100
+                              + (Decimal("0.03") if (y, q) == (2024, 3) else 0))
+                  for y in years for q in (1, 2, 3)}
+        facts = _calendar_filer(years, values)
+        for year in years[:-1]:
+            for q, (start_month, end_month, end_day) in enumerate(
+                    [(1, 3, 31), (4, 6, 30), (7, 9, 30)], start=1):
+                facts.append(_fact(date(year, start_month, 1), date(year, end_month, end_day),
+                                   values[(year, q)], year + 1, f"Q{q}",
+                                   filed=date(year + 1, end_month + 1, 10)))
+        assert is_correct(run_edgartools_fiscal(facts).reading)
+        assert not is_correct(run_raw_fiscal_labels(facts).reading)
+
+    def test_newest_quarter_without_a_labelled_partner_is_refused(self) -> None:
+        values = {(y, q): "1" for y in range(2020, 2025) for q in (1, 2, 3)}
+        facts = [f for f in _calendar_filer(range(2020, 2025), values)
+                 if f.end != date(2023, 9, 30)]
+        reading = run_edgartools_fiscal(facts).reading
+        assert reading.value is None and "newest" in reading.refusal
+
+    def test_companyfacts_rows_round_trip_exact_decimals(self) -> None:
+        payload = {"facts": {"us-gaap": {"EarningsPerShareDiluted": {"units": {"USD/shares": [
+            {"start": "2024-01-01", "end": "2024-03-31", "val": Decimal("0.1"), "fy": 2024,
+             "fp": "Q1", "form": "10-Q", "filed": "2024-05-01", "accn": "a"},
+        ]}}}}}
+        rows = companyfacts_rows(payload)
+        assert rows == [["2024-01-01", "2024-03-31", "0.1", "2024", "Q1", "10-Q", "2024-05-01",
+                         "a"]]
+        (fact,) = parse_companyfacts_rows(rows)
+        assert fact.value == Decimal("0.1") and fact.fy == 2024
+        assert companyfacts_rows({"facts": {}}) is None
+
+    def test_sample_is_seeded_and_excludes_anchors(self) -> None:
+        panel = {str(i): [Point(end=date(2020, 1, 1), value=Decimal(1))] * 12
+                 for i in range(1, 600)}
+        first, second = draw_sample(panel, ["5"]), draw_sample(panel, ["5"])
+        assert first == second and len(first) == 300 and "5" not in first
 
 
 class TestDegeneracyOffline:

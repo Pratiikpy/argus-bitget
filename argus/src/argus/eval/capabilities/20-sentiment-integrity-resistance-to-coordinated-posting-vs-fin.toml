@@ -5,6 +5,7 @@ modules = [
     "argus/market/macro.py",
     "argus/eval/sentiment_comparison.py",
     "argus/eval/baselines/finbert_loader.py",
+    "argus/eval/sentiment_dedup_rival.py",
 ]
 # 2026-09-27: expanded from 2 narratives to 30 manipulation narratives (both sides, two
 # attacks each) plus 12 corroborated true events; the reproducibility claim was a cache hit
@@ -28,6 +29,19 @@ modules = [
 state = "implemented"
 baseline = "ProsusAI/finBERT for classification; BloombergGPT and FinMA for the published bar"
 blockers = [
+    """\
+        Measured 2026-09-29 against the fair general rival (eval/sentiment_dedup_rival.py, \
+        data/sentiment_dedup_rival.json; Activity/28_CAPABILITY_CLOSE_PLAN_2.md §20): collapse \
+        near-duplicate posts first (truth.novelty, word-shingle Jaccard at 0.55), then run \
+        finBERT once per story, and score every reader on the same question, whether repetition \
+        moved it toward the rumour's side. On template copies the general tool is level with \
+        ARGUS: dedup collapses every set of five to one story and finBERT moves on 0 of 30, \
+        ARGUS's recorded analyst on 1 of 30 (McNemar p = 1.0). On five retellings by five \
+        accounts, dedup keeps 4.97 stories on average and finBERT moves on 23 of 30 against \
+        ARGUS's 2 (21 discordant cases, all the rival's, exact McNemar p = 9.5e-7). finBERT \
+        counting every post moves on 22 and 24. Still designed cases, not a population: OWNED \
+        needs the same comparison on real coordinated clusters (run 1 holds 35 flagged of \
+        3,948), and the ARGUS arm there is about 140 Qwen calls, which need approval.""",
     """\
         UPDATED 2026-09-16 — the first version of this blocker is now stale, corrected rather than \
         left standing. It read: 'the Bitget social Skill was empty in 93% of live cycles and the \

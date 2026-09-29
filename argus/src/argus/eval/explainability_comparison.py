@@ -66,6 +66,38 @@ def _real_facts(symbol: str) -> dict[str, float]:
     }
 
 
+BAND = 0.20
+"""The general validator's tolerance: an entry more than 20% from the live price is refused. A
+wide band on purpose, so a legitimate limit order a few percent away is never refused; it is the
+bound a careful engineer would put on the field with an off-the-shelf schema library."""
+
+
+def band_validator_raises(entry_price: float, current_price: float) -> bool:
+    """The best general-purpose tool for this job, run for real: a pydantic v2 model whose field
+    validator refuses a non-positive entry or one outside ``BAND`` of the live price. Blocker 1 of
+    29-*.toml said such a check "would plausibly catch the same twelve"; this measures it
+    (Activity/28_CAPABILITY_CLOSE_PLAN_2.md §29)."""
+    from pydantic import BaseModel, ValidationError, field_validator
+
+    class Proposal(BaseModel):
+        current_price: float
+        entry_price: float
+
+        @field_validator("entry_price")
+        @classmethod
+        def near_the_market(cls, value: float, info: Any) -> float:
+            live = float(info.data["current_price"])
+            if value <= 0 or abs(value / live - 1.0) > BAND:
+                raise ValueError(f"entry {value} is not within {BAND:.0%} of {live}")
+            return value
+
+    try:
+        Proposal(current_price=current_price, entry_price=entry_price)
+    except ValidationError:
+        return True
+    return False
+
+
 def run_baseline_reproduced() -> dict[str, Any]:
     """TradingAgents' real, unmodified `TraderProposal` validates a wildly fabricated
     `entry_price` (no relationship to any real fact) without error — proves the schema's own
@@ -116,17 +148,31 @@ def run_same_input_comparison() -> dict[str, Any]:
                 "fabricated_entry_price": fabricated,
                 "real_current_price": facts["current_price"],
                 "tradingagents_real_validator_raised": ta_raised,
+                "band_validator_raised": band_validator_raises(fabricated,
+                                                               facts["current_price"]),
                 "argus_grounding_flags_it": argus_flags_it,
             })
 
     n = len(cases)
     n_ta_catches = sum(1 for c in cases if c["tradingagents_real_validator_raised"])
     n_argus_catches = sum(1 for c in cases if c["argus_grounding_flags_it"])
+    n_band_catches = sum(1 for c in cases if c["band_validator_raised"])
+    # And the band validator's false alarms on real figures: the live price itself, and the real
+    # 24h high and low, must all pass, or its catches are bought with refusing the truth.
+    real_refused = 0
+    for symbol in REAL_SYMBOLS:
+        facts = _real_facts(symbol)
+        real_refused += sum(1 for value in facts.values()
+                            if band_validator_raises(value, facts["current_price"]))
     return {
         "cases": cases,
         "n_cases": n,
         "n_tradingagents_catches": n_ta_catches,
         "n_argus_catches": n_argus_catches,
+        "n_band_validator_catches": n_band_catches,
+        "band_validator_real_figures_refused": real_refused,
+        "band_validator": f"pydantic v2 field_validator: entry > 0 and within {BAND:.0%} of the "
+                          f"live price",
     }
 
 
@@ -297,7 +343,9 @@ def render(report: dict[str, Any]) -> str:
     lines.append(
         f"  {same['n_cases']} fabricated-figure case(s) across {len(REAL_SYMBOLS)} real "
         f"symbols: TradingAgents catches {same['n_tradingagents_catches']}/{same['n_cases']}, "
-        f"ARGUS grounding catches {same['n_argus_catches']}/{same['n_cases']}"
+        f"ARGUS grounding catches {same['n_argus_catches']}/{same['n_cases']}, a pydantic band "
+        f"validator catches {same.get('n_band_validator_catches', 'n/a')}/{same['n_cases']} "
+        f"(refusing {same.get('band_validator_real_figures_refused', 'n/a')} real figures)"
     )
     lines.append(f"  positive control (real prices resolve): {control['all_real_figures_resolve']}")
     lines.append(

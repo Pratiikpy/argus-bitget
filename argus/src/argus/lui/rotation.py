@@ -37,16 +37,33 @@ SAFE: dict[str, str] = {"XAUUSDT": "GLD"}
 """The safe asset: gold, scored on the GLD fund's history."""
 
 _ASKS = re.compile(
-    r"\brisk[\s-]?(?:on|off)\b|\brotat(?:e|ion|ing)\b.*\b(?:stocks?|crypto|gold|asset\s+class)"
+    # "risk on" as the regime, not "risk on coin" (the risk carried on a name): the blind routing
+    # set's "compare risk on coin and mstr" and "hedge overnight risk on my coin rtoken" were sent
+    # here once this door opened (kind_routing blind 240 -> 237, found 2026-09-29).
+    r"\brisk-(?:on|off)\b|\brisk\s?(?:on|off)(?=\s*(?:$|[?.,!;]|or\b|vs\.?|versus\b|mode\b|"
+    r"regime\b|environment\b|trades?\b|assets?\b|market\b|now\b|today\b))"
+    r"|\brotat(?:e|ion|ing)\b.*\b(?:stocks?|crypto|gold|asset\s+class)"
     r"|\b(?:stocks?|equities)\s*(?:,|or|vs\.?|versus)\s*(?:crypto|bitcoin|gold)\b.*\b(?:gold|crypto|"
     r"which|where|rotate|allocat\w*)\b|\bwhich\s+asset\s+class\b|\bdefensive\s+(?:allocation|"
     r"rotation)\b|\bbreadth\s+momentum\b|\bvigilant\s+asset\s+allocation\b|风险偏好|避险轮动",
     re.I)
 
 
+_SINGLE_NAME_TRADE = re.compile(r"\b(?:trim|sell|cut|reduce|dump|swap|exit)\s+(?:my\s+|some\s+|"
+                                r"half\s+(?:of\s+)?(?:my\s+)?)?([a-z]{2,6})\b", re.I)
+""""Trim MSTR and rotate into gold" moves one holding, a question for the impact engine; the
+rotation rule allocates between asset classes and has no view on MSTR."""
+
+
 def asks_for_rotation(text: str) -> bool:
     """A question about rotating between asset classes, or about risk-on versus risk-off."""
-    return bool(_ASKS.search(text))
+    if not _ASKS.search(text):
+        return False
+    from argus.lui.question import resolve_symbol
+
+    traded = _SINGLE_NAME_TRADE.search(text)
+    return not (traded and resolve_symbol(traded.group(1)) is not None
+                and resolve_symbol(traded.group(1)) not in (*RISK, *SAFE))
 
 
 def _bars(ticker: str, daily: Callable[[str], Sequence[Any]]) -> list[tuple[datetime, float]]:

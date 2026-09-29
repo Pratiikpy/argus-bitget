@@ -208,15 +208,17 @@ class TestTheNativeAsOfRivals:
         assert out["questions"] == 1
         assert (out["right"], out["leak"]) == (1, 0)
 
-    def test_right_period_wrong_value_is_stale_not_right(self) -> None:
+    def test_right_period_rounded_value_is_rounding_not_staleness(self) -> None:
         # The case a float32-downcasting store produces (found running the real Qlib pipeline):
         # correct period, a value off by storage rounding rather than a data or period error.
+        # Counted as neither right nor stale since 2026-09-29.
         outputs: dict[str, Any] = {"qlib": {"tickers": {"T": {"probes": [
             {"accn": "a-q2", "side": "before", "end": None, "value": None},
             {"accn": "a-q2", "side": "after", "end": "2026-07-26", "value": 96.199997},
         ]}}}}
         out = pit_rivals.score_native("qlib_pit", "T", [Q1, Q2], self.probes, outputs)
-        assert (out["stale_after_restatement"], out["right"]) == (1, 0)
+        assert (out["rounded_by_storage"], out["stale_after_restatement"], out["right"]) == \
+            (1, 0, 0)
 
     def test_by_side_splits_before_and_after_and_pools_neither(self) -> None:
         rows = [
@@ -226,7 +228,8 @@ class TestTheNativeAsOfRivals:
         ]
         split = pit_rivals.by_side(rows)
         assert split["before"] == {"questions": 2, "right": 1, "leak": 1, "late": 0,
-                                   "stale_after_restatement": 0, "right_rate": 0.5}
+                                   "stale_after_restatement": 0, "rounded_by_storage": 0,
+                                   "right_rate": 0.5}
         assert split["after"]["questions"] == 1
         assert split["after"]["right_rate"] == 1.0
 

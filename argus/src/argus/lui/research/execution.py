@@ -286,6 +286,7 @@ def _depth_lines(symbol: str, notional: Decimal, adv: Decimal, plan: Any,
         f"slippage on top of the fee{reach}.")
     hourly = adv / Decimal(24)
     sliced: float | None = 0.0 if whole.complete else None
+    slice_lines: list[str] = []
     for part in plan.slices:
         size = notional * part.fraction
         try:
@@ -301,13 +302,22 @@ def _depth_lines(symbol: str, notional: Decimal, adv: Decimal, plan: Any,
         except Exception:
             impact = "book impact unreadable"
             sliced = None
-        lines.append(f"Slice {part.index}: {part.fraction:.0%} (${float(size):,.0f}) as "
-                     f"{part.style} — about {float(part.expected_cost_bps):.1f}bps fee plus "
-                     f"{impact}.")
+        slice_lines.append(f"Slice {part.index}: {part.fraction:.0%} (${float(size):,.0f}) as "
+                           f"{part.style} — about {float(part.expected_cost_bps):.1f}bps fee "
+                           f"plus {impact}.")
     total_hours = (float(notional / (hourly * MAX_HOURLY_PARTICIPATION)) if hourly > 0
                    else 0.0)
     optimal = (_optimal_schedule(symbol, notional, adv, book, fee, total_hours, urgent, side)
                if total_hours > 1 else [])
+    if optimal and len(plan.slices) > 1:
+        # Worked over hours, the slices are an order-type mix inside each hour's share, not three
+        # blocks sent now; quoting each block's own sweep read as a second, rival plan beside the
+        # schedule (stranger QA, 2026-09-29).
+        mix = ", ".join(f"{part.fraction:.0%} as {part.style}" for part in plan.slices)
+        lines.append(f"Order types inside each hour's share: {mix}. The timing is the schedule "
+                     f"below; the one plan is the two together.")
+    else:
+        lines.extend(slice_lines)
     if optimal:
         lines.extend(optimal)
     elif total_hours > 1:

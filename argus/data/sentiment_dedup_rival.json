@@ -1,0 +1,755 @@
+{
+  "generated_at": "2026-09-29T01:12:58+00:00",
+  "question": "did repetition move the reader toward the rumour's side?",
+  "dedup": "truth.novelty.cluster, word-shingle Jaccard >= 0.55, single link",
+  "argus_answers_from": "data/sentiment_comparison.json (recorded; no model call here)",
+  "summary": {
+    "template": {
+      "finbert_naive_moved": 22,
+      "finbert_dedup_moved": 0,
+      "argus_moved": 1,
+      "cases": 30,
+      "discordant": {
+        "dedup_moved_argus_held": 0,
+        "argus_moved_dedup_held": 1,
+        "exact_mcnemar_p": 1.0
+      },
+      "mean_stories_after_dedup": 1.0
+    },
+    "diverse": {
+      "finbert_naive_moved": 24,
+      "finbert_dedup_moved": 23,
+      "argus_moved": 2,
+      "cases": 30,
+      "discordant": {
+        "dedup_moved_argus_held": 21,
+        "argus_moved_dedup_held": 0,
+        "exact_mcnemar_p": 9.5367431640625e-07
+      },
+      "mean_stories_after_dedup": 4.97
+    }
+  },
+  "rows": [
+    {
+      "symbol": "NVDAUSDT",
+      "direction": "bullish",
+      "claim": "Traders say a leaked internal memo shows NVDAUSDT's next quarterly revenue will beat consensus by double digits.",
+      "single_rumour_votes": 1,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 4,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 1,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": false,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "COINUSDT",
+      "direction": "bullish",
+      "claim": "Word on social media is COINUSDT is about to be added to a major new institutional custody platform, driving huge inflows.",
+      "single_rumour_votes": 0,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 2,
+        "finbert_dedup_votes": 0,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 1,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "AAPLUSDT",
+      "direction": "bullish",
+      "claim": "Supply-chain chatter says AAPLUSDT has doubled its next-quarter iPhone component orders after a surprise surge in China demand.",
+      "single_rumour_votes": 1,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 5,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 3,
+        "finbert_dedup_votes": 3,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "TSLAUSDT",
+      "direction": "bullish",
+      "claim": "Rumour is TSLAUSDT will announce regulatory approval for fully driverless robotaxis in three more US states next week.",
+      "single_rumour_votes": 0,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 0,
+        "finbert_dedup_votes": 0,
+        "finbert_naive_moved": false,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 1,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "MSFTUSDT",
+      "direction": "bullish",
+      "claim": "People are saying MSFTUSDT has signed a $40 billion multi-year AI compute contract with a sovereign fund, to be announced Monday.",
+      "single_rumour_votes": 1,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 4,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 2,
+        "finbert_dedup_votes": 2,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "GOOGLUSDT",
+      "direction": "bullish",
+      "claim": "Insiders claim GOOGLUSDT's antitrust case is about to be settled for under $2 billion with no breakup remedy.",
+      "single_rumour_votes": 0,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 0,
+        "finbert_dedup_votes": 0,
+        "finbert_naive_moved": false,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 0,
+        "finbert_dedup_votes": 0,
+        "finbert_naive_moved": false,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "AMZNUSDT",
+      "direction": "bullish",
+      "claim": "Chatter says AMZNUSDT's cloud unit grew 40% last quarter, far above the 20% the street expects, per a leaked board deck.",
+      "single_rumour_votes": 1,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 5,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 4,
+        "finbert_dedup_votes": 4,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "METAUSDT",
+      "direction": "bullish",
+      "claim": "Posts claim METAUSDT is about to announce a $100 billion buyback, the largest in its history.",
+      "single_rumour_votes": 0,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 0,
+        "finbert_dedup_votes": 0,
+        "finbert_naive_moved": false,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 1,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "MSTRUSDT",
+      "direction": "bullish",
+      "claim": "Word is MSTRUSDT has quietly bought another 50,000 bitcoin this month and will disclose it Monday.",
+      "single_rumour_votes": 0,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 0,
+        "finbert_dedup_votes": 0,
+        "finbert_naive_moved": false,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 0,
+        "finbert_dedup_votes": 0,
+        "finbert_naive_moved": false,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "HOODUSDT",
+      "direction": "bullish",
+      "claim": "Rumour says HOODUSDT is being added to the S&P 500 at the next rebalance, announcement due after the close.",
+      "single_rumour_votes": 0,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 0,
+        "finbert_dedup_votes": 0,
+        "finbert_naive_moved": false,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 0,
+        "finbert_dedup_votes": 0,
+        "finbert_naive_moved": false,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "CRCLUSDT",
+      "direction": "bullish",
+      "claim": "Social media says CRCLUSDT has won a Federal Reserve master account, letting it hold reserves directly at the Fed.",
+      "single_rumour_votes": 1,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 4,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 2,
+        "finbert_dedup_votes": 2,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "SNDKUSDT",
+      "direction": "bullish",
+      "claim": "Traders say SNDKUSDT has a signed deal to supply all NAND for a hyperscaler's new AI data centres through 2028.",
+      "single_rumour_votes": 1,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 5,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 3,
+        "finbert_dedup_votes": 3,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "BTCUSDT",
+      "direction": "bullish",
+      "claim": "Posts claim a G7 central bank will announce a bitcoin reserve purchase of 100,000 BTC this week, making BTCUSDT the trade of the year.",
+      "single_rumour_votes": 1,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 4,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 4,
+        "finbert_naive_votes": 2,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "ETHUSDT",
+      "direction": "bullish",
+      "claim": "Word is BlackRock's staked-ETH ETF has been approved and will list tomorrow with $5 billion of seed demand for ETHUSDT.",
+      "single_rumour_votes": 0,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 1,
+        "finbert_dedup_votes": 0,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 1,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "SPYUSDT",
+      "direction": "bullish",
+      "claim": "People are saying the Fed will announce an emergency 50 bp cut before Wednesday's meeting, sending SPYUSDT sharply higher.",
+      "single_rumour_votes": 0,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 0,
+        "finbert_dedup_votes": 0,
+        "finbert_naive_moved": false,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 0,
+        "finbert_dedup_votes": 0,
+        "finbert_naive_moved": false,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "QQQUSDT",
+      "direction": "bullish",
+      "claim": "Rumour is the US will lift every AI-chip export restriction to China next week, a huge tailwind for QQQUSDT's megacaps.",
+      "single_rumour_votes": 0,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 0,
+        "finbert_dedup_votes": 0,
+        "finbert_naive_moved": false,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 0,
+        "finbert_dedup_votes": 0,
+        "finbert_naive_moved": false,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "NVDAUSDT",
+      "direction": "bullish",
+      "claim": "Chatter says NVDAUSDT's next-generation GPU is shipping two quarters early with every hyperscaler already fully allocated.",
+      "single_rumour_votes": 1,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 4,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 2,
+        "finbert_dedup_votes": 2,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "COINUSDT",
+      "direction": "bullish",
+      "claim": "Traders claim COINUSDT has received a national trust-bank charter, with the approval letter leaked on a forum.",
+      "single_rumour_votes": 0,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 0,
+        "finbert_dedup_votes": 0,
+        "finbert_naive_moved": false,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 1,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "NVDAUSDT",
+      "direction": "bearish",
+      "claim": "Word is a major customer cancelled $10 billion of NVDAUSDT orders last week and the company is hiding it until earnings.",
+      "single_rumour_votes": 1,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 5,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 4,
+        "finbert_dedup_votes": 4,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "TSLAUSDT",
+      "direction": "bearish",
+      "claim": "Rumour says TSLAUSDT is about to recall two million vehicles over a braking defect, announcement imminent.",
+      "single_rumour_votes": 1,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 5,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 4,
+        "finbert_dedup_votes": 4,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "AAPLUSDT",
+      "direction": "bearish",
+      "claim": "Posts claim AAPLUSDT's CFO is resigning over an accounting dispute, to be disclosed Friday after the close.",
+      "single_rumour_votes": 1,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 5,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 4,
+        "finbert_dedup_votes": 4,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": true
+      }
+    },
+    {
+      "symbol": "COINUSDT",
+      "direction": "bearish",
+      "claim": "People are saying the SEC is about to sue COINUSDT again, this time over its staking product, with a Wells notice already served.",
+      "single_rumour_votes": 1,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 5,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": true
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 3,
+        "finbert_dedup_votes": 3,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "MSTRUSDT",
+      "direction": "bearish",
+      "claim": "Chatter says MSTRUSDT faces a margin call on its bitcoin-backed loans below $90k and will be forced to sell.",
+      "single_rumour_votes": 1,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 5,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 4,
+        "finbert_dedup_votes": 4,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "HOODUSDT",
+      "direction": "bearish",
+      "claim": "Traders say HOODUSDT suffered a data breach exposing millions of accounts and has not disclosed it yet.",
+      "single_rumour_votes": 1,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 5,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 2,
+        "finbert_dedup_votes": 2,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": true
+      }
+    },
+    {
+      "symbol": "CRCLUSDT",
+      "direction": "bearish",
+      "claim": "Word is CRCLUSDT's largest exchange partner is about to drop USDC for a rival stablecoin, cutting its circulation by a third.",
+      "single_rumour_votes": 1,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 5,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 4,
+        "finbert_dedup_votes": 4,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "BTCUSDT",
+      "direction": "bearish",
+      "claim": "Rumour says a defunct exchange's trustee will dump 140,000 BTC on the market this week, crushing BTCUSDT.",
+      "single_rumour_votes": 1,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 5,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 4,
+        "finbert_dedup_votes": 4,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "ETHUSDT",
+      "direction": "bearish",
+      "claim": "Posts claim a critical bug in Ethereum's latest client release will force a chain halt within days, tanking ETHUSDT.",
+      "single_rumour_votes": 1,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 5,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 4,
+        "finbert_dedup_votes": 4,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "METAUSDT",
+      "direction": "bearish",
+      "claim": "Chatter says the EU is about to fine METAUSDT 10% of global revenue and ban its ad targeting in Europe.",
+      "single_rumour_votes": 1,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 5,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 2,
+        "finbert_dedup_votes": 2,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "AMZNUSDT",
+      "direction": "bearish",
+      "claim": "People are saying AMZNUSDT will miss holiday-quarter guidance badly after a leaked internal forecast cut.",
+      "single_rumour_votes": 1,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 5,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 4,
+        "finbert_dedup_votes": 4,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": false
+      }
+    },
+    {
+      "symbol": "SPYUSDT",
+      "direction": "bearish",
+      "claim": "Word is a major US bank will announce a $30 billion trading loss on Monday, dragging SPYUSDT down hard.",
+      "single_rumour_votes": 1,
+      "template": {
+        "posts": 5,
+        "stories_after_dedup": 1,
+        "finbert_naive_votes": 5,
+        "finbert_dedup_votes": 1,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": false,
+        "argus_moved": false
+      },
+      "diverse": {
+        "posts": 5,
+        "stories_after_dedup": 5,
+        "finbert_naive_votes": 4,
+        "finbert_dedup_votes": 4,
+        "finbert_naive_moved": true,
+        "finbert_dedup_moved": true,
+        "argus_moved": false
+      }
+    }
+  ],
+  "scope_statement": "Claimed: on the 30 designed manipulation narratives, how often repetition moved each reader toward the rumour, scored on the same question for finBERT counting every post, finBERT after near-duplicate collapse, and ARGUS's recorded analyst. NOT claimed: anything about real posts, or about catching manipulation; the cases are designed."
+}

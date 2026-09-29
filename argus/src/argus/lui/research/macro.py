@@ -113,8 +113,72 @@ def write_macro_snapshot(days: int = 120) -> int:
     return sum(len(v) for v in series.values())
 
 
-def _book_rate_lines(book: Mapping[str, float], dollar_first: bool) -> tuple[list[str], str | None,
-                                                                            dict[str, Any]]:
+RATES_UP = re.compile(r"\b(?:hikes?|hiking|hiked|tighten\w*|rates?\s+(?:rise|rising|go\s+up|up)|"
+                      r"(?:rising|higher|climbing)\s+(?:rates?|yields?)|yields?\s+(?:rise|rising|up)|"
+                      r"raises?\s+rates?)\b", re.I)
+"""A question about rates going up: the illustration then moves the 10-year up, not down. A
+2022-style hike question was answered with "if a Fed cut took the 10-year down" (stranger QA,
+2026-09-29)."""
+
+_RATE_YEAR = re.compile(r"\b((?:19[89]|20[0-2])\d)\b")
+
+
+def _fred_year(series: str, year: int) -> tuple[tuple[str, float], tuple[str, float]] | None:
+    """A FRED series' last reading before ``year`` and its last reading in it."""
+    text = http.fetch_text(FRED_CSV.format(series=series, start=f"{year - 1}-12-01")
+                           + f"&coed={year}-12-31", timeout=FRED_TIMEOUT_S)
+    rows: list[tuple[str, float]] = []
+    for line in text.splitlines()[1:]:
+        day, _, value = line.partition(",")
+        try:
+            rows.append((day, float(value)))
+        except ValueError:
+            continue
+    before = [r for r in rows if r[0] < f"{year}-01-01"]
+    inside = [r for r in rows if r[0].startswith(str(year))]
+    return (before[-1], inside[-1]) if before and inside else None
+
+
+def _book_year_line(book: Mapping[str, float], year: int) -> tuple[str, Source] | None:
+    """What this book, at today's weights and held all year, did in a named past year, beside the
+    10-year's move that year. History read from Yahoo's adjusted daily closes and FRED; the
+    answer to "a 2022-style hike" is what 2022 did, not a straight line from a 10bp slope."""
+    from argus.market import equity_history
+
+    returns: dict[str, float] = {}
+    for symbol in book:
+        try:
+            days = equity_history.daily(_t(symbol))
+        except Exception:
+            continue
+        start = [d for d in days if d.day.year == year - 1]
+        end = [d for d in days if d.day.year == year]
+        if start and end:
+            returns[symbol] = end[-1].close / start[-1].close - 1
+    covered = sum(w for s, w in book.items() if s in returns)
+    if not returns or covered < 0.5:
+        return None
+    book_return = sum(book[s] * r for s, r in returns.items()) / covered
+    try:
+        ten = _fred_year("DGS10", year)
+    except Exception:
+        ten = None
+    parts = ", ".join(f"{_t(s)} {r:+.1%}" for s, r in
+                      sorted(returns.items(), key=lambda kv: -book[kv[0]]))
+    rates = (f"the 10-year went from {ten[0][1]:.2f}% to {ten[1][1]:.2f}% "
+             f"({(ten[1][1] - ten[0][1]) * 100:+.0f}bp, FRED) and " if ten else "")
+    missing = [s for s in book if s not in returns]
+    note = (f"; {', '.join(_t(s) for s in missing)} has no {year} history and is left out, so "
+            f"the figure covers {covered:.0%} of the book" if missing else "")
+    line = (f"In {year} {rates}this book, at today's weights held through the year, returned "
+            f"{book_return:+.1%} ({parts}; Yahoo Finance adjusted closes){note}. That is what "
+            f"that year did, not a forecast of the next one.")
+    return line, Source(kind="venue", ref="Yahoo Finance daily chart and FRED DGS10",
+                        detail=f"calendar {year}, {len(returns)} holding(s)")
+
+
+def _book_rate_lines(book: Mapping[str, float], dollar_first: bool, rising: bool = False
+                     ) -> tuple[list[str], str | None, dict[str, Any]]:
     """Each holding's measured sensitivity to the 10-year yield and the dollar, weighted into the
     book's. The same regression the single-name line uses, so the book figure is the sum of the
     lines a reader can check one by one."""
@@ -154,11 +218,14 @@ def _book_rate_lines(book: Mapping[str, float], dollar_first: bool) -> tuple[lis
                    "not been what moves it")
                 + f"; {_t(driver)} carries the most rate exposure.")
     else:
-        cut = -rate * 1.0  # a 10bp fall in the 10-year
+        # The illustration moves rates the way the question does: up for a hike, down otherwise.
+        move = (f"rising rates took the 10-year up 10bp the measured relationship says about "
+                f"{rate:+.2f}%" if rising else
+                f"a Fed cut took the 10-year down 10bp the measured relationship says about "
+                f"{-rate:+.2f}%")
         head = (f"Bottom line: your book has moved about {rate:+.2f}% for each +10bp in the "
                 f"10-year "
-                f"(weighted from each holding's last three months), so if a Fed cut took the "
-                f"10-year down 10bp the measured relationship says about {cut:+.2f}% — "
+                f"(weighted from each holding's last three months), so if {move} — "
                 f"{_t(driver)} is the biggest part of it. The 10-year does not have to follow the "
                 f"Fed; this is sensitivity, not a forecast.")
     return lines, head, {"per_symbol": per, "book_pct_per_10bp": rate, "covered": covered}
@@ -223,10 +290,21 @@ def _macro(symbol: str | None, book: Mapping[str, float] | None = None,
     dollar_first = bool(_DOLLAR_FOCUS.search(raw_text))
     book_head: str | None = None
     if book and len(book) > 1:
-        book_lines, book_head, book_readings = _book_rate_lines(book, dollar_first)
+        book_lines, book_head, book_readings = _book_rate_lines(
+            book, dollar_first, rising=bool(RATES_UP.search(raw_text)))
         lines.extend(book_lines)
         if book_readings:
             readings["book"] = book_readings
+        named = _RATE_YEAR.search(raw_text)
+        if named and int(named.group(1)) < datetime.now(UTC).year:
+            replay = _book_year_line(book, int(named.group(1)))
+            if replay is not None:
+                # A named year is answered by that year first; the slope follows as context.
+                lines.insert(0, replay[0])
+                readings["year_replay"] = {"year": int(named.group(1)), "line": replay[0],
+                                           "source": replay[1]}
+                if book_head is not None:
+                    book_head, lines[0] = f"Bottom line: {replay[0]}", unlead(book_head)
     try:
         sensitivity = None if book_head else _rate_sensitivity(target)
     except Exception:
@@ -306,6 +384,8 @@ def _macro(symbol: str | None, book: Mapping[str, float] | None = None,
     macro_sources = [Source(kind="venue", ref="FRED (St. Louis Fed) + Bitget TLTUSDT/EURUSDUSDT",
                             detail="FRED series DGS10, DGS2, DFF, T10YIE, DTWEXBGS; Bitget hourly "
                                    "candles; Federal Reserve press feed, live")]
+    if "year_replay" in readings:
+        macro_sources.append(readings["year_replay"].pop("source"))
     try:
         curve = curve_job.result(timeout=8.0)
     except Exception:

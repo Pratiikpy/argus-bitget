@@ -119,6 +119,37 @@ def _hourly_yahoo(ticker: str) -> Series:
             zip(result["timestamp"], closes, strict=False) if close]
 
 
+def _premarket_yahoo(ticker: str) -> Series:
+    """The stock's own hourly prints including pre- and post-market (04:00-20:00 New York),
+    bar-end stamped like :func:`_hourly_yahoo`. The general tool a trader reaches for at 09:00: the
+    stock is already trading, so its own price is the obvious estimate of where it opens."""
+    url = (f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}"
+           f"?interval=60m&range=1y&includePrePost=true")
+    request = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 argus-research"})
+    with urllib.request.urlopen(request, timeout=30) as response:
+        result = json.load(response)["chart"]["result"][0]
+    closes = result["indicators"]["quote"][0]["close"]
+    return [(float(stamp) + 3600, float(close)) for stamp, close in
+            zip(result["timestamp"], closes, strict=False) if close]
+
+
+def collect_premarket() -> dict[str, Any]:
+    """Add each stock's extended-hours series to the saved inputs, leaving every other series as
+    it was fetched, so the published scores for the other candidates do not move."""
+    path = DATA / "inputs.json"
+    inputs: dict[str, Any] = json.loads(path.read_text("utf-8"))
+    inputs["premarket"] = {}
+    inputs["premarket_fetched"] = datetime.now(UTC).isoformat(timespec="seconds")
+    for stock in UNIVERSE:
+        try:
+            inputs["premarket"][stock] = _premarket_yahoo(stock)
+        except Exception as exc:  # one name's failure is recorded, not fatal
+            inputs.setdefault("failures", {})[f"{stock}_premarket"] = \
+                f"{type(exc).__name__}: {exc}"[:160]
+    path.write_text(json.dumps(inputs), "utf-8", newline="\n")
+    return inputs
+
+
 def _hourly_bitget(symbol: str) -> Series:
     from argus.market.history import fetch_range
 
@@ -477,6 +508,83 @@ def sunday_evening(inputs: dict[str, Any]) -> dict[str, Any] | None:
             "paired": _paired(rows, "perp_weekend", "last_close")}
 
 
+def general_tool(inputs: dict[str, Any], scored: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """The general tool, and the hours it cannot reach (Activity/28_CAPABILITY_CLOSE_PLAN_2.md
+    §44). At 09:00 New York the stock has traded pre-market since 04:00, so its own last price is
+    the obvious estimate of its open, and the perpetual's lead over gloaming may be nothing the
+    stock's own quote does not already show. At 03:30 no US venue this harness can read is
+    quoting, and the perpetual is scored alone against the last close, which is where the
+    capability's claim actually lives. Blue Ocean ATS, which quotes overnight, is a paid feed and
+    is not run."""
+    premarket = {k: [(float(t), float(c)) for t, c in v]
+                 for k, v in (inputs.get("premarket") or {}).items()}
+    if not premarket:
+        return None
+    hourly = {k: [(float(t), float(c)) for t, c in v] for k, v in inputs["hourly"].items()}
+    at_nine: list[dict[str, Any]] = []
+    at_three: list[dict[str, Any]] = []
+    with console_feed(hourly, _session_closes(inputs)):
+        for row in scored:
+            opened = date.fromisoformat(row["opened"])
+            series = premarket.get(row["stock"]) or []
+            # Two hours of staleness at most: the 08:00-09:00 bar, or the one before it on a
+            # quiet morning. An older print is not a pre-market price.
+            nine = _at(series, _ny(opened, time(9)), stale=2 * 3600)
+            if nine:
+                at_nine.append({**row, "estimates": {
+                    **row["estimates"], "premarket_0900": nine / row["close"] - 1}})
+            early = _ny(opened, time(3, 30))
+            perp = _at(hourly.get(f"{row['stock']}USDT") or [], early)
+            if perp:
+                console = console_implied_open(f"{row['stock']}USDT", perp,
+                                               datetime.fromtimestamp(early, UTC))
+                if console is not None:
+                    at_three.append({**row, "estimates": {
+                        "zero": 0.0, "argus_perp_0330": console[0] / row["close"] - 1}})
+    out: dict[str, Any] = {
+        "premarket_fetched": inputs.get("premarket_fetched"),
+        "method": "the stock's own last pre-market print at or before 09:00 New York (Yahoo, "
+                  "includePrePost), over the prior regular close; and the console's implied open "
+                  "at 03:30 New York, before any pre-market, over the same close",
+        "not_run": "Blue Ocean ATS overnight quotes (paid feed)",
+    }
+    if len(at_nine) >= 20:
+        # The nights an estimator is most likely to fail on, scored separately so a win on quiet
+        # nights cannot hide a loss on the ones that matter: the biggest tenth of gaps (earnings,
+        # macro prints), and nights the perpetual's price did not change in the two hours before
+        # the read (a stale book, where "the perp says" means nothing moved).
+        gaps = sorted(abs(r["gap"]) for r in at_nine)
+        cut = gaps[int(len(gaps) * 0.9)]
+        hardest = [r for r in at_nine if abs(r["gap"]) >= cut]
+        stale = []
+        for r in at_nine:
+            opened = date.fromisoformat(r["opened"])
+            book = hourly.get(f"{r['stock']}USDT") or []
+            before = _at(book, _ny(opened, time(7)))
+            if before is not None and before == r["perp_now"]:
+                stale.append(r)
+        out["adversarial"] = {
+            "largest_tenth_of_gaps": {
+                "rows": len(hardest), "min_abs_gap_bps": round(cut * 1e4, 1),
+                "vs_premarket": _paired(hardest, "argus_perp", "premarket_0900"),
+                "vs_zero": _paired(hardest, "argus_perp", "zero")},
+            "stale_perpetual": {
+                "rows": len(stale),
+                "vs_premarket": _paired(stale, "argus_perp", "premarket_0900")
+                if len(stale) >= 10 else None},
+        }
+        out["at_0900"] = {
+            "rows": len(at_nine), "nights": len({r["opened"] for r in at_nine}),
+            "summary": {n: _summary(at_nine, n) for n in ("argus_perp", "premarket_0900")},
+            "paired": _paired(at_nine, "argus_perp", "premarket_0900")}
+    if len(at_three) >= 20:
+        out["at_0330"] = {
+            "rows": len(at_three), "nights": len({r["opened"] for r in at_three}),
+            "summary": {n: _summary(at_three, n) for n in ("argus_perp_0330", "zero")},
+            "paired": _paired(at_three, "argus_perp_0330", "zero")}
+    return out
+
+
 def _console_replay(all_rows: list[dict[str, Any]],
                     scored: list[dict[str, Any]]) -> dict[str, Any]:
     """How the console's printed implied open compares with the formula this harness used to
@@ -543,6 +651,7 @@ def score(inputs: dict[str, Any] | None = None) -> dict[str, Any]:
                    _paired(scored, "argus_perp_fitted", "argus_perp")],
         "per_stock": per_stock,
         "sunday_evening_vs_nocturne_claim": sunday_evening(inputs),
+        "general_tool_premarket": general_tool(inputs, scored),
         "out_of_sample": {
             "method": "walk-forward per stock: every fitted candidate is refit before each night "
                       "on that stock's earlier nights only",
@@ -599,6 +708,28 @@ def comparison_reports(report: dict[str, Any]) -> list[ComparisonReport]:
             ci95=(block["ci95_bps"][0], block["ci95_bps"][1]),
             scored=report["scored_rows"], total=total, groups=per_group,
             artefact="data/overnight_comparison.json", created_at=report["generated"])))
+    general = report.get("general_tool_premarket") or {}
+    for key, argus, rival, rival_label, question in (
+            ("at_0900", "argus_perp", "premarket_0900",
+             "the stock's own pre-market price at 09:00 (the general tool)",
+             "the stock's overnight gap, read at 09:00 New York"),
+            ("at_0330", "argus_perp_0330", "zero", "no gap (the last close), before pre-market",
+             "the stock's overnight gap, read at 03:30 New York")):
+        block = general.get(key)
+        if not block:
+            continue
+        pair = block["paired"]
+        out.append(finalise(ComparisonReport(
+            comparison="overnight", question=question, argus=argus, rival=rival_label,
+            metric="mean absolute error of the predicted close-to-open gap, bps",
+            lower_is_better=True, argus_score=block["summary"][argus]["mae_bps"],
+            rival_score=block["summary"][rival]["mae_bps"], n=pair["nights"], unit="night",
+            outcome=legacy_outcome(pair["verdict"], argus_is_a=True),
+            basis="paired bootstrap over nights, 4000 draws, seed 7, on the rows where both "
+                  "estimates exist",
+            ci95=(pair["ci95_bps"][0], pair["ci95_bps"][1]), scored=block["rows"],
+            total=report["scored_rows"], artefact="data/overnight_comparison.json",
+            created_at=report["generated"])))
     weekend = report.get("sunday_evening_vs_nocturne_claim")
     if weekend:
         block = weekend["paired"]
@@ -620,6 +751,8 @@ def comparison_reports(report: dict[str, Any]) -> list[ComparisonReport]:
 def main() -> int:  # pragma: no cover - CLI
     if "--collect" in sys.argv:
         collect()
+    if "--premarket" in sys.argv:
+        collect_premarket()
     report = score()
     artefact.write(REPORT, report)
     print(json.dumps({k: report.get(k) for k in ("scored_rows", "nights", "summary",

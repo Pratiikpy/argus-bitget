@@ -265,6 +265,20 @@ def _coordination_test(symbol: str | None) -> tuple[str, dict[str, Any]] | None:
         text += (f". On the {_t(symbol or '')} narrative finBERT counted "
                  f"{coordinated.get('matching_count')} of {coordinated.get('n_posts')} posts as "
                  f"{coordinated.get('dominant_label')}; the analyst's reason: \u201c{first}\u201d")
+    # The fair rival too, so the line does not rest on the weakest version of the general tool:
+    # collapsing near-duplicates before finBERT stops the template copies, not the retellings
+    # (`eval/sentiment_dedup_rival.py`).
+    try:
+        dedup = _json.loads((desk_notes_path().parent / "sentiment_dedup_rival.json")
+                            .read_text(encoding="utf-8"))["summary"]
+        text += (f". Deduplicating first fixes the copies (finBERT then moved on "
+                 f"{dedup['template']['finbert_dedup_moved']} of {dedup['template']['cases']}, "
+                 f"the analyst on {dedup['template']['argus_moved']}), not five accounts retelling "
+                 f"one rumour in their own words ({dedup['diverse']['finbert_dedup_moved']} of "
+                 f"{dedup['diverse']['cases']} against the analyst's "
+                 f"{dedup['diverse']['argus_moved']})")
+    except (OSError, ValueError, KeyError, TypeError):
+        pass
     return text + ".", {"narratives": len(runs), "finbert_louder": louder, "held": held}
 
 

@@ -847,6 +847,11 @@ CLAIMS: tuple[Claim, ...] = (
           refusal_accuracy_2h, ("readme", "public-readme")),
     Claim("refusal_forgone_2h", rf"forgave\s+(?P<q>[-{chr(0x2212)}]?[\d.]+)\s*bps of net edge",
           refusal_forgone_2h, ("readme", "public-readme")),
+    Claim("premarket_mae",
+          r"pre-market price at 09:00, the general tool, missed by (?P<q>\d+)bps",
+          lambda: round(_json("overnight_comparison.json")["general_tool_premarket"]["at_0900"]
+                        ["summary"]["premarket_0900"]["mae_bps"]),
+          ("public-readme",)),
     Claim("workbench_breadth",
           r"workbench answers \*\*(?P<q1>[\d.]+) per stock against\s+OpenBB's "
           r"(?P<q2>[\d.]+)\*\*", workbench_breadth, ("public-readme",)),

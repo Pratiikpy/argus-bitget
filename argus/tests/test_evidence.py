@@ -8,11 +8,14 @@ where a fast feed becomes a leak, and it is asserted at the gate, not trusted at
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
+from typing import Any, ClassVar
 
 import pytest
 
 from argus.market.evidence import (
+    FUND_FORMS,
     RSS_FEEDS,
+    EdgarSource,
     EvidenceError,
     Filing,
     Gathered,
@@ -103,6 +106,42 @@ class TestTickerMapping:
 
     def test_a_suffix_alone_is_not_a_ticker(self) -> None:
         assert underlying_ticker("USDT") == "USDT"
+
+
+class TestFundFilings:
+    """A fund is looked up in the SEC's fund map and read for fund reports, never 10-Qs."""
+
+    MF: ClassVar[dict[str, Any]] = {"fields": ["cik", "seriesId", "classId", "symbol"],
+          "data": [[1067839, "S1", "C1", "QQQ"], [1174610, "S2", "C2", "TQQQ"],
+                   [1174610, "S3", "C3", "SQQQ"]]}
+    SUBMISSIONS: ClassVar[dict[str, Any]] = {
+        "name": "INVESCO QQQ TRUST, SERIES 1", "filings": {"recent": {
+        "form": ["NPORT-P", "10-K", "497K", "N-CSRS", "NPORT-P"],
+        "acceptanceDateTime": ["2026-08-28T16:00:00.000Z", "2026-08-01T16:00:00.000Z",
+                               "2026-07-01T16:00:00.000Z", "2026-06-01T16:00:00.000Z",
+                               "2024-01-01T16:00:00.000Z"],
+        "filingDate": ["2026-08-28", "2026-08-01", "2026-07-01", "2026-06-01", "2024-01-01"],
+        "accessionNumber": ["a1", "a2", "a3", "a4", "a5"]}}}
+
+    def _source(self) -> EdgarSource:
+        src = EdgarSource()
+        src._get = lambda url: (  # type: ignore[method-assign]
+            self.MF if url == EdgarSource.FUND_TICKERS_URL else self.SUBMISSIONS)
+        return src
+
+    def test_only_fund_report_forms_inside_the_window_are_read(self) -> None:
+        name, series, reports = self._source().fund_filings(
+            "QQQ", since=datetime(2025, 9, 1, tzinfo=UTC))
+        assert name == "INVESCO QQQ TRUST, SERIES 1" and series == 1
+        assert [f.form for f in reports] == ["NPORT-P", "N-CSRS"]
+        assert set(FUND_FORMS) >= {f.form for f in reports}
+
+    def test_a_shared_trust_reports_how_many_funds_file_under_it(self) -> None:
+        assert self._source().fund_cik_for("SQQQ") == (1174610, 2)
+
+    def test_a_company_ticker_is_not_a_fund(self) -> None:
+        assert self._source().fund_filings("NVDA", since=datetime(2025, 1, 1, tzinfo=UTC)) == (
+            "", 0, [])
 
 
 class TestFilingSemantics:

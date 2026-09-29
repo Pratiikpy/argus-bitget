@@ -948,6 +948,12 @@ _ANSWERERS = {
 }
 
 
+EMPTY_QUESTION_HINT = ('Ask a question in words — for example "where is NVDA trading?" or "what '
+                      'if the Nasdaq drops 10%? I hold 50% NVDA, 50% AAPL".')
+"""What every door says to a blank question: /ask, MCP and the CLI (the CLI said "name a symbol or
+a decision number", the hint for a vague follow-up; fresh-eyes audit, 2026-09-29)."""
+
+
 def answer(ledger: PaperLedger, question: Question) -> Answer:
     """Route a classified question to its answerer, or refuse by name."""
     if question.intent is Intent.UNSUPPORTED:
@@ -957,7 +963,8 @@ def answer(ledger: PaperLedger, question: Question) -> Answer:
         )
     if question.intent is Intent.AMBIGUOUS:
         return _refuse(question, question.reason,
-                       suggestion="Name a symbol or a decision number.")
+                       suggestion=(EMPTY_QUESTION_HINT if not question.raw.strip()
+                                   else "Name a symbol or a decision number."))
     if question.intent is Intent.ORDER:
         return _refuse(
             question, question.reason,

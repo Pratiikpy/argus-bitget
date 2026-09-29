@@ -20,15 +20,33 @@ does, so this module measures three things and publishes them whichever way they
 
 No model is called anywhere in this module.
 
-    python -m argus.eval.factor_split_half
+**The bars are frozen (2026-09-29).** The first runs fetched ninety days live on every call, so the
+published result could not be reproduced: by the time anyone re-ran it the window had moved. The
+twelve series now live in ``data/factor_split_half_bars.json`` with a sha256 per symbol and one over
+the whole set, checked on every load, and the module reads them by default. ``--fetch`` re-pulls the
+fixture first (Bitget public candles, keyless). The frozen window is the published run's own, the
+ninety days ending at :data:`WINDOW_END` (the 2026-09-25 artefact's ``generated_at``), re-pulled on
+2026-09-29. **The venue's candles for that window had moved in the meantime**: re-pulled, the
+bounds and the bar count match the 2026-09-25 run exactly (2,159 bars, 06-27 15:00 to 09-25 13:00
+UTC) but NVDAUSDT's split-half statistics differ from the published ones by up to a few percent, so
+the artefact was regenerated from the fixture rather than claimed to be the old one. Each row also
+keeps the open and the quote volume, which the lab does not use and `eval/factor_quality_rivals.py`
+needs (FactorMiner's panel carries ``open``, ``amount`` and ``vwap``).
+
+    python -m argus.eval.factor_split_half            # from the fixture
+    python -m argus.eval.factor_split_half --fetch    # re-freeze first, then run
 """
 
 from __future__ import annotations
 
+import hashlib
+import json
 import random
 import sys
 from collections.abc import Sequence
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
+from decimal import Decimal
+from pathlib import Path
 from typing import Any
 
 from argus.backtest.engine import Bar
@@ -49,6 +67,13 @@ from argus.truth.paths import DATA_DIR
 
 DATA = DATA_DIR
 REPORT_PATH = DATA / "factor_split_half.json"
+FIXTURE = DATA / "factor_split_half_bars.json"
+
+WINDOW_DAYS = 90
+WINDOW_END = datetime(2026, 9, 25, 14, 17, 35, 964747, tzinfo=UTC)
+"""The instant the published 2026-09-25 run was generated. The fixture is the ninety days before it,
+so the frozen evidence is the window that run measured, not whichever ninety days precede a later
+re-freeze."""
 
 SYMBOLS = ("NVDAUSDT", "TSLAUSDT", "AAPLUSDT", "MSFTUSDT", "METAUSDT", "GOOGLUSDT", "AMZNUSDT",
            "COINUSDT", "MSTRUSDT", "QQQUSDT", "TQQQUSDT", "SQQQUSDT")
@@ -85,6 +110,117 @@ def fetch_bars(symbol: str, days: int = 90) -> list[Bar]:  # pragma: no cover - 
     return [Bar(ts=c.ts, close=c.close,
                 extra={"volume": float(c.volume), "high": float(c.high), "low": float(c.low)})
             for c in candles]
+
+
+class FixtureError(RuntimeError):
+    """The frozen bars are missing, altered, or not prices."""
+
+
+def pull_candles(symbol: str, *, start: datetime, end: datetime,
+                 pause: float = 0.15) -> list[list[str]]:  # pragma: no cover - network
+    """Raw hourly rows ``[ts, open, high, low, close, volume, quote_volume]`` in ``[start, end]``.
+
+    The paging is `market/history.fetch_window`'s (walk ``endTime`` back to the oldest bar already
+    held; stop when a page is empty or the window stops moving) with `history.fetch`'s request
+    parameters, read through the same `history._get`. It is repeated here only because
+    `history.Candle` drops the seventh field, the quote volume, which FactorMiner's panel needs as
+    ``amount``. Retries only on HTTP 429, as :func:`fetch_bars` does.
+    """
+    import time
+
+    from argus.market import history
+
+    seen: dict[int, list[str]] = {}
+    cursor: datetime = end
+    while True:
+        params = {"category": "USDT-FUTURES", "symbol": symbol, "interval": "1H",
+                  "type": str(history.CandleType.MARKET), "limit": str(history.MAX_LIMIT),
+                  "endTime": str(int(cursor.timestamp() * 1000))}
+        page: list[list[str]] = []
+        for attempt in range(4):
+            try:
+                page = history._get(params)
+                break
+            except history.HistoryError as exc:
+                if "429" not in str(exc) or attempt == 3:
+                    raise
+                time.sleep(10.0 * (attempt + 1))
+        page = [row for row in page if len(row) >= 7]
+        if not page:
+            break
+        new = {int(row[0]): [str(v) for v in row[:7]] for row in page if int(row[0]) not in seen}
+        if not new:
+            break
+        seen.update(new)
+        oldest = datetime.fromtimestamp(min(int(row[0]) for row in page) / 1000, tz=UTC)
+        if oldest <= start or oldest >= cursor:
+            break  # covered, or the window stopped moving (the venue is clamping)
+        cursor = oldest
+        time.sleep(pause)
+    lo, hi = start.timestamp() * 1000, end.timestamp() * 1000
+    rows = []
+    for ms in sorted(seen):
+        if lo <= ms <= hi:
+            row = seen[ms]
+            if any(Decimal(v) <= 0 for v in row[1:5]):
+                raise FixtureError(f"{symbol}: non-positive price in candle {row}")
+            rows.append([datetime.fromtimestamp(ms / 1000, tz=UTC).isoformat(), *row[1:7]])
+    return rows
+
+
+def _digest(rows: Any) -> str:
+    return hashlib.sha256(json.dumps(rows, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+
+def freeze(symbols: Sequence[str] = SYMBOLS, *, end: datetime = WINDOW_END,
+           days: int = WINDOW_DAYS, path: Path = FIXTURE) -> Path:  # pragma: no cover - network
+    """Pull every symbol's window once and write the hashed fixture every later run reads."""
+    import time
+
+    from argus.truth.artefact import write
+
+    start = end - timedelta(days=days)
+    series: dict[str, Any] = {}
+    for symbol in symbols:
+        rows = pull_candles(symbol, start=start, end=end)
+        series[symbol] = {"sha256": _digest(rows), "rows": rows}
+        print(f"  froze {symbol}: {len(rows)} bars", file=sys.stderr)
+        time.sleep(2.0)  # the venue rate-limits consecutive 90-day pulls
+    write(path, {
+        "interval": "1H",
+        "window_start": start.isoformat(),
+        "window_end": end.isoformat(),
+        "fetched_at": datetime.now(UTC).isoformat(),
+        "source": "Bitget public /api/v3/market/history-candles, category USDT-FUTURES, type "
+                  "MARKET, keyless; row = [ts, open, high, low, close, volume, quote_volume]",
+        "sha256": _digest({s: series[s]["sha256"] for s in sorted(series)}),
+        "series": series,
+    }, indent=0)
+    return path
+
+
+def load_fixture(path: Path = FIXTURE) -> tuple[dict[str, list[list[str]]], str]:
+    """Every frozen series and the digest over the whole set, each hash checked before use."""
+    if not path.exists():
+        raise FixtureError(f"{path} is missing; run `python -m argus.eval.factor_split_half "
+                           f"--fetch` once to freeze it")
+    blob = json.loads(path.read_text(encoding="utf-8"))
+    series: dict[str, list[list[str]]] = {}
+    for symbol, entry in blob["series"].items():
+        if _digest(entry["rows"]) != entry["sha256"]:
+            raise FixtureError(f"{path}: {symbol}'s rows do not match their recorded sha256")
+        series[symbol] = entry["rows"]
+    overall = _digest({s: blob["series"][s]["sha256"] for s in sorted(blob["series"])})
+    if overall != blob["sha256"]:
+        raise FixtureError(f"{path}: the set of series does not match its recorded sha256")
+    return series, overall
+
+
+def bars_from_rows(rows: Sequence[Sequence[str]]) -> list[Bar]:
+    """Fixture rows as the lab's bars: exactly the conversion :func:`fetch_bars` applies."""
+    return [Bar(ts=datetime.fromisoformat(r[0]), close=Decimal(r[4]),
+                extra={"volume": float(r[5]), "high": float(r[2]), "low": float(r[3])})
+            for r in rows]
 
 
 def next_returns(bars: Sequence[Bar]) -> list[float]:
@@ -215,33 +351,36 @@ def summarise(libraries: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - network
-    import time
-
+def main(argv: Sequence[str] | None = None) -> int:  # pragma: no cover - writes the artefact
     from argus.truth.artefact import write
 
-    symbols = tuple(argv) if argv else SYMBOLS
+    args = list(argv or [])
+    if "--fetch" in args:
+        args.remove("--fetch")
+        freeze()
+    symbols = tuple(args) if args else SYMBOLS
+    series, digest = load_fixture()
     libraries: list[dict[str, Any]] = []
     returns_by_symbol: dict[str, list[float]] = {}
     failed: dict[str, str] = {}
     for symbol in symbols:
-        try:
-            bars = fetch_bars(symbol)
-        except Exception as exc:  # reported per symbol in the artefact, not swallowed
-            failed[symbol] = f"{type(exc).__name__}: {exc}"
+        if symbol not in series:
+            failed[symbol] = f"not in {FIXTURE.name}"
             continue
+        bars = bars_from_rows(series[symbol])
         if len(bars) < BLOCK * SPLIT_HALF_MIN_BLOCKS:
             failed[symbol] = f"only {len(bars)} bars"
             continue
         returns_by_symbol[symbol] = next_returns(bars)
         libraries.append(library_on(symbol, bars))
         print(f"  {symbol}: {len(bars)} bars", file=sys.stderr)
-        time.sleep(2.0)  # the venue rate-limits consecutive 90-day pulls
     if not libraries:
-        print(f"no instrument could be fetched; nothing written: {failed}", file=sys.stderr)
+        print(f"no instrument in the fixture; nothing written: {failed}", file=sys.stderr)
         return 1
     report: dict[str, Any] = {
         "generated_at": datetime.now(UTC).isoformat(),
+        "bars": {"fixture": f"data/{FIXTURE.name}", "sha256": digest,
+                 "window_end": WINDOW_END.isoformat(), "days": WINDOW_DAYS},
         "block_bars": BLOCK,
         "symbols_failed": failed,
         "planted": planted_checks(returns_by_symbol),
@@ -267,5 +406,6 @@ if __name__ == "__main__":  # pragma: no cover
     raise SystemExit(main(sys.argv[1:]))
 
 
-__all__ = ["BLOCK", "SYMBOLS", "library_on", "next_returns", "planted", "planted_checks",
+__all__ = ["BLOCK", "FIXTURE", "SYMBOLS", "WINDOW_END", "FixtureError", "bars_from_rows",
+           "freeze", "library_on", "load_fixture", "next_returns", "planted", "planted_checks",
            "summarise"]

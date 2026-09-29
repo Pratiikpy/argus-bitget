@@ -6,12 +6,33 @@ modules = [
     "argus/desk/stress_search.py",
     "argus/eval/stress_search_comparison.py",
 ]
-state = "implemented"
+state = "tied"
 baseline = """\
-    the normal-shock method of Open-Finance-Lab/AgenticTrading's run_monte_carlo_stress \
-    (stress_testing.py:335-441, NOASSERTION, rebuilt from its description), taken in closed \
-    form; and its run_reverse_stress_test's uniform random search"""
+    historical simulation, the general method (the breach frequency skfolio's and \
+    riskfolio's historical VaR are read from); and, as context, the normal-shock method of \
+    Open-Finance-Lab/AgenticTrading's run_monte_carlo_stress (stress_testing.py:335-441, \
+    NOASSERTION, rebuilt from its description) in closed form, and its \
+    run_reverse_stress_test's uniform random search"""
 blockers = [
+    """\
+        RE-GRADED 2026-09-29 from IMPLEMENTED to TIED \
+        (Activity/28_CAPABILITY_CLOSE_PLAN_2.md §46) with historical simulation, the general \
+        method, after two defects in the comparison and one in the product were fixed. The \
+        product: a book whose 50 stored levels ended before a $50k exit was filled counted \
+        as a certain breach on every move, favourable ones included, which made META's and \
+        COIN's breach chances at a 10% tolerance simply their share of truncated books \
+        (17.9% and 7.6%); such books now leave the calculation and are counted and named \
+        (desk/stress_search.UNKNOWN_DEPTH). The comparison: the realised chance was ARGUS's \
+        own search on the second half, so the book rule sat in both estimate and truth; it \
+        is now the share of non-overlapping held-out windows whose move, with the median \
+        exit cost, broke the limit. Scored that way (data/stress_search_comparison.json), \
+        ARGUS and historical simulation are level: mean absolute error 3.63 against 3.61 \
+        points at a 3% limit, 1.61 against 1.59 at 5%, 0.32 against 0.32 at 10%, per-row \
+        difference -0.012 points, interval [-0.032, +0.002] over 36 rows. The normal model \
+        is context (3.19, 1.89, 0.28). The book term adds nothing measurable at this size, \
+        because where a book can price the exit its cost is small; the search half (random \
+        search finds the most likely failure in 3.8% of runs at 10,000 draws) is true by \
+        construction, since the space is small enough to enumerate.""",
     """\
         Out of sample on 12 rTokens (first half of each symbol's 24-hour windows fits, second \
         half is scored): mean absolute error of the breach probability 1.49 against 3.31 points \
@@ -43,3 +64,27 @@ artefact = "data/stress_search_comparison.json"
 condition = "implementation_complete"
 how = "desk/stress_search.py, shown in the research task's stress step"
 test = "test_stress_search.py::test_the_failure_probability_counts_failing_pairs"
+
+[[proofs]]
+condition = "costs_included"
+how = "every arm and the realised truth carry the median exit slippage and the 6bps taker fee"
+artefact = "data/stress_search_comparison.json"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = """\
+    estimates on the first half of each name's windows, truth on non-overlapping windows of the \
+    second half"""
+artefact = "data/stress_search_comparison.json"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    the books too shallow to price the exit are counted per name, and the tolerance where ARGUS \
+    is closer on fewest names is published"""
+artefact = "data/stress_search_comparison.json"
+
+[[proofs]]
+condition = "adversarial_test"
+how = "the most volatile quarter of names scored on its own"
+artefact = "data/stress_search_comparison.json"

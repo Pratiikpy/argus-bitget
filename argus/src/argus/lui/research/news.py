@@ -4,13 +4,14 @@ first."""
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from typing import Any
 
 from argus.desk.portfolio import (
     beta,
 )
-from argus.lui.answer import Source
+from argus.lui.answer import Source, unlead
 from argus.lui.question import (
     TRADED_SYMBOLS,
 )
@@ -91,7 +92,54 @@ def _headlines_naming(symbol: str) -> tuple[list[Any], set[str]]:
     return kept, names
 
 
-def _news(symbol: str, is_open: Any) -> tuple[list[str], list[Source], dict[str, Any]]:
+TONE_ASKED = (
+    ("negative", re.compile(r"\b(?:negative|bad|bearish|worrying|concerning|downbeat|grim)\s+"
+                            r"(?:news|headlines?|stories|press)\b|\bany\s+bad\b", re.I)),
+    ("positive", re.compile(r"\b(?:positive|good|bullish|upbeat|encouraging)\s+"
+                            r"(?:news|headlines?|stories|press)\b|\bany\s+good\b", re.I)),
+)
+"""A question that asks for one side of the news ("any negative news on NVDA") is answered with
+that side: every headline is scored and the ones on the asked side lead. Before 2026-09-29 it got
+the same list as any news question (stranger QA)."""
+
+
+def tone_asked(text: str) -> str | None:
+    return next((tone for tone, pattern in TONE_ASKED if pattern.search(text)), None)
+
+
+def _tone_lines(kept: Sequence[Any], ticker: str, tone: str,
+                now: datetime) -> tuple[list[str], dict[str, Any]] | None:
+    """Every kept headline scored with VADER (the vendored lexicon the crowd-tone line uses), and
+    the ones on the asked side listed first. A lexicon reads words, not events, so the line says
+    so; ``None`` when VADER cannot be loaded, and the plain list stands."""
+    from argus.market import vader
+    from argus.market.social_pulse import vader_tone
+
+    try:
+        score = vader_tone()
+    except vader.VaderLoadError:
+        return None
+    scored = [(h, score(h.title)) for h in kept]
+    side = [(h, v) for h, v in scored if (v <= vader.NEGATIVE_AT if tone == "negative"
+                                          else v >= vader.POSITIVE_AT)]
+    side.sort(key=lambda hv: hv[1] if tone == "negative" else -hv[1])
+    head = (f"Bottom line: of {len(kept)} headline(s) naming {ticker} in {NEWS_LOOKBACK_HOURS}h, "
+            f"{len(side)} read {tone} by VADER's word lexicon"
+            + (" — none do, so nothing on the record reads that way." if not side else
+               ", listed first below. A lexicon scores wording, not what the news means for "
+               "the stock; read them."))
+    lines = [head]
+    for h, v in side[:5]:
+        hours = (now - h.published).total_seconds() / 3600
+        outlet = "Yahoo Finance" if h.feed.startswith("yahoo") else h.feed
+        lines.append(f"{tone.capitalize()} ({v:+.2f}), {hours:.0f}h ago — {h.title} ({outlet}) "
+                     f"{h.link}")
+    return lines, {"asked": tone, "scorer": "VADER compound", "on_side": len(side),
+                   "scored": len(scored)}
+
+
+def _news(symbol: str, is_open: Any,
+          tone: str | None = None) -> tuple[list[str], list[Source], dict[str, Any]]:
     """Headlines that name ``symbol``, its SEC filings this week, and its 24-hour move split into
     the market's part and its own. For QQQ, the market-wide headlines instead."""
     from datetime import timedelta as _td
@@ -182,16 +230,28 @@ def _news(symbol: str, is_open: Any) -> tuple[list[str], list[Source], dict[str,
     else:
         lines.insert(0, "Bottom line: the headlines below are what the market is reading; none of "
                         "them is a cause until a price reaction can be tied to it.")
+    toned = _tone_lines(kept, ticker, tone, now) if tone and kept and not market else None
+    if toned is not None:
+        # The asked side leads; the 8-K lead, when there is one, still comes first.
+        at = 1 if events else 0
+        if not events:
+            lines[0] = unlead(lines[0])
+        lines[at:at] = toned[0]
+    listed = {line.split(" — ", 1)[1] for line in (toned[0][1:] if toned else [])
+              if " — " in line}
     for h in kept[:5]:
         hours = (now - h.published).total_seconds() / 3600
         outlet = "Yahoo Finance" if h.feed.startswith("yahoo") else h.feed
+        if f"{h.title} ({outlet}) {h.link}" in listed:
+            continue
         lines.append(f"{hours:.0f}h ago — {h.title} ({outlet}) {h.link}")
     for f in filings[:2]:
         lines.append(f"SEC filing: {f.form} filed {f.filed:%Y-%m-%d} — "
                      f"{f.item_summary if f.is_event else f.description or f.form}.")
     payload = {"change_24h_pct": change, "headlines": [
         {"title": h.title, "feed": h.feed, "link": h.link, "published": h.published.isoformat()}
-        for h in kept[:10]], "filings": [f.form for f in filings]}
+        for h in kept[:10]], "filings": [f.form for f in filings],
+        "tone": toned[1] if toned is not None else None}
     sources = [Source(kind="venue", ref="RSS + Yahoo Finance + SEC EDGAR",
                       detail=f"{len(kept)} headline(s), {len(filings)} filing(s)")]
     try:

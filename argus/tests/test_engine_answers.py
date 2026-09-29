@@ -94,13 +94,43 @@ def test_daily_technicals_compute_average_rsi_and_the_last_cross(
 
 
 def test_options_loans_and_life_savings_lead_with_the_scope() -> None:
-    assert "options are outside" in research.analogue._scope_lead("should I buy NVDA calls?", "")[0]
+    lead, _ = research.analogue._scope_lead("should I buy BTC calls?", "BTCUSDT")
+    assert "no US-listed options chain" in lead[0] and "not priced here" in lead[0]
     assert "borrowing against" in research.analogue._scope_lead(
-        "can I take a loan against my BTC?", "")[0]
+        "can I take a loan against my BTC?", "")[0][0]
     assert "not a licensed adviser" in research.analogue._scope_lead(
-        "I am 62, should I put all my savings in BTC?", "")[0]
+        "I am 62, should I put all my savings in BTC?", "")[0][0]
     assert research.analogue._scope_lead(
-        "what happens on a margin call at 10x BTC?", "BTCUSDT") == []
+        "what happens on a margin call at 10x BTC?", "BTCUSDT") == ([], [])
+
+
+_CHAIN = ("Options on NVDA (Cboe, delayed): 30-day implied vol 48.1%; put/call 0.58 by today's "
+          "volume, 0.73 by open interest.")
+
+
+def test_an_options_question_leads_with_the_chain_it_read_not_a_denial() -> None:
+    # Stranger QA, 2026-09-29: "options are outside what this desk reads" led an answer whose own
+    # later line gave the chain's put/call ratio.
+    lead, sources = research.analogue._scope_lead(
+        "what's the options put/call ratio for NVDA", "NVDAUSDT", ["Bottom line: x", _CHAIN])
+    assert lead == [f"Bottom line: {_CHAIN}"] and sources == []
+    buying, _ = research.analogue._scope_lead("should I buy NVDA calls?", "NVDAUSDT", [_CHAIN])
+    assert buying[0] == f"Bottom line: {_CHAIN}" and "not priced here" in buying[1]
+    assert not any("outside what this desk reads" in line for line in (*lead, *buying))
+
+
+def test_an_options_question_reads_the_chain_when_the_answer_has_none(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    from argus.lui.answer import Source
+    from argus.lui.research import positioning
+
+    seen = Source(kind="venue", ref="cboe delayed_quotes/options", detail="NVDA")
+    monkeypatch.setattr(positioning, "_options_line", lambda ticker: (_CHAIN, seen, {}))
+    lead, sources = research.analogue._scope_lead("should I buy NVDA calls?", "NVDAUSDT", [])
+    assert lead[0] == f"Bottom line: {_CHAIN}" and sources == [seen]
+    monkeypatch.setattr(positioning, "_options_line", lambda ticker: None)
+    failed, _ = research.analogue._scope_lead("should I buy NVDA calls?", "NVDAUSDT", [])
+    assert "did not answer just now" in failed[0]
 
 
 def test_put_call_ratio_is_answered_not_logged() -> None:

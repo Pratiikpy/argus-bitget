@@ -53,9 +53,12 @@ _META = re.compile(r"^(?:Data:|Sources reached|Sources:|Quoted \d|Caveat:|Method
 
 _LIVE_LEAD = re.compile(r"\S+ last [\d,.]+ USDT on Bitget\b|Open interest:|Crypto fear|"
                         r"Long/short on Bitget\b|\S+ funding is [+-]?\d|RSI\(|"
-                        r"US spot (?:BTC|ETH) ETFs\b", re.I)
+                        r"US spot (?:BTC|ETH) ETFs\b|Fund holdings \(|Largest disclosed holders\b|"
+                        r"\S+ corporate actions: |Latest SEC filings: |Options on \S+ \(Cboe|"
+                        r"Dark pools \(FINRA|Short volume \(FINRA|Institutions: \d", re.I)
 """A live reading moved to the lead unchanged — the price, open interest, the long/short split,
-the funding rate asked for — keeps its live label."""
+the funding rate, a fund's holdings or the filing a dividend question asked for — keeps its live
+label."""
 
 # Order matters: the first rule that matches decides. Missing and assumed come first because a
 # line that says it could not read something must never be labelled as if it had.
@@ -79,6 +82,9 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
                             r"If the )|\bis \d+% of the book but \d+% of its loss\b")),
     # A measured record over past sweeps or past releases (`eval/skill_matrix.py`, the "into
     # earnings" history): counted from what already happened, not read now.
+    # the capability register's own rows, read for a question about a named rival (lui/rivals.py)
+    ("record", re.compile(r"^(?:OWNED|TIED|IMPLEMENTED|LOST) — |"
+                          r"^(?:Bottom line: )?\d+ capability rows? in ARGUS's register\b")),
     ("record", re.compile(r"^(?:(?:Actionable|Bottom line): )?across \d+ sweep|"
                           r"^bitget-mcp-server: every call|"
                           r"^bitget-signal's news|^Answering with data in the latest sweep|"
@@ -86,6 +92,18 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
                           r"^The most recent one, ", re.I)),
     # what an as-of answer left out, and why: the answer describing itself
     ("assumed", re.compile(r"^Point in time: \d+ line\(s\) about today")),
+    # A tone computed over the posts that were read. Checked before "missing": the line also says
+    # abusive posts were withheld from the count, which describes the input, not a gap in the
+    # figure (it was badged missing on the console, 2026-09-29).
+    ("computed", re.compile(r"^Crowd tone on\b")),
+    # a headline read now and scored for the side the question asked (lui/research/news.py)
+    ("computed", re.compile(r"^(?:Negative|Positive) \([+-]\d\.\d\d\), \d+h ago — ")),
+    # The feeds added 2026-09-29 (lui/research/positioning.py, lui/research/fundamentals.py), read
+    # from their sources for this answer. Checked before "missing": the dark-pool line says FINRA
+    # publishes late, and the fund line can say a figure was withheld.
+    ("live", re.compile(r"^Options on \S+ \(Cboe|^Dark pools \(FINRA|^Short volume \(FINRA|"
+                        r"^Largest disclosed holders\b|^(?:Company|Fund): |"
+                        r"^\S+ corporate actions: |^Latest SEC filings: |^Fund holdings \(")),
     # A FRED series served from the snapshot shipped with the console is a past reading. Checked
     # before "missing": its line also says FRED did not answer, which is why it is a record and not
     # a gap (the CPI lead was tagged computed on the live page, 2026-09-25).
@@ -95,8 +113,11 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
         r"\bunavailable\b|\bcould\s+not\s+(?:load|read|reach|fetch)\b|\btoo\s+few\b|"
         r"\bno\s+(?:data|reading|quote)\b|\bnothing\s+in\s+\d+h\b|\bso\s+I\s+need\s+what\s+you\s+"
         r"hold\b|\bnot\s+available\s+—|\b(?<!none )withheld\b|\bnot\s+(?:yet\s+)?published\b|"
-        r"^I did not recognise\b|^Missing:|\bholds no\b[^.;]{0,40}\bfigure\b|"
-        r"\bhas not verified\b|\bcould not be measured\b|\bwas not (?:read|measured|fetched)\b",
+        r"^I did not recognise\b|^Missing:|^Not read from your book:|"
+        r"\bholds no\b[^.;]{0,40}\bfigure\b|"
+        r"\bhas not verified\b|\bcould not be measured\b|\bwas not (?:read|measured|fetched)\b|"
+        # "short interest itself ... is not read here", "single contracts are not priced here"
+        r"\b(?:is|are)\s+not\s+(?:read|priced)\s+here\b",
         re.I)),
     ("assumed", re.compile(r"^Assumed:|^假设\uff1a|\bno\s+\w+\s+was\s+(?:stated|given)\b|"
                            r"\bis\s+assessed\s+at\b|\bwere\s+scaled\s+to\s+100%|"
@@ -191,7 +212,10 @@ def label(line: str) -> str | None:
         # top ("Bottom line: NVDA last 226.3 USDT on Bitget") stays live, a record stays a record,
         # and a lead that says a figure is missing is missing. Anything else a lead says is the
         # answer's conclusion, computed for it.
-        rest = lead.group(1)[0].upper() + lead.group(1)[1:]
+        # "Bottom line: yes — KO corporate actions: ..." answers a yes-or-no question with the
+        # reading itself; the reading decides the label.
+        body = re.sub(r"^(?:yes|no) — ", "", lead.group(1), flags=re.I)
+        rest = body[0].upper() + body[1:]
         inner = label(rest)
         if inner == "live":
             # only a reading promoted as it was read; a conclusion drawn on live counts ("2

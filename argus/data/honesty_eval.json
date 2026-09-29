@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-26T02:59:52.835942+00:00",
+  "generated_at": "2026-09-29T03:49:38.664268+00:00",
   "item": "lui/honesty.py \u2014 true reasons for questions no console can answer as asked",
   "method": "HONESTY-EVAL \u2014 `lui/honesty.py` graded by the infeasibility bench's own grader, and its false\npositives.\n\n**What it measures.** (a) Every infeasible case of ``data/infeasibility_bench.json`` is re-asked of\n:func:`argus.lui.honesty.honest_answer` (and :func:`~argus.lui.honesty.order_prefix` for orders);\nwhere it answers, its lines replace the console's recorded reply, where it does not, the recorded\nreply stands, and each is graded by `eval/infeasibilitybench.grade_infeasible` \u2014 the same\nvocabulary that produced the \"before\" counts, so the two columns are comparable. (b) Detection is\nrun over every question of the three 2026-09-25 LUI corpora (the rows marked answerable; the\n``refuse`` rows are counted separately as coverage) and over the bench's 72 controls: any hit on\nan answerable question is a false positive and is listed verbatim.\n\nNot measured here: the reply as served through `lui/server._answer` (this module is not wired in\nyet), the Qwen path, and whether the figures the two data builders print are correct beyond the\narithmetic tested in ``tests/test_honesty.py``.\n",
   "detection_offline": {
@@ -195,7 +195,7 @@
           "Sources reached: 3 of 3 answered.",
           "Data: Bitget live 24h ticker and order book (50 levels). This is analysis, not advice \u2014 you make the call."
         ],
-        "elapsed_ms": 0.2
+        "elapsed_ms": 0.1
       },
       {
         "id": "ord-06",
@@ -297,11 +297,11 @@
         "cause_agrees": true,
         "matched": "is not listed",
         "lines": [
-          "Actionable: HSBC is not listed on Bitget \u2014 no perpetual and no spot or rToken market under HSBC among the 805 USDT-futures contracts (live) and 3169 spot symbols (live) checked \u2014 so there is no Bitget data to answer from.",
+          "Bottom line: HSBC is not listed on Bitget \u2014 no perpetual and no spot or rToken market under HSBC among the 804 USDT-futures contracts (live) and 3393 spot symbols (live) checked \u2014 so there is no Bitget data to answer from.",
           "Any contract Bitget lists can be asked about \u2014 e.g. \"how risky is JPM\"; if HSBC trades under another ticker, name the ticker.",
-          "Data: Bitget contract list (805 USDT-futures contracts (live) and 3169 spot symbols (live))."
+          "Data: Bitget contract list (804 USDT-futures contracts (live) and 3393 spot symbols (live))."
         ],
-        "elapsed_ms": 909.9
+        "elapsed_ms": 942.2
       },
       {
         "id": "unl-02",
@@ -314,11 +314,11 @@
         "cause_agrees": true,
         "matched": "is not listed",
         "lines": [
-          "Actionable: Deutsche Bank is not listed on Bitget \u2014 no perpetual and no spot or rToken market under DB or DBK among the 805 USDT-futures contracts (live) and 3169 spot symbols (live) checked \u2014 so there is no Bitget data to answer from.",
+          "Bottom line: Deutsche Bank is not listed on Bitget \u2014 no perpetual and no spot or rToken market under DB or DBK among the 804 USDT-futures contracts (live) and 3393 spot symbols (live) checked \u2014 so there is no Bitget data to answer from.",
           "Any contract Bitget lists can be asked about \u2014 e.g. \"how risky is JPM\"; if Deutsche Bank trades under another ticker, name the ticker.",
-          "Data: Bitget contract list (805 USDT-futures contracts (live) and 3169 spot symbols (live))."
+          "Data: Bitget contract list (804 USDT-futures contracts (live) and 3393 spot symbols (live))."
         ],
-        "elapsed_ms": 549.3
+        "elapsed_ms": 544.0
       },
       {
         "id": "unl-03",
@@ -331,11 +331,11 @@
         "cause_agrees": true,
         "matched": "is not listed",
         "lines": [
-          "Actionable: TotalEnergies is not listed on Bitget \u2014 no perpetual and no spot or rToken market under TTE or TOTAL among the 805 USDT-futures contracts (live) and 3169 spot symbols (live) checked \u2014 so there is no Bitget data to answer from.",
+          "Bottom line: TotalEnergies is not listed on Bitget \u2014 no perpetual and no spot or rToken market under TTE or TOTAL among the 804 USDT-futures contracts (live) and 3393 spot symbols (live) checked \u2014 so there is no Bitget data to answer from.",
           "Any contract Bitget lists can be asked about \u2014 e.g. \"how risky is JPM\"; if TotalEnergies trades under another ticker, name the ticker.",
-          "Data: Bitget contract list (805 USDT-futures contracts (live) and 3169 spot symbols (live))."
+          "Data: Bitget contract list (804 USDT-futures contracts (live) and 3393 spot symbols (live))."
         ],
-        "elapsed_ms": 505.5
+        "elapsed_ms": 484.4
       },
       {
         "id": "unl-04",
@@ -348,11 +348,11 @@
         "cause_agrees": true,
         "matched": "is not listed",
         "lines": [
-          "Actionable: Nestle is not listed on Bitget \u2014 no perpetual and no spot or rToken market under NSRGY or NESN among the 805 USDT-futures contracts (live) and 3169 spot symbols (live) checked \u2014 so there is no Bitget data to answer from.",
+          "Bottom line: Nestle is not listed on Bitget \u2014 no perpetual and no spot or rToken market under NSRGY or NESN among the 804 USDT-futures contracts (live) and 3393 spot symbols (live) checked \u2014 so there is no Bitget data to answer from.",
           "Any contract Bitget lists can be asked about \u2014 e.g. \"how risky is JPM\"; if Nestle trades under another ticker, name the ticker.",
-          "Data: Bitget contract list (805 USDT-futures contracts (live) and 3169 spot symbols (live))."
+          "Data: Bitget contract list (804 USDT-futures contracts (live) and 3393 spot symbols (live))."
         ],
-        "elapsed_ms": 662.5
+        "elapsed_ms": 465.1
       },
       {
         "id": "unl-05",
@@ -365,12 +365,12 @@
         "cause_agrees": true,
         "matched": "is not listed",
         "lines": [
-          "Actionable: Reliance Industries is not listed on Bitget \u2014 no perpetual and no spot or rToken market under RELIANCE or RELI among the 805 USDT-futures contracts (live) and 3169 spot symbols (live) checked \u2014 so there is no Bitget data to answer from.",
+          "Bottom line: Reliance Industries is not listed on Bitget \u2014 no perpetual and no spot or rToken market under RELIANCE or RELI among the 804 USDT-futures contracts (live) and 3393 spot symbols (live) checked \u2014 so there is no Bitget data to answer from.",
           "Reliance Industries is listed in India (NSE: RELIANCE).",
           "Any contract Bitget lists can be asked about \u2014 e.g. \"how risky is JPM\"; if Reliance Industries trades under another ticker, name the ticker.",
-          "Data: Bitget contract list (805 USDT-futures contracts (live) and 3169 spot symbols (live))."
+          "Data: Bitget contract list (804 USDT-futures contracts (live) and 3393 spot symbols (live))."
         ],
-        "elapsed_ms": 514.2
+        "elapsed_ms": 533.0
       },
       {
         "id": "unl-06",
@@ -383,12 +383,12 @@
         "cause_agrees": true,
         "matched": "is not listed",
         "lines": [
-          "Actionable: Saudi Aramco is not listed on Bitget \u2014 no perpetual and no spot or rToken market under ARAMCO or 2222 among the 805 USDT-futures contracts (live) and 3169 spot symbols (live) checked \u2014 so there is no Bitget data to answer from.",
+          "Bottom line: Saudi Aramco is not listed on Bitget \u2014 no perpetual and no spot or rToken market under ARAMCO or 2222 among the 804 USDT-futures contracts (live) and 3393 spot symbols (live) checked \u2014 so there is no Bitget data to answer from.",
           "Saudi Aramco is listed only on the Saudi exchange (Tadawul, 2222).",
           "Any contract Bitget lists can be asked about \u2014 e.g. \"how risky is JPM\"; if Saudi Aramco trades under another ticker, name the ticker.",
-          "Data: Bitget contract list (805 USDT-futures contracts (live) and 3169 spot symbols (live))."
+          "Data: Bitget contract list (804 USDT-futures contracts (live) and 3393 spot symbols (live))."
         ],
-        "elapsed_ms": 556.7
+        "elapsed_ms": 559.8
       },
       {
         "id": "unl-08",
@@ -401,12 +401,12 @@
         "cause_agrees": true,
         "matched": "is not listed",
         "lines": [
-          "Actionable: Stripe is not listed on Bitget \u2014 no perpetual and no spot or rToken market under STRIPE among the 805 USDT-futures contracts (live) and 3169 spot symbols (live) checked \u2014 so there is no Bitget data to answer from.",
+          "Bottom line: Stripe is not listed on Bitget \u2014 no perpetual and no spot or rToken market under STRIPE among the 804 USDT-futures contracts (live) and 3393 spot symbols (live) checked \u2014 so there is no Bitget data to answer from.",
           "Stripe is privately held.",
           "Any contract Bitget lists can be asked about \u2014 e.g. \"how risky is JPM\"; if Stripe trades under another ticker, name the ticker.",
-          "Data: Bitget contract list (805 USDT-futures contracts (live) and 3169 spot symbols (live))."
+          "Data: Bitget contract list (804 USDT-futures contracts (live) and 3393 spot symbols (live))."
         ],
-        "elapsed_ms": 553.3
+        "elapsed_ms": 537.1
       },
       {
         "id": "unl-09",
@@ -451,12 +451,12 @@
         "cause_agrees": true,
         "matched": "is not listed",
         "lines": [
-          "Actionable: Credit Suisse is not listed on Bitget \u2014 no perpetual and no spot or rToken market under CS or CSGN among the 805 USDT-futures contracts (live) and 3169 spot symbols (live) checked \u2014 so there is no Bitget data to answer from.",
+          "Bottom line: Credit Suisse is not listed on Bitget \u2014 no perpetual and no spot or rToken market under CS or CSGN among the 804 USDT-futures contracts (live) and 3393 spot symbols (live) checked \u2014 so there is no Bitget data to answer from.",
           "Credit Suisse is acquired by UBS in June 2023, so its shares no longer trade.",
           "Any contract Bitget lists can be asked about \u2014 e.g. \"how risky is JPM\"; if Credit Suisse trades under another ticker, name the ticker.",
-          "Data: Bitget contract list (805 USDT-futures contracts (live) and 3169 spot symbols (live))."
+          "Data: Bitget contract list (804 USDT-futures contracts (live) and 3393 spot symbols (live))."
         ],
-        "elapsed_ms": 547.8
+        "elapsed_ms": 525.8
       },
       {
         "id": "unl-12",
@@ -469,12 +469,12 @@
         "cause_agrees": true,
         "matched": "is not listed",
         "lines": [
-          "Actionable: Twitter is not listed on Bitget \u2014 no perpetual and no spot or rToken market under TWTR among the 805 USDT-futures contracts (live) and 3169 spot symbols (live) checked \u2014 so there is no Bitget data to answer from.",
+          "Bottom line: Twitter is not listed on Bitget \u2014 no perpetual and no spot or rToken market under TWTR among the 804 USDT-futures contracts (live) and 3393 spot symbols (live) checked \u2014 so there is no Bitget data to answer from.",
           "Twitter is taken private in October 2022 (now X Corp.), so it has no listed shares at all.",
           "Any contract Bitget lists can be asked about \u2014 e.g. \"how risky is JPM\"; if Twitter trades under another ticker, name the ticker.",
-          "Data: Bitget contract list (805 USDT-futures contracts (live) and 3169 spot symbols (live))."
+          "Data: Bitget contract list (804 USDT-futures contracts (live) and 3393 spot symbols (live))."
         ],
-        "elapsed_ms": 539.5
+        "elapsed_ms": 527.2
       },
       {
         "id": "fut-01",
@@ -487,7 +487,7 @@
         "cause_agrees": true,
         "matched": "no one can know",
         "lines": [
-          "Actionable: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for NVDA at that date.",
+          "Bottom line: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for NVDA at that date.",
           "What it can give is the historical range: ask \"what are the odds NVDA is up this week\" for how often it has risen over such a stretch and how far it usually moves, or \"has NVDA been here before\" for what followed similar setups."
         ],
         "elapsed_ms": 0.2
@@ -503,10 +503,10 @@
         "cause_agrees": true,
         "matched": "no one can know",
         "lines": [
-          "Actionable: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for BTC at that date.",
+          "Bottom line: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for BTC at that date.",
           "What it can give is the historical range: ask \"what are the odds BTC is up this week\" for how often it has risen over such a stretch and how far it usually moves, or \"has BTC been here before\" for what followed similar setups."
         ],
-        "elapsed_ms": 0.4
+        "elapsed_ms": 0.3
       },
       {
         "id": "fut-03",
@@ -519,10 +519,10 @@
         "cause_agrees": true,
         "matched": "no one can know",
         "lines": [
-          "Actionable: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for TSLA at that date.",
+          "Bottom line: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for TSLA at that date.",
           "What it can give is the historical range: ask \"what are the odds TSLA is up this week\" for how often it has risen over such a stretch and how far it usually moves, or \"has TSLA been here before\" for what followed similar setups."
         ],
-        "elapsed_ms": 0.2
+        "elapsed_ms": 0.1
       },
       {
         "id": "fut-04",
@@ -535,10 +535,10 @@
         "cause_agrees": true,
         "matched": "no one can know",
         "lines": [
-          "Actionable: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for XAU at that date.",
+          "Bottom line: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for XAU at that date.",
           "What it can give is the historical range: ask \"what are the odds XAU is up this week\" for how often it has risen over such a stretch and how far it usually moves, or \"has XAU been here before\" for what followed similar setups."
         ],
-        "elapsed_ms": 0.2
+        "elapsed_ms": 0.1
       },
       {
         "id": "fut-05",
@@ -551,10 +551,10 @@
         "cause_agrees": true,
         "matched": "no one can know",
         "lines": [
-          "Actionable: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for SP500 at that date.",
+          "Bottom line: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for SP500 at that date.",
           "What it can give is the historical range: ask \"what are the odds SP500 is up this week\" for how often it has risen over such a stretch and how far it usually moves, or \"has SP500 been here before\" for what followed similar setups."
         ],
-        "elapsed_ms": 0.3
+        "elapsed_ms": 0.2
       },
       {
         "id": "fut-06",
@@ -567,7 +567,7 @@
         "cause_agrees": true,
         "matched": "no one can know",
         "lines": [
-          "Actionable: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for MSTR at that date.",
+          "Bottom line: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for MSTR at that date.",
           "What it can give is the historical range: ask \"what are the odds MSTR is up this week\" for how often it has risen over such a stretch and how far it usually moves, or \"has MSTR been here before\" for what followed similar setups."
         ],
         "elapsed_ms": 0.2
@@ -583,7 +583,7 @@
         "cause_agrees": true,
         "matched": "no one can know",
         "lines": [
-          "Actionable: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for ETH at that date.",
+          "Bottom line: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for ETH at that date.",
           "What it can give is the historical range: ask \"what are the odds ETH is up this week\" for how often it has risen over such a stretch and how far it usually moves, or \"has ETH been here before\" for what followed similar setups."
         ],
         "elapsed_ms": 0.2
@@ -599,10 +599,10 @@
         "cause_agrees": true,
         "matched": "no one can know",
         "lines": [
-          "Actionable: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for AAPL at that date.",
+          "Bottom line: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for AAPL at that date.",
           "What it can give is the historical range: ask \"what are the odds AAPL is up this week\" for how often it has risen over such a stretch and how far it usually moves, or \"has AAPL been here before\" for what followed similar setups."
         ],
-        "elapsed_ms": 0.1
+        "elapsed_ms": 0.2
       },
       {
         "id": "fut-09",
@@ -615,10 +615,10 @@
         "cause_agrees": true,
         "matched": "no one can know",
         "lines": [
-          "Actionable: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for BTC at that date.",
+          "Bottom line: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for BTC at that date.",
           "What it can give is the historical range: ask \"what are the odds BTC is up this week\" for how often it has risen over such a stretch and how far it usually moves, or \"has BTC been here before\" for what followed similar setups."
         ],
-        "elapsed_ms": 0.1
+        "elapsed_ms": 0.2
       },
       {
         "id": "fut-10",
@@ -631,10 +631,10 @@
         "cause_agrees": true,
         "matched": "no one can know",
         "lines": [
-          "Actionable: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for SOL at that date.",
+          "Bottom line: no one can know that \u2014 a future price cannot be known, and this console does not forecast prices, so there is no figure for SOL at that date.",
           "What it can give is the historical range: ask \"what are the odds SOL is up this week\" for how often it has risen over such a stretch and how far it usually moves, or \"has SOL been here before\" for what followed similar setups."
         ],
-        "elapsed_ms": 0.2
+        "elapsed_ms": 0.3
       },
       {
         "id": "prv-01",
@@ -647,10 +647,10 @@
         "cause_agrees": true,
         "matched": "cannot see your Bitget account",
         "lines": [
-          "Actionable: this console cannot see your Bitget account \u2014 it holds no key to anyone's account, so nothing was read: no balance, margin, orders, fills or P&L.",
+          "Bottom line: this console cannot see your Bitget account \u2014 it holds no key to anyone's account, so nothing was read: no balance, margin, orders, fills or P&L.",
           "What it can do: state your book in My book (\"I hold 60% NVDA, 40% AAPL\") and it answers risk, stress and hedging for it; or paste your trades (date, symbol, side, size, price) and it reviews them."
         ],
-        "elapsed_ms": 0.1
+        "elapsed_ms": 0.2
       },
       {
         "id": "prv-02",
@@ -663,7 +663,7 @@
         "cause_agrees": true,
         "matched": "cannot see your Bitget account",
         "lines": [
-          "Actionable: this console cannot see your Bitget account \u2014 it holds no key to anyone's account, so nothing was read: no balance, margin, orders, fills or P&L.",
+          "Bottom line: this console cannot see your Bitget account \u2014 it holds no key to anyone's account, so nothing was read: no balance, margin, orders, fills or P&L.",
           "What it can do: state your book in My book (\"I hold 60% NVDA, 40% AAPL\") and it answers risk, stress and hedging for it; or paste your trades (date, symbol, side, size, price) and it reviews them."
         ],
         "elapsed_ms": 0.1
@@ -679,7 +679,7 @@
         "cause_agrees": true,
         "matched": "cannot see your Bitget account",
         "lines": [
-          "Actionable: this console cannot see your Bitget account \u2014 it holds no key to anyone's account, so nothing was read: no balance, margin, orders, fills or P&L.",
+          "Bottom line: this console cannot see your Bitget account \u2014 it holds no key to anyone's account, so nothing was read: no balance, margin, orders, fills or P&L.",
           "What it can do: state your book in My book (\"I hold 60% NVDA, 40% AAPL\") and it answers risk, stress and hedging for it; or paste your trades (date, symbol, side, size, price) and it reviews them."
         ],
         "elapsed_ms": 0.1
@@ -695,10 +695,10 @@
         "cause_agrees": true,
         "matched": "cannot see your Bitget account",
         "lines": [
-          "Actionable: this console cannot see your Bitget account \u2014 it holds no key to anyone's account, so nothing was read: no balance, margin, orders, fills or P&L.",
+          "Bottom line: this console cannot see your Bitget account \u2014 it holds no key to anyone's account, so nothing was read: no balance, margin, orders, fills or P&L.",
           "What it can do: state your book in My book (\"I hold 60% NVDA, 40% AAPL\") and it answers risk, stress and hedging for it; or paste your trades (date, symbol, side, size, price) and it reviews them."
         ],
-        "elapsed_ms": 0.1
+        "elapsed_ms": 0.2
       },
       {
         "id": "prv-05",
@@ -711,10 +711,10 @@
         "cause_agrees": true,
         "matched": "cannot see your Bitget account",
         "lines": [
-          "Actionable: this console cannot see your Bitget account \u2014 it holds no key to anyone's account, so nothing was read: no balance, margin, orders, fills or P&L.",
+          "Bottom line: this console cannot see your Bitget account \u2014 it holds no key to anyone's account, so nothing was read: no balance, margin, orders, fills or P&L.",
           "What it can do: state your book in My book (\"I hold 60% NVDA, 40% AAPL\") and it answers risk, stress and hedging for it; or paste your trades (date, symbol, side, size, price) and it reviews them."
         ],
-        "elapsed_ms": 0.1
+        "elapsed_ms": 0.2
       },
       {
         "id": "prv-06",
@@ -727,10 +727,10 @@
         "cause_agrees": true,
         "matched": "not public",
         "lines": [
-          "Actionable: Other traders' positions are not public \u2014 no one outside the account can see them, and this console has no access to anyone's account.",
+          "Bottom line: Other traders' positions are not public \u2014 no one outside the account can see them, and this console has no access to anyone's account.",
           "What is public: 13F filings (quarterly, filed up to 45 days after the quarter ends) for a named manager's US holdings, and Bitget's aggregate long/short split, which shows how the crowd leans without naming anyone \u2014 ask \"what's the long/short ratio on TSLA\"."
         ],
-        "elapsed_ms": 0.1
+        "elapsed_ms": 0.2
       },
       {
         "id": "prv-07",
@@ -743,7 +743,7 @@
         "cause_agrees": true,
         "matched": "not public",
         "lines": [
-          "Actionable: Citadel's live positions are not public \u2014 no one outside the account can see them, and this console has no access to anyone's account.",
+          "Bottom line: Citadel's live positions are not public \u2014 no one outside the account can see them, and this console has no access to anyone's account.",
           "What is public: 13F filings (quarterly, filed up to 45 days after the quarter ends) for a named manager's US holdings, and Bitget's aggregate long/short split, which shows how the crowd leans without naming anyone \u2014 ask \"what's the long/short ratio on NVDA\"."
         ],
         "elapsed_ms": 0.2
@@ -759,7 +759,7 @@
         "cause_agrees": true,
         "matched": "cannot see your Bitget account",
         "lines": [
-          "Actionable: this console cannot see your Bitget account \u2014 it holds no key to anyone's account, so nothing was read: no balance, margin, orders, fills or P&L.",
+          "Bottom line: this console cannot see your Bitget account \u2014 it holds no key to anyone's account, so nothing was read: no balance, margin, orders, fills or P&L.",
           "What it can do: state your book in My book (\"I hold 60% NVDA, 40% AAPL\") and it answers risk, stress and hedging for it; or paste your trades (date, symbol, side, size, price) and it reviews them."
         ],
         "elapsed_ms": 0.1
@@ -775,7 +775,7 @@
         "cause_agrees": true,
         "matched": "cannot see your Bitget account",
         "lines": [
-          "Actionable: this console cannot see your Bitget account \u2014 it holds no key to anyone's account, so nothing was read: no balance, margin, orders, fills or P&L.",
+          "Bottom line: this console cannot see your Bitget account \u2014 it holds no key to anyone's account, so nothing was read: no balance, margin, orders, fills or P&L.",
           "What it can do: state your book in My book (\"I hold 60% NVDA, 40% AAPL\") and it answers risk, stress and hedging for it; or paste your trades (date, symbol, side, size, price) and it reviews them."
         ],
         "elapsed_ms": 0.1
@@ -791,11 +791,11 @@
         "cause_agrees": true,
         "matched": "record starts",
         "lines": [
-          "Actionable: the desk's record starts on 12 Sep 2026 \u2014 its first decision \u2014 so there are no decisions, calls or P&L before that, and none for 1 Mar 2026.",
-          "What it holds: 707 decisions from 2026-09-12 to 2026-09-25; ask \"what did the desk decide on 2026-09-12\" or \"show me the latest decisions\".",
+          "Bottom line: the desk's record starts on 12 Sep 2026 \u2014 its first decision \u2014 so there are no decisions, calls or P&L before that, and none for 1 Mar 2026.",
+          "What it holds: 836 decisions from 2026-09-12 to 2026-09-28; ask \"what did the desk decide on 2026-09-12\" or \"show me the latest decisions\".",
           "Data: the decision ledger (data/paper_ledger.jsonl), first and last decided_at."
         ],
-        "elapsed_ms": 27.3
+        "elapsed_ms": 30.5
       },
       {
         "id": "bef-02",
@@ -808,11 +808,11 @@
         "cause_agrees": true,
         "matched": "record starts",
         "lines": [
-          "Actionable: the desk's record starts on 12 Sep 2026 \u2014 its first decision \u2014 so there are no decisions, calls or P&L before that, and none for Christmas Eve 2025.",
-          "What it holds: 707 decisions from 2026-09-12 to 2026-09-25; ask \"what did the desk decide on 2026-09-12\" or \"show me the latest decisions\".",
+          "Bottom line: the desk's record starts on 12 Sep 2026 \u2014 its first decision \u2014 so there are no decisions, calls or P&L before that, and none for Christmas Eve 2025.",
+          "What it holds: 836 decisions from 2026-09-12 to 2026-09-28; ask \"what did the desk decide on 2026-09-12\" or \"show me the latest decisions\".",
           "Data: the decision ledger (data/paper_ledger.jsonl), first and last decided_at."
         ],
-        "elapsed_ms": 23.5
+        "elapsed_ms": 29.1
       },
       {
         "id": "bef-03",
@@ -825,11 +825,11 @@
         "cause_agrees": true,
         "matched": "record starts",
         "lines": [
-          "Actionable: the desk's record starts on 12 Sep 2026 \u2014 its first decision \u2014 so there are no decisions, calls or P&L before that, and none for August 2026.",
-          "What it holds: 707 decisions from 2026-09-12 to 2026-09-25; ask \"what did the desk decide on 2026-09-12\" or \"show me the latest decisions\".",
+          "Bottom line: the desk's record starts on 12 Sep 2026 \u2014 its first decision \u2014 so there are no decisions, calls or P&L before that, and none for August 2026.",
+          "What it holds: 836 decisions from 2026-09-12 to 2026-09-28; ask \"what did the desk decide on 2026-09-12\" or \"show me the latest decisions\".",
           "Data: the decision ledger (data/paper_ledger.jsonl), first and last decided_at."
         ],
-        "elapsed_ms": 23.9
+        "elapsed_ms": 21.0
       },
       {
         "id": "bef-04",
@@ -842,11 +842,11 @@
         "cause_agrees": true,
         "matched": "record starts",
         "lines": [
-          "Actionable: the desk's record starts on 12 Sep 2026 \u2014 its first decision \u2014 so there are no decisions, calls or P&L before that, and none for 2025.",
-          "What it holds: 707 decisions from 2026-09-12 to 2026-09-25; ask \"what did the desk decide on 2026-09-12\" or \"show me the latest decisions\".",
+          "Bottom line: the desk's record starts on 12 Sep 2026 \u2014 its first decision \u2014 so there are no decisions, calls or P&L before that, and none for 2025.",
+          "What it holds: 836 decisions from 2026-09-12 to 2026-09-28; ask \"what did the desk decide on 2026-09-12\" or \"show me the latest decisions\".",
           "Data: the decision ledger (data/paper_ledger.jsonl), first and last decided_at."
         ],
-        "elapsed_ms": 24.2
+        "elapsed_ms": 21.8
       },
       {
         "id": "bef-05",
@@ -859,12 +859,12 @@
         "cause_agrees": true,
         "matched": "history starts",
         "lines": [
-          "Actionable: Bitget's NVDAUSDT history starts on 18 Aug 2025 \u2014 its first daily bar \u2014 so the perpetual did not exist in March 2025 and there is no funding rate for it then.",
+          "Bottom line: Bitget's NVDAUSDT history starts on 18 Aug 2025 \u2014 its first daily bar \u2014 so the perpetual did not exist in March 2025 and there is no funding rate for it then.",
           "NVDA (the stock) in March 2025: first close 113.76 (2025-03-03), last 108.11 (2025-03-31); lowest close 106.70 on 2025-03-10, highest 121.36 on 2025-03-14.",
           "Today's quote is not an answer to a past date; ask \"where is NVDA trading right now\" for that.",
           "Data: Bitget NVDAUSDT daily candles (history-candles, 1D); Yahoo Finance daily closes for NVDA, split-adjusted."
         ],
-        "elapsed_ms": 3867.6
+        "elapsed_ms": 4051.4
       },
       {
         "id": "bef-06",
@@ -877,12 +877,12 @@
         "cause_agrees": true,
         "matched": "history starts",
         "lines": [
-          "Actionable: Bitget's COINUSDT history starts on 26 Aug 2025 \u2014 its first daily bar \u2014 so the perpetual did not exist in 2024 and there is no price for it then.",
+          "Bottom line: Bitget's COINUSDT history starts on 26 Aug 2025 \u2014 its first daily bar \u2014 so the perpetual did not exist in 2024 and there is no price for it then.",
           "COIN (the stock) in 2024: first close 156.88 (2024-01-02), last 248.30 (2024-12-31); lowest close 117.30 on 2024-02-05, highest 343.62 on 2024-12-06.",
           "Today's quote is not an answer to a past date; ask \"where is COIN trading right now\" for that.",
           "Data: Bitget COINUSDT daily candles (history-candles, 1D); Yahoo Finance daily closes for COIN, split-adjusted."
         ],
-        "elapsed_ms": 3518.8
+        "elapsed_ms": 3550.9
       },
       {
         "id": "bef-07",
@@ -895,11 +895,11 @@
         "cause_agrees": true,
         "matched": "was not yet listed",
         "lines": [
-          "Actionable: COIN was not yet listed in 2015 \u2014 its daily history starts on 14 Apr 2021, so it has no 2015 price.",
+          "Bottom line: COIN was not yet listed in 2015 \u2014 its daily history starts on 14 Apr 2021, so it has no 2015 price.",
           "Today's quote is not an answer to a past date; ask \"where is COIN trading right now\" for that.",
           "Data: Yahoo Finance daily closes for COIN, split-adjusted."
         ],
-        "elapsed_ms": 0.7
+        "elapsed_ms": 0.6
       },
       {
         "id": "bef-08",
@@ -912,11 +912,11 @@
         "cause_agrees": true,
         "matched": "record starts",
         "lines": [
-          "Actionable: the desk's record starts on 12 Sep 2026 \u2014 its first decision \u2014 so there are no decisions, calls or P&L before that, and none for March 2020.",
-          "What it holds: 707 decisions from 2026-09-12 to 2026-09-25; ask \"what did the desk decide on 2026-09-12\" or \"show me the latest decisions\".",
+          "Bottom line: the desk's record starts on 12 Sep 2026 \u2014 its first decision \u2014 so there are no decisions, calls or P&L before that, and none for March 2020.",
+          "What it holds: 836 decisions from 2026-09-12 to 2026-09-28; ask \"what did the desk decide on 2026-09-12\" or \"show me the latest decisions\".",
           "Data: the decision ledger (data/paper_ledger.jsonl), first and last decided_at."
         ],
-        "elapsed_ms": 23.4
+        "elapsed_ms": 34.2
       },
       {
         "id": "bef-09",
@@ -929,12 +929,12 @@
         "cause_agrees": true,
         "matched": "history starts",
         "lines": [
-          "Actionable: Bitget's MSTRUSDT history starts on 26 Aug 2025 \u2014 its first daily bar \u2014 so the perpetual did not exist in 1 Jun 2025 and there is no price for it then.",
+          "Bottom line: Bitget's MSTRUSDT history starts on 26 Aug 2025 \u2014 its first daily bar \u2014 so the perpetual did not exist in 1 Jun 2025 and there is no price for it then.",
           "MSTR (the stock) closed at 369.06 on 2025-05-30, the last session on or before 1 Jun 2025.",
           "Today's quote is not an answer to a past date; ask \"where is MSTR trading right now\" for that.",
           "Data: Bitget MSTRUSDT daily candles (history-candles, 1D); Yahoo Finance daily closes for MSTR, split-adjusted."
         ],
-        "elapsed_ms": 4688.3
+        "elapsed_ms": 3861.9
       },
       {
         "id": "hor-01",
@@ -947,11 +947,11 @@
         "cause_agrees": true,
         "matched": "has only traded since",
         "lines": [
-          "Actionable: COIN has only traded since 2021-04-14 in the data \u2014 its daily history starts there, 5.4 years ago \u2014 so a 15-year figure does not exist.",
-          "Over the 5.4 years that do exist (2021-04-14 to 2026-09-25): annualised return -9.1% (total -40.6%), max drawdown -90.9%.",
+          "Bottom line: COIN has only traded since 2021-04-14 in the data \u2014 its daily history starts there, 5.5 years ago \u2014 so a 15-year figure does not exist.",
+          "Over the 5.5 years that do exist (2021-04-14 to 2026-09-28): annualised return -9.4% (total -41.6%), max drawdown -90.9%.",
           "Data: Yahoo Finance daily closes for COIN, split-adjusted."
         ],
-        "elapsed_ms": 1.5
+        "elapsed_ms": 2.4
       },
       {
         "id": "hor-02",
@@ -964,11 +964,11 @@
         "cause_agrees": true,
         "matched": "has only traded since",
         "lines": [
-          "Actionable: BTC has only traded since 2019-07-09 in the data \u2014 Bitget's daily history starts there, 7.2 years ago \u2014 so a 25-year figure does not exist.",
-          "Over the 7.2 years that do exist (2019-07-09 to 2026-09-24): max drawdown -76.4% (peak 2021-11-09, trough 2022-11-20).",
+          "Bottom line: BTC has only traded since 2019-07-09 in the data \u2014 Bitget's daily history starts there, 7.2 years ago \u2014 so a 25-year figure does not exist.",
+          "Over the 7.2 years that do exist (2019-07-09 to 2026-09-27): max drawdown -76.4% (peak 2021-11-09, trough 2022-11-20).",
           "Data: Bitget BTCUSDT daily candles (history-candles, 1D)."
         ],
-        "elapsed_ms": 17358.5
+        "elapsed_ms": 17338.5
       },
       {
         "id": "hor-03",
@@ -981,11 +981,11 @@
         "cause_agrees": true,
         "matched": "has only traded since",
         "lines": [
-          "Actionable: TQQQ has only traded since 2010-02-11 in the data \u2014 its daily history starts there, 16.6 years ago \u2014 so a 30-year figure does not exist.",
-          "Over the 16.6 years that do exist (2010-02-11 to 2026-09-25): annualised return +43.1% (total +38694.2%), max drawdown -81.7%.",
+          "Bottom line: TQQQ has only traded since 2010-02-11 in the data \u2014 its daily history starts there, 16.6 years ago \u2014 so a 30-year figure does not exist.",
+          "Over the 16.6 years that do exist (2010-02-11 to 2026-09-28): annualised return +42.8% (total +37446.6%), max drawdown -81.7%.",
           "Data: Yahoo Finance daily closes for TQQQ, split-adjusted."
         ],
-        "elapsed_ms": 602.2
+        "elapsed_ms": 555.0
       },
       {
         "id": "hor-04",
@@ -998,11 +998,11 @@
         "cause_agrees": true,
         "matched": "record spans",
         "lines": [
-          "Actionable: the desk's record spans only 13 days \u2014 it starts on 2026-09-12 \u2014 so 6 months of it do not exist yet, and neither does any comparison across them.",
-          "What it holds: 707 decisions over those 13 days; ask \"what is the sharpe\" or \"are you well calibrated\" for the whole record as it stands.",
+          "Bottom line: the desk's record spans only 16 days \u2014 it starts on 2026-09-12 \u2014 so 6 months of it do not exist yet, and neither does any comparison across them.",
+          "What it holds: 836 decisions over those 16 days; ask \"what is the sharpe\" or \"are you well calibrated\" for the whole record as it stands.",
           "Data: the decision ledger (data/paper_ledger.jsonl), first and last decided_at."
         ],
-        "elapsed_ms": 48.4
+        "elapsed_ms": 31.3
       },
       {
         "id": "hor-05",
@@ -1015,11 +1015,11 @@
         "cause_agrees": true,
         "matched": "has only traded since",
         "lines": [
-          "Actionable: SOL has only traded since 2021-07-22 in the data \u2014 Bitget's daily history starts there, 5.2 years ago \u2014 so a 10-year figure does not exist.",
-          "Over the 5.2 years that do exist (2021-07-22 to 2026-09-24): Sharpe 0.79 (risk-free rate taken as 0%; annualised return +33.5%, volatility 96.5%).",
+          "Bottom line: SOL has only traded since 2021-07-22 in the data \u2014 Bitget's daily history starts there, 5.2 years ago \u2014 so a 10-year figure does not exist.",
+          "Over the 5.2 years that do exist (2021-07-22 to 2026-09-27): Sharpe 0.79 (risk-free rate taken as 0%; annualised return +33.2%, volatility 96.4%).",
           "Data: Bitget SOLUSDT daily candles (history-candles, 1D)."
         ],
-        "elapsed_ms": 12925.8
+        "elapsed_ms": 12602.2
       },
       {
         "id": "hor-06",
@@ -1032,11 +1032,11 @@
         "cause_agrees": true,
         "matched": "has only traded since",
         "lines": [
-          "Actionable: PLTR has only traded since 2020-09-30 in the data \u2014 its daily history starts there, 6.0 years ago \u2014 so a 20-year figure does not exist.",
-          "Over the 6.0 years that do exist (2020-09-30 to 2026-09-25): beta to QQQ 1.59 on 1503 daily returns.",
+          "Bottom line: PLTR has only traded since 2020-09-30 in the data \u2014 its daily history starts there, 6.0 years ago \u2014 so a 20-year figure does not exist.",
+          "Over the 6.0 years that do exist (2020-09-30 to 2026-09-28): beta to QQQ 1.59 on 1504 daily returns.",
           "Data: Yahoo Finance daily closes for PLTR, split-adjusted; Yahoo Finance daily closes for QQQ, split-adjusted."
         ],
-        "elapsed_ms": 1012.2
+        "elapsed_ms": 1700.8
       },
       {
         "id": "hor-07",
@@ -1049,11 +1049,11 @@
         "cause_agrees": true,
         "matched": "record spans",
         "lines": [
-          "Actionable: the desk's record spans only 13 days \u2014 it starts on 2026-09-12 \u2014 so 2 years of it do not exist yet, and neither does any comparison across them.",
-          "What it holds: 707 decisions over those 13 days; ask \"what is the sharpe\" or \"are you well calibrated\" for the whole record as it stands.",
+          "Bottom line: the desk's record spans only 16 days \u2014 it starts on 2026-09-12 \u2014 so 2 years of it do not exist yet, and neither does any comparison across them.",
+          "What it holds: 836 decisions over those 16 days; ask \"what is the sharpe\" or \"are you well calibrated\" for the whole record as it stands.",
           "Data: the decision ledger (data/paper_ledger.jsonl), first and last decided_at."
         ],
-        "elapsed_ms": 39.4
+        "elapsed_ms": 22.4
       },
       {
         "id": "hor-08",
@@ -1066,11 +1066,11 @@
         "cause_agrees": true,
         "matched": "has only traded since",
         "lines": [
-          "Actionable: ETH has only traded since 2019-08-09 in the data \u2014 Bitget's daily history starts there, 7.1 years ago \u2014 so a 15-year figure does not exist.",
-          "Over the 7.1 years that do exist (2019-08-09 to 2026-09-24): annualised return +43.4% (total +1207.4%), max drawdown -79.6%.",
+          "Bottom line: ETH has only traded since 2019-08-09 in the data \u2014 Bitget's daily history starts there, 7.1 years ago \u2014 so a 15-year figure does not exist.",
+          "Over the 7.1 years that do exist (2019-08-09 to 2026-09-27): annualised return +43.3% (total +1202.7%), max drawdown -79.6%.",
           "Data: Bitget ETHUSDT daily candles (history-candles, 1D)."
         ],
-        "elapsed_ms": 16982.0
+        "elapsed_ms": 16852.8
       },
       {
         "id": "hor-09",
@@ -1083,11 +1083,11 @@
         "cause_agrees": true,
         "matched": "has only traded since",
         "lines": [
-          "Actionable: CRCL has only traded since 2025-06-05 in the data \u2014 its daily history starts there, 1.3 years ago \u2014 so a 5-year figure does not exist.",
-          "Over the 1.3 years that do exist (2025-06-05 to 2026-09-25): annualised volatility 110.6%.",
+          "Bottom line: CRCL has only traded since 2025-06-05 in the data \u2014 its daily history starts there, 1.3 years ago \u2014 so a 5-year figure does not exist.",
+          "Over the 1.3 years that do exist (2025-06-05 to 2026-09-28): annualised volatility 110.5%.",
           "Data: Yahoo Finance daily closes for CRCL, split-adjusted."
         ],
-        "elapsed_ms": 364.0
+        "elapsed_ms": 346.4
       },
       {
         "id": "hor-10",
@@ -1100,11 +1100,11 @@
         "cause_agrees": true,
         "matched": "has only existed since",
         "lines": [
-          "Actionable: the NVDAUSDT perpetual has only existed since 2025-08-18 \u2014 its history starts there, 1.1 years ago \u2014 so a 2-year funding history does not exist.",
+          "Bottom line: the NVDAUSDT perpetual has only existed since 2025-08-18 \u2014 its history starts there, 1.1 years ago \u2014 so a 2-year funding history does not exist.",
           "Ask \"what's the funding on NVDA\" for the current rate and what it costs to hold.",
           "Data: Bitget NVDAUSDT daily candles (history-candles, 1D)."
         ],
-        "elapsed_ms": 3346.3
+        "elapsed_ms": 3271.6
       },
       {
         "id": "amb-01",
@@ -1120,7 +1120,7 @@
           "\"that\" has nothing to refer to yet \u2014 name a symbol or a decision number",
           "Name a symbol or a decision number."
         ],
-        "elapsed_ms": 0.1
+        "elapsed_ms": 0.2
       },
       {
         "id": "amb-02",
@@ -1152,7 +1152,7 @@
           "\"that\" has nothing to refer to yet \u2014 name a symbol or a decision number",
           "Name a symbol or a decision number."
         ],
-        "elapsed_ms": 0.1
+        "elapsed_ms": 0.2
       },
       {
         "id": "amb-04",
@@ -1165,7 +1165,7 @@
         "cause_agrees": true,
         "matched": "which one",
         "lines": [
-          "Actionable: which one? \"this stock\" names no instrument, and there is no earlier question for it to refer to \u2014 so nothing was looked up.",
+          "Bottom line: which one? \"this stock\" names no instrument, and there is no earlier question for it to refer to \u2014 so nothing was looked up.",
           "Name the ticker \u2014 e.g. \"how risky is NVDA?\" \u2014 or ask about two by name: \"is TSLA riskier than NVDA\"."
         ],
         "elapsed_ms": 0.1
@@ -1197,10 +1197,10 @@
         "cause_agrees": true,
         "matched": "which one",
         "lines": [
-          "Actionable: which one? \"the perp\" names no instrument, and there is no earlier question for it to refer to \u2014 so nothing was looked up.",
+          "Bottom line: which one? \"the perp\" names no instrument, and there is no earlier question for it to refer to \u2014 so nothing was looked up.",
           "Name the ticker \u2014 e.g. \"how risky is NVDA?\" \u2014 or ask about two by name: \"is TSLA riskier than NVDA\"."
         ],
-        "elapsed_ms": 0.1
+        "elapsed_ms": 0.2
       },
       {
         "id": "amb-07",
@@ -1213,7 +1213,7 @@
         "cause_agrees": true,
         "matched": "which one",
         "lines": [
-          "Actionable: which one? \"the chip stock\" names no instrument, and there is no earlier question for it to refer to \u2014 so nothing was looked up.",
+          "Bottom line: which one? \"the chip stock\" names no instrument, and there is no earlier question for it to refer to \u2014 so nothing was looked up.",
           "Name the ticker \u2014 e.g. \"how risky is NVDA?\" \u2014 or ask about two by name: \"is TSLA riskier than NVDA\"."
         ],
         "elapsed_ms": 0.1
@@ -1229,7 +1229,7 @@
         "cause_agrees": true,
         "matched": "which one",
         "lines": [
-          "Actionable: which one? \"Micro\" could mean more than one listed name \u2014 MSFT, MSTR, MU \u2014 so nothing was looked up.",
+          "Bottom line: which one? \"Micro\" could mean more than one listed name \u2014 MSFT, MSTR, MU \u2014 so nothing was looked up.",
           "Name the ticker: e.g. \"how is MSFT doing today\"."
         ],
         "elapsed_ms": 0.2
@@ -1245,7 +1245,7 @@
         "cause_agrees": true,
         "matched": "\u54ea\u4e00",
         "lines": [
-          "Actionable: \u54ea\u4e00\u4e2a\uff1f\u95ee\u9898\u91cc\u6ca1\u6709\u70b9\u540d\u4efb\u4f55\u6807\u7684\uff0c\u4e5f\u6ca1\u6709\u4e4b\u524d\u7684\u95ee\u9898\u53ef\u4ee5\u6307\u4ee3 \u2014 which one: no instrument was named and there is no earlier question to refer to.",
+          "Bottom line: \u54ea\u4e00\u4e2a\uff1f\u95ee\u9898\u91cc\u6ca1\u6709\u70b9\u540d\u4efb\u4f55\u6807\u7684\uff0c\u4e5f\u6ca1\u6709\u4e4b\u524d\u7684\u95ee\u9898\u53ef\u4ee5\u6307\u4ee3 \u2014 which one: no instrument was named and there is no earlier question to refer to.",
           "\u8bf7\u5e26\u4e0a\u4ee3\u7801\u6216\u540d\u79f0\uff0c\u4f8b\u5982\uff1a\"\u82f1\u4f1f\u8fbe\u6280\u672f\u9762\u600e\u4e48\u6837\" \u6216 \"is NVDA overbought\"\u3002"
         ],
         "elapsed_ms": 0.1
@@ -1261,10 +1261,10 @@
         "cause_agrees": true,
         "matched": "which one",
         "lines": [
-          "Actionable: which one? \"which of the two\" names no instrument, and there is no earlier question for it to refer to \u2014 so nothing was looked up.",
+          "Bottom line: which one? \"which of the two\" names no instrument, and there is no earlier question for it to refer to \u2014 so nothing was looked up.",
           "Name the ticker \u2014 e.g. \"how risky is NVDA?\" \u2014 or ask about two by name: \"is TSLA riskier than NVDA\"."
         ],
-        "elapsed_ms": 0.1
+        "elapsed_ms": 0.2
       },
       {
         "id": "rec-01",
@@ -1333,7 +1333,7 @@
           "The log holds 684 abstention(s) and 0 settled trade(s) over 14 day(s). Sharpe, win rate and drawdown need trades; abstentions are scored separately, by abstention value.",
           "Net PnL 0 on stated capital 10000."
         ],
-        "elapsed_ms": 14.6
+        "elapsed_ms": 20.0
       }
     ]
   },
@@ -1342,12 +1342,12 @@
     "false_positives": 0,
     "hits": [],
     "refuse_rows": 147,
-    "refuse_rows_detected": 32,
+    "refuse_rows_detected": 34,
     "refuse_detected_by_cause": {
-      "order_prefix": 20,
+      "order_prefix": 22,
       "future_price": 12
     },
-    "detection_ms_total": 405.7
+    "detection_ms_total": 357.6
   },
   "call_site": "argus.lui.server._answer, directly after the multistep block (the `if split is not None:` return) and before `followed = follow_up(text, prior, book)`: `honest = honesty.honest_answer(text, prior=prior, book=book)`; when not None, `return engine_payload(honest[1], [], {'cause': honest[0]}, by='honesty')`. order_prefix: in _answer, compute `prefix = honesty.order_prefix(text)` once at the top; wherever a payload is returned (the research payload included), insert it at lines[0] when not None."
 }

@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-24T13:08:41.380299+00:00",
+ "generated_at": "2026-09-29T01:32:41.780457+00:00",
  "protocol": {
   "horizon": 5,
   "coverage": 0.8,
@@ -254,6 +254,41 @@
    "p": 0.0105,
    "dates": 38,
    "paired_queries": 2690
+  },
+  "argusShape vs analogConformal": {
+   "mean_diff_pct": 1.143,
+   "t": 3.054,
+   "p": 0.0023,
+   "dates": 38,
+   "paired_queries": 2698
+  },
+  "argusShape vs analogRaw": {
+   "mean_diff_pct": 0.551,
+   "t": 0.968,
+   "p": 0.3332,
+   "dates": 38,
+   "paired_queries": 2698
+  },
+  "argusShape vs uncondNamePIT": {
+   "mean_diff_pct": 1.255,
+   "t": 3.282,
+   "p": 0.001,
+   "dates": 38,
+   "paired_queries": 2698
+  },
+  "argusShape vs volHarness": {
+   "mean_diff_pct": 1.23,
+   "t": 3.367,
+   "p": 0.0008,
+   "dates": 38,
+   "paired_queries": 2698
+  },
+  "argusShape vs pooledUncond": {
+   "mean_diff_pct": -0.367,
+   "t": -0.73,
+   "p": 0.4653,
+   "dates": 38,
+   "paired_queries": 2698
   },
   "argusRegimeBlend50 vs analogConformal": {
    "mean_diff_pct": -0.388,

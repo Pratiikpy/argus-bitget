@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import math
 import re
+from collections.abc import Mapping, Sequence
 from dataclasses import replace
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
@@ -92,6 +93,7 @@ from argus.lui.research.macro import (
 )
 from argus.lui.research.news import (
     _news,
+    tone_asked,
 )
 from argus.lui.research.parse import (
     _ROUND_TRIP,
@@ -101,11 +103,14 @@ from argus.lui.research.parse import (
     _VAR,
     _WEEKEND_GAP_Q,
     CRYPTO_ETF_QUESTION,
+    DARK_POOL_Q,
     HEDGE_BOOK_VALUE,
     IMPLIED_OPEN_QUESTION,
     LONG_SHORT_QUESTION,
     OPEN_INTEREST_QUESTION,
+    OPTIONS_POSITIONING_Q,
     PRICE_AT,
+    SHORT_FLOW_Q,
     _idea_request,
     _mandate_lines,
     daily_technicals_asked,
@@ -201,7 +206,8 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
                 # asked.
                 answer.lines[0:0] = lines
                 answer.sources.extend(sources)
-            scoped = _scope_lead(raw_text, symbol)
+            scoped, scoped_sources = _scope_lead(raw_text, symbol, answer.lines)
+            answer.sources.extend(scoped_sources)
             if scoped:
                 answer.lines[:] = [*scoped, *(re.sub(r"^(?:Actionable|Bottom line)(?: "
                                                      r"\(\w+\))?:\s*(\w)",
@@ -251,6 +257,31 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
         answer.data["coverage"] = reached.as_dict()
         _honest_data_line(answer, reached)
     return answer
+
+
+BETA_TIE = 0.05
+"""Two session betas closer than this are said as the same market risk: an hourly beta over 30
+days carries a standard error of several hundredths, so a gap inside it names no winner."""
+
+
+def _compare_lead(rows: Sequence[Mapping[str, Any]]) -> str:
+    """Which of the compared names carries the most market risk per dollar, and which swings the
+    most on its own. Betas inside :data:`BETA_TIE` of each other are said as the same: 0.79 against
+    0.78 named gold the riskier of gold and bitcoin (stranger QA, 2026-09-29)."""
+    by_beta = sorted(rows, key=lambda r: -abs(r["beta_open"] or 0))
+    riskiest, second = by_beta[0], by_beta[1]
+    wildest = max(rows, key=lambda r: r["realised_vol"] or 0.0)
+    if abs(riskiest["beta_open"] or 0) - abs(second["beta_open"] or 0) < BETA_TIE:
+        lead = (f"Bottom line: {_t(riskiest['symbol'])} and {_t(second['symbol'])} carry about "
+                f"the same market risk per dollar (beta {riskiest['beta_open'] or 0:.2f} and "
+                f"{second['beta_open'] or 0:.2f})")
+    else:
+        lead = (f"Bottom line: {_t(riskiest['symbol'])} carries the most market risk per dollar "
+                f"of the {len(rows)}")
+    if wildest["symbol"] != riskiest["symbol"]:
+        lead += (f", but {_t(wildest['symbol'])} swings the most on its own — most of its risk is "
+                 f"its own news, which a QQQ hedge will not touch")
+    return lead
 
 
 _INTO_EARNINGS = re.compile(r"\b(?:into|over|through|across|before|ahead\s+of)\s+(?:its\s+|the\s+|"
@@ -318,8 +349,8 @@ def _earnings_night_lines(symbol: str, weight: float | None) -> list[str]:
 def _honest_data_line(answer: Answer, reached: Any) -> None:
     """Rewrite a "Data:" line that credits a server which did not answer this time.
 
-    Each kind names its sources up front ("Data: Bitget's bitget-mcp-server (US equity data) and
-    the company's SEC filings, live"), which is true when the server answers. On 2026-09-25 it
+    Each kind names its sources up front ("Data: Bitget's bitget-mcp-server (US equity data), Yahoo
+    Finance and SEC EDGAR, live"), which is true when the server answers. On 2026-09-25 it
     answered 503 on every tool for hours, the figures came from SEC filings and Yahoo Finance,
     and the line still credited it — false provenance in a product whose point is that every
     number names its source (readiness audit, finding 32). The rewritten line names what did
@@ -461,6 +492,37 @@ def _agent_hub_lines(symbol: str, request: ResearchRequest, plan: Any,
         return []
 
 
+def _positioning_lead(found: list[str], raw_text: str, symbol: str) -> list[str]:
+    """Lead a sentiment answer with the listed-market line the question asked for — the options
+    chain, dark pools or short volume (`lui/research/positioning.py`) — or say it is missing.
+
+    "show me dark pool activity for TSLA" reached the desk's track record, and once routed here
+    the dark-pool line sat five lines under a funding verdict (stranger QA, 2026-09-29)."""
+    from argus.market.bitget import ANCHOR_OF
+
+    ticker = ANCHOR_OF.get(symbol, _t(symbol))
+    for pattern, prefix, what in (
+            (DARK_POOL_Q, "Dark pools (FINRA", "off-exchange (FINRA ATS) volume"),
+            (SHORT_FLOW_Q, "Short volume (FINRA", "FINRA's daily short volume"),
+            (OPTIONS_POSITIONING_Q, f"Options on {ticker} (Cboe", "Cboe's listed options chain")):
+        if not pattern.search(raw_text):
+            continue
+        led = _lead_with(found, prefix)
+        if led is not found:
+            if pattern is SHORT_FLOW_Q and re.search(r"\bshort\s+interest\b", raw_text, re.I):
+                # the figure read is the daily flow; the stock of open shorts is not read
+                led.insert(1, "Short interest itself — FINRA's twice-monthly count of shares "
+                              "held short — is not read here; the daily short-sale volume above "
+                              "is the flow, not the stock of shorts.")
+            return led
+        reason = ("it is read only for the US-listed underlying of a Bitget stock perpetual"
+                  if symbol not in ANCHOR_OF else "the source did not answer just now")
+        what = what[0].upper() + what[1:]
+        return [f"Bottom line: {what} was not read for {_t(symbol)} — {reason}; the "
+                f"positioning that was read follows.", *(unlead(line) for line in found)]
+    return found
+
+
 def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answer:
     """Answer a research request from the desk's engines. Refuses by name rather than guessing."""
     question = _question(raw_text, request)
@@ -508,6 +570,8 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             # "open interest on ETH futures" opened on the sentiment summary with the open
             # interest four lines down (live, 2026-09-25): the figure asked for leads.
             found = _lead_with(found, "Open interest:")
+        if request.kind is ResearchKind.SENTIMENT and request.symbols:
+            found = _positioning_lead(found, raw_text, request.symbols[0])
         if (request.kind is ResearchKind.MACRO and request.symbols
                 and any("standing for it" in note for note in request.notes)):
             # "how does that affect crypto" after a Fed question: the name's own sensitivity to
@@ -756,7 +820,8 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                                      "liquidation odds cannot be measured. Try again shortly."])
 
         elif request.kind is ResearchKind.NEWS:
-            lines, extra, news_payload = _news(request.symbols[0], is_open)
+            lines, extra, news_payload = _news(request.symbols[0], is_open,
+                                               tone=tone_asked(raw_text))
             sources.extend(extra)
             payload["news"] = news_payload
 
@@ -1001,17 +1066,7 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                         "in the open session")
                 lines.insert(0, f"{a.removesuffix('USDT')} and {b.removesuffix('USDT')} move "
                                 f"together at {rho:+.2f} {when} — {read}.")
-            riskiest = max(rows, key=lambda r: abs(r["beta_open"] or 0))
-            wildest = max(rows, key=lambda r: r["realised_vol"] or 0.0)
-            actionable = (
-                f"Bottom line: {_t(riskiest['symbol'])} carries the most market risk per dollar of "
-                f"the {len(rows)}"
-            )
-            if wildest["symbol"] != riskiest["symbol"]:
-                actionable += (
-                    f", but {_t(wildest['symbol'])} swings the most on its own — most of its risk "
-                    f"is its own news, which a QQQ hedge will not touch"
-                )
+            actionable = _compare_lead(rows)
             lines.insert(1, actionable + ". Listed from most to least volatile.")
             if re.search(r"\bcorrelat\w*|\bmove\s+together\b|\bco-?move", raw_text, re.I):
                 # "How correlated is LINK to BTC" led on which is riskier; the figure asked

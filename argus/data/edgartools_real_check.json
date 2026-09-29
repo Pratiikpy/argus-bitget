@@ -1,0 +1,42 @@
+{
+ "generated_by": "scripts/pit_runners/edgartools_real_runner.py + ad hoc scorer under argus's own venv (scripts/pit_runners/edgartools_real_scorer.py)",
+ "edgartools_version": "5.59.1",
+ "method": "real pip-installed edgartools: EntityFactsParser.parse_company_facts -> TTMCalculator(facts).quarterize() -> detect_fiscal_year_end + calculate_fiscal_year_for_label -> pair_by_label (fiscal_year - 1, same fiscal_period), first eight labelled changes, population-std SUE",
+ "offline_or_live": "offline: EntityFactsParser.parse_company_facts fed the frozen companyfacts snapshot directly, no network access",
+ "companyfacts_source": "general_sue_frames_snapshot_companyfacts.json",
+ "filers_scored": 309,
+ "correct_counts": {
+  "real_edgartools_package": 279,
+  "argus_rebuild_edgartools_fiscal": 279,
+  "argus_dated_after": 299
+ },
+ "real_vs_rebuild": {
+  "filers": 309,
+  "both_correct": 279,
+  "only_real_correct": 0,
+  "only_rebuild_correct": 0,
+  "neither_correct": 30,
+  "per_filer_verdicts_agree": 309,
+  "per_filer_verdicts_disagree": 0,
+  "mcnemar_exact": {
+   "discordant": 0,
+   "p": 1.0,
+   "log10_p": 0.0
+  }
+ },
+ "real_vs_argus_dated_after": {
+  "filers": 309,
+  "both_correct": 278,
+  "only_real_correct": 1,
+  "only_argus_correct": 21,
+  "neither_correct": 9,
+  "difference_in_correct_share": -0.06472491909385113,
+  "mcnemar_exact": {
+   "discordant": 22,
+   "p": 1.0967254638671872e-05,
+   "log10_p": -4.959902072926012
+  }
+ },
+ "disagreements_with_rebuild": [],
+ "sue_value_mismatches_on_agreeing_verdicts": []
+}

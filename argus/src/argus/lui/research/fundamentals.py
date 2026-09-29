@@ -44,6 +44,8 @@ from argus.lui.research.parse import (
     ADD_VERB,
     CRYPTO_ETF_QUESTION,
     OPEN_INTEREST_QUESTION,
+    OWNERSHIP_Q,
+    POSITIONING_Q,
     PRICE_AT,
     daily_technicals_asked,
     hold_cost_question,
@@ -114,10 +116,9 @@ def _lead_with_what_was_asked(lines: list[str], question: str) -> list[str]:
     """Put the line that answers the question first. "What are analysts' price targets for AAPL?"
     used to lead with the earnings date; the target line was fifth."""
     focus = (r"Analyst price targets" if re.search(r"\btarget|analyst|rating", question, re.I)
-             else r"^Institutions:|Institutional holders" if re.search(
-                 r"\b13f|institution|holders?|who\s+owns|"
-                                                        r"funds?\s+(?:bought|own|hold)",
-                                                        question, re.I)
+             else r"^Institutions:|Institutional holders" if (
+                 OWNERSHIP_Q.search(question)
+                 or re.search(r"\b13f|institution|holders?", question, re.I))
              else r"Earnings surprise" if re.search(r"\bsurprise|beat|miss", question, re.I)
              else None)
     if focus is None:
@@ -126,12 +127,27 @@ def _lead_with_what_was_asked(lines: list[str], question: str) -> list[str]:
                                                          or _EARNINGS_CALL.search(question)
                                                          or _LINE_ITEM.search(question)):
         return lines  # the ownership-flow answer already leads with what was asked
+    if lines and LEAD.match(lines[0]) and any(re.match(pattern.lstrip("^"), unlead(lines[0]))
+                                              for pattern in focus.split("|")):
+        # `_fundamentals_focus` already led with it, its companions under it ("who owns NVDA":
+        # the 5% holders second); re-leading here dropped them and lower-cased "Institutions"
+        # (stranger QA, 2026-09-29).
+        return lines
     # Alternatives in order of preference: the institutional summary before one 13F sample.
     hit = next((i for pattern in focus.split("|") for i, line in enumerate(lines)
                 if re.search(pattern, line)), None)
     if hit is None:
         return lines
     chosen = lines[hit]
+    counts = re.search(r"\((\d+) firms[^)]*\).*?(\d+) buy, (\d+) hold, (\d+) sell", chosen)
+    if counts and _RATING_COUNT_Q.search(question):
+        # "How many analysts rate NVDA a buy" found its count mid-sentence (stranger QA,
+        # 2026-09-29); the count leads and the target line follows as it was.
+        firms, buy, hold, sell = counts.groups()
+        rest = [unlead(line) for line in lines]
+        return [f"Bottom line: {buy} of the {firms} firms with a price target in the last "
+                f"{PRICE_TARGET_WINDOW_DAYS} days rate it a buy, {hold} hold and {sell} sell.",
+                *rest]
     # One lead line: the answer's own "Bottom line:" steps down behind the one asked for.
     rest = [unlead(line)
             for i, line in enumerate(lines) if i != hit]
@@ -329,10 +345,14 @@ def pattern_reading_wins(request: ResearchRequest | None, text: str) -> bool:
         # date (a judge-style pass, 2026-09-25). A stated add of a stated size has one engine.
         return True
     if request.kind is ResearchKind.SENTIMENT:
-        return bool(_HYPE.search(text) or (OPEN_INTEREST_QUESTION.search(text)
-                                           and not _QUOTE.search(text)))
+        # Listed positioning (options chain, dark pools, short volume) is read only by the
+        # sentiment answer; the kind model sent "which funds own TSLA" to a comparison and dark
+        # pools to the desk's record (stranger QA, 2026-09-29).
+        return bool(_HYPE.search(text) or POSITIONING_Q.search(text)
+                    or (OPEN_INTEREST_QUESTION.search(text) and not _QUOTE.search(text)))
     return request.kind is ResearchKind.FUNDAMENTALS and bool(
-        _FLOW.search(text) or _EARNINGS_CALL.search(text) or _LINE_ITEM.search(text)
+        _FLOW.search(text) or OWNERSHIP_Q.search(text) or _EARNINGS_CALL.search(text)
+        or _LINE_ITEM.search(text)
         or _VALUE_WORDS.search(text)
         or re.search(r"\b(?:dividends?|balance\s+sheet|(?:over|under)[\s-]?valued)\b", text, re.I))
 
@@ -648,9 +668,19 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
 
             pending["fund_holdings"] = pool.submit(
                 lambda: EstimatesSource().summary(ticker, "topHoldings"))
+            # A fund files NPORT-P, N-CSR and the like, never a 10-Q: the company path found no
+            # filings for QQQ at all (perception comparison, 2026-09-29).
+            pending["fund_filings"] = pool.submit(
+                lambda: EdgarSource().fund_filings(
+                    ticker, since=datetime.now(UTC) - timedelta(days=400), limit=60))
         pending["filings"] = pool.submit(
             lambda: EdgarSource().filings(ticker, since=datetime.now(UTC) - timedelta(days=400),
                                           limit=60))
+        if _SECTOR_Q.search(raw_text):
+            # "Is AAPL's P/E high for its sector" had no benchmark (stranger QA, 2026-09-29).
+            from argus.lui.research.sector import sector_valuation
+
+            pending["sector"] = pool.submit(sector_valuation, ticker)
 
     def safe(name: str) -> Any:
         try:
@@ -827,6 +857,24 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
             lines.append(f"Latest SEC filings: {'; '.join(shown)}.")
             sources.append(Source(kind="venue", ref="SEC EDGAR submissions",
                                   detail=f"{ticker} 10-Q, 10-K and 8-K, last 400 days"))
+    fund_filed = safe("fund_filings")
+    if isinstance(fund_filed, tuple) and len(fund_filed) == 3 and fund_filed[2]:
+        from argus.market.evidence import FUND_FORMS
+
+        filer, series, reports = fund_filed
+        by_report: dict[str, Any] = {}
+        for f in sorted(reports, key=lambda f: f.filed, reverse=True):
+            by_report.setdefault(f.form, f)
+        shown = [f"{form} ({FUND_FORMS[form]}) filed {f.filed:%d %b %Y}"
+                 for form, f in by_report.items()][:4]
+        # EDGAR spells filers in capitals; "INVESCO QQQ TRUST" reads as "Invesco QQQ Trust".
+        name = " ".join(w if w == ticker else w.title() for w in filer.split())
+        shared = (f"; {name} files these once for all {series} of its funds, so they are not "
+                  f"{ticker}'s alone" if series > 1 else f"; filed by {name}")
+        lines.append(f"Latest SEC filings: {'; '.join(shown)}{shared}.")
+        sources.append(Source(kind="venue", ref="SEC EDGAR submissions",
+                              detail=f"{ticker} fund reports ({', '.join(by_report)}), "
+                                     "last 400 days"))
     if ratio_row is not None:
         parts = [(label, ratio_row.get(key)) for label, key in (
             ("P/E (trailing 12m)", "pe_ttm_ed"), ("P/S (trailing 12m)", "ps_ttm_ed"),
@@ -840,6 +888,10 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
             lines.append(f"Valuation on {ratio_row.get('period_ending')}: {', '.join(shown)}.")
             sources.append(Source(kind="venue", ref="bitget-mcp-server equity_fundamental_ratios",
                                   detail=f"{ticker} {ratio_row.get('period_ending')}"))
+    against_sector = safe("sector")
+    if isinstance(against_sector, tuple):
+        lines.append(against_sector[0])
+        sources.append(against_sector[1])
     positions = safe("equity_ownership_inst_position_summary")
     flow_lines: list[str] = []
     if _LINE_ITEM.search(raw_text) and not _EARNINGS_CALL.search(raw_text):
@@ -880,6 +932,12 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
             sources.append(Source(kind="venue",
                                   ref="bitget-mcp-server equity_ownership_major_holders",
                                   detail=f"{ticker} 5% holders disclosed as of {newest}"))
+    if any(line.startswith(("Institutions:", "Largest disclosed holders")) for line in lines):
+        # The 13F feed is a sample (for NVDA and QQQ on 2026-09-29, one filer holding a few
+        # thousand shares); beside the holder count and the 5% holders it only misleads.
+        lines[:] = [line for line in lines
+                    if not line.startswith("Institutional holders: the source returned")]
+        sources[:] = [s for s in sources if s.ref != "bitget-mcp-server 13F holdings"]
     profile = safe("equity_profile")
     row = profile[0] if isinstance(profile, list) and profile else None
     if isinstance(row, dict) and row.get("legal_name") and str(row.get("symbol")) == ticker:
@@ -922,17 +980,36 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
     return _fundamentals_focus(lines, raw_text, ticker), sources
 
 
+_SECTOR_Q = re.compile(r"\b(?:sector|industry|peers?|compared?\s+(?:to|with)\s+(?:its|the)\s+"
+                       r"(?:sector|industry|peers|group))\b", re.I)
+"""A valuation question asked against the stock's sector or peers."""
+
+_PAYS_Q = re.compile(r"\b(?:does|do|did|is)\b[^?.]{0,30}\bpay(?:s|ing)?\b[^?.]{0,12}"
+                     r"\bdividends?\b|\bpays?\s+a\s+dividend\b", re.I)
+"""A yes-or-no dividend question ("does KO pay a dividend"): the answer says yes or no first."""
+
+_RATING_COUNT_Q = re.compile(r"\bhow\s+many\s+analysts\b|\b(?:buy|sell|hold)\s+ratings?\b|"
+                             r"\brate[sd]?\b[^?.]{0,25}\b(?:a\s+)?(?:buy|sell|hold)\b", re.I)
+"""A question for the count of analysts on each side: the count leads, not the target median."""
+
+
 _FOCUS: tuple[tuple[re.Pattern[str], tuple[str, ...], str], ...] = (
+    (_SECTOR_Q, ("Against its sector",), "sector valuation"),
     (re.compile(r"\bdividends?|payout\b", re.I), ("Valuation on", "Ex-dividend", "Dividend"),
      "dividend"),
     (re.compile(r"\bbalance\s+sheet|\bbitcoin|\bbtc\b|\btreasury\b", re.I),
      ("holds", "bitcoin"), "bitcoin holding"),
     (re.compile(r"\b(?:expensive|cheap|pricey|valuation|(?:over|under)[\s-]?valued|p/?e\b|"
                 r"p/?b\b|ev/?ebitda|multiple)", re.I), ("Valuation on",), "valuation"),
-    (re.compile(r"\b(?:institution\w*|who\s+owns|holders?|13f)\b", re.I),
+    # "What does QQQ hold" asks for a fund's portfolio (or a company's bitcoin), not its owners.
+    (re.compile(r"\bwhat\s+does\s+\S+\s+hold\b|\bholdings\b|\bconstituents\b|\btop\s+positions\b",
+                re.I), ("Fund holdings", "holds"), "holdings"),
+    (re.compile(r"\b(?:institution\w*|who\s+owns|holders?|13f)\b|" + OWNERSHIP_Q.pattern, re.I),
      ("Institutions:", "Institutional holders", "Largest disclosed holders"),
      "institutional holders"),
     (re.compile(r"\binsiders?\b|form\s+4", re.I), ("Insider filings",), "insider filings"),
+    (re.compile(r"\b(?:sec\s+)?filings?\b|\b10-?[kq]s?\b|\b8-?ks?\b|\bn-?port\b|\bn-csrs?\b",
+                re.I), ("Latest SEC filings",), "SEC filing"),
 )
 """What the question asked for, and the line that answers it. The fundamentals engine gathers the
 whole picture and used to lead with the earnings date whatever was asked: "what's the dividend
@@ -1037,7 +1114,8 @@ def _fundamentals_focus(lines: list[str], question: str, ticker: str) -> list[st
         # actions: last cash dividend ..."), and those lines, not the yield inside the valuation
         # row, are what a dividend question asks for; they are looked for first.
         dated = (next((i for i, line in enumerate(plain)
-                       if "ex-dividend" in line or "corporate actions:" in line), None)
+                       if "ex-dividend" in line or ("corporate actions:" in line
+                                                    and "dividend" in line)), None)
                  if topic == "dividend" else None)
         hit = dated if dated is not None else next(
             (i for i, line in enumerate(plain)
@@ -1046,9 +1124,21 @@ def _fundamentals_focus(lines: list[str], question: str, ticker: str) -> list[st
                     for p in starts)
              and (topic != "dividend" or "dividend" in line.lower())), None)
         if hit is None:
+            if topic == "dividend" and _PAYS_Q.search(question):
+                return [f"Bottom line: no dividend is on record for {ticker} in the sources read "
+                        f"here, so none can be confirmed — the rest of its fundamentals "
+                        f"follow.", *plain]
             return [f"Bottom line: the data source holds no {topic} figure for {ticker} right now, "
                     f"so none is given — the rest of its fundamentals follow.", *plain]
-        return [f"Bottom line: {plain[hit]}", *plain[:hit], *plain[hit + 1:]]
+        if topic == "dividend" and _PAYS_Q.search(question):
+            plain[hit] = f"yes — {plain[hit]}"
+        # The other lines that answer the same question follow the lead ("who owns NVDA": the
+        # holder count leads, the 5% holders come next rather than eleven lines down).
+        also = [i for i, line in enumerate(plain) if i != hit and (
+            any(line.startswith(p) for p in starts if p not in ("holds", "bitcoin"))
+            or (topic == "dividend" and ("ex-dividend" in line or "corporate actions:" in line)))]
+        rest = [line for i, line in enumerate(plain) if i != hit and i not in also]
+        return [f"Bottom line: {plain[hit]}", *(plain[i] for i in also), *rest]
     return lines
 
 

@@ -48,56 +48,64 @@
     "right": 343,
     "leak": 236,
     "late": 40,
-    "stale_after_restatement": 0
+    "stale_after_restatement": 0,
+    "rounded_by_storage": 0
    },
    "vibe_trading_research": {
     "questions": 619,
     "right": 9,
     "leak": 610,
     "late": 0,
-    "stale_after_restatement": 0
+    "stale_after_restatement": 0,
+    "rounded_by_storage": 0
    },
    "openbb_pit": {
     "questions": 493,
     "right": 7,
     "leak": 486,
     "late": 0,
-    "stale_after_restatement": 0
+    "stale_after_restatement": 0,
+    "rounded_by_storage": 0
    },
    "openbb_default": {
     "questions": 493,
     "right": 7,
     "leak": 486,
     "late": 0,
-    "stale_after_restatement": 0
+    "stale_after_restatement": 0,
+    "rounded_by_storage": 0
    },
    "langalpha_yfinance": {
     "questions": 619,
     "right": 10,
     "leak": 608,
     "late": 1,
-    "stale_after_restatement": 0
+    "stale_after_restatement": 0,
+    "rounded_by_storage": 0
    },
    "openalice_yfinance": {
     "questions": 619,
     "right": 10,
     "leak": 608,
     "late": 1,
-    "stale_after_restatement": 0
+    "stale_after_restatement": 0,
+    "rounded_by_storage": 0
    },
    "qlib_pit": {
     "questions": 619,
     "right": 51,
     "leak": 179,
     "late": 106,
-    "stale_after_restatement": 283
+    "stale_after_restatement": 0,
+    "rounded_by_storage": 283
    },
    "edgartools_asof": {
     "questions": 619,
     "right": 369,
     "leak": 198,
     "late": 52,
-    "stale_after_restatement": 0
+    "stale_after_restatement": 0,
+    "rounded_by_storage": 0
    }
   },
   "restated_quarter_after": {
@@ -431,24 +439,6 @@
   }
  },
  "day_granular_fairness": {
-  "qlib_pit": {
-   "before": {
-    "questions": 309,
-    "right": 2,
-    "leak": 179,
-    "late": 26,
-    "stale_after_restatement": 102,
-    "right_rate": 0.0065
-   },
-   "after": {
-    "questions": 310,
-    "right": 49,
-    "leak": 0,
-    "late": 80,
-    "stale_after_restatement": 181,
-    "right_rate": 0.1581
-   }
-  },
   "edgartools_asof": {
    "before": {
     "questions": 309,
@@ -456,6 +446,7 @@
     "leak": 198,
     "late": 0,
     "stale_after_restatement": 0,
+    "rounded_by_storage": 0,
     "right_rate": 0.3592
    },
    "after": {
@@ -464,7 +455,28 @@
     "leak": 0,
     "late": 52,
     "stale_after_restatement": 0,
+    "rounded_by_storage": 0,
     "right_rate": 0.8323
+   }
+  },
+  "qlib_pit": {
+   "before": {
+    "questions": 309,
+    "right": 2,
+    "leak": 179,
+    "late": 26,
+    "stale_after_restatement": 0,
+    "rounded_by_storage": 102,
+    "right_rate": 0.0065
+   },
+   "after": {
+    "questions": 310,
+    "right": 49,
+    "leak": 0,
+    "late": 80,
+    "stale_after_restatement": 0,
+    "rounded_by_storage": 181,
+    "right_rate": 0.1581
    }
   }
  },
@@ -30921,7 +30933,7 @@
     "accn": "0001045810-17-000027",
     "side": "after",
     "as_of": "2017-03-01T23:30:49+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -30935,7 +30947,7 @@
     "accn": "0001045810-17-000075",
     "side": "after",
     "as_of": "2017-05-23T21:34:55+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -30949,7 +30961,7 @@
     "accn": "0001045810-17-000123",
     "side": "after",
     "as_of": "2017-08-23T21:24:51+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -30977,7 +30989,7 @@
     "accn": "0001045810-18-000010",
     "side": "after",
     "as_of": "2018-02-28T22:31:19+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -30991,7 +31003,7 @@
     "accn": "0001045810-18-000080",
     "side": "after",
     "as_of": "2018-05-22T21:35:51+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -31005,7 +31017,7 @@
     "accn": "0001045810-18-000114",
     "side": "after",
     "as_of": "2018-08-16T21:31:19+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -31019,7 +31031,7 @@
     "accn": "0001045810-18-000150",
     "side": "after",
     "as_of": "2018-11-15T22:32:23+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -31033,7 +31045,7 @@
     "accn": "0001045810-19-000023",
     "side": "after",
     "as_of": "2019-02-21T22:37:18+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -31061,7 +31073,7 @@
     "accn": "0001045810-19-000144",
     "side": "after",
     "as_of": "2019-08-15T22:20:59+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -31075,7 +31087,7 @@
     "accn": "0001045810-19-000170",
     "side": "after",
     "as_of": "2019-11-14T22:36:33+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -31089,7 +31101,7 @@
     "accn": "0001045810-20-000010",
     "side": "after",
     "as_of": "2020-02-20T22:38:18+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -31117,7 +31129,7 @@
     "accn": "0001045810-20-000147",
     "side": "after",
     "as_of": "2020-08-19T21:36:51+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -31131,7 +31143,7 @@
     "accn": "0001045810-20-000189",
     "side": "after",
     "as_of": "2020-11-18T22:35:57+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -31145,7 +31157,7 @@
     "accn": "0001045810-21-000064",
     "side": "after",
     "as_of": "2021-05-26T21:35:56+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -31159,14 +31171,14 @@
     "accn": "0001045810-21-000131",
     "side": "after",
     "as_of": "2021-08-20T21:32:40+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
     "accn": "0001045810-21-000163",
     "side": "before",
     "as_of": "2021-11-20T01:16:20+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -31215,7 +31227,7 @@
     "accn": "0001045810-22-000166",
     "side": "after",
     "as_of": "2022-11-18T22:35:31+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -31257,7 +31269,7 @@
     "accn": "0001045810-23-000227",
     "side": "after",
     "as_of": "2023-11-21T22:36:29+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -31271,7 +31283,7 @@
     "accn": "0001045810-24-000124",
     "side": "after",
     "as_of": "2024-05-29T21:36:32+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -31285,7 +31297,7 @@
     "accn": "0001045810-24-000264",
     "side": "after",
     "as_of": "2024-08-28T22:05:08+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -31299,7 +31311,7 @@
     "accn": "0001045810-24-000316",
     "side": "after",
     "as_of": "2024-11-20T22:31:22+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -31313,7 +31325,7 @@
     "accn": "0001045810-25-000116",
     "side": "after",
     "as_of": "2025-05-28T21:32:57+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -31327,7 +31339,7 @@
     "accn": "0001045810-25-000209",
     "side": "after",
     "as_of": "2025-08-27T21:52:07+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -31341,7 +31353,7 @@
     "accn": "0001045810-25-000230",
     "side": "after",
     "as_of": "2025-11-19T22:36:17+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -31355,7 +31367,7 @@
     "accn": "0001045810-26-000052",
     "side": "after",
     "as_of": "2026-05-20T21:35:52+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "NVDA",
@@ -31369,14 +31381,14 @@
     "accn": "0001045810-26-000075",
     "side": "after",
     "as_of": "2026-08-26T21:36:00+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
     "accn": "0001628280-17-000717",
     "side": "before",
     "as_of": "2017-02-01T20:33:29+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
@@ -31481,7 +31493,7 @@
     "accn": "0000320193-18-000145",
     "side": "after",
     "as_of": "2018-11-05T14:01:40+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
@@ -31495,7 +31507,7 @@
     "accn": "0000320193-19-000010",
     "side": "after",
     "as_of": "2019-01-30T22:31:37+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
@@ -31509,7 +31521,7 @@
     "accn": "0000320193-19-000066",
     "side": "after",
     "as_of": "2019-05-01T21:32:00+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
@@ -31523,14 +31535,14 @@
     "accn": "0000320193-19-000076",
     "side": "after",
     "as_of": "2019-07-31T21:31:53+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
     "accn": "0000320193-19-000119",
     "side": "before",
     "as_of": "2019-10-30T21:12:36+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
@@ -31544,21 +31556,21 @@
     "accn": "0000320193-20-000010",
     "side": "before",
     "as_of": "2020-01-28T22:02:44+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
     "accn": "0000320193-20-000010",
     "side": "after",
     "as_of": "2020-01-29T00:02:44+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
     "accn": "0000320193-20-000052",
     "side": "before",
     "as_of": "2020-04-30T21:03:10+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
@@ -31572,21 +31584,21 @@
     "accn": "0000320193-20-000062",
     "side": "before",
     "as_of": "2020-07-30T22:29:09+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
     "accn": "0000320193-20-000062",
     "side": "after",
     "as_of": "2020-07-31T00:29:09+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
     "accn": "0000320193-20-000096",
     "side": "before",
     "as_of": "2020-10-29T21:06:25+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
@@ -31600,21 +31612,21 @@
     "accn": "0000320193-21-000010",
     "side": "before",
     "as_of": "2021-01-27T22:03:06+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
     "accn": "0000320193-21-000010",
     "side": "after",
     "as_of": "2021-01-28T00:03:06+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
     "accn": "0000320193-21-000056",
     "side": "before",
     "as_of": "2021-04-28T21:02:54+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
@@ -31628,7 +31640,7 @@
     "accn": "0000320193-21-000065",
     "side": "before",
     "as_of": "2021-07-27T21:03:42+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
@@ -31642,21 +31654,21 @@
     "accn": "0000320193-22-000007",
     "side": "before",
     "as_of": "2022-01-27T22:00:58+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
     "accn": "0000320193-22-000007",
     "side": "after",
     "as_of": "2022-01-28T00:00:58+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
     "accn": "0000320193-22-000059",
     "side": "before",
     "as_of": "2022-04-28T21:03:58+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
@@ -31670,7 +31682,7 @@
     "accn": "0000320193-22-000070",
     "side": "before",
     "as_of": "2022-07-28T21:06:56+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
@@ -31684,21 +31696,21 @@
     "accn": "0000320193-23-000006",
     "side": "before",
     "as_of": "2023-02-02T22:01:30+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
     "accn": "0000320193-23-000006",
     "side": "after",
     "as_of": "2023-02-03T00:01:30+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
     "accn": "0000320193-23-000064",
     "side": "before",
     "as_of": "2023-05-04T21:03:52+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
@@ -31712,7 +31724,7 @@
     "accn": "0000320193-23-000077",
     "side": "before",
     "as_of": "2023-08-03T21:04:43+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
@@ -31726,21 +31738,21 @@
     "accn": "0000320193-24-000006",
     "side": "before",
     "as_of": "2024-02-01T22:03:38+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
     "accn": "0000320193-24-000006",
     "side": "after",
     "as_of": "2024-02-02T00:03:38+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
     "accn": "0000320193-24-000069",
     "side": "before",
     "as_of": "2024-05-02T21:04:25+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
@@ -31754,7 +31766,7 @@
     "accn": "0000320193-24-000081",
     "side": "before",
     "as_of": "2024-08-01T21:03:34+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
@@ -31775,7 +31787,7 @@
     "accn": "0000320193-25-000008",
     "side": "after",
     "as_of": "2025-01-31T12:01:27+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
@@ -31789,7 +31801,7 @@
     "accn": "0000320193-25-000057",
     "side": "after",
     "as_of": "2025-05-02T11:00:46+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
@@ -31803,7 +31815,7 @@
     "accn": "0000320193-25-000073",
     "side": "after",
     "as_of": "2025-08-01T11:00:42+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
@@ -31817,7 +31829,7 @@
     "accn": "0000320193-26-000006",
     "side": "after",
     "as_of": "2026-01-30T12:01:32+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
@@ -31831,7 +31843,7 @@
     "accn": "0000320193-26-000013",
     "side": "after",
     "as_of": "2026-05-01T11:01:00+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AAPL",
@@ -31845,7 +31857,7 @@
     "accn": "0000320193-26-000020",
     "side": "after",
     "as_of": "2026-07-31T11:01:02+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -31943,7 +31955,7 @@
     "accn": "0001564590-18-019062",
     "side": "after",
     "as_of": "2018-08-03T16:03:33+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -31957,7 +31969,7 @@
     "accn": "0001564590-18-024893",
     "side": "after",
     "as_of": "2018-10-24T21:13:07+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -31971,7 +31983,7 @@
     "accn": "0001564590-19-001392",
     "side": "after",
     "as_of": "2019-01-30T22:09:56+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -31985,7 +31997,7 @@
     "accn": "0001564590-19-012709",
     "side": "after",
     "as_of": "2019-04-24T21:10:10+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -31999,7 +32011,7 @@
     "accn": "0001564590-19-027952",
     "side": "after",
     "as_of": "2019-08-01T21:09:55+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -32013,7 +32025,7 @@
     "accn": "0001564590-19-037549",
     "side": "after",
     "as_of": "2019-10-23T21:09:48+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -32027,7 +32039,7 @@
     "accn": "0001564590-20-002450",
     "side": "after",
     "as_of": "2020-01-29T22:08:43+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -32041,7 +32053,7 @@
     "accn": "0001564590-20-019706",
     "side": "after",
     "as_of": "2020-04-29T21:11:11+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -32055,7 +32067,7 @@
     "accn": "0001564590-20-034944",
     "side": "after",
     "as_of": "2020-07-31T01:44:46+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -32069,7 +32081,7 @@
     "accn": "0001564590-20-047996",
     "side": "after",
     "as_of": "2020-10-27T21:21:58+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -32083,7 +32095,7 @@
     "accn": "0001564590-21-002316",
     "side": "after",
     "as_of": "2021-01-26T22:09:34+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -32097,7 +32109,7 @@
     "accn": "0001564590-21-020891",
     "side": "after",
     "as_of": "2021-04-27T21:09:38+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -32111,7 +32123,7 @@
     "accn": "0001564590-21-051992",
     "side": "after",
     "as_of": "2021-10-26T21:11:30+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -32125,7 +32137,7 @@
     "accn": "0001564590-22-002324",
     "side": "after",
     "as_of": "2022-01-25T22:09:04+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -32139,7 +32151,7 @@
     "accn": "0001564590-22-015675",
     "side": "after",
     "as_of": "2022-04-26T21:08:55+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -32153,7 +32165,7 @@
     "accn": "0001564590-22-035087",
     "side": "after",
     "as_of": "2022-10-25T21:08:55+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -32167,7 +32179,7 @@
     "accn": "0001564590-23-000733",
     "side": "after",
     "as_of": "2023-01-24T22:34:20+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -32181,7 +32193,7 @@
     "accn": "0000950170-23-014423",
     "side": "after",
     "as_of": "2023-04-25T21:07:43+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -32195,7 +32207,7 @@
     "accn": "0000950170-23-054855",
     "side": "after",
     "as_of": "2023-10-24T21:07:40+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -32209,7 +32221,7 @@
     "accn": "0000950170-24-008814",
     "side": "after",
     "as_of": "2024-01-30T22:05:46+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -32223,7 +32235,7 @@
     "accn": "0000950170-24-048288",
     "side": "after",
     "as_of": "2024-04-25T21:06:24+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -32237,7 +32249,7 @@
     "accn": "0000950170-24-118967",
     "side": "after",
     "as_of": "2024-10-30T21:07:17+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -32265,7 +32277,7 @@
     "accn": "0000950170-25-061046",
     "side": "after",
     "as_of": "2025-04-30T21:08:52+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -32279,7 +32291,7 @@
     "accn": "0001193125-25-256321",
     "side": "after",
     "as_of": "2025-10-29T21:10:48+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -32293,7 +32305,7 @@
     "accn": "0001193125-26-027207",
     "side": "after",
     "as_of": "2026-01-28T22:07:34+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSFT",
@@ -32307,14 +32319,14 @@
     "accn": "0001193125-26-191507",
     "side": "after",
     "as_of": "2026-04-29T21:06:24+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
     "accn": "0001018724-17-000011",
     "side": "before",
     "as_of": "2017-02-09T21:56:36+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
@@ -32328,7 +32340,7 @@
     "accn": "0001018724-17-000051",
     "side": "before",
     "as_of": "2017-04-27T22:05:44+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
@@ -32433,49 +32445,49 @@
     "accn": "0001018724-19-000004",
     "side": "after",
     "as_of": "2019-02-01T02:22:40+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
     "accn": "0001018724-19-000043",
     "side": "before",
     "as_of": "2019-04-25T22:08:50+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
     "accn": "0001018724-19-000043",
     "side": "after",
     "as_of": "2019-04-26T00:08:50+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
     "accn": "0001018724-19-000071",
     "side": "before",
     "as_of": "2019-07-25T22:40:28+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
     "accn": "0001018724-19-000071",
     "side": "after",
     "as_of": "2019-07-26T00:40:28+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
     "accn": "0001018724-19-000089",
     "side": "before",
     "as_of": "2019-10-24T23:49:26+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
     "accn": "0001018724-19-000089",
     "side": "after",
     "as_of": "2019-10-25T01:49:26+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
@@ -32489,70 +32501,70 @@
     "accn": "0001018724-20-000004",
     "side": "after",
     "as_of": "2020-01-31T02:46:13+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
     "accn": "0001018724-20-000010",
     "side": "before",
     "as_of": "2020-04-30T22:23:48+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
     "accn": "0001018724-20-000010",
     "side": "after",
     "as_of": "2020-05-01T00:23:48+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
     "accn": "0001018724-20-000021",
     "side": "before",
     "as_of": "2020-07-30T23:00:55+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
     "accn": "0001018724-20-000021",
     "side": "after",
     "as_of": "2020-07-31T01:00:55+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
     "accn": "0001018724-20-000030",
     "side": "before",
     "as_of": "2020-10-29T22:08:00+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
     "accn": "0001018724-20-000030",
     "side": "after",
     "as_of": "2020-10-30T00:08:00+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
     "accn": "0001018724-21-000004",
     "side": "before",
     "as_of": "2021-02-02T23:44:10+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
     "accn": "0001018724-21-000004",
     "side": "after",
     "as_of": "2021-02-03T01:44:10+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
     "accn": "0001018724-21-000010",
     "side": "before",
     "as_of": "2021-04-29T21:48:35+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
@@ -32566,21 +32578,21 @@
     "accn": "0001018724-21-000020",
     "side": "before",
     "as_of": "2021-07-29T22:02:39+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
     "accn": "0001018724-21-000020",
     "side": "after",
     "as_of": "2021-07-30T00:02:39+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
     "accn": "0001018724-21-000028",
     "side": "before",
     "as_of": "2021-10-28T21:29:31+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
@@ -32594,7 +32606,7 @@
     "accn": "0001018724-22-000013",
     "side": "before",
     "as_of": "2022-04-28T21:29:24+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
@@ -32608,7 +32620,7 @@
     "accn": "0001018724-22-000019",
     "side": "before",
     "as_of": "2022-07-28T21:24:06+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
@@ -32622,7 +32634,7 @@
     "accn": "0001018724-22-000023",
     "side": "before",
     "as_of": "2022-10-27T21:23:57+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
@@ -32636,7 +32648,7 @@
     "accn": "0001018724-23-000008",
     "side": "before",
     "as_of": "2023-04-27T21:24:51+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
@@ -32650,7 +32662,7 @@
     "accn": "0001018724-23-000012",
     "side": "before",
     "as_of": "2023-08-03T21:24:35+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
@@ -32664,7 +32676,7 @@
     "accn": "0001018724-23-000018",
     "side": "before",
     "as_of": "2023-10-26T21:36:51+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
@@ -32678,7 +32690,7 @@
     "accn": "0001018724-24-000083",
     "side": "before",
     "as_of": "2024-04-30T21:38:29+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
@@ -32692,7 +32704,7 @@
     "accn": "0001018724-24-000130",
     "side": "before",
     "as_of": "2024-08-01T21:39:50+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
@@ -32706,7 +32718,7 @@
     "accn": "0001018724-24-000161",
     "side": "before",
     "as_of": "2024-10-31T21:44:54+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
@@ -32720,7 +32732,7 @@
     "accn": "0001018724-25-000036",
     "side": "before",
     "as_of": "2025-05-01T21:14:53+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
@@ -32734,7 +32746,7 @@
     "accn": "0001018724-25-000086",
     "side": "before",
     "as_of": "2025-07-31T21:13:08+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
@@ -32748,7 +32760,7 @@
     "accn": "0001018724-25-000123",
     "side": "before",
     "as_of": "2025-10-30T21:18:21+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
@@ -32762,7 +32774,7 @@
     "accn": "0001018724-26-000014",
     "side": "before",
     "as_of": "2026-04-29T21:48:09+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
@@ -32776,7 +32788,7 @@
     "accn": "0001018724-26-000026",
     "side": "before",
     "as_of": "2026-07-30T21:11:13+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMZN",
@@ -32797,14 +32809,14 @@
     "accn": "0001652044-17-000014",
     "side": "after",
     "as_of": "2017-05-02T21:25:09+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-17-000026",
     "side": "before",
     "as_of": "2017-07-24T21:23:27+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
@@ -32818,7 +32830,7 @@
     "accn": "0001652044-17-000042",
     "side": "before",
     "as_of": "2017-10-26T20:49:09+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
@@ -32832,7 +32844,7 @@
     "accn": "0001652044-18-000016",
     "side": "before",
     "as_of": "2018-04-23T21:54:51+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
@@ -32853,14 +32865,14 @@
     "accn": "0001652044-18-000027",
     "side": "after",
     "as_of": "2018-07-24T02:02:56+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-18-000035",
     "side": "before",
     "as_of": "2018-10-25T20:41:36+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
@@ -32874,21 +32886,21 @@
     "accn": "0001652044-19-000015",
     "side": "before",
     "as_of": "2019-04-29T22:32:43+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-19-000015",
     "side": "after",
     "as_of": "2019-04-30T00:32:43+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-19-000023",
     "side": "before",
     "as_of": "2019-07-25T21:11:13+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
@@ -32902,21 +32914,21 @@
     "accn": "0001652044-19-000032",
     "side": "before",
     "as_of": "2019-10-28T22:02:44+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-19-000032",
     "side": "after",
     "as_of": "2019-10-29T00:02:44+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-20-000021",
     "side": "before",
     "as_of": "2020-04-28T21:52:33+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
@@ -32951,77 +32963,77 @@
     "accn": "0001652044-20-000050",
     "side": "after",
     "as_of": "2020-10-30T00:30:04+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-21-000020",
     "side": "before",
     "as_of": "2021-04-27T22:17:57+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-21-000020",
     "side": "after",
     "as_of": "2021-04-28T00:17:57+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-21-000047",
     "side": "before",
     "as_of": "2021-07-27T23:16:30+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-21-000047",
     "side": "after",
     "as_of": "2021-07-28T01:16:30+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-21-000057",
     "side": "before",
     "as_of": "2021-10-26T22:47:06+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-21-000057",
     "side": "after",
     "as_of": "2021-10-27T00:47:06+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-22-000029",
     "side": "before",
     "as_of": "2022-04-26T23:51:20+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-22-000029",
     "side": "after",
     "as_of": "2022-04-27T01:51:20+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-22-000071",
     "side": "before",
     "as_of": "2022-07-26T22:29:36+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-22-000071",
     "side": "after",
     "as_of": "2022-07-27T00:29:36+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
@@ -33035,42 +33047,42 @@
     "accn": "0001652044-22-000090",
     "side": "after",
     "as_of": "2022-10-26T02:32:59+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-23-000045",
     "side": "before",
     "as_of": "2023-04-25T23:15:00+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-23-000045",
     "side": "after",
     "as_of": "2023-04-26T01:15:00+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-23-000070",
     "side": "before",
     "as_of": "2023-07-25T22:13:26+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-23-000070",
     "side": "after",
     "as_of": "2023-07-26T00:13:26+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-23-000094",
     "side": "before",
     "as_of": "2023-10-24T21:39:13+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
@@ -33084,21 +33096,21 @@
     "accn": "0001652044-24-000053",
     "side": "before",
     "as_of": "2024-04-25T23:22:11+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-24-000053",
     "side": "after",
     "as_of": "2024-04-26T01:22:11+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
     "accn": "0001652044-24-000079",
     "side": "before",
     "as_of": "2024-07-23T22:12:07+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
@@ -33147,7 +33159,7 @@
     "accn": "0001652044-25-000062",
     "side": "after",
     "as_of": "2025-07-24T00:44:01+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
@@ -33161,7 +33173,7 @@
     "accn": "0001652044-25-000091",
     "side": "after",
     "as_of": "2025-10-30T02:55:01+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
@@ -33175,7 +33187,7 @@
     "accn": "0001652044-26-000048",
     "side": "after",
     "as_of": "2026-04-30T02:02:11+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "GOOGL",
@@ -33189,7 +33201,7 @@
     "accn": "0001652044-26-000071",
     "side": "after",
     "as_of": "2026-07-23T02:15:54+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
@@ -33217,7 +33229,7 @@
     "accn": "0001326801-17-000038",
     "side": "after",
     "as_of": "2017-07-27T21:25:55+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
@@ -33231,7 +33243,7 @@
     "accn": "0001326801-17-000053",
     "side": "after",
     "as_of": "2017-11-02T21:37:43+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
@@ -33245,7 +33257,7 @@
     "accn": "0001326801-18-000032",
     "side": "after",
     "as_of": "2018-04-26T22:06:41+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
@@ -33259,7 +33271,7 @@
     "accn": "0001326801-18-000057",
     "side": "after",
     "as_of": "2018-07-26T21:25:03+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
@@ -33273,7 +33285,7 @@
     "accn": "0001326801-18-000067",
     "side": "after",
     "as_of": "2018-10-31T21:13:09+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
@@ -33287,7 +33299,7 @@
     "accn": "0001326801-19-000037",
     "side": "after",
     "as_of": "2019-04-25T02:06:00+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
@@ -33301,7 +33313,7 @@
     "accn": "0001326801-19-000055",
     "side": "after",
     "as_of": "2019-07-25T02:12:30+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
@@ -33315,7 +33327,7 @@
     "accn": "0001326801-19-000069",
     "side": "after",
     "as_of": "2019-10-31T02:00:31+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
@@ -33329,7 +33341,7 @@
     "accn": "0001326801-20-000048",
     "side": "after",
     "as_of": "2020-04-30T11:14:44+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
@@ -33343,7 +33355,7 @@
     "accn": "0001326801-20-000076",
     "side": "after",
     "as_of": "2020-07-31T21:17:44+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
@@ -33357,210 +33369,210 @@
     "accn": "0001326801-20-000084",
     "side": "after",
     "as_of": "2020-10-30T02:29:56+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-21-000033",
     "side": "before",
     "as_of": "2021-04-28T23:12:05+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-21-000033",
     "side": "after",
     "as_of": "2021-04-29T01:12:05+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-21-000049",
     "side": "before",
     "as_of": "2021-07-28T23:13:08+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-21-000049",
     "side": "after",
     "as_of": "2021-07-29T01:13:08+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-21-000065",
     "side": "before",
     "as_of": "2021-10-25T23:44:20+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-21-000065",
     "side": "after",
     "as_of": "2021-10-26T01:44:20+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-22-000057",
     "side": "before",
     "as_of": "2022-04-27T23:42:59+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-22-000057",
     "side": "after",
     "as_of": "2022-04-28T01:42:59+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-22-000082",
     "side": "before",
     "as_of": "2022-07-27T23:44:34+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-22-000082",
     "side": "after",
     "as_of": "2022-07-28T01:44:34+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-22-000108",
     "side": "before",
     "as_of": "2022-10-26T23:26:36+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-22-000108",
     "side": "after",
     "as_of": "2022-10-27T01:26:36+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-23-000067",
     "side": "before",
     "as_of": "2023-04-26T23:56:18+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-23-000067",
     "side": "after",
     "as_of": "2023-04-27T01:56:18+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-23-000093",
     "side": "before",
     "as_of": "2023-07-26T23:11:08+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-23-000093",
     "side": "after",
     "as_of": "2023-07-27T01:11:08+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-23-000103",
     "side": "before",
     "as_of": "2023-10-25T23:07:27+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-23-000103",
     "side": "after",
     "as_of": "2023-10-26T01:07:27+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-24-000049",
     "side": "before",
     "as_of": "2024-04-24T23:14:19+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-24-000049",
     "side": "after",
     "as_of": "2024-04-25T01:14:19+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-24-000069",
     "side": "before",
     "as_of": "2024-07-31T23:14:40+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-24-000069",
     "side": "after",
     "as_of": "2024-08-01T01:14:40+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-24-000081",
     "side": "before",
     "as_of": "2024-10-30T22:54:51+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-24-000081",
     "side": "after",
     "as_of": "2024-10-31T00:54:51+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-25-000054",
     "side": "before",
     "as_of": "2025-04-30T23:03:18+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001326801-25-000054",
     "side": "after",
     "as_of": "2025-05-01T01:03:18+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001628280-25-036791",
     "side": "before",
     "as_of": "2025-07-30T23:02:12+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001628280-25-036791",
     "side": "after",
     "as_of": "2025-07-31T01:02:12+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001628280-25-047240",
     "side": "before",
     "as_of": "2025-10-29T21:50:26+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
@@ -33574,21 +33586,21 @@
     "accn": "0001628280-26-028526",
     "side": "before",
     "as_of": "2026-04-29T22:54:11+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001628280-26-028526",
     "side": "after",
     "as_of": "2026-04-30T00:54:11+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
     "accn": "0001628280-26-050705",
     "side": "before",
     "as_of": "2026-07-29T21:58:51+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "META",
@@ -33609,14 +33621,14 @@
     "accn": "0001564590-17-003118",
     "side": "after",
     "as_of": "2017-03-01T22:54:21+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
     "accn": "0001564590-17-009968",
     "side": "before",
     "as_of": "2017-05-09T20:56:24+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -33637,21 +33649,21 @@
     "accn": "0001564590-17-015705",
     "side": "after",
     "as_of": "2017-08-04T22:15:55+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
     "accn": "0001564590-17-021343",
     "side": "before",
     "as_of": "2017-11-02T22:56:36+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
     "accn": "0001564590-17-021343",
     "side": "after",
     "as_of": "2017-11-03T00:56:36+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -33665,14 +33677,14 @@
     "accn": "0001564590-18-002956",
     "side": "after",
     "as_of": "2018-02-23T12:07:43+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
     "accn": "0001564590-18-011086",
     "side": "before",
     "as_of": "2018-05-05T00:46:25+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -33686,7 +33698,7 @@
     "accn": "0001564590-18-019254",
     "side": "before",
     "as_of": "2018-08-04T00:56:44+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -33700,14 +33712,14 @@
     "accn": "0001564590-18-026353",
     "side": "before",
     "as_of": "2018-11-01T23:38:56+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
     "accn": "0001564590-18-026353",
     "side": "after",
     "as_of": "2018-11-02T01:38:56+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -33721,7 +33733,7 @@
     "accn": "0001564590-19-003165",
     "side": "after",
     "as_of": "2019-02-19T12:10:16+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -33735,7 +33747,7 @@
     "accn": "0001564590-19-013462",
     "side": "after",
     "as_of": "2019-04-29T11:09:07+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -33749,7 +33761,7 @@
     "accn": "0001564590-19-026445",
     "side": "after",
     "as_of": "2019-07-29T11:21:00+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -33763,7 +33775,7 @@
     "accn": "0001564590-19-038256",
     "side": "after",
     "as_of": "2019-10-29T12:23:29+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -33791,7 +33803,7 @@
     "accn": "0001564590-20-019931",
     "side": "after",
     "as_of": "2020-04-30T11:26:18+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -33805,7 +33817,7 @@
     "accn": "0001564590-20-033670",
     "side": "after",
     "as_of": "2020-07-28T11:03:48+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -33819,7 +33831,7 @@
     "accn": "0001564590-20-047486",
     "side": "after",
     "as_of": "2020-10-26T11:06:44+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -33833,21 +33845,21 @@
     "accn": "0001564590-21-004599",
     "side": "after",
     "as_of": "2021-02-08T13:27:23+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
     "accn": "0000950170-21-000046",
     "side": "before",
     "as_of": "2021-04-27T23:02:05+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
     "accn": "0000950170-21-000046",
     "side": "after",
     "as_of": "2021-04-28T01:02:05+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -33861,7 +33873,7 @@
     "accn": "0000950170-21-000524",
     "side": "after",
     "as_of": "2021-07-27T11:47:13+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -33875,14 +33887,14 @@
     "accn": "0000950170-21-002253",
     "side": "after",
     "as_of": "2021-10-25T11:12:15+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
     "accn": "0000950170-22-006034",
     "side": "before",
     "as_of": "2022-04-23T00:36:59+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -33903,7 +33915,7 @@
     "accn": "0000950170-22-012936",
     "side": "after",
     "as_of": "2022-07-25T11:07:25+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -33917,14 +33929,14 @@
     "accn": "0000950170-22-019867",
     "side": "after",
     "as_of": "2022-10-24T11:08:50+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
     "accn": "0000950170-23-013890",
     "side": "before",
     "as_of": "2023-04-21T21:05:23+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -33938,7 +33950,7 @@
     "accn": "0000950170-23-033872",
     "side": "before",
     "as_of": "2023-07-21T21:08:29+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -33952,7 +33964,7 @@
     "accn": "0001628280-23-034847",
     "side": "before",
     "as_of": "2023-10-20T21:41:03+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -33966,42 +33978,42 @@
     "accn": "0001628280-24-017503",
     "side": "before",
     "as_of": "2024-04-23T23:27:48+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
     "accn": "0001628280-24-017503",
     "side": "after",
     "as_of": "2024-04-24T01:27:48+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
     "accn": "0001628280-24-032662",
     "side": "before",
     "as_of": "2024-07-23T22:41:09+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
     "accn": "0001628280-24-032662",
     "side": "after",
     "as_of": "2024-07-24T00:41:09+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
     "accn": "0001628280-24-043486",
     "side": "before",
     "as_of": "2024-10-23T23:42:47+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
     "accn": "0001628280-24-043486",
     "side": "after",
     "as_of": "2024-10-24T01:42:47+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -34015,14 +34027,14 @@
     "accn": "0001628280-25-018911",
     "side": "after",
     "as_of": "2025-04-23T02:02:10+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
     "accn": "0001628280-25-035806",
     "side": "before",
     "as_of": "2025-07-23T23:23:31+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -34043,7 +34055,7 @@
     "accn": "0001628280-25-045968",
     "side": "after",
     "as_of": "2025-10-23T02:08:43+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -34057,7 +34069,7 @@
     "accn": "0001628280-26-026673",
     "side": "after",
     "as_of": "2026-04-23T02:43:00+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "TSLA",
@@ -34071,14 +34083,14 @@
     "accn": "0001628280-26-049270",
     "side": "after",
     "as_of": "2026-07-23T02:02:31+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
     "accn": "0000002488-17-000107",
     "side": "before",
     "as_of": "2017-05-08T19:35:05+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
@@ -34169,7 +34181,7 @@
     "accn": "0000002488-18-000189",
     "side": "after",
     "as_of": "2018-10-31T21:15:18+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
@@ -34183,7 +34195,7 @@
     "accn": "0000002488-19-000011",
     "side": "after",
     "as_of": "2019-02-08T22:44:26+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
@@ -34211,7 +34223,7 @@
     "accn": "0000002488-19-000104",
     "side": "after",
     "as_of": "2019-07-31T21:27:08+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
@@ -34225,7 +34237,7 @@
     "accn": "0000002488-19-000159",
     "side": "after",
     "as_of": "2019-10-30T21:17:03+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
@@ -34239,7 +34251,7 @@
     "accn": "0000002488-20-000008",
     "side": "after",
     "as_of": "2020-02-04T23:21:47+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
@@ -34281,7 +34293,7 @@
     "accn": "0000002488-20-000164",
     "side": "after",
     "as_of": "2020-10-28T21:59:17+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
@@ -34309,7 +34321,7 @@
     "accn": "0000002488-21-000056",
     "side": "after",
     "as_of": "2021-04-28T21:39:55+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
@@ -34323,7 +34335,7 @@
     "accn": "0000002488-21-000116",
     "side": "after",
     "as_of": "2021-07-28T21:46:31+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
@@ -34337,7 +34349,7 @@
     "accn": "0000002488-21-000178",
     "side": "after",
     "as_of": "2021-10-27T21:37:56+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
@@ -34351,7 +34363,7 @@
     "accn": "0000002488-22-000078",
     "side": "after",
     "as_of": "2022-05-04T21:50:40+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
@@ -34365,7 +34377,7 @@
     "accn": "0000002488-22-000123",
     "side": "after",
     "as_of": "2022-08-03T22:15:57+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
@@ -34379,7 +34391,7 @@
     "accn": "0000002488-22-000170",
     "side": "after",
     "as_of": "2022-11-02T21:35:10+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
@@ -34393,14 +34405,14 @@
     "accn": "0000002488-23-000076",
     "side": "after",
     "as_of": "2023-05-03T21:28:42+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
     "accn": "0000002488-23-000139",
     "side": "before",
     "as_of": "2023-08-02T20:12:01+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
@@ -34435,7 +34447,7 @@
     "accn": "0000002488-24-000056",
     "side": "after",
     "as_of": "2024-05-01T21:10:44+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
@@ -34449,7 +34461,7 @@
     "accn": "0000002488-24-000123",
     "side": "after",
     "as_of": "2024-07-31T21:20:22+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
@@ -34463,14 +34475,14 @@
     "accn": "0000002488-24-000163",
     "side": "after",
     "as_of": "2024-10-30T21:26:03+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
     "accn": "0000002488-25-000047",
     "side": "before",
     "as_of": "2025-05-06T21:04:48+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
@@ -34484,7 +34496,7 @@
     "accn": "0000002488-25-000108",
     "side": "before",
     "as_of": "2025-08-05T21:08:21+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
@@ -34498,21 +34510,21 @@
     "accn": "0000002488-25-000166",
     "side": "before",
     "as_of": "2025-11-04T22:07:50+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
     "accn": "0000002488-25-000166",
     "side": "after",
     "as_of": "2025-11-05T00:07:50+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
     "accn": "0000002488-26-000076",
     "side": "before",
     "as_of": "2026-05-05T21:06:27+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
@@ -34526,7 +34538,7 @@
     "accn": "0000002488-26-000123",
     "side": "before",
     "as_of": "2026-08-04T20:40:01+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "AMD",
@@ -34540,21 +34552,21 @@
     "accn": "0001679788-21-000010",
     "side": "after",
     "as_of": "2021-05-14T02:12:24+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "COIN",
     "accn": "0001679788-21-000026",
     "side": "before",
     "as_of": "2021-08-10T22:28:18+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "COIN",
     "accn": "0001679788-21-000026",
     "side": "after",
     "as_of": "2021-08-11T00:28:18+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "COIN",
@@ -34568,7 +34580,7 @@
     "accn": "0001679788-21-000071",
     "side": "after",
     "as_of": "2021-11-10T02:07:39+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "COIN",
@@ -34582,7 +34594,7 @@
     "accn": "0001679788-22-000048",
     "side": "after",
     "as_of": "2022-05-10T21:20:44+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "COIN",
@@ -34596,7 +34608,7 @@
     "accn": "0001679788-22-000085",
     "side": "after",
     "as_of": "2022-08-09T21:31:36+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "COIN",
@@ -34610,7 +34622,7 @@
     "accn": "0001679788-22-000116",
     "side": "after",
     "as_of": "2022-11-03T21:15:08+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "COIN",
@@ -34624,7 +34636,7 @@
     "accn": "0001679788-23-000073",
     "side": "after",
     "as_of": "2023-05-04T21:18:08+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "COIN",
@@ -34638,7 +34650,7 @@
     "accn": "0001679788-23-000106",
     "side": "after",
     "as_of": "2023-08-03T21:13:52+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "COIN",
@@ -34652,7 +34664,7 @@
     "accn": "0001679788-23-000113",
     "side": "after",
     "as_of": "2023-11-02T21:17:17+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "COIN",
@@ -34666,7 +34678,7 @@
     "accn": "0001679788-24-000089",
     "side": "after",
     "as_of": "2024-05-02T21:11:54+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "COIN",
@@ -34680,7 +34692,7 @@
     "accn": "0001679788-24-000149",
     "side": "after",
     "as_of": "2024-08-01T21:15:55+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "COIN",
@@ -34694,7 +34706,7 @@
     "accn": "0001679788-24-000187",
     "side": "after",
     "as_of": "2024-10-30T21:15:11+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "COIN",
@@ -34708,7 +34720,7 @@
     "accn": "0001679788-25-000089",
     "side": "after",
     "as_of": "2025-05-08T21:17:45+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "COIN",
@@ -34722,7 +34734,7 @@
     "accn": "0001679788-25-000154",
     "side": "after",
     "as_of": "2025-07-31T21:16:44+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "COIN",
@@ -34736,7 +34748,7 @@
     "accn": "0001679788-25-000208",
     "side": "after",
     "as_of": "2025-10-30T21:12:04+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "COIN",
@@ -34750,7 +34762,7 @@
     "accn": "0001679788-26-000054",
     "side": "after",
     "as_of": "2026-05-07T21:20:01+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "COIN",
@@ -34764,7 +34776,7 @@
     "accn": "0001679788-26-000088",
     "side": "after",
     "as_of": "2026-07-30T21:15:28+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSTR",
@@ -34834,7 +34846,7 @@
     "accn": "0001564590-18-001547",
     "side": "after",
     "as_of": "2018-02-07T23:00:46+00:00",
-    "outcome": "stale"
+    "outcome": "rounded"
    },
    {
     "ticker": "MSTR",

@@ -324,8 +324,10 @@ _PRIVATE = re.compile(
 """The asker's own account: balance, margin, orders, fills, history, cost basis, account P&L."""
 
 _OTHERS = re.compile(
+    # Not "funds": which funds own a stock is public (13F filings and 5% holders) and the
+    # fundamentals answer reads it; "which funds own TSLA" was refused (stranger QA, 2026-09-29).
     r"\bwhich\s+(?:bitget\s+|other\s+)?(?:users|traders|accounts|people|clients|customers|"
-    r"whales|funds)\s+(?:are|were|is|have|hold|own|bought|sold)\b"
+    r"whales)\s+(?:are|were|is|have|hold|own|bought|sold)\b"
     r"|\bwho\s+(?:is|are|was|were)\s+(?:long|short|buying|selling|holding)\b"
     r"|\b(?P<who>(?-i:[A-Z][\w&.-]+(?:\s+[A-Z][\w&.-]+){0,2}))(?:'s|’s)\s+(?:exact\s+|current\s+|live\s+|"
     r"latest\s+|real[\s-]time\s+|actual\s+)*(?:positions?|holdings|book|portfolio|trades|"
