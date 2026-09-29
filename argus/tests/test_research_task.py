@@ -490,3 +490,39 @@ class TestTheTaskUsesWhatTheTraderSaidBefore:
         research_task(reading=reading, asked=ASKED)
         impact = _one(engines, ResearchKind.IMPACT)
         assert not impact.budget_stated and impact.mandate_text == ""
+
+
+class TestThePageLabelsItsOwnAutoRunExample:
+    """First-user audit, 2026-09-29: `/research` with nothing typed runs a worked example
+    (`_research_route`'s no-``q`` branch, `lui/server.py`) and the page that comes back looks
+    exactly like an answer to a question the visitor asked — the textbox is even filled with it.
+    `task.asked` is empty on that path alone (`research_task()` called with no ``asked=``); every
+    other path, including a rejected question, sets it. That is the one clean signal `task_page`
+    has for "nobody asked this."""
+
+    def test_the_unasked_default_is_labelled_an_example(
+            self, engines: list[ResearchRequest]) -> None:
+        from argus.lui.task_page import render_task
+
+        page = render_task(research_task(), "")
+        assert "Run live when this page loaded" in page
+        assert "not your question" in page
+        assert "<span class='pill'>Example</span>" in page
+
+    def test_a_typed_question_carries_no_example_label(
+            self, engines: list[ResearchRequest]) -> None:
+        from argus.lui.task_page import render_task
+
+        reading = read_question(ASKED)
+        assert isinstance(reading, Reading)
+        page = render_task(research_task(reading=reading, asked=ASKED), "")
+        assert "Run live when this page loaded" not in page
+
+    def test_a_rejected_question_also_carries_no_example_label(self) -> None:
+        """`unread_task` is reached with a non-empty `asked` too (a typed question the reader
+        could not read as one): it must not be mistaken for the auto-run default either."""
+        from argus.lui.task import unread_task
+        from argus.lui.task_page import render_task
+
+        page = render_task(unread_task("hello there", "could not find a name Bitget lists"), "")
+        assert "Run live when this page loaded" not in page

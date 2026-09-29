@@ -80,6 +80,30 @@ class TestTheLivePageKeepsItsPromises:
         page = render(collect(DATA))
         assert page.count("a baseline beat us") >= 10
 
+    def test_a_plain_summary_sits_directly_above_the_first_entry(self) -> None:
+        """First-user audit, 2026-09-29: the first thing a retail trader read on this page, cold,
+        was "N ledger rows booked P&L on positions the risk layer refused" — a bug report with no
+        framing. A plain-language box now sits directly above the first entry, saying why a page
+        of losses exists at all; its count is read from the same `corrections` list the rows are
+        built from, never typed separately."""
+        found = collect(DATA)
+        page = render(found)
+        plain_at = page.index("<div class='plain'>")
+        first_entry_at = page.index("<article class='c ")
+        assert plain_at < first_entry_at
+        box = page[plain_at:page.index("</div>", plain_at)]
+        assert "trading tool that only tells you what went right" in box
+        assert f"{len(found)} entries" in box
+        lost = sum(1 for c in found if c.kind == "loss")
+        assert f"{lost} of them" in box
+        # nothing that already led the page was removed
+        assert page.index("Every entry is read out of the artefact") < plain_at
+
+    def test_an_empty_record_still_carries_the_plain_summary(self) -> None:
+        page = render([])
+        assert "<div class='plain'>" in page
+        assert "0 entries follow, 0 of them" in page
+
 
 def test_a_removed_capability_is_listed_with_its_reason() -> None:
     from argus.lui.corrections import register_removals

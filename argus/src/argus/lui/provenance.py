@@ -48,7 +48,7 @@ from typing import Any
 LABELS = ("live", "computed", "record", "desk", "assumed", "missing", "memory")
 
 _META = re.compile(r"^(?:Data:|Sources reached|Sources:|Quoted \d|Caveat:|Method:|Corrected:|"
-                   r"Computed by ARGUS\b|Read as filed:|"
+                   r"Computed by ARGUS\b|Read as filed:|Read as: \"|"
                    r"以下|\(\d+ decisions? matched|Answerable today\b)", re.I)
 
 _LIVE_LEAD = re.compile(r"\S+ last [\d,.]+ USDT on Bitget\b|Open interest:|Crypto fear|"

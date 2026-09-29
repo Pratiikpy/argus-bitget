@@ -720,9 +720,10 @@ def trade_comparison(rows: list[dict[str, Any]], best_gloaming: str, *,
     threshold ``c``: an edge that does not clear its own round-trip cost is not a trade. Three
     arms, each scored the same way (:func:`_trade_side_and_pnl`): ``argus_perp`` (the console's own
     estimate, replayed through :func:`console_feed`), ``best_gloaming`` (this run's best-scoring
-    gloaming variant), and ``zero`` -- gloaming's shipped estimate is not swapped in here, so
-    ``zero`` (predicts no gap, and so never trades) is the honest no-trade floor every arm must
-    clear before its signal is worth paying for.
+    gloaming variant), and ``zero``, which predicts the stock opens at its last close. Entered at
+    the perpetual's price, ``zero`` trades whenever the perpetual has moved more than the cost
+    away from that close, betting the move reverses: a fade to the last close, which trades on
+    most nights (808 of 904 on 2026-09-29), not a no-trade floor.
     """
     from argus.cost.model import CostModel
 

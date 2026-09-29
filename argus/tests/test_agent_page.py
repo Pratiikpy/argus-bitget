@@ -52,6 +52,9 @@ def test_an_unreadable_record_shows_nothing_stale() -> None:
     html = agent_page.render(_fetch({}))
     assert "could not be read just now" in html
     assert "Scored so far" not in html
+    # The disambiguation is part of the page's own frame, not the fetched body — it must survive
+    # even when the record itself cannot be read.
+    assert "separate project" in html
 
 
 def test_no_decisions_yet_explains_the_heartbeats() -> None:
@@ -66,3 +69,17 @@ def test_the_track3_nav_does_not_carry_the_track2_entry() -> None:
 
     assert all(path != "/agent" for path, _ in design.LINKS)
     assert 'href="/agent"' not in design.nav("/")
+
+
+def test_the_page_says_plainly_it_is_a_separate_project_before_the_reader_can_confuse_it() -> None:
+    """First-user audit, 2026-09-29: the headline "The agent that trades." on the Track 3
+    console's own domain read as ARGUS itself placing orders. The h1 stays (it is kept content,
+    not removed); a plain notice now sits directly under it."""
+    html = agent_page.render(_fetch({"summary.json": SUMMARY, "decisions.json": DECISIONS}))
+    assert "The agent that trades." in html  # unchanged
+    assert "separate project" in html
+    assert "same team" in html
+    assert "Bitget's Demo (paper) environment" in html
+    assert "no real money" in html
+    assert "ARGUS" in html and "never places an order" in html
+    assert html.index("The agent that trades.") < html.index("separate project")

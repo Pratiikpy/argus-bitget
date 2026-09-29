@@ -79,6 +79,38 @@ def test_an_unreadable_register_shows_nothing_rather_than_something(tmp_path: Pa
     assert "unreadable" in render(wins, counts)
 
 
+def test_a_plain_summary_leads_the_page_with_no_jargon_and_the_pages_own_counts() -> None:
+    """First-user audit, 2026-09-29: the page opened on "45 capabilities measured... 6 OWNED, 32
+    TIED..." — an audit-log sentence, not something a retail trader could use. A short
+    plain-language box now leads, defining OWNED/TIED/LOST and stating what a claim on this page
+    means for the reader; its counts are the same `counts` the headline is built from, never a
+    number typed separately."""
+    wins, counts = collect(DATA)
+    page = render(wins, counts)
+    lead = page.split("<h1>", 1)[1].split("</h1>", 1)[1]
+    box = lead.split("<div class='plain'>", 1)[1].split("</div>", 1)[0]
+    assert "<b>OWNED</b>" in box and "<b>TIED</b>" in box and "<b>LOST</b>" in box
+    assert "same input" in box or "same question" in box
+    assert "thirteen" in box
+    assert f"{counts.get('owned', 0)} OWNED" in box
+    assert f"{counts.get('tied', 0)} tied" in box
+    assert f"{counts.get('lost', 0)} lost" in box
+    # no statistics vocabulary in the plain box, even though the page uses it further down
+    for term in ("p-value", "statistically", "ablation", "out-of-sample", "confidence interval"):
+        assert term not in box.lower()
+    # the box comes before the existing technical paragraph and the capability cards, not instead
+    # of them (nothing removed)
+    assert page.index("<div class='plain'>") < page.index("all thirteen conditions hold")
+    assert "OWNED means all thirteen conditions hold" in page  # existing content kept verbatim
+
+
+def test_the_unreadable_register_carries_no_plain_summary(tmp_path: Path) -> None:
+    """There is nothing to summarise plainly when the register itself could not be read."""
+    wins, counts = collect(tmp_path)
+    page = render(wins, counts)
+    assert "<div class='plain'>" not in page
+
+
 def test_the_favicon_copy_matches_the_server() -> None:
     assert FAVICON == SERVER_FAVICON
 

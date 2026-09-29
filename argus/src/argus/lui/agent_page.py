@@ -168,9 +168,15 @@ def render(fetch: Fetch = fetch_json) -> str:
   ol.dec p {{ margin:8px 0 0 }}
   .card {{ border:1px solid var(--line); border-radius:12px; padding:16px;
     background:var(--panel) }}
+  .notice {{ border:1px solid var(--line); border-left:3px solid var(--ink); border-radius:12px;
+    padding:14px 16px; margin:16px 0 20px; background:var(--panel); font-size:14.5px }}
+  .notice b {{ font-weight:600 }}
 {design.BASE_CSS}</style></head><body>{design.nav('/agent')}<div class="wrap">
 <p class="kicker">Track 2 · Agentic Trading · Market Sentiment Agent</p>
 <h1>The agent that trades.</h1>
+<div class="notice"><b>This is a separate project, by the same team</b> — not ARGUS. It trades on
+Bitget's Demo (paper) environment, with no real money. ARGUS, the console you are reading right
+now, never places an order.</div>
 <p class="sub">ARGUS researches; its sibling project trades. Qwen decides, a risk kernel that can
 only reduce stands between it and the venue, and Bitget's Agent Hub places every order on Bitget
 Demo. Everything below is read live from the agent's own record, recomputed hourly from its

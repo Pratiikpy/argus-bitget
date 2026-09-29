@@ -8,10 +8,16 @@ assumed: rebuilt from XLK's ten largest holdings, each weighted by its share and
 P/E from Yahoo, the harmonic P/E is 35.5 over the 58% of the fund those ten names hold, beside the
 33.0 the whole fund implies. The stock's own figures are Yahoo's ``summaryDetail`` and
 ``defaultKeyStatistics``, so both sides come from one source and one definition.
+
+When the answer already shows the stock's multiples from Bitget's data service, those are passed in
+as ``own`` and used here instead, so one answer never prints two different P/Es for the same stock
+(NVDA read 29.1 from Yahoo beside 28.6 from Bitget on 2026-09-29, first-user audit). The line then
+names both sources.
 """
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Any
 
 from argus.lui.answer import Source
@@ -40,9 +46,13 @@ def _raw(block: Any, key: str) -> float | None:
     return float(value) if isinstance(value, (int, float)) and value > 0 else None
 
 
-def sector_valuation(ticker: str, fetch: Any = None) -> tuple[str, Source] | None:
+def sector_valuation(ticker: str, fetch: Any = None,
+                     own: Mapping[str, float | None] | None = None) -> tuple[str, Source] | None:
     """One line setting ``ticker``'s trailing P/E and P/B beside its sector fund's, or ``None``
-    when the sector or either side's figures are not published (a fund, an unlisted sector)."""
+    when the sector or either side's figures are not published (a fund, an unlisted sector).
+
+    ``own`` (keys ``pe`` and ``pb``) replaces Yahoo's figures for the stock with the ones the rest
+    of the answer already shows; a key that is absent or ``None`` keeps Yahoo's."""
     if fetch is None:
         from argus.market.estimates import EstimatesSource
 
@@ -55,19 +65,32 @@ def sector_valuation(ticker: str, fetch: Any = None) -> tuple[str, Source] | Non
     held = (fetch(fund, "topHoldings").get("topHoldings") or {}).get("equityHoldings") or {}
     own_pe = _raw(profile.get("summaryDetail"), "trailingPE")
     own_pb = _raw(profile.get("defaultKeyStatistics"), "priceToBook")
+    given = {k: v for k, v in (own or {}).items() if isinstance(v, (int, float)) and v > 0}
+    own_pe, own_pb = given.get("pe", own_pe), given.get("pb", own_pb)
     fund_pe = (1 / y) if (y := _raw(held, "priceToEarnings")) else None
     fund_pb = (1 / y) if (y := _raw(held, "priceToBook")) else None
     parts = []
-    for label, own, bench in (("trailing P/E", own_pe, fund_pe), ("P/B", own_pb, fund_pb)):
-        if own is not None and bench is not None:
-            ratio = own / bench
+    for label, stock, bench in (("trailing P/E", own_pe, fund_pe), ("P/B", own_pb, fund_pb)):
+        if stock is not None and bench is not None:
+            ratio = stock / bench
             rel = f"{ratio:.1f} times" if ratio >= 2 else f"{ratio - 1:+.0%}"
-            parts.append(f"{label} {own:.1f} against {bench:.1f} ({rel})")
+            parts.append(f"{label} {stock:.1f} against {bench:.1f} ({rel})")
     if not parts:
         return None
-    line = (f"Against its sector ({sector}, measured by the SPDR fund {fund}): "
-            f"{'; '.join(parts)}. Both from Yahoo Finance; the fund's figure is its "
-            f"holdings-weighted earnings and book yield, inverted.")
+    # A plain reading for "is it expensive": on trailing earnings, against the sector, with a band
+    # of 10% either side called "in line" so a few points of difference are not called a verdict.
+    verdict = ""
+    if own_pe is not None and fund_pe is not None:
+        ratio = own_pe / fund_pe
+        verdict = ("priced above its sector on earnings" if ratio > 1.1 else
+                   "priced below its sector on earnings" if ratio < 0.9 else
+                   "priced in line with its sector on earnings")
+        verdict = f"{ticker} is {verdict}: "
+    line = (f"Against its sector ({sector}, measured by the SPDR fund {fund}): {verdict}"
+            f"{'; '.join(parts)}. "
+            + ("The stock's figures are Bitget's data service's, the fund's Yahoo Finance's"
+               if given else "Both from Yahoo Finance")
+            + "; the fund's figure is its holdings-weighted earnings and book yield, inverted.")
     return line, Source(kind="venue", ref="Yahoo Finance quoteSummary (sector fund)",
                         detail=f"{ticker} against {fund} topHoldings.equityHoldings")
 

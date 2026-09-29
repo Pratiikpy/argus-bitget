@@ -119,6 +119,9 @@ BASE_CSS = """
     letter-spacing:.1em; text-transform:uppercase; padding:8px 10px; border-radius:8px }
   .nav .links a:hover { color:var(--ink); background:var(--veil) }
   .nav .links a.on { color:var(--ink); background:var(--veil) }
+  /* Invisible to layout at every width except the one below, where it becomes the box the
+     scroll-hint chevron is positioned against — so wrapping the row costs nothing on desktop. */
+  .nav .links-wrap { display:contents }
   @media (max-width: 720px) {
     /* One scrollable row, not three wrapped ones: the bar is sticky, and wrapped it held a fifth
        of a phone screen (155px at 390px wide, seen 2026-09-29). The fade says there is more. */
@@ -131,6 +134,18 @@ BASE_CSS = """
     /* the current page leads the row, so it is never scrolled out of sight (no script: the
        proof pages ship none) */
     .nav .links a.on { order:-1 }
+    /* The fade alone did not say there was more to scroll (first-user audit, 2026-09-29): nothing
+       marked the row as scrollable rather than simply wrapped oddly. A chevron sits over the fade,
+       ink on the page background for full contrast (WCAG AA, ~19:1 in both themes) — CSS only,
+       `pointer-events:none` so it never intercepts a tap on the link underneath, and it needs no
+       script to know when to appear or disappear: it is drawn once, over the row's own height. */
+    .nav .links-wrap { display:block; position:relative; width:100% }
+    .nav .links-wrap::after {
+      content:"\\203A "; position:absolute; top:0; right:0; bottom:0; display:flex;
+      align-items:center; padding:0 2px 0 20px; pointer-events:none; color:var(--ink);
+      font:700 17px/1 var(--sans);
+      background:linear-gradient(to right, transparent, var(--bg) 55%, var(--bg))
+    }
     .wrap { padding:28px 16px 56px }
   }
   .foot { border-top:1px solid var(--line); margin-top:56px; padding:22px 24px 36px;
@@ -183,8 +198,8 @@ def nav(active: str = "/") -> str:
                     for href, label in LINKS)
     return (f'<a class="skip" href="#main">Skip to content</a>'
             f'<nav class="nav" aria-label="Primary"><a class="brand" href="/" aria-label="ARGUS '
-            f'home">{mark_svg(22)}<span>ARGUS</span></a><div class="links">{links}'
-            f'<a href="https://github.com/Pratiikpy/argus-bitget">GitHub</a></div></nav>'
+            f'home">{mark_svg(22)}<span>ARGUS</span></a><div class="links-wrap"><div class="links">'
+            f'{links}<a href="https://github.com/Pratiikpy/argus-bitget">GitHub</a></div></div></nav>'
             f'<span id="main" tabindex="-1"></span>')
 
 
@@ -194,7 +209,8 @@ def footer() -> str:
     return ('<footer class="foot"><span>ARGUS · every figure computed, every source named, every '
             'loss published.</span><span>Analysis, not advice. Data: Bitget, SEC EDGAR, FRED, '
             'public news. <a href="/architecture">Architecture</a> · <a href="/policy">Risk '
-            'policy</a> · <a href="/factors">Factors</a> · <a href="/agent">Track 2 agent</a> · '
+            'policy</a> · <a href="/factors">Factors</a> · '
+            '<a href="/agent">Trading agent (separate project)</a> · '
             '<a href="/brand">Brand</a></span></footer>')
 
 

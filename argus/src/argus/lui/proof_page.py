@@ -308,6 +308,7 @@ def _card(win: Win) -> str:
 
 def render(wins: list[Win], counts: dict[str, int]) -> str:
     esc = html.escape
+    plain = ""
     if not wins:
         body = ("<p class='sub'>The standing register could not be read, so nothing is shown "
                 "rather than something unverified.</p>")
@@ -317,6 +318,23 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
         headline = (f"{len(wins)} capabilities measured against a named rival: "
                     + ", ".join(f"{counts.get(s, 0)} {s.upper()}" for s in order))
         reachable = sum(1 for w in wins if w.console)
+        # Plain language before the audit-log detail below: a first-time reader met the vocabulary
+        # of a compliance log ("13 of 13 conditions met") with nothing that said what a claim on
+        # this page actually promises them (first-user and judge audit, 2026-09-29). The counts are
+        # the same `counts` the headline above is built from, read once here, never retyped.
+        plain = (
+            "<div class='plain'><p>This page is the evidence behind every "
+            "&ldquo;ARGUS beats X&rdquo; claim we make: for each one, we picked a real, named "
+            "competitor, ran both on the exact same question, and checked who actually won &mdash; "
+            "rather than just asserting it. <b>OWNED</b> means ARGUS beat that competitor on the "
+            "same input and we checked the win thirteen separate ways. <b>TIED</b> means the two "
+            "came out about even. <b>LOST</b> means the competitor won, and we say so rather than "
+            "leaving it off the page. Right now that is "
+            f"{counts.get('owned', 0)} OWNED, {counts.get('tied', 0)} tied, "
+            f"{counts.get('lost', 0)} lost, and {counts.get('implemented', 0)} built but not yet "
+            "checked this way &mdash; so for you, a claim on this page is never just our word for "
+            "it.</p></div>"
+        )
         sections: list[str] = []
         for track in TRACK_ORDER:
             mine = [w for w in wins if w.track == track]
@@ -346,6 +364,10 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
  h3.theme {{ font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim);
    margin:22px 0 8px; font-weight:600 }}
  .sub {{ margin:0 0 14px }}
+ .plain {{ background:var(--panel); border:1px solid var(--line); border-radius:10px;
+   padding:14px 16px; margin:0 0 16px }}
+ .plain p {{ margin:0; font-size:14.5px; max-width:none }}
+ .plain b {{ font-weight:600 }}
  .w {{ background:var(--panel); border:1px solid var(--line); border-radius:10px;
    padding:14px 16px; margin-bottom:12px }}
  .w h3 {{ font-size:15.5px; margin:6px 0 8px; line-height:1.35 }}
@@ -383,6 +405,7 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
  @media (max-width:520px) {{ .lbl {{ display:block; min-width:0 }} }}
 {design.BASE_CSS}</style></head><body>{design.nav('/proof')}<div class="wrap">
 <h1>{esc(headline)}</h1>
+{plain}
 <p class="sub">OWNED means all thirteen conditions hold: the rival's best implementation read,
 its method reproduced, both run on the same input, a statistically valid evaluation with costs,
 out-of-sample, ablation, an adversarial test, failure cases, reproducibility, and no specialist

@@ -154,6 +154,8 @@ NOT_JUDGES: Mapping[str, str] = {
     "argus/agents/debate.py:389": "argues a side; convergence is computed arithmetically, no "
                                   "seat issues a verdict",
     "argus/lui/translate.py:145": "translates text; generation, not judgement",
+    "argus/lui/server.py:628": "restates a question in an unread script as English before "
+                               "routing; the restatement is shown to the asker, not graded",
     "argus/eval/leakage.py:753,770": "the model is the subject under test, not the grader",
     "argus/desk/rule_proposer.py:604": "writes a candidate rule; whether it is kept is decided "
                                        "by a replayed regression gate, not by a model",

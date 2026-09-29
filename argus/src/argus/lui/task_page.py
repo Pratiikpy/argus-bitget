@@ -139,6 +139,8 @@ def _top(asked: str, name: str, size_pct: float, book_text: str) -> str:
    color:var(--on-accent); border-radius:8px; font-size:14px; cursor:pointer }}
  form button:disabled {{ opacity:.7; cursor:progress }}
  .running {{ margin:8px 0 0; font-size:13.5px; color:var(--dim) }}
+ .example {{ margin:0 0 8px; font-size:13.5px; color:var(--dim) }}
+ .example .pill {{ margin-right:8px; vertical-align:1px }}
  .q {{ font-size:17px; font-weight:600; margin:0 0 12px }}
  .concl {{ background:var(--panel); border:1px solid var(--accent); border-radius:10px;
    padding:14px 18px; margin:0 0 20px }}
@@ -272,7 +274,14 @@ def _main(task: Task) -> str:
         notes = "".join(f"<li>{esc(n)}</li>" for n in task.reading.notes)
         read = (f"<p class='read'><b>Read as:</b> {esc(task.reading.summary)}</p>"
                 + (f"<ul class='notes'>{notes}</ul>" if notes else ""))
-    return f"""<p class="q">{esc(task.question)}</p>
+    # This page auto-runs a worked example the instant it loads with nothing typed (`asked` is
+    # empty only on that path — `_research_route` never reaches `research_task()` with an empty
+    # `asked` any other way). Without a label the first thing a visitor sees is a full answer to a
+    # question they never asked, read as though it were theirs (first-user audit, 2026-09-29).
+    example = ("<p class='example'><span class='pill'>Example</span> Run live when this page "
+               "loaded &mdash; not your question. Ask your own above.</p>"
+               if not task.asked else "")
+    return f"""{example}<p class="q">{esc(task.question)}</p>
 {read}
 {called}<section class="concl"><h2>What to do, engine by engine</h2><ol>{conclusion}</ol>
 </section>

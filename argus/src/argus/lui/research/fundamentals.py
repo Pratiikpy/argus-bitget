@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import itertools
 import re
 from collections.abc import Mapping, Sequence
@@ -633,6 +634,7 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
     def entry(entry_id: str) -> Any:
         return shared_service().results(entry_id, symbol=ticker)
 
+    sector_reads: dict[tuple[str, str], Any] = {}
     with ContextPool(max_workers=8) as pool:
         pending = {name: pool.submit(ask, name) for name in
                    ("next_earnings", "consensus", "institutional_holdings", "quote",
@@ -676,11 +678,18 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
         pending["filings"] = pool.submit(
             lambda: EdgarSource().filings(ticker, since=datetime.now(UTC) - timedelta(days=400),
                                           limit=60))
-        if _SECTOR_Q.search(raw_text):
+        if _SECTOR_Q.search(raw_text) or _VALUE_Q.search(raw_text):
             # "Is AAPL's P/E high for its sector" had no benchmark (stranger QA, 2026-09-29).
             from argus.lui.research.sector import sector_valuation
+            from argus.market.estimates import EstimatesSource
 
-            pending["sector"] = pool.submit(sector_valuation, ticker)
+            # Fetched now, in parallel with the rest; the line is written once the answer's own
+            # multiples are known, so the stock's P/E is the same figure everywhere in it.
+            def recording(symbol: str, modules: str) -> Any:
+                sector_reads[(symbol, modules)] = EstimatesSource().summary(symbol, modules)
+                return sector_reads[(symbol, modules)]
+
+            pending["sector"] = pool.submit(sector_valuation, ticker, recording)
 
     def safe(name: str) -> Any:
         try:
@@ -889,8 +898,18 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
             sources.append(Source(kind="venue", ref="bitget-mcp-server equity_fundamental_ratios",
                                   detail=f"{ticker} {ratio_row.get('period_ending')}"))
     against_sector = safe("sector")
+    if isinstance(against_sector, tuple) and ratio_row is not None:
+        # A read that failed the first time is not retried; the earlier line stands.
+        with contextlib.suppress(KeyError):
+            against_sector = sector_valuation(
+                ticker, fetch=lambda symbol, modules: sector_reads[(symbol, modules)],
+                own={"pe": ratio_row.get("pe_ttm_ed"), "pb": ratio_row.get("pb_mrq")}) \
+                or against_sector
     if isinstance(against_sector, tuple):
-        lines.append(against_sector[0])
+        # Ahead of the multiples, so the verdict is read before the figures behind it.
+        at = next((i for i, line in enumerate(lines) if line.startswith("Valuation on")),
+                  len(lines))
+        lines.insert(at, against_sector[0])
         sources.append(against_sector[1])
     positions = safe("equity_ownership_inst_position_summary")
     flow_lines: list[str] = []
@@ -977,8 +996,28 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
     if not lines:
         lines.append(f"bitget-mcp-server covers US stocks and ETFs, and returned nothing for "
                      f"{ticker} just now — a non-US listing has no US filings to report.")
+    if _QUOTE.search(raw_text) and symbol in TRADED_SYMBOLS:
+        # "Where is NVDA trading, when does it report and is it expensive" came back with no
+        # price at all (first-user audit, 2026-09-29): a question that asks for the price gets it,
+        # read live from Bitget, whichever engine answers the rest.
+        from argus.market.bitget import fetch_tickers
+
+        try:
+            live = fetch_tickers().get(symbol)
+        except Exception:
+            live = None
+        if live is not None:
+            lines.insert(0, f"{ticker} last {live.last} USDT on Bitget "
+                            f"({float(live.change_24h) * 100:+.2f}% over 24h).")
+            sources.append(Source(kind="venue", ref="Bitget v2 tickers",
+                                  detail=f"{symbol} last price, live"))
     return _fundamentals_focus(lines, raw_text, ticker), sources
 
+
+_VALUE_Q = re.compile(r"\b(?:expensive|cheap|pricey|valuation|(?:over|under)[\s-]?valued|p/?e\b|"
+                      r"p/?b\b|ev/?ebitda|multiple)", re.I)
+"""A valuation question. "Is it expensive" is answered against the sector first: the multiples
+alone gave a first-time user no verdict (first-user audit, 2026-09-29)."""
 
 _SECTOR_Q = re.compile(r"\b(?:sector|industry|peers?|compared?\s+(?:to|with)\s+(?:its|the)\s+"
                        r"(?:sector|industry|peers|group))\b", re.I)
@@ -999,8 +1038,7 @@ _FOCUS: tuple[tuple[re.Pattern[str], tuple[str, ...], str], ...] = (
      "dividend"),
     (re.compile(r"\bbalance\s+sheet|\bbitcoin|\bbtc\b|\btreasury\b", re.I),
      ("holds", "bitcoin"), "bitcoin holding"),
-    (re.compile(r"\b(?:expensive|cheap|pricey|valuation|(?:over|under)[\s-]?valued|p/?e\b|"
-                r"p/?b\b|ev/?ebitda|multiple)", re.I), ("Valuation on",), "valuation"),
+    (_VALUE_Q, ("Against its sector", "Valuation on"), "valuation"),
     # "What does QQQ hold" asks for a fund's portfolio (or a company's bitcoin), not its owners.
     (re.compile(r"\bwhat\s+does\s+\S+\s+hold\b|\bholdings\b|\bconstituents\b|\btop\s+positions\b",
                 re.I), ("Fund holdings", "holds"), "holdings"),

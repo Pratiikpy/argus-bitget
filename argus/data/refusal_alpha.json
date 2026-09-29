@@ -1,8 +1,8 @@
 {
-  "as_of": "2026-09-28T20:11:52.073374+00:00",
+  "as_of": "2026-09-29T14:20:33.678328+00:00",
   "round_trip_bps": 12.0,
   "min_directional_for_a_rate": 30,
-  "total_marks": 592,
+  "total_marks": 602,
   "outside_buckets": 0,
   "horizons": [
     {
@@ -54,27 +54,27 @@
     },
     {
       "horizon": "overnight_12h_plus",
-      "marks": 146,
-      "directional": 142,
-      "correct": 68,
-      "coverage_pct": 97.3,
-      "accuracy_pct": 47.9,
+      "marks": 156,
+      "directional": 152,
+      "correct": 71,
+      "coverage_pct": 97.4,
+      "accuracy_pct": 46.7,
       "accuracy_ci95": [
-        37.6,
-        57.0
+        37.1,
+        55.8
       ],
       "interval_method": "bootstrap over decision cycles",
-      "cycles": 13,
+      "cycles": 14,
       "beats_a_coin": false,
       "naive_lean": "up",
-      "naive_accuracy_pct": 52.8,
+      "naive_accuracy_pct": 52.6,
       "cycles_lean_beat_naive": 5,
-      "cycles_naive_beat_lean": 5,
+      "cycles_naive_beat_lean": 6,
       "cycles_tied": 3,
       "sign_test_p_vs_naive": 1.0,
       "beats_the_naive_call": false,
-      "hurdle_clearance_pct": 84.9,
-      "median_forgone_bps": -18.82,
+      "hurdle_clearance_pct": 84.6,
+      "median_forgone_bps": -19.53,
       "enough_for_a_rate": true
     }
   ],

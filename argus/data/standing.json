@@ -5056,12 +5056,12 @@
     {
       "capability": "Deliberation priced as a trading cost",
       "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/deliberation_comparison.json: designed_cases - a 17-point delay sweep and three thinking-budget tiers through two pure functions: a property of the formulas, not a measurement over decisions"
+      "detail": "no groupwise check has run on its artefacts: data/deliberation_comparison.json: designed_cases - a 17-point delay sweep and three thinking-budget tiers through two pure functions: a property of the formulas, not a measurement over decisions; data/general_delib_comparison.json: aggregate_without_rows - 23,003 real decision instants reduced to MSE per contender, horizon, book and phase, with a block-bootstrap interval on each difference; the per-instant predictions are hashed (instants_sha256), not stored"
     },
     {
       "capability": "Deliberation priced as a trading cost",
       "problem": "out_of_sample_test is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/deliberation_comparison.json: designed_cases - a 17-point delay sweep and three thinking-budget tiers through two pure functions: a property of the formulas, not a measurement over decisions"
+      "detail": "no groupwise check has run on its artefacts: data/deliberation_comparison.json: designed_cases - a 17-point delay sweep and three thinking-budget tiers through two pure functions: a property of the formulas, not a measurement over decisions; data/general_delib_comparison.json: aggregate_without_rows - 23,003 real decision instants reduced to MSE per contender, horizon, book and phase, with a block-bootstrap interval on each difference; the per-instant predictions are hashed (instants_sha256), not stored"
     },
     {
       "capability": "Abstention scored as a decision",

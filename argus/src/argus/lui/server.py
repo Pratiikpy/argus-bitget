@@ -143,6 +143,10 @@ PAGE = """<!doctype html>
   .fb button { padding:3px 11px; border:1px solid var(--line); background:var(--panel);
     color:var(--ink); border-radius:999px; font-size:12.5px; cursor:pointer }
   .fb button:hover, .fb button:focus-visible { border-color:var(--accent) }
+  .more { display:block; margin:8px 0 2px; padding:6px 12px; border:1px solid var(--line);
+    background:var(--panel); color:var(--accent); font:600 12.5px system-ui,sans-serif;
+    border-radius:8px; cursor:pointer }
+  .more:hover, .more:focus-visible { border-color:var(--accent) }
   .stat { font:12px/1.6 var(--mono); color:var(--dim); margin:0 0 14px }
   .jump { display:flex; gap:10px 22px; flex-wrap:wrap; margin:0 0 30px; font-weight:500 }
   .jump a { text-decoration:none; color:var(--ink); border-bottom:1px solid var(--line);
@@ -294,6 +298,24 @@ const lineClass = l => /^(Actionable|Bottom line)(?: \\([^)]*\\))?:/.test(l) ? '
   : l.startsWith('Hedge:') ? 'line hedge'
   : (l.startsWith('Assumed:') || l.startsWith('Data:')) ? 'line fine' : 'line';
 
+// A long answer (research and portfolio questions run past eight lines routinely) used to land as
+// one wall of text; a first-time reader had no way to tell the lead from the supporting detail
+// (first-user audit, 2026-09-29). Past eight lines, only the first six show — the lead and its
+// closest support — behind a real button rather than a link, so it is reachable by keyboard and
+// announced by a screen reader as expandable. Source badges (`pv()`) are baked into every line,
+// shown or hidden, so nothing loses its provenance by being collapsed. A refusal is never
+// collapsed: the reason a question was refused is the one thing this console must never bury.
+let cardSeq = 0;
+const collapseLines = (divs, refused) => {
+  if (refused || divs.length <= 8) return divs.join('');
+  const id = 'more-' + (++cardSeq);
+  const label = `Show all ${divs.length} lines`;
+  return divs.slice(0, 6).join('') +
+    `<div class="rest" id="${id}" hidden>${divs.slice(6).join('')}</div>` +
+    `<button type="button" class="more" aria-expanded="false" aria-controls="${id}" ` +
+    `data-label="${escA(label)}">${label}</button>`;
+};
+
 fetch('status').then(r => r.json()).then(s => {
   // The age is shown unconditionally, not only when stale. A figure with no date beside it invites
   // the reader to assume it is current, and the chain of a stale snapshot verifies perfectly.
@@ -306,11 +328,15 @@ fetch('status').then(r => r.json()).then(s => {
   } else {
     const next = s.next_cycle_at ? new Date(s.next_cycle_at) : null;
     const until = next ? Math.max(0, Math.round((next - Date.now()) / 36e5 * 10) / 10) : null;
-    age = ` Last decision ${s.age_hours}h ago; the desk decides four times a day during US ` +
-      `market hours` + (until !== null ? `, next in ${until}h.` : '.');
+    age = ` Last decision ${s.age_hours}h ago` + (until !== null ? `, next in ${until}h.` : '.');
   }
+  // Plain language before the jargon: a first-time reader met "836 decisions on record, chain
+  // intact" with no idea what a "decision" was or whose money was on the line (first-user audit,
+  // 2026-09-29). What it is, then the live count.
   document.getElementById('stat').textContent =
-    `${s.entries} decisions on record, chain ${s.chain_intact ? 'intact' : 'BROKEN'}.` + age;
+    `This is ARGUS's own paper desk: it decides four times a day during US market hours, with ` +
+    `no real money, and every decision is written into a tamper-evident record. ${s.entries} ` +
+    `decisions logged so far, chain ${s.chain_intact ? 'unbroken' : 'BROKEN'}.` + age;
 }).catch(() => {});
 
 const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
@@ -338,9 +364,9 @@ document.getElementById('f').addEventListener('submit', async ev => {
           <span class="tag">answered in ${(a.elapsed_ms / 1000).toFixed(1)} s</span>
           ${a.refused ? '<span class="tag over">refused</span>' : ''}
         </div>
-        <div class="lines">${a.lines.map((l, i) =>
-          `<div class="${lineClass(l)}">${pv((a.line_labels || [])[i])}${esc(l)}</div>`)
-          .join('')}</div>
+        <div class="lines">${collapseLines(a.lines.map((l, i) =>
+          `<div class="${lineClass(l)}">${pv((a.line_labels || [])[i])}${esc(l)}</div>`),
+          a.refused)}</div>
         ${a.sources.length ? `<div class="src"><span class="rk">Receipt · ${a.sources.length}` +
           ` source${a.sources.length === 1 ? '' : 's'}</span>` +
           a.sources.map(s => `&nbsp;&nbsp;<b>${esc(s.kind)}</b>:${esc(s.ref)}` +
@@ -368,8 +394,8 @@ document.getElementById('f').addEventListener('submit', async ev => {
           lines.lang = a.translate.lang;
           lines.innerHTML =
             note.map(l => `<div class="line fine">${esc(l)}</div>`).join('') +
-            t.lines.map((l, i) => `<div class="${lineClass(body[i])}">` +
-              `${pv((a.line_labels || [])[a.translate.skip + i])}${esc(l)}</div>`).join('');
+            collapseLines(t.lines.map((l, i) => `<div class="${lineClass(body[i])}">` +
+              `${pv((a.line_labels || [])[a.translate.skip + i])}${esc(l)}</div>`), a.refused);
         }).catch(() => {});
     }
   } catch (e) {
@@ -389,8 +415,19 @@ document.getElementById('f').addEventListener('submit', async ev => {
     clearTimeout(timer); document.getElementById('go').disabled = false; qEl.focus();
   }
 });
-// "Did this answer your question?" — one click per answer, counted anonymously (`lui/usage.py`).
+// "Show all N lines": a real button toggled by a click or, natively, by Enter/Space on it, with
+// aria-expanded kept true to what is on screen for a screen reader.
 out.addEventListener('click', e => {
+  const more = e.target.closest('.more');
+  if (more) {
+    const rest = document.getElementById(more.getAttribute('aria-controls'));
+    if (!rest) return;
+    const expand = rest.hidden;
+    rest.hidden = !expand;
+    more.setAttribute('aria-expanded', String(expand));
+    more.textContent = expand ? 'Show fewer lines' : more.dataset.label;
+    return;
+  }
   const b = e.target.closest('.fb button'); if (!b) return;
   const box = b.parentElement;
   post('feedback', {id: box.dataset.id, useful: b.dataset.u}).catch(() => {});
@@ -569,6 +606,43 @@ EMPTY_QUESTION: dict[str, Any] = {
 MCP ``argus_ask`` tool says the same in its ``isError`` result (`lui/mcp_server.py`)."""
 
 
+UNREAD_SCRIPT = re.compile("[\u0590-\u05ff\u0600-\u06ff\u0400-\u04ff\u0900-\u097f"
+                           "\u0e00-\u0e7f\uac00-\ud7af\u3040-\u30ff]")
+"""Hebrew, Arabic, Cyrillic, Devanagari, Thai, Hangul and Japanese kana: scripts the question
+patterns do not read, and on which the local reader has seven training questions each. A Hindi
+"what is NVDA's price right now" was answered with an unrelated decision on the hosted console and
+a path match locally, each stated with confidence (hostile review, 2026-09-29)."""
+
+RESTATE_PROMPT = (
+    "Restate the user's question in English, exactly as meant. Keep every ticker, name, number "
+    "and date unchanged. Do not answer it. Reply as JSON: {\"english\": \"...\"}.")
+
+
+def _read_in_english(text: str) -> tuple[str | None, str]:
+    """The question restated in English by the model, and why when it cannot be. The model only
+    restates the question; every figure in the answer is still computed from live data."""
+    client = _router()
+    if client is None:
+        return None, "no language model is configured on this console"
+    try:
+        out = client.complete_json(
+            [{"role": "system", "content": RESTATE_PROMPT}, {"role": "user", "content": text}],
+            required_keys=("english",), max_tokens=300)
+    except Exception as exc:  # the refusal below says so rather than guessing
+        return None, f"the language model did not answer ({type(exc).__name__})"
+    english = str(out.get("english") or "").strip()
+    if not english or UNREAD_SCRIPT.search(english):
+        return None, "the language model did not return an English reading"
+    return english[:500], ""
+
+
+SOMEONE_ELSE = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+|\b(?:for|of)\s+(?:user|account|client|"
+                          r"customer)\s+\S+|\b(?:user|account)\s+(?:id|number|#)\s*\S+", re.I)
+"""A question that names a person or an account. The console keeps no accounts, so what it answers
+is the desk's own record or the book the asker gave; "positions for user x@y.com" was answered with
+the desk's position and no word that the name was not used (hostile review, 2026-09-29)."""
+
+
 def handle_ask(
     text: str, prior: list[str], *, now: datetime | None = None, visitor: str = "local",
     book: str = "", memory: str = "",
@@ -580,6 +654,18 @@ def handle_ask(
     with what was noted."""
     from argus.lui import memory as mem
 
+    read_as = ""
+    if UNREAD_SCRIPT.search(text):
+        english, why = _read_in_english(text)
+        if english is None:
+            return {**EMPTY_QUESTION, "error": "unread language", "reason": "unread language",
+                    "lines": [
+                        "This console reads questions in English and Chinese, and reads other "
+                        f"languages through its language model, but {why}, so it will not guess "
+                        "at this one. Ask in English, for example \"what is NVDA's price right "
+                        "now\"."],
+                    "memory": memory, "remembered": []}
+        read_as, text = text, english
     facts = mem.parse(memory)
     new = mem.extract(text, now, price_of=_price_now)
     facts = mem.merge(facts, new)
@@ -622,6 +708,20 @@ def handle_ask(
                        classified_by="memory", sources=[])
     payload["memory"] = mem.dumps(facts)
     payload["remembered"] = [f.text for f in new]
+    if SOMEONE_ELSE.search(text) and payload.get("lines") and not payload.get("refused"):
+        # After a bottom line, which answers first; otherwise ahead of everything, so the note
+        # never lands inside a list ("1 open position:" was split from its row, 2026-09-29).
+        lines = list(payload["lines"])
+        at = 1 if str(lines[0]).startswith("Bottom line") else 0
+        lines.insert(at, "This console has no user accounts: the name or account in the question "
+                         "was not used. What follows is ARGUS's own paper desk or the book you "
+                         "gave, not anyone else's.")
+        payload["lines"] = lines
+    if read_as and payload.get("lines"):
+        # Said on the answer, so a misreading is visible rather than silently answered.
+        payload["lines"] = [f'Read as: "{text}" (restated in English by the language model; every '
+                            "figure below is computed from live data).", *payload["lines"]]
+        payload["read_as"] = {"original": read_as, "english": text}
     # "1 trade(s)" resolved against its count, here where every answer leaves (`lui/plural.py`).
     from argus.lui.plural import resolve_plurals
 

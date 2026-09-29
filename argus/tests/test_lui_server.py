@@ -628,3 +628,58 @@ def test_a_book_naming_what_bitget_does_not_list_is_said_not_dropped() -> None:
                          now=newest + timedelta(hours=1), book="50% ZZZZ, 50% NVDA")
     assert payload["lines"][1] == ("Not read from your book: ZZZZ (50%) — not a contract Bitget "
                                    "lists, so it is left out of this answer.")
+
+
+class TestAScriptThePatternsDoNotRead:
+    """A question in a script the patterns do not read is restated in English by the model, and
+    the answer says how it was read; with no model it is refused, never guessed at (hostile
+    review, 2026-09-29: a Hindi price question got an unrelated, confident answer)."""
+
+    def test_without_a_model_it_refuses_rather_than_guesses(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui import server
+
+        monkeypatch.setattr(server, "_router", lambda: None)
+        payload = server.handle_ask("अभी NVDA की कीमत क्या है?", [])
+        assert payload["refused"] is True and payload["reason"] == "unread language"
+        assert "will not guess" in payload["lines"][0]
+
+    def test_with_a_model_the_english_reading_is_answered_and_shown(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui import server
+
+        class Restater:
+            def complete_json(self, messages: object, **_: object) -> dict[str, str]:
+                return {"english": "is the log tamper-evident"}
+
+        monkeypatch.setattr(server, "_router", lambda: Restater())
+        payload = server.handle_ask("क्या लॉग छेड़छाड़-रोधी है?", [])
+        assert payload["lines"][0].startswith('Read as: "is the log tamper-evident"')
+        assert payload["read_as"]["english"] == "is the log tamper-evident"
+
+    def test_a_latin_or_chinese_question_is_not_restated(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui import server
+
+        assert not server.UNREAD_SCRIPT.search("where is NVDA trading")
+        assert not server.UNREAD_SCRIPT.search("英伟达什么时候发布财报")
+        assert server.UNREAD_SCRIPT.search("Сколько стоит NVDA")
+
+
+def test_a_question_naming_someone_else_says_the_console_has_no_accounts() -> None:
+    """Hostile review, 2026-09-29: "positions for user x@y.com" was answered with the desk's own
+    position and no word that the name was not used."""
+    from argus.lui.server import _ledger_path
+    from argus.paper.ledger import PaperLedger
+
+    newest = max(datetime.fromisoformat(e.decided_at)
+                 for e in PaperLedger(path=_ledger_path()).entries)
+    payload = handle_ask("why did you do nothing all weekend for user bob@example.com", [],
+                         now=newest + timedelta(hours=1))
+    lines = payload["lines"]
+    note = next(i for i, line in enumerate(lines) if "no user accounts" in line)
+    assert note == (1 if lines[0].startswith("Bottom line") else 0)
+    listing = handle_ask("show positions for user bob@example.com", [],
+                         now=newest + timedelta(hours=1))["lines"]
+    assert "no user accounts" in listing[0] or listing[0].startswith("Bottom line")
+    assert not listing[-1].startswith("This console has no user accounts")

@@ -45,6 +45,52 @@ class TestTheTopBar:
         assert {"/", "/research", "/proof", "/wrong", "/status", "/materials", "/architecture",
                 "/policy", "/factors", "/agent", "/brand"} <= linked
 
+    def test_the_footer_names_the_track_2_agent_as_its_own_project(self) -> None:
+        """First-user audit, 2026-09-29: "Track 2 agent" read as part of this console rather than
+        a link away to a separate entry."""
+        assert '<a href="/agent">Trading agent (separate project)</a>' in design.footer()
+        assert "Track 2 agent" not in design.footer()
+
+    def test_the_mobile_row_carries_a_scroll_hint_over_the_fade(self) -> None:
+        """First-user audit, 2026-09-29: the sideways-scrolling nav gave no sign there was more to
+        it than three cramped links — the fade alone said nothing to a visitor who had not already
+        scrolled. The hint is CSS only (no script: the proof pages ship none) and inert to touch
+        and click so it never steals a tap meant for the link underneath it."""
+        bar = design.nav("/")
+        assert '<div class="links-wrap"><div class="links">' in bar
+        css = design.BASE_CSS
+        # Invisible on every width except the one narrow enough to need it: the wrapper costs
+        # nothing on desktop, where the row never scrolls.
+        assert ".nav .links-wrap { display:contents }" in css
+        mobile = css.split("@media (max-width: 720px)", 1)[1]
+        assert ".nav .links-wrap::after" in mobile
+        assert "content:" in mobile and "203A" in mobile  # \203A: the chevron glyph
+        assert "pointer-events:none" in mobile
+        assert "color:var(--ink)" in mobile
+
+    def test_the_scroll_hint_meets_wcag_aa_contrast(self) -> None:
+        """The hint is drawn in the page's own ink-on-background pair, the same one every heading
+        and body line already uses, checked here rather than assumed."""
+
+        def luminance(hex_colour: str) -> float:
+            r, g, b = (int(hex_colour[i:i + 2], 16) / 255 for i in (1, 3, 5))
+
+            def lin(c: float) -> float:
+                return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+
+            lr, lg, lb = lin(r), lin(g), lin(b)
+            return 0.2126 * lr + 0.7152 * lg + 0.0722 * lb
+
+        def ratio(a: str, b: str) -> float:
+            la, lb = luminance(a) + 0.05, luminance(b) + 0.05
+            return max(la, lb) / min(la, lb)
+
+        palette = {name: hexcode for name, hexcode, *_ in design.PALETTE}
+        assert ratio(palette["Ink"], palette["Paper"]) >= 4.5  # light mode: --ink on --bg
+        # Dark mode swaps in near-white ink on near-black paper (design.TOKENS_CSS); Ink/Paper
+        # inverted is the same pair read the other way, so the ratio is identical.
+        assert ratio(palette["Paper"], palette["Ink"]) >= 4.5
+
 
 class TestTheConsoleCard:
     def test_a_correct_answer_is_not_stamped_over_budget(self) -> None:
@@ -58,6 +104,34 @@ class TestTheConsoleCard:
     def test_a_translation_declares_its_language(self) -> None:
         """Finding 86: translated lines were rendered under lang="en"."""
         assert "lines.lang = a.translate.lang;" in PAGE
+
+    def test_the_record_line_says_what_it_is_before_the_number(self) -> None:
+        """First-user audit, 2026-09-29: "836 decisions on record, chain intact" meant nothing to
+        a newcomer — a decision by whom, with whose money, verified how. The plain sentence leads;
+        the live figures (`${s.entries}`, chain state, age) are unchanged, not retyped."""
+        assert "own paper desk" in PAGE
+        assert "decides four times a day during US market hours, with " in PAGE
+        assert "no real money, and every decision is written into a tamper-evident record" in PAGE
+        assert "${s.entries} " in PAGE and "decisions logged so far, chain ${s.chain_intact" in PAGE
+        # the age branches this sentence used to carry are still there, just not duplicated
+        assert "Age unknown" in PAGE and "a scheduled cycle was missed" in PAGE
+
+    def test_a_long_answer_collapses_behind_a_real_accessible_button(self) -> None:
+        """First-user audit, 2026-09-29: a long answer (a research or portfolio question routinely
+        runs well past eight lines) landed as one unbroken wall of text. Past eight lines only the
+        first six show, behind a real <button> (reachable by keyboard, announced as expandable),
+        never a link doing a button's job."""
+        assert "divs.slice(0, 6)" in PAGE
+        assert '`Show all ${divs.length} lines`' in PAGE
+        assert '<button type="button" class="more" aria-expanded="false" aria-controls="${id}"' \
+            in PAGE
+        # a refusal, or an error, is never the thing this collapses
+        assert "if (refused || divs.length <= 8) return divs.join('');" in PAGE
+        assert "collapseLines(a.lines.map" in PAGE and "collapseLines(t.lines.map" in PAGE
+        assert "a.refused)}</div>" in PAGE  # the initial render passes it
+        assert "), a.refused);" in PAGE  # the translate swap passes it too
+        # every line, hidden or shown, still carries its own source badge
+        assert "pv((a.line_labels || [])[i])" in PAGE
 
 
 class TestTheMcpEndpointInABrowser:

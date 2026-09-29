@@ -40,3 +40,22 @@ def test_an_unmapped_sector_or_a_fund_gives_nothing() -> None:
 
 def test_every_yahoo_sector_has_a_fund() -> None:
     assert len(SECTOR_FUND) == 11 and len(set(SECTOR_FUND.values())) == 11
+
+
+def test_the_line_says_plainly_whether_it_is_priced_above_or_below_its_sector() -> None:
+    above = sector_valuation("AAPL", fetch=_fetch(pe=39.08))
+    below = sector_valuation("NVDA", fetch=_fetch(pe=28.5))
+    level = sector_valuation("MSFT", fetch=_fetch(pe=33.5))
+    assert above is not None and "AAPL is priced above its sector on earnings" in above[0]
+    assert below is not None and "NVDA is priced below its sector on earnings" in below[0]
+    assert level is not None and "MSFT is priced in line with its sector on earnings" in level[0]
+
+
+def test_the_answers_own_multiples_replace_yahoos_so_one_pe_is_shown() -> None:
+    found = sector_valuation("NVDA", fetch=_fetch(pe=29.1, pb=24.3), own={"pe": 28.6, "pb": None})
+    assert found is not None
+    assert "trailing P/E 28.6 against 33.0" in found[0] and "29.1" not in found[0]
+    assert "P/B 24.3 against" in found[0]
+    assert "Bitget's data service's, the fund's Yahoo Finance's" in found[0]
+    plain = sector_valuation("NVDA", fetch=_fetch(pe=29.1))
+    assert plain is not None and "Both from Yahoo Finance" in plain[0]

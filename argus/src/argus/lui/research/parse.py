@@ -689,7 +689,11 @@ _PRICE_WORDS = (
 
 
 PRICE_FORECAST = re.compile(
-    r"\b(?:what\s+will\s+(?:\w+\s+){0,3}(?:price|be\s+(?:worth|at|trading))|"
+    # a possessive counts as a word (straight or curly apostrophe): "what will TSLA's stock
+    # price be next Friday" slipped past as a routing miss (judge audit, 2026-09-29)
+    r"\b(?:what\s+will\s+(?:[\w'\u2019]+\s+){0,3}(?:price|be\s+(?:worth|at|trading))|"
+    r"price\s+(?:be\s+|will\s+be\s+)?(?:next|by|this\s+coming)\s+(?:week|month|year|"
+    r"quarter|monday|tuesday|wednesday|thursday|friday|saturday|sunday)|"
     r"what\s+will\s+\w+\s+be\s+(?:next|tomorrow|by|on|in|at\s+the)|exact(?:ly)?\s+"
     r"(?:\w+\s+){0,2}(?:price|level)|(?:a|one|\d+)\s+(?:years?|months?)\s+from\s+now|"
     r"forecast\w*|predict\w*|price\s+target|where\s+will\s+\w+\s+(?:be|go|trade|close)|"
