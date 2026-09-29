@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-09-29T17:40:42.052079+00:00",
-  "decisions": 867,
-  "gate_population": 785,
+  "generated_at": "2026-09-29T19:40:11.348353+00:00",
+  "decisions": 879,
+  "gate_population": 797,
   "proposed_exposure": 1,
   "session_coverage": {
     "by_phase": {
       "extended": 1,
-      "rth": 499,
+      "rth": 511,
       "weekend": 367
     },
-    "with_price_discovery": 499,
+    "with_price_discovery": 511,
     "median_hours_to_discovery": 0.0,
     "min_hours_to_discovery": 0.0,
     "single_phase_only": false,
-    "note": "867 decision(s) across 3 session phase(s): extended=1, rth=499, weekend=367. 499 were taken while the anchor market had price discovery"
+    "note": "879 decision(s) across 3 session phase(s): extended=1, rth=511, weekend=367. 511 were taken while the anchor market had price discovery"
   },
   "gates": [
     {
@@ -21,9 +21,9 @@
       "name": "no_exposure",
       "checks": "verdict carries no quantity, or quantity <= 0",
       "status": "FIRED",
-      "reached": 785,
-      "fired": 784,
-      "note": "bound on 784 of 785 decision(s) that reached it"
+      "reached": 797,
+      "fired": 796,
+      "note": "bound on 796 of 797 decision(s) that reached it"
     },
     {
       "order": 2,
@@ -154,12 +154,12 @@
   ],
   "unreached_gates": [],
   "confidence_median": 0.62,
-  "confidence_mean": 0.6752,
+  "confidence_mean": 0.6739,
   "confidence_min": 0.38,
   "confidence_would_have_bound": true,
-  "verdict": "1 of 867 decision(s) proposed exposure, so the risk chain has live inputs and its outcomes below are exercised rather than unreached",
+  "verdict": "1 of 879 decision(s) proposed exposure, so the risk chain has live inputs and its outcomes below are exercised rather than unreached",
   "falsifier": "the next session with price discovery is 0.0h away, and the committed cycle schedule (13:30/15:30/17:30/19:30 UTC) sits inside US regular hours. If the desk abstains through a full session of those, the cause is the desk and this conclusion is refuted",
   "triggered_by": [
-    "10 settlements since the last postmortem"
+    "20 settlements since the last postmortem"
   ]
 }

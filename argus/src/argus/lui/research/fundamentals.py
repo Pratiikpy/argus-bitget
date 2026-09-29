@@ -299,6 +299,14 @@ def pattern_reading_wins(request: ResearchRequest | None, text: str) -> bool:
         return True
     if request.kind is ResearchKind.SENTIMENT and CRYPTO_ETF_QUESTION.search(text):
         return True
+    if request.kind is ResearchKind.CONSTRUCT and request.notional is not None:
+        # The sum divided between the names is a field the model's plan drops (2026-09-30).
+        return True
+    if (request.kind is ResearchKind.ANALOGUE and request.symbols
+            and re.search(r"\boutlook\b", text, re.I)):
+        # "outlook on SOL": the hosted model read it as not research and the ledger refused SOL as
+        # not a desk stock, while "is SOL bullish" was answered (a judge's audit, 2026-09-29).
+        return True
     if request.kind is ResearchKind.SENTIMENT and LONG_SHORT_QUESTION.search(text):
         # One engine answers the crowd's long/short split; the hosted model read the German and
         # Chinese forms as a quote (live, 2026-09-29).

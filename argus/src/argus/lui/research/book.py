@@ -133,11 +133,17 @@ def _book_report(request: ResearchRequest, data: MarketData,
     """The whole book as held: risk by holding against weight, volatility, beta and how much of the
     book's movement QQQ explains, the stress and the worst realised 24 hours, and the one trim that
     brings every holding inside the risk budget."""
-    columns = _open_columns(data.raw, is_open)
     # Shorts are kept, as negative weights: the Euler decomposition, the beta stress and the worst
     # window are all linear in the weights and read a short as the offset it is. Dropping them
     # reported "NVDA 80% of the money, 100% of the risk" for a book 20% short TSLA (audit, round 3).
     weights = {s: w for s, w in request.book.items() if w != 0}
+    # **A book with no stock in it is read on every hour.** Crypto trades round the clock; reading
+    # a BTC/ETH book on US open-session hours alone dropped about 70% of its history and reported
+    # its worst "24 hours" as 24 open-session hours, about 3.7 trading days (a first-user audit,
+    # 2026-09-30). Beta to QQQ is still read on the open session below, the only hours QQQ prices.
+    round_clock = all(not is_us_equity(s) and s not in TRADED_SYMBOLS for s in weights)
+    open_columns = _open_columns(data.raw, is_open)
+    columns = (_open_columns(data.raw, lambda _t: True) if round_clock else open_columns)
     has_short = any(w < 0 for w in weights.values())
     risk = decompose(weights, columns)
     if risk is None:
@@ -216,21 +222,22 @@ def _book_report(request: ResearchRequest, data: MarketData,
     annual = hourly_vol * math.sqrt(24 * 365)
     spread = risk.effective_positions
     lines.append(
-        f"Book volatility about {annual:.0%} a year on open-session hours"
+        f"Book volatility about {annual:.0%} a year on "
+        + ("every hour, as crypto trades" if round_clock else "open-session hours")
         + (f"; risk is spread across {spread:.1f} effective position(s) of {len(weights)}"
            if spread is not None else "")
         + (f"; {request.cash:.0%} cash dilutes all of it" if request.cash else "") + "."
     )
-    bench = columns.get(BENCHMARK, [])
-    complete = bool(bench) and all(s in columns for s in weights)
-    book_series = [sum(weights[s] * columns[s][i] for s in weights)
+    bench = open_columns.get(BENCHMARK, [])
+    complete = bool(bench) and all(s in open_columns for s in weights)
+    book_series = [sum(weights[s] * open_columns[s][i] for s in weights)
                    for i in range(len(bench))] if complete else []
     book_beta = beta(book_series, bench) if book_series else None
     rho = correlation(book_series, bench) if book_series else None
     r2 = None if rho is None else rho * rho
     if book_beta is not None:
         shocks = [Shock("benchmark -5%", -5.0), Shock("benchmark -10%", -10.0)]
-        for outcome in stress_by_beta(weights=weights, columns=columns, benchmark=bench,
+        for outcome in stress_by_beta(weights=weights, columns=open_columns, benchmark=bench,
                                       shocks=shocks):
             if outcome.portfolio_move_pct is not None:
                 lines.append(f"If QQQ moves {outcome.shock.removeprefix('benchmark ')}: the book "
@@ -239,9 +246,10 @@ def _book_report(request: ResearchRequest, data: MarketData,
     hedge = _hedge_line(book_beta, r2)
     if hedge:
         lines.append(hedge)
-    # The columns here are open-session hours (the volatility line above says so), and the line
-    # says so too.
-    worst = replace(worst_window(weights=weights, columns=columns), session_hours=True)
+    # The line says which hours it slid over, as the volatility line above does: open-session
+    # hours for a book with a stock in it, every hour for a crypto book.
+    worst = replace(worst_window(weights=weights, columns=columns),
+                    session_hours=not round_clock)
     lines.append(worst.render().replace("[stress] ", "What actually happened, not a model — "))
     payload = {"risk": risk.as_dict(), "shares": shares, "book_beta": book_beta,
                "r_squared_vs_qqq": r2, "cash": request.cash, "worst_window": worst.as_dict()}
@@ -662,7 +670,8 @@ def _hedge_line(book_beta: float | None, r_squared: float | None = None) -> str 
         return (
             f"Hedge: QQQ explains only {r_squared:.0%} of this book's moves, so a QQQ {side} "
             f"(about {abs(book_beta):.0%} of the book, beta {book_beta:.2f}) would remove little "
-            f"of its risk — it is mostly its own; reduce the largest holding instead."
+            f"of its risk — it is mostly its own, so the lever is position size, not a "
+            f"hedge."
         )
     return (
         f"Hedge: {side} QQQ worth about {abs(book_beta):.0%} of the book's value neutralises its "

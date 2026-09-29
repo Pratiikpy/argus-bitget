@@ -47,3 +47,16 @@ def test_leaders_are_only_the_sectors_ahead_of_spy() -> None:
 ])
 def test_only_a_question_about_sectors_leading_reaches_it(text: str, asked: bool) -> None:
     assert sr.asks_for_sector_rotation(text) is asked
+
+
+def test_two_sectors_named_in_words_are_compared_first() -> None:
+    """A judge's audit, 2026-09-29: "is capital rotating out of tech and into energy" never said
+    "sector" and was answered with Treasury yields."""
+    month = {"SPY": 0.0, "XLK": 0.05, "XLE": -0.01}
+    quarter = {"SPY": 0.0, "XLK": 0.02, "XLE": 0.16}
+    text = "is capital rotating out of tech and into energy"
+    assert sr.asks_for_sector_rotation(text)
+    lines, _, _ = sr.answer(text, daily=_daily(month, quarter))
+    assert lines[0].startswith("Bottom line: from Technology into Energy — not over the month, "
+                               "but yes over three months")
+    assert lines[1].startswith("Over the last month relative strength has favoured Technology")

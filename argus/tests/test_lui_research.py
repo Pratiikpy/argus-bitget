@@ -1284,3 +1284,16 @@ def test_a_loss_over_a_period_is_read_as_the_odds_question_and_led_by_the_loss()
                                "than 5.8% by the end, and at its worst point inside the week it "
                                "was more than 8.7% under water — on $10,000, about $575 and $871.")
     assert lines[1] == "No one can know."
+
+
+def test_names_given_as_a_book_without_weights_are_that_book_held_equally() -> None:
+    """A judge's audit, 2026-09-29: "research report on my portfolio of AAPL MSFT GOOGL" was
+    read as adding AAPL and GOOGL was dropped without a word."""
+    from argus.lui.research import ResearchKind, detect, pattern_reading_wins
+
+    text = "research report on my portfolio of AAPL MSFT GOOGL"
+    request = detect(text)
+    assert request is not None and request.kind is ResearchKind.BOOK
+    assert set(request.book) == {"AAPLUSDT", "MSFTUSDT", "GOOGLUSDT"}
+    assert any("read as held equally" in note for note in request.notes)
+    assert pattern_reading_wins(request, text)

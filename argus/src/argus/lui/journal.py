@@ -295,6 +295,56 @@ _SIZE_BEFORE_AT = re.compile(
     re.I)
 """A size written before its price with no unit: "sold 150 at 255", "bought 100 more at 260"."""
 
+_FRACTION = re.compile(
+    r"\b(?:sold|sell|closed|cut|trimmed|took\s+profit\s+on)\s+(half|a\s+half|a\s+third|a\s+quarter|"
+    r"two\s+thirds|(\d{1,3})\s*%)(?:\s+of\s+(?:it|them|my\s+position|the\s+position))?\b",
+    re.I)
+"""A sale sized as a share of the holding: "sold half at 70000", "sold 25% at 190"."""
+
+_FRACTIONS = {"half": 0.5, "a half": 0.5, "a third": 1 / 3, "a quarter": 0.25,
+              "two thirds": 2 / 3}
+
+
+_FEE = re.compile(
+    rf"\b(?:fees?|commission|commissions)\b[^\d$]{{0,24}}\$?\s*{_NUM}|"
+    rf"\$?\s*{_NUM}\s*(?:dollars?|usd|usdt|bucks)?\s+(?:in\s+|of\s+)?(?:fees?|commission)\b|"
+    rf"手续费[^\d]{{0,6}}{_NUM}", re.I)
+"""A fee typed in words: "fee was 25 dollars", "paid $3 in fees", "手续费 5". It was read and
+dropped without a word (a hostile review, 2026-09-29)."""
+
+_VOCABULARY = ("bought", "sold", "shorted", "covered", "closed", "entered", "exited", "patterns",
+               "habits", "mistakes", "review", "what", "trades", "position")
+"""Words a journal turns on, for :func:`repair_typos`."""
+
+
+def _near(word: str, target: str) -> bool:
+    """One adjacent swap ("sodl") or one missing letter ("boght") away from ``target``."""
+    if len(word) == len(target):
+        diffs = [i for i, (a, b) in enumerate(zip(word, target, strict=True)) if a != b]
+        return (len(diffs) == 2 and diffs[1] == diffs[0] + 1
+                and word[diffs[0]] == target[diffs[1]] and word[diffs[1]] == target[diffs[0]])
+    if len(word) + 1 == len(target):
+        return any(target[:i] + target[i + 1:] == word for i in range(len(target)))
+    return False
+
+
+def repair_typos(text: str) -> str:
+    """The journal's key words spelled right: "boght AAPL at 150, sodl at 145, waht bad pattrens"
+    was not read as a journal at all (a hostile review, 2026-09-29). Only a swap of two adjacent
+    letters or one missing letter is repaired, never a changed letter: "gold" is an instrument and
+    must never become "sold"."""
+    def fix(match: re.Match[str]) -> str:
+        word = match.group(0)
+        lower = word.lower()
+        if len(lower) < 4 or lower in _VOCABULARY:
+            return word
+        for target in _VOCABULARY:
+            if _near(lower, target):
+                return target
+        return word
+    return re.sub(r"[A-Za-z]+", fix, text)
+
+
 _BARE_FILL = re.compile(
     rf"^\s*(?:and\s+|then\s+|another\s+|plus\s+)?{_NUM}\s*(k)?\s+(?:more\s+|shares?\s+|"
     rf"units?\s+)?(?:at\b|@)\s*\$?{_NUM}", re.I)
@@ -339,7 +389,10 @@ _HYPOTHETICAL = re.compile(r"\b(?:if|should|would|could|shall|will|gonna|going\s
                            r"planning|plan\s+to|thinking\s+of)\b|如果|要是|假如|想要|打算|应该|要不要",
                            re.I)
 _CJK = re.compile(r"[一-鿿]")
-_CLAUSE_SPLIT = re.compile(r"[,，;；。\n]+|\s+(?:then|and\s+then|after\s+that|later)\s+|然后|之后|"  # noqa: RUF001
+_CLAUSE_SPLIT = re.compile(r"[,，;；。\n]+|\s+(?:then|and\s+then|after\s+that|later)\s+|"  # noqa: RUF001
+                           # "bought 100 AAPL at 150 and 50 more at 160": an "and" before a size
+                           # starts the next fill (a judge's audit, 2026-09-29)
+                           r"\s+and\s+(?=\d)|然后|之后|"
                            r"后来|接着", re.I)
 _CRYPTO_LOWER = frozenset({"BTC", "ETH", "SOL", "XRP", "DOGE", "BNB", "ADA", "AVAX", "LTC", "SUI"})
 _NOT_SYMBOL = frozenset({"AT", "ON", "IN", "TO", "FOR", "THE", "AND", "OUT", "BACK", "STOP", "LONG",
@@ -472,6 +525,12 @@ def _leg_from(action: str, window: str, context_symbol: str | None, now: date,
         if bare:
             price = _number(bare[0].group(1), bare[0].group(2))
     flags = {name for name, pattern in _FLAGS if pattern.search(window)}
+    share = _FRACTION.search(window) if qty is None else None
+    if share is not None:
+        # The size is a share of what is held at that point, resolved when the fills are walked.
+        fraction = (int(share.group(2)) / 100.0 if share.group(2)
+                    else _FRACTIONS[re.sub(r"\s+", " ", share.group(1).lower())])
+        flags.add(f"fraction={fraction:.6f}")
     if action == "close" and "stopped" in flags:
         notes.add("a stop that was hit was read as closing the position")
     return Leg(action=action, symbol=symbol, price=price, qty=qty, day=day, flags=flags,
@@ -518,6 +577,10 @@ def parse_text(text: str, *, now: date | None = None) -> tuple[list[Leg], list[s
             legs.append(Leg(legs[-1].action, legs[-1].symbol, _number(bare.group(3)),
                             qty=_number(bare.group(1), bare.group(2)), day=legs[-1].day,
                             text=clause.strip()))
+            continue
+        fee = _FEE.search(clause)
+        if not verbs and fee is not None and legs:
+            legs[-1].fee = (legs[-1].fee or 0.0) + _number(next(g for g in fee.groups() if g))
             continue
         if not verbs:
             found = _symbols_in(clause)
@@ -1241,6 +1304,7 @@ def read_journal(text: str, *, now: date | None = None,
     taken for a review request; a call to the review tool is that request, and its own documented
     example, one round trip, was refused without it (QA inventory, 2026-09-28).
     """
+    text = repair_typos(text)
     if not text or not text.strip():
         return None
     table = parse_fills(text)
@@ -1266,6 +1330,7 @@ def read_journal(text: str, *, now: date | None = None,
 
 def review_requested(text: str) -> bool:
     """A request to review the trader's own trades that pastes none."""
+    text = repair_typos(text)
     return bool(_REVIEW_REQUEST.search(text)) and not _DESK.search(text)
 
 
@@ -1357,9 +1422,16 @@ def summary_lines(checks: Sequence[Check], patterns: Sequence[Pattern]) -> list[
                    f"return. {top.check}")
     else:
         worst = min(range(len(rets)), key=lambda i: rets[i])
-        out.append(f"Bottom line: none of the checked habits shows up in these {len(rets)} trades; "
-                   f"the largest loss was {_short(checks[worst].trade.symbol)} "
-                   f"{_pct(rets[worst])}, so review that one entry and exit by hand.")
+        these = "this trade" if len(rets) == 1 else f"these {len(rets)} trades"
+        # A winning trade was called "the largest loss" (a hostile review, 2026-09-29): the line
+        # names a loss only when there is one.
+        which = ("the largest loss was" if rets[worst] < 0 else
+                 "it made money" if len(rets) == 1 else "every trade made money; the smallest was")
+        name = _short(checks[worst].trade.symbol)
+        out.append(f"Bottom line: none of the checked habits shows up in {these}; {which} "
+                   f"{name} {_pct(rets[worst])}, so review "
+                   + ("that one entry and exit by hand." if rets[worst] < 0 else
+                      "whether the size matched the conviction, which a return alone cannot say."))
     total = sum(rets)
     out.append(f"{len(rets)} closed trade(s): {wins} won, {losses} lost, summed return "
                f"{_pct(total)} (each trade's % on its own entry price, equal-weighted).")
@@ -1419,15 +1491,36 @@ def gate_lines(trades: Sequence[Trade]) -> tuple[list[str], dict[str, Any] | Non
 
 
 POSITION_Q = re.compile(
+    r"\bhow\s+am\s+i\s+doing\b|\bam\s+i\s+(?:up|down|in\s+(?:profit|the\s+(?:green|red)))\b|"
     r"\b(?:position|holdings?|p\s*&\s*l|pnl|profit|realized|realised|unrealized|unrealised|"
     r"cost\s+basis|average\s+(?:cost|price)|break[\s-]?even|up\s+or\s+down|how\s+much\s+"
     r"(?:did\s+i|have\s+i)\s+(?:make|made|lose|lost))\b|持仓|盈亏|成本价|赚了多少|亏了多少", re.I)
 """A question about where the trader's own fills leave them: the position and its profit."""
 
 
+def _fraction_of(leg: Leg) -> float | None:
+    """The share of the holding a sale was typed as ("sold half"), or None."""
+    for flag in leg.flags:
+        if flag.startswith("fraction="):
+            return float(flag.removeprefix("fraction="))
+    return None
+
+
 def _money(value: float) -> str:
     """+$750.00 / -$1,204.50: the sign before the dollar, as a trader writes it."""
     return f"{'+' if value >= 0 else '-'}${abs(value):,.2f}"
+
+
+_HOLDING = re.compile(
+    rf"(?<![\w.]){_NUM}\s*(?:shares?\s+(?:of\s+)?|units?\s+(?:of\s+)?)?\$?([A-Za-z]{{2,6}})\s*(?:@|at\s+)"
+    rf"\s*\$?{_NUM}", re.I)
+"""A holding written with its entry price: "100 COIN@$180", "50 MSTR at 320"."""
+
+_STATED_MARK = re.compile(
+    rf"\b(?:if\s+(?:it'?s|it\s+is|the\s+price\s+is)|it'?s|price\s+is|trading|now)\s+(?:at\s+|"
+    rf"around\s+)?\$?\s*{_NUM}\s*(?:now|today|currently)?\s*[?.!]*\s*$", re.I)
+"""A price the trader gives for today: "... what's my P&L if it's at 175 now". The live price is
+used only when none is given (a judge's audit, 2026-09-29)."""
 
 
 def position_and_pnl(text: str, *, now: datetime | None = None,
@@ -1442,13 +1535,22 @@ def position_and_pnl(text: str, *, now: datetime | None = None,
     price paid so far) and first in, first out (each sale closes the oldest lots, as tax lots
     usually do). Long positions only; a sale larger than the holding is said, not guessed at.
     """
+    text = repair_typos(text)
     if not POSITION_Q.search(text):
         return None
     clock = now or datetime.now(UTC)
     legs, _notes = parse_text(text, now=clock.date())
-    fills = [leg for leg in legs if leg.symbol and leg.price and leg.qty
-             and leg.action in ("buy", "sell")]
-    if len(fills) < 2:
+    fills = [leg for leg in legs if leg.symbol and leg.price and leg.action in ("buy", "sell")
+             and (leg.qty or _fraction_of(leg) is not None)]
+    if not fills:
+        # Holdings written as "100 COIN@$180, 50 MSTR@$320": each is a buy at that price. The
+        # P&L asked of them was never computed (a judge's audit, 2026-09-29).
+        fills = [Leg("buy", symbol, _number(m.group(3)), qty=_number(m.group(1)), text=m.group(0))
+                 for m in _HOLDING.finditer(text)
+                 if (symbol := _resolve_word(m.group(2))) is not None]
+        if not fills:
+            return None
+    elif len(fills) < 2:
         return None
     lines: list[str] = []
     data: dict[str, Any] = {}
@@ -1461,7 +1563,11 @@ def position_and_pnl(text: str, *, now: datetime | None = None,
         realised_fifo = 0.0
         oversold = False
         for leg in own:
-            qty, px = float(leg.qty or 0.0), float(leg.price or 0.0)
+            share = _fraction_of(leg)
+            qty = float(leg.qty) if leg.qty else held * (share or 0.0)
+            px = float(leg.price or 0.0)
+            if share is not None and not leg.qty:
+                leg.qty = qty  # said back in the fills line as the size it resolved to
             if leg.action == "buy":
                 held += qty
                 cost += qty * px
@@ -1491,7 +1597,11 @@ def position_and_pnl(text: str, *, now: datetime | None = None,
         fifo_cost = sum(q * px for q, px in lots)
         fifo_average = fifo_cost / held if held > 1e-9 else 0.0
         mark: float | None = None
-        if price is not None and held > 1e-9:
+        stated = _STATED_MARK.search(text)
+        given = stated is not None and len(set(leg.symbol for leg in fills)) == 1
+        if given and stated is not None:
+            mark = _number(stated.group(1))
+        elif price is not None and held > 1e-9:
             try:
                 mark = price(symbol)
             except Exception:
@@ -1510,9 +1620,13 @@ def position_and_pnl(text: str, *, now: datetime | None = None,
                          f"each (the oldest lots were sold first), against ${average:,.2f} at "
                          f"average cost.")
         if mark is not None:
-            lines.append(f"{name} unrealised at Bitget's live {mark:,.2f}: "
-                         f"{_money((mark - average) * held)} at average cost, "
-                         f"{_money((mark - fifo_average) * held)} first in, first out.")
+            where = f"the {mark:,.2f} you gave" if given else f"Bitget's live {mark:,.2f}"
+            if abs(fifo_average - average) > 1e-9:
+                lines.append(f"{name} unrealised at {where}: "
+                             f"{_money((mark - average) * held)} at average cost, "
+                             f"{_money((mark - fifo_average) * held)} first in, first out.")
+            else:
+                lines.append(f"{name} unrealised at {where}: {_money((mark - average) * held)}.")
         data[symbol] = {"held": held, "average_cost": average, "fifo_average_cost": fifo_average,
                         "realised_average": realised_avg, "realised_fifo": realised_fifo,
                         "mark": mark}
@@ -1521,6 +1635,10 @@ def position_and_pnl(text: str, *, now: datetime | None = None,
             lines, [Source("computation", "argus.lui.journal:position_and_pnl",
                            "the typed fills open a short, which this does not read")],
             {"position": data})
+    marked = [v for v in data.values() if v.get("mark") is not None and v["held"] > 1e-9]
+    if marked and len(marked) == len(data):
+        total = sum((v["mark"] - v["average_cost"]) * v["held"] for v in marked)
+        leads.append(f"at today's prices that is {_money(total)} unrealised in all")
     lines.insert(0, "Bottom line: " + "; ".join(leads) + ".")
     lines.append("Fees are not in these figures unless you typed them; this reads the fills you "
                  "wrote, not your Bitget account.")
@@ -1593,7 +1711,15 @@ def review_trades(text: str, *, now: datetime | None = None, explicit: bool = Fa
     lines.extend(gate)
 
     assumed: list[str] = []
-    if journal.parsed_from == "text":
+    typed_fees = sum(t.fees or 0.0 for t in trades)
+    sized = all(t.qty is not None for t in trades)
+    if journal.parsed_from == "text" and typed_fees:
+        assumed.append(f"the {typed_fees:,.2f} of fees you typed are "
+                       + ("taken off the dollar result" if sized else
+                          "listed per trade; with no sizes typed there is no dollar result to "
+                          "take them from, and the % returns are before them")
+                       + "; funding, which a typed trade does not carry, is not counted")
+    elif journal.parsed_from == "text":
         assumed.append("returns are before fees and funding, which a typed trade does not carry")
     if not all(t.qty is not None for t in trades):
         assumed.append("trades without a size count equally in the summed return")

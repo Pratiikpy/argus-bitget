@@ -711,7 +711,7 @@ python -m argus.market.skills --symbol NVDAUSDT
 And to check the whole thing is what this document says it is:
 
 ```bash
-pytest                    # 10,359 tests
+pytest                    # 10,426 tests
 python -m argus.status    # 152/152 modules importable, 18/18 sub-themes, artefacts on disk
 ```
 
@@ -1191,18 +1191,19 @@ out-of-sample, a widening drawdown, calibration divergence, and look-ahead. An i
 counts against publishability.
 
 **Where it stands.** Every one of these is built, tested and running. What every one of them
-reports today is *undefined, no settled trades* — and reports it in those words. Part 11 is about
+reports today is *undefined: one settled trade* — and reports it in those words. Part 11 is about
 why.
 
 ---
 
 ## Part 11 — The quantitative half, brutally
 
-**The paper-trading log has 867 decisions on record (2026-09-29). One is a live position — seq 797, BUY 1 NVDAUSDT at 232.45, opened 2026-09-28 13:47 UTC and not yet settled. Every other one is a refusal, and 813 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
+**The paper-trading log has 879 decisions on record (2026-09-29). One was a trade — seq 797, BUY 1 NVDAUSDT at 232.45, opened 2026-09-28 13:47 UTC and settled 2026-09-29 at 230.96, a net loss of 1.78 USDT after 0.29 of costs. Every other one is a refusal, and 833 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
 
 Track 2 is 50% scored on Sharpe ratio, maximum drawdown and win rate computed from that log. With
-zero settled trades, those three numbers **do not exist**. Not "are zero" — do not exist. Half of the track
-is currently unscoreable for us, and no amount of architecture compensates for that.
+one settled trade, Sharpe and maximum drawdown **do not exist** and the win rate is 0% of one. Not
+"are zero" — do not exist. Half of the track is unscoreable for this desk, and no amount of
+architecture compensates for that; the Track 2 entry is the separate agent, which trades.
 
 Here is exactly why, and why we believe it is the correct state rather than a broken one.
 
@@ -1357,9 +1358,9 @@ to bind on, and dividing by 86 would report an idle layer where there was never 
 reports it first, before any statistic, as a broken invariant.
 
 **What we cannot yet say.** Whether an intervention was *correct* — whether the trade it shrank would
-have lost money — needs the outcome of that trade, and there are no settled trades. The audit reports
-that as undefined with the reason, rather than printing a zero that reads as "the risk layer saved
-nothing".
+have lost money — needs the outcome of that trade, and the one settled trade was not one the risk
+layer changed. The audit reports that as undefined with the reason, rather than printing a zero
+that reads as "the risk layer saved nothing".
 
 **The correction we made to our own claim.** The risk layer used to be told, during regular hours,
 that no hedge existed. That was false, and it would have shaped every regular-hours decision on the
@@ -1370,8 +1371,8 @@ route to it — is now what the layer sees.
 
 ## Part 13 — What we cannot do on Track 2, said plainly
 
-- **No settled trades.** The scored half of the track is undefined until a regular-hours session
-  produces them.
+- **One settled trade.** Seq 797 closed on 2026-09-29 at a 1.78 USDT loss; the scored half of the
+  track needs many more before a Sharpe, a drawdown or a win rate means anything.
 - **Zero certified factors.** The lab found none worth trading and says so.
 - **Analysts run one after another**, and the record labels their agreement as possible contagion.
 - **No checkpoint and resume** of an interrupted cycle.
@@ -1419,9 +1420,9 @@ risk rather than its size, and is told plainly when something cannot be computed
 2 door, the model decides — what to trade, how much, how sure it is, and what would prove it wrong —
 and a risk layer that can only ever shrink or refuse makes sure the record afterwards is one you can
 trust. Both doors open onto the same evidence, the same analysts, the same checks against the
-model's own reasoning, and the same hash-chained ledger. Every decision on the ledger is a
-refusal and none is a trade, which makes half of Track 2 unscoreable today, and we have written that down
-in the same place we would have written a Sharpe ratio.
+model's own reasoning, and the same hash-chained ledger. Every decision on the ledger but one is
+a refusal, and one trade is not a sample, which makes half of Track 2 unscoreable for this desk,
+and we have written that down in the same place we would have written a Sharpe ratio.
 
 
 ---
@@ -1764,11 +1765,11 @@ takes, and every artefact the system writes.
 
 | | |
 |---|---|
-| Source modules | **561** files across **20 packages** (2026-09-27) |
+| Source modules | **564** files across **20 packages** (2026-09-27) |
 | Registered and importable | **152/152** (`python -m argus.status` checks this at runtime) |
-| Test files / tests | **353 files**, **10,359 tests collected** |
-| Type and lint | `ruff` clean, `mypy --strict` clean on **558 source files** |
-| Artefacts written | **830** files under `argus/data/` |
+| Test files / tests | **353 files**, **10,426 tests collected** |
+| Type and lint | `ruff` clean, `mypy --strict` clean on **561 source files** |
+| Artefacts written | **831** files under `argus/data/` |
 | Code-level teardowns of other people's systems | **56** under `research/architecture/` |
 | Runtime dependencies | **two**: `pydantic`, `python-dateutil`. No numpy, no pandas, no scipy |
 
@@ -2008,7 +2009,7 @@ Also in this package, each described by the first sentence of its own docstring:
 `resolve` — the auto-resolver and the scoreboard, structurally unable to answer early.
 `open_register` — commits a batch and submits its head to four Bitcoin calendars.
 
-Live: **346 claims across all twelve stock perpetuals** (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — what the chain's head was when that proof was taken, so it timestamps the first 36 claims and not the 120 added after. Each scheduled cycle appends and re-anchors; the live head is `41f21e5d743cbb46`. Anchored
+Live: **351 claims across all twelve stock perpetuals** (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — what the chain's head was when that proof was taken, so it timestamps the first 36 claims and not the 120 added after. Each scheduled cycle appends and re-anchors; the live head is `41f21e5d743cbb46`. Anchored
 2026-09-14. The resolver runs on every scheduled cycle.
 
 Also in this package, each described by the first sentence of its own docstring:
@@ -2412,12 +2413,12 @@ source is a build failure, not a typo.
 
 | | |
 |---|---|
-| Source modules | 561 files, 20 packages; `mypy --strict` clean on 558 source files |
+| Source modules | 564 files, 20 packages; `mypy --strict` clean on 561 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 152/152 modules importable |
-| Tests | 10,359 tests collected, `ruff` clean |
+| Tests | 10,426 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
-| Artefacts on disk | 830 files under `argus/data/`, every one produced by running something |
+| Artefacts on disk | 831 files under `argus/data/`, every one produced by running something |
 | Code-level teardowns of other systems | 62, each citing file and line |
 | Competitor entries read at source | 5, each cloned and verified or refuted |
 | Live data sources reaching a decision | 15 |
@@ -3027,7 +3028,7 @@ says until Bitcoin has confirmed it. `python -m argus.register.anchorcheck` re-c
 > were upgraded against their calendars and rewritten in the standard format. Nothing committed
 > changed; upgrading only appends the path from our digest to a block header.
 
-Each scheduled cycle appends and re-anchors, so the register grows: it now holds **346 falsifiable
+Each scheduled cycle appends and re-anchors, so the register grows: it now holds **351 falsifiable
 claims about all twelve stock perpetuals**, head `41f21e5d743cbb46`. The opening figures above are kept as
 the dated historical record — a register that quietly restates its own opening head would be
 defeating its own purpose — and `eval/docclaims.py` checks the live count on every run.
@@ -3306,7 +3307,8 @@ floor would have allowed it, and the position would have been sized on a sample 
 exist — which is exactly the failure the floor is there to catch, arriving through the front door.
 
 This is an assessment against the real `ConstitutionPolicy`, **not a ledger entry**. The trade was
-refused, so nothing was booked and the ledger still holds zero settled positions.
+refused, so nothing was booked; the ledger then held zero settled positions (its first settled on
+2026-09-29).
 
 So the claim is small and every part of it was measured: **gate one passes, gate two fires, gates
 three to seven remain unreached and are reported as unreached.** Gate one was cleared by supplying an

@@ -2316,6 +2316,26 @@ def read_request(text: str) -> ResearchRequest | None:
     if ORDER_CJK.search(raw):
         return None  # an instruction to trade, in Chinese; refused as an order, never researched
     symbols, _ = research_symbols(raw)
+    if (len(symbols) >= 2 and _NAMED_BOOK.search(raw) and not re.search(r"\d+(?:\.\d+)?\s*%", raw)
+            and not is_an_order(raw) and not _STRESS.search(raw) and not ADD_VERB.search(raw)):
+        # A what-if on the named book ("I hold NVDA, TSLA and COIN. What if tech crashes?") is
+        # the stress engine's, which reads the names itself, and one adding a name ("my portfolio
+        # is only AAPL and MSFT ... if I put money in TQQQ") is the impact engine's.
+        # "research report on my portfolio of AAPL MSFT GOOGL" was read as adding AAPL, and
+        # GOOGL was dropped without a word (a judge's audit, 2026-09-29). Names given as a book
+        # with no weights are that book, held equally, and the answer says so.
+        weight = 1.0 / len(symbols)
+        return ResearchRequest(
+            kind=ResearchKind.BOOK, symbols=symbols, book=dict.fromkeys(symbols, weight),
+            notes=(f"no weights were given, so the {len(symbols)} names are read as held "
+                   f"equally — say the weights for your own book",))
+    if len(symbols) >= 2 and _ALLOCATE_BETWEEN.search(raw) and not is_an_order(raw):
+        # "what allocation split between BTC and ETH for $30,000" was read as a market order in
+        # BTC, the word "split" taken for splitting an order (a judge's audit, 2026-09-29). Money
+        # divided between named names is the construction engine's question; the sum, when
+        # stated, is carried so the answer is in dollars.
+        return ResearchRequest(kind=ResearchKind.CONSTRUCT, symbols=symbols,
+                               notional=parse_notional(raw))
     if (len(symbols) == 1 and _LOSS_OVER_PERIOD.search(raw) and _LOSS_PERIOD.search(raw)
             and not is_an_order(raw)
             and not re.search(r"\b(?:i\s+hold|my\s+(?:book|portfolio))\b", raw, re.I)):
@@ -3650,6 +3670,19 @@ def plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, dic
 
 _VAR = re.compile(r"\bvar\b(?!\s*\()|\bvalue[\s-]+at[\s-]+risk\b|\bexpected\s+shortfall\b|\bcvar\b",
                   re.I)
+
+
+_NAMED_BOOK = re.compile(
+    r"\bmy\s+(?:\w+\s+)?(?:portfolio|book|holdings|positions|stocks|bag)\s+(?:of|is|are|has|holds|:|"
+    r"=|—|-|includes?|consists?\s+of)\b|\bi\s+(?:hold|own|have)\s+(?:only\s+)?(?:[A-Z]{2,6}[,\s]+)"
+    r"(?:and\s+)?[A-Z]{2,6}\b", re.I)
+"""Names given as the book, with no weights: "my portfolio of AAPL MSFT GOOGL"."""
+
+_ALLOCATE_BETWEEN = re.compile(
+    r"\b(?:allocat\w*|split\w*|divid\w*|distribut\w*|spread|put)\b[^?.]{0,60}?\b(?:between|across|"
+    r"among)\b|\bhow\s+much\s+(?:of\s+each|in\s+each|to\s+each)\b|\b(?:allocation|weighting|"
+    r"split)\s+(?:of|for|between)\b", re.I)
+"""Money divided between named names: "how should I split $30k between BTC and ETH"."""
 
 
 _LOSS_OVER_PERIOD = re.compile(

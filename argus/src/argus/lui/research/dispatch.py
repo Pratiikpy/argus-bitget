@@ -90,6 +90,7 @@ from argus.lui.research.kinds import (
 )
 from argus.lui.research.macro import (
     _macro,
+    fed_premise_line,
 )
 from argus.lui.research.news import (
     _news,
@@ -294,6 +295,68 @@ def _loss_lead(lines: list[str], odds: Mapping[str, Any] | None,
             f"and ${worst_bps:,.0f}. That is how often in the past, not a forecast; the loss "
             f"beyond it is the one-in-ten tail, not a cap.")
     return [lead, *(unlead(line) if i == 0 else line for i, line in enumerate(lines))]
+
+
+_MOMENTUM_ASKED = re.compile(
+    r"\bmomentum\b|\b(?:strong|weak)er\b|\bstronger\s+trend\b|\bperform\w*\b|\boutperform\w*\b|"
+    r"\btrending\b|\bup\s+more\b|\bdoing\s+better\b", re.I)
+"""A comparison that asks which name is moving the better way, not which is riskier: "which one has
+better momentum" was answered with volatility (a judge's audit, 2026-09-29)."""
+
+
+_PERIOD_ASKED = re.compile(
+    r"\b(?:over|in|during)\s+the\s+(?:last|past)\s+(?:month|week|30\s+days|7\s+days|few\s+weeks)\b|"
+    r"\b(?:this|last)\s+(?:month|week)\b|\bhow\s+(?:did|has|have)\b|\breturns?\b", re.I)
+_RISK_ASKED = re.compile(r"\brisk\w*|\bvolatil\w*|\bbeta\b|\bsafe\w*|\bcorrelat\w*|\bdrawdown",
+                         re.I)
+_WEEK_ASKED = re.compile(r"\bweek\b|\b7\s+days\b", re.I)
+
+
+def _asks_for_the_move(raw_text: str) -> bool:
+    """Whether a comparison asks how the names moved rather than how risky they are: "BTC vs ETH
+    over the last month" led on volatility and never said which rose (a first-user audit,
+    2026-09-30). A named period counts unless the question also names a risk measure."""
+    return bool(_MOMENTUM_ASKED.search(raw_text)
+                or (_PERIOD_ASKED.search(raw_text) and not _RISK_ASKED.search(raw_text)))
+
+
+def _compounded(hourly: Sequence[Any]) -> float | None:
+    """The compounded return of a run of hourly returns, or None when there are none."""
+    values = [float(r) for r in hourly if r is not None]
+    if not values:
+        return None
+    growth = 1.0
+    for r in values:
+        growth *= 1.0 + r
+    return growth - 1.0
+
+
+def _momentum_lead(rows: Sequence[Mapping[str, Any]], *, week: bool = False) -> str:
+    """Which of the compared names has risen more over 30 days, with the last week beside it, or
+    over the last week when the question named a week."""
+    if week:
+        by_week = sorted((r for r in rows if r.get("ret_7d") is not None),
+                         key=lambda r: -float(r["ret_7d"]))
+        if len(by_week) >= 2:
+            others = ", ".join(f"{_t(r['symbol'])} {float(r['ret_7d']):+.1%}"
+                               for r in by_week[1:])
+            return (f"Bottom line: {_t(by_week[0]['symbol'])} did better over the last week — "
+                    f"{float(by_week[0]['ret_7d']):+.1%} against {others}. A week is short; "
+                    f"it describes the move so far, not the next one")
+    ranked = sorted((r for r in rows if r.get("ret_30d") is not None),
+                    key=lambda r: -float(r["ret_30d"]))
+    if len(ranked) < 2:
+        return _compare_lead(rows)
+    top, rest = ranked[0], ranked[1:]
+    week_top = top.get("ret_7d")
+    same_week = all(r.get("ret_7d") is not None and week_top is not None
+                    and float(week_top) >= float(r["ret_7d"]) for r in rest)
+    others = ", ".join(f"{_t(r['symbol'])} {float(r['ret_30d']):+.1%}" for r in rest)
+    return (f"Bottom line: {_t(top['symbol'])} has the stronger momentum — "
+            f"{float(top['ret_30d']):+.1%} over 30 days against {others}; "
+            + ("it also leads over the last week." if same_week else
+               "over the last week the order is different, so the lead is fading.")
+            + " Momentum describes the move so far, not the next one")
 
 
 def _compare_lead(rows: Sequence[Mapping[str, Any]]) -> str:
@@ -577,6 +640,12 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                                   if request.kind is ResearchKind.MACRO
                                   else _sentiment(request.symbols[0] if request.symbols
                                                   else None))
+        premise = fed_premise_line(raw_text) if request.kind is ResearchKind.MACRO else None
+        if premise is not None and found:
+            # A Fed move stated as fact is checked first, in the lead (a judge's audit).
+            found = [f"Bottom line: {premise[0]}",
+                     *(unlead(line) if i == 0 else line for i, line in enumerate(found))]
+            extra = [*extra, premise[1]]
         if not found:
             return Answer(question=question, refused=True,
                           reason="the backdrop sources did not answer",
@@ -791,7 +860,11 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             sources.extend(extra)
 
         elif request.kind is ResearchKind.CONSTRUCT:
-            columns = _open_columns(data.raw, is_open)
+            # Crypto alone is weighted on every hour, as `book._book_report` reads it (2026-09-30).
+            columns = _open_columns(
+                data.raw, (lambda _t: True) if all(
+                    not is_us_equity(s) and s not in TRADED_SYMBOLS for s in request.symbols)
+                else is_open)
             names = tuple(s for s in request.symbols if s in columns)
             weights = _equal_risk_weights(names, columns) if len(names) >= 2 else None
             if weights is None:
@@ -808,6 +881,15 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                             for s in sorted(equal, key=lambda s: -equal[s]))
                 + f" — each carries about {1 / len(equal):.0%} of the risk, the quieter names "
                   f"held larger so no single one dominates.")
+            if request.notional is not None:
+                # The sum asked about, divided: "$30,000 between BTC and ETH" answered in
+                # percentages alone left the arithmetic to the reader (2026-09-30).
+                total = float(request.notional)
+                headline = headline.removesuffix(".") + (
+                    f"; of ${total:,.0f} that is "
+                    + ", ".join(f"{_t(s)} ${total * equal[s]:,.0f}"
+                                for s in sorted(equal, key=lambda s: -equal[s]))
+                    + f", against ${total / len(equal):,.0f} each split evenly.")
             limited: dict[str, Any] | None = None
             if cap is not None or count is not None or risk_cap is not None:
                 fitted = _within_limits(equal, columns, cap, count, risk_cap)
@@ -1080,7 +1162,8 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                 vol = None if var is None else math.sqrt(var) * math.sqrt(24 * 365)
                 rows.append({"symbol": symbol, "beta_open": betas.get("open"),
                              "beta_shut": betas.get("shut"), "qqq_minus_10": ten,
-                             "worst_24h": rep.worst.move_pct, "realised_vol": vol})
+                             "worst_24h": rep.worst.move_pct, "realised_vol": vol,
+                             "ret_30d": _compounded(hourly), "ret_7d": _compounded(hourly[-168:])})
             for row in sorted(rows, key=lambda r: -(r["realised_vol"] or 0.0)):
                 vol_text = ("n/a" if row["realised_vol"] is None
                             else f"{row['realised_vol']:.0%}")
@@ -1107,7 +1190,8 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                         "in the open session")
                 lines.insert(0, f"{a.removesuffix('USDT')} and {b.removesuffix('USDT')} move "
                                 f"together at {rho:+.2f} {when} — {read}.")
-            actionable = _compare_lead(rows)
+            actionable = (_momentum_lead(rows, week=bool(_WEEK_ASKED.search(raw_text)))
+                          if _asks_for_the_move(raw_text) else _compare_lead(rows))
             lines.insert(1, actionable + ". Listed from most to least volatile.")
             if re.search(r"\bcorrelat\w*|\bmove\s+together\b|\bco-?move", raw_text, re.I):
                 # "How correlated is LINK to BTC" led on which is riskier; the figure asked

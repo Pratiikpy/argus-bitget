@@ -360,7 +360,11 @@ const escA = s => esc(s).replace(/"/g, '&quot;');
 const linked = s => esc(s).replace(
   /https?:\\/\\/[^\\s<>"']*[^\\s<>"'.,;:!?)\\]]/g,
   u => `<a href="${u}" rel="noopener noreferrer" target="_blank">` +
-    `${u.replace(/^https?:\\/\\/(?:www\\.)?([^\\/?#]+).*$/, '$1')} &#8599;</a>`);
+    `${u.replace(/^https?:\\/\\/(?:www\\.)?([^\\/?#]+).*$/, '$1')} &#8599;</a>`)
+  // "bps" explained where it stands: a newcomer met it in every cost line with no definition
+  // anywhere on the page (a first-time-user audit, 2026-09-29).
+  .replace(/(\\d)bps\\b/g,
+    '$1<abbr title="basis points: hundredths of a percent, so 100bps is 1%">bps</abbr>');
 
 document.getElementById('f').addEventListener('submit', async ev => {
   ev.preventDefault();
@@ -373,13 +377,18 @@ document.getElementById('f').addEventListener('submit', async ev => {
   out.insertAdjacentHTML('afterbegin', `<div class="card pending" id="pending">` +
     `<div class="q">${esc(text)}</div><div class="meta"><span class="tag">working · ` +
     `<span id="tick">0</span> s</span></div></div>`);
-  // Brought into view when it lands below the screen, as it does on a phone under the examples;
-  // the answer replaces it in place, so the reader is already looking at where it arrives.
+  // Brought into view when it lands in the lower half of the screen, as it does under the examples
+  // on a phone and on a portrait tablet; the answer replaces it in place, so the reader is already
+  // looking at where it arrives. The line used to be "below the screen", which on an 820x1180
+  // tablet left the answer starting 119px from the bottom edge (a first-user audit, 2026-09-30).
   const inFlight = document.getElementById('pending');
-  if (inFlight.getBoundingClientRect().top > innerHeight - 96) {
-    inFlight.scrollIntoView({block: 'start', behavior:
-      matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
-  }
+  const bringIntoView = card => {
+    if (card && card.getBoundingClientRect().top > innerHeight * 0.5) {
+      card.scrollIntoView({block: 'start', behavior:
+        matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+    }
+  };
+  bringIntoView(inFlight);
   const t0 = Date.now(), ticker = setInterval(() => {
     const tick = document.getElementById('tick');
     if (tick) tick.textContent = String(Math.round((Date.now() - t0) / 1000));
@@ -450,7 +459,11 @@ document.getElementById('f').addEventListener('submit', async ev => {
   } finally {
     clearTimeout(timer); clearInterval(ticker);
     const pending = document.getElementById('pending'); if (pending) pending.remove();
-    document.getElementById('go').disabled = false; qEl.focus();
+    // Again once the answer is in: while it was pending the page was often too short to scroll
+    // that far. The box is refocused only where that opens no on-screen keyboard over the answer.
+    bringIntoView(out.firstElementChild);
+    document.getElementById('go').disabled = false;
+    if (!matchMedia('(pointer: coarse)').matches) qEl.focus({preventScroll: true});
   }
 });
 // "Show all N lines": a real button toggled by a click or, natively, by Enter/Space on it, with
@@ -555,9 +568,24 @@ _PRONOUN = re.compile(r"\b(?:that|it|this|those|them|its)\b", re.I)
 _NAME_SWAP = re.compile(r"^\s*(?:and\s+)?(?:what|how)\s+(?:about|abt|bout)\s+\S+\s*\??\s*$|"
                         r"^\s*and\s+(?:for\s+)?\S+\s*\??\s*$|^\s*(?:(?:actually|sorry|no|oops|"
                         r"wait)[,\s]+)*(?:i\s+)?(?:meant|mean)\b", re.I)
+_ANOTHER_PERIOD = re.compile(
+    r"^\s*(?:and\s+|so\s+)?(?:what|how)?\s*(?:about\s+)?(?:over\s+|for\s+|if\s+)?(?:the\s+"
+    r"(?:last|past)\s+)?(?P<n>\d+|a|one|two|three|four|five|ten)\s+(?P<unit>years?|months?)"
+    r"(?:\s+ago)?\s*[?.!]*\s*$", re.I)
+"""A follow-up that changes only the period: "what about 5 years?"."""
+
+_SIMPLER = re.compile(
+    r"^\s*(?:(?:can\s+you\s+|please\s+)?(?:explain|say|put)\s+(?:it|that|this)?\s*(?:again\s+)?"
+    r"(?:simpler|more\s+simply|simply|in\s+simple(?:r)?\s+(?:terms|words|english)|in\s+plain\s+"
+    r"(?:english|words|terms)|like\s+i'?m\s+(?:5|five|new))|simpler(?:\s+please)?|eli5|"
+    r"in\s+plain\s+english|i\s+don'?t\s+(?:understand|get\s+it)|what\s+does\s+that\s+mean)"
+    r"\s*(?:please)?\s*[?.!]*\s*$", re.I)
+"""A request to say the last answer again, simply."""
+
 _WHICH_ONE = re.compile(
-    r"^\s*(?:so\s+|and\s+)?which\s+(?:one|of\s+(?:them|the\s+two)|is)\s+(?:is\s+)?(?:more|less|"
-    r"the\s+(?:most|least)|riskier|safer|better|worse|bigger|cheaper|volatile)\b[^?]*\??\s*$", re.I)
+    r"^\s*(?:so\s+|and\s+)?which\s+(?:one|of\s+(?:them|the\s+two)|is)\s+"
+    r"(?:is\s+|has\s+|shows\s+|looks\s+|got\s+)?(?:more|less|the\s+(?:most|least)|riskier|safer|"
+    r"better|worse|bigger|cheaper|volatile|stronger|weaker|momentum)\b[^?]*\??\s*$", re.I)
 _BETTER_WORSE = re.compile(
     r"^\s*(?:so\s+)?(?:is|was)\s+(?:that|it|this)\s+(?:any\s+)?(?:better|worse|safer|riskier)"
     r"(?:\s+or\s+(?:better|worse|safer|riskier))?(?:\s+than\s+(?:before|the\s+last|that))?"
@@ -612,7 +640,8 @@ def _carry_prior_name(text: str, prior: list[str]) -> str | None:
     """The question with the previous turn's contract appended, when it names none itself, refers
     back by pronoun, and is not about the desk's record ("why did you do that" is a ledger
     question, and its "that" is a decision, not a contract)."""
-    if not prior or research_symbols(text)[0] or not _PRONOUN.search(text):
+    if not prior or research_symbols(text)[0] or not (_PRONOUN.search(text)
+                                                       or _ABOUT_THE_SAME.search(text)):
         return None
     if about_the_record(text):
         return None
@@ -620,13 +649,56 @@ def _carry_prior_name(text: str, prior: list[str]) -> str | None:
         named = research_symbols(earlier)[0]
         if named:
             return f"{text} ({named[0].removesuffix('USDT')})"
+        if _ABOUT_THE_BOOK.search(earlier):
+            # "what should I trim" then "hedge it": "it" is the book the last turn was about, not
+            # a name from a turn before that ("read as a follow-up about NVDA", first-user audit,
+            # 2026-09-29).
+            return None
     return None
+
+
+_ABOUT_THE_SAME = re.compile(
+    r"^\s*(?:and\s+|so\s+)?(?:what|how)\s+about\s+(?:the\s+|its\s+)?(?:macd|rsi|funding|"
+    r"open\s+interest|volume|bollinger|atr|momentum|volatility|beta|earnings|news|technicals|"
+    r"valuation|p\s*/\s*e|dividends?|options?|sentiment|support|resistance)\b|"
+    r"\b(?:should|can|do)\s+i\s+(?:add|buy|sell|trim)\s+(?:some\s+)?more\b|"
+    r"^\s*(?:add|buy|sell)\s+more\b", re.I)
+"""A follow-up that names neither the contract nor a pronoun: "what about MACD" after an RSI
+question, "should I add more" after a position (a judge's audit, 2026-09-29, both refused)."""
+
+
+_BOOK_RISK_WORDS = re.compile(r"\b(?:concentrat\w*|diversif\w*|too\s+(?:much|risky|big)|"
+                              r"risk\w*|safe|exposed|exposure|all\s+in)\b", re.I)
+"""A follow-up about how risky a holding is: read as a question about that holding as the book."""
+
+
+_ABOUT_THE_BOOK = re.compile(
+    r"\b(?:my\s+(?:book|portfolio|holdings|positions?|risk)|the\s+book|trim|rebalanc\w*|"
+    r"diversif\w*|concentrat\w*|exposure|what\s+should\s+i\s+(?:sell|cut|trim))\b", re.I)
+"""A turn about the whole book, which a following "it" refers to."""
 
 
 def _price_now(symbol: str) -> float:
     from argus.market.bitget import fetch_tickers
 
     return float(fetch_tickers()[symbol].last)
+
+
+def _worst_day(symbol: str) -> float | None:
+    """The worst compounded 24 hours in the last 30 days of Bitget hourly closes, as a fraction,
+    or None when the venue does not answer (`desk.portfolio.worst_window` on one name)."""
+    from argus.desk.portfolio import worst_window
+    from argus.market.bitget import fetch_candles
+
+    try:
+        closes = [float(c["close"]) for c in fetch_candles(symbol, limit=720)]  # type: ignore[arg-type]
+    except Exception:
+        return None
+    from itertools import pairwise
+
+    returns = [b / a - 1.0 for a, b in pairwise(closes) if a]
+    worst = worst_window(weights={symbol: 1.0}, columns={symbol: returns})
+    return None if worst.move_pct is None else worst.move_pct / 100.0
 
 
 _MEMORY: contextvars.ContextVar[tuple[Any, ...]] = contextvars.ContextVar("argus_memory",
@@ -680,6 +752,40 @@ def _read_in_english(text: str, client: Any = None) -> tuple[str | None, str]:
     if not english or UNREAD_SCRIPT.search(english):
         return None, "the language model did not return an English reading"
     return english[:500], ""
+
+
+_PRICE_CLAIM = re.compile(
+    r"\b(?P<name>[A-Za-z]{2,10})\s+(?:is|'s|at|is\s+(?:now\s+)?(?:at|trading\s+at|around|near)|"
+    r"trades?\s+at|trading\s+at|sits\s+at)\s+(?:about\s+|around\s+)?\$?(?P<price>\d[\d,]*(?:\.\d+)?)"
+    r"(?P<k>k)?\b(?!\s*%)", re.I)
+"""A price a question states as the present one: "NVDA is at 150", "BTC's 60k"."""
+
+PRICE_PREMISE_TOLERANCE = 0.05
+"""How far a stated price may sit from Bitget's last before it is called out: wide enough for a
+figure a trader rounded or read an hour ago, narrow enough to catch a stale one."""
+
+
+def _price_premise(text: str) -> str | None:
+    """The correction for a stated price that is not the present one, or None."""
+    claim = _PRICE_CLAIM.search(text)
+    if claim is None:
+        return None
+    named, _ = research_symbols(claim.group("name"))
+    if not named:
+        return None
+    stated = float(claim.group("price").replace(",", "")) * (1000 if claim.group("k") else 1)
+    try:
+        live = _price_now(named[0])
+    except Exception:
+        return None
+    if stated <= 0 or abs(stated / live - 1.0) <= PRICE_PREMISE_TOLERANCE:
+        return None
+    name = named[0].removesuffix("USDT")
+    said = f"{stated:,.2f}".rstrip("0").rstrip(".")
+    gap = stated / live - 1.0
+    return (f"{name} is not at {said}: it last traded at {live:,.2f} on Bitget, so the question's "
+            f"figure is {abs(gap):.0%} {'below' if gap < 0 else 'above'} it, and what follows is "
+            f"read at the real price.")
 
 
 SOMEONE_ELSE = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+|\b(?:for|of)\s+(?:user|account|client|"
@@ -770,6 +876,15 @@ def handle_ask(
                          "was not used. What follows is ARGUS's own paper desk or the book you "
                          "gave, not anyone else's.")
         payload["lines"] = lines
+    corrected = _price_premise(text) if payload.get("classified_by") not in (
+        "position-pnl", "journal", "hindsight") and not payload.get("refused") else None
+    if corrected is not None and payload.get("lines"):
+        # "NVDA is at 150, should I buy?" was answered without a word that NVDA was at 227
+        # (a judge's audit, 2026-09-29); a Fed premise was already checked, a price was not.
+        lines = [str(line) for line in payload["lines"]]
+        first = lines[0].removeprefix("Bottom line: ")
+        payload["lines"] = [f"Bottom line: {corrected}", first[:1].upper() + first[1:],
+                            *lines[1:]]
     if visitor != "local" and allowance_spent(visitor) and payload.get("lines"):
         # Over the hourly allowance the console still answers, from its own readers; it says so,
         # so a worse reading is never mistaken for the console's best (a judge's audit, 2026-09-29).
@@ -822,6 +937,11 @@ def _answer(
     def engine_payload(lines: list[str], sources: list[Any], data: dict[str, Any],
                        by: str) -> dict[str, Any]:
         q = classify(text, now=clock, conversation=conversation)
+        if q.intent in (Intent.UNSUPPORTED, Intent.UNKNOWN, Intent.AMBIGUOUS):
+            # An engine answered it, so it was a research question whatever the ledger classifier
+            # made of it: the payload read "unsupported" beside a full answer (judge audit,
+            # 2026-09-29).
+            q = replace(q, intent=Intent.RESEARCH)
         note = _language_note(text)
         built = Answer(question=q, lines=([note] if note else []) + lines, sources=sources,
                        data=data).as_dict()
@@ -871,15 +991,45 @@ def _answer(
         # "how does ARGUS compare to Nautilus Trader": the register's rows against that rival
         # (`lui/rivals.py`), not an adjacent statistic (fresh-eyes audit, 2026-09-29).
         return engine_payload(*rivals.answer(text), by="rivals")
+    from argus.lui.research import sizing
+
+    if sizing.asks_for_size(text) and not about_the_record(text):
+        # "$50,000 account, risk at most 2% per trade with a 4% stop — what position size" was
+        # answered with the desk's abstention count (a judge's audit, 2026-09-29).
+        sized = research_symbols(text)[0]
+        return engine_payload(*sizing.answer(text, sized[0] if sized else None, price=_price_now,
+                                             worst_day=_worst_day), by="sizing")
+    from argus.lui.research import starter
+
+    if starter.amount_of(text) is not None and not about_the_record(text):
+        # "I have 5000 dollars, what should I do" was refused (a first-time-user audit,
+        # 2026-09-29): no advice, and what that sum has been through in three broad markets.
+        return engine_payload(*starter.answer(text, today=clock.date()), by="starter")
     from argus.lui import concepts
 
     named_now = research_symbols(text)[0]
     concept = concepts.concept_asked(text, named_now)
+    if concept is not None and len(text) > 220 and not re.match(
+            r"\s*(?:what|explain|define|how\s+does|tell\s+me\s+about)\b", text, re.I):
+        # A long message that mentions a term in passing is not a request to define it: a
+        # paragraph of several questions got only the stop-loss definition (first-user audit).
+        concept = None
     if concept is not None and not about_the_record(text):
         # "explain what RSI means like I'm new to trading" was answered with an unrelated
         # decision's trace (a judge's audit, 2026-09-29): the definition, then its live reading.
-        return engine_payload(*concepts.answer(concept, named_now[0] if named_now else None),
+        return engine_payload(*concepts.answer(concept, named_now[0] if named_now else None,
+                                               concepts.second_concept(text, concept)),
                               by="concept")
+    from argus.lui.research import hindsight
+
+    if named_now and hindsight.HINDSIGHT_Q.search(text) and not about_the_record(text):
+        # "how much would I have lost if I bought TSLA at the start of 2022" was answered with
+        # position sizing (a judge's audit, 2026-09-29): the real closes from that day to now.
+        return engine_payload(*hindsight.hindsight(text, named_now[0], today=clock.date()),
+                              by="hindsight")
+    if named_now and hindsight.DCA_Q.search(text) and not about_the_record(text):
+        # "should I DCA into BTC" never engaged the averaging: monthly buys against one buy.
+        return engine_payload(*hindsight.dca(text, named_now[0], today=clock.date()), by="dca")
     from argus.lui.research import sector_rotation
 
     if sector_rotation.asks_for_sector_rotation(text) and not about_the_record(text):
@@ -975,6 +1125,67 @@ def _answer(
         compared = _compare_last_two_books(text, prior, book, ledger, started, audit)
         if compared is not None:
             return compared
+    period = _ANOTHER_PERIOD.match(text)
+    if period is not None and prior:
+        # "what about 5 years?" after a hindsight or averaging answer was refused (a first-time-
+        # user audit, 2026-09-29): the same question over the new period.
+        from argus.lui.research import hindsight
+
+        earlier = prior[-1]
+        names = research_symbols(earlier)[0]
+        span = f"{period.group('n')} {period.group('unit')} ago"
+        if names and hindsight.HINDSIGHT_Q.search(earlier):
+            sum_asked = hindsight.stated_amount(earlier)
+            put = f"${sum_asked:,.0f} " if sum_asked else ""
+            return engine_payload(*hindsight.hindsight(f"if I had put {put}in it {span}", names[0],
+                                                       today=clock.date()), by="hindsight")
+        if names and hindsight.DCA_Q.search(earlier):
+            return engine_payload(*hindsight.dca(f"since {span}", names[0], today=clock.date()),
+                                  by="dca")
+    if _SIMPLER.match(text) and prior:
+        # "explain simpler" after an answer dumped an unrelated desk decision (a first-time-user
+        # audit, 2026-09-29): the previous answer again, its lead first, with the words in it a
+        # newcomer may not know defined in one line each.
+        from argus.lui import concepts
+
+        again = _answer(prior[-1], prior[:-1], now=now, visitor=visitor, book=book)
+        before = [str(line) for line in again.get("lines") or []]
+        if before and not again.get("refused"):
+            head = before[0].removeprefix("Bottom line: ")
+            # Basis points said as percent ("356bps" is 3.56%), and a figure written against its
+            # unit ("12bps") read as two words so the glossary can find the unit.
+            head = re.sub(r"(\d+(?:\.\d+)?)bps\b",
+                          lambda m: f"{float(m.group(1)) / 100:.2f}%", head)
+            spaced = re.sub(r"(\d)(bps?)\b", r"\1 \2", " ".join(before[:4]))
+            words = [c for c in concepts.CONCEPTS
+                     if re.search(rf"\b(?:{c.pattern})\b", spaced, re.I)][:4]
+            again["lines"] = [
+                f"Bottom line: in plain words, {head[:1].lower() + head[1:]}",
+                *(f"{c.name[:1].upper() + c.name[1:]}: {c.definition}" for c in words),
+                f"Assumed: read as asking the previous question again more simply — "
+                f"\"{prior[-1][:60]}\"; ask it with a name to change the subject."]
+            again["turns"] = [*prior, text][-12:]
+            again["classified_by"] = "research-follow-up"
+            return again
+    if _WHICH_ONE.match(text) and prior:
+        # "which one has better momentum" after asking about BTC and then ETH compares the two
+        # names the last turns asked about, not the last question again (a judge's audit,
+        # 2026-09-29: answered with ETH's quote).
+        named: list[str] = []
+        for earlier in reversed(prior[-3:]):
+            for symbol in research_symbols(earlier)[0]:
+                if symbol not in named:
+                    named.append(symbol)
+        if len(named) >= 2:
+            two = tuple(named[:2][::-1])
+            pair = " and ".join(s.removesuffix("USDT") for s in two)
+            compared_request = ResearchRequest(
+                kind=ResearchKind.COMPARE, symbols=two,
+                notes=(f"read as comparing {pair}, the names of the last questions",))
+            return _research_payload(f"compare {pair}: {text}", prior, compared_request,
+                                     ledger, started,
+                                     "research-follow-up",
+                                     {**audit, "detail": "the last turns' names compared"})
     if BARE_FOLLOW.match(text) or _BARE_WHY.match(text) or _WHICH_ONE.match(text):
         # "what about that one?", "why?" or "which one is more volatile" after a research question
         # is that question again: re-asked with its own words and its resolved context (a
@@ -999,6 +1210,13 @@ def _answer(
         # "and how does that compare to last week" after "whats bitcoin doing rn" was told no
         # contract was named (2026-09-25 audit): the pronoun is the previous turn's name.
         request = detect_research(carried)
+        if request is None and _BOOK_RISK_WORDS.search(text):
+            # "Is that too concentrated for moderate risk tolerance?" after "I have a $20,000
+            # account, all of it in BTC" was told "that" had nothing to refer to (a judge's audit,
+            # 2026-09-29): the previous turn's holding is the book, held whole.
+            holding = research_symbols(carried)[0][0]
+            request = ResearchRequest(kind=ResearchKind.BOOK, symbols=(holding,),
+                                      book={holding: 1.0})
         if request is not None:
             carried_name = research_symbols(carried)[0][0].removesuffix("USDT")
             request = replace(request, notes=(
@@ -1196,7 +1414,28 @@ def _research_payload(
     # offers it under the answer (`lui/task.py`), carrying the question and the saved book.
     payload["research_task"] = (not result.refused and request.kind is ResearchKind.IMPACT
                                 and bool(request.symbols))
+    if payload["research_task"] and _BRIEF_ASKED.search(text):
+        # "full research brief on COIN" was answered with a one-line sizing rule and nothing said
+        # about the rest (a judge's audit, 2026-09-29). The brief is the eight-engine task; the
+        # answer says so first and names what it runs, and the risk profile follows as part one.
+        from argus.lui.task import STEPS
+
+        name = request.symbols[0].removesuffix("USDT")
+        rest = [str(line).removeprefix("Bottom line: ") for line in payload.get("lines") or []]
+        payload["lines"] = [
+            f"Bottom line: a full brief on {name} is the research task under this answer — "
+            f"{len(STEPS)} engines in turn: " + "; ".join(t.lower() for t, _, _ in STEPS)
+            + ", then a verdict. Its risk profile, the part answered here, follows.", *rest]
+        payload["open_task"] = True
     return payload
+
+
+_BRIEF_ASKED = re.compile(
+    r"\b(?:full|complete|whole|deep|in-?depth|thorough|detailed)\s+(?:research\s+)?(?:brief|report|"
+    r"dive|analysis|write-?up|rundown|breakdown|tear\s*sheet)|\b(?:research\s+)?(?:brief|report|"
+    r"tear\s*sheet|deep\s+dive|rundown)\s+(?:on|for|about)\b|\bdo\s+(?:full|deep)\s+research\b",
+    re.I)
+"""A request for everything on a name, not one reading of it."""
 
 
 _SPANISH = re.compile(r"[¿¡]|\b(?:qué|cómo|como|cuál|cuánto|los|las|del|tasas|oro|acciones|"
@@ -1252,23 +1491,31 @@ def offer_translation(payload: dict[str, Any], text: str) -> None:
 
 
 
-MODEL_CALLS_PER_VISITOR_PER_HOUR = 60
+MODEL_CALLS_PER_VISITOR_PER_HOUR = 40
 """How many model-assisted questions one visitor may ask per hour, per server instance.
 
 **Counted once per question.** Until 2026-09-29 every model call counted — the planner, the
 router, a filing read, each translation — so a judge asking in French spent three or four a
 question, and after ten to twenty questions translation came back silently in English and the
-planner stopped reading (a judge's audit). A question is now one unit whatever it calls, and the
-allowance is sixty.
+planner stopped reading (a judge's audit). A question is now one unit whatever it calls.
 
-**Why there is a limit at all.** The hosted console now carries the hackathon Qwen key in its
-server environment — never in the bundle — so that a judge's oddly-phrased question is understood.
-That key has a finite balance, and an unauthenticated page that spends it on every request is a page
-anyone can drain. Thirty an hour is far above what a person reading answers asks, and far below
-what a script would try. Over the limit the console does not fail: it answers from its
-deterministic layers alone, exactly as it did before the key was deployed. Per instance because a
-serverless platform keeps no shared memory; the process's own :class:`~argus.llm.qwen.TokenBudget`
-bounds the total spend of each instance independently of who asked."""
+**Why forty, and how it sits under the instance budget.** A question costs at most about 10k
+tokens: the planner's ~4k prompt, a restatement under 1k and a translation of up to 4k out plus
+its input. Forty questions is at most ~400k, inside :data:`ROUTER_BUDGET_TOKENS` (500k), so one
+visitor cannot spend an instance's whole budget in an hour; sixty (the first version of this
+change) could, and a hostile review said so (2026-09-29). Forty is still well above what a person
+reading the answers asks in an hour.
+
+**Why there is a limit at all.** The hosted console carries the hackathon Qwen key in its server
+environment — never in the bundle — so that a judge's oddly-phrased question is understood. That
+key has a finite balance, and an unauthenticated page that spends it on every request is a page
+anyone can drain. Over the limit the console does not fail: it answers from its deterministic
+layers alone and says so. Per instance because a serverless platform keeps no shared memory; the
+process's own :class:`~argus.llm.qwen.TokenBudget` bounds the total spend of each instance
+independently of who asked."""
+
+ROUTER_BUDGET_TOKENS = 500_000
+"""Tokens one server instance may spend on the model over its life, whoever asks."""
 
 _VISITS: dict[str, list[float]] = {}
 
@@ -1488,12 +1735,11 @@ def _router() -> Router | None:
     """
     global _ROUTER, _ROUTER_BUILT
     if not _ROUTER_BUILT:
-        # 200k tokens per server instance, about fifty planner calls (each is a ~4k-token prompt
-        # with thinking off). The router's own default, 20k, ran out after five questions: a
-        # readiness audit on 2026-09-25 hit BudgetExhausted twice in one sitting, and every question
-        # after that fell back to the pattern reader. The per-visitor hourly allowance above is what
-        # bounds spending; this only stops one instance from spending without end.
-        _ROUTER = build_router(budget_tokens=200_000)
+        # ROUTER_BUDGET_TOKENS per server instance, about fifty worst-case questions (see
+        # MODEL_CALLS_PER_VISITOR_PER_HOUR for the arithmetic). The router's own default, 20k, ran
+        # out after five questions: a readiness audit on 2026-09-25 hit BudgetExhausted twice in
+        # one sitting, and every question after that fell back to the pattern reader.
+        _ROUTER = build_router(budget_tokens=ROUTER_BUDGET_TOKENS)
         _ROUTER_BUILT = True
     return _ROUTER
 

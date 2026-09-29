@@ -48,3 +48,17 @@ def test_the_suggestions_are_buttons_a_keyboard_can_reach() -> None:
 
     assert '<button type="button" class="chip">' in server.PAGE
     assert '<span class="chip">' not in server.PAGE
+
+
+def test_basis_points_carry_their_definition() -> None:
+    """"bps" was on every cost line with no definition anywhere on the page (a first-user audit,
+    2026-09-29): a figure in basis points says what they are on hover, and a word is left alone."""
+    out = linked("a 12bps round trip; the bps word alone")
+    assert out.count("<abbr") == 1
+    assert "100bps is 1%" in out
+
+
+def test_the_console_defines_basis_points_the_same_way() -> None:
+    from argus.lui.server import PAGE
+
+    assert "100bps is 1%" in PAGE

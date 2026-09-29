@@ -201,6 +201,27 @@ def translate(lines: list[str], lang: str, client: Any) -> dict[str, Any]:
         else:
             result_lines.append(src)
             kept.append(i)
+    if kept:
+        # One more try for the lines that failed the figure check, told exactly why: a Spanish
+        # answer kept a line with no figures in English because the translation wrote a digit
+        # the source did not have (a judge's audit, 2026-09-29). The check itself is unchanged.
+        retry = [lines[i] for i in kept]
+        try:
+            again = client.complete_json([
+                {"role": "system", "content":
+                    f"Translate each line into {LANGUAGES[lang]}. Write every number exactly as "
+                    f"it appears in the line, in the same digits, and write no number, digit or "
+                    f"URL that the line does not contain. Reply as JSON {{\"lines\": [...]}}, "
+                    f"one line per input line, same order."},
+                {"role": "user", "content": json.dumps({"lines": retry}, ensure_ascii=False)},
+            ], required_keys=("lines",), max_tokens=2000, thinking=Thinking.OFF).get("lines")
+        except Exception:
+            again = None
+        if isinstance(again, list) and len(again) == len(retry):
+            for i, src, dst in zip(list(kept), retry, again, strict=True):
+                if isinstance(dst, str) and dst.strip() and figures_match(src, dst):
+                    result_lines[i] = dst.strip()
+                    kept.remove(i)
     result = {"lines": result_lines, "kept_english": kept, "note": NOTES.get(lang)}
     with _LOCK:
         _CACHE[key] = result

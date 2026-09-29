@@ -301,7 +301,10 @@ _WINDOW = re.compile(
     r"\b(?:this|next|coming)\s+(?:coming\s+)?week\b|\bweek\s+ahead\b|\b(?:next|coming)\s+"
     r"(?:\d{1,2}|few|couple(?:\s+of)?|two|2)\s+(?:days|weeks)\b|\bupcoming\b|\bcoming\s+up\b|"
     r"\bon\s+(?:the\s+)?deck\b|\bahead\s+(?:for|of\s+me|this)\b|\bthe\s+days?\s+ahead\b|"
-    r"本周|这周|这个星期|这星期|下周|下个星期|未来\s*\d+\s*天|未来一周|接下来", re.I)
+    # "next month" had a window (`window`) that this gate never let through (a hostile
+    # review, 2026-09-29)
+    r"\b(?:this|next|coming)\s+month\b|"
+    r"本周|这周|这个星期|这星期|下周|下个星期|下个?月|未来\s*\d+\s*天|未来一周|接下来", re.I)
 _CUE = re.compile(
     r"\bwatch(?:list|ing)?\b(?!\s+out)|\bkeep\s+(?:an\s+)?eyes?\s+on\b|\bcalendar\b|\bcatalysts?\b|"
     r"\bevents?\b|\bkey\s+dates\b|\b(?:data|macro|economic)\s+(?:releases?|prints?|data)\b|"
@@ -355,6 +358,10 @@ def window(text: str, now: datetime, days: int | None = None) -> tuple[datetime,
         return now, now + timedelta(days=max(1, min(n, MAX_DAYS))), True
     if re.search(r"\b(?:next|coming)\s+(?:two|2)\s+weeks\b", text, re.I):
         return now, now + timedelta(days=14), True
+    if re.search(r"\b(?:next|coming|this)\s+month\b|下个?月", text, re.I):
+        # "what earnings are coming up next month" was read as the next seven days (a judge's
+        # audit, 2026-09-29).
+        return now, now + timedelta(days=MAX_DAYS), True
     if re.search(r"\bnext\s+week\b|下周|下个星期", text, re.I):
         local = now.astimezone(NEW_YORK)
         monday = datetime.combine(local.date() + timedelta(days=7 - local.weekday()), time(0),
@@ -577,6 +584,10 @@ def _rank_key(event: Event) -> tuple[int, float, float]:
     return (2, -(event.excess or 0.0), 0.0)
 
 
+_EARNINGS_ASKED = re.compile(r"\bearnings\b|\breport(?:s|ing)?\b|\bresults\b|财报", re.I)
+"""A week-ahead question that asks about company reports."""
+
+
 def watchlist(question: str, book_text: str = "", *, now: datetime | None = None,
               days: int | None = None, calendar_path: Path = MACRO_CALENDAR,
               reactions_path: Path | None = None,
@@ -592,12 +603,27 @@ def watchlist(question: str, book_text: str = "", *, now: datetime | None = None
     moment = now or datetime.now(UTC)
     start, end, stated = window(question, moment, days)
     book, cash, book_lines = resolve_book(question, book_text)
+    if not book and _EARNINGS_ASKED.search(question):
+        # "what earnings are coming up this week for tech stocks" listed payrolls and GDP and no
+        # earnings (a judge's audit, 2026-09-29): with no book, the stocks the desk trades are the
+        # list checked, and the answer names them.
+        from argus.lui.question import TRADED_SYMBOLS
+        from argus.market.instruments import REGISTRY, InstrumentKind
+
+        # Companies only: an index fund reports no earnings.
+        stocks = sorted(s for s in TRADED_SYMBOLS if s in REGISTRY
+                        and REGISTRY[s].kind is InstrumentKind.EQUITY)
+        book = dict.fromkeys(stocks, 1.0 / len(stocks))
+        names = ", ".join(s.removesuffix("USDT") for s in stocks)
+        book_lines = [f"Assumed: no book was given, so the {len(stocks)} US stocks the desk trades "
+                      f"on Bitget were checked ({names}) — name yours to check them instead."]
     equities = [s for s in book if is_us_equity(s)]
     sources: list[Source] = []
     lines: list[str] = []
 
     calendar = load_calendar(calendar_path)
     events: list[Event] = []
+    after_window: list[tuple[date, str]] = []
     if calendar is None:
         lines.append("The frozen macro calendar (data/macro_calendar_2026.json) could not be read, "
                      "so no macro release is listed — none is estimated in its place.")
@@ -644,6 +670,8 @@ def watchlist(question: str, book_text: str = "", *, now: datetime | None = None
             events.append(Event("EARNINGS", at, f"{bare_symbol(symbol)} earnings", report.source,
                                 touched={symbol: book[symbol]}, timing=report.timing
                                 + (" (an estimated date)" if report.estimated else "")))
+        elif report.day > end.astimezone(NEW_YORK).date():
+            after_window.append((report.day, bare_symbol(symbol)))
     if tickers:
         sources.append(Source(kind="venue", ref="bitget-mcp-server equity_calendar + Yahoo Finance",
                               detail=f"next report for {', '.join(tickers)}"))
@@ -696,6 +724,24 @@ def watchlist(question: str, book_text: str = "", *, now: datetime | None = None
                         + (f"; {', '.join(missing_dates)} had no report date to check."
                            if missing_dates else "."))
 
+    if _EARNINGS_ASKED.search(question) and after_window and not any(
+            event.kind == "EARNINGS" for event in events):
+        # An earnings question is answered with earnings first: none in the window, and the next
+        # ones after it, before the macro calendar that the lead otherwise gives.
+        soonest = ", ".join(f"{name} {day:%a %d %b}" for day, name in sorted(after_window)[:5])
+        rest = lines[0].removeprefix("Bottom line: ")
+        lines[0] = rest[:1].upper() + rest[1:]
+        lines.insert(0, f"Bottom line: none of these companies reports in {span}; the next "
+                        f"reports are {soonest}.")
+    reporting = sorted((e for e in events if e.kind == "EARNINGS"), key=lambda e: e.at)
+    if _EARNINGS_ASKED.search(question) and reporting and not lines[0].startswith(
+            "Bottom line: none of these companies"):
+        listed = ", ".join(
+            f"{e.title.removesuffix(' earnings')} {e.at.astimezone(NEW_YORK):%a %d %b}"
+            for e in reporting[:8])
+        rest = lines[0].removeprefix("Bottom line: ")
+        lines[0] = rest[:1].upper() + rest[1:]
+        lines.insert(0, f"Bottom line: {len(reporting)} of these report in {span}: {listed}.")
     fed_asked = re.search(r"\b(?:fed|fomc|powell|federal\s+reserve|"
                           r"rate\s+(?:decision|cut|hike)s?)\b", question, re.I)
     if (fed_asked and calendar is not None

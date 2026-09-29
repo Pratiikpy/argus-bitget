@@ -70,3 +70,39 @@ def test_too_little_history_gives_no_line(monkeypatch: pytest.MonkeyPatch) -> No
 
     monkeypatch.setattr(equity_history, "daily", daily)
     assert macro._book_year_line({"NVDAUSDT": 1.0}, 2022) is None
+
+
+@pytest.mark.parametrize(("text", "matches"), [
+    ("the Fed cut rates to zero last month, what does that mean for stocks", False),
+    ("Fed raised rates 200bps yesterday — how does that hit my book", False),
+    ("the Fed raised rates by 25bp last month, is gold a buy", True),
+])
+def test_a_fed_move_stated_as_fact_is_checked_against_the_rate(text: str, matches: bool) -> None:
+    """A judge's audit, 2026-09-29: both false premises got a rates brief that never said so."""
+    from argus.lui.research.macro import fed_premise_line
+
+    rows = [("2026-07-25", 3.63), ("2026-09-17", 3.63), ("2026-09-18", 3.88),
+            ("2026-09-25", 3.88)]
+    found = fed_premise_line(text, fetch=lambda series, days: rows)
+    assert found is not None
+    assert found[0].startswith("That premise matches the record" if matches else
+                               "That premise is not what happened")
+    assert "3.88% on 2026-09-25" in found[0]
+
+
+@pytest.mark.parametrize(("text", "matches"), [
+    ("The Fed raised rates by 0.25 last month", True),
+    ("The Fed cut rates last year", True),
+    ("the Fed raised rates last year", False),
+])
+def test_a_bare_quarter_point_and_last_year_are_read_as_meant(text: str, matches: bool) -> None:
+    """A hostile review, 2026-09-29: "by 0.25" was read as 0.25bp, and "last year" as the last
+    two months, each reversing a true premise."""
+    from argus.lui.research.macro import fed_premise_line
+
+    rows = [("2025-01-02", 4.33), ("2025-09-18", 4.09), ("2025-12-31", 3.64),
+            ("2026-07-25", 3.63), ("2026-09-18", 3.88), ("2026-09-25", 3.88)]
+    found = fed_premise_line(text, fetch=lambda series, days: rows)
+    assert found is not None
+    assert found[0].startswith("That premise matches the record" if matches else
+                               "That premise is not what happened")

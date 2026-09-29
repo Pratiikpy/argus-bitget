@@ -723,3 +723,102 @@ def test_a_french_question_is_restated_before_it_is_routed(monkeypatch: pytest.M
     payload = server.handle_ask("Où se trouve NVDA en ce moment ?", [], visitor="local")
     assert seen == ["Where is NVDA trading right now?"]
     assert str(payload["lines"][0]).startswith('Read as: "Where is NVDA trading right now?"')
+
+
+def test_one_visitors_hour_fits_inside_an_instances_budget() -> None:
+    """A hostile review, 2026-09-29: at sixty questions an hour one visitor could spend a whole
+    instance's model budget. A question costs at most about 10k tokens (server.py)."""
+    from argus.lui import server
+
+    assert server.MODEL_CALLS_PER_VISITOR_PER_HOUR * 10_000 <= server.ROUTER_BUDGET_TOKENS
+
+
+@pytest.mark.parametrize(("text", "prior", "carried"), [
+    ("what about MACD", ["is NVDA overbought"], "what about MACD (NVDA)"),
+    ("should I add more", ["I hold 100 AAPL, what is its price"], "should I add more (AAPL)"),
+    ("hedge it", ["what is NVDA price", "what should I trim"], None),
+    ("is it overbought", ["what is NVDA price"], "is it overbought (NVDA)"),
+])
+def test_a_follow_up_carries_the_right_subject(text: str, prior: list[str],
+                                               carried: str | None) -> None:
+    """A judge's and a first-user audit, 2026-09-29: "what about MACD" and "should I add more"
+    were refused, and "hedge it" after a book question was read as about NVDA from an older turn."""
+    from argus.lui import server
+
+    assert server._carry_prior_name(text, prior) == carried
+
+
+def test_which_one_reads_as_a_comparison_and_momentum_leads_it() -> None:
+    from argus.lui import server
+    from argus.lui.research.dispatch import _momentum_lead
+
+    assert server._WHICH_ONE.match("which one has better momentum")
+    rows = [{"symbol": "BTCUSDT", "ret_30d": 0.064, "ret_7d": 0.01, "beta_open": 0.5,
+             "realised_vol": 0.4},
+            {"symbol": "ETHUSDT", "ret_30d": 0.083, "ret_7d": 0.02, "beta_open": 0.6,
+             "realised_vol": 0.6}]
+    assert _momentum_lead(rows).startswith(
+        "Bottom line: ETH has the stronger momentum — +8.3% over 30 days against BTC +6.4%; it "
+        "also leads over the last week.")
+
+
+def test_a_stated_price_far_from_the_live_one_is_corrected(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    """A judge's audit, 2026-09-29: "NVDA is at 150, should I buy?" never said NVDA was at 227."""
+    from argus.lui import server
+
+    monkeypatch.setattr(server, "_price_now", lambda symbol: 227.77)
+    assert server._price_premise("NVDA is at 150, should I buy?") == (
+        "NVDA is not at 150: it last traded at 227.77 on Bitget, so the question's figure is 34% "
+        "below it, and what follows is read at the real price.")
+    assert server._price_premise("NVDA is at 228, is that expensive") is None
+    assert server._price_premise("TSLA is 20% of my book") is None
+
+
+@pytest.mark.parametrize(("text", "simpler", "period"), [
+    ("explain simpler", True, None),
+    ("can you say that more simply?", True, None),
+    ("i don't understand", True, None),
+    ("what about 5 years?", False, ("5", "years")),
+    ("and over the last 10 years", False, ("10", "years")),
+    ("explain MACD", False, None),
+])
+def test_the_follow_ups_a_newcomer_types_are_recognised(
+        text: str, simpler: bool, period: tuple[str, str] | None) -> None:
+    """A first-time-user audit, 2026-09-29: "explain simpler" dumped a desk decision and "what
+    about 5 years?" was refused."""
+    from argus.lui import server
+
+    assert bool(server._SIMPLER.match(text)) is simpler
+    found = server._ANOTHER_PERIOD.match(text)
+    assert (found.group("n", "unit") if found else None) == period
+
+
+@pytest.mark.parametrize(("text", "move"), [
+    ("BTC vs ETH over the last month", True),
+    ("how did NVDA do vs AMD", True),
+    ("BTC vs ETH returns this week", True),
+    ("compare BTC and ETH", False),
+    ("which is riskier, BTC or ETH, over the last month", False),
+])
+def test_a_named_period_asks_how_the_names_moved(text: str, move: bool) -> None:
+    """A first-user audit, 2026-09-30: "BTC vs ETH over the last month" led on volatility and never
+    said which rose. A period without a risk word asks for the move; a week ranks by the week."""
+    from argus.lui.research.dispatch import _asks_for_the_move, _momentum_lead
+
+    assert _asks_for_the_move(text) is move
+    rows = [{"symbol": "BTCUSDT", "ret_30d": 0.064, "ret_7d": 0.03, "beta_open": 0.5,
+             "realised_vol": 0.4},
+            {"symbol": "ETHUSDT", "ret_30d": 0.083, "ret_7d": 0.02, "beta_open": 0.6,
+             "realised_vol": 0.6}]
+    assert _momentum_lead(rows, week=True).startswith(
+        "Bottom line: BTC did better over the last week — +3.0% against ETH +2.0%.")
+
+
+def test_an_engine_answer_is_labelled_research_not_unsupported() -> None:
+    """A judge's audit, 2026-09-29: the payload's intent read "unsupported" beside a full answer."""
+    from argus.lui import server
+
+    payload = server._answer("if I had bought NVDA on 2023-02-29", [],
+                             now=datetime(2026, 9, 30, tzinfo=UTC))
+    assert payload["intent"] == "research"

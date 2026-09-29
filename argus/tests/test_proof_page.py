@@ -249,3 +249,18 @@ def test_a_measured_comparison_shows_its_own_uncertainty(tmp_path: Path) -> None
     assert "ARGUS better</b> vs gloaming" in page and "113 nights" in page
     assert "95% interval of the difference [-60.72, -42.77]" in page
     assert "better in every group" in page and "no significance test recorded" in page
+
+
+def test_the_page_opens_with_contents_that_reach_every_capability() -> None:
+    """A first-time reader met 46 phone screens with no contents (a first-user audit, 2026-09-29):
+    every capability and every sub-theme heading is one link away, and every link lands."""
+    import re
+
+    wins, counts = collect(DATA)
+    page = render(wins, counts)
+    ids = re.findall(r"id='([^']+)'", page)
+    targets = re.findall(r"href='#([^']+)'", page)
+    assert len(ids) == len(set(ids))
+    assert set(targets) <= set(ids)
+    assert page.index("class='toc'") < page.index("<section>")
+    assert len(targets) >= len(wins)

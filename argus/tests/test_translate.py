@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 from typing import Any
 
 import pytest
@@ -118,3 +119,22 @@ def test_everyday_questions_a_first_user_typed(text: str, lang: str | None) -> N
     """First-user audit, 2026-09-29: the first two were refused or answered with the desk's
     positions, because nothing read them as French."""
     assert tr.target_language(text) == lang
+
+
+def test_a_line_that_fails_the_figure_check_is_tried_once_more() -> None:
+    """A judge's audit, 2026-09-29: a Spanish line with no figures stayed English because the
+    translation wrote a digit the source did not have."""
+    calls: list[int] = []
+
+    class Client:
+        def complete_json(self, messages: Any, **_: Any) -> dict[str, Any]:
+            calls.append(1)
+            lines = json.loads(messages[-1]["content"])["lines"]
+            if len(calls) == 1:
+                return {"lines": ["Precio 1 hoy" if "no figures" in line else f"es: {line}"
+                                  for line in lines]}
+            return {"lines": ["Sin cifras aquí" for _ in lines]}
+
+    out = tr.translate(["NVDA at 230", "a line with no figures"], "es", Client())
+    assert len(calls) == 2
+    assert out["lines"] == ["es: NVDA at 230", "Sin cifras aquí"] and out["kept_english"] == []

@@ -240,3 +240,28 @@ def test_a_fed_decision_asked_for_when_none_is_due_is_said() -> None:
     assert lines[1].startswith("No Fed rate decision falls in Tue 29 Sep to Tue 06 Oct; the next "
                                "is the FOMC rate decision")
     assert "Wed 28 Oct 2026" in lines[1]
+
+
+def test_an_earnings_question_with_no_book_checks_the_desks_stocks_and_leads_with_them() -> None:
+    """A judge's audit, 2026-09-29: "what earnings are coming up this week for tech stocks"
+    listed payrolls and GDP and no earnings."""
+    from datetime import UTC, datetime
+
+    from argus.lui import watchlist as wl
+
+    reports = {"TSLA": date(2026, 10, 21), "MSFT": date(2026, 10, 28)}
+
+    def lookup(ticker: str, today: date) -> wl.Report | None:
+        day = reports.get(ticker)
+        return wl.Report(ticker, day, "after the close", "test") if day else None
+
+    lines, _, _ = wl.watchlist("what earnings are coming up this week for tech stocks",
+                               now=datetime(2026, 9, 29, 16, 0, tzinfo=UTC),
+                               earnings_lookup=lookup, filings_lookup=lambda s, t: {})
+    assert lines[0] == ("Bottom line: none of these companies reports in Tue 29 Sep to Tue 06 "
+                        "Oct; the next reports are TSLA Wed 21 Oct, MSFT Wed 28 Oct.")
+    assert any("QQQ" not in line and "US stocks the desk trades" in line for line in lines)
+    month, _, _ = wl.watchlist("what earnings are coming up next month",
+                               now=datetime(2026, 9, 29, 16, 0, tzinfo=UTC),
+                               earnings_lookup=lookup, filings_lookup=lambda s, t: {})
+    assert month[0].startswith("Bottom line: 2 of these report in Tue 29 Sep to")

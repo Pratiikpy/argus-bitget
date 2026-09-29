@@ -262,6 +262,34 @@ def _measured(row: dict[str, Any]) -> str:
             f"{esc(str(row.get('unit')))}s, {esc(basis)}{esc(every)}</li>")
 
 
+def _anchor(text: str) -> str:
+    """A stable fragment id for a heading or a card, so the page's contents can link to it."""
+    return "-".join(re.findall(r"[a-z0-9]+", text.lower()))[:60] or "item"
+
+
+def _contents(wins: list[Win], themes: dict[str, list[str]]) -> str:
+    """The page's contents: every capability grouped by state, then every track and sub-theme.
+
+    A first-time reader met 46 phone screens with no way to find the OWNED rows or a named
+    sub-theme without scrolling all of it (a first-time-user audit, 2026-09-29)."""
+    esc = html.escape
+    groups: list[str] = []
+    for state in ("owned", "tied", "lost", "implemented"):
+        mine = [w for w in wins if w.state == state]
+        if not mine:
+            continue
+        items = "".join(f"<li><a href='#{_anchor(w.name)}'>{esc(w.name)}</a></li>" for w in mine)
+        opened = " open" if state in ("owned", "lost") else ""
+        groups.append(f"<details{opened}><summary><span class='st {state}'>{state.upper()}</span> "
+                      f"{len(mine)}</summary><ul>{items}</ul></details>")
+    tracks = "".join(
+        f"<li><a href='#{_anchor(track)}'>{esc(track)}</a><ul>"
+        + "".join(f"<li><a href='#{_anchor(track + ' ' + t)}'>{esc(t)}</a></li>" for t in names)
+        + "</ul></li>" for track, names in themes.items())
+    return (f"<nav class='toc' aria-label='On this page'><h2>On this page</h2>{''.join(groups)}"
+            f"<details><summary>By track and sub-theme</summary><ul>{tracks}</ul></details></nav>")
+
+
 def _card(win: Win) -> str:
     esc = html.escape
     links: list[str] = []
@@ -292,7 +320,7 @@ def _card(win: Win) -> str:
             reason = reason[:900].rsplit(" ", 1)[0] + "…"
         tested += (f"<p class='why'><span class='lbl'>Why not OWNED</span>{esc(reason)}</p>")
     return (
-        f"<article class='w {esc(win.state)}'>"
+        f"<article class='w {esc(win.state)}' id='{_anchor(win.name)}'>"
         f"<div class='head'><span class='st {esc(win.state)}'>{esc(win.state.upper())}</span>"
         f"<span class='cn'>{win.conditions} of 13 conditions"
         + (" — against a rival that does not lead the sub-theme"
@@ -336,6 +364,7 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
             "it.</p></div>"
         )
         sections: list[str] = []
+        contents: dict[str, list[str]] = {}
         for track in TRACK_ORDER:
             mine = [w for w in wins if w.track == track]
             if not mine:
@@ -345,15 +374,18 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
             by_theme: dict[str, list[Win]] = {}
             for win in sorted(mine, key=lambda w: rank.get(w.subtheme, len(rank))):
                 by_theme.setdefault(win.subtheme, []).append(win)
+            contents[track] = list(by_theme)
             themes = "".join(
-                f"<h3 class='theme'>{esc(theme)}</h3>" + THEME_LINKS.get(theme, "")
+                f"<h3 class='theme' id='{_anchor(track + ' ' + theme)}'>{esc(theme)}</h3>"
+                + THEME_LINKS.get(theme, "")
                 + "".join(_card(w) for w in items)
                 for theme, items in by_theme.items())
-            sections.append(f"<section><h2>{esc(track)}</h2>"
+            sections.append(f"<section><h2 id='{_anchor(track)}'>{esc(track)}</h2>"
                             f"<p class='sub'>{esc(TRACK_NOTE[track])}</p>{themes}</section>")
         body = (f"<p class='sub'>{reachable} of {len(wins)} run live from a question in the "
                 f"console; the rest are named as gaps below. Losses and withdrawn claims are on "
-                f"<a href='/wrong'>what we got wrong</a>.</p>" + "".join(sections))
+                f"<a href='/wrong'>what we got wrong</a>.</p>" + _contents(wins, contents)
+                + "".join(sections))
     head = design.head("ARGUS — measured against the specialists",
                        "Every capability ARGUS claims, the specialist it was run against on the "
                        "same input, and who won.", "/proof")
@@ -401,6 +433,14 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
  .note {{ font-size:12.5px; overflow-wrap:anywhere }}
  .why {{ color:var(--ink) }} .why .lbl {{ color:var(--redline) }}
  a {{ color:var(--accent) }}
+ .toc {{ background:var(--panel); border:1px solid var(--line); border-radius:10px;
+   padding:12px 16px; margin:0 0 18px; font-size:14px }}
+ .toc h2 {{ font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim);
+   margin:0 0 6px }}
+ .toc details {{ color:var(--ink); font-size:14px; margin:4px 0 }}
+ .toc ul {{ margin:6px 0 8px; padding-left:18px }}
+ .toc li {{ margin:3px 0 }}
+ [id] {{ scroll-margin-top:84px }}
  a:focus-visible, summary:focus-visible {{ outline:2px solid var(--accent); outline-offset:2px }}
  @media (max-width:520px) {{ .lbl {{ display:block; min-width:0 }} }}
 {design.BASE_CSS}</style></head><body>{design.nav('/proof')}<div class="wrap">

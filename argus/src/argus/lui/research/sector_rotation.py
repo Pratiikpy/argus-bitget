@@ -44,9 +44,43 @@ SECTOR_ROTATION_Q = re.compile(
 money moving, so "what sector is NVDA in" does not reach it."""
 
 
+_SECTOR_WORDS: tuple[tuple[str, str], ...] = (
+    (r"tech\w*|semis?|semiconductors?", "Technology"),
+    (r"energy|oil\s+stocks", "Energy"),
+    (r"financials?|banks?", "Financial Services"),
+    (r"health\s*care|pharma\w*|biotech", "Healthcare"),
+    (r"utilities", "Utilities"),
+    (r"industrials?", "Industrials"),
+    (r"(?:basic\s+)?materials", "Basic Materials"),
+    (r"real\s+estate|reits?", "Real Estate"),
+    (r"(?:consumer\s+)?staples|consumer\s+defensive", "Consumer Defensive"),
+    (r"(?:consumer\s+)?discretionary|consumer\s+cyclical|retail", "Consumer Cyclical"),
+    (r"communications?(?:\s+services)?|media", "Communication Services"),
+)
+"""Everyday names for the eleven sectors, in the map's own names."""
+
+_NAMED_ROTATION = re.compile(
+    r"\b(?:rotat\w*|money|capital|flow\w*|moving|shift\w*)\b[^?.]{0,50}"
+    r"\b(?:out\s+of|into|from|to)\b", re.I)
+"""Money said to move between sectors named in words: "is capital rotating out of tech and into
+energy" (a judge's audit, 2026-09-29) never said "sector"."""
+
+
+def named_sectors(text: str) -> list[str]:
+    """The sectors a question names, in the order it names them."""
+    found: list[tuple[int, str]] = []
+    for pattern, sector in _SECTOR_WORDS:
+        m = re.search(rf"\b(?:{pattern})\b", text, re.I)
+        if m is not None and sector not in (name for _, name in found):
+            found.append((m.start(), sector))
+    return [name for _, name in sorted(found)]
+
+
 def asks_for_sector_rotation(text: str) -> bool:
-    return bool(SECTOR_ROTATION_Q.search(text)) and not re.search(
-        r"\bwhat\s+sector\s+(?:is|does)\b", text, re.I)
+    if re.search(r"\bwhat\s+sector\s+(?:is|does)\b", text, re.I):
+        return False
+    return bool(SECTOR_ROTATION_Q.search(text)) or (
+        bool(_NAMED_ROTATION.search(text)) and len(named_sectors(text)) >= 2)
 
 
 def _returns(ticker: str, daily: Callable[[str], Any]) -> tuple[float, float, str] | None:
@@ -108,7 +142,25 @@ def answer(text: str, daily: Callable[[str], Any] | None = None) -> tuple[list[s
     else:
         lead = (f"Bottom line: no sector beat SPY over the last month; the least weak were "
                 f"{named(rows[:2])}.")
-    lines = [lead,
+    asked = [r for name in named_sectors(text) for r in rows if r["sector"] == name]
+    general = lead
+    if len(asked) >= 2:
+        # The sectors the question named, compared first; the full ranking follows.
+        a, b = asked[0], asked[1]
+        month = float(b["vs_spy_month"]) - float(a["vs_spy_month"])
+        quarter = float(b["vs_spy_quarter"]) - float(a["vs_spy_quarter"])
+        verdict = ("yes, on both the month and the quarter" if month > 0 and quarter > 0 else
+                   "not over the month, but yes over three months" if quarter > 0 else
+                   "yes over the month, not over three months" if month > 0 else
+                   "no, on both the month and the quarter")
+        lead = (f"Bottom line: from {a['sector']} into {b['sector']} — {verdict}: "
+                f"{a['sector']} {points(float(a['month']))}% and {b['sector']} "
+                f"{points(float(b['month']))}% over the month (SPY {points(bench[0])}%), "
+                f"{points(float(a['quarter']))}% and {points(float(b['quarter']))}% over three "
+                f"months.")
+    rest = general.removeprefix("Bottom line: ")
+    lines_head = [lead] if lead == general else [lead, rest[:1].upper() + rest[1:]]
+    lines = [*lines_head,
              f"SPY: {points(bench[0])}% over the month and {points(bench[1])}% over three months, "
              f"to {bench[2]}.",
              "Every sector, month then quarter, each against SPY: " + "; ".join(

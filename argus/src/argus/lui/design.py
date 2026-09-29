@@ -262,4 +262,10 @@ def linked(text: str) -> str:
                    f"{html.escape(host.group(1) if host else url)} &#8599;</a>")
         at = match.end()
     out.append(html.escape(text[at:]))
-    return "".join(out)
+    return _BPS.sub(r'\1<abbr title="basis points: hundredths of a percent, so 100bps is 1%">bps'
+                    r"</abbr>", "".join(out))
+
+
+_BPS = re.compile(r"(\d)bps\b")
+"""A figure in basis points, given its definition on hover (the console's ``linked`` does the
+same)."""

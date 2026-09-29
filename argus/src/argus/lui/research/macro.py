@@ -239,6 +239,91 @@ def _fred_is_the_mirror(ident: str, args: dict[str, Any]
     return Health.OK, "read by the macro answer", None, "FRED (St. Louis Fed)", True
 
 
+FED_CLAIM = re.compile(
+    r"\b(?:the\s+)?(?:fed|fomc|federal\s+reserve)\s+(?:just\s+|already\s+)?(?P<verb>cut|lowered|"
+    r"slashed|raised|hiked|increased)\s+(?:interest\s+)?rates?(?:\s+(?P<how>to|by)\s+"
+    r"(?P<amount>zero|\d+(?:\.\d+)?)\s*(?P<unit>bps|bp|basis\s+points?|%|percent)?)?"
+    r"(?:[^.?!]{0,20}?\b(?P<when>yesterday|today|last\s+(?:week|month|year)|this\s+(?:week|month|"
+    r"year)|(?:in\s+the\s+)?past\s+year))?",
+    re.I)
+"""A question that states a Fed move as fact: "the Fed cut rates to zero last month"."""
+
+_CLAIM_WINDOW_DAYS = {"today": 1, "yesterday": 2, "this week": 7, "last week": 14,
+                      "this month": 31, "last month": 62, "this year": 366, "last year": 400,
+                      "past year": 366, "in the past year": 366}
+
+
+def fed_premise_line(raw_text: str,
+                     fetch: Any = None) -> tuple[str, Source] | None:
+    """Whether a Fed move the question states as fact is what the effective fed funds rate did.
+
+    "Fed cut rates to zero last month" and "Fed raised rates 200bps yesterday" were answered with
+    a rates brief that contradicted both and never said so (a judge's audit, 2026-09-29). The
+    effective rate (FRED DFF) is read over the window the question names, and the premise is
+    called matching or not in the lead. A move the question does not size is judged on its
+    direction alone."""
+    claim = FED_CLAIM.search(raw_text)
+    if claim is None:
+        return None
+    rows = (fetch or _fred)("DFF", 420)
+    if len(rows) < 2:
+        return None
+    named_when = claim.group("when")
+    when = re.sub(r"\s+", " ", (named_when or "last month").lower())
+    span = _CLAIM_WINDOW_DAYS.get(when, 62)
+    last_day, last = rows[-1]
+    from datetime import date as _date
+    from datetime import timedelta as _td
+
+    since = (_date.fromisoformat(last_day) - _td(days=span)).isoformat()
+    until = last_day
+    if when == "last year":
+        # The calendar year before this one, not a rolling window reaching into this year: "the
+        # Fed cut rates last year" is about 2025, whatever 2026 did (a hostile review found the
+        # verdict reversed by a two-month slice, 2026-09-29).
+        year = int(last_day[:4]) - 1
+        since, until = f"{year}-01-01", f"{year}-12-31"
+    elif when == "this year":
+        since = f"{last_day[:4]}-01-01"
+    # The rate standing at the window's start (the last reading on or before it: FRED skips
+    # weekends and holidays) against the last reading inside it.
+    standing = [v for d, v in rows if d <= since]
+    upto = [(d, v) for d, v in rows if d <= until]
+    if not upto:
+        return None
+    before = standing[-1] if standing else rows[0][1]
+    end_day, last = upto[-1]
+    moved_bp = (last - before) * 100.0
+    cut = claim.group("verb").lower() in ("cut", "lowered", "slashed")
+    direction_ok = moved_bp < -5 if cut else moved_bp > 5
+    amount, how = claim.group("amount"), claim.group("how")
+    unit = (claim.group("unit") or "").lower()
+    size_ok = True
+    if amount == "zero" or (amount and how == "to"):
+        level = 0.0 if amount == "zero" else float(amount)
+        size_ok = abs(last - level) <= 0.25
+    elif amount:
+        # A bare small number is percentage points ("raised rates by 0.25" is a quarter point);
+        # it was read as 0.25bp and the premise called false beside its own +25bp (a hostile
+        # review, 2026-09-29). A bare number of 5 or more is basis points.
+        points = unit in ("%", "percent") or (not unit and float(amount) < 5)
+        bp = float(amount) * (100.0 if points else 1.0)
+        size_ok = abs(abs(moved_bp) - bp) <= 15
+    moved = (f"moved {moved_bp:+.0f}bp" if abs(moved_bp) >= 5 else "did not move")
+    over = {"today": "today", "yesterday": "since the day before", "this week": "this week",
+            "last week": "over the last two weeks", "this month": "this month",
+            "last month": "over the last two months", "this year": "this year",
+            "last year": f"over {int(last_day[:4]) - 1}", "past year": "over the past year",
+            "in the past year": "over the past year"}.get(when, "over that time")
+    fact = (f"the effective fed funds rate was {last:.2f}% on {end_day} and {moved} {over} "
+            f"(from {before:.2f}%, FRED DFF)")
+    if named_when is None:
+        fact += "; no period was named, so the last two months were checked"
+    line = (f"That premise matches the record: {fact}." if direction_ok and size_ok else
+            f"That premise is not what happened: {fact}.")
+    return line, Source(kind="venue", ref="FRED DFF", detail=f"effective fed funds to {end_day}")
+
+
 def _macro(symbol: str | None, book: Mapping[str, float] | None = None,
            raw_text: str = "") -> tuple[list[str], list[Source], dict[str, Any]]:
     """Rates, the Fed, inflation and the dollar from FRED, and how ``symbol`` (QQQ when none) — or
