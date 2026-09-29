@@ -369,8 +369,10 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
  .links a {{ color:var(--accent); overflow-wrap:anywhere }}
  .links a.live {{ font-weight:600 }}
  .gap {{ color:var(--warn); font-size:13px }}
+ /* The rerun command wraps rather than scrolling: a scrolling box a keyboard cannot reach
+    failed axe's scrollable-region-focusable on phones (accessibility audit, 2026-09-29). */
  .cmd {{ display:block; font:12px var(--mono); color:var(--dim); margin:2px 0 6px;
-   overflow-x:auto; white-space:nowrap }}
+   white-space:pre-wrap; overflow-wrap:anywhere }}
  details {{ font-size:13px; color:var(--dim) }}
  summary {{ cursor:pointer; color:var(--accent) }}
  details ul {{ padding-left:18px; margin:8px 0 }}

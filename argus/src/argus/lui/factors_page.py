@@ -20,6 +20,7 @@ from typing import Any
 
 from argus.lui import design
 from argus.lui.proof_page import REPOSITORY
+from argus.truth.paths import DATA_DIR
 
 
 def load(data_dir: Path) -> dict[str, Any] | None:
@@ -50,6 +51,31 @@ def _row(f: dict[str, Any]) -> str:
             f"<div class='why'>{esc(str(f.get('rejection_reason') or ''))}</div></td></tr>")
 
 
+def _rival(data_dir: Path) -> str:
+    """The same gates run on the specialist's catalogues (`eval/factor_quality_rivals.py`): the
+    page said what ARGUS's own factors did and not how the leading factor miner's fared through
+    the same gates (visual review, 2026-09-29)."""
+    try:
+        blob = json.loads((data_dir / "factor_quality_rivals.json").read_text(encoding="utf-8"))
+        fam = blob["summary"]["by_family"]
+        noise = blob["noise"]
+    except (OSError, ValueError, KeyError, TypeError):
+        return ""
+
+    def cell(family: str) -> str:
+        row = fam.get(family, {}).get("as_written", {})
+        return f"{row.get('pass_all', '?')} of {row.get('pairs', '?')}"
+
+    return (f'<p class="sub"><b>Against FactorMiner</b>, run in its own engine on the same bars '
+            f"through the same gates: its paper factors pass all of them on {cell('paper')} "
+            f"factor-instrument pairs, its Alpha101 set on {cell('alpha101')}, the adapted "
+            f"variants on {cell('alpha101_adapted')}, and these rules on {cell('argus')}; coin "
+            f"flips pass split-half alone {noise.get('passed')} times in {noise.get('of')}. "
+            f'Neither side finds an edge these gates can see, so the row is TIED '
+            f'(<a href="{REPOSITORY}data/factor_quality_rivals.json">'
+            f"<code>data/factor_quality_rivals.json</code></a>).</p>")
+
+
 def render(blob: dict[str, Any] | None) -> str:
     esc = html.escape
     if blob is None:
@@ -77,7 +103,7 @@ factor, and {esc(str(blob.get('separation', '')))}.</p>
 {esc(str(blob.get('generated_at', ''))[:16].replace('T', ' '))} UTC by
 <a href="{REPOSITORY}src/argus/research/factor_lab.py"><code>research/factor_lab.py</code></a>;
 the record is <a href="{REPOSITORY}data/factor_lab.json"><code>data/factor_lab.json</code></a>.
-</p>"""
+</p>{_rival(DATA_DIR)}"""
     head = design.head("ARGUS — factors, tested",
                        "Every factor the lab tried, the gate each one stopped at, and why.",
                        "/factors")

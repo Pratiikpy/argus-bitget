@@ -1,0 +1,1426 @@
+{
+ "method": "G5 -- stress-window replay of run 2's registered policy (21_T2_QUANT_SEARCH.md row G5).\n\nAnswers: does any nine-day stress window break the policy's stated loss bounds (the 4% venue\nstop, widened per name under run2-a7, and the weekend freeze that flattens every US-session leg\nbefore Friday 20:00 UTC)?\n\nMethod. Run 2 is FROZEN (paper-traded on Bitget Demo): this script never imports it as a running\nservice, never restarts anything, and places no order. It only reads run 2's own code\n(``scripts/strategy_replay.py`` and the ``sentiment_agent`` package it imports) as a library and\nreplays historical data through it -- the same production ``analysis.armsim.ArmSimulator`` path\nG2 already used for the pre-genesis audit (``research/harvest/quant/T2_STRATEGY_AUDIT.md``,\n\"Real-kernel replay\" section). No Qwen/LLM call, no network order, at any point.\n\nWindow selection is objective, not hand-picked: take the exact 216-hour (9-day) window set G2\nreplayed (every day 00:00 UTC with a full window of history behind it), compute four statistics\nper window from the same Demo/live candle history the replay already loads\n(``research/harvest/quant/replay/{history.json,history_marks.json}``), and pick the window that\nis most extreme on each statistic:\n\n* **crash**  -- most negative peak-to-trough drawdown of BTCUSDT within the window.\n* **squeeze** -- largest trough-to-peak rally of BTCUSDT within the window.\n* **flat**   -- lowest realised volatility (population stdev of hourly log returns) of BTCUSDT.\n* **weekend gap** -- largest |Friday 20:00 UTC -> Monday 00:00 UTC| price move on any\n  weekend-frozen instrument (``AssetClass.follows_us_session``: every US equity and index in the\n  universe) that falls inside the window.\n\nBTCUSDT is used for (a)-(c) because it is the cleanest, most liquid, 24/7-quoted instrument in\nthe universe (T2_STRATEGY_AUDIT.md D1) and the only one that is not itself subject to the\nweekend freeze, so its price path is not an artefact of the freeze rule under test.\n\nFor each selected window the registered arm (``fade_7.5bp_registered``, run 2's actual trigger\nand sizing as shipped) is replayed through the identical ``Policy``/``RiskKernel``/\n``ArmSimulator`` construction ``strategy_replay.run_window`` uses, but calling\n``ArmSimulator.run`` directly so the individual ``ClosedTrade`` records (with each trade's\n``exit_reason``) survive for inspection -- ``run_window``'s own closure discards them after\nextracting summary metrics. Every stop-caused exit's realised loss (net of fees, as a fraction of\nits notional) is compared against ``Policy.stop_for(symbol)``, the exact per-symbol stop distance\n(widened for the four names with wide Demo-live gaps, run2-a7) the venue was asked to honour.\n\nUsage::\n\n    python argus/scripts/t2_stress_windows.py [--out argus/data/t2_stress_windows.json]\n",
+ "n_candidate_windows": 51,
+ "window_hours": 216,
+ "candidate_windows_scored": [
+  {
+   "start": "2026-07-30T00:00:00+00:00",
+   "end": "2026-08-08T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.03841526641456483,
+    "max_rally": 0.044082542973799876,
+    "hourly_log_return_stdev": 0.0026235190101273867,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "SNDKUSDT",
+    "friday_2000z": "2026-07-31T20:00:00+00:00",
+    "monday_0000z": "2026-08-03T00:00:00+00:00",
+    "gap_bps": 416.46357079715426
+   },
+   "n_weekend_gap_observations": 26
+  },
+  {
+   "start": "2026-07-31T00:00:00+00:00",
+   "end": "2026-08-09T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.033944673366368194,
+    "max_rally": 0.044082542973799876,
+    "hourly_log_return_stdev": 0.0024611862845465293,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "SNDKUSDT",
+    "friday_2000z": "2026-07-31T20:00:00+00:00",
+    "monday_0000z": "2026-08-03T00:00:00+00:00",
+    "gap_bps": 416.46357079715426
+   },
+   "n_weekend_gap_observations": 26
+  },
+  {
+   "start": "2026-08-01T00:00:00+00:00",
+   "end": "2026-08-10T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.09970961637181364,
+    "max_rally": 0.11038678095575283,
+    "hourly_log_return_stdev": 0.009704913173930105,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "MSTRUSDT",
+    "friday_2000z": "2026-08-07T20:00:00+00:00",
+    "monday_0000z": "2026-08-10T00:00:00+00:00",
+    "gap_bps": 71.88498402555865
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-02T00:00:00+00:00",
+   "end": "2026-08-11T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.09970961637181364,
+    "max_rally": 0.11099953022555975,
+    "hourly_log_return_stdev": 0.009735606653131437,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "MSTRUSDT",
+    "friday_2000z": "2026-08-07T20:00:00+00:00",
+    "monday_0000z": "2026-08-10T00:00:00+00:00",
+    "gap_bps": 71.88498402555865
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-03T00:00:00+00:00",
+   "end": "2026-08-12T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.09970961637181364,
+    "max_rally": 0.11099953022555975,
+    "hourly_log_return_stdev": 0.009731184026439821,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "MSTRUSDT",
+    "friday_2000z": "2026-08-07T20:00:00+00:00",
+    "monday_0000z": "2026-08-10T00:00:00+00:00",
+    "gap_bps": 71.88498402555865
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-04T00:00:00+00:00",
+   "end": "2026-08-13T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.09970961637181364,
+    "max_rally": 0.11099953022555975,
+    "hourly_log_return_stdev": 0.009687520026897685,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "MSTRUSDT",
+    "friday_2000z": "2026-08-07T20:00:00+00:00",
+    "monday_0000z": "2026-08-10T00:00:00+00:00",
+    "gap_bps": 71.88498402555865
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-05T00:00:00+00:00",
+   "end": "2026-08-14T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.09970961637181364,
+    "max_rally": 0.11099953022555975,
+    "hourly_log_return_stdev": 0.00966555160886018,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "MSTRUSDT",
+    "friday_2000z": "2026-08-07T20:00:00+00:00",
+    "monday_0000z": "2026-08-10T00:00:00+00:00",
+    "gap_bps": 71.88498402555865
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-06T00:00:00+00:00",
+   "end": "2026-08-15T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.09970961637181364,
+    "max_rally": 0.11099953022555975,
+    "hourly_log_return_stdev": 0.009669260703529345,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "SNDKUSDT",
+    "friday_2000z": "2026-08-14T20:00:00+00:00",
+    "monday_0000z": "2026-08-17T00:00:00+00:00",
+    "gap_bps": 188.54498014195588
+   },
+   "n_weekend_gap_observations": 26
+  },
+  {
+   "start": "2026-08-07T00:00:00+00:00",
+   "end": "2026-08-16T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.09970961637181364,
+    "max_rally": 0.11099953022555975,
+    "hourly_log_return_stdev": 0.009648556998855029,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "SNDKUSDT",
+    "friday_2000z": "2026-08-14T20:00:00+00:00",
+    "monday_0000z": "2026-08-17T00:00:00+00:00",
+    "gap_bps": 188.54498014195588
+   },
+   "n_weekend_gap_observations": 26
+  },
+  {
+   "start": "2026-08-08T00:00:00+00:00",
+   "end": "2026-08-17T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.09752459658527968,
+    "max_rally": 0.11099953022555975,
+    "hourly_log_return_stdev": 0.00962832888514381,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "SNDKUSDT",
+    "friday_2000z": "2026-08-14T20:00:00+00:00",
+    "monday_0000z": "2026-08-17T00:00:00+00:00",
+    "gap_bps": 188.54498014195588
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-09T00:00:00+00:00",
+   "end": "2026-08-18T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.09543898113021632,
+    "max_rally": 0.11099953022555975,
+    "hourly_log_return_stdev": 0.009665029101851005,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "SNDKUSDT",
+    "friday_2000z": "2026-08-14T20:00:00+00:00",
+    "monday_0000z": "2026-08-17T00:00:00+00:00",
+    "gap_bps": 188.54498014195588
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-10T00:00:00+00:00",
+   "end": "2026-08-19T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.04104300399859051,
+    "max_rally": 0.03563600345080986,
+    "hourly_log_return_stdev": 0.0021430040029624337,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "SNDKUSDT",
+    "friday_2000z": "2026-08-14T20:00:00+00:00",
+    "monday_0000z": "2026-08-17T00:00:00+00:00",
+    "gap_bps": 188.54498014195588
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-11T00:00:00+00:00",
+   "end": "2026-08-20T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.027628257408054635,
+    "max_rally": 0.11327443524938507,
+    "hourly_log_return_stdev": 0.0036331266292196386,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "SNDKUSDT",
+    "friday_2000z": "2026-08-14T20:00:00+00:00",
+    "monday_0000z": "2026-08-17T00:00:00+00:00",
+    "gap_bps": 188.54498014195588
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-12T00:00:00+00:00",
+   "end": "2026-08-21T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.025088466905901163,
+    "max_rally": 0.16614212224813873,
+    "hourly_log_return_stdev": 0.004077131550486835,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "SNDKUSDT",
+    "friday_2000z": "2026-08-14T20:00:00+00:00",
+    "monday_0000z": "2026-08-17T00:00:00+00:00",
+    "gap_bps": 188.54498014195588
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-13T00:00:00+00:00",
+   "end": "2026-08-22T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.032036105263290704,
+    "max_rally": 0.26656388791257957,
+    "hourly_log_return_stdev": 0.005401414771848833,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "SNDKUSDT",
+    "friday_2000z": "2026-08-14T20:00:00+00:00",
+    "monday_0000z": "2026-08-17T00:00:00+00:00",
+    "gap_bps": 188.54498014195588
+   },
+   "n_weekend_gap_observations": 26
+  },
+  {
+   "start": "2026-08-14T00:00:00+00:00",
+   "end": "2026-08-23T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.032036105263290704,
+    "max_rally": 0.26656388791257957,
+    "hourly_log_return_stdev": 0.00552378464361248,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "SNDKUSDT",
+    "friday_2000z": "2026-08-14T20:00:00+00:00",
+    "monday_0000z": "2026-08-17T00:00:00+00:00",
+    "gap_bps": 188.54498014195588
+   },
+   "n_weekend_gap_observations": 26
+  },
+  {
+   "start": "2026-08-15T00:00:00+00:00",
+   "end": "2026-08-24T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.04121630740937432,
+    "max_rally": 0.2608692886236079,
+    "hourly_log_return_stdev": 0.005577843957295129,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "TSLAUSDT",
+    "friday_2000z": "2026-08-21T20:00:00+00:00",
+    "monday_0000z": "2026-08-24T00:00:00+00:00",
+    "gap_bps": 113.53615520282246
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-16T00:00:00+00:00",
+   "end": "2026-08-25T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.04121630740937432,
+    "max_rally": 0.2640644308623068,
+    "hourly_log_return_stdev": 0.005858434656871698,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "TSLAUSDT",
+    "friday_2000z": "2026-08-21T20:00:00+00:00",
+    "monday_0000z": "2026-08-24T00:00:00+00:00",
+    "gap_bps": 113.53615520282246
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-17T00:00:00+00:00",
+   "end": "2026-08-26T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.04121630740937432,
+    "max_rally": 0.2832628398791539,
+    "hourly_log_return_stdev": 0.006124751120477,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "TSLAUSDT",
+    "friday_2000z": "2026-08-21T20:00:00+00:00",
+    "monday_0000z": "2026-08-24T00:00:00+00:00",
+    "gap_bps": 113.53615520282246
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-18T00:00:00+00:00",
+   "end": "2026-08-27T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.04121630740937432,
+    "max_rally": 0.25955579278237395,
+    "hourly_log_return_stdev": 0.00616264359410291,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "TSLAUSDT",
+    "friday_2000z": "2026-08-21T20:00:00+00:00",
+    "monday_0000z": "2026-08-24T00:00:00+00:00",
+    "gap_bps": 113.53615520282246
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-19T00:00:00+00:00",
+   "end": "2026-08-28T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.04121630740937432,
+    "max_rally": 0.25689189294419035,
+    "hourly_log_return_stdev": 0.006204629709569593,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "TSLAUSDT",
+    "friday_2000z": "2026-08-21T20:00:00+00:00",
+    "monday_0000z": "2026-08-24T00:00:00+00:00",
+    "gap_bps": 113.53615520282246
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-20T00:00:00+00:00",
+   "end": "2026-08-29T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.04173378403160166,
+    "max_rally": 0.16648454889717557,
+    "hourly_log_return_stdev": 0.00564441538833412,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "TSLAUSDT",
+    "friday_2000z": "2026-08-21T20:00:00+00:00",
+    "monday_0000z": "2026-08-24T00:00:00+00:00",
+    "gap_bps": 113.53615520282246
+   },
+   "n_weekend_gap_observations": 26
+  },
+  {
+   "start": "2026-08-21T00:00:00+00:00",
+   "end": "2026-08-30T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.04173378403160166,
+    "max_rally": 0.09530239962650455,
+    "hourly_log_return_stdev": 0.00525789722032137,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "TSLAUSDT",
+    "friday_2000z": "2026-08-21T20:00:00+00:00",
+    "monday_0000z": "2026-08-24T00:00:00+00:00",
+    "gap_bps": 113.53615520282246
+   },
+   "n_weekend_gap_observations": 26
+  },
+  {
+   "start": "2026-08-22T00:00:00+00:00",
+   "end": "2026-08-31T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.04173378403160166,
+    "max_rally": 0.06173654845240928,
+    "hourly_log_return_stdev": 0.0039296174936082244,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "GOOGLUSDT",
+    "friday_2000z": "2026-08-28T20:00:00+00:00",
+    "monday_0000z": "2026-08-31T00:00:00+00:00",
+    "gap_bps": -58.46768357984256
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-23T00:00:00+00:00",
+   "end": "2026-09-01T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.04173378403160166,
+    "max_rally": 0.06173654845240928,
+    "hourly_log_return_stdev": 0.0038665348614307115,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "GOOGLUSDT",
+    "friday_2000z": "2026-08-28T20:00:00+00:00",
+    "monday_0000z": "2026-08-31T00:00:00+00:00",
+    "gap_bps": -58.46768357984256
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-24T00:00:00+00:00",
+   "end": "2026-09-02T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.044417652569128774,
+    "max_rally": 0.049588055896945704,
+    "hourly_log_return_stdev": 0.003856453685428226,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "GOOGLUSDT",
+    "friday_2000z": "2026-08-28T20:00:00+00:00",
+    "monday_0000z": "2026-08-31T00:00:00+00:00",
+    "gap_bps": -58.46768357984256
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-25T00:00:00+00:00",
+   "end": "2026-09-03T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.05116077933792951,
+    "max_rally": 0.03558670352986559,
+    "hourly_log_return_stdev": 0.003470696594850763,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "GOOGLUSDT",
+    "friday_2000z": "2026-08-28T20:00:00+00:00",
+    "monday_0000z": "2026-08-31T00:00:00+00:00",
+    "gap_bps": -58.46768357984256
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-26T00:00:00+00:00",
+   "end": "2026-09-04T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.04913426148978539,
+    "max_rally": 0.0669927065445215,
+    "hourly_log_return_stdev": 0.0036238756419357597,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "GOOGLUSDT",
+    "friday_2000z": "2026-08-28T20:00:00+00:00",
+    "monday_0000z": "2026-08-31T00:00:00+00:00",
+    "gap_bps": -58.46768357984256
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-27T00:00:00+00:00",
+   "end": "2026-09-05T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.04913426148978539,
+    "max_rally": 0.0669927065445215,
+    "hourly_log_return_stdev": 0.0038894277691456573,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "GOOGLUSDT",
+    "friday_2000z": "2026-08-28T20:00:00+00:00",
+    "monday_0000z": "2026-08-31T00:00:00+00:00",
+    "gap_bps": -58.46768357984256
+   },
+   "n_weekend_gap_observations": 26
+  },
+  {
+   "start": "2026-08-28T00:00:00+00:00",
+   "end": "2026-09-06T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.04913426148978539,
+    "max_rally": 0.0669927065445215,
+    "hourly_log_return_stdev": 0.0037527223915971453,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "GOOGLUSDT",
+    "friday_2000z": "2026-08-28T20:00:00+00:00",
+    "monday_0000z": "2026-08-31T00:00:00+00:00",
+    "gap_bps": -58.46768357984256
+   },
+   "n_weekend_gap_observations": 26
+  },
+  {
+   "start": "2026-08-29T00:00:00+00:00",
+   "end": "2026-09-07T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.034599873937494974,
+    "max_rally": 0.0669927065445215,
+    "hourly_log_return_stdev": 0.003512415941690741,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "MSTRUSDT",
+    "friday_2000z": "2026-09-04T20:00:00+00:00",
+    "monday_0000z": "2026-09-07T00:00:00+00:00",
+    "gap_bps": -34.18922690482717
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-30T00:00:00+00:00",
+   "end": "2026-09-08T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.03586661852629258,
+    "max_rally": 0.0669927065445215,
+    "hourly_log_return_stdev": 0.0035624983722622114,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "MSTRUSDT",
+    "friday_2000z": "2026-09-04T20:00:00+00:00",
+    "monday_0000z": "2026-09-07T00:00:00+00:00",
+    "gap_bps": -34.18922690482717
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-08-31T00:00:00+00:00",
+   "end": "2026-09-09T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.046129085557275795,
+    "max_rally": 0.0669927065445215,
+    "hourly_log_return_stdev": 0.0035461980124357213,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "MSTRUSDT",
+    "friday_2000z": "2026-09-04T20:00:00+00:00",
+    "monday_0000z": "2026-09-07T00:00:00+00:00",
+    "gap_bps": -34.18922690482717
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-09-01T00:00:00+00:00",
+   "end": "2026-09-10T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.04665536591783903,
+    "max_rally": 0.0669927065445215,
+    "hourly_log_return_stdev": 0.003623440578727126,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "MSTRUSDT",
+    "friday_2000z": "2026-09-04T20:00:00+00:00",
+    "monday_0000z": "2026-09-07T00:00:00+00:00",
+    "gap_bps": -34.18922690482717
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-09-02T00:00:00+00:00",
+   "end": "2026-09-11T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.06331887082264964,
+    "max_rally": 0.0669927065445215,
+    "hourly_log_return_stdev": 0.0036252668341595624,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "MSTRUSDT",
+    "friday_2000z": "2026-09-04T20:00:00+00:00",
+    "monday_0000z": "2026-09-07T00:00:00+00:00",
+    "gap_bps": -34.18922690482717
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-09-03T00:00:00+00:00",
+   "end": "2026-09-12T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.06331887082264964,
+    "max_rally": 0.06069850798196552,
+    "hourly_log_return_stdev": 0.004287295410620597,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "NVDAUSDT",
+    "friday_2000z": "2026-09-11T20:00:00+00:00",
+    "monday_0000z": "2026-09-14T00:00:00+00:00",
+    "gap_bps": -213.906171942414
+   },
+   "n_weekend_gap_observations": 26
+  },
+  {
+   "start": "2026-09-04T00:00:00+00:00",
+   "end": "2026-09-13T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.05734837660738035,
+    "max_rally": 0.03472795693304764,
+    "hourly_log_return_stdev": 0.0038040709616023547,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "NVDAUSDT",
+    "friday_2000z": "2026-09-11T20:00:00+00:00",
+    "monday_0000z": "2026-09-14T00:00:00+00:00",
+    "gap_bps": -213.906171942414
+   },
+   "n_weekend_gap_observations": 26
+  },
+  {
+   "start": "2026-09-05T00:00:00+00:00",
+   "end": "2026-09-14T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.047078306127277036,
+    "max_rally": 0.03472795693304764,
+    "hourly_log_return_stdev": 0.0034665499266094647,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "NVDAUSDT",
+    "friday_2000z": "2026-09-11T20:00:00+00:00",
+    "monday_0000z": "2026-09-14T00:00:00+00:00",
+    "gap_bps": -213.906171942414
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-09-06T00:00:00+00:00",
+   "end": "2026-09-15T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.047078306127277036,
+    "max_rally": 0.03472795693304764,
+    "hourly_log_return_stdev": 0.0036111098007787622,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "NVDAUSDT",
+    "friday_2000z": "2026-09-11T20:00:00+00:00",
+    "monday_0000z": "2026-09-14T00:00:00+00:00",
+    "gap_bps": -213.906171942414
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-09-07T00:00:00+00:00",
+   "end": "2026-09-16T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.0585351363090586,
+    "max_rally": 0.03472795693304764,
+    "hourly_log_return_stdev": 0.0038640358216700736,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "NVDAUSDT",
+    "friday_2000z": "2026-09-11T20:00:00+00:00",
+    "monday_0000z": "2026-09-14T00:00:00+00:00",
+    "gap_bps": -213.906171942414
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-09-08T00:00:00+00:00",
+   "end": "2026-09-17T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.05311758576969905,
+    "max_rally": 0.03472795693304764,
+    "hourly_log_return_stdev": 0.003932173306053569,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "NVDAUSDT",
+    "friday_2000z": "2026-09-11T20:00:00+00:00",
+    "monday_0000z": "2026-09-14T00:00:00+00:00",
+    "gap_bps": -213.906171942414
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-09-09T00:00:00+00:00",
+   "end": "2026-09-18T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.05311758576969905,
+    "max_rally": 0.03472795693304764,
+    "hourly_log_return_stdev": 0.0038257844790869915,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "NVDAUSDT",
+    "friday_2000z": "2026-09-11T20:00:00+00:00",
+    "monday_0000z": "2026-09-14T00:00:00+00:00",
+    "gap_bps": -213.906171942414
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-09-10T00:00:00+00:00",
+   "end": "2026-09-19T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.0474833880120924,
+    "max_rally": 0.07657206189612542,
+    "hourly_log_return_stdev": 0.004153507867471279,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "NVDAUSDT",
+    "friday_2000z": "2026-09-11T20:00:00+00:00",
+    "monday_0000z": "2026-09-14T00:00:00+00:00",
+    "gap_bps": -213.906171942414
+   },
+   "n_weekend_gap_observations": 26
+  },
+  {
+   "start": "2026-09-11T00:00:00+00:00",
+   "end": "2026-09-20T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.0474833880120924,
+    "max_rally": 0.08446153764569875,
+    "hourly_log_return_stdev": 0.004088813195770597,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "NVDAUSDT",
+    "friday_2000z": "2026-09-11T20:00:00+00:00",
+    "monday_0000z": "2026-09-14T00:00:00+00:00",
+    "gap_bps": -213.906171942414
+   },
+   "n_weekend_gap_observations": 26
+  },
+  {
+   "start": "2026-09-12T00:00:00+00:00",
+   "end": "2026-09-21T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.047405197813175204,
+    "max_rally": 0.08446153764569875,
+    "hourly_log_return_stdev": 0.0033734967208323774,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "NVDAUSDT",
+    "friday_2000z": "2026-09-18T20:00:00+00:00",
+    "monday_0000z": "2026-09-21T00:00:00+00:00",
+    "gap_bps": 121.71859387773765
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-09-13T00:00:00+00:00",
+   "end": "2026-09-22T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.047405197813175204,
+    "max_rally": 0.15300889836350717,
+    "hourly_log_return_stdev": 0.003979638301787946,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "NVDAUSDT",
+    "friday_2000z": "2026-09-18T20:00:00+00:00",
+    "monday_0000z": "2026-09-21T00:00:00+00:00",
+    "gap_bps": 121.71859387773765
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-09-14T00:00:00+00:00",
+   "end": "2026-09-23T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.047405197813175204,
+    "max_rally": 0.15300889836350717,
+    "hourly_log_return_stdev": 0.004042553881525145,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "NVDAUSDT",
+    "friday_2000z": "2026-09-18T20:00:00+00:00",
+    "monday_0000z": "2026-09-21T00:00:00+00:00",
+    "gap_bps": 121.71859387773765
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-09-15T00:00:00+00:00",
+   "end": "2026-09-24T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.036198128910061356,
+    "max_rally": 0.15491796323989515,
+    "hourly_log_return_stdev": 0.004166331278541727,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "NVDAUSDT",
+    "friday_2000z": "2026-09-18T20:00:00+00:00",
+    "monday_0000z": "2026-09-21T00:00:00+00:00",
+    "gap_bps": 121.71859387773765
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-09-16T00:00:00+00:00",
+   "end": "2026-09-25T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.04466280204327622,
+    "max_rally": 0.15420796014627158,
+    "hourly_log_return_stdev": 0.004125962784987253,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "NVDAUSDT",
+    "friday_2000z": "2026-09-18T20:00:00+00:00",
+    "monday_0000z": "2026-09-21T00:00:00+00:00",
+    "gap_bps": 121.71859387773765
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-09-17T00:00:00+00:00",
+   "end": "2026-09-26T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.04466280204327622,
+    "max_rally": 0.1418074675243821,
+    "hourly_log_return_stdev": 0.004077791570090617,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "NVDAUSDT",
+    "friday_2000z": "2026-09-18T20:00:00+00:00",
+    "monday_0000z": "2026-09-21T00:00:00+00:00",
+    "gap_bps": 121.71859387773765
+   },
+   "n_weekend_gap_observations": 13
+  },
+  {
+   "start": "2026-09-18T00:00:00+00:00",
+   "end": "2026-09-27T00:00:00+00:00",
+   "btc": {
+    "max_drawdown": -0.04466280204327622,
+    "max_rally": 0.13801436969301117,
+    "hourly_log_return_stdev": 0.004067152110942138,
+    "n_hours": 216
+   },
+   "worst_weekend_gap": {
+    "symbol": "NVDAUSDT",
+    "friday_2000z": "2026-09-18T20:00:00+00:00",
+    "monday_0000z": "2026-09-21T00:00:00+00:00",
+    "gap_bps": 121.71859387773765
+   },
+   "n_weekend_gap_observations": 13
+  }
+ ],
+ "selection_rules": {
+  "crash": "most negative peak-to-trough drawdown of BTCUSDT hourly closes within the window",
+  "squeeze": "largest trough-to-peak rally of BTCUSDT hourly closes within the window",
+  "flat": "lowest population stdev of BTCUSDT hourly log returns within the window",
+  "weekend_gap": "largest |Friday 20:00 UTC -> Monday 00:00 UTC| move on any weekend-frozen instrument (every US equity/index in the universe) falling inside the window"
+ },
+ "windows": {
+  "crash": {
+   "label": "crash",
+   "selection_rule": "most negative peak-to-trough drawdown of BTCUSDT hourly closes within the window",
+   "start": "2026-08-01T00:00:00+00:00",
+   "end": "2026-08-10T00:00:00+00:00",
+   "metrics": {
+    "closed_trades": 3,
+    "total_return": 0.0009065975282775973,
+    "sharpe_ann": 9.020315105444963,
+    "max_drawdown": -0.0006436823295897787,
+    "win_rate": 1.0,
+    "fees_paid": 0.8927551180875617,
+    "turnover": 0.14874687738107498
+   },
+   "exit_reason_counts": {
+    "protective_exit:weekend_freeze": 3
+   },
+   "stop_filled_trades": [],
+   "weekend_freeze_trades": [
+    {
+     "symbol": "GOOGLUSDT",
+     "opened_at": "2026-08-06T01:00:00+00:00",
+     "closed_at": "2026-08-07T20:00:00+00:00",
+     "direction": -1,
+     "entry_avg": 364.52405522823307,
+     "exit_avg": 354.7938868059275,
+     "net_pnl": 6.3230328068178405,
+     "notional": 247.8763575551985,
+     "pnl_pct_of_notional": 0.025508817658859588,
+     "exit_reason": "protective_exit:weekend_freeze",
+     "policy_stop_bound_pct": 0.04,
+     "stop_gapped_through": null
+    },
+    {
+     "symbol": "NDX100USDT",
+     "opened_at": "2026-08-04T17:00:00+00:00",
+     "closed_at": "2026-08-07T20:00:00+00:00",
+     "direction": 1,
+     "entry_avg": 29559.900351505505,
+     "exit_avg": 29736.068808860593,
+     "net_pnl": 1.1809633572144846,
+     "notional": 248.30316295264623,
+     "pnl_pct_of_notional": 0.00475613497295524,
+     "exit_reason": "protective_exit:weekend_freeze",
+     "policy_stop_bound_pct": 0.04,
+     "stop_gapped_through": null
+    },
+    {
+     "symbol": "SP500USDT",
+     "opened_at": "2026-08-04T17:00:00+00:00",
+     "closed_at": "2026-08-07T20:00:00+00:00",
+     "direction": 1,
+     "entry_avg": 7698.155161271371,
+     "exit_avg": 7755.636668429195,
+     "net_pnl": 1.5619791187441276,
+     "notional": 249.4202272251924,
+     "pnl_pct_of_notional": 0.006262439643012087,
+     "exit_reason": "protective_exit:weekend_freeze",
+     "policy_stop_bound_pct": 0.0533,
+     "stop_gapped_through": null
+    }
+   ],
+   "window_end_trades": [],
+   "any_stop_gapped_through": false,
+   "worst_single_trade_pnl_pct_of_notional": 0.00475613497295524,
+   "trades": [
+    {
+     "symbol": "GOOGLUSDT",
+     "opened_at": "2026-08-06T01:00:00+00:00",
+     "closed_at": "2026-08-07T20:00:00+00:00",
+     "direction": -1,
+     "entry_avg": 364.52405522823307,
+     "exit_avg": 354.7938868059275,
+     "net_pnl": 6.3230328068178405,
+     "notional": 247.8763575551985,
+     "pnl_pct_of_notional": 0.025508817658859588,
+     "exit_reason": "protective_exit:weekend_freeze",
+     "policy_stop_bound_pct": 0.04,
+     "stop_gapped_through": null
+    },
+    {
+     "symbol": "NDX100USDT",
+     "opened_at": "2026-08-04T17:00:00+00:00",
+     "closed_at": "2026-08-07T20:00:00+00:00",
+     "direction": 1,
+     "entry_avg": 29559.900351505505,
+     "exit_avg": 29736.068808860593,
+     "net_pnl": 1.1809633572144846,
+     "notional": 248.30316295264623,
+     "pnl_pct_of_notional": 0.00475613497295524,
+     "exit_reason": "protective_exit:weekend_freeze",
+     "policy_stop_bound_pct": 0.04,
+     "stop_gapped_through": null
+    },
+    {
+     "symbol": "SP500USDT",
+     "opened_at": "2026-08-04T17:00:00+00:00",
+     "closed_at": "2026-08-07T20:00:00+00:00",
+     "direction": 1,
+     "entry_avg": 7698.155161271371,
+     "exit_avg": 7755.636668429195,
+     "net_pnl": 1.5619791187441276,
+     "notional": 249.4202272251924,
+     "pnl_pct_of_notional": 0.006262439643012087,
+     "exit_reason": "protective_exit:weekend_freeze",
+     "policy_stop_bound_pct": 0.0533,
+     "stop_gapped_through": null
+    }
+   ],
+   "window_stats": {
+    "start": "2026-08-01T00:00:00+00:00",
+    "end": "2026-08-10T00:00:00+00:00",
+    "btc": {
+     "max_drawdown": -0.09970961637181364,
+     "max_rally": 0.11038678095575283,
+     "hourly_log_return_stdev": 0.009704913173930105,
+     "n_hours": 216
+    },
+    "worst_weekend_gap": {
+     "symbol": "MSTRUSDT",
+     "friday_2000z": "2026-08-07T20:00:00+00:00",
+     "monday_0000z": "2026-08-10T00:00:00+00:00",
+     "gap_bps": 71.88498402555865
+    },
+    "n_weekend_gap_observations": 13
+   }
+  },
+  "squeeze": {
+   "label": "squeeze",
+   "selection_rule": "largest trough-to-peak rally of BTCUSDT hourly closes within the window",
+   "start": "2026-08-17T00:00:00+00:00",
+   "end": "2026-08-26T00:00:00+00:00",
+   "metrics": {
+    "closed_trades": 2,
+    "total_return": 0.0006179428146884103,
+    "sharpe_ann": 1.5898387856399763,
+    "max_drawdown": -0.0013063420000183346,
+    "win_rate": 0.5,
+    "fees_paid": 0.5907491101774386,
+    "turnover": 0.09841568386430077
+   },
+   "exit_reason_counts": {
+    "protective_exit:weekend_freeze": 2
+   },
+   "stop_filled_trades": [],
+   "weekend_freeze_trades": [
+    {
+     "symbol": "SNDKUSDT",
+     "opened_at": "2026-08-19T09:00:00+00:00",
+     "closed_at": "2026-08-21T20:00:00+00:00",
+     "direction": -1,
+     "entry_avg": 1662.7098560163097,
+     "exit_avg": 1597.0705971429784,
+     "net_pnl": 9.55250859021534,
+     "notional": 249.40647840244645,
+     "pnl_pct_of_notional": 0.038300964158602374,
+     "exit_reason": "protective_exit:weekend_freeze",
+     "policy_stop_bound_pct": 0.06964,
+     "stop_gapped_through": null
+    },
+    {
+     "symbol": "SP500USDT",
+     "opened_at": "2026-08-17T17:00:00+00:00",
+     "closed_at": "2026-08-21T20:00:00+00:00",
+     "direction": 1,
+     "entry_avg": 7767.764702426414,
+     "exit_avg": 7671.948142490649,
+     "net_pnl": -3.3730804433311907,
+     "notional": 249.34524694788792,
+     "pnl_pct_of_notional": -0.013527751118657377,
+     "exit_reason": "protective_exit:weekend_freeze",
+     "policy_stop_bound_pct": 0.0533,
+     "stop_gapped_through": null
+    }
+   ],
+   "window_end_trades": [],
+   "any_stop_gapped_through": false,
+   "worst_single_trade_pnl_pct_of_notional": -0.013527751118657377,
+   "trades": [
+    {
+     "symbol": "SNDKUSDT",
+     "opened_at": "2026-08-19T09:00:00+00:00",
+     "closed_at": "2026-08-21T20:00:00+00:00",
+     "direction": -1,
+     "entry_avg": 1662.7098560163097,
+     "exit_avg": 1597.0705971429784,
+     "net_pnl": 9.55250859021534,
+     "notional": 249.40647840244645,
+     "pnl_pct_of_notional": 0.038300964158602374,
+     "exit_reason": "protective_exit:weekend_freeze",
+     "policy_stop_bound_pct": 0.06964,
+     "stop_gapped_through": null
+    },
+    {
+     "symbol": "SP500USDT",
+     "opened_at": "2026-08-17T17:00:00+00:00",
+     "closed_at": "2026-08-21T20:00:00+00:00",
+     "direction": 1,
+     "entry_avg": 7767.764702426414,
+     "exit_avg": 7671.948142490649,
+     "net_pnl": -3.3730804433311907,
+     "notional": 249.34524694788792,
+     "pnl_pct_of_notional": -0.013527751118657377,
+     "exit_reason": "protective_exit:weekend_freeze",
+     "policy_stop_bound_pct": 0.0533,
+     "stop_gapped_through": null
+    }
+   ],
+   "window_stats": {
+    "start": "2026-08-17T00:00:00+00:00",
+    "end": "2026-08-26T00:00:00+00:00",
+    "btc": {
+     "max_drawdown": -0.04121630740937432,
+     "max_rally": 0.2832628398791539,
+     "hourly_log_return_stdev": 0.006124751120477,
+     "n_hours": 216
+    },
+    "worst_weekend_gap": {
+     "symbol": "TSLAUSDT",
+     "friday_2000z": "2026-08-21T20:00:00+00:00",
+     "monday_0000z": "2026-08-24T00:00:00+00:00",
+     "gap_bps": 113.53615520282246
+    },
+    "n_weekend_gap_observations": 13
+   }
+  },
+  "flat": {
+   "label": "flat",
+   "selection_rule": "lowest population stdev of BTCUSDT hourly log returns within the window",
+   "start": "2026-08-10T00:00:00+00:00",
+   "end": "2026-08-19T00:00:00+00:00",
+   "metrics": {
+    "closed_trades": 3,
+    "total_return": -0.00017641680599522758,
+    "sharpe_ann": -2.2889829515392233,
+    "max_drawdown": -0.0006481352802039098,
+    "win_rate": 0.3333333333333333,
+    "fees_paid": 0.8935525389985434,
+    "turnover": 0.14891212772778506
+   },
+   "exit_reason_counts": {
+    "protective_exit:weekend_freeze": 2,
+    "protective_exit:window_end": 1
+   },
+   "stop_filled_trades": [],
+   "weekend_freeze_trades": [
+    {
+     "symbol": "GOOGLUSDT",
+     "opened_at": "2026-08-11T17:00:00+00:00",
+     "closed_at": "2026-08-14T20:00:00+00:00",
+     "direction": -1,
+     "entry_avg": 348.5773775516277,
+     "exit_avg": 346.2521079569124,
+     "net_pnl": 1.3549440514211848,
+     "notional": 247.48993806165566,
+     "pnl_pct_of_notional": 0.005474743991748205,
+     "exit_reason": "protective_exit:weekend_freeze",
+     "policy_stop_bound_pct": 0.04,
+     "stop_gapped_through": null
+    },
+    {
+     "symbol": "SP500USDT",
+     "opened_at": "2026-08-13T17:00:00+00:00",
+     "closed_at": "2026-08-14T20:00:00+00:00",
+     "direction": 1,
+     "entry_avg": 7784.366978046727,
+     "exit_avg": 7784.732679239371,
+     "net_pnl": -0.2881218511154575,
+     "notional": 249.87817999529992,
+     "pnl_pct_of_notional": -0.001153049262328055,
+     "exit_reason": "protective_exit:weekend_freeze",
+     "policy_stop_bound_pct": 0.0533,
+     "stop_gapped_through": null
+    }
+   ],
+   "window_end_trades": [
+    {
+     "symbol": "SP500USDT",
+     "opened_at": "2026-08-17T17:00:00+00:00",
+     "closed_at": "2026-08-19T00:00:00+00:00",
+     "direction": 1,
+     "entry_avg": 7767.764702426414,
+     "exit_avg": 7688.845825744668,
+     "net_pnl": -2.830990260256636,
+     "notional": 249.34524694788792,
+     "pnl_pct_of_notional": -0.011353696510799345,
+     "exit_reason": "protective_exit:window_end",
+     "policy_stop_bound_pct": 0.0533,
+     "stop_gapped_through": null
+    }
+   ],
+   "any_stop_gapped_through": false,
+   "worst_single_trade_pnl_pct_of_notional": -0.011353696510799345,
+   "trades": [
+    {
+     "symbol": "GOOGLUSDT",
+     "opened_at": "2026-08-11T17:00:00+00:00",
+     "closed_at": "2026-08-14T20:00:00+00:00",
+     "direction": -1,
+     "entry_avg": 348.5773775516277,
+     "exit_avg": 346.2521079569124,
+     "net_pnl": 1.3549440514211848,
+     "notional": 247.48993806165566,
+     "pnl_pct_of_notional": 0.005474743991748205,
+     "exit_reason": "protective_exit:weekend_freeze",
+     "policy_stop_bound_pct": 0.04,
+     "stop_gapped_through": null
+    },
+    {
+     "symbol": "SP500USDT",
+     "opened_at": "2026-08-13T17:00:00+00:00",
+     "closed_at": "2026-08-14T20:00:00+00:00",
+     "direction": 1,
+     "entry_avg": 7784.366978046727,
+     "exit_avg": 7784.732679239371,
+     "net_pnl": -0.2881218511154575,
+     "notional": 249.87817999529992,
+     "pnl_pct_of_notional": -0.001153049262328055,
+     "exit_reason": "protective_exit:weekend_freeze",
+     "policy_stop_bound_pct": 0.0533,
+     "stop_gapped_through": null
+    },
+    {
+     "symbol": "SP500USDT",
+     "opened_at": "2026-08-17T17:00:00+00:00",
+     "closed_at": "2026-08-19T00:00:00+00:00",
+     "direction": 1,
+     "entry_avg": 7767.764702426414,
+     "exit_avg": 7688.845825744668,
+     "net_pnl": -2.830990260256636,
+     "notional": 249.34524694788792,
+     "pnl_pct_of_notional": -0.011353696510799345,
+     "exit_reason": "protective_exit:window_end",
+     "policy_stop_bound_pct": 0.0533,
+     "stop_gapped_through": null
+    }
+   ],
+   "window_stats": {
+    "start": "2026-08-10T00:00:00+00:00",
+    "end": "2026-08-19T00:00:00+00:00",
+    "btc": {
+     "max_drawdown": -0.04104300399859051,
+     "max_rally": 0.03563600345080986,
+     "hourly_log_return_stdev": 0.0021430040029624337,
+     "n_hours": 216
+    },
+    "worst_weekend_gap": {
+     "symbol": "SNDKUSDT",
+     "friday_2000z": "2026-08-14T20:00:00+00:00",
+     "monday_0000z": "2026-08-17T00:00:00+00:00",
+     "gap_bps": 188.54498014195588
+    },
+    "n_weekend_gap_observations": 13
+   }
+  },
+  "weekend_gap": {
+   "label": "weekend_gap",
+   "selection_rule": "largest |Friday 20:00 UTC -> Monday 00:00 UTC| move on any weekend-frozen instrument (every US equity/index in the universe) falling inside the window",
+   "start": "2026-07-30T00:00:00+00:00",
+   "end": "2026-08-08T00:00:00+00:00",
+   "metrics": {
+    "closed_trades": 5,
+    "total_return": -0.002588916321129009,
+    "sharpe_ann": -6.509797396955909,
+    "max_drawdown": -0.003857920454517938,
+    "win_rate": 0.6,
+    "fees_paid": 1.4825667353462022,
+    "turnover": 0.24784383268821955
+   },
+   "exit_reason_counts": {
+    "stop_filled": 2,
+    "protective_exit:weekend_freeze": 3
+   },
+   "stop_filled_trades": [
+    {
+     "symbol": "SNDKUSDT",
+     "opened_at": "2026-07-30T01:00:00+00:00",
+     "closed_at": "2026-07-30T13:00:00+00:00",
+     "direction": -1,
+     "entry_avg": 1018.7428637039344,
+     "exit_avg": 1089.8373589681876,
+     "net_pnl": -17.366314415485565,
+     "notional": 244.49828728894425,
+     "pnl_pct_of_notional": -0.07102836837037768,
+     "exit_reason": "stop_filled",
+     "policy_stop_bound_pct": 0.06964,
+     "stop_gapped_through": false
+    },
+    {
+     "symbol": "SNDKUSDT",
+     "opened_at": "2026-07-31T01:00:00+00:00",
+     "closed_at": "2026-07-31T14:00:00+00:00",
+     "direction": 1,
+     "entry_avg": 1377.22885472796,
+     "exit_avg": 1281.1349666020133,
+     "net_pnl": -17.58400315537406,
+     "notional": 247.90119385103282,
+     "pnl_pct_of_notional": -0.07093149848217563,
+     "exit_reason": "stop_filled",
+     "policy_stop_bound_pct": 0.06964,
+     "stop_gapped_through": false
+    }
+   ],
+   "weekend_freeze_trades": [
+    {
+     "symbol": "GOOGLUSDT",
+     "opened_at": "2026-08-06T01:00:00+00:00",
+     "closed_at": "2026-08-07T20:00:00+00:00",
+     "direction": -1,
+     "entry_avg": 364.52405522823307,
+     "exit_avg": 354.7938868059275,
+     "net_pnl": 6.3230328068178405,
+     "notional": 247.8763575551985,
+     "pnl_pct_of_notional": 0.025508817658859588,
+     "exit_reason": "protective_exit:weekend_freeze",
+     "policy_stop_bound_pct": 0.04,
+     "stop_gapped_through": null
+    },
+    {
+     "symbol": "NDX100USDT",
+     "opened_at": "2026-08-04T17:00:00+00:00",
+     "closed_at": "2026-08-07T20:00:00+00:00",
+     "direction": 1,
+     "entry_avg": 29559.900351505505,
+     "exit_avg": 29736.068808860593,
+     "net_pnl": 1.1809633572144846,
+     "notional": 248.30316295264623,
+     "pnl_pct_of_notional": 0.00475613497295524,
+     "exit_reason": "protective_exit:weekend_freeze",
+     "policy_stop_bound_pct": 0.04,
+     "stop_gapped_through": null
+    },
+    {
+     "symbol": "SP500USDT",
+     "opened_at": "2026-08-04T17:00:00+00:00",
+     "closed_at": "2026-08-07T20:00:00+00:00",
+     "direction": 1,
+     "entry_avg": 7698.155161271371,
+     "exit_avg": 7755.636668429195,
+     "net_pnl": 1.5571581955381273,
+     "notional": 248.65041170906528,
+     "pnl_pct_of_notional": 0.006262439643012087,
+     "exit_reason": "protective_exit:weekend_freeze",
+     "policy_stop_bound_pct": 0.0533,
+     "stop_gapped_through": null
+    }
+   ],
+   "window_end_trades": [],
+   "any_stop_gapped_through": false,
+   "worst_single_trade_pnl_pct_of_notional": -0.07102836837037768,
+   "trades": [
+    {
+     "symbol": "SNDKUSDT",
+     "opened_at": "2026-07-30T01:00:00+00:00",
+     "closed_at": "2026-07-30T13:00:00+00:00",
+     "direction": -1,
+     "entry_avg": 1018.7428637039344,
+     "exit_avg": 1089.8373589681876,
+     "net_pnl": -17.366314415485565,
+     "notional": 244.49828728894425,
+     "pnl_pct_of_notional": -0.07102836837037768,
+     "exit_reason": "stop_filled",
+     "policy_stop_bound_pct": 0.06964,
+     "stop_gapped_through": false
+    },
+    {
+     "symbol": "SNDKUSDT",
+     "opened_at": "2026-07-31T01:00:00+00:00",
+     "closed_at": "2026-07-31T14:00:00+00:00",
+     "direction": 1,
+     "entry_avg": 1377.22885472796,
+     "exit_avg": 1281.1349666020133,
+     "net_pnl": -17.58400315537406,
+     "notional": 247.90119385103282,
+     "pnl_pct_of_notional": -0.07093149848217563,
+     "exit_reason": "stop_filled",
+     "policy_stop_bound_pct": 0.06964,
+     "stop_gapped_through": false
+    },
+    {
+     "symbol": "GOOGLUSDT",
+     "opened_at": "2026-08-06T01:00:00+00:00",
+     "closed_at": "2026-08-07T20:00:00+00:00",
+     "direction": -1,
+     "entry_avg": 364.52405522823307,
+     "exit_avg": 354.7938868059275,
+     "net_pnl": 6.3230328068178405,
+     "notional": 247.8763575551985,
+     "pnl_pct_of_notional": 0.025508817658859588,
+     "exit_reason": "protective_exit:weekend_freeze",
+     "policy_stop_bound_pct": 0.04,
+     "stop_gapped_through": null
+    },
+    {
+     "symbol": "NDX100USDT",
+     "opened_at": "2026-08-04T17:00:00+00:00",
+     "closed_at": "2026-08-07T20:00:00+00:00",
+     "direction": 1,
+     "entry_avg": 29559.900351505505,
+     "exit_avg": 29736.068808860593,
+     "net_pnl": 1.1809633572144846,
+     "notional": 248.30316295264623,
+     "pnl_pct_of_notional": 0.00475613497295524,
+     "exit_reason": "protective_exit:weekend_freeze",
+     "policy_stop_bound_pct": 0.04,
+     "stop_gapped_through": null
+    },
+    {
+     "symbol": "SP500USDT",
+     "opened_at": "2026-08-04T17:00:00+00:00",
+     "closed_at": "2026-08-07T20:00:00+00:00",
+     "direction": 1,
+     "entry_avg": 7698.155161271371,
+     "exit_avg": 7755.636668429195,
+     "net_pnl": 1.5571581955381273,
+     "notional": 248.65041170906528,
+     "pnl_pct_of_notional": 0.006262439643012087,
+     "exit_reason": "protective_exit:weekend_freeze",
+     "policy_stop_bound_pct": 0.0533,
+     "stop_gapped_through": null
+    }
+   ],
+   "window_stats": {
+    "start": "2026-07-30T00:00:00+00:00",
+    "end": "2026-08-08T00:00:00+00:00",
+    "btc": {
+     "max_drawdown": -0.03841526641456483,
+     "max_rally": 0.044082542973799876,
+     "hourly_log_return_stdev": 0.0026235190101273867,
+     "n_hours": 216
+    },
+    "worst_weekend_gap": {
+     "symbol": "SNDKUSDT",
+     "friday_2000z": "2026-07-31T20:00:00+00:00",
+     "monday_0000z": "2026-08-03T00:00:00+00:00",
+     "gap_bps": 416.46357079715426
+    },
+    "n_weekend_gap_observations": 26
+   }
+  }
+ },
+ "verdict": {
+  "any_stress_window_breaks_stop_bound": false,
+  "worst_book_level_max_drawdown_across_stress_windows": -0.003857920454517938
+ }
+}

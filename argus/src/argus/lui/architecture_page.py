@@ -32,8 +32,12 @@ def load(data_dir: Path) -> dict[str, Any] | None:
 
 
 def _sentences(text: str) -> str:
-    """The report's verdict with each sentence starting in capitals, as the page's prose does."""
-    return re.sub(r"(^|[.!?]\s+)([a-z])", lambda m: m.group(1) + m.group(2).upper(), text)
+    """The report's verdict with each sentence starting in capitals, as the page's prose does,
+    and "7 dependency cycle(s)" said as "7 dependency cycles" (visual review, 2026-09-29)."""
+    from argus.lui.plural import resolve_plurals
+
+    return re.sub(r"(^|[.!?]\s+)([a-z])", lambda m: m.group(1) + m.group(2).upper(),
+                  resolve_plurals(text))
 
 
 def _layers() -> str:

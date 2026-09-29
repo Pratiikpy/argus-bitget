@@ -1768,7 +1768,7 @@ takes, and every artefact the system writes.
 | Registered and importable | **152/152** (`python -m argus.status` checks this at runtime) |
 | Test files / tests | **353 files**, **10,176 tests collected** |
 | Type and lint | `ruff` clean, `mypy --strict` clean on **554 source files** |
-| Artefacts written | **781** files under `argus/data/` |
+| Artefacts written | **783** files under `argus/data/` |
 | Code-level teardowns of other people's systems | **56** under `research/architecture/` |
 | Runtime dependencies | **two**: `pydantic`, `python-dateutil`. No numpy, no pandas, no scipy |
 
@@ -2417,7 +2417,7 @@ source is a build failure, not a typo.
 | Modules registered and importable | 152/152 modules importable |
 | Tests | 10,176 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
-| Artefacts on disk | 781 files under `argus/data/`, every one produced by running something |
+| Artefacts on disk | 783 files under `argus/data/`, every one produced by running something |
 | Code-level teardowns of other systems | 62, each citing file and line |
 | Competitor entries read at source | 5, each cloned and verified or refuted |
 | Live data sources reaching a decision | 15 |

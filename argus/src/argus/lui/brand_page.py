@@ -103,8 +103,10 @@ def render() -> str:
   .grid {{ display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px }}
   .sw {{ min-height:168px; border:1px solid var(--line); border-radius:14px; padding:18px;
     display:flex; flex-direction:column; justify-content:space-between }}
+  /* Full opacity: at .85 the loss swatch's label read 4.17:1 on #c2410c, under WCAG AA's
+     4.5:1 (accessibility audit, 2026-09-29). */
   .sw span, .sw code, .sw small {{ font:500 11px/1.4 var(--mono); letter-spacing:.1em;
-    text-transform:uppercase; opacity:.85 }}
+    text-transform:uppercase }}
   .sw strong {{ font:700 22px/1 var(--sans) }}
   .type {{ border:1px solid var(--line); border-radius:14px; overflow:hidden }}
   .row {{ display:grid; grid-template-columns:150px 1fr; gap:24px; padding:20px 24px;
