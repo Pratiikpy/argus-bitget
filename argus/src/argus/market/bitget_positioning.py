@@ -181,6 +181,13 @@ def next_ex_dividend(ticker: str, today: date | None = None) -> str | None:
     return None
 
 
+def corporate_actions(ticker: str) -> list[dict[str, Any]]:
+    """Every dividend and split the service records for ``ticker``, as its raw rows (each split
+    carries ``split_numerator`` and ``split_denominator``); empty when the service does not
+    answer."""
+    return _safe("equity_fundamental_dividends", symbol=ticker)
+
+
 def dividend_history(ticker: str, today: date | None = None) -> str | None:
     """The last cash dividend, the trailing twelve months' total, and the last split, as the
     service records them. Read when no ex-date is near (:func:`next_ex_dividend` covers that):

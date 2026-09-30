@@ -49,10 +49,13 @@ from argus.lui.research.parse import (
     OWNERSHIP_Q,
     POSITIONING_Q,
     PRICE_AT,
+    RISKS_OF,
+    TAKE_ON,
     daily_technicals_asked,
     hold_cost_question,
     leveraged_fund_asked,
 )
+from argus.lui.research.sizing import HOW_MUCH_IN
 from argus.lui.trace import trace_module
 from argus.truth.coverage import ContextPool
 
@@ -298,6 +301,26 @@ def pattern_reading_wins(request: ResearchRequest | None, text: str) -> bool:
     if leveraged_fund_asked(text) is not None and request.kind is not ResearchKind.COMPARE:
         return True
     if request.kind is ResearchKind.SENTIMENT and CRYPTO_ETF_QUESTION.search(text):
+        return True
+    if (request.kind is ResearchKind.QUOTE and request.symbols and len(text.split()) <= 6
+            and re.search(r"\bprice\b|\bquote\b", text, re.I)):
+        # A bare "<name> price" is a quote: the kind model read "S&P 500 price" as an execution
+        # plan, the ampersand unlike anything it was trained on (2026-09-30).
+        return True
+    if request.kind is ResearchKind.IMPACT and len(request.symbols) == 1 and (
+            TAKE_ON.search(text) or HOW_MUCH_IN.search(text) or RISKS_OF.search(text)):
+        # A view on one name: the hosted model read "quick take on ETH" as no question at all.
+        return True
+    if request.kind is ResearchKind.COMPARE and re.search(
+            r"\b(?:outperform\w*|underperform\w*|beat(?:s|ing|en)?|(?:done|doing|did)\s+better|"
+            r"better\s+than|worse\s+than)\b", text, re.I):
+        # "is ETH beating BTC this month" was planned by the hosted model as ETH's base rates
+        # (2026-09-30): two names and "beating" is the comparison's momentum question.
+        return True
+    if request.kind is ResearchKind.MACRO and any("does not forecast" in n for n in request.notes):
+        # "What will the S&P 500 do after the next FOMC meeting?" is refused by the hosted model as
+        # a prediction; the patterns answer it as the measured backdrop and say it is not a
+        # forecast, which is the honest answer (live, 2026-09-30).
         return True
     if request.kind is ResearchKind.CONSTRUCT and request.notional is not None:
         # The sum divided between the names is a field the model's plan drops (2026-09-30).

@@ -22,6 +22,7 @@ import re
 from dataclasses import dataclass
 
 from argus.lui.answer import Source
+from argus.lui.provenance import explains
 from argus.lui.trace import trace_module
 
 
@@ -384,6 +385,8 @@ CONCEPTS: tuple[Concept, ...] = (
             "turning point.", "sentiment", "fear & greed"),
 )
 
+explains(*(c.definition for c in CONCEPTS), *(c.reading for c in CONCEPTS))
+
 _ASK = re.compile(
     r"\b(?:what(?:'s|\s+is|\s+are|\s+does|\s+do)|explain|define|definition\s+of|meaning\s+of|"
     r"how\s+does|how\s+do\s+(?:i|you)\s+(?:read|use|interpret)|tell\s+me\s+about|"
@@ -405,6 +408,11 @@ def concept_asked(text: str, named_symbols: tuple[str, ...] = ()) -> Concept | N
     nothing but "what is a <term>" / "what is <term>" with no contract named. "what is NVDA's RSI"
     names a contract and asks for its reading; "what is the sharpe" and "what's my drawdown" ask
     for the desk's or the book's own figure. Neither is a concept question."""
+    # Typed as a newcomer types: "whats a perp", "waht is dca", "wats sharpe ratio" were declined
+    # or answered with the desk's own Sharpe (a first-time-user audit, 2026-09-30).
+    text = re.sub(r"\b(?:what|wat|waht|whta|wht)'?s(?=\s)", "what is",
+                  text, flags=re.I)
+    text = re.sub(r"\b(?:waht|whta|wht|wat)\b", "what", text, flags=re.I)
     if not _ASK.search(text) or (_OWNED.search(text) and not _MEANS.search(text)):
         return None
     for concept in CONCEPTS:

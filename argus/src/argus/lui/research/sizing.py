@@ -62,7 +62,10 @@ _STOP_PRICE = re.compile(
     r"(?P<v>\d[\d,]*(?:\.\d+)?)(?!\s*%)", re.I)
 _ENTRY_PRICE = re.compile(
     r"\b(?:entry|enter|entering|buy(?:ing)?|in)\s+(?:at|@|is|=)?\s*\$?\s*(?P<v>\d[\d,]*(?:\.\d+)?)"
-    r"(?!\s*%)|@\s*\$?\s*(?P<v2>\d[\d,]*(?:\.\d+)?)", re.I)
+    r"(?!\s*%)|@\s*\$?\s*(?P<v2>\d[\d,]*(?:\.\d+)?)|"
+    # "of a $50 stock", "at $50 a share", "priced at 50" (a hostile review, 2026-09-30)
+    r"\$\s*(?P<v3>\d[\d,]*(?:\.\d+)?)\s+(?:stock|share|coin|token)s?\b|"
+    r"\b(?:priced|trading)\s+at\s+\$?\s*(?P<v4>\d[\d,]*(?:\.\d+)?)", re.I)
 
 ROUND_TRIP = float(CostModel.bitget_perp().taker_bps * Decimal(2)) / 10_000
 """The taker round trip a stopped trade pays: 0.06% a side on Bitget's perpetuals."""
@@ -91,10 +94,88 @@ def account_of(text: str) -> float | None:
     return None
 
 
+_CAPITAL = re.compile(
+    r"\b(?:i\s+(?:only\s+)?(?:have|got|own)|with|using|of)\s+(?:about\s+|around\s+|only\s+)?"
+    r"(?:\$\s*(?P<a>\d[\d,]*(?:\.\d+)?)(?![\d.])(?:\s*(?P<ak>k|thousand|grand)\b)?"
+    r"|(?P<b>\d[\d,]*(?:\.\d+)?)(?![\d.])\s*"
+    r"(?:(?P<bk>k|thousand|grand)\b|(?:dollars?|usd|usdt|bucks)\b))(?!\s*%)"
+    r"(?!\s+(?:stock|share|coin|token)s?\b)", re.I)
+"""The money a trader says they have: "if i have 3k", "with $5,000", "i got 2 grand"."""
+
+HOW_MUCH_IN = re.compile(
+    r"\bhow\s+much\s+(?:money\s+)?(?:should|can|could|do|would)\s+i\s+(?:put|invest|allocate|"
+    r"buy|spend|throw|have)\b", re.I)
+"""A request for an amount in one name: "how much should i put in nvda if i have 3k"."""
+
+
+def stated_capital(text: str) -> float | None:
+    """The money the question says the trader has, in dollars, or None."""
+    account = account_of(text)
+    if account is not None:
+        return account
+    m = _CAPITAL.search(text)
+    if m is None:
+        return None
+    unit = m.group("ak") or m.group("bk")
+    return _value(m.group("a") or m.group("b"), "k" if unit else None)
+
+
+def capital_lines(name: str, capital: float, worst_day: float) -> list[str]:
+    """How much of ``capital`` to hold in one name so that its worst day costs 1% of it.
+
+    "how much should i put in nvda if i have 3k" was answered with NVDA's options, the $3,000
+    never used (a first-time-user audit, 2026-09-30). There is no honest single amount without a
+    risk tolerance, so the answer names one — a bad day costing 1% of the money, the low end of
+    the fixed-fractional rules this module follows — and shows how the amount scales with it."""
+    bad = abs(worst_day)
+    if bad <= 0:
+        return []
+    one = capital * 0.01 / bad
+    two = capital * 0.02 / bad
+    held_one = min(one, capital)
+    held_two = min(two, capital)
+    return [
+        f"Bottom line: with ${capital:,.0f}, holding about ${held_one:,.0f} of {name} means a day "
+        f"like its worst in the last 30 days ({-bad:+.1%}) costs you ${held_one * bad:,.0f}, "
+        f"{held_one * bad / capital:.1%} of your money; if 2% is your limit it is about "
+        f"${held_two:,.0f}"
+        + (" — the whole amount either way, as its worst day is small against it."
+           if held_one >= capital else "."),
+        f"The rule behind it: decide how much of your money one bad day may cost, then divide "
+        f"that by how far the name has fallen in a day ({bad:.1%} here). A worse day than the "
+        f"last 30 days held is always possible, so this is a starting size, not a ceiling on loss.",
+        "This is arithmetic on a risk limit you choose, not advice on whether to buy.",
+    ]
+
+
+_NUMBER_WORDS = {"half": "0.5", "one": "1", "two": "2", "three": "3", "four": "4", "five": "5",
+                 "six": "6", "seven": "7", "eight": "8", "nine": "9", "ten": "10"}
+
+
+def spelled_out(text: str) -> str:
+    """Percentages as a trader types them, rewritten as figures: "3 percent", "one percent",
+    "two pct" were missed by every pattern here (a hostile review, 2026-09-30)."""
+    text = re.sub(r"\b(" + "|".join(_NUMBER_WORDS) + r")\s+(?:percent|per\s+cent|pct)\b",
+                  lambda m: _NUMBER_WORDS[m.group(1).lower()] + "%", text, flags=re.I)
+    return re.sub(r"(\d+(?:\.\d+)?)\s*(?:percent|per\s+cent|pct)\b", r"\1%", text, flags=re.I)
+
+
 def asks_for_size(text: str) -> bool:
-    """A size is asked for and there is a risk budget and a stop to size it from."""
-    return bool(SIZING_Q.search(text) and (_RISK_PCT.search(text) or _RISK_USD.search(text))
-                and (_STOP_PCT.search(text) or _STOP_PRICE.search(text)))
+    """A risk budget with a stop, or a risk budget with a request for a size.
+
+    A budget and a stop together are a sizing question however they are worded: the hostile
+    review of 2026-09-30 found "$0 account, risk 2%, stop 1%" and "entry 100, stop 250" sent to the
+    stress and execution engines, one of which planned a $250,000 order for an empty account. A
+    budget with a size asked for and no stop is answered by asking for the stop."""
+    text = spelled_out(text)
+    budget = bool(_RISK_PCT.search(text) or _RISK_USD.search(text))
+    stop = bool(_STOP_PCT.search(text) or _STOP_PRICE.search(text))
+    return budget and (stop or bool(SIZING_Q.search(text)))
+
+
+def _refusal(line: str) -> tuple[list[str], list[Source], dict[str, Any]]:
+    """An input no honest size follows from, said as such with what to give instead."""
+    return [f"Bottom line: {line}"], [], {"sizing": None}
 
 
 def answer(text: str, symbol: str | None = None, *,
@@ -102,8 +183,11 @@ def answer(text: str, symbol: str | None = None, *,
            worst_day: Callable[[str], float | None] | None = None,
            ) -> tuple[list[str], list[Source], dict[str, Any]]:
     """The fixed-fractional size, net of costs, in dollars and (for a named name) in units."""
+    text = spelled_out(text)
     notes: list[str] = []
-    account = account_of(text)
+    # "I have $25k" is the account as much as "a $25k account": it was sized on $10,000 when a
+    # ticker was named (a hostile review, 2026-09-30).
+    account = stated_capital(text)
     risk_usd: float | None = None
     if (m := _RISK_USD.search(text)) is not None:
         risk_usd = _value(m.group("n"), m.group("k"))
@@ -115,10 +199,23 @@ def answer(text: str, symbol: str | None = None, *,
                          "with it")
         risk_usd = account * fraction
     assert risk_usd is not None  # asks_for_size() guaranteed a risk budget
+    if account is not None and account <= 0:
+        return _refusal("an account of $0 has nothing to risk, so no position size follows from "
+                        "it — give the account size, as in \"a $10,000 account, risk 1%, a 4% "
+                        "stop\".")
+    if risk_usd <= 0:
+        return _refusal("a risk budget of nothing sizes a position of nothing — give the most "
+                        "you will lose on the trade, as a percentage of the account or in dollars.")
+    if account is not None and risk_usd >= account:
+        return _refusal(
+            f"risking ${risk_usd:,.0f} of a ${account:,.0f} account on one trade is not a risk "
+            f"budget — a stop-out would take {risk_usd / account:.0%} of the account. The "
+            f"fixed-fractional rule this answer uses (Elder's 2% rule, van Tharp's percent-risk "
+            f"model) sizes from a small slice, typically 0.5-2% a trade.")
 
     entry: float | None = None
     if (m := _ENTRY_PRICE.search(text)) is not None:
-        entry = float((_group(m, "v", "v2") or "0").replace(",", ""))
+        entry = float((_group(m, "v", "v2", "v3", "v4") or "0").replace(",", ""))
     if entry is None and symbol is not None and price is not None:
         try:
             entry = price(symbol)
@@ -127,18 +224,39 @@ def answer(text: str, symbol: str | None = None, *,
         except Exception:  # a missing quote only drops the unit count
             entry = None
     stop_frac: float | None = None
+    side = "short" if re.search(r"\bshort", text, re.I) else "long"
     if (m := _STOP_PCT.search(text)) is not None:
         stop_frac = float(_group(m, "p", "p2") or 0) / 100
     elif (m := _STOP_PRICE.search(text)) is not None and entry:
-        stop_frac = abs(entry - float(m.group("v").replace(",", ""))) / entry
-    if not stop_frac or stop_frac <= 0 or stop_frac >= 1:
-        lines = ["Bottom line: a stop price needs an entry price to become a distance — say "
-                 "\"entry 150, stop 144\", or give the stop as a percentage (\"a 4% stop\")."]
-        return lines, [], {"sizing": None}
+        stop_price = float(m.group("v").replace(",", ""))
+        if stop_price > entry and side == "long":
+            side = "short"
+            notes.append(f"the stop ({stop_price:,.2f}) is above the entry ({entry:,.2f}), which "
+                         f"only a short's stop can be, so this is sized as a short")
+        elif stop_price < entry and side == "short":
+            return _refusal(f"a short's stop sits above its entry, and {stop_price:,.2f} is below "
+                            f"{entry:,.2f} — give the price at which the short would be closed.")
+        stop_frac = abs(entry - stop_price) / entry
+    elif _STOP_PRICE.search(text) is not None:
+        return _refusal("a stop price needs an entry price to become a distance — say \"entry "
+                        "150, stop 144\", or give the stop as a percentage (\"a 4% stop\").")
+    if stop_frac is None:
+        return _refusal(f"a size follows from the risk (${risk_usd:,.0f} here) and how far away "
+                        f"the stop is, and no stop was given — add one, as in \"a 4% stop\" or "
+                        f"\"entry 150, stop 144\".")
+    if stop_frac <= 0:
+        return _refusal("a stop at the entry is no distance at all: the trade would be stopped at "
+                        "once, paying only the round trip, and the size formula divides by "
+                        "nothing — give a stop some distance from the entry.")
+    if stop_frac >= 1 and side == "long":
+        return _refusal(f"a {stop_frac:.0%} stop on a long is at or below zero, a price it cannot "
+                        f"reach, so it never protects anything — give a stop the price can "
+                        f"actually hit.")
 
     gross = risk_usd / stop_frac
     net = risk_usd / (stop_frac + ROUND_TRIP)
-    who = f" of {symbol.removesuffix('USDT')}" if symbol else ""
+    who = (f" of {symbol.removesuffix('USDT')}" if symbol else "") + (
+        " (a short)" if side == "short" else "")
     lines = [
         f"Bottom line: to lose no more than ${risk_usd:,.0f} if the {stop_frac:.2%} stop is hit, "
         f"the position{who} is ${net:,.0f} — ${risk_usd:,.0f} divided by the stop distance plus "

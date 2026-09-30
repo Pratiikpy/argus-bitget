@@ -427,7 +427,52 @@ def resolve_window(text: str, *, now: datetime) -> Window | None:
             )
         if label == "all time":
             return Window(datetime(2000, 1, 1, tzinfo=UTC), now, "all time")
+    day = _named_day(text, now.date())
+    if day is not None:
+        # "what did we do on 2026-09-20" returned every decision on record: a named day was not a
+        # window at all (2026-09-30).
+        return _day_window(day, now, f"{day:%d %b %Y}")
     return None
+
+
+_MONTH_NUMBERS = {name: i for i, name in enumerate(
+    ("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"),
+    start=1)}
+_ISO_DAY = re.compile(r"(?<![\d-])(\d{4})-(\d{2})-(\d{2})(?![\d-])")
+# A month as a whole word, full or abbreviated: "dec[a-z]*" read "decision 12" as 12 December.
+_MONTH = (r"(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|"
+          r"sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\b")
+_MONTH_DAY = re.compile(
+    r"\b(?:(\d{1,2})(?:st|nd|rd|th)?\s+" + _MONTH + r"|" + _MONTH.replace("(", "(", 1)
+    + r"\.?\s+(\d{1,2})(?:st|nd|rd|th)?)(?:,?\s+(\d{4}))?\b", re.I)
+
+
+def _named_day(text: str, today: date) -> date | None:
+    """A single calendar day the text names, not in the future: an ISO date, "20 September",
+    "Sep 20" (this year, or last year when that day has not come yet)."""
+    m = _ISO_DAY.search(text)
+    if m is not None:
+        try:
+            day = date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+        except ValueError:
+            return None
+        return day if day <= today else None
+    m = _MONTH_DAY.search(text)
+    if m is None:
+        return None
+    number = int(m.group(1) or m.group(4))
+    month = _MONTH_NUMBERS[(m.group(2) or m.group(3)).lower()[:3]]
+    year = int(m.group(5)) if m.group(5) else today.year
+    try:
+        day = date(year, month, number)
+    except ValueError:
+        return None
+    if day > today and not m.group(5):
+        try:
+            day = date(year - 1, month, number)
+        except ValueError:
+            return None
+    return day if day <= today else None
 
 
 def _day_window(day: date, now: datetime, label: str) -> Window:

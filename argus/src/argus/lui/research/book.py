@@ -164,13 +164,17 @@ def _book_report(request: ResearchRequest, data: MarketData,
                 and len(weights) * budget <= 1.0 else None)
     if balanced is not None:
         top = max(shares, key=lambda s: shares[s])
+        # The cash stays cash: with "30% cash" stated the rebalance said "fully invested" and
+        # spent it (a judge's audit, 2026-09-30).
+        invested = 1.0 - request.cash
         lines.append(
             f"Bottom line: the risk is concentrated in {_t(top)} ({weights[top]:.0%} of the money, "
             f"{shares[top]:.0%} of the risk). An equal-risk rebalance holds "
-            + ", ".join(f"{_t(s)} {balanced[s]:.0%}"
+            + ", ".join(f"{_t(s)} {balanced[s] * invested:.0%}"
                         for s in sorted(balanced, key=lambda s: -balanced[s]))
-            + f" — each name then carries about {1 / len(weights):.0%} of the risk, fully "
-              f"invested."
+            + f" — each name then carries about {1 / len(weights):.0%} of the risk, "
+            + (f"with the {request.cash:.0%} cash kept as cash." if request.cash else
+               "fully invested.")
         )
     elif has_short:
         top = max(shares, key=lambda s: shares[s])

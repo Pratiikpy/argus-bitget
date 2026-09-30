@@ -32,7 +32,36 @@ from argus.truth import http
 
 _TIMEOUT = 30.0
 ARCHIVE = "https://www.sec.gov/Archives/edgar/data/{cik}/{folder}/"
-_BILLION = re.compile(r"\$\s?([\d,]+(?:\.\d+)?)\s*(billion|million)", re.I)
+_BILLION = re.compile(r"\$\s?([\d,]+(?:\.\d+)?)\s*(billion|million|bn|b|mm|m)\b", re.I)
+"""A dollar amount with its scale, in words or as a slide deck abbreviates it ("$1.2B")."""
+
+_MONEY = r"\$\s?(?P<amount>[\d,]+(?:\.\d+)?)\s*(?P<unit>billion|million|bn|b|mm|m)\b"
+_REVENUE_WORD = r"(?:revenues?|net\s+sales)\b"
+_KIND = r"(?P<kind>(?:total|consolidated)\s+(?:[\w.]+\s+){0,2}?|net\s+)?"
+_LINK = (r"(?:(?!revenue|net\s+sales)[^$.;•]){0,70}?"
+         r"\b(?:of|was|were|reached|totall?ed|came\s+in\s+at|to)\s+"
+         r"(?:a\s+(?:quarterly\s+)?record\s+(?:of\s+)?|approximately\s+|about\s+)?|\s*[:\u2013-]\s*")
+_REVENUE_FIGURE = re.compile(
+    r"\b" + _KIND + _REVENUE_WORD + r"(?:" + _LINK + r")" + _MONEY
+    + r"|" + _MONEY.replace("amount>", "amount2>").replace("unit>", "unit2>")
+    + r"\s+(?:in\s+|of\s+)?" + _KIND.replace("kind>", "kind2>") + _REVENUE_WORD, re.I)
+"""A revenue figure stated next to the word, allowing the few words a release puts between them:
+"revenue of $96.2 billion", "net sales increased 20% to $200.6 billion", "revenues increased 24%,
+or 23% in constant currency, to $119.8 billion", "total revenues for the second quarter of 2026
+were $122.4 million", "$1.2B total revenue". The old reader took the first dollar amount anywhere
+in a sentence that mentioned revenue, and read Coinbase's Q2 2026 deck as $100m, from a footnote
+about when a product first reached "$100 million in quarterly annualized net revenue", against the
+$1.2B the deck states (a judge's audit, 2026-09-30)."""
+
+_NOT_THE_TOTAL = re.compile(
+    r"annuali[sz]ed|run[- ]rate|defined\s+as|measured\s+based|guidance|outlook|expect", re.I)
+"""Words near a figure that make it something other than the quarter's reported revenue."""
+
+_HEADLINE_LEAD = {"", "reported", "record", "quarterly", "quarter", "the", "of", "and", "with",
+                  "total", "net", "q1", "q2", "q3", "q4", "revenue", "overall", "consolidated",
+                  "company", "our", "its"}
+"""The words that may stand before a plain "revenue" for it to be the company's total, not a
+segment's ("Data Center revenue", "stablecoin revenue")."""
 
 
 @dataclass(frozen=True)
@@ -61,7 +90,8 @@ def clean(document: str) -> str:
 
 
 def _dollars(amount: str, unit: str) -> float:
-    return float(amount.replace(",", "")) * (1e9 if unit.lower() == "billion" else 1e6)
+    scale = 1e9 if unit.lower() in ("billion", "bn", "b") else 1e6
+    return float(amount.replace(",", "")) * scale
 
 
 def _sentences(text: str) -> list[str]:
@@ -78,17 +108,47 @@ def _prose(sentence: str) -> bool:
     return len(sentence) < 600
 
 
+def _reported_revenue(sentences: list[str]) -> tuple[float | None, str]:
+    """The quarter's reported revenue and the sentence it was read from, or ``(None, "")``.
+
+    A total or net revenue figure beats a plain "revenue" one, and a plain one counts only when no
+    segment name stands before it; within a rank the first in the document wins, as the headline
+    figure comes first in every release read (NVDA, COIN, TSLA, MSTR, HOOD, 2026-09-30)."""
+    best: tuple[int, int, float, str] | None = None
+    order = 0
+    for sentence in sentences:
+        for m in _REVENUE_FIGURE.finditer(sentence):
+            order += 1
+            near = sentence[max(0, m.start() - 60): m.end() + 60]
+            if _NOT_THE_TOTAL.search(near):
+                continue
+            kind = (m.group("kind") or m.group("kind2") or "").strip().lower()
+            if kind.startswith(("total", "consolidated")):
+                rank = 0
+            elif kind.startswith("net"):
+                rank = 1
+            else:
+                before = re.findall(r"[A-Za-z0-9&/]+", sentence[max(0, m.start() - 30): m.start()])
+                if (before[-1].lower() if before else "") not in _HEADLINE_LEAD:
+                    continue
+                rank = 2
+            amount = m.group("amount") or m.group("amount2")
+            unit = m.group("unit") or m.group("unit2")
+            value = _dollars(amount, unit)
+            if best is None or (rank, order) < (best[0], best[1]):
+                # The clause the figure stands in, quoted as the release's words: a slide deck
+                # splits into run-on "sentences" of letter-spaced headings, and quoting the whole
+                # of one read as noise (2026-09-30).
+                tail = re.match(r"(?:[^.;•●◦▪]|\.(?=\d)){0,90}", sentence[m.end():])
+                best = (rank, order, value,
+                        (m.group(0) + (tail.group(0) if tail else "")).strip(" ,"))
+    return (best[2], best[3]) if best is not None else (None, "")
+
+
 def parse(text: str) -> dict[str, Any]:
     """Headline, reported revenue and the outlook from an earnings release's plain text."""
     sentences = _sentences(text)
-    revenue, revenue_sentence = None, ""
-    for sentence in sentences:
-        if re.search(r"\b(?:total\s+)?revenue\b", sentence, re.I) and re.search(
-                r"\bquarter\b|\breported\b|\bup\b|\bdown\b", sentence, re.I):
-            found = _BILLION.search(sentence)
-            if found:
-                revenue, revenue_sentence = _dollars(*found.groups()), sentence
-                break
+    revenue, revenue_sentence = _reported_revenue(sentences)
     outlook: list[str] = []
     start = re.search(r"\b(?:Outlook|Guidance|Business Outlook|Financial Outlook)\b", text)
     if start:

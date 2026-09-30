@@ -181,7 +181,10 @@ _EXECUTION = re.compile(
     r"how\s+(?:should|do|would)\s+i\s+(?:buy|sell|enter|get\s+into|exit)|best\s+way\s+to\s+"
     r"(?:buy|sell|exit|enter|get)|market\s+or\s+limit|limit\s+or\s+market|twap|vwap|"
     r"in\s+one\s+(?:clip|go|shot)|minimi[sz]e\s+(?:the\s+)?(?:impact|slippage|cost)|"
-    r"cost\s+of\s+(?:buying|selling)|(?:sell|selling|exit|exiting|unload\w*|dump\w*)\s+"
+    r"cost\s+of\s+(?:buying|selling)|"
+    # "what does it cost to buy $500 of BTC" was refused as not a desk stock (2026-09-30)
+    r"(?:does|would|will|did)\s+it\s+cost\s+to\s+(?:buy|sell)|\bcost\s+to\s+(?:buy|sell)\b|"
+    r"(?:sell|selling|exit|exiting|unload\w*|dump\w*)\s+"
     r"(?:\$|\d)|scal(?:e|ing)\s+(?:in|into|out)|break\s+(?:up|down)\s+(?:an?\s+)?(?:\w+\s+){0,2}"
     r"order|smaller\s+(?:clips|chunks|pieces|orders|slices)|in\s+(?:tranches|chunks|pieces)|"
     r"cleanly|without\s+(?:tanking|crashing|moving|pushing)\b|how\s+do\s+i\s+do\s+it|"
@@ -508,10 +511,12 @@ _NEWS = re.compile(
     r"with|what\s+happened\s+(?:to|with)\s+\w+\s+(?:today|this\s+week|yesterday)|why\s+(?:is|did|"
     r"has|was|are|were)\s+(?:\S+\s+){1,4}?(?:drop|fall|fell|dump|crash|tank|rall|jump|pump|"
     r"surg|spik|soar|sink|slid|slump|plung|mov|up|down|red|green|gap)\w*|"
-    r"what\s+happened\s+(?:to|with)\s+\w+\s+(?:overnight|last\s+night|this\s+morning))",
+    r"what\s+happened\s+(?:to|with)\s+\w+\s+(?:overnight|last\s+night|this\s+morning)|"
+    r"(?:what|how)\s+(?:is|are|'s)\s+(?:the\s+)?\S+(?:\s+\S+)?\s+doing\b)",
     re.I,
 )
-"""News and "why did it move" questions."""
+"""News and "why did it move" questions, and "what is the S&P 500 doing" (2026-09-30: it fell
+through to a sizing template)."""
 
 
 _VENUE = re.compile(
@@ -866,7 +871,13 @@ _BOOK_QUESTION_STRONG = re.compile(
     r"\b(?:sharpe|sortino|drawdown|returns?|performance|balanced?|diversified|concentration|"
     r"correlation(?:\s+matrix)?|risk\s+check|worth|value)\b[^?.]{0,40}\bmy\s+(?:\w+\s+){0,3}"
     r"(?:book|portfolio|holdings|bag|stack|allocation)\b|"
-    r"\bwhat'?s\s+my\s+(?:max(?:imum)?\s+)?(?:drawdown|sharpe|volatility)\b", re.I)
+    r"\bwhat'?s\s+my\s+(?:max(?:imum)?\s+)?(?:drawdown|sharpe|volatility)\b|"
+    # "What's the biggest single point of failure in this book?" with a book set was answered
+    # "No open positions" (a judge's audit, 2026-09-30)
+    r"\b(?:single\s+)?point\s+of\s+failure\b|\bweakest\s+(?:link|spot|point|holding)\b|"
+    r"\b(?:biggest|largest|main)\s+(?:single\s+)?risk\s+in\s+(?:this|my|the)\s+(?:book|portfolio)\b|"
+    r"\bwhat\s+(?:could|would|can)\s+(?:hurt|sink|kill|break)\s+(?:this|my)\s+(?:book|portfolio)\b",
+    re.I)
 """A question about the saved book that names it only as "my holdings" or "my most concentrated
 risk": "which holding should I cut?" was answered with the desk's open positions and "what's my
 most concentrated risk?" declined (2026-09-25 audit, round 2)."""
@@ -998,6 +1009,9 @@ def _read(text: str) -> dict[str, str]:
     from argus.market.universe import CJK_ALIASES
 
     text = coin_as_ticker(text)
+    # "S&P 500" and "the S&P" are the index, written as its name: both were declined or answered
+    # "not a contract Bitget lists" while "sp500" and "SPX" resolved (2026-09-30).
+    text = re.sub(r"\bS\s*&\s*P(?:\s*500)?(?![\w&])", "SP500", text, flags=re.I)
     trust = not _shouting(text)
     found: dict[str, str] = {}
     rtoken = rtoken_named(text)
@@ -1008,6 +1022,11 @@ def _read(text: str) -> dict[str, str]:
             found[symbol] = ""
     cue = bool(_MARKET_CUE.search(text))
     for match in re.finditer(r"[A-Za-z][A-Za-z0-9&]{1,17}", text):
+        if match.group(0).upper() in ("P&L", "PNL"):
+            # Profit and loss, never the platinum contract PL: "what is my current P&L?" was
+            # answered with platinum's price (a hostile review, 2026-09-30). "S&P" still folds
+            # to the index below.
+            continue
         token = match.group(0).replace("&", "")
         compound = re.match(r"(?i)([a-z]{3,})(?:preis|kurs|koers|prijs)$", token)
         if compound and resolve_name(compound.group(1), trust_case=False) is not None:
@@ -2078,6 +2097,10 @@ def about_the_desk(text: str) -> bool:
     holding" with a TQQQ quote, because the research planner reads every named ticker as a
     research subject. A question that plans rather than asks about the record ("what would adding
     NVDA do to our book", "should we hedge") stays with research."""
+    # "us" as the reader, not the desk: "what are funding rates telling us about crowd positioning
+    # in ETH" was sent to the record and refused (a judge's audit, 2026-09-30).
+    text = re.sub(r"\b(?:tells?|telling|told|shows?|showing|showed|gives?|giving|gave|lets?|"
+                  r"helps?|for|to)\s+us\b", " ", text, flags=re.I)
     return bool(_THE_DESK_ACTS.search(text)) and not _A_PLAN_NOT_A_RECORD.search(text)
 
 
@@ -2329,6 +2352,37 @@ def read_request(text: str) -> ResearchRequest | None:
             kind=ResearchKind.BOOK, symbols=symbols, book=dict.fromkeys(symbols, weight),
             notes=(f"no weights were given, so the {len(symbols)} names are read as held "
                    f"equally — say the weights for your own book",))
+    from argus.lui.research.sizing import HOW_MUCH_IN, stated_capital
+
+    if len(symbols) == 1 and HOW_MUCH_IN.search(raw) and not is_an_order(raw):
+        # "how much should i put in nvda if i have 3k" was answered with NVDA's options, the
+        # money stated never used (a first-time-user audit, 2026-09-30).
+        capital = stated_capital(raw)
+        return ResearchRequest(
+            kind=ResearchKind.IMPACT, symbols=symbols,
+            notional=None if capital is None else Decimal(str(capital)),
+            notes=() if capital is not None else (
+                "no amount was stated, so the sizes are for $10,000 — say what you have",))
+    if (len(symbols) == 1 and RISKS_OF.search(raw) and not is_an_order(raw)
+            and not about_the_record(raw) and not _LEVERED_OR_SHORT.search(raw)):
+        return ResearchRequest(kind=ResearchKind.IMPACT, symbols=symbols,
+                               notes=("the risks were asked, so this is the name's risk profile — "
+                                      "its worst day, how it moves with the market, and what that "
+                                      "does to a book",))
+    if (len(symbols) == 1 and TAKE_ON.search(raw) and not is_an_order(raw)
+            and not price_forecast_asked(raw)):
+        # "Give me a quick take on ETH" was refused: the hosted model read an open-ended view as
+        # no research question (a judge's audit, 2026-09-30). A view on one name is its risk
+        # profile, with the full research task offered under it.
+        return ResearchRequest(kind=ResearchKind.IMPACT, symbols=symbols,
+                               notes=("a view was asked for, so this is the name's risk profile "
+                                      "— the research task under it runs every engine on it",))
+    if (len(symbols) >= 2 and not is_an_order(raw) and re.search(
+            r"\b(?:outperform\w*|underperform\w*|beat(?:s|ing|en)?|(?:done|doing|did)\s+better|"
+            r"better\s+than|worse\s+than|lagg?(?:ing|ed)?)\b", raw, re.I)):
+        # "does BTC outperform QQQ", "is ETH beating BTC this month" were read as nothing, or as
+        # one name's risk profile (2026-09-30): which rose more is the comparison's momentum lead.
+        return ResearchRequest(kind=ResearchKind.COMPARE, symbols=symbols[:4])
     if len(symbols) >= 2 and _ALLOCATE_BETWEEN.search(raw) and not is_an_order(raw):
         # "what allocation split between BTC and ETH for $30,000" was read as a market order in
         # BTC, the word "split" taken for splitting an order (a judge's audit, 2026-09-29). Money
@@ -2489,6 +2543,27 @@ def read_request(text: str) -> ResearchRequest | None:
     if _VENUE.search(raw) and not about_the_record(raw):
         return ResearchRequest(kind=ResearchKind.VENUE, symbols=symbols[:1] or ("NVDAUSDT",),
                                notes=() if symbols else ("NVDA used as the worked example",))
+    given_weights = holding_pairs(raw) if len(symbols) >= 2 else []
+    if (len(given_weights) >= 2 and {s for _, s, _ in given_weights} >= set(symbols)
+            and all(w > 0 for _, _, w in given_weights) and not ADD_VERB.search(raw)
+            and not is_an_order(raw) and not _STRESS.search(raw) and not _STRESS_BARE.search(raw)
+            and not _EXECUTION.search(raw) and not _HEDGE.search(raw)
+            and not _MACRO.search(raw)):
+        # Every name given with its weight is a book, whatever is asked of it: "build me a
+        # portfolio: NVDA 70%, TSLA 20%, GOOGL 10%" was answered with an equal-risk book that
+        # replaced the weights without a word, and "NVDA 40%, TSLA 40%, GOOGL 40%, how risky" as a
+        # comparison (a hostile review, 2026-09-30). The book engine reads the weights as given,
+        # says when they were rescaled, and shows the equal-risk alternative itself.
+        given_book: dict[str, float] = {}
+        for _, symbol, weight in given_weights:
+            given_book[symbol] = given_book.get(symbol, 0.0) + weight
+        noted: list[str] = []
+        if not _CASH_PCT.search(raw):
+            given_book = _normalise(given_book, noted)
+        given_book, cash = split_cash(raw, given_book)
+        if given_book:
+            return ResearchRequest(kind=ResearchKind.BOOK, symbols=tuple(given_book),
+                                   book=given_book, cash=cash, notes=tuple(noted))
     if _CONSTRUCT.search(raw) and not about_the_record(raw) and not _EXECUTION.search(raw):
         named = symbols if len(symbols) >= 2 else ()
         theme = None if named else _theme(raw)
@@ -2503,7 +2578,11 @@ def read_request(text: str) -> ResearchRequest | None:
             and _is_equity_or_traded(symbols[0])):
         return ResearchRequest(kind=ResearchKind.FUNDAMENTALS, symbols=symbols[:1])
     if (symbols and not holding_pairs(raw) and _EVENT_REACTION.search(raw)
-            and not about_the_record(raw)):
+            and not about_the_record(raw)
+            and not (symbols[0] in _SHOCK_SUBJECTS and _MACRO.search(raw))):
+        # An index asked about around a Fed or CPI date ("what will the S&P 500 do after the
+        # next FOMC") is the macro backdrop's: event reactions are measured for the desk's twelve
+        # names only, and answered that SP500 was not one once the index resolved (2026-09-30).
         return ResearchRequest(kind=ResearchKind.EVENT, symbols=symbols[:1])
     spot_ticker = _spot_rtoken(raw)
     multiple = re.search(r"\b(\d+(?:\.\d+)?)\s*x\b", raw, re.I)
@@ -3053,12 +3132,18 @@ def with_book(request: ResearchRequest | None, book_text: str,
     if saved_budget is not None and not request.budget_stated:
         request = replace(request, budget=saved_budget, budget_stated=True)
         book_text = strip_budget(book_text)
-    if request.book and question and not _states_holdings(question):
+    invented = bool(request.book) and bool(question) and not (
+        set(request.book) <= set(research_symbols(question)[0]))
+    if request.book and question and (not _states_holdings(question) or invented):
         # The question states no holdings, so a book on the request was supplied by the model, not
         # the trader. In one of three identical calls it read "what does adding 20% TSLA do to my
         # risk" as a book of TSLA alone and answered "100% of your risk" (a judge's probe,
-        # 2026-09-24). The saved book is the trader's own statement and it wins.
-        request = replace(request, book={})
+        # 2026-09-24). The saved book is the trader's own statement and it wins. A book holding a
+        # name the question never mentions is the model's too: "stress test this portfolio for a
+        # 10% Nasdaq drop" came back as 100% QQQ, the shock itself, every time (a judge's audit,
+        # 2026-09-30), with its "read as equal weight" note beside the saved book's.
+        request = replace(request, book={}, notes=tuple(
+            n for n in request.notes if "equal weight" not in n))
     if request.book:
         return request
     book, cash = split_cash(book_text, parse_book(book_text))
@@ -3678,6 +3763,23 @@ _NAMED_BOOK = re.compile(
     r"(?:and\s+)?[A-Z]{2,6}\b", re.I)
 """Names given as the book, with no weights: "my portfolio of AAPL MSFT GOOGL"."""
 
+TAKE_ON = re.compile(
+    r"\b(?:quick\s+|short\s+|honest\s+|your\s+)?(?:take|view|thoughts?|opinion|read|thesis|"
+    r"(?:bull|bear)(?:ish)?\s+case)\s+(?:on|of|about|for)"
+    r"\b|\bwhat\s+do\s+you\s+(?:think|make)\s+(?:of|about)\b|\bhow\s+do\s+you\s+(?:see|feel\s+about)"
+    r"\b", re.I)
+"""An open-ended view asked of a name: "quick take on ETH", "what do you think of COIN"."""
+
+_LEVERED_OR_SHORT = re.compile(
+    r"(?<![\w.])\d+(?:\.\d+)?\s*x\b|\bleverag\w*|\bshort(?:ing|s)?\b", re.I)
+"""Leverage or a short side: the leverage engine's question, not a plain risk profile."""
+
+RISKS_OF = re.compile(
+    r"\bwhat\s+(?:could|can|might)\s+go\s+wrong\b|\b(?:the\s+)?(?:main\s+|biggest\s+|key\s+)?"
+    r"risks?\s+(?:of|in|with)\s+(?:holding\s+|buying\s+|owning\s+)?\$?[A-Za-z]", re.I)
+"""The risks of one name asked in words: "what could go wrong with NVDA" went to the desk's record
+(the round-8 first-user audit, 2026-09-30)."""
+
 _ALLOCATE_BETWEEN = re.compile(
     r"\b(?:allocat\w*|split\w*|divid\w*|distribut\w*|spread|put)\b[^?.]{0,60}?\b(?:between|across|"
     r"among)\b|\bhow\s+much\s+(?:of\s+each|in\s+each|to\s+each)\b|\b(?:allocation|weighting|"
@@ -3816,7 +3918,11 @@ _FLOW = re.compile(
     r"\b(?:smart|institutional)\s+money\b|\binstitutions?\s+(?:selling|buying)\b", re.I)
 
 
-_OPTIONS_Q = re.compile(r"\b(?:calls?|puts?)\b(?=[^?.]{0,30}(?:option|strike|expir|buy|sell|"
+# "put" as the verb is not a put option: "how much should i put in nvda if i have 3k" was answered
+# with NVDA's options chain (a first-time-user audit, 2026-09-30).
+_OPTIONS_Q = re.compile(r"\b(?:calls?|puts?)\b(?!\s+(?:in|into|it|money|my|some|all|every\w*|"
+                        r"\$|\d|aside|away|down|together))"
+                        r"(?=[^?.]{0,30}(?:option|strike|expir|buy|sell|"
                         r"\?|$))|\boptions?\s+(?:chain|on|for|trade|trading|strategy)|\bstrikes?\b|"
                         r"\bcovered\s+calls?|\bstraddle|\bstrangle|\bimplied\s+vol\w*|\bgreeks?\b",
                         re.I)

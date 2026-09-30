@@ -240,6 +240,8 @@ _FUTURE_EXTRA = re.compile(
     r"sit)\s+(?:at|on|the)\b"
     # fut-03 "what price will TSLA reach in 2030".
     r"|\bwhat\s+(?:price|level|value)\s+will\b"
+    # "what will NVDA do on 2030-01-01" was declined as unrecognised (2026-09-30).
+    r"|\bwhat\s+will\s+(?:[\w&.$'’-]+\s+){1,4}do\s+(?:on|by)\s+\d{4}-\d{2}-\d{2}\b"
     # fut-05 "where will the S&P 500 be at year end": the old pattern allowed one word of name.
     r"|\bwhere\s+will\s+(?:[\w&.$'’-]+\s+){1,4}(?:be|go|trade|close|end|land|finish|top|"
     r"bottom)\b"
@@ -1065,7 +1067,10 @@ def detect(text: str, *, prior: Sequence[str] = (), book: str = "",
             span_days = (ledger[1] - ledger[0]).total_seconds() / 86400.0
             if days is not None and days > span_days and not names:
                 return Detected(HORIZON, years=days / 365.25, detail="desk")
-    if names and past and _PRICE_WORDS.search(raw) and not _N_YEARS.search(raw) \
+    # "what was NVDA on 2024-02-13" names no price word and was answered with a desk decision
+    # (a hostile review, 2026-09-30); a name, "was" and a day is a past price.
+    on_a_day = re.search(r"\bwhat\s+was\b[^?]{0,40}\bon\s+\d{4}-\d{2}-\d{2}\b", raw, re.I)
+    if names and past and (_PRICE_WORDS.search(raw) or on_a_day) and not _N_YEARS.search(raw) \
             and not re.search(r"\b(?:since|from)\b", raw, re.I):
         return Detected(BEFORE_DATA, names[0], span=past[0], detail="price")
     years_match = _N_YEARS.search(raw)
@@ -1086,6 +1091,93 @@ def detect(text: str, *, prior: Sequence[str] = (), book: str = "",
     return None
 
 
+IMPOSSIBLE_DATE = "impossible_date"
+"""A date no calendar has: "what happened on 2025-13-01" was answered as a session question (a
+hostile review, 2026-09-30)."""
+
+_MONTHS = {m: i + 1 for i, m in enumerate(
+    ("january", "february", "march", "april", "may", "june", "july", "august", "september",
+     "october", "november", "december"))}
+_ISO_LIKE = re.compile(r"(?<![\d.-])(\d{4})-(\d{1,2})-(\d{1,2})(?![\d.-])")
+_NAMED_DAY = re.compile(
+    r"\b(?:(\d{1,2})(?:st|nd|rd|th)?\s+(" + "|".join(_MONTHS) + r")|(" + "|".join(_MONTHS)
+    + r")\s+(\d{1,2})(?:st|nd|rd|th)?)\b,?\s+(\d{4})\b", re.I)
+
+
+def impossible_date(text: str) -> str | None:
+    """The first date written in ``text`` that no calendar has, as written, or None."""
+    for m in _ISO_LIKE.finditer(text):
+        try:
+            date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+        except ValueError:
+            return m.group(0)
+    for m in _NAMED_DAY.finditer(text):
+        day = int(m.group(1) or m.group(4))
+        month = _MONTHS[(m.group(2) or m.group(3)).lower()]
+        try:
+            date(int(m.group(5)), month, day)
+        except ValueError:
+            return m.group(0)
+    return None
+
+
+_PAST_TENSE = re.compile(r"\b(?:was|were|did|closed|close|happened|traded|opened)\b", re.I)
+
+
+def future_date_asked_as_past(text: str, today: date) -> date | None:
+    """A date after ``today`` in a question asked in the past tense: "what was NVDA's price on
+    2030-01-01" was answered with today's quote (a hostile review, 2026-09-30)."""
+    if not _PAST_TENSE.search(text):
+        return None
+    for m in _ISO_LIKE.finditer(text):
+        try:
+            day = date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+        except ValueError:
+            continue
+        if day > today:
+            return day
+    return None
+
+
+_NUMERIC_DATE = re.compile(r"(?<![\d/.-])(\d{1,2})[/.](\d{1,2})[/.](\d{4})(?![\d/.-])")
+
+
+def iso_dates(text: str) -> tuple[str, str | None]:
+    """Numeric dates rewritten as ISO dates, and a note when the order had to be assumed.
+
+    "NVDA on 13/02/2024" was answered with a whole-year summary and "02/13/2024" with a desk
+    decision (a hostile review, 2026-09-30). A day over 12 settles the order; when both parts are
+    12 or under the date is read month first, as US exchanges write it, and the answer says so."""
+    note: str | None = None
+
+    def rewrite(m: re.Match[str]) -> str:
+        nonlocal note
+        first, second, year = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        if first > 12 >= second:
+            month, day = second, first
+        elif second > 12 >= first:
+            month, day = first, second
+        elif first <= 12 and second <= 12:
+            month, day = first, second
+            if first != second:
+                note = (f"{m.group(0)} was read month first, as "
+                        f"{date(year, month, day):%d %B %Y}; write {year}-{second:02d}-"
+                        f"{first:02d} for the other reading") if _valid(year, month, day) else note
+        else:
+            return m.group(0)
+        return f"{year:04d}-{month:02d}-{day:02d}"
+
+    return _NUMERIC_DATE.sub(rewrite, text), note
+
+
+def _valid(year: int, month: int, day: int) -> bool:
+    try:
+        date(year, month, day)
+    except ValueError:
+        return False
+    return True
+
+
 def honest_answer(text: str, *, prior: list[str], book: str,
                   today: date | None = None) -> tuple[str, list[str]] | None:
     """``(cause, lines)`` for a question no console can answer as asked, else None.
@@ -1096,6 +1188,18 @@ def honest_answer(text: str, *, prior: list[str], book: str,
     the plain reason when the read fails. An order is not answered here — :func:`order_prefix`
     puts its statement above the console's own analysis.
     """
+    ahead = future_date_asked_as_past(text, today or datetime.now(UTC).date())
+    if ahead is not None:
+        return IMPOSSIBLE_DATE, [
+            f"Bottom line: {ahead:%d %B %Y} has not happened yet, so there is no price or event "
+            f"on it to report — this console does not forecast; ask about a past date, or "
+            f"\"has NVDA been here before\" for what followed states like today's."]
+    impossible = impossible_date(text)
+    if impossible is not None:
+        return IMPOSSIBLE_DATE, [
+            f"Bottom line: {impossible} is not a date on the calendar, so nothing happened on it "
+            f"— check the month and the day, and ask again with a real date (\"2025-12-01\", "
+            f"\"1 March 2025\")."]
     found = detect(text, prior=prior, book=book, today=today)
     if found is None:
         return None

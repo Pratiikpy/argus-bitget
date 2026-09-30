@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import math
 import re
+import statistics
 from collections.abc import Mapping, Sequence
 from dataclasses import replace
 from datetime import UTC, date, datetime, timedelta
@@ -151,6 +152,7 @@ from argus.lui.research.session import (
     anchor_is_open,
 )
 from argus.lui.research.technicals import (
+    _answer_the_level_asked,
     _answer_the_state_asked,
     _technicals,
 )
@@ -299,7 +301,8 @@ def _loss_lead(lines: list[str], odds: Mapping[str, Any] | None,
 
 _MOMENTUM_ASKED = re.compile(
     r"\bmomentum\b|\b(?:strong|weak)er\b|\bstronger\s+trend\b|\bperform\w*\b|\boutperform\w*\b|"
-    r"\btrending\b|\bup\s+more\b|\bdoing\s+better\b", re.I)
+    r"\btrending\b|\bup\s+more\b|\b(?:doing|done|did)\s+better\b|\bbeat(?:s|ing|en)?\b|"
+    r"\bbetter\s+than\b|\bworse\s+than\b|\blagg?(?:ing|ed)?\b", re.I)
 """A comparison that asks which name is moving the better way, not which is riskier: "which one has
 better momentum" was answered with volatility (a judge's audit, 2026-09-29)."""
 
@@ -318,6 +321,49 @@ def _asks_for_the_move(raw_text: str) -> bool:
     2026-09-30). A named period counts unless the question also names a risk measure."""
     return bool(_MOMENTUM_ASKED.search(raw_text)
                 or (_PERIOD_ASKED.search(raw_text) and not _RISK_ASKED.search(raw_text)))
+
+
+def _standalone_lead(lines: list[str], add: str, raw: Mapping[str, Mapping[Any, float]],
+                     request: ResearchRequest, raw_text: str) -> list[str]:
+    """The lead for a question about one name held alone, when a view or an amount was asked.
+
+    "Give me a quick take on ETH" led with a sizing rule for a $10,000 position, and "how much
+    should i put in nvda if i have 3k" never used the $3,000 (the round-7 audits, 2026-09-30). Both
+    are read here from every hour of the name's own history: the move over 30 days and a week, how
+    much it swings, and the worst 24 hours, which the amount is sized against."""
+    from argus.desk.portfolio import worst_window
+    from argus.lui.research.parse import RISKS_OF, TAKE_ON
+    from argus.lui.research.sizing import HOW_MUCH_IN, capital_lines
+
+    series = [v for _, v in sorted((raw.get(add) or {}).items())]
+    if len(series) < 48:
+        return lines
+    worst = worst_window(weights={add: 1.0}, columns={add: series})
+    worst_day = None if worst.move_pct is None else worst.move_pct / 100.0
+    rest = [LEAD.sub("", line, count=1) if bool(LEAD.match(line)) else line for line in lines]
+    name = _t(add)
+    if HOW_MUCH_IN.search(raw_text) and worst_day is not None:
+        capital = float(request.notional) if request.notional is not None else 10_000.0
+        return [*capital_lines(name, capital, worst_day), *rest]
+    should = re.search(r"\bshould\s+i\s+(?:buy|get\s+into|invest\s+in|add)\b|\bis\s+\S+\s+a\s+"
+                       r"(?:good\s+)?buy\b|\bworth\s+buying\b", raw_text, re.I)
+    if TAKE_ON.search(raw_text) or RISKS_OF.search(raw_text) or should:
+        month, week = _compounded(series[-720:]), _compounded(series[-168:])
+        swing = statistics.pstdev(series[-720:]) * math.sqrt(24 * 365)
+        if month is None or week is None:
+            return lines
+        # "should i buy bitcoin" opened on a sizing rule and never said the console makes no buy
+        # calls (the round-8 first-user audit, 2026-09-30).
+        call = ("this console makes no buy or sell call, so here is what holding it has meant — "
+                if should else "")
+        return [f"Bottom line: {call}{name} is {month:+.1%} over the last 30 days and "
+                f"{week:+.1%} over "
+                f"the last week, swinging about {swing:.0%} a year"
+                + (f"; its worst 24 hours in that time was {worst_day:+.1%}"
+                   if worst_day is not None else "")
+                + ". That is the move so far, not a forecast; the figures below are what it does "
+                  "to a book.", *rest]
+    return lines
 
 
 def _compounded(hourly: Sequence[Any]) -> float | None:
@@ -671,6 +717,11 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             # "open interest on ETH futures" opened on the sentiment summary with the open
             # interest four lines down (live, 2026-09-25): the figure asked for leads.
             found = _lead_with(found, "Open interest:")
+        if (request.kind is ResearchKind.SENTIMENT and re.search(r"\bfunding\b", raw_text, re.I)
+                and not re.search(r"\bopen[\s-]+interest\b|\bOI\b", raw_text)):
+            # "What are funding rates telling us about crowd positioning in ETH" led with open
+            # interest (a judge's audit, 2026-09-30): funding was asked, and its reading leads.
+            found = _lead_with(found, "Funding means ")
         if request.kind is ResearchKind.SENTIMENT and request.symbols:
             found = _positioning_lead(found, raw_text, request.symbols[0])
         if (request.kind is ResearchKind.MACRO and request.symbols
@@ -802,6 +853,8 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                              target=request.target)
             columns = _open_columns(data.raw, is_open)
             lines = _impact_lines(report, request, columns)
+            if not before:
+                lines = _standalone_lead(lines, add, data.raw, request, raw_text)
             exposure_lines, exposure_sources = _exposure_lines(exposure_future)
             lines.extend(exposure_lines)
             sources.extend(exposure_sources)
@@ -947,6 +1000,17 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                                                tone=tone_asked(raw_text))
             sources.extend(extra)
             payload["news"] = news_payload
+            moved = next((i for i, line in enumerate(lines)
+                          if re.search(r" is [+-][\d.]+% over 24 hours on Bitget", str(line))),
+                         None)
+            if (moved is not None and lines
+                    and re.search(r"\b(?:what|how)\s+(?:is|are|'s)\b[^?]{1,40}\bdoing\b",
+                                  raw_text, re.I)):
+                # "what is the S&P 500 doing" led with "nothing in 48h names SP500" and gave the
+                # move itself second (2026-09-30): the move is what was asked, the news is why.
+                head = str(lines[0]).removeprefix("Bottom line: ")
+                lines = [f"Bottom line: {lines[moved]} On the news: {head[:1].lower() + head[1:]}",
+                         *(line for i, line in enumerate(lines) if i not in (0, moved))]
 
         elif request.kind is ResearchKind.BOOK:
             lines, extra, book_payload = _book_report(request, data, is_open)
@@ -1331,6 +1395,7 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                                               line) for line in lines)]
                     sources.extend(daily_sources)
             lines = _answer_the_state_asked(raw_text, request.symbols[0], lines)
+            lines = _answer_the_level_asked(raw_text, lines)
             if not lines:
                 # The Skill has no series for some listed contracts (CVXSTOCKUSDT, SP500USDT —
                 # "No OHLCV data", measured 2026-09-23). The same indicators are computed from

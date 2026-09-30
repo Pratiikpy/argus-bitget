@@ -1512,9 +1512,17 @@ def _money(value: float) -> str:
 
 
 _HOLDING = re.compile(
-    rf"(?<![\w.]){_NUM}\s*(?:shares?\s+(?:of\s+)?|units?\s+(?:of\s+)?)?\$?([A-Za-z]{{2,6}})\s*(?:@|at\s+)"
+    rf"(?<![\w.]){_NUM}\s*(?:shares?\s+(?:of\s+)?|units?\s+(?:of\s+)?)?\$?([A-Za-z]{{2,6}})\s*"
+    rf"(?:(?:that\s+i\s+|which\s+i\s+)?(?:bought|purchased|acquired|entered|paid)\s+)?(?:@|at\s+)"
     rf"\s*\$?{_NUM}", re.I)
-"""A holding written with its entry price: "100 COIN@$180", "50 MSTR at 320"."""
+"""A holding written with its entry price: "100 COIN@$180", "50 MSTR at 320", "100 shares of
+NVDA bought at $200"."""
+
+_PNL_ASKED = re.compile(
+    r"\bhow\s+am\s+i\s+doing\b|\bam\s+i\s+(?:up|down|in\s+(?:profit|the\s+(?:green|red)))\b|"
+    r"\bp\s*&\s*l\b|\bpnl\b|\bprofit\b|\bunreali[sz]ed\b|\bup\s+or\s+down\b|\bhow\s+much\s+(?:did|"
+    r"have)\s+i\s+(?:make|made|lose|lost)\b|\bmy\s+(?:gain|loss|return)\b", re.I)
+"""A question about the profit on a position, which one fill is enough to answer."""
 
 _STATED_MARK = re.compile(
     rf"\b(?:if\s+(?:it'?s|it\s+is|the\s+price\s+is)|it'?s|price\s+is|trading|now)\s+(?:at\s+|"
@@ -1550,7 +1558,9 @@ def position_and_pnl(text: str, *, now: datetime | None = None,
                  if (symbol := _resolve_word(m.group(2))) is not None]
         if not fills:
             return None
-    elif len(fills) < 2:
+    elif len(fills) < 2 and not _PNL_ASKED.search(text):
+        # One fill with a profit question is a position: "i bought 2 shares of tesla at 250 how am
+        # i doing" was answered with an order cost (a first-time-user audit, 2026-09-30).
         return None
     lines: list[str] = []
     data: dict[str, Any] = {}

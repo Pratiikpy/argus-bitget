@@ -317,3 +317,26 @@ def test_one_insider_filing_reads_as_one(monkeypatch: pytest.MonkeyPatch) -> Non
     assert "1 open-market sale," in text and "($1,000)" in text
     assert "filings" not in text.split("Insiders, from")[1].split(":")[0]
     assert "which says nothing" in text
+
+
+@pytest.mark.parametrize(("text", "revenue"), [
+    # Coinbase's Q2 2026 deck: a footnote about "$100 million in quarterly annualized net revenue"
+    # was read as the quarter's revenue (a judge's audit, 2026-09-30)
+    ("[3] Measured based on when the product generated $100 million in quarterly annualized net "
+     "revenue for the most recent qualifying quarter. • $1.2B total revenue (-14% Q/Q) against a "
+     "backdrop of lower volumes.", 1.2e9),
+    ("Total quarterly revenue increased 26% YoY to $28.2B.", 28.2e9),
+    ("Net sales increased 20% to $200.6 billion in the second quarter, compared with $167.7 "
+     "billion in second quarter 2025.", 200.6e9),
+    ("Consolidated Alphabet revenues increased 24%, or 23% in constant currency, to $119.8 "
+     "billion. Google Cloud revenues increased 82% to $24.8 billion.", 119.8e9),
+    ("Revenues: Total revenues for the second quarter of 2026 were $122.4 million, compared to "
+     "total revenues of $114.5 million for the second quarter of 2025.", 122.4e6),
+    ("Revenue \u2013 Revenue was $60.80 billion, an increase of 28% year-over-year.", 60.8e9),
+    ("Data Center revenue was $89.0 billion. Revenue of $96.2 billion, up 106%.", 96.2e9),
+])
+def test_the_reported_revenue_is_the_figure_stated_beside_the_word(text: str,
+                                                                   revenue: float) -> None:
+    from argus.market.earnings_release import parse
+
+    assert parse(text)["revenue"] == pytest.approx(revenue)

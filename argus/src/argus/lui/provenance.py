@@ -20,6 +20,9 @@ a price read a second ago from a figure computed on it or from a record measured
 * ``missing`` — something that could not be read or checked, said as such.
 * ``memory`` — something the trader told the console earlier (`lui/memory.py`), shown where it
   shaped the answer.
+* ``explained`` — fixed text written into the console: a definition, how the risk layer works,
+  how buying on Bitget works. Nothing in it is computed for the answer; a number it states is read
+  from the code that enforces it.
 
 **How a line gets its label.** The rivals attach a label where the number is made; ARGUS's lines
 are made in several hundred places, so the label is read from the wording those places share —
@@ -45,7 +48,22 @@ import re
 from collections.abc import Mapping, Sequence
 from typing import Any
 
-LABELS = ("live", "computed", "record", "desk", "assumed", "missing", "memory")
+LABELS = ("live", "computed", "record", "desk", "assumed", "missing", "memory", "explained")
+
+_EXPLAINED: set[str] = set()
+"""Fixed text written into the console — a definition, how the risk layer works, how buying on
+Bitget works — registered by the module that writes it (:func:`explains`). Such a line computes
+nothing for the answer, and a lead of it was labelled ``computed`` (a first-time-user audit,
+2026-09-30); ``explained`` says what it is."""
+
+
+def explains(*lines: str) -> None:
+    """Register lines of fixed explanatory text, so each is labelled ``explained`` wherever it is
+    shown, with or without a "Bottom line:" before it."""
+    for line in lines:
+        text = re.sub(r"^(?:Bottom line|How to read it|[^:]{1,40}):\s*", "", line.strip())
+        _EXPLAINED.add(line.strip())
+        _EXPLAINED.add(text)
 
 _META = re.compile(r"^(?:Data:|Sources reached|Sources:|Quoted \d|Caveat:|Method:|Corrected:|"
                    r"Computed by ARGUS\b|Read as filed:|Read as: \"|"
@@ -206,6 +224,9 @@ def label(line: str) -> str | None:
     text = line.strip()
     if not text or _META.search(text):
         return None
+    if text in _EXPLAINED or re.sub(r"^(?:Bottom line|How to read it|[^:]{1,40}):\s*", "",
+                                    text) in _EXPLAINED:
+        return "explained"
     lead = re.match(r"^(?:Actionable|Bottom line)(?: \(\w+\))?:\s*(.+)$", text)
     if lead is not None:
         # A lead is labelled by what it is, not by being first: a live reading promoted to the

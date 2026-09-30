@@ -60,7 +60,7 @@ def test_every_surface_carries_the_labels(monkeypatch: pytest.MonkeyPatch) -> No
     assert "Assumed: 20%. <i>· assumed</i>" in text and "Data: Bitget.\n" in text + "\n"
     assert mcp_server._answer_text(payload).startswith("[assumed] Assumed: 20%.\nData: Bitget.")
     assert provenance.LABELS == ("live", "computed", "record", "desk", "assumed", "missing",
-                                 "memory")
+                                 "memory", "explained")
     # every label has its meaning on the page, so a chip is never unexplained
     from argus.lui.server import PAGE
 

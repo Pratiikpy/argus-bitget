@@ -83,8 +83,14 @@ def _distribution_line(symbol: str, raw: Mapping[str, Mapping[datetime, float]],
     tails = ("fat-tailed — large hourly moves are far more common than a normal curve implies"
              if shape[1] > 3 else "close to normal in its tails" if shape[1] < 1 else
              "moderately fat-tailed")
-    return (f"Return shape over {len(hourly)} hourly bars: realised volatility {vol:.0%} a year, "
-            f"skew {shape[0]:+.2f}, excess kurtosis {shape[1]:.1f} ({tails}){r2}.")
+    # Each statistic with its meaning beside it: a first-time user met "skew +0.81" and "R²" with
+    # no word on what either says (the round-8 first-user audit, 2026-09-30).
+    lean = ("the large moves have been upward more often than downward" if shape[0] > 0.3 else
+            "the large moves have been downward more often than upward" if shape[0] < -0.3 else
+            "large moves have come about as often up as down")
+    return (f"Return shape over {len(hourly)} hourly bars: realised volatility {vol:.0%} a year "
+            f"(how far it typically swings), skew {shape[0]:+.2f} ({lean}), excess kurtosis "
+            f"{shape[1]:.1f} ({tails}){r2}.")
 
 
 def _venue(symbol: str, is_open: Any, spot: str | None = None

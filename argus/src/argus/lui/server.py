@@ -135,6 +135,7 @@ PAGE = """<!doctype html>
   .pv-live { color:var(--accent); border-color:color-mix(in srgb, var(--accent) 55%, transparent) }
   .pv-record { font-style:italic }
   .pv-memory { color:var(--ink); border-style:dotted }
+  .pv-explained { color:var(--dim) }
   .mem { display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin:-8px 0 16px;
     font-size:12.5px; color:var(--dim) }
   .mem .fact { border:1px dotted var(--line); border-radius:999px; padding:3px 9px;
@@ -299,7 +300,9 @@ const PV = {
   desk: "quoted from the desk's own logged decision",
   assumed: 'a default applied because the question did not say',
   memory: 'something you told the console earlier, kept in this browser',
-  missing: 'could not be read or checked'};
+  missing: 'could not be read or checked',
+  explained: 'written into the console to explain a term or a rule; nothing in it is ' +
+    'computed for this answer'};
 const pv = t => t ? `<span class="pv pv-${t}" title="${PV[t]}">${t}</span>` : '';
 const lineClass = l => /^(Actionable|Bottom line)(?: \\([^)]*\\))?:/.test(l) ? 'line act'
   : l.startsWith('Hedge:') ? 'line hedge'
@@ -408,6 +411,11 @@ document.getElementById('f').addEventListener('submit', async ev => {
         <div class="meta">
           <span class="tag">answered in ${(a.elapsed_ms / 1000).toFixed(1)} s</span>
           ${a.refused ? '<span class="tag over">refused</span>' : ''}
+          ${a.model_left !== undefined && a.model_left <= 10 ? `<span class="tag" title="` +
+            `Counted per network address. After these, the console's own readers answer, in ` +
+            `English, for up to an hour.">` +
+            `language model: ${a.model_left} question${a.model_left === 1 ? '' : 's'} left ` +
+            `this hour</span>` : ''}
         </div>
         <div class="lines">${collapseLines(a.lines.map((l, i) =>
           `<div class="${lineClass(l)}">${pv((a.line_labels || [])[i])}${linked(l)}</div>`),
@@ -573,6 +581,36 @@ _ANOTHER_PERIOD = re.compile(
     r"(?:last|past)\s+)?(?P<n>\d+|a|one|two|three|four|five|ten)\s+(?P<unit>years?|months?)"
     r"(?:\s+ago)?\s*[?.!]*\s*$", re.I)
 """A follow-up that changes only the period: "what about 5 years?"."""
+
+def _sentence_case(text: str) -> str:
+    """``text`` continued mid-sentence: its first letter lowered unless the first word is a name or
+    a ticker ("TSLA carries..." stays, "The book..." becomes "the book...")."""
+    first = text.split(" ", 1)[0]
+    return text if any(c.isupper() for c in first[1:]) else text[:1].lower() + text[1:]
+
+
+def riskexplain_asked(text: str) -> bool:
+    """Whether the question is about the risk layer's mechanism, which has its own answer."""
+    from argus.lui import riskexplain
+
+    return bool(riskexplain.RISK_HOW_Q.search(text))
+
+
+_ALLOWANCE_ASKED = re.compile(
+    r"\bhow\s+many\s+(?:more\s+)?(?:questions|queries|asks|messages)\b[^?]{0,30}\b(?:left|remaining|"
+    r"do\s+i\s+get|can\s+i\s+ask)|\b(?:question|model|usage|rate)\s+(?:limit|allowance|quota)\b|"
+    r"\bquestions?\s+(?:do\s+i\s+have\s+)?left\b", re.I)
+"""A question about the hourly allowance itself."""
+
+_WHY_THAT = re.compile(
+    r"^\s*(?:but\s+|and\s+|so\s+|ok\s+|okay\s+)?why\s*[?.!]*\s*$|"
+    r"^\s*(?:but\s+|and\s+)?why\s+(?:do|did|would)\s+you\s+(?:say|think|conclude|recommend|suggest)"
+    r"\s+(?:that|this|so)\b[^?]*[?.!]*\s*$|"
+    r"^\s*(?:how|why)\s+(?:do|did)\s+you\s+(?:know|get|work\s+(?:that|it)\s+out)\b[^?]*[?.!]*\s*$|"
+    r"^\s*(?:what'?s|what\s+is)\s+(?:that|this)\s+based\s+on\s*[?.!]*\s*$|"
+    r"^\s*(?:explain|show)\s+(?:me\s+)?(?:your|the)\s+(?:reasoning|working|evidence)\s*[?.!]*\s*$",
+    re.I)
+"""A request for the reasons behind the previous answer."""
 
 _SIMPLER = re.compile(
     r"^\s*(?:(?:can\s+you\s+|please\s+)?(?:explain|say|put)\s+(?:it|that|this)?\s*(?:again\s+)?"
@@ -830,7 +868,14 @@ def handle_ask(
     facts = mem.merge(facts, new)
     token = _MEMORY.set(tuple(facts))
     try:
+        from argus.lui.honesty import iso_dates
+
+        # "13/02/2024" and "02/13/2024" read as the date they are before anything else reads the
+        # question (a hostile review, 2026-09-30); an order that had to be assumed is said.
+        text, date_note = iso_dates(text)
         payload = _answer(text, prior, now=now, visitor=visitor, book=book)
+        if date_note and payload.get("lines"):
+            payload["lines"] = [*payload["lines"], f"Assumed: {date_note}."]
         from argus.lui.honesty import order_prefix
 
         prefix = order_prefix(text)
@@ -885,6 +930,10 @@ def handle_ask(
         first = lines[0].removeprefix("Bottom line: ")
         payload["lines"] = [f"Bottom line: {corrected}", first[:1].upper() + first[1:],
                             *lines[1:]]
+    if visitor != "local":
+        # Shown on the answer once ten or fewer are left: two auditors met the pause mid-session
+        # with nothing before it to say it was coming (the round-7 audits, 2026-09-30).
+        payload["model_left"] = allowance_left(visitor)
     if visitor != "local" and allowance_spent(visitor) and payload.get("lines"):
         # Over the hourly allowance the console still answers, from its own readers; it says so,
         # so a worse reading is never mistaken for the console's best (a judge's audit, 2026-09-29).
@@ -985,12 +1034,44 @@ def _answer(
         return engine_payload(*arbitrage.answer(text), by="arbitrage")
     if onchain.asks_for_gas(text):
         return engine_payload(*onchain.gas(text), by="eth-gas")
+    from argus.lui import architecture
+
+    if architecture.ARCHITECTURE_Q.search(text) and not riskexplain_asked(text):
+        # "Walk me through your architecture" opened on one ledger row's evidence (a judge's
+        # audit, 2026-09-30).
+        return engine_payload(*architecture.answer(), by="architecture")
+    from argus.lui import riskexplain
+
+    if riskexplain.RISK_HOW_Q.search(text):
+        # "How does your risk control layer actually work, step by step?" got the count of
+        # decisions it reduced, not the mechanism (a judge's audit, 2026-09-30).
+        return engine_payload(*riskexplain.answer(), by="risk-mechanism")
+    from argus.lui import edge
+
+    edge_named = research_symbols(text)[0]
+    if edge_named and edge.EDGE_ON_NAME_Q.search(text):
+        return engine_payload(*edge.name_answer(ledger, edge_named[0]), by="edge")
+    if edge.EDGE_Q.search(text) and re.search(r"\b(?:you|your|argus'?s?|the\s+desk'?s?|we|our)\b",
+                                              text, re.I):
+        # "What's ARGUS's edge over a simple buy-and-hold strategy?" was answered "No open
+        # positions" (a judge's audit, 2026-09-30).
+        return engine_payload(*edge.answer(ledger), by="edge")
     from argus.lui import rivals
 
     if rivals.asks_about_a_rival(text):
         # "how does ARGUS compare to Nautilus Trader": the register's rows against that rival
         # (`lui/rivals.py`), not an adjacent statistic (fresh-eyes audit, 2026-09-29).
         return engine_payload(*rivals.answer(text), by="rivals")
+    from argus.lui.research import splits
+
+    split_named = research_symbols(text)[0]
+    if split_named and splits.SPLIT_CLAIM.search(text) and not about_the_record(text):
+        # "after NVDA's 3-for-1 split last week, what's my 30 share position worth": no such
+        # split, and neither the premise nor the 30 shares were answered (a hostile review,
+        # 2026-09-30).
+        checked = splits.check(text, split_named[0], price=_price_now)
+        if checked is not None:
+            return engine_payload(*checked, by="split-check")
     from argus.lui.research import sizing
 
     if sizing.asks_for_size(text) and not about_the_record(text):
@@ -999,6 +1080,38 @@ def _answer(
         sized = research_symbols(text)[0]
         return engine_payload(*sizing.answer(text, sized[0] if sized else None, price=_price_now,
                                              worst_day=_worst_day), by="sizing")
+    if _ALLOWANCE_ASKED.search(text):
+        # "how many questions do i have left" was declined while the tag on the same card showed
+        # the count (the round-8 first-user audit, 2026-09-30).
+        left = allowance_left(visitor) if visitor != "local" else MODEL_CALLS_PER_VISITOR_PER_HOUR
+        return engine_payload([
+            f"Bottom line: {left} of {MODEL_CALLS_PER_VISITOR_PER_HOUR} questions are left this "
+            f"hour for the language model to read; the count is per network address, so people "
+            f"on the same network share it.",
+            "After that, for up to an hour, the console's own readers answer, in English — every "
+            "figure is still computed from live data, and questions that name what they want "
+            "(\"NVDA price\", \"is TSLA riskier than NVDA\") read just as well."], [],
+            {"model_left": left}, by="allowance")
+    from argus.lui import newcomer
+
+    first_steps = (None if about_the_record(text)
+                   else newcomer.reply(text, named=bool(research_symbols(text)[0])))
+    if first_steps is not None:
+        # "is this financial advice", "how do i buy crypto", "should i buy the dip" were all
+        # declined as unrecognised (a first-time-user audit, 2026-09-30).
+        if first_steps.lines:
+            return engine_payload(list(first_steps.lines), [], {}, by="newcomer")
+        named_first = research_symbols(text)[0]
+        subject = named_first[0].removesuffix("USDT") if named_first else "BTC"
+        answered = _answer(first_steps.reask.format(name=subject), prior, now=now,
+                           visitor=visitor, book=book)
+        said = ([first_steps.note] if first_steps.note else []) + (
+            [] if named_first or "{name}" not in first_steps.reask
+            else ["no name was given, so BTC is the worked example"])
+        answered["lines"] = [*answered.get("lines", []), *(f"Assumed: {n}." for n in said)]
+        answered["turns"] = [*prior, text][-12:]
+        answered["classified_by"] = "newcomer"
+        return answered
     from argus.lui.research import starter
 
     if starter.amount_of(text) is not None and not about_the_record(text):
@@ -1014,6 +1127,14 @@ def _answer(
         # A long message that mentions a term in passing is not a request to define it: a
         # paragraph of several questions got only the stop-loss definition (first-user audit).
         concept = None
+    if concept is not None and named_now:
+        # A named scenario that uses the term is the engine's, not the glossary's: "Explain the
+        # risk in shorting DOGE with 20x leverage" got leverage defined (live, 2026-09-30).
+        from argus.lui.research import detect as detect_research_request
+
+        scenario = detect_research_request(text)
+        if scenario is not None and scenario.kind is ResearchKind.LEVERAGE:
+            concept = None
     if concept is not None and not about_the_record(text):
         # "explain what RSI means like I'm new to trading" was answered with an unrelated
         # decision's trace (a judge's audit, 2026-09-29): the definition, then its live reading.
@@ -1166,6 +1287,42 @@ def _answer(
                 f"\"{prior[-1][:60]}\"; ask it with a name to change the subject."]
             again["turns"] = [*prior, text][-12:]
             again["classified_by"] = "research-follow-up"
+            return again
+    if _WHY_THAT.match(text) and prior:
+        # "Why do you say that?" after a research answer was declined, and a bare "why" returned
+        # an answer from three questions earlier (the round-7 judge and first-user audits,
+        # 2026-09-30): the reasons are the previous answer's own evidence and sources.
+        again = _answer(prior[-1], prior[:-1], now=now, visitor=visitor, book=book)
+        before = [str(line) for line in again.get("lines") or []]
+        engine_said = str(again.get("classified_by") or "") not in (
+            "patterns", "ngram", "router", "declined", "declined-off-topic", "")
+        if before and engine_said and not again.get("refused"):
+            head = before[0].removeprefix("Bottom line: ").rstrip(".")
+            support = [line for line in before[1:]
+                       if not re.match(r"(?:Data|Assumed|Sources reached|Missing):", line)][:6]
+            receipt = "; ".join(f"{s.get('kind')}: {s.get('ref')}"
+                                for s in (again.get("sources") or [])[:4]
+                                if isinstance(s, dict))
+            again["lines"] = [
+                f"Bottom line: the last answer said {_sentence_case(head)} — because of "
+                f"what follows, each line computed from the sources under it.",
+                *support,
+                *([f"Read from: {receipt}."] if receipt else []),
+                f"Assumed: read as asking why the previous answer said what it did — "
+                f"\"{prior[-1][:60]}\"."]
+            again["turns"] = [*prior, text][-12:]
+            again["classified_by"] = "research-follow-up"
+            return again
+        if before and not again.get("refused"):
+            # The previous answer came from the desk's own record ("why did you skip NVDA"):
+            # its reasons are that record, said again, not a research reading of its ticker,
+            # which is what the research follow-up made of it (2026-09-30).
+            again["lines"] = [
+                "Bottom line: the last answer came from the desk's own record — the entries "
+                "below are its reasons, as the desk logged them when it decided.", *before,
+                f"Assumed: read as asking why the previous answer said what it did — "
+                f"\"{prior[-1][:60]}\"."]
+            again["turns"] = [*prior, text][-12:]
             return again
     if _WHICH_ONE.match(text) and prior:
         # "which one has better momentum" after asking about BTC and then ETH compares the two
@@ -1537,13 +1694,18 @@ def _model_for(visitor: str, *, count: bool = True) -> Router | None:
     return _router()
 
 
-def allowance_spent(visitor: str) -> bool:
-    """Whether this visitor's hourly allowance is used up, so an answer can say so."""
+def allowance_left(visitor: str) -> int:
+    """How many more questions this visitor's hourly allowance lets the language model read."""
     import time
 
     now = time.monotonic()
-    return len([t for t in _VISITS.get(visitor, []) if now - t < 3600.0]) \
-        >= MODEL_CALLS_PER_VISITOR_PER_HOUR
+    used = len([t for t in _VISITS.get(visitor, []) if now - t < 3600.0])
+    return max(0, MODEL_CALLS_PER_VISITOR_PER_HOUR - used)
+
+
+def allowance_spent(visitor: str) -> bool:
+    """Whether this visitor's hourly allowance is used up, so an answer can say so."""
+    return allowance_left(visitor) == 0
 
 
 ALLOWANCE_NOTE = ("The language model is paused for you for up to an hour (the hourly allowance on "

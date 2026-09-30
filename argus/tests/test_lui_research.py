@@ -427,6 +427,7 @@ class TestTechnicals:
     def test_the_figures_are_the_skills_and_named_as_such(
             self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setattr(research.technicals, "_skill_calls", _skills(rsi=75.0, hist=0.5))
+        monkeypatch.setattr(research.technicals, "swing_levels", lambda *a, **k: None)
         answer = run("q", ResearchRequest(kind=ResearchKind.TECHNICALS, symbols=("NVDAUSDT",)))
         assert answer.lines[0].startswith("Bottom line:") and "overbought" in answer.lines[0]
         assert "within 1% of resistance" in answer.lines[0]
@@ -435,6 +436,7 @@ class TestTechnicals:
 
     def test_a_neutral_tape_says_neutral(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setattr(research.technicals, "_skill_calls", _skills(rsi=50.0, hist=0.0))
+        monkeypatch.setattr(research.technicals, "swing_levels", lambda *a, **k: None)
         lines, _ = research.technicals._technicals("NVDAUSDT")
         assert "overbought" not in lines[0] and "oversold" not in lines[0]
 

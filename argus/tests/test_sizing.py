@@ -128,3 +128,32 @@ def test_a_crypto_book_is_read_on_every_hour_and_a_stock_book_on_the_session() -
     lines, _, payload = _book_report(stock, _synthetic(("NVDAUSDT", "BTCUSDT")), us_open)
     assert any("open-session hours" in line for line in lines)
     assert payload["worst_window"]["move_pct"] > -4.0  # the session never saw it
+
+
+@pytest.mark.parametrize(("text", "said"), [
+    # a hostile review, 2026-09-30: each of these reached the stress or execution engine, and a $0
+    # account was given a $250,000 order plan
+    ("$0 account, risk 2%, stop 1%, how much BTC should I buy", "an account of $0"),
+    ("risk 150% of my $20k account with a 5% stop, what size", "is not a risk budget"),
+    ("$10k account, risk $200, entry 100, stop at 100", "a stop at the entry is no distance"),
+    ("risk 2% of my 50k account, how big a position in NVDA", "no stop was given"),
+    ("short TSLA, entry 350, stop 340, risk $200", "a short's stop sits above its entry"),
+])
+def test_an_input_no_honest_size_follows_from_is_refused_with_the_reason(text: str,
+                                                                          said: str) -> None:
+    assert sizing.asks_for_size(text)
+    lines, _, data = sizing.answer(text)
+    assert data["sizing"] is None
+    assert said in lines[0]
+
+
+def test_a_stop_above_the_entry_is_sized_as_a_short_and_says_so() -> None:
+    lines, _, data = sizing.answer("$10k account, risk $100, entry 100, stop at 105")
+    assert data["sizing"]["stop"] == pytest.approx(0.05)
+    assert "(a short)" in lines[0]
+    assert any("sized as a short" in line for line in lines)
+
+
+def test_a_budget_and_a_stop_are_a_sizing_question_however_worded() -> None:
+    assert sizing.asks_for_size("$10k account, risk $500, entry 100, stop 95")
+    assert not sizing.asks_for_size("what is the risk of a 2% drop")

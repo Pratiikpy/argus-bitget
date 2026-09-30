@@ -362,9 +362,13 @@ def _depth_lines(symbol: str, notional: Decimal, adv: Decimal, plan: Any,
         verdict = (" — the book absorbs it, so splitting saves little beyond the passive fills."
                    if float(whole.slippage_bps) < 2 else
                    " — enough book impact that splitting on the schedule below is worth doing.")
+    # The cost in dollars beside the basis points: "what does it cost to buy $500 of BTC" was
+    # answered "6.0bps", a unit a newcomer asking it does not read (2026-09-30).
+    dollars = float(notional) * one_shot / 10_000
     lines.insert(0, (
         f"Bottom line: in one market order this costs {at_least or 'about '}{one_shot:.1f}bps "
-        f"({fee:.1f}bps fee + {at_least}{float(whole.slippage_bps):.1f}bps book impact)"
+        f"({fee:.1f}bps fee + {at_least}{float(whole.slippage_bps):.1f}bps book impact), "
+        f"{at_least or 'about '}${dollars:,.2f} on ${float(notional):,.0f}"
         + verdict))
     return lines
 
