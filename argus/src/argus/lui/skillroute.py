@@ -41,6 +41,15 @@ SKILL_WAIT_S = 8.0
 COOLDOWN_S = 900.0
 """After a Skill fails, how long it is answered from its mirror without being asked again."""
 
+FRESH_S = 1800.0
+"""How long a Skill's own answer is reused, said with the time it was read. The Skills often take
+15 to 30 seconds and an answer waits a few, so asked live they were mostly seen as their fallbacks
+(a judge's audit, round 11, 2026-09-30: rates_yields and news_feed "did not answer in time"). An
+answer the Skill gave within the half hour is still the Skill's answer, labelled as read then."""
+
+BACKGROUND_WAIT_S = 45.0
+"""How long a background ask may take: long enough for a slow Skill, and off the answer's path."""
+
 SkillCall = Callable[[str, dict[str, Any], float], tuple[Any, str]]
 MirrorCall = Callable[[str, dict[str, Any]], tuple[Health, str, Any, str, bool]]
 
@@ -65,6 +74,8 @@ class Routed:
     """When the Skill was last actually asked (UTC), which is now unless it is cooling down."""
     reused: bool = False
     """True when the Skill was not re-asked because it failed within :data:`COOLDOWN_S`."""
+    cached: bool = False
+    """True when the payload is the Skill's own answer from earlier, read at :attr:`asked_at`."""
 
     @property
     def ident(self) -> str:
@@ -85,7 +96,9 @@ class Routed:
         if self.via == "skill":
             owner = (f"Bitget's {self.skill} Skill" if self.skill != "server"
                      else "a bitget-signal tool no SKILL.md names")
-            return Source(kind="venue", ref=f"bitget-signal {self.ident}", detail=f"{owner}, live")
+            return Source(kind="venue", ref=f"bitget-signal {self.ident}",
+                          detail=(f"{owner}, read at {self.asked_at}" if self.cached
+                                  else f"{owner}, live"))
         why = f"the Skill {self.skill_said}"
         relation = ("the source bitget-signal's " if self.same_upstream
                     else "standing in for the keyed source of bitget-signal's ")
@@ -102,7 +115,50 @@ _SAID = {
 }
 
 _DOWN: dict[str, tuple[float, Health, str, str]] = {}
+_FRESH: dict[str, tuple[float, Any, str]] = {}
+"""The last answer each Skill call gave: when (monotonic), the payload, and the UTC time said."""
+_ASKING: set[str] = set()
+"""Calls a background ask is already out for, so a busy page does not stack them."""
 _LOCK = threading.Lock()
+
+
+def _key(ident: str, call_args: Mapping[str, Any]) -> str:
+    import json
+
+    return ident + json.dumps(dict(call_args), sort_keys=True, default=str)
+
+
+def _start(job: Callable[[], None]) -> None:
+    threading.Thread(target=job, name="skill-background", daemon=True).start()
+
+
+_START: Callable[[Callable[[], None]], None] = _start
+"""How a background ask is started; a test runs it inline or not at all."""
+
+
+def _ask_in_background(key: str, ask: SkillCall, tool: str, call_args: dict[str, Any],
+                       ident: str, now: Callable[[], float]) -> None:
+    """Ask the Skill with a long wait, off the answer's path; keep what it says if it answered."""
+    with _LOCK:
+        if key in _ASKING:
+            return
+        _ASKING.add(key)
+
+    def run() -> None:
+        try:
+            payload, status = ask(tool, call_args, BACKGROUND_WAIT_S)
+            health, _detail = classify_reply(payload, status)
+            if health is Health.OK:
+                with _LOCK:
+                    _FRESH[key] = (now(), payload, datetime.now(UTC).strftime("%H:%M UTC"))
+                    _DOWN.pop(ident, None)
+        except Exception:
+            pass  # the answer path already said the Skill did not answer
+        finally:
+            with _LOCK:
+                _ASKING.discard(key)
+
+    _START(run)
 
 
 def _skill_of(tool: str, action: str) -> str:
@@ -143,9 +199,17 @@ def route(tool: str, action: str, args: Mapping[str, Any] | None = None, *,
     skill = _skill_of(tool, action)
     ask = skill_call or _default_skill
     mirror = mirror_call or _default_mirror
+    key = _key(ident, call_args)
     with _LOCK:
         down = _DOWN.get(ident)
+        fresh = _FRESH.get(key)
+    if fresh is not None and now() - fresh[0] < FRESH_S:
+        if now() - fresh[0] > FRESH_S / 6:
+            _ask_in_background(key, ask, tool, call_args, ident, now)
+        return Routed(tool, action, skill, Health.OK, "answered", "skill", fresh[1],
+                      asked_at=fresh[2], cached=True)
     if down is not None and now() - down[0] < COOLDOWN_S:
+        _ask_in_background(key, ask, tool, call_args, ident, now)
         health, _detail, payload, upstream, same = mirror(ident, call_args)
         _, skill_health, skill_detail, asked_at = down
         return Routed(tool, action, skill, skill_health, skill_detail,
@@ -165,10 +229,14 @@ def route(tool: str, action: str, args: Mapping[str, Any] | None = None, *,
         if skill_health is Health.OK:
             with _LOCK:
                 _DOWN.pop(ident, None)
+                _FRESH[key] = (now(), payload, asked_at)
             return Routed(tool, action, skill, skill_health, skill_detail, "skill", payload,
                           asked_at=asked_at)
         with _LOCK:
             _DOWN[ident] = (now(), skill_health, skill_detail, asked_at)
+        # Not answered in the few seconds an answer can wait: asked again with time to answer, so
+        # the next question is answered by the Skill rather than its fallback.
+        _ask_in_background(key, ask, tool, call_args, ident, now)
         health, _detail, mirrored, upstream, same = mirror_job.result()
     finally:
         pool.shutdown(wait=False)  # a Skill that answered does not wait for the mirror
@@ -183,6 +251,9 @@ def reset() -> None:
     """Forget every cooling-down Skill (tests; a restarted server starts clean anyway)."""
     with _LOCK:
         _DOWN.clear()
+        _FRESH.clear()
+        _ASKING.clear()
 
 
-__all__ = ["COOLDOWN_S", "SKILL_WAIT_S", "Routed", "reset", "route"]
+__all__ = ["BACKGROUND_WAIT_S", "COOLDOWN_S", "FRESH_S", "SKILL_WAIT_S", "Routed", "reset",
+           "route"]

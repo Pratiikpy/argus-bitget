@@ -61,7 +61,7 @@ def _crypto_anchor_line(symbol: str, raw: Mapping[str, Mapping[datetime, float]]
                    f"more than BTC does")
     return (f"{_t(symbol)} against bitcoin: {b:.2f}x BTC's hourly move across all "
             f"{len(both.get(symbol, []))} aligned hours, correlation {rho:+.2f} (R² "
-            f"{rho * rho:.0%}){verdict}.")
+            f"{rho * rho:.0%}: the share of its moves bitcoin's explain){verdict}.")
 
 
 def _distribution_line(symbol: str, raw: Mapping[str, Mapping[datetime, float]],

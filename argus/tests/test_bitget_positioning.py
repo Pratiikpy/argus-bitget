@@ -70,7 +70,8 @@ def test_an_ex_dividend_date_is_shown_only_when_it_is_near(
 
 
 def test_a_bitcoin_treasury_is_valued_against_the_company(
-        monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch: pytest.MonkeyPatch, tmp_path: Any) -> None:
+    monkeypatch.setattr("argus.truth.paths.DATA_DIR", tmp_path)  # no second treasury record
     _serve(monkeypatch, {"crypto_institutional_company_flow": [
         {"company_name": "Strategy", "ticker": "MSTR", "holding_balance": 846842.0,
          "ts": "1790092800000"},
@@ -80,7 +81,8 @@ def test_a_bitcoin_treasury_is_valued_against_the_company(
          "ts": "1790092800000"}]})
     line = bp.bitcoin_treasury("MSTR", 61.0e9, 83_518.0)
     assert line is not None
-    assert line.startswith("Strategy holds 846,842 BTC, worth $70.7bn at $83,518")
+    # dated, since round 11: a second feed on the same page carried a later figure
+    assert line.startswith("Strategy holds 846,842 BTC as of 22 Sep 2026, worth $70.7bn at $83,518")
     assert "0.86x its bitcoin" in line
     assert bp.bitcoin_treasury("TSLA", 1e12, 83_518.0) is None
 

@@ -25,6 +25,9 @@ _GENERIC = frozenset({
     "that", "model", "agent", "agents", "system", "engine", "stack", "measure", "worse", "beat",
     "data", "real", "research", "market", "stock", "stocks", "crypto", "bitget", "open", "source",
     "bitcoin", "ether", "ethereum", "gold", "silver", "nasdaq", "index", "funds", "fund",
+    # "how many capabilities have you tested against rivals" named a rival "tested" (round 11)
+    "tested", "test", "tests", "capability", "capabilities", "many", "rival", "rivals",
+    "named", "measured", "competitors", "competitor", "systems", "beaten",
 })
 """Words a question and a baseline share without naming a rival."""
 
@@ -88,7 +91,8 @@ def answer(text: str) -> tuple[list[str], list[Source], dict[str, Any]]:
     rows = sorted(rows, key=lambda c: (order.get(c.state.value, 9), c.name))
     counts = {s: sum(1 for c in rows if c.state.value == s) for s in order}
     tally = ", ".join(f"{n} {s.upper()}" for s, n in counts.items() if n)
-    lines = [f"Bottom line: {len(rows)} capability row(s) in ARGUS's register were measured "
+    rows_said = f"{len(rows)} capability row{' was' if len(rows) == 1 else 's were'}"
+    lines = [f"Bottom line: in ARGUS's register, {rows_said} measured "
              f"against {named}: {tally}. Each state below is the register's own, re-derived "
              f"from its artefacts, not a claim written for this answer."]
     for cap in rows[:6]:

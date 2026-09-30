@@ -30,12 +30,15 @@ class Reply:
     """A question for the console's own engines, when the answer is a computed one."""
     note: str | None = ""
     """What the re-asked question assumed, said under the answer."""
+    lead: str = ""
+    """A first line that answers the question as asked, above the engine's ("{name}" filled in)."""
 
 
 _ADVICE = re.compile(
     r"\b(?:is\s+(?:this|it|that|argus)\s+(?:financial\s+|investment\s+)?advice|are\s+you\s+(?:a\s+)?"
     r"(?:financial\s+|investment\s+)?advis[eo]r|can\s+i\s+trust\s+(?:this|you|it|argus)|should\s+i\s+"
-    r"(?:trust|follow|listen\s+to)\s+(?:you|this|argus))\b", re.I)
+    r"(?:trust|follow|listen\s+to)\s+(?:you|this|argus)|are\s+you\s+(?:giving\s+(?:me\s+)?)?"
+    r"(?:financial|investment)\s+advice)\b", re.I)
 _HOW_TO_BUY = re.compile(
     r"\bhow\s+(?:do\s+i|to|can\s+i|would\s+i)\s+(?:buy|get|purchase|start\s+(?:buying|trading|"
     r"investing))\s*(?:(?:some\s+)?(?:crypto|bitcoin|btc|ethereum|eth|stocks?|shares?|coins?|"
@@ -53,7 +56,9 @@ _GO_WRONG = re.compile(
     r"risks\b|\bwhat\s+(?:could|can)\s+i\s+lose\b", re.I)
 _GOOD_TIME = re.compile(
     r"\bis\s+(?:now|this|today|it)\s+(?:a\s+)?(?:good|bad|the\s+right|right)\s+time\s+to\s+"
-    r"(?:buy|invest|get\s+in|start)\b|\bshould\s+i\s+(?:buy|invest|get\s+in)\s+now\b", re.I)
+    r"(?:buy|invest|get\s+in|start|sell|get\s+out)\b|\bshould\s+i\s+(?:buy|invest|get\s+in|sell|"
+    r"get\s+out)(?:\s+(?:my|all\s+my|everything|some)?\s*(?:crypto|coins?|stocks?|shares?|"
+    r"holdings|positions?))?\s+(?:right\s+)?now\b", re.I)
 _HOW_MUCH_BARE = re.compile(
     r"\bhow\s+much\s+(?:money\s+)?(?:should|can|could|do)\s+i\s+(?:put\s+in(?:to)?|invest|start\s+with)"
     r"\b|\brecommend\w*\b|\bwhat\s+would\s+you\s+do\s+with\b", re.I)
@@ -70,7 +75,28 @@ _DIP = re.compile(r"\bbuy(?:ing)?\s+(?:the|this)\s+dip\b|\bdip\s+buy", re.I)
 _BEGINNER_PICK = re.compile(
     r"\b(?:good|best|safe|safest|first)\s+(?:stocks?|coins?|crypto|investments?|things?)\s+(?:for|to)"
     r"\s+(?:a\s+)?(?:beginners?|newbies?|start|buy\s+first)\b|\bwhat\s+should\s+(?:a\s+)?beginners?\s+"
-    r"(?:buy|invest\s+in)\b|\bbeginner\s+(?:stocks?|picks?|coins?)\b", re.I)
+    r"(?:buy|invest\s+in)\b|\bbeginner\s+(?:stocks?|picks?|coins?)\b|"
+    # "whats the best coin to buy right now" was answered "No open positions" (round 11)
+    r"\b(?:best|top|hottest)\s+(?:\w+\s+)?(?:coins?|crypto|cryptos|stocks?|tokens?)\s+to\s+"
+    r"(?:buy|invest\s+in|get)\b", re.I)
+
+_MONEY_SAFE = re.compile(
+    r"\bis\s+my\s+(?:money|crypto|account|deposit|cash|capital)\s+safe\b|\bis\s+(?:this|it|argus|"
+    r"this\s+site)\s+(?:a\s+)?(?:scam|safe|legit|legitimate)\b|\b(?:do|does|can)\s+(?:you|argus|"
+    r"this)\s+(?:hold|keep|take|touch|access)\s+my\s+(?:money|funds|crypto|account)\b", re.I)
+"""A newcomer asking whether their money is safe here (a first-time user, round 11: answered with
+how rTokens and perpetuals differ)."""
+
+_SAFE = (
+    "Bottom line: this console never holds, moves or touches money: there is no account to open, "
+    "no login, no deposit and no connection to your Bitget account — it reads public market data "
+    "and answers questions, nothing more.",
+    "Money you keep on Bitget is held by Bitget, the exchange; its safety is Bitget's, and ARGUS "
+    "does not audit it. Bitget publishes its own reserve reports on its site — read those, and "
+    "keep only what you can afford to lose on any exchange.",
+    "No order is ever placed from here: the trading commands the console shows are marked "
+    "--dry-run, which previews an order and sends nothing.",
+)
 
 _NOT_ADVICE = (
     "Bottom line: no — this console never tells anyone what to buy or sell. It computes from live "
@@ -123,7 +149,7 @@ _GOING_WRONG = (
 )
 
 
-explains(*_NOT_ADVICE, *_BUYING, *_LOSING, *_GOING_WRONG, *_NO_GUARANTEE)
+explains(*_NOT_ADVICE, *_BUYING, *_LOSING, *_GOING_WRONG, *_NO_GUARANTEE, *_SAFE)
 
 def reply(text: str, *, named: bool = False) -> Reply | None:
     """The newcomer answer to ``text``, or None when it is not one of these questions.
@@ -138,6 +164,8 @@ def reply(text: str, *, named: bool = False) -> Reply | None:
         return Reply(lines=_NO_GUARANTEE)
     if _ADVICE.search(text):
         return Reply(lines=_NOT_ADVICE)
+    if _MONEY_SAFE.search(text):
+        return Reply(lines=_SAFE)
     if _LOSE_MORE.search(text):
         return Reply(lines=_LOSING)
     if _HOW_TO_BUY.search(text) or _HOW_BUYING_WORKS.search(text):
@@ -151,10 +179,16 @@ def reply(text: str, *, named: bool = False) -> Reply | None:
         return Reply(reask=f"I have ${money or 1000:,.0f}, what should I do",
                      note=None if money else "no amount was given, so $1,000 is the worked "
                                              "example")
-    if _GOOD_TIME.search(text):
+    timing = _GOOD_TIME.search(text)
+    if timing:
+        # "should i sell my crypto now" was told how "a good time to buy" was read (round 11).
+        verb = "sell" if re.search(r"\b(?:sell|get\s+out)\b", timing.group(0), re.I) else "buy"
         return Reply(reask="has {name} been here before",
-                     note="\"a good time to buy\" was read as: what followed similar past "
-                          "states — a base rate, not a forecast or a call")
+                     lead=f"Bottom line: no call — this console will not tell you whether to "
+                          f"{verb} now. What it can show is what followed past moments like "
+                          f"{{name}}'s today, below: a base rate, not a forecast.",
+                     note=f"\"a good time to {verb}\" was read as: what followed similar past "
+                          f"states — a base rate, not a forecast or a call")
     if _BEGINNER_PICK.search(text):
         # No pick: what a first sum has been through in three broad markets, from the starter
         # engine, on a stated $1,000.

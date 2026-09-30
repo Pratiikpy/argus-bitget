@@ -29,6 +29,10 @@ test —
   part of a forward claim no filing can test;
 * **valuation**: the trailing P/E against the sector fund's (a measurement) and the analysts' mean
   target against the price (an opinion); a verdict only where they agree or one alone leans;
+* **one name against another** ("SOL will outrun ETH"): both names' returns over 7, 30 and ~90
+  days from Bitget's daily candles — the record so far, never the claim about what comes next;
+* **macro** ("Fed rate cuts will boost NVDA"): the name's sensitivity to the 10-year yield and its
+  event-study reaction around Fed decisions or CPI releases (`lui/macro_thesis.py`);
 * **momentum**, **positioning** (funding) and **sentiment** (Fear & Greed) read the figure the task
   already holds and say whether it agrees — and where agreeing is not an edge, the line says so.
 
@@ -66,6 +70,8 @@ class Kind(StrEnum):
     SENTIMENT = "sentiment"
     VALUATION = "valuation"
     DRIVER = "a demand driver"
+    RELATIVE = "one name against another"
+    DIRECTION = "a direction"
     EARNINGS = "earnings"
     MACRO = "macro"
     OTHER = "other"
@@ -117,10 +123,13 @@ _STANCE = re.compile(r"^(?:i(?:'m| am)?\s+)?(?:going\s+|thinking of going\s+|con
 
 _ASK_WORDS = re.compile(
     r"^\s*(?:i\s+(?:think|believe|reckon|expect|feel)\s+(?:that\s+)?|my\s+(?:thesis|view|take|"
-    r"idea)\s+(?:is\s+)?(?:that\s+)?:?\s*|here'?s\s+my\s+(?:thesis|view|take|idea):?\s*)|"
+    r"idea)(?:\s+is)?(?:\s+that)?\s*:?\s*|here'?s\s+my\s+(?:thesis|view|take|idea):?\s*)|"
     r"\s*[-\u2013\u2014:,.]?\s*(?:please\s+|can\s+you\s+)?(?:test|check|challenge|"
     r"stress[\s-]*test|pressure[\s-]*test|poke\s+holes\s+in|kill|critique|evaluate|assess|validate)\s+"
-    r"(?:(?:my|this|the|that)\s+(?:thesis|idea|view|take|theory|call)|it|this|that)\b[\s?.!]*$",
+    r"(?:(?:my|this|the|that)\s+(?:thesis|idea|view|take|theory|call)|it|this|that)\b[\s?.!]*$|"
+    # a closing question about the thesis: "... Is that thesis right?", "am I wrong?" (round 11)
+    r"\s*[.?!]?\s*(?:is\s+(?:that|this|my|the)\s+(?:thesis|view|idea|take|theory|reasoning)"
+    r"(?:\s+\w+){1,2}|am\s+i\s+(?:right|wrong)|what\s+do\s+you\s+think|thoughts)[\s?.!]*$",
     re.I)
 """The asking around a stated thesis ("I think ...", "... test my thesis"): not a reason."""
 
@@ -184,10 +193,17 @@ def reasons(text: str) -> tuple[Reason, ...]:
     out: list[Reason] = []
     text = _ASK_WORDS.sub("", text.strip()).strip()
     for part in _SPLIT.split(text.rstrip(".?!")):
-        part = part.strip(" .")
+        # "because of institutional adoption" leaves "of ..." after the split (round 11)
+        part = re.sub(r"^(?:of|to|on|that|the\s+fact\s+that)\s+", "", part.strip(" ."), flags=re.I)
         if not part or _STANCE.match(part) or _ASKED.match(part):
             continue
         kind = next((k for k, pattern in _KINDS if pattern.search(part)), None)
+        if _RELATIVE.search(part) and len(_two_names(part)) == 2:
+            # "SOL will outrun ETH" named two contracts and was left "not tested" (round 11).
+            kind = Kind.RELATIVE
+        if kind is None and _DIRECTION.search(part):
+            # "stocks will go up" was listed as nothing any engine reads (round 11)
+            kind = Kind.DIRECTION
         if kind is None:
             if len(part.split()) <= 2 or not re.search(r"\b(is|are|will|looks?|has|have|"
                                                          r"getting|keeps?)\b", part, re.I):
@@ -195,6 +211,63 @@ def reasons(text: str) -> tuple[Reason, ...]:
             kind = Kind.OTHER
         out.append(Reason(text=part, kind=kind))
     return tuple(out)
+
+
+_RELATIVE = re.compile(
+    r"\b(?:outrun|outperform|outpace|beat|overtake|flip|do(?:es)?\s+better\s+than|lead|lag|"
+    r"underperform)\w*\b", re.I)
+"""A claim about one name against another."""
+
+
+def _two_names(text: str) -> tuple[str, ...]:
+    from argus.lui.research import research_symbols
+
+    return research_symbols(text)[0][:2]
+
+
+def relative_facts(reason: str) -> dict[str, Any] | None:
+    """Both names' returns over 7, 30 and ~90 days from Bitget's daily candles, in the order
+    named."""
+    names = _two_names(reason)
+    if len(names) != 2:
+        return None
+    out: dict[str, Any] = {"names": list(names)}
+    for symbol in names:
+        rows = _closes(symbol)
+        if len(rows) < 31:
+            return None
+        last = rows[-1][2]
+        out[symbol] = {n: last / rows[-1 - n][2] - 1 for n in (7, 30, len(rows) - 1)
+                       if len(rows) > n}
+    return out
+
+
+def _relative(reason: Reason, found: Mapping[str, Any] | None) -> Tested:
+    """Whether the first name has been beating the second over the last 30 days and the longest
+    window Bitget serves; the claim itself is about what comes next, which no data tests."""
+    if not found:
+        return Tested(reason.text, reason.kind, Result.NOT_TESTED,
+                      "The two names' daily candles did not answer, so the comparison is not "
+                      "tested.")
+    first, second = found["names"]
+    a, b = found[first], found[second]
+    spans = sorted(set(a) & set(b))
+    parts = [f"over {n} days {first.removesuffix('USDT')} {a[n]:+.1%} against "
+             f"{second.removesuffix('USDT')} {b[n]:+.1%}" for n in spans]
+    ahead = [a[n] > b[n] for n in spans if n >= 30]
+    claims_behind = bool(re.search(r"\b(?:lag|underperform)\w*\b", reason.text, re.I))
+    if ahead and all(ahead):
+        result = Result.CONTRADICTED if claims_behind else Result.SUPPORTED
+    elif ahead and not any(ahead):
+        result = Result.SUPPORTED if claims_behind else Result.CONTRADICTED
+    else:
+        result = Result.NOT_MEASURABLE
+    return Tested(reason.text, reason.kind, result,
+                  "So far: " + "; ".join(parts) + ". That is the recent record, not the claim: "
+                  "whether it keeps up is what comes next, and no data tests that.",
+                  evidence=tuple(Finding(f"{s.removesuffix('USDT')} daily closes, Bitget",
+                                         "Bitget market candles", _candles_url(s))
+                                 for s in (first, second)))
 
 
 # --- network activity -------------------------------------------------------------------------
@@ -469,6 +542,42 @@ def _recent(quote: Mapping[str, Any]) -> tuple[float, float, float] | None:
     return change, (last / high - 1) * 100, (last / low - 1) * 100
 
 
+_DIRECTION = re.compile(
+    r"\bwill\b.{0,20}\b(?:go\s+up|go\s+down|rise|fall|rally|drop|climb|sink|moon|crash|pump|dump|"
+    r"higher|lower)\w*|\b(?:go|goes|going|head|heads|headed|heading|move|moves|trend|trends)"
+    r"\s+(?:up|down|higher|lower)\b", re.I)
+"""A bare direction: "X will go up", "BTC is heading lower"."""
+
+
+def _direction(reason: Reason, long_run: Mapping[str, Any], name: str) -> Tested:
+    """A direction claimed with no reason: what followed states like today's, at 1, 5 and 20 days,
+    against any day — the only honest read of "will go up", which nothing forecasts."""
+    rows = [r for r in long_run.get("horizons") or [] if int(r.get("episodes") or 0) >= 8]
+    if not rows:
+        return Tested(reason.text, reason.kind, Result.NOT_TESTED,
+                      f"No long-run daily history answered for {name}, so the direction cannot be "
+                      f"set against what followed similar days.")
+    down = bool(re.search(r"\b(?:down|fall|drop|sink|crash|dump|lower)\b", reason.text, re.I))
+    sign = -1 if down else 1
+    best = max(rows, key=lambda r: sign * float(r.get("z") or 0))
+    z = float(best.get("z") or 0)
+    days = int(best["days"])
+    said = (f"after days like today, {name} was up {float(best['up']):.0%} of the time {days} "
+            f"day{'' if days == 1 else 's'} later against {float(best['base_up']):.0%} for any "
+            f"day, "
+            f"on {best['episodes']} independent episodes")
+    if sign * z >= 2:
+        return Tested(reason.text, reason.kind, Result.SUPPORTED,
+                      f"History leans the claim's way: {said} ({abs(z):.1f} standard errors) — a "
+                      f"base rate, not a forecast.")
+    if sign * z <= -2:
+        return Tested(reason.text, reason.kind, Result.CONTRADICTED,
+                      f"History leans the other way: {said} ({abs(z):.1f} standard errors).")
+    return Tested(reason.text, reason.kind, Result.NOT_MEASURABLE,
+                  f"Today's setup does not change the odds either way: {said}, within two standard "
+                  f"errors ({z:+.1f}). No data says which way it goes next.")
+
+
 def _reversion(reason: Reason, long_run: Mapping[str, Any], quote: Mapping[str, Any],
                name: str) -> Tested:
     """Whether the move the reason describes exists — over 20 days, or as a dip or a pop inside
@@ -526,6 +635,35 @@ def _reversion(reason: Reason, long_run: Mapping[str, Any], quote: Mapping[str, 
     return Tested(reason.text, reason.kind, Result.NOT_MEASURABLE,
                   f"{where}. History neither backs nor refutes {expects} from here: "
                   f"{detail(best)}, within two standard errors ({z:+.1f}).")
+
+
+_INSTITUTIONAL = re.compile(r"\b(?:institution\w*|funds?|13f|wall\s+street|big\s+money|"
+                           r"adoption|asset\s+managers?|etfs?)\b", re.I)
+"""Adoption by institutions, which a stock's 13F ownership reads where a chain's activity cannot."""
+
+
+def _institutions(reason: Reason, found: Mapping[str, Any], name: str) -> Tested:
+    """Institutional adoption of a stock, from the 13F ownership Bitget's data service reports: the
+    net shares the filing institutions bought in their latest filings, against what they hold.
+
+    "Institutional adoption" in an MSTR thesis was read as on-chain activity and left untested,
+    while the console held MSTR's 13F ownership (a hostile review, round 11, 2026-09-30)."""
+    held, net = float(found.get("holding_vol") or 0), float(found.get("net_trade_vol") or 0)
+    if held <= 0:
+        return Tested(reason.text, reason.kind, Result.NOT_TESTED,
+                      f"{name}'s institutional holdings were not reported, so adoption is not "
+                      f"measured.")
+    change = net / (held - net) if held > net else 0.0
+    result = (Result.SUPPORTED if change > 0.01 else Result.CONTRADICTED if change < -0.01
+              else Result.NOT_MEASURABLE)
+    return Tested(reason.text, reason.kind, result,
+                  f"{float(found.get('holders') or 0):,.0f} institutions filing 13F hold "
+                  f"{float(found.get('share_pct') or 0):.1f}% of {name}'s shares, and their latest "
+                  f"filings show a net {'purchase' if net >= 0 else 'sale'} of {abs(net):,.0f} "
+                  f"shares, {change:+.1%} on what they held before (as of {found.get('as_of')}). "
+                  f"13F filings lag the quarter they describe by up to 45 days.",
+                  evidence=(Finding(f"13F ownership, {found.get('as_of')}",
+                                    "bitget-mcp-server equity_ownership_inst_position_summary"),))
 
 
 def _activity(reason: Reason, activity: Mapping[str, Any] | None, name: str) -> Tested:
@@ -685,8 +823,6 @@ def _driver(reason: Reason, found: Mapping[str, Any] | None, name: str) -> Teste
 _UNTESTED: Mapping[Kind, str] = {
     Kind.EARNINGS: "The earnings step reports the last surprise and the next date, but no engine "
                    "tests a claim about future earnings.",
-    Kind.MACRO: "No engine in this task tests a macro claim; the console's macro answers "
-                "(`/ask`, FRED) do, one question at a time.",
     Kind.OTHER: "No engine reads this kind of claim, so it is yours to judge.",
 }
 
@@ -695,7 +831,9 @@ def check(stated: Sequence[Reason], *, name: str, data: Mapping[str, Mapping[str
          activity: Mapping[str, Any] | None = None,
          fear_greed: Mapping[str, Any] | None = None,
          ctx: Mapping[str, Any] | None = None, side: str | None = None,
-         driver: Mapping[str, Any] | None = None) -> tuple[Tested, ...]:
+         driver: Mapping[str, Any] | None = None,
+         relative: Mapping[str, Any] | None = None,
+         macro: Mapping[str, Any] | None = None) -> tuple[Tested, ...]:
     """Each stated reason against the measurement that bears on it. ``data`` is the research
     task's step data by kind, as :func:`argus.lui.weigh.weigh` takes it."""
     analogue = data.get("analogue") or {}
@@ -707,7 +845,11 @@ def check(stated: Sequence[Reason], *, name: str, data: Mapping[str, Mapping[str
             out.append(_reversion(reason, analogue.get("long_run") or {},
                                   data.get("quote") or {}, name))
         elif reason.kind is Kind.ACTIVITY:
-            out.append(_activity(reason, activity, name))
+            institutions = fund.get("institutions")
+            if activity is None and institutions and _INSTITUTIONAL.search(reason.text):
+                out.append(_institutions(reason, institutions, name))
+            else:
+                out.append(_activity(reason, activity, name))
         elif reason.kind is Kind.MOMENTUM:
             out.append(_momentum(reason, tech, name))
         elif reason.kind is Kind.POSITIONING:
@@ -718,6 +860,16 @@ def check(stated: Sequence[Reason], *, name: str, data: Mapping[str, Mapping[str
             out.append(_valuation(reason, fund, name))
         elif reason.kind is Kind.DRIVER:
             out.append(_driver(reason, driver, name))
+        elif reason.kind is Kind.RELATIVE:
+            out.append(_relative(reason, relative))
+        elif reason.kind is Kind.DIRECTION:
+            out.append(_direction(reason, analogue.get("long_run") or {}, name))
+        elif reason.kind is Kind.MACRO:
+            from argus.lui import macro_thesis
+
+            result, line, notes = macro_thesis.test(reason.text, macro, name)
+            out.append(Tested(reason.text, reason.kind, Result(result), line, evidence=tuple(
+                Finding(note, "event study and FRED snapshot") for note in notes)))
         else:
             out.append(Tested(reason.text, reason.kind, Result.NOT_TESTED, _UNTESTED[reason.kind]))
     ctx = ctx or {}

@@ -40,7 +40,7 @@ from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Any
 
-from argus.lui import drivers, thesis
+from argus.lui import drivers, macro_thesis, thesis
 from argus.lui.answer import LEAD
 from argus.lui.research import (
     ANALOGUE_DAYS,
@@ -447,6 +447,9 @@ def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
         driven = next((r.text for r in stated if r.kind is thesis.Kind.DRIVER), None)
         driver = (pool.submit(drivers.facts, symbol.removesuffix("USDT"), driven)
                   if driven is not None else None)
+        against = next((r.text for r in stated if r.kind is thesis.Kind.RELATIVE), None)
+        relative = (pool.submit(thesis.relative_facts, against) if against is not None else None)
+        macro = (pool.submit(macro_thesis.facts, symbol) if thesis.Kind.MACRO in kinds else None)
         around = pool.submit(thesis.context, symbol) if stated else None
         futures = [pool.submit(one, step) for step in STEPS]
         direct = reading.direct if reading is not None else None
@@ -495,7 +498,8 @@ def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
                                   data=_data_by_kind(steps), activity=extra(activity),
                                   fear_greed=extra(mood), ctx=extra(around),
                                   side=thesis.stated_side(asked),
-                                  driver=extra(driver))
+                                  driver=extra(driver), relative=extra(relative),
+                                  macro=extra(macro))
     finally:
         pool.shutdown(wait=False, cancel_futures=True)
     return Task(question=question, name=symbol.removesuffix("USDT"), size_pct=size * 100,

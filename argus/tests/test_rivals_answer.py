@@ -29,7 +29,7 @@ def test_the_answer_is_every_register_row_naming_the_rival_with_its_state() -> N
     lines, sources, data = rivals.answer("is ARGUS better than OpenBB")
     expected = {c.name: c.state.value for c in REGISTER if "openbb" in c.baseline.lower()}
     assert {r["name"]: r["state"] for r in data["rival_rows"]} == expected
-    assert lines[0].startswith(f"Bottom line: {len(expected)} capability row")
+    assert lines[0].startswith(f"Bottom line: in ARGUS's register, {len(expected)} capability row")
     assert "against OpenBB:" in lines[0]
     assert all(not line.split(" — ", 1)[-1].startswith(("RE-GRADED", "GRADED"))
                for line in lines[1:])

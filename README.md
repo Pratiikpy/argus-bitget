@@ -198,11 +198,11 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 10,593 tests collected
+pytest -q                       # 10,636 tests collected
 ```
 
 Nothing above needs a credential. On 2026-09-29, with every outbound connection refused, 10,021
-passed, 39 skipped and 0 failed in 25 minutes, of the 10,593 tests collected that day (more have
+passed, 39 skipped and 0 failed in 25 minutes, of the 10,636 tests collected that day (more have
 been added since); the other 238 read a live venue, feed or model and run apart
 (`pytest -m network`). Tests that need a rival's source cloned beside the repository skip
 and say which. `ARGUS_BLOCK_NETWORK=1` refuses every outbound connection, so
@@ -222,8 +222,8 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **10,593 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 571 source files** |
+| Tests | **10,636 tests collected** — `pytest -q` |
+| Types | **`mypy --strict` clean on 573 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
 | Sub-themes | **18/18 sub-themes** each resolve to an importable module and a test file (`python -m argus.status`). That is coverage, not a claim to lead them: 6 of 45 capabilities are OWNED against a named rival, and `/proof` says which |

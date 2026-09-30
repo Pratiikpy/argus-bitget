@@ -102,7 +102,9 @@ class LocalPlanner:
             # The console's "declined by the model" rule reads this field on the same terms as the
             # LLM's; the model's own probability, on the plan's scale (`plan_confidence`).
             return {"kind": "none" if label == REFUSE else "record",
-                    "confidence": scaled, "why": f"kind model: {label} at {confidence:.2f}"}
+                    "confidence": scaled, "why": f"kind model: {label} at {confidence:.2f} "
+                                                 f"(its own probability; {scaled:.2f} on the "
+                                                 f"plan's scale)"}
         # A percentage beside a shock word or signed ("a -10% NVDA shock", "qqq -10% scenario")
         # is the shock, not a holding weight; the patterns draw the same line
         # (`research._named_shock_request`).
@@ -119,7 +121,10 @@ class LocalPlanner:
             # The kind model's probability on the plan's scale: its CV-chosen threshold lands on
             # `plan_with_model`'s floor, so a reading the model accepts is never refused for scale.
             "confidence": scaled,
-            "why": f"kind model: {label} at {confidence:.2f}",
+            # Both numbers named: "confidence 0.67" beside "news at 0.27" read as a contradiction
+            # (a hostile review, round 11) — one is the model's probability, one the plan's scale.
+            "why": f"kind model: {label} at {confidence:.2f} (its own probability; "
+                   f"{scaled:.2f} on the plan's scale)",
             "names": named,
             "holdings": holdings,
         }

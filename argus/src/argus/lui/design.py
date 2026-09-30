@@ -122,33 +122,30 @@ BASE_CSS = """
     letter-spacing:.1em; text-transform:uppercase; padding:8px 10px; border-radius:8px }
   .nav .links a:hover { color:var(--ink); background:var(--veil) }
   .nav .links a.on { color:var(--ink); background:var(--veil) }
-  /* Invisible to layout at every width except the one below, where it becomes the box the
-     scroll-hint chevron is positioned against — so wrapping the row costs nothing on desktop. */
-  .nav .links-wrap { display:contents }
+  /* The phone menu: absent on desktop, where every link fits in the bar. */
+  .nav .menu { display:none }
   @media (max-width: 720px) {
-    /* One scrollable row, not three wrapped ones: the bar is sticky, and wrapped it held a fifth
-       of a phone screen (155px at 390px wide, seen 2026-09-29). The fade says there is more. */
-    .nav { flex-direction:column; align-items:flex-start; gap:8px; padding:10px 16px 6px }
-    .nav .links { justify-content:flex-start; flex-wrap:nowrap; overflow-x:auto; width:100%;
-      scrollbar-width:none; -webkit-overflow-scrolling:touch;
-      mask-image:linear-gradient(to right, #000 85%, transparent) }
-    .nav .links::-webkit-scrollbar { display:none }
-    .nav .links a { white-space:nowrap; flex:none }
-    /* the current page leads the row, so it is never scrolled out of sight (no script: the
-       proof pages ship none) */
-    .nav .links a.on { order:-1 }
-    /* The fade alone did not say there was more to scroll (first-user audit, 2026-09-29): nothing
-       marked the row as scrollable rather than simply wrapped oddly. A chevron sits over the fade,
-       ink on the page background for full contrast (WCAG AA, ~19:1 in both themes) — CSS only,
-       `pointer-events:none` so it never intercepts a tap on the link underneath, and it needs no
-       script to know when to appear or disappear: it is drawn once, over the row's own height. */
-    .nav .links-wrap { display:block; position:relative; width:100% }
-    .nav .links-wrap::after {
-      content:"\\203A "; position:absolute; top:0; right:0; bottom:0; display:flex;
-      align-items:center; padding:0 2px 0 20px; pointer-events:none; color:var(--ink);
-      font:700 17px/1 var(--sans);
-      background:linear-gradient(to right, transparent, var(--bg) 55%, var(--bg))
-    }
+    /* A Menu button, not a sideways-scrolling row. The row hid four of seven links behind a fade
+       and a chevron, and a first-time user still read it as three links and a stray arrow (round
+       11, 2026-09-30, after a first-user audit on 2026-09-29 added the chevron). A <details>
+       opens and closes with no script, by tap, Enter or Space, and a screen reader announces it
+       as a disclosure. */
+    .nav { padding:10px 16px }
+    .nav .links-wrap { display:none }
+    .nav .menu { display:block; position:relative }
+    .nav .menu summary { list-style:none; cursor:pointer; color:var(--ink);
+      font:600 12px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase;
+      padding:9px 12px; border:1px solid var(--line); border-radius:8px }
+    .nav .menu summary::-webkit-details-marker { display:none }
+    .nav .menu summary::after { content:" \\25BE" }
+    .nav .menu[open] summary::after { content:" \\25B4" }
+    .nav .menu .menu-list { position:absolute; right:0; top:calc(100% + 6px); min-width:230px;
+      display:flex; flex-direction:column; padding:6px; background:var(--panel);
+      border:1px solid var(--line); border-radius:10px;
+      box-shadow:0 12px 32px color-mix(in srgb, var(--ink) 18%, transparent) }
+    .nav .menu .menu-list a { color:var(--ink); text-decoration:none; padding:11px 12px;
+      font:500 15px/1.2 var(--sans); border-radius:6px }
+    .nav .menu .menu-list a.on { background:var(--veil); font-weight:600 }
     .wrap { padding:28px 16px 56px }
   }
   .foot { border-top:1px solid var(--line); margin-top:56px; padding:22px 24px 36px;
@@ -202,7 +199,9 @@ def nav(active: str = "/") -> str:
     return (f'<a class="skip" href="#main">Skip to content</a>'
             f'<nav class="nav" aria-label="Primary"><a class="brand" href="/" aria-label="ARGUS '
             f'home">{mark_svg(22)}<span>ARGUS</span></a><div class="links-wrap"><div class="links">'
-            f'{links}<a href="https://github.com/Pratiikpy/argus-bitget">GitHub</a></div></div></nav>'
+            f'{links}<a href="https://github.com/Pratiikpy/argus-bitget">GitHub</a></div></div>'
+            f'<details class="menu"><summary>Menu</summary><div class="menu-list">{links}'
+            f'<a href="https://github.com/Pratiikpy/argus-bitget">GitHub</a></div></details></nav>'
             f'<span id="main" tabindex="-1"></span>')
 
 

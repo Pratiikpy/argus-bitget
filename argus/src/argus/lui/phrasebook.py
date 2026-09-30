@@ -68,17 +68,17 @@ PHRASES: dict[str, dict[Language, str]] = {
     "perf.few_trades": {
         Language.EN: (
             "Track record: {trades} settled trade(s) and {abstentions} abstention(s) over {days} "
-            "day(s), net {net} — too few trades for a win rate, Sharpe or drawdown to say anything "
-            "yet{win}. Abstentions are scored separately, by abstention value."
+            "day(s), net {net}.{win} That is too few trades to judge the desk by; Sharpe and "
+            "drawdown need more. Abstentions are scored separately, by abstention value."
         ),
         Language.ZH: (
             "交易记录：{days} 天内 {trades} 笔已结算交易、{abstentions} 次放弃交易，净盈亏 {net}——"
-            "交易太少，胜率、夏普比率和回撤暂无意义{win}。放弃交易另行评分，按放弃价值衡量。"
+            "{win}交易太少，尚不足以评判；夏普比率和回撤需要更多交易。放弃交易另行评分，按放弃价值衡量。"
         ),
     },
     "perf.few_trades_win": {
-        Language.EN: " (the win rate over them is {pct:.0f}%, {wins} of {trades})",
-        Language.ZH: "（其胜率为 {pct:.0f}%，{trades} 笔中 {wins} 笔盈利）",
+        Language.EN: " Win rate {pct:.0f}% ({wins} of {trades}).",
+        Language.ZH: "胜率 {pct:.0f}%（{trades} 笔中 {wins} 笔盈利）。",
     },
     "perf.headline": {
         Language.EN: (

@@ -420,6 +420,7 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
  .plain {{ background:var(--panel); border:1px solid var(--line); border-radius:10px;
    padding:14px 16px; margin:0 0 16px }}
  .plain p {{ margin:0; font-size:14.5px; max-width:none }}
+ .counts {{ font:600 15px/1.5 var(--mono); margin:0 0 14px }}
  .plain b {{ font-weight:600 }}
  .words {{ margin:-6px 0 16px; font-size:13.5px }}
  .words dl {{ margin:8px 0 0; display:grid; grid-template-columns:max-content 1fr; gap:4px 12px }}
@@ -471,8 +472,9 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
  a:focus-visible, summary:focus-visible {{ outline:2px solid var(--accent); outline-offset:2px }}
  @media (max-width:520px) {{ .lbl {{ display:block; min-width:0 }} }}
 {design.BASE_CSS}</style></head><body>{design.nav('/proof')}<div class="wrap">
-<h1>{esc(headline)}</h1>
+<h1>What ARGUS beats, and what beats it</h1>
 {plain}
+<p class="counts">{esc(headline)}</p>
 <p class="sub">OWNED means all thirteen conditions hold: the rival's best implementation read,
 its method reproduced, both run on the same input, a statistically valid evaluation with costs,
 out-of-sample, ablation, an adversarial test, failure cases, reproducibility, and no specialist

@@ -1004,7 +1004,8 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             payload["report"] = report.as_dict()
             payload["sizing"] = impact_sizing(report, request, columns)
             sources.append(Source(kind="computation", ref="argus.desk.portfolio.copilot",
-                                  detail="session beta, Euler risk decomposition, beta stress, "
+                                  detail="session beta, each holding's share of the risk "
+                                         "(Euler decomposition), beta stress, "
                                          "realised worst 24h window"))
             anchor = _crypto_anchor_line(add, data.raw, columns)
             if anchor is not None:

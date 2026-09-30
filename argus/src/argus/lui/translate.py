@@ -60,6 +60,48 @@ NOTES: dict[str, str] = {
           "không khớp thì giữ nguyên tiếng Anh.",
 }
 
+PAUSED: dict[str, tuple[str, str]] = {
+    "fr": ("Réponse en anglais : le modèle de langue est en pause pour votre réseau pendant "
+           "{minutes} minutes au plus (quota horaire atteint). Les chiffres restent calculés en "
+           "direct.",
+           "Sans le modèle de langue, en pause pour votre réseau pendant {minutes} minutes au "
+           "plus, cette question n'a pas pu être lue. Posez-la en anglais, ou de nouveau après."),
+    "de": ("Antwort auf Englisch: Das Sprachmodell ist für Ihr Netzwerk höchstens {minutes} "
+           "Minuten pausiert (Stundenkontingent aufgebraucht). Alle Zahlen sind weiterhin live "
+           "berechnet.",
+           "Ohne das Sprachmodell, das für Ihr Netzwerk höchstens {minutes} Minuten pausiert ist, "
+           "ließ sich diese Frage nicht lesen. Stellen Sie sie auf Englisch oder danach erneut."),
+    "es": ("Respuesta en inglés: el modelo de lenguaje está en pausa para su red durante "
+           "{minutes} minutos como máximo (cupo horario agotado). Las cifras se siguen calculando "
+           "en vivo.",
+           "Sin el modelo de lenguaje, en pausa para su red durante {minutes} minutos como máximo, "
+           "no se pudo leer esta pregunta. Hágala en inglés, o de nuevo después."),
+    "pt": ("Resposta em inglês: o modelo de linguagem está pausado para a sua rede por até "
+           "{minutes} minutos (cota horária esgotada). Os números continuam calculados ao vivo.",
+           "Sem o modelo de linguagem, pausado para a sua rede por até {minutes} minutos, não foi "
+           "possível ler esta pergunta. Pergunte em inglês, ou de novo depois."),
+    "zh": ("以下为英文回答：语言模型对您的网络暂停，最多 {minutes} 分钟（每小时额度已用完）。"  # noqa: RUF001
+           "所有数字仍由实时数据计算。",
+           "语言模型对您的网络暂停，最多 {minutes} 分钟，因此无法读取这个问题。"  # noqa: RUF001
+           "请用英文提问，或稍后再问。"),  # noqa: RUF001
+    "zh-Hant": ("以下為英文回答：語言模型對您的網路暫停，最多 {minutes} 分鐘（每小時額度已用完）。"  # noqa: RUF001
+                "所有數字仍由即時資料計算。",
+                "語言模型對您的網路暫停，最多 {minutes} 分鐘，因此無法讀取這個問題。"  # noqa: RUF001
+                "請用英文提問，或稍後再問。"),  # noqa: RUF001
+    "ja": ("英語で回答します：言語モデルはお使いのネットワークで最大 {minutes} 分間停止中です"  # noqa: RUF001
+           "（1時間の上限に到達）。数字はすべて引き続きリアルタイムで計算しています。",  # noqa: RUF001
+           "言語モデルがお使いのネットワークで最大 {minutes} 分間停止中のため、この質問を"
+           "読み取れませんでした。英語で質問するか、しばらくしてから再度お試しください。"),
+    "ko": ("영어로 답합니다: 언어 모델이 사용 중인 네트워크에 대해 최대 {minutes}분간 멈춰 "
+           "있습니다(시간당 한도 소진). 모든 숫자는 계속 실시간으로 계산됩니다.",
+           "언어 모델이 최대 {minutes}분간 멈춰 있어 이 질문을 읽지 못했습니다. 영어로 "
+           "묻거나 잠시 후 다시 물어 주세요."),
+}
+"""When the hourly model allowance is used, what an answer (first) or a refusal (second) says, in
+the question's own language. Fixed text, so it needs no model: German and Spanish questions came
+back with an English note and a French one with an English refusal while the model was paused (a
+judge's audit, round 11, 2026-09-30)."""
+
 _NUMBER = re.compile(r"\d+")
 _URL = re.compile(r"https?://\S+")
 _KANA = re.compile(r"[぀-ヿ]")
@@ -108,18 +150,22 @@ _COMMON: dict[str, frozenset[str]] = {
         "mon", "ma", "mes", "que", "qui", "une", "des", "du", "avec", "dans", "combien", "prix",
         "cours", "faut", "dois", "acheter", "vendre",
         "où", "se", "trouve", "ce", "moment", "je", "puis", "perdre", "cette", "semaine",
-        "maintenant", "actuellement", "devrais", "risque"
+        "maintenant", "actuellement", "devrais", "risque", "et", "pourquoi", "thèse", "un",
+        "au", "aux", "comment", "valorisation"
     }),
     "de": frozenset({
         "der", "die", "das", "ist", "sind", "wie", "hoch", "bei", "mein", "meine", "was", "welche",
         "welcher", "warum", "und", "mit", "für", "nicht", "soll", "sollte", "kaufen", "verkaufen",
         "preis", "kurs", "wird", "kostet", "kosten", "aktie", "aktuell", "steht", "gerade",
-        "ich", "kann", "diese", "woche", "verlieren", "jetzt", "heute", "wo"
+        "ich", "kann", "diese", "woche", "verlieren", "jetzt", "heute", "wo",
+        # "Wie reagiert NVDA auf CPI-Daten?" was read as English (round 11)
+        "auf", "reagiert", "daten", "zu", "von", "den", "dem", "ein", "eine", "nach", "über"
     }),
     "es": frozenset({
         "el", "la", "los", "las", "es", "son", "cuál", "cuánto", "cómo", "para", "mi", "mis", "que",
         "en", "con", "precio", "debo", "comprar", "vender", "está",
-        "dónde", "esta", "semana", "puedo", "perder", "ahora", "hoy"
+        "dónde", "esta", "semana", "puedo", "perder", "ahora", "hoy", "del", "al", "por", "qué",
+        "reacciona", "datos", "sobre", "una", "un"
     }),
     "pt": frozenset({
         "o", "a", "os", "as", "é", "são", "qual", "quanto", "como", "para", "meu", "minha", "que",

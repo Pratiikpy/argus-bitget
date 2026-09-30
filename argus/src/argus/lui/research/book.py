@@ -258,7 +258,8 @@ def _book_report(request: ResearchRequest, data: MarketData,
     payload = {"risk": risk.as_dict(), "shares": shares, "book_beta": book_beta,
                "r_squared_vs_qqq": r2, "cash": request.cash, "worst_window": worst.as_dict()}
     return lines, [Source(kind="computation", ref="argus.desk.portfolio.decompose",
-                          detail="Euler risk decomposition, beta stress, realised worst window")
+                          detail="each holding's share of the risk (Euler decomposition), "
+                                 "beta stress, realised worst window")
                    ], payload
 
 

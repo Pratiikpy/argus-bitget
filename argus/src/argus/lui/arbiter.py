@@ -227,9 +227,15 @@ def arbitrate(text: str, *, book: str, model: Any, instruction: bool, desk_first
         if named:
             request = ResearchRequest(
                 kind=ResearchKind.IMPACT, symbols=(named[0],),
-                notes=("no specific research question was recognised, so this is the name's risk "
-                       "profile — ask for its technicals, news, earnings or what it does to your "
-                       "book for more",))
+                notes=((
+                    # "and ETH?" was told no question was recognised while it was answered
+                    # (a first-time user, round 11): a bare name is a question about the name.
+                    "only the name was given"
+                    if re.fullmatch(r"\s*(?:(?:and|so|but|what\s+about|how\s+about)\s+)?"
+                                    r"[\w$.&/-]+\s*[?.!]*\s*", text, re.I)
+                    else "no specific research question was recognised")
+                    + ", so this is the name's risk profile — ask for its technicals, news, "
+                      "earnings or what it does to your book for more",))
     if request is not None:
         return Reading(request, {**audit, "detail": "recognised by the research patterns"},
                        "research-patterns", kind_said)
@@ -273,6 +279,25 @@ def in_domain(text: str) -> bool:
     return True
 
 
+_DAY_QUESTION_WORDS = frozenset({
+    "what", "happened", "happen", "did", "do", "does", "you", "we", "on", "the", "last", "this",
+    "past", "yesterday", "today", "week", "weekend", "day", "and", "so", "then", "in", "over",
+    "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "mon", "tue",
+    "tues", "wed", "thu", "thurs", "fri", "sat", "sun", "was", "were", "decided", "decide",
+    "january", "february", "march", "april", "may", "june", "july", "august", "september",
+    "october", "november", "december", "sep", "sept", "oct", "nov", "dec", "jan", "feb", "mar",
+    "apr", "jun", "jul", "aug"})
+
+
+def _names_no_subject(text: str) -> bool:
+    """A day question with no subject of its own — "what happened last Friday" — which, asked of
+    this console, is asked of its record. It was declined as off-topic whenever the model was
+    unavailable (a hostile review, round 11), while "what did the Lakers do last Friday" names a
+    subject and stays declined."""
+    words = re.findall(r"[a-z]+", text.lower())
+    return bool(words) and all(w in _DAY_QUESTION_WORDS for w in words)
+
+
 def gate_ledger_reading(question: Question, classified_by: str, text: str, *, prior: list[str],
                         audit: Any, desk_first: bool) -> tuple[Question, str]:
     """The n-gram layer's reading of a ledger question, after two gates.
@@ -301,7 +326,8 @@ def gate_ledger_reading(question: Question, classified_by: str, text: str, *, pr
             # English names its subject ("the desk", "you") and is read by `in_domain`; "what did
             # the Lakers do last Friday" must still be declined.
             and not (classified_by == "patterns" and question.intent is Intent.DECISION_LIST
-                     and question.window is not None and not re.search(r"[A-Za-z]", text))):
+                     and question.window is not None and (not re.search(r"[A-Za-z]", text)
+                                                          or _names_no_subject(text)))):
         question = replace(question, intent=Intent.UNKNOWN,
                            reason="nothing in the question is about markets or the desk's record")
         classified_by = "declined-off-topic"

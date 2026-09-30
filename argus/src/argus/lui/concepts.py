@@ -42,6 +42,9 @@ class Concept:
     an earnings surprise) needs a stock, not BTC."""
     cited: str = ""
     """Where a fact stated in the text comes from, when the text states one (a fee, an interval)."""
+    asset: bool = False
+    """The term is itself a contract ("what is bitcoin"): asked bare, it is a definition even
+    though it names the contract."""
 
 
 CONCEPTS: tuple[Concept, ...] = (
@@ -378,6 +381,30 @@ CONCEPTS: tuple[Concept, ...] = (
             "recent high.",
             "The labels describe what has happened, not what will; rallies inside bear markets are "
             "common and sharp."),
+    Concept("Agent Hub dry run", r"dry[\s-]*runs?|agent\s+hub",
+            "Agent Hub is Bitget's official toolkit for AI agents (its bgc command line, MCP "
+            "server and SDK); a dry run (--dry-run) builds the exact order request and shows "
+            "it without sending it, so no order is placed.",
+            "This console only ever shows dry-run commands: ask \"how should I split a $2k "
+            "order in BTC\" and the answer ends with the bgc command that previews it."),
+    Concept("APY and APR", r"\bapy\b|\bapr\b|annual\s+percentage\s+(?:yield|rate)",
+            "APR is the yearly interest rate without compounding; APY is the same rate with "
+            "compounding counted, so APY is always at least APR.",
+            "A 10% APR paid daily and reinvested is about 10.5% APY; a quoted APY on a crypto "
+            "product says nothing about the risk of the thing paying it."),
+    Concept("bitcoin", r"bitcoin|btc",
+            "Bitcoin is a digital currency that runs on a public network no company or government "
+            "controls; its supply is capped at 21 million coins and it trades around the clock.",
+            "Its price is set only by what buyers pay: it has no earnings or dividends, and it "
+            "has fallen more than 70% from a peak more than once.", "quote", " last ", "BTCUSDT",
+            asset=True),
+    Concept("ethereum", r"ethereum|\beth\b|ether\b",
+            "Ethereum is a public blockchain that runs programs (smart contracts); ether (ETH) is "
+            "the coin used to pay for them and trades around the clock.",
+            "Much of crypto's lending, trading and stablecoin activity runs on it, so its price "
+            "moves with that activity as well as with crypto overall.", "quote", " last ",
+            "ETHUSDT",
+            asset=True),
     Concept("fear and greed index", r"fear\s*(?:&|and)\s*greed",
             "The fear and greed index is a 0 to 100 score of market mood built from price, "
             "volatility and positioning measures.",
@@ -391,7 +418,8 @@ _ASK = re.compile(
     r"\b(?:what(?:'s|\s+is|\s+are|\s+does|\s+do)|explain|define|definition\s+of|meaning\s+of|"
     r"how\s+does|how\s+do\s+(?:i|you)\s+(?:read|use|interpret)|tell\s+me\s+about|"
     r"eli5|like\s+i'?m\s+(?:new|five|5|a\s+beginner))\b", re.I)
-_MEANS = re.compile(r"\b(?:mean|means|meaning|explain\w*|define|definition|eli5|like\s+i'?m|"
+_MEANS = re.compile(r"\bdo\s*[?.!]*\s*$|"
+                    r"\b(?:mean|means|meaning|explain\w*|define|definition|eli5|like\s+i'?m|"
                     r"beginner|new\s+to\s+trading|how\s+(?:does|do)\s+\S+\s+work|"
                     r"difference\s+between|in\s+plain\s+(?:terms|english|words))\b", re.I)
 
@@ -412,7 +440,18 @@ def concept_asked(text: str, named_symbols: tuple[str, ...] = ()) -> Concept | N
     # or answered with the desk's own Sharpe (a first-time-user audit, 2026-09-30).
     text = re.sub(r"\b(?:what|wat|waht|whta|wht)'?s(?=\s)", "what is",
                   text, flags=re.I)
-    text = re.sub(r"\b(?:waht|whta|wht|wat)\b", "what", text, flags=re.I)
+    text = re.sub(r"\b(?:waht|whta|wht|wat|wut|whaat)\b", "what", text, flags=re.I)
+    # Hinglish, as typed: "bitcoin kya hai" / "stop loss kya hota hai" is "what is ..." (a
+    # first-time user, round 11, got BTC's trading cost).
+    hinglish = re.fullmatch(r"\s*(.+?)\s+kya\s+(?:hai|hota\s+hai|hoti\s+hai|h)\s*[?.!]*\s*", text,
+                            re.I)
+    if hinglish is not None:
+        text = f"what is {hinglish.group(1)}"
+    # "how risky is leverage trading" asks what the term carries (round 11).
+    risky = (re.match(r"^\s*how\s+risky\s+(?:is|are)\s+(.+?)[?.!\s]*$", text, re.I)
+             or re.match(r"^\s*(?:is|are)\s+(.+?)\s+(?:risky|dangerous)[?.!\s]*$", text, re.I))
+    if risky is not None:
+        text = f"explain {risky.group(1)}"
     if not _ASK.search(text) or (_OWNED.search(text) and not _MEANS.search(text)):
         return None
     for concept in CONCEPTS:
@@ -423,7 +462,7 @@ def concept_asked(text: str, named_symbols: tuple[str, ...] = ()) -> Concept | N
             return concept
         bare = re.fullmatch(rf"\s*what(?:'s|\s+is|\s+are)\s+(?:an?\s+)?{term}s?\s*[?.!]*\s*",
                             text, re.I)
-        if bare is not None and not named_symbols:
+        if bare is not None and (not named_symbols or concept.asset):
             return concept
     return None
 

@@ -242,6 +242,19 @@ def _copy_tree(source: Path, target: Path, *, dry_run: bool) -> tuple[int, int]:
         if not dry_run:
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(item, destination)
+    # A file deleted from the source stays deleted in the bundle. Three capability files removed
+    # from the register lived on in it, so the hosted register counted 48 with 3 IMPLEMENTED while
+    # /proof, built from the artefact, said 45 (a hostile review, 2026-09-30; tracker row 85).
+    for item in sorted(target.rglob("*")):
+        if item.is_dir():
+            continue
+        relative = item.relative_to(target)
+        if (set(relative.parts) & SKIP_DIRS or item.suffix in SKIP_SUFFIXES
+                or (source / relative).exists()):
+            continue
+        changed += 1
+        if not dry_run:
+            item.unlink()
     return seen, changed
 
 

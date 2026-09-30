@@ -24,7 +24,9 @@ class TestTheTopBar:
         """Finding 74: the active link carried a class and nothing a screen reader reads."""
         bar = design.nav("/status")
         assert '<a href="/status" class="on" aria-current="page">' in bar
-        assert bar.count('aria-current="page"') == 1
+        # Once in the desktop row and once in the phone menu; one of the two is display:none at
+        # any width, so a screen reader meets exactly one.
+        assert bar.count('aria-current="page"') == 2
 
     def test_a_keyboard_visitor_can_skip_the_bar(self) -> None:
         bar = design.nav("/")
@@ -51,25 +53,25 @@ class TestTheTopBar:
         assert '<a href="/agent">Trading agent (separate project)</a>' in design.footer()
         assert "Track 2 agent" not in design.footer()
 
-    def test_the_mobile_row_carries_a_scroll_hint_over_the_fade(self) -> None:
-        """First-user audit, 2026-09-29: the sideways-scrolling nav gave no sign there was more to
-        it than three cramped links — the fade alone said nothing to a visitor who had not already
-        scrolled. The hint is CSS only (no script: the proof pages ship none) and inert to touch
-        and click so it never steals a tap meant for the link underneath it."""
-        bar = design.nav("/")
-        assert '<div class="links-wrap"><div class="links">' in bar
+    def test_a_phone_gets_a_menu_button_with_every_link(self) -> None:
+        """First-user audits, 2026-09-29 and round 11 (2026-09-30): the sideways-scrolling row hid
+        four of seven links, and neither a fade nor a chevron over it read as "there is more". On a
+        phone the bar is now a Menu disclosure holding every link — a <details>, so it works with
+        no script (the proof pages ship none) and is announced as a disclosure."""
+        bar = design.nav("/proof")
+        menu = bar[bar.index('<details class="menu">'):bar.index("</details>")]
+        assert "<summary>Menu</summary>" in menu
+        for href, _ in design.LINKS:
+            assert f'href="{href}"' in menu
+        assert 'href="/proof" class="on" aria-current="page"' in menu
         css = design.BASE_CSS
-        # Invisible on every width except the one narrow enough to need it: the wrapper costs
-        # nothing on desktop, where the row never scrolls.
-        assert ".nav .links-wrap { display:contents }" in css
+        assert ".nav .menu { display:none }" in css.split("@media (max-width: 720px)", 1)[0]
         mobile = css.split("@media (max-width: 720px)", 1)[1]
-        assert ".nav .links-wrap::after" in mobile
-        assert "content:" in mobile and "203A" in mobile  # \203A: the chevron glyph
-        assert "pointer-events:none" in mobile
-        assert "color:var(--ink)" in mobile
+        assert ".nav .links-wrap { display:none }" in mobile
+        assert ".nav .menu { display:block" in mobile
 
-    def test_the_scroll_hint_meets_wcag_aa_contrast(self) -> None:
-        """The hint is drawn in the page's own ink-on-background pair, the same one every heading
+    def test_the_menu_meets_wcag_aa_contrast(self) -> None:
+        """The menu is drawn in the page's own ink-on-background pair, the same one every heading
         and body line already uses, checked here rather than assumed."""
 
         def luminance(hex_colour: str) -> float:

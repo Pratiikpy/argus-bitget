@@ -23,7 +23,7 @@ INTRO_Q = re.compile(
     rf"{_SUBJECT}\s+do|who\s+(?:is|'s)\s+(?:{_SUBJECT}|it)\s+for|who\s+(?:made|built)\s+{_SUBJECT}|"
     rf"what\s+can\s+(?:you|argus|this(?:\s+\w+)?)\s+do(?:\s+for\s+me)?|what\s+(?:can|should)\s+i\s+"
     rf"ask(?:\s+(?:you|it|argus|here))?|how\s+do\s+i\s+use\s+{_SUBJECT}|what\s+am\s+i\s+looking\s+at|"
-    rf"help|getting\s+started|where\s+do\s+i\s+start)"
+    rf"help|getting\s+started|where\s+do\s+i\s+start|who\s+are\s+you)"
     rf"(?:\s*(?:,|and)\s*(?:who\s+(?:is|'s)\s+(?:{_SUBJECT}|it)\s+for|what\s+(?:does\s+{_SUBJECT}\s+do|"
     rf"can\s+(?:you|it)\s+do)))?\s*[?.!]*\s*$",
     re.I)
@@ -57,5 +57,74 @@ def answer() -> tuple[list[str], list[Source], dict[str, Any]]:
                           "the capability counts, read now")], {
         "standing": {s.value: n for s, n in counts.items()}, "total": total}
 
+
+
+STANDING_Q = re.compile(
+    r"\bhow\s+many\s+(?:capabilities|features|things|comparisons|rivals|competitors)\b|"
+    r"\bwhat\s+(?:have\s+you|has\s+argus|did\s+you)\s+(?:beaten|beat|won|lost|tested)\b|"
+    r"\bhow\s+(?:do\s+you|does\s+argus)\s+(?:compare|stack\s+up)\s+(?:to|with|against)\s+"
+    r"(?:rivals|competitors|others|the\s+competition)\b|\bwhere\s+(?:do\s+you|does\s+argus)\s+"
+    r"(?:win|lose)\b", re.I)
+"""The scoreboard asked as a whole: "how many capabilities have you tested against rivals" was read
+as a rival named "tested" and answered with one row (a hostile review, round 11)."""
+
+
+def standing_answer() -> tuple[list[str], list[Source], dict[str, Any]]:
+    from argus.eval.standing import REGISTER, State
+
+    counts = {s: sum(1 for cap in REGISTER if cap.state is s) for s in State}
+    lost = [cap.name for cap in REGISTER if cap.state is State.LOST]
+    lines = [
+        f"Bottom line: {len(REGISTER)} capabilities have each been run against a named rival "
+        f"on the same input: {counts[State.OWNED]} won (OWNED), {counts[State.TIED]} tied, "
+        f"{counts[State.LOST]} lost" + (f", {counts[State.IMPLEMENTED]} built but not yet compared"
+                                        if counts[State.IMPLEMENTED] else "") + ".",
+        "OWNED needs all thirteen checks to pass — the rival run on the same input, costs "
+        "included, out-of-sample, an ablation, an adversarial test and more; a loss is published "
+        "the moment it is found.",
+        "Lost, by name: " + "; ".join(lost) + "." if lost else "Nothing is graded lost.",
+        "Every row, with its rival and the measurement, is on /proof; ask \"how does ARGUS "
+        "compare to Nautilus Trader\" (or any rival) for the rows that name it.",
+    ]
+    explains(*lines[1:2], *lines[3:])
+    return lines, [Source("computation", "argus.eval.standing register",
+                          "every capability's state, read now")], {
+        "standing": {s.value: n for s, n in counts.items()}, "total": len(REGISTER)}
+
+
+HOW_Q = re.compile(
+    r"^\s*(?:(?:and|so|but)\s+)?(?:how\s+do\s+you\s+know\s+(?:all\s+)?(?:this|that|these|it)|"
+    r"where\s+(?:do|does)\s+(?:you|this|the\s+data|your\s+data|the\s+numbers)\s+(?:get|come\s+from)"
+    r"(?:\s+(?:it|this|that|your\s+data|the\s+data|from))?|what\s+(?:model|llm|ai|language\s+model)"
+    r"\s+(?:do\s+you|does\s+(?:this|argus|it))\s+(?:run\s+on|use)|which\s+(?:model|llm|ai)\s+"
+    r"(?:is\s+this|do\s+you\s+use|are\s+you)|are\s+you\s+(?:an?\s+)?(?:ai|chatgpt|gpt|llm|bot|"
+    r"robot))\s*[?.!]*\s*$", re.I)
+"""How the console knows what it says, and which model it runs on: "how do you know all this" and
+"what model do you run on" were answered with decision 879's evidence (round 11, 2026-09-30)."""
+
+
+def how_answer(text: str = "") -> tuple[list[str], list[Source], dict[str, Any]]:
+    lines = [
+        "Bottom line: nothing here is remembered or made up — every figure is fetched or computed "
+        "at the moment you ask, from the sources listed in the receipt under each answer.",
+        "The sources: Bitget's live market data and its bitget-signal Skills and data service; "
+        "SEC filings (EDGAR, XBRL) for companies; official calendars for CPI and the Fed; and a "
+        "few public feeds (options quotes, news, prediction markets), each named where it is used.",
+        "The language model: Qwen 3.8 Max, through Bitget's hackathon endpoint, reads your "
+        "question and picks which engine answers it; it never writes a number. When it is "
+        "unavailable, a small classifier trained here and the console's own patterns read the "
+        "question instead. The model reads up to 40 questions an hour from one network address; "
+        "past that the classifier and patterns answer, in English. Each line of an answer is "
+        "marked with where it came from.",
+    ]
+    if re.search(r"\b(?:model|llm|ai|gpt|chatgpt|bot|robot)\b", text, re.I):
+        # Asked which model, the model leads.
+        lines = ["Bottom line: " + lines[2].removeprefix("The language model: ")[:1].upper()
+                 + lines[2].removeprefix("The language model: ")[1:], *lines[:2]]
+        lines[1] = lines[1].replace("Bottom line: ", "", 1)
+        lines[1] = lines[1][:1].upper() + lines[1][1:]
+    explains(*lines)
+    return lines, [Source("computation", "argus.lui.arbiter", "which reader decides a question")
+                   ], {}
 
 trace_module(globals())

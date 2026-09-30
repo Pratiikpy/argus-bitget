@@ -42,7 +42,7 @@ from argus.lui.arbiter import arbitrate, gate_ledger_reading
 from argus.lui.cli import BUDGET_MS
 from argus.lui.ngram import reclassify
 from argus.lui.provenance import labels as provenance_labels
-from argus.lui.question import Conversation, Intent, classify
+from argus.lui.question import Conversation, Intent, classify, resolve_window
 from argus.lui.research import (
     BARE_FOLLOW,
     ResearchKind,
@@ -987,6 +987,22 @@ def handle_ask(
         payload["lines"] = [*payload["lines"], allowance_note(visitor)]
         payload["model_paused"] = True
         payload["model_back_in"] = allowance_back_in(visitor)
+        from argus.lui.translate import PAUSED, target_language
+
+        code = target_language(text)
+        if code in PAUSED:
+            # Said in the question's language, from fixed text: a paused model cannot translate.
+            answered, declined = PAUSED[code]
+            minutes = max(1, payload["model_back_in"])
+            body = [str(x) for x in payload["lines"]]
+            if payload.get("refused") or str(payload.get("classified_by", "")).startswith(
+                    "declined"):
+                payload["lines"] = [declined.format(minutes=minutes), *body]
+            else:
+                payload["lines"] = [answered.format(minutes=minutes),
+                                    *(x for x in body if not x.startswith(
+                                        ("Answered in English", "Respuesta en inglés",
+                                         "以下为英文回答")))]
     if read_as and payload.get("lines"):
         # Said on the answer, so a misreading is visible rather than silently answered.
         payload["lines"] = [f'Read as: "{text}" (restated in English by the language model; every '
@@ -1053,6 +1069,15 @@ def _answer(
         # "What is this site and who is it for" was told "that" had nothing to refer to (a
         # first-time user, 2026-09-30).
         return engine_payload(*intro.answer(), by="intro")
+    if intro.STANDING_Q.search(text):
+        return engine_payload(*intro.standing_answer(), by="standing")
+    if intro.HOW_Q.search(text):
+        return engine_payload(*intro.how_answer(text), by="intro")
+    from argus.lui import skills_explain
+
+    if skills_explain.asks(text):
+        # "what does the sentiment-analyst skill do" was declined (a hostile review, round 11).
+        return engine_payload(*skills_explain.answer(text), by="skills")
     from argus.lui import thesis_answer
 
     if thesis_answer.asks(text):
@@ -1176,6 +1201,10 @@ def _answer(
             [] if named_first or "{name}" not in first_steps.reask
             else ["no name was given, so BTC is the worked example"])
         answered["lines"] = [*answered.get("lines", []), *(f"Assumed: {n}." for n in said)]
+        if first_steps.lead and answered.get("lines"):
+            first, *rest = answered["lines"]
+            answered["lines"] = [first_steps.lead.format(name=subject),
+                                 unlead(str(first)), *rest]
         answered["turns"] = [*prior, text][-12:]
         answered["classified_by"] = "newcomer"
         return answered
@@ -1202,6 +1231,14 @@ def _answer(
         scenario = detect_research_request(text)
         if scenario is not None and scenario.kind is ResearchKind.LEVERAGE:
             concept = None
+    if concept is None and prior and not named_now and _IT_FOLLOW_UP.search(text):
+        # "does it place a real order" after "what does Agent Hub's dry run do" was told "that"
+        # had nothing to refer to (a hostile review, round 11): "it" is the term just defined.
+        defined = concepts.concept_asked(prior[-1], research_symbols(prior[-1])[0])
+        if defined is not None:
+            lines, sources, data = concepts.answer(defined, None)
+            return engine_payload([*lines, f"Assumed: read as a follow-up about "
+                                           f"{defined.name}."], sources, data, by="concept")
     if concept is not None and not about_the_record(text):
         # "explain what RSI means like I'm new to trading" was answered with an unrelated
         # decision's trace (a judge's audit, 2026-09-29): the definition, then its live reading.
@@ -1355,6 +1392,18 @@ def _answer(
             again["turns"] = [*prior, text][-12:]
             again["classified_by"] = "research-follow-up"
             return again
+    day_again = _DAY_FOLLOW_UP.match(text)
+    if day_again and prior and resolve_window(prior[-1], now=clock) is not None:
+        # "why not Thursday?" after "what happened last Friday" dumped every abstention on record
+        # (a hostile review, round 11): the same question, over the day now named.
+        day = day_again.group("day").capitalize()
+        last = "last " if re.search(r"\blast\b", prior[-1], re.I) or day_again.group("last") else ""
+        again = _answer(f"what did the desk do {last or 'on '}{day}", prior[:-1], now=now,
+                        visitor=visitor, book=book)
+        again["lines"] = [*again.get("lines", []),
+                          f"Assumed: read as the previous question asked of {last}{day}."]
+        again["turns"] = [*prior, text][-12:]
+        return again
     if _WHY_THAT.match(text) and prior:
         # "Why do you say that?" after a research answer was declined, and a bare "why" returned
         # an answer from three questions earlier (the round-7 judge and first-user audits,
@@ -1686,6 +1735,7 @@ def _research_payload(
             payload["sources"] = [*payload.get("sources", []),
                                   {"kind": "venue", "ref": "bitget /api/v2/mix/market/tickers",
                                    "detail": "last prices for the names asked about"}]
+    payload["lines"] = saved_book_first([str(x) for x in payload.get("lines") or []])
     note = _language_note(text)
     if note:
         payload["lines"] = [note, *payload.get("lines", [])]
@@ -1729,6 +1779,21 @@ _SPANISH = re.compile(r"[¿¡]|\b(?:qué|cómo|como|cuál|cuánto|los|las|del|ta
 _LATIN_OTHER = re.compile(r"\b(?:quoi|pourquoi|est-ce|wie|warum|welche|ist|wenn|meinem|meine|"
                           r"passiert|devo|preço|ações)\b",
                           re.I)
+
+
+def saved_book_first(lines: list[str]) -> list[str]:
+    """The saved book, said under the lead rather than near the foot.
+
+    The saved book shapes every figure in the answer, and a first-time user read "takes NVDA from
+    40% to 52%" as a portfolio they never gave (round 11, 2026-09-30): the book was one saved in
+    My book, named seventeenth of nineteen lines."""
+    saved = next((i for i, line in enumerate(lines)
+                  if line.startswith("Assumed: used your saved book")), None)
+    if saved is None or saved <= 1:
+        return lines
+    held = lines[saved].removeprefix("Assumed: used your saved book").strip(" .()")
+    return [lines[0], f"Assumed: read against your saved book in My book — {held}; clear it to ask "
+                      f"without it.", *lines[1:saved], *lines[saved + 1:]]
 
 
 def _language_note(text: str) -> str | None:
@@ -1894,6 +1959,18 @@ def _traced() -> bool:
                 trace.instrument()
                 _TRACE_READY = True
     return True
+
+
+_DAY_FOLLOW_UP = re.compile(
+    r"^\s*(?:and|so|but|what\s+about|how\s+about|why\s+not|and\s+what\s+about)\s+(?:on\s+)?"
+    r"(?P<last>last\s+)?(?P<day>monday|tuesday|wednesday|thursday|friday|saturday|sunday|"
+    r"yesterday|today)\s*[?.!]*\s*$", re.I)
+"""Another day asked of the previous day question."""
+
+
+_IT_FOLLOW_UP = re.compile(r"^\s*(?:(?:and|so|but)\s+)?(?:does|do|is|can|will|would)\s+(?:it|that|"
+                           r"they|this)\b", re.I)
+"""A yes/no follow-up about the thing just discussed."""
 
 
 _SKILLS_Q = re.compile(

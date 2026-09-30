@@ -245,13 +245,42 @@ def bitcoin_treasury(ticker: str, market_cap_usd: float | None,
         held = float(latest["holding_balance"])
     except (KeyError, TypeError, ValueError):
         return None
-    line = f"{latest.get('company_name', ticker)} holds {held:,.0f} BTC"
+    stamp = str(latest.get("ts", "") or "")
+    as_of = (datetime.fromtimestamp(int(stamp) / 1000, UTC).date() if stamp.isdigit() else None)
+    line = (f"{latest.get('company_name', ticker)} holds {held:,.0f} BTC"
+            + (f" as of {as_of:%d %b %Y}" if as_of else ""))
     if bitcoin_usd and market_cap_usd and held > 0:
         worth = held * bitcoin_usd
         line += (f", worth ${worth / 1e9:,.1f}bn at ${bitcoin_usd:,.0f}; a "
                  f"${market_cap_usd / 1e9:,.1f}bn market value is {market_cap_usd / worth:.2f}x "
                  f"its bitcoin")
-    return line + f" ({SOURCE})."
+    return line + f" ({SOURCE})" + _other_treasury_record(ticker, held) + "."
+
+
+def _other_treasury_record(ticker: str, held: float) -> str:
+    """The purchase record the ETF-flow sweep keeps (SoSoValue), when it disagrees.
+
+    One MSTR research page said "Strategy holds 846,842 BTC" in one card and "holding 847,666 BTC"
+    after a 1,665 BTC buy in another, with nothing to reconcile them (a judge, round 11,
+    2026-09-30): Bitget's data service had not moved since before that buy. Both are said, with
+    their dates, and the company's own SEC filing named as the record."""
+    import json
+
+    from argus.truth.paths import DATA_DIR
+
+    if ticker.upper() != "MSTR":
+        return ""
+    try:
+        snapshot = json.loads((DATA_DIR / "etf_flows.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return ""
+    record = snapshot.get("treasury") or {}
+    other, recent = record.get("holding_btc"), record.get("recent") or []
+    if not other or not recent or abs(float(other) - held) < 1:
+        return ""
+    return (f"; SoSoValue's purchase record has {float(other):,.0f} BTC after the "
+            f"{recent[0]['date']} purchase — the feeds disagree, and Strategy's weekly SEC 8-K is "
+            f"the record")
 
 
 __all__ = ["Positioning", "bitcoin_treasury", "crypto_mood", "next_ex_dividend", "positioning",

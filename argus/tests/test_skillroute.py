@@ -60,7 +60,8 @@ def test_an_error_envelope_is_not_an_answer_and_the_mirror_is_credited_as_itself
     assert "the Skill answered with no data" in source.detail
 
 
-def test_a_dark_skill_is_not_asked_again_while_it_cools_down() -> None:
+def test_a_dark_skill_is_not_asked_again_while_it_cools_down(monkeypatch: Any) -> None:
+    monkeypatch.setattr(skillroute, "_START", lambda job: None)  # the answer path only
     clock = [1000.0]
     first = _skill(None, "bitget:sentiment_index: unavailable (TimeoutError)")
     routed = skillroute.route("sentiment_index", "current", skill_call=first,
@@ -139,3 +140,35 @@ def test_the_btc_cross_check_agrees_or_says_it_does_not() -> None:
     dark = skillroute.Routed("crypto_derivatives", "ticker_24h", "server", Health.TIMEOUT, "",
                              "none", None)
     assert _skill_btc_line(_Done(dark), _Ticker(84000.0)) is None
+
+
+def test_a_slow_skill_answers_the_next_question_from_its_background_ask(monkeypatch: Any) -> None:
+    """Round 11 (2026-09-30): the Skills take 15 to 30 seconds and an answer waits a few, so live
+    they were mostly seen as their fallbacks. A failed ask is repeated off the answer's path with
+    time to answer, and the next question gets the Skill's own reading, labelled with when it was
+    read."""
+    monkeypatch.setattr(skillroute, "_START", lambda job: job())  # run the background ask inline
+    clock = [5000.0]
+    calls: list[float] = []
+
+    def slow(tool: str, args: dict[str, Any], wait: float) -> tuple[Any, str]:
+        calls.append(wait)
+        if wait < skillroute.BACKGROUND_WAIT_S:
+            return None, "bitget:sentiment_index: unavailable (TimeoutError)"
+        return {"value": 61, "classification": "Greed"}, "ok"
+
+    first = skillroute.route("sentiment_index", "current", skill_call=slow,
+                             mirror_call=_mirror([{"value": "50"}]), now=lambda: clock[0])
+    assert first.via == "mirror"
+    assert calls[-1] == skillroute.BACKGROUND_WAIT_S
+    clock[0] += 120
+    second = skillroute.route("sentiment_index", "current", skill_call=slow,
+                              mirror_call=_mirror([{"value": "50"}]), now=lambda: clock[0])
+    assert second.via == "skill" and second.cached
+    assert second.payload == {"value": 61, "classification": "Greed"}
+    assert "read at" in second.source().detail
+    clock[0] += skillroute.FRESH_S + 1
+    calls.clear()
+    third = skillroute.route("sentiment_index", "current", skill_call=slow,
+                             mirror_call=_mirror([{"value": "50"}]), now=lambda: clock[0])
+    assert not third.cached and calls  # stale answers are not served; the Skill is asked again

@@ -999,6 +999,10 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
         if isinstance(holders_n, (int, float)) and isinstance(share, (int, float)):
             lines.append(f"Institutions: {holders_n:,.0f} holders own {share:.1f}% of the shares "
                          f"(as of {now_row.get('chg_date')}).")
+            found["institutions"] = {"holders": holders_n, "share_pct": share,
+                                     "holding_vol": now_row.get("holding_total_vol"),
+                                     "net_trade_vol": now_row.get("net_trade_vol"),
+                                     "as_of": now_row.get("chg_date")}
             sources.append(Source(kind="venue",
                                   ref="bitget-mcp-server equity_ownership_inst_position_summary",
                                   detail=f"{ticker} {now_row.get('chg_date')}"))

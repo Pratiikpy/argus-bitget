@@ -779,7 +779,10 @@ CLAIMS: tuple[Claim, ...] = (
     # claim, and matching both made the checker report a disagreement between a document and
     # itself.
     Claim("tests_passing", r"(?P<q>\d{1,3},\d{3}|\d{4,}) tests(?: passing| collected)?",
-          tests_collected, ("readme", "public-readme", "submission", "explained"), mode="at_least"),
+          # "architecture" joined 2026-09-30: ARGUS-ARCHITECTURE.md said 10,340 while the others
+          # said 10,604, the one document the claim did not read (tracker rows 16, 100, 143, 290).
+          tests_collected, ("readme", "public-readme", "submission", "explained", "architecture"),
+          mode="at_least"),
     Claim("source_files",
           r"strict\W{0,3}clean (?:on|across) (?:the )?(?:\*\*)?(?P<q>\d+) (?:source )?files",
           mypy_files, ("readme", "public-readme", "submission", "explained", "architecture")),
