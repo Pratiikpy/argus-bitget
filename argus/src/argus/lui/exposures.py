@@ -842,7 +842,9 @@ def exposures_answer(
         tilt = max((f for f in FACTORS if f != "market"), key=lambda f: abs(load_b[f]))
         lead = (f"Bottom line: your book is {_pct(top_b[1])} {top_b[0]}"
                 + (f" across {eff_sec_b:.1f} effective sectors" if len(sec_b) > 1 else "")
-                + f"; its market beta is {load_b['market']:.2f} to the S&P 500 and its largest "
+                + f"; its market beta is {load_b['market']:.2f} to the S&P 500 (daily closes, "
+                  f"about a year — not the hourly beta to the Nasdaq-100 the console's risk "
+                  f"answers quote) and its largest "
                   f"style tilt is {tilt.replace('_', ' ')} at {_signed(load_b[tilt])}.")
         if top_b[1] >= 0.5 and len(before) > 1:
             lead += (" Half or more of it rides on one sector, so the names do not diversify "

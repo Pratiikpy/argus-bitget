@@ -362,6 +362,27 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
             f"{counts.get('lost', 0)} lost, and {counts.get('implemented', 0)} built but not yet "
             "checked this way &mdash; so for you, a claim on this page is never just our word for "
             "it.</p></div>"
+            # The words the rows use, each in one line: a first-time reader met "ablation", "SUE"
+            # and "Euler risk decomposition" with nothing on the page to say what they are (a
+            # first-user audit, 2026-09-30).
+            "<details class='words'><summary>Words used on this page</summary><dl>"
+            "<dt>Same-input test</dt><dd>ARGUS and the rival run on exactly the same data, "
+            "so the difference is the method, not the input.</dd>"
+            "<dt>Out-of-sample</dt><dd>Checked on data the method was not tuned on, so a result "
+            "is not just a good fit to the past.</dd>"
+            "<dt>Ablation</dt><dd>Switching one part off to see whether the result depended on "
+            "it.</dd>"
+            "<dt>Adversarial test</dt><dd>Inputs built to make the method fail, to find where "
+            "it breaks.</dd>"
+            "<dt>SUE</dt><dd>Standardised unexpected earnings: how far a company's earnings moved "
+            "against its own usual swing.</dd>"
+            "<dt>Euler risk decomposition</dt><dd>Splitting a portfolio's risk into each "
+            "holding's share, so the shares add up to the whole.</dd>"
+            "<dt>Funding z-score</dt><dd>How unusual a perpetual's funding rate is against its own "
+            "recent history, in standard deviations.</dd>"
+            "<dt>Sharpe ratio</dt><dd>Return divided by how much it swung; higher is steadier "
+            "for the same return.</dd>"
+            "</dl></details>"
         )
         sections: list[str] = []
         contents: dict[str, list[str]] = {}
@@ -400,6 +421,12 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
    padding:14px 16px; margin:0 0 16px }}
  .plain p {{ margin:0; font-size:14.5px; max-width:none }}
  .plain b {{ font-weight:600 }}
+ .words {{ margin:-6px 0 16px; font-size:13.5px }}
+ .words dl {{ margin:8px 0 0; display:grid; grid-template-columns:max-content 1fr; gap:4px 12px }}
+ .words dt {{ font-weight:600; color:var(--ink) }}
+ .words dd {{ margin:0; color:var(--dim) }}
+ @media (max-width:520px) {{ .words dl {{ grid-template-columns:1fr }} .words dd {{
+   margin-bottom:6px }} }}
  .w {{ background:var(--panel); border:1px solid var(--line); border-radius:10px;
    padding:14px 16px; margin-bottom:12px }}
  .w h3 {{ font-size:15.5px; margin:6px 0 8px; line-height:1.35 }}

@@ -927,7 +927,10 @@ def resolve_name(raw: str, *, trust_case: bool = True) -> tuple[str, str] | None
 
     traded = resolve_symbol(raw)
     if traded is not None:
-        return traded, ""
+        # Said when the class asked for is not the class answered: "GOOG" was answered as GOOGL
+        # without a word (a hostile review, 2026-09-30).
+        return traded, ("GOOG read as GOOGL: Bitget lists Alphabet's class A shares, which track "
+                        "the class C almost exactly" if raw.strip().upper() == "GOOG" else "")
     upper = raw.strip().upper()
     if not upper or upper in _NOT_A_NAME:
         return None
@@ -1012,6 +1015,12 @@ def _read(text: str) -> dict[str, str]:
     # "S&P 500" and "the S&P" are the index, written as its name: both were declined or answered
     # "not a contract Bitget lists" while "sp500" and "SPX" resolved (2026-09-30).
     text = re.sub(r"\bS\s*&\s*P(?:\s*500)?(?![\w&])", "SP500", text, flags=re.I)
+    # A share class written with its dot ("BRK.B", "BF/B") is one ticker: the dot split "BRK.B"
+    # into BRK and B and the question was answered for QQQ alone (a hostile review, 2026-09-30).
+    text = re.sub(r"\b([A-Z]{2,5})[./]([AB])\b",
+                  lambda m: (m.group(1) + m.group(2)
+                             if resolve_name(m.group(1) + m.group(2)) is not None else m.group(0)),
+                  text)
     trust = not _shouting(text)
     found: dict[str, str] = {}
     rtoken = rtoken_named(text)
@@ -1227,8 +1236,29 @@ def unread_holdings(text: str) -> list[tuple[str, float]]:
     return out
 
 
+_SPLIT_NOTATION = re.compile(
+    r"\b(\d{1,3})\s*/\s*(\d{1,3})(?:\s*/\s*(\d{1,3}))?\s+([A-Za-z]{2,6})\s*/\s*([A-Za-z]{2,6})"
+    r"(?:\s*/\s*([A-Za-z]{2,6}))?\b")
+"""A split written as a trader writes it: "a 60/40 NVDA/AMD book", "50/30/20 BTC/ETH/SOL"."""
+
+
+def split_notation(text: str) -> str:
+    """``60/40 NVDA/AMD`` rewritten as ``60% NVDA, 40% AMD``, the form every weight reader takes;
+    it was refused as a book (a judge's audit, 2026-09-30). Only when the counts match and the
+    weights sum to 100."""
+    def rewrite(m: re.Match[str]) -> str:
+        weights = [g for g in (m.group(1), m.group(2), m.group(3)) if g]
+        names = [g for g in (m.group(4), m.group(5), m.group(6)) if g]
+        if len(weights) != len(names) or sum(int(w) for w in weights) != 100:
+            return m.group(0)
+        return ", ".join(f"{w}% {n}" for w, n in zip(weights, names, strict=True))
+
+    return _SPLIT_NOTATION.sub(rewrite, text)
+
+
 def holding_pairs(text: str) -> list[tuple[int, str, float]]:
     """Every (position, symbol, weight) the text states, weights as fractions of one."""
+    text = split_notation(text)
     found: list[tuple[int, str, float]] = []
     taken: set[tuple[int, int]] = set()
 
@@ -1373,8 +1403,10 @@ _BOOK_CASH_USD = re.compile(
 
 _BOOK_USD = re.compile(
     r"(?<![\w.%])(?:\$\s?(\d[\d,]*(?:\.\d+)?)\s*(k|m)?|(\d[\d,]*(?:\.\d+)?)\s*(k|m)\b)\s*"
-    r"(?:(?:in|of|worth\s+of|into)\s+)?([A-Za-z][A-Za-z0-9.]{1,15})\b", re.I)
-""""$20k NVDA", "20k in TSLA", "$5,000 of BTC": a holding stated as its dollar value."""
+    r"(?:(?:in|of|worth\s+of|into)\s+(?:an?\s+|my\s+|the\s+)?)?"
+    r"([A-Za-z][A-Za-z0-9.]{1,15})\b", re.I)
+""""$20k NVDA", "20k in TSLA", "$5,000 of BTC", "$5k in an S&P fund": a holding stated as its
+dollar value."""
 
 
 _BOOK_COUNT = re.compile(
@@ -1410,6 +1442,8 @@ class PricedBook:
     weights: dict[str, float]
     cash: float
     lines: tuple[str, ...]
+    value: float = 0.0
+    """The whole account in dollars, holdings and cash, at the prices used."""
 
 
 def priced_book(text: str) -> PricedBook | None:
@@ -1437,6 +1471,9 @@ def priced_book(text: str) -> PricedBook | None:
 
 
 def _price_book(text: str) -> PricedBook | None:
+    # The index as it is written in a sentence: "$5k in an S&P fund" (a first-user audit,
+    # 2026-09-30).
+    text = re.sub(r"\bS\s*&\s*P(?:\s*500)?(?![\w&])", "SP500", text, flags=re.I)
     taken: list[tuple[int, int]] = []
 
     def free(span: tuple[int, int]) -> bool:
@@ -1502,7 +1539,8 @@ def _price_book(text: str) -> PricedBook | None:
     if account <= 0:
         return PricedBook(weights={}, cash=0.0, lines=tuple(lines))
     weights = {s: v / gross for s, v in usd.items() if v} if gross > 0 else {}
-    return PricedBook(weights=weights, cash=cash_usd / account, lines=tuple(lines))
+    return PricedBook(weights=weights, cash=cash_usd / account, lines=tuple(lines),
+                      value=account)
 
 
 def _last_prices() -> dict[str, float]:
@@ -1877,13 +1915,15 @@ _HORIZON = re.compile(r"\b(?:hold(?:ing)?(?:\s+it)?|for|over|horizon\s+(?:of|is)
                       r"around\s+)?(\d+)\s*(hours?|days?|weeks?|months?)\b", re.I)
 
 
-_MANDATE_HORIZON = re.compile(r"\b(?:my\s+)?(?:horizon|holding\s+period)\s+(?:is\s+|of\s+)?"
-                              r"(?:about\s+)?(\d+)\s*(hours?|days?|weeks?|months?)\b", re.I)
+_MANDATE_HORIZON = re.compile(r"\b(?:(?:my\s+)?(?:horizon|holding\s+period)\s+(?:is\s+|of\s+)?|"
+                              r"retir\w*\s+in\s+|(?:need|want)\s+(?:the\s+money|it)\s+(?:back\s+)?"
+                              r"in\s+)(?:about\s+)?(\d+)\s*(hours?|days?|weeks?|months?|years?)\b",
+                              re.I)
 """The mandate's own horizon ("my horizon is 2 weeks"), as distinct from how long this one trade
 is meant to last ("hold it for 3 months"), which `_HORIZON` reads."""
 
 
-_HORIZON_HOURS = {"hour": 1, "day": 24, "week": 168, "month": 720}
+_HORIZON_HOURS = {"hour": 1, "day": 24, "week": 168, "month": 720, "year": 8760}
 
 
 def stated_profile(text: str) -> Any:
@@ -1918,7 +1958,25 @@ def stated_profile(text: str) -> Any:
         changes["holding_horizon_hours"] = int(horizon.group(1)) * _HORIZON_HOURS[unit]
     if changes and base is not None:
         changes["name"] = f"{base.name}, with your stated limits"
+    if base is None:
+        # What was not stated is said to be a default, not called "stated": "your stated mandate:
+        # 10% per name ... 168h horizon" printed two limits the trader never gave (a judge's
+        # audit, 2026-09-30).
+        changes["name"] = "your mandate"
+        changes["defaulted"] = tuple(
+            field for field, given in (("max_position_pct", position),
+                                       ("loss_tolerance_pct", loss),
+                                       ("holding_horizon_hours", horizon)) if not given)
     return _replace(profile, **changes) if changes else profile
+
+
+def _hours_said(hours: int) -> str:
+    """A horizon as an adjective in the unit a person says it in: 26280h is "3-year", 168h
+    "1-week"."""
+    for size, unit in ((8760, "year"), (720, "month"), (168, "week"), (24, "day")):
+        if hours >= size and hours % size == 0:
+            return f"{hours // size}-{unit}"
+    return f"{hours}h"
 
 
 def _worst_day_pct(symbol: str, raw_series: Mapping[str, Mapping[datetime, float]]) -> Decimal:
@@ -1997,11 +2055,19 @@ def _mandate_lines(symbol: str, size: float, raw_series: Mapping[str, Mapping[da
         return re.sub(r"(?<![\d.$%])(\d{4,})(?![\d.%h])", lambda m: f"${int(m.group(1)):,}",
                       text)
 
-    limits = (f"{profile.max_position_pct}% per name, {profile.loss_tolerance_pct}% loss "
-              f"tolerance, {profile.holding_horizon_hours}h horizon"
+    defaulted = set(getattr(profile, "defaulted", ()))
+
+    def mark(field: str, text: str) -> str:
+        return f"{text} (a default — say yours)" if field in defaulted else text
+
+    limits = (mark("max_position_pct", f"{profile.max_position_pct}% per name") + ", "
+              + mark("loss_tolerance_pct", f"{profile.loss_tolerance_pct}% loss tolerance") + ", "
+              + mark("holding_horizon_hours",
+                     f"a {_hours_said(profile.holding_horizon_hours)} horizon")
               + (f", excludes {', '.join(_t(x) for x in profile.excluded_symbols)}"
                  if profile.excluded_symbols else ""))
-    lines = [f"Bottom line: for your mandate ({profile.name}: {limits}), {said(mine)} — "
+    named = "" if profile.name == "your mandate" else f"{profile.name}: "
+    lines = [f"Bottom line: for your mandate ({named}{limits}), {said(mine)} — "
              f"{why(mine)}. The bad case is {_t(symbol)}'s own worst 24 hours in the history "
              f"loaded here" + ("" if horizon else ", and the trade is read as a day long — say "
                                                  "how long you would hold it to change that")
@@ -2339,6 +2405,12 @@ def read_request(text: str) -> ResearchRequest | None:
     if ORDER_CJK.search(raw):
         return None  # an instruction to trade, in Chinese; refused as an order, never researched
     symbols, _ = research_symbols(raw)
+    if (len(symbols) == 2 and AFFECTS.search(raw) and not is_an_order(raw)
+            and not about_the_record(raw)):
+        # "What's WTI crude oil doing and does it matter for BTC?" was answered with oil's
+        # technicals, and the German form lost the "how does it affect Bitcoin" half (a judge's
+        # audit, 2026-09-30): whether one moves the other is the pair's co-movement.
+        return ResearchRequest(kind=ResearchKind.COMPARE, symbols=symbols)
     if (len(symbols) >= 2 and _NAMED_BOOK.search(raw) and not re.search(r"\d+(?:\.\d+)?\s*%", raw)
             and not is_an_order(raw) and not _STRESS.search(raw) and not ADD_VERB.search(raw)):
         # A what-if on the named book ("I hold NVDA, TSLA and COIN. What if tech crashes?") is
@@ -2363,6 +2435,27 @@ def read_request(text: str) -> ResearchRequest | None:
             notional=None if capital is None else Decimal(str(capital)),
             notes=() if capital is not None else (
                 "no amount was stated, so the sizes are for $10,000 — say what you have",))
+    if (symbols and _HOLDING_CUE.search(raw) and not re.search(r"\d\s*%", raw)
+            and not ADD_VERB.search(raw) and not is_an_order(raw) and not _STRESS.search(raw)
+            and not _STRESS_BARE.search(raw) and not _HEDGE.search(raw)):
+        # Holdings stated as coins and dollars, not weights: "I have about 2 ETH and $5k in an
+        # S&P fund, what does that mean for me?" was refused as ETH not being a desk name (a
+        # first-time-user audit, 2026-09-30). Priced at Bitget's last prices, it is a book.
+        priced = priced_book(raw)
+        if priced is not None and len(priced.weights) > len(holding_pairs(raw)):
+            return ResearchRequest(
+                kind=ResearchKind.BOOK, symbols=tuple(priced.weights), book=dict(priced.weights),
+                cash=priced.cash, notional=Decimal(str(round(priced.value, 2))),
+                notes=("your holdings were priced at Bitget's last price: "
+                       + ", ".join(priced.lines),))
+    market = {"QQQUSDT", "SPYUSDT", "SP500USDT", "NDX100USDT"}
+    beta_names = tuple(s for s in symbols if s not in market)
+    if (len(beta_names) == 1 and BETA_TO_MARKET.search(raw) and not is_an_order(raw)
+            and not about_the_record(raw)):
+        # "What is the live price of BRK.B and its beta to QQQ?" was read as a comparison of BRK.B
+        # with QQQ, led by which is more volatile (a hostile review, 2026-09-30): a beta to the
+        # market is one name's profile, which states it, with the price first when it is asked.
+        return ResearchRequest(kind=ResearchKind.IMPACT, symbols=beta_names)
     if (len(symbols) == 1 and RISKS_OF.search(raw) and not is_an_order(raw)
             and not about_the_record(raw) and not _LEVERED_OR_SHORT.search(raw)):
         return ResearchRequest(kind=ResearchKind.IMPACT, symbols=symbols,
@@ -2576,7 +2669,10 @@ def read_request(text: str) -> ResearchRequest | None:
     if (symbols and not holding_pairs(raw) and _LINE_ITEM.search(raw)
             and not _EVENT_REACTION.search(raw) and not about_the_record(raw)
             and _is_equity_or_traded(symbols[0])):
-        return ResearchRequest(kind=ResearchKind.FUNDAMENTALS, symbols=symbols[:1])
+        # Two companies' line items side by side: "compare NVDA and AMD quarterly revenue" gave
+        # NVDA's alone (a judge's audit, 2026-09-30).
+        pair = tuple(s for s in symbols[:2] if _is_equity_or_traded(s))
+        return ResearchRequest(kind=ResearchKind.FUNDAMENTALS, symbols=pair or symbols[:1])
     if (symbols and not holding_pairs(raw) and _EVENT_REACTION.search(raw)
             and not about_the_record(raw)
             and not (symbols[0] in _SHOCK_SUBJECTS and _MACRO.search(raw))):
@@ -3184,6 +3280,18 @@ def with_book(request: ResearchRequest | None, book_text: str,
     return request
 
 
+GIVEN_THAT = re.compile(
+    r"\bgiven\s+(?:that|this|what\s+i\s+(?:said|told\s+you|hold))\b|\bin\s+that\s+case\b|"
+    r"\bwith\s+that\s+(?:in\s+mind|book|portfolio)\b|\bwhat\s+should\s+i\s+(?:do|change)\s+"
+    r"(?:differently|then|about\s+it|about\s+that)\b|\bso\s+what\s+(?:should|do)\s+i\s+do\b", re.I)
+"""A follow-up that leans on what the trader just said, naming nothing new."""
+
+COMPARE_FOLLOW_UP = re.compile(
+    r"^\s*(?:and\s+|so\s+)?(?:how\s+(?:does|do|did)\s+(?:that|it|this|they)\s+compare|compared?|"
+    r"(?:and\s+)?vs\.?|versus|(?:and\s+)?against|how\s+about\s+against)\s+(?:with|to|against)?",
+    re.I)
+"""A follow-up that sets a new name beside the one already asked about."""
+
 _FOLLOW_UP = re.compile(
     r"^\s*(?:and\s+)?(?:what|how)\s+(?:about|abt|bout)\b|^\s*and\s+(?:for\s+)?\S+\s*\??\s*$|"
     r"^\s*(?:same|now|ok(?:ay)?|also)\b[^?]{0,40}\b(?:for|with)\b|^\s*(?:do|try)\s+(?:the\s+)?"
@@ -3245,6 +3353,22 @@ def follow_up(text: str, prior: list[str], book_text: str = "") -> ResearchReque
     contextual = _contextual_follow_up(text, prior, book_text)
     if contextual is not None:
         return contextual
+    if COMPARE_FOLLOW_UP.search(text):
+        # "how does that compare with AMD?" after two questions on NVDA's revenue and earnings
+        # answered AMD alone and said no question was recognised (a judge's audit, 2026-09-30):
+        # the earlier question, asked of both names.
+        added, _ = research_symbols(text)
+        earlier_request = _previous_request(prior, book_text)
+        if added and earlier_request is not None:
+            earlier, base = earlier_request
+            kept = tuple(s for s in base.symbols if s not in added)[:1]
+            if kept:
+                names = (*kept, added[0])
+                kind = (base.kind if base.kind in (ResearchKind.FUNDAMENTALS, ResearchKind.COMPARE)
+                        else ResearchKind.COMPARE)
+                return replace(base, kind=kind, symbols=names, book={}, notes=(
+                    *base.notes, f"read as the previous question — \"{earlier[:60]}\" — for "
+                                 f"{_t(names[0])} and {_t(names[1])} side by side"))
     if not _FOLLOW_UP.search(text):
         return None
     named, _ = research_symbols(text)
@@ -3307,6 +3431,15 @@ def _contextual_follow_up(text: str, prior: list[str],
                           book_text: str) -> ResearchRequest | None:
     """A new book, a bare "and that?", or "is that bullish?" — each read against the previous
     research question in the client's own history."""
+    if GIVEN_THAT.search(text) and not research_symbols(text)[0]:
+        # "what should I do differently given that", after stating 2 ETH and $5k in an S&P
+        # fund, was answered for ETH alone (a first-time-user audit, 2026-09-30): the earlier
+        # question, with everything it stated.
+        found = _previous_request(prior, book_text)
+        if found is not None:
+            earlier, base = found
+            return replace(base, notes=(*base.notes, f"read as the previous question — "
+                                                     f"\"{earlier[:60]}\" — asked again"))
     rebook = _REBOOK.match(text)
     new_book = parse_book(text) if rebook else {}
     if rebook and new_book:
@@ -3769,6 +3902,17 @@ TAKE_ON = re.compile(
     r"\b|\bwhat\s+do\s+you\s+(?:think|make)\s+(?:of|about)\b|\bhow\s+do\s+you\s+(?:see|feel\s+about)"
     r"\b", re.I)
 """An open-ended view asked of a name: "quick take on ETH", "what do you think of COIN"."""
+
+AFFECTS = re.compile(
+    r"\b(?:does|do|did|will|would|can)\s+(?:\S+\s+){0,2}\S+\s+(?:matter|affect|impact|"
+    r"drive|move|influence|hit)\s+(?:for\s+)?|\bhow\s+(?:does|do|will)\s+(?:\S+\s+){0,2}\S+\s+"
+    r"(?:affect|impact|influence|hit)\b|\b(?:effect|impact)\s+(?:of\s+\S+\s+)?on\b", re.I)
+"""Whether one market moves another: "does oil matter for BTC", "how does that affect bitcoin"."""
+
+BETA_TO_MARKET = re.compile(
+    r"\bbeta\s+(?:to|vs\.?|versus|against|relative\s+to|with)\s+(?:the\s+)?(?:qqq|spy|market|"
+    r"nasdaq(?:-?100)?|s&p(?:\s*500)?|sp500|ndx100|index)\b", re.I)
+"""A beta asked against the market benchmark, not a comparison of two names."""
 
 _LEVERED_OR_SHORT = re.compile(
     r"(?<![\w.])\d+(?:\.\d+)?\s*x\b|\bleverag\w*|\bshort(?:ing|s)?\b", re.I)

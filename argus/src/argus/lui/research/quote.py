@@ -333,7 +333,7 @@ def _quote_extras(raw_text: str, quoted: list[tuple[str, Any]],
     if len(quoted) >= 2 and _RATIO_Q.search(raw_text):
         (a_sym, a), (b_sym, b) = quoted[0], quoted[1]
         ratio = float(a.last) / float(b.last)
-        text = (f"The {_t(a_sym)}/{_t(b_sym)} ratio is {ratio:,.2f} on Bitget right now "
+        text = (f"The {_t(a_sym)}/{_t(b_sym)} ratio is {ratio:,.4g} on Bitget right now "
                 f"({a.last} over {b.last}).")
         lines.append(text)
         lead = lead or text

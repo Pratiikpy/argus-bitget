@@ -38,8 +38,9 @@ def test_a_question_in_flight_stays_on_screen_with_a_running_count() -> None:
     """First-user audit, 2026-09-29: a slow answer showed only a greyed-out button."""
     from argus.lui import server
 
-    assert 'class="card pending" id="pending"' in server.PAGE
-    assert "clearInterval(ticker)" in server.PAGE and "pending.remove()" in server.PAGE
+    # Each question holds its own placeholder, replaced in place (a first-user audit, 2026-09-30).
+    assert 'class="card pending" id="${slotId}"' in server.PAGE
+    assert "clearInterval(ticker)" in server.PAGE and "leftover.remove()" in server.PAGE
 
 
 def test_the_suggestions_are_buttons_a_keyboard_can_reach() -> None:

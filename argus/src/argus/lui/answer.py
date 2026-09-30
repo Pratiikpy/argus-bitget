@@ -427,12 +427,17 @@ def _how_it_was_reached(seq: int) -> list[str]:
         keep = 1
         if prefix == "[panel] ":
             # which analysts ran, whether they could see each other, and what deliberation cost
+            # "also ran" is kept too: the cross-asset analyst runs outside the selected panel, and
+            # without its note "3 of 3 analysts run" sat above "4 analysts" in the agreement line
+            # (a judge's audit, 2026-09-30).
             found = [n for n in found
-                     if " analysts run" in n or "deliberation" in n or "ran concurrently" in n]
-            keep = 3
+                     if " analysts run" in n or "deliberation" in n or "ran concurrently" in n
+                     or " also ran" in n]
+            keep = 4
         for note in found[:keep]:
             text = note[len(prefix):].strip() if prefix.startswith("[") else note
             text = text.removeprefix("panel:").removeprefix("ENTITY GATE —").strip()
+            text = text.replace("cross_asset also ran", "the cross-asset analyst also ran")
             line = f"{label}: {text[:1].upper()}{text[1:]}".rstrip(".") + "."
             if prefix == "[grounding]" and "do not resolve" in line:
                 # A flagged figure that the desk's own agreement step produced is not an outside

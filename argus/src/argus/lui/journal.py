@@ -1512,8 +1512,11 @@ def _money(value: float) -> str:
 
 
 _HOLDING = re.compile(
-    rf"(?<![\w.]){_NUM}\s*(?:shares?\s+(?:of\s+)?|units?\s+(?:of\s+)?)?\$?([A-Za-z]{{2,6}})\s*"
+    rf"(?<![\w.]){_NUM}\s*(?:shares?\s+(?:of\s+)?|units?\s+(?:of\s+)?|contracts?\s+(?:of\s+)?)?"
+    rf"\$?([A-Za-z]{{2,6}})\s*(?:(?:perpetual|perp|futures?|spot)\s+)?(?:contracts?\s+|shares?\s+)?"
     rf"(?:(?:that\s+i\s+|which\s+i\s+)?(?:bought|purchased|acquired|entered|paid)\s+)?(?:@|at\s+)"
+    # "at an average entry price of 205.00" (a hostile review, 2026-09-30)
+    rf"(?:an?\s+)?(?:average\s+|avg\.?\s+)?(?:entry\s+|cost\s+)?(?:price\s+)?(?:of\s+)?"
     rf"\s*\$?{_NUM}", re.I)
 """A holding written with its entry price: "100 COIN@$180", "50 MSTR at 320", "100 shares of
 NVDA bought at $200"."""

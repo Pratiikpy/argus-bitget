@@ -48,11 +48,11 @@ _ACCOUNT = (
 )
 """The account size, written "$50,000 account", "account of 50k" or "50k account"."""
 _RISK_PCT = re.compile(
-    r"\brisk(?:ing)?\s+(?:at\s+most\s+|max(?:imum)?\s+|no\s+more\s+than\s+|up\s+to\s+|only\s+)?"
+    r"\brisk(?:ing)?\s+(?:at\s+most\s+|max(?:imum)?\s+|no\s+more\s+than\s+|up\s+to\s+|only\s+|exactly\s+|about\s+|around\s+|roughly\s+|just\s+)?"
     r"(?P<p>\d+(?:\.\d+)?)\s*%|(?P<p2>\d+(?:\.\d+)?)\s*%\s+(?:risk|of\s+(?:my\s+)?(?:account|"
     r"capital)\s+(?:per|a|each)\s+trade)", re.I)
 _RISK_USD = re.compile(
-    r"\brisk(?:ing)?\s+(?:at\s+most\s+|max(?:imum)?\s+|no\s+more\s+than\s+|up\s+to\s+|only\s+)?"
+    r"\brisk(?:ing)?\s+(?:at\s+most\s+|max(?:imum)?\s+|no\s+more\s+than\s+|up\s+to\s+|only\s+|exactly\s+|about\s+|around\s+|roughly\s+|just\s+)?"
     r"\$\s*(?P<n>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k)?", re.I)
 _STOP_PCT = re.compile(
     r"(?P<p>\d+(?:\.\d+)?)\s*%\s*(?:stop|stop[-\s]loss|sl)\b|\b(?:stop|stop[-\s]loss|sl)\s+(?:of|at|"

@@ -345,6 +345,29 @@ def _standalone_lead(lines: list[str], add: str, raw: Mapping[str, Mapping[Any, 
     if HOW_MUCH_IN.search(raw_text) and worst_day is not None:
         capital = float(request.notional) if request.notional is not None else 10_000.0
         return [*capital_lines(name, capital, worst_day), *rest]
+    from argus.lui.research.parse import BETA_TO_MARKET
+
+    if BETA_TO_MARKET.search(raw_text):
+        # The beta asked for leads, with the price first when that was asked too (a hostile
+        # review, 2026-09-30).
+        beta_line = next((line for line in rest if " moves " in line and "Nasdaq-100" in line),
+                         None)
+        if beta_line is not None:
+            price_first = ""
+            if re.search(r"\bprice\b|\bquote\b|\btrading\s+at\b", raw_text, re.I):
+                try:
+                    from argus.market.bitget import fetch_tickers
+
+                    last = float(fetch_tickers()[add].last)
+                    price_first = f"{name} last {last:,.2f} USDT on Bitget; "
+                except Exception:
+                    price_first = ""
+            word = beta_line.split(" ", 1)[0]
+            said = (beta_line if any(c.isupper() for c in word[1:])
+                    else beta_line[:1].lower() + beta_line[1:])
+            return [f"Bottom line: {price_first}{said}" if price_first
+                    else f"Bottom line: {beta_line}",
+                    *(line for line in rest if line is not beta_line)]
     should = re.search(r"\bshould\s+i\s+(?:buy|get\s+into|invest\s+in|add)\b|\bis\s+\S+\s+a\s+"
                        r"(?:good\s+)?buy\b|\bworth\s+buying\b", raw_text, re.I)
     if TAKE_ON.search(raw_text) or RISKS_OF.search(raw_text) or should:
@@ -633,6 +656,48 @@ def _agent_hub_lines(symbol: str, request: ResearchRequest, plan: Any,
         return []
 
 
+def _earnings_straddle(found: list[str], symbol: str, sources: list[Source]) -> list[str]:
+    """The options line priced on the first expiry that spans the next report, when earnings were
+    asked about and the nearest expiry falls before it (a judge's audit, 2026-09-30: TSLA's move
+    "around its next earnings" was the 5 Oct straddle, 16 days before the 21 Oct report)."""
+    from argus.lui.watchlist import earnings_date
+    from argus.market.options import OptionsError, options_summary
+    from argus.truth import http
+
+    ticker = _t(symbol)
+    at = next((i for i, line in enumerate(found)
+               if f"Options on {ticker} (Cboe" in line and "straddle prices" in line), None)
+    if at is None:
+        return found
+    report = earnings_date(ticker, datetime.now(UTC).date())
+    if report is None:
+        return found
+    shown = re.search(r"move by (\d{4}-\d{2}-\d{2})", found[at])
+    if shown is not None and date.fromisoformat(shown.group(1)) >= report.day:
+        return found
+    try:
+        spanning = options_summary(ticker, after=report.day)
+    except (http.RpcError, OptionsError, ValueError, KeyError):
+        spanning = None
+    if spanning is None or spanning.implied_move_pct is None or spanning.expiry is None:
+        return [*found[:at + 1],
+                f"The expiry above ends before {ticker}'s report on {report.day:%d %b}; no "
+                f"quoted expiry after it could be read, so the move priced around the report "
+                f"is not given.", *found[at + 1:]]
+    line = (f"Around the report: {ticker} reports on {report.day:%d %b}"
+            + (" (an estimated date)" if report.estimated else "")
+            + f"; the first expiry after it, {spanning.expiry.isoformat()}, prices a "
+              f"{spanning.implied_move_pct:.1f}% move either way — the nearer expiry quoted "
+              f"below ends before the report.")
+    sources.append(Source(kind="venue", ref="cboe delayed_quotes/options",
+                          detail=f"{ticker} chain, first expiry after {report.day.isoformat()}"))
+    lead = next((i for i, x in enumerate(found) if bool(LEAD.match(x))), None)
+    if lead is None:
+        return [f"Bottom line: {line}", *found]
+    rest = LEAD.sub("", found[lead], count=1)
+    return [f"Bottom line: {line}", *found[:lead], rest, *found[lead + 1:]]
+
+
 def _positioning_lead(found: list[str], raw_text: str, symbol: str) -> list[str]:
     """Lead a sentiment answer with the listed-market line the question asked for — the options
     chain, dark pools or short volume (`lui/research/positioning.py`) — or say it is missing.
@@ -724,6 +789,8 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             found = _lead_with(found, "Funding means ")
         if request.kind is ResearchKind.SENTIMENT and request.symbols:
             found = _positioning_lead(found, raw_text, request.symbols[0])
+            if re.search(r"\bearnings\b|\breport\b", raw_text, re.I):
+                found = _earnings_straddle(found, request.symbols[0], extra)
         if (request.kind is ResearchKind.MACRO and request.symbols
                 and any("standing for it" in note for note in request.notes)):
             # "how does that affect crypto" after a Fed question: the name's own sensitivity to
@@ -1016,7 +1083,9 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             lines, extra, book_payload = _book_report(request, data, is_open)
             sources.extend(extra)
             payload["book"] = book_payload
-            worth = parse_notional(raw_text)
+            # A book priced from coins and dollars carries its own value; the first amount in
+            # the text is only one holding (2026-09-30).
+            worth = request.notional or parse_notional(raw_text)
             if worth and request.book:
                 dollar_lines = _book_dollar_lines(request, data, is_open, float(worth))
                 if dollar_lines:
@@ -1257,7 +1326,10 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             actionable = (_momentum_lead(rows, week=bool(_WEEK_ASKED.search(raw_text)))
                           if _asks_for_the_move(raw_text) else _compare_lead(rows))
             lines.insert(1, actionable + ". Listed from most to least volatile.")
-            if re.search(r"\bcorrelat\w*|\bmove\s+together\b|\bco-?move", raw_text, re.I):
+            from argus.lui.research.parse import AFFECTS
+
+            if (re.search(r"\bcorrelat\w*|\bmove\s+together\b|\bco-?move", raw_text, re.I)
+                    or AFFECTS.search(raw_text)):
                 # "How correlated is LINK to BTC" led on which is riskier; the figure asked
                 # for leads (2026-09-25 audit, round 2).
                 lines = _lead_with(lines, f"{a.removesuffix('USDT')} and ")

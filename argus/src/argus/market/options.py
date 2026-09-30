@@ -155,8 +155,14 @@ def _new_york(stamp: str) -> str:
     return at.astimezone(NEW_YORK).strftime("%Y-%m-%d %H:%M")
 
 
-def summarise(payload: Mapping[str, Any], *, today: date) -> OptionsSummary:
-    """Reduce one Cboe chain to the figures above. Pure: no network."""
+def summarise(payload: Mapping[str, Any], *, today: date,
+              after: date | None = None) -> OptionsSummary:
+    """Reduce one Cboe chain to the figures above. Pure: no network.
+
+    ``after``, when given, picks the first expiry on or after that day rather than the nearest:
+    the move priced around an earnings report is the straddle that spans it. The nearest expiry,
+    16 days before TSLA's report, was quoted as "the move around its next earnings" (a judge's
+    audit, 2026-09-30)."""
     data = payload.get("data") or {}
     symbol = str(data.get("symbol") or "")
     spot = float(data.get("current_price") or data.get("close") or 0.0)
@@ -168,7 +174,8 @@ def summarise(payload: Mapping[str, Any], *, today: date) -> OptionsSummary:
     puts = [c for c in contracts if c.right == "P"]
     calls = [c for c in contracts if c.right == "C"]
     quoted = [c for c in contracts if c.quoted]
-    later = sorted({c.expiry for c in quoted if (c.expiry - today).days >= MIN_DAYS_TO_EXPIRY})
+    later = sorted({c.expiry for c in quoted if (c.expiry - today).days >= MIN_DAYS_TO_EXPIRY
+                    and (after is None or c.expiry >= after)})
     expiry = later[0] if later else None
     atm = move = skew = None
     if expiry is not None:
@@ -208,11 +215,12 @@ def fetch_chain(symbol: str, *, timeout: float = TIMEOUT_S) -> dict[str, Any]:
 
 
 def options_summary(symbol: str, *, now: datetime | None = None,
-                    timeout: float = TIMEOUT_S) -> OptionsSummary:
+                    timeout: float = TIMEOUT_S, after: date | None = None) -> OptionsSummary:
     now = now or datetime.now(UTC)
     # Days to expiry are counted on the exchange's calendar: after 20:00 in New York the UTC date
     # is already tomorrow's.
-    return summarise(fetch_chain(symbol, timeout=timeout), today=now.astimezone(NEW_YORK).date())
+    return summarise(fetch_chain(symbol, timeout=timeout), today=now.astimezone(NEW_YORK).date(),
+                     after=after)
 
 
 def options_evidence(symbol: str, *, as_of: datetime,

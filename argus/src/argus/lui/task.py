@@ -206,6 +206,7 @@ def read_question(text: str, saved_book: str = "") -> Reading | str:
         notes.append(f"no size was given, so the task assesses a {UNSTATED_SIZE_PCT:g}% position "
                      "— say the size you have in mind to change it")
         notes.extend(_held_note(named[0], book))
+        notes.extend(_also_named(text, named[0], book))
         return Reading(name=named[0], size_pct=UNSTATED_SIZE_PCT, book=book, cash=cash,
                        notes=tuple(notes))
     name = request.symbols[0]
@@ -225,9 +226,24 @@ def read_question(text: str, saved_book: str = "") -> Reading | str:
     if request.notional is not None:
         notes.append(f"the execution step is sized on the ${request.notional:,.0f} you named")
     notes.extend(_held_note(name, book))
+    notes.extend(n for n in _also_named(text, name, book)
+                 if not any("several contracts" in m for m in notes))
     direct = request if request.kind not in _ADD_KINDS else None
     return Reading(name=name, size_pct=size_pct, book=book, cash=cash, notes=tuple(notes),
                    notional=request.notional, direct=direct)
+
+
+def _also_named(text: str, name: str, book: dict[str, float]) -> list[str]:
+    """A note for every other contract the question names that the task does not research: "a
+    readout on Coinbase's competitor risk and MSTR's bitcoin exposure together" researched COIN
+    and dropped MSTR after one line without a word (a judge's audit, 2026-09-30)."""
+    others = [s for s in research_symbols(text)[0] if s != name and s not in book]
+    if not others:
+        return []
+    shown = ", ".join(s.removesuffix("USDT") for s in others)
+    return [f"the task researches one name at a time, {name.removesuffix('USDT')} here; {shown} "
+            f"{'was' if len(others) == 1 else 'were'} named too — run the task on "
+            f"{'it' if len(others) == 1 else 'each'} for its own readout"]
 
 
 _ASKED_NAME = re.compile(

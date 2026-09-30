@@ -384,6 +384,10 @@ class TraderProfile:
     holding_horizon_hours: int
     loss_tolerance_pct: Decimal
     preferred_evidence: tuple[str, ...] = ()
+    defaulted: tuple[str, ...] = ()
+    """The limits the trader did not state and a default filled — "max_position_pct",
+    "holding_horizon_hours" — so an answer can say which of its limits are theirs (a judge's
+    audit, 2026-09-30: a defaulted cap and horizon were printed as "your stated mandate")."""
 
     # --- the dimensions an Investor Policy Statement carries that the first six did not ---
     #

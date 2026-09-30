@@ -119,6 +119,8 @@ PAGE = """<!doctype html>
   .book input { flex:1 1 280px; min-width:0; padding:7px 10px; border:1px solid var(--line);
     border-radius:7px; background:var(--panel); color:var(--ink); font:13px var(--mono) }
   .book .saved { font-size:12px; color:var(--ok) }
+  .book .saved .clear { background:none; border:0; padding:0; font:inherit; color:var(--accent);
+    text-decoration:underline; cursor:pointer }
   .group { font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--dim);
     margin:0 0 6px }
   .line.act { font-weight:600; color:var(--ink); border-left:2px solid var(--ink);
@@ -231,7 +233,7 @@ qEl.addEventListener('keydown', e => {
   }
 });
 const bookEl = document.getElementById('book'), savedEl = document.getElementById('saved');
-let turns = [], first = true;
+let turns = [], first = true, askSeq = 0;
 // Our own visits are marked so the usage count (`lui/usage.py`) is of other people: opening the
 // console once with ?internal=1 sets the flag in this browser.
 let internal = '';
@@ -249,10 +251,25 @@ const ASK_LIMIT_MS = 90000;
 
 // The book is the visitor's own and stays in their browser; it is sent with each question and
 // never stored on the server.
+// A restored book says so, with a way to clear it: it came back silently on every visit with no
+// sign it was remembered and no control to forget it (a first-time-user audit, 2026-09-30).
+const showSaved = () => {
+  savedEl.innerHTML = bookEl.value.trim()
+    ? 'saved in this browser · <button type="button" class="clear" id="clearbook">clear</button>'
+    : '';
+};
 try { bookEl.value = localStorage.getItem('argus.book') || ''; } catch (e) {}
+showSaved();
 bookEl.addEventListener('change', () => {
   try { localStorage.setItem('argus.book', bookEl.value.trim()); } catch (e) {}
-  savedEl.textContent = bookEl.value.trim() ? 'saved in this browser' : '';
+  showSaved();
+});
+savedEl.addEventListener('click', e => {
+  if (!e.target.closest('#clearbook')) return;
+  bookEl.value = '';
+  try { localStorage.removeItem('argus.book'); } catch (err) {}
+  showSaved();
+  bookEl.focus();
 });
 
 // What the trader has told the console ("I can't lose more than 10%", "I think NVDA runs on AI
@@ -377,14 +394,27 @@ document.getElementById('f').addEventListener('submit', async ev => {
   const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), ASK_LIMIT_MS);
   // The question stays on screen with a running count while the desk works: a slow answer showed
   // only a greyed-out button and an empty box, and read as stuck (first-user audit, 2026-09-29).
-  out.insertAdjacentHTML('afterbegin', `<div class="card pending" id="pending">` +
+  // Each question holds its own place: the answer replaces this card where it stands, so two
+  // questions in flight keep the order they were asked in. A slow answer used to be inserted at
+  // the top when it finished, above a newer fast one (a first-user audit, 2026-09-30).
+  const slotId = `pending-${++askSeq}`;
+  out.insertAdjacentHTML('afterbegin', `<div class="card pending" id="${slotId}">` +
     `<div class="q">${esc(text)}</div><div class="meta"><span class="tag">working · ` +
-    `<span id="tick">0</span> s</span></div></div>`);
+    `<span class="tick">0</span> s</span></div></div>`);
+  const place = html => {
+    const slot = document.getElementById(slotId);
+    if (!slot) { out.insertAdjacentHTML('afterbegin', html); return out.firstElementChild; }
+    slot.insertAdjacentHTML('beforebegin', html);
+    const card = slot.previousElementSibling;
+    slot.remove();
+    return card;
+  };
+  let placed = null;
   // Brought into view when it lands in the lower half of the screen, as it does under the examples
   // on a phone and on a portrait tablet; the answer replaces it in place, so the reader is already
   // looking at where it arrives. The line used to be "below the screen", which on an 820x1180
   // tablet left the answer starting 119px from the bottom edge (a first-user audit, 2026-09-30).
-  const inFlight = document.getElementById('pending');
+  const inFlight = document.getElementById(slotId);
   const bringIntoView = card => {
     if (card && card.getBoundingClientRect().top > innerHeight * 0.5) {
       card.scrollIntoView({block: 'start', behavior:
@@ -393,7 +423,7 @@ document.getElementById('f').addEventListener('submit', async ev => {
   };
   bringIntoView(inFlight);
   const t0 = Date.now(), ticker = setInterval(() => {
-    const tick = document.getElementById('tick');
+    const tick = document.querySelector(`#${slotId} .tick`);
     if (tick) tick.textContent = String(Math.round((Date.now() - t0) / 1000));
   }, 1000);
   try {
@@ -405,7 +435,7 @@ document.getElementById('f').addEventListener('submit', async ev => {
     if (a.memory) { try { memory = JSON.parse(a.memory); } catch (e) {} saveMemory(); }
     // Plain elapsed time. The per-intent budget is an engineering target, and stamping a correct
     // answer "OVER BUDGET" in the warning colour read as a failure (audit, 2026-09-26).
-    out.insertAdjacentHTML('afterbegin', `
+    placed = place(`
       <div class="card ${a.refused ? 'refused' : ''}">
         <div class="q">${esc(text)}</div>
         <div class="meta">
@@ -435,7 +465,7 @@ document.getElementById('f').addEventListener('submit', async ev => {
     if (a.translate) {
       // English first, then the reader's language: every figure in the translation was checked
       // against the English by the server before it was sent (`lui/translate.py`).
-      const card = out.firstElementChild;
+      const card = placed;
       const body = a.lines.slice(a.translate.skip);
       post('translate', {lang: a.translate.lang, token: a.translate.token,
         lines: JSON.stringify(body)})
@@ -459,17 +489,17 @@ document.getElementById('f').addEventListener('submit', async ev => {
       : String(e.message).startsWith('http ')
         ? `The desk hit an error answering this (${esc(e.message.toUpperCase())}).`
         : 'The console could not reach the desk: the connection dropped or the server is down.';
-    out.insertAdjacentHTML('afterbegin',
+    placed = place(
       `<div class="card refused"><div class="q">${esc(text)}</div>
        <div class="line">${why} Your question is back in the box — ask again, or ask something
        narrower.</div></div>`);
     if (!qEl.value) { qEl.value = text; grow(); }
   } finally {
     clearTimeout(timer); clearInterval(ticker);
-    const pending = document.getElementById('pending'); if (pending) pending.remove();
+    const leftover = document.getElementById(slotId); if (leftover) leftover.remove();
     // Again once the answer is in: while it was pending the page was often too short to scroll
     // that far. The box is refocused only where that opens no on-screen keyboard over the answer.
-    bringIntoView(out.firstElementChild);
+    bringIntoView(placed);
     document.getElementById('go').disabled = false;
     if (!matchMedia('(pointer: coarse)').matches) qEl.focus({preventScroll: true});
   }
@@ -683,8 +713,16 @@ def _carry_prior_name(text: str, prior: list[str]) -> str | None:
         return None
     if about_the_record(text):
         return None
+    from argus.lui.research.parse import GIVEN_THAT
+
+    if GIVEN_THAT.search(text):
+        # "what should I do differently given that" leans on the whole earlier question — a book
+        # of two holdings — not on its first name (a first-time-user audit, 2026-09-30).
+        return None
     for earlier in reversed(prior[-4:]):
         named = research_symbols(earlier)[0]
+        if len(named) > 1:
+            return None  # "it" after a question about several names is not one of them
         if named:
             return f"{text} ({named[0].removesuffix('USDT')})"
         if _ABOUT_THE_BOOK.search(earlier):
@@ -1034,6 +1072,12 @@ def _answer(
         return engine_payload(*arbitrage.answer(text), by="arbitrage")
     if onchain.asks_for_gas(text):
         return engine_payload(*onchain.gas(text), by="eth-gas")
+    from argus.lui import agent_answer
+
+    if agent_answer.asks_about_the_agent(text):
+        # The Track 2 agent's Sharpe and win rate were answered from this console's own desk
+        # ledger, a different system (a judge's audit, 2026-09-30).
+        return engine_payload(*agent_answer.answer(), by="track2-agent")
     from argus.lui import architecture
 
     if architecture.ARCHITECTURE_Q.search(text) and not riskexplain_asked(text):
@@ -1460,6 +1504,12 @@ def _answer(
         swapped_from = resolved_previous(prior, book)
         wording = (swapped_from[0] if swapped_from is not None and _NAME_SWAP.search(text)
                    and swapped_from[1].kind is followed.kind else text)
+        from argus.lui.research.parse import COMPARE_FOLLOW_UP
+
+        if swapped_from is not None and COMPARE_FOLLOW_UP.search(text):
+            # "how does that compare with AMD?" is answered in the earlier question's words, so
+            # the revenue it asked for leads for both names (a judge's audit, 2026-09-30).
+            wording = swapped_from[0]
         payload = _research_payload(wording, prior, followed, ledger, started,
                                     "research-follow-up",
                                     {**audit, "detail": "a follow-up to the previous question"})
@@ -1536,6 +1586,50 @@ def _answer(
 
 
 
+_PRICE_ASKED = re.compile(
+    r"\bwhere(?:'s|\s+is|\s+are)\b|\bprice\b|\bquote\b|\btrading\s+at\b|\bat\s+right\s+now\b|"
+    r"\bwhat(?:'s|\s+is)\s+\S+(?:\s+\S+){0,2}\s+(?:doing|at)\b|\blevel\s+of\b|\bratio\b", re.I)
+_RATIO = re.compile(r"\b([A-Za-z]{2,6})\s*/\s*([A-Za-z]{2,6})\s+(?:ratio|cross)\b", re.I)
+
+
+def _prices_left_out(text: str, lines: list[str]) -> list[str]:
+    """The last price of each name the question asks the price of and the answer never states,
+    and a ratio asked for by name ("the ETH/BTC ratio"); nothing when no price was asked."""
+    if not _PRICE_ASKED.search(text):
+        return []
+    named = research_symbols(text)[0]
+    if not named:
+        return []
+    joined = " ".join(lines)
+    try:
+        from argus.market.bitget import fetch_tickers
+
+        tickers = fetch_tickers()
+    except Exception:
+        return []
+    out: list[str] = []
+    ratio = _RATIO.search(text)
+    if ratio is not None and len(named) >= 2 and not re.search(r"\bratio is\b", joined):
+        first, second = named[0], named[1]
+        a, b = tickers.get(first), tickers.get(second)
+        if a is not None and b is not None and float(b.last) > 0:
+            level = float(a.last) / float(b.last)
+            out.append(f"{first.removesuffix('USDT')}/{second.removesuffix('USDT')} stands at "
+                       f"{level:.5g} ({first.removesuffix('USDT')} {float(a.last):,.2f} over "
+                       f"{second.removesuffix('USDT')} {float(b.last):,.2f}, Bitget last prices).")
+    for symbol in named:
+        name = symbol.removesuffix("USDT")
+        ticker = tickers.get(symbol)
+        if ticker is None or re.search(rf"\b{re.escape(name)}\b[^.;]{{0,40}}\blast\b", joined):
+            continue
+        if ratio is not None:
+            continue  # the ratio line carries both prices
+        change = getattr(ticker, "change_24h", None)
+        out.append(f"{name} last {float(ticker.last):,.2f} USDT on Bitget"
+                   + (f" ({float(change) * 100:+.2f}% over 24h)." if change is not None else "."))
+    return out
+
+
 def _research_payload(
     text: str, prior: list[str], request: Any, ledger: PaperLedger, started: float,
     classified_by: str, audit: dict[str, Any],
@@ -1558,6 +1652,17 @@ def _research_payload(
                       len(result.lines))
             result.lines[at:at] = extra
     payload = result.as_dict()
+    if not result.refused:
+        asked = _prices_left_out(text, [str(line) for line in payload.get("lines") or []])
+        if asked:
+            # "Where's the 10-year yield and gold right now?" gave the yield and never gold's
+            # price; "what's WTI doing and does it matter for BTC?" never gave oil (a judge's
+            # audit, 2026-09-30): a price asked for is stated under the lead.
+            body = list(payload.get("lines") or [])
+            payload["lines"] = [*body[:1], *asked, *body[1:]]
+            payload["sources"] = [*payload.get("sources", []),
+                                  {"kind": "venue", "ref": "bitget /api/v2/mix/market/tickers",
+                                   "detail": "last prices for the names asked about"}]
     note = _language_note(text)
     if note:
         payload["lines"] = [note, *payload.get("lines", [])]
@@ -1709,8 +1814,10 @@ def allowance_spent(visitor: str) -> bool:
 
 
 ALLOWANCE_NOTE = ("The language model is paused for you for up to an hour (the hourly allowance on "
-                  "this public console is used), so this was read by the console's own readers "
-                  "and stays in English; every figure is still computed from live data.")
+                  "this public console, counted per network address, is used), so this was read "
+                  "by the console's own readers and stays in English. Every figure is still "
+                  "computed from live data, and a question that names the instrument and what you "
+                  "want (\"NVDA price\", \"is TSLA overbought\") reads as well as before.")
 
 
 _FILING_Q = re.compile(

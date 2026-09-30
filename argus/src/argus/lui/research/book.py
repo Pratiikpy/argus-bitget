@@ -593,7 +593,12 @@ def _hedge_plan(book: Mapping[str, float], value: Decimal,
     top_r2 = pickable[0]["r2"]
     near = [r for r in pickable if r["r2"] >= top_r2 - HEDGE_R2_TOLERANCE]
     best = min(near, key=lambda r: r["total_bps"])
-    lines = []
+    # Every beta here is over every hour of the last 30 days — the hours a perpetual hedge is held —
+    # and says so: the same book showed beta 0.91 to QQQ in the risk answer (US trading hours) and
+    # 0.73 in this one, with nothing to tell the reader why (a hostile review, 2026-09-30).
+    lines = ["Each hedge is sized by the book's beta to it over every hour of the last 30 days, "
+             "the hours a perpetual hedge is actually held; the book's risk answer quotes its beta "
+             "in US trading hours alone, which is a different window and so a different figure."]
     for r in rows:
         funding = r["funding_bps"]
         # A leg with a negative beta moves against the book, so the hedge is a long in it

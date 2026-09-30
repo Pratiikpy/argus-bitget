@@ -225,7 +225,10 @@ def test_a_preset_named_in_words_and_limits_stated_in_numbers() -> None:
     conservative = research.stated_profile("I'm a conservative investor, should I add NVDA")
     assert conservative is not None and conservative.max_position_pct == Decimal(5)
     own = research.stated_profile("no more than 10% in any name and I can't lose more than 6%")
-    assert own is not None and own.name == "your stated mandate"
+    # Named "your mandate", with the limits it did not state marked as defaults (a judge's audit,
+    # 2026-09-30: defaulted limits were printed as "stated").
+    assert own is not None and own.name == "your mandate"
+    assert own.defaulted == ("holding_horizon_hours",)
     assert own.max_position_pct == Decimal(10) and own.loss_tolerance_pct == Decimal(6)
     mixed = research.stated_profile("aggressive trader, my horizon is 2 weeks")
     assert mixed is not None and mixed.holding_horizon_hours == 336

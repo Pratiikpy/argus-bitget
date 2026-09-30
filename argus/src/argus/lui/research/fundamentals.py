@@ -43,6 +43,8 @@ from argus.lui.research.parse import (
     _VAR,
     _WEEKEND_GAP_Q,
     ADD_VERB,
+    AFFECTS,
+    BETA_TO_MARKET,
     CRYPTO_ETF_QUESTION,
     LONG_SHORT_QUESTION,
     OPEN_INTEREST_QUESTION,
@@ -308,14 +310,25 @@ def pattern_reading_wins(request: ResearchRequest | None, text: str) -> bool:
         # plan, the ampersand unlike anything it was trained on (2026-09-30).
         return True
     if request.kind is ResearchKind.IMPACT and len(request.symbols) == 1 and (
-            TAKE_ON.search(text) or HOW_MUCH_IN.search(text) or RISKS_OF.search(text)):
+            TAKE_ON.search(text) or HOW_MUCH_IN.search(text) or RISKS_OF.search(text)
+            or BETA_TO_MARKET.search(text)):
         # A view on one name: the hosted model read "quick take on ETH" as no question at all.
+        return True
+    if request.kind is ResearchKind.COMPARE and AFFECTS.search(text):
+        # "does oil matter for BTC": the pair's co-movement, which the model read as technicals.
         return True
     if request.kind is ResearchKind.COMPARE and re.search(
             r"\b(?:outperform\w*|underperform\w*|beat(?:s|ing|en)?|(?:done|doing|did)\s+better|"
             r"better\s+than|worse\s+than)\b", text, re.I):
         # "is ETH beating BTC this month" was planned by the hosted model as ETH's base rates
         # (2026-09-30): two names and "beating" is the comparison's momentum question.
+        return True
+    if request.kind is ResearchKind.MACRO and request.symbols and re.search(
+            r"\b\d+[\s-]*year\b|\btreasur\w*|\byields?\b|\bfed\s+funds\b|\bbond\s+market\b",
+            text, re.I):
+        # "Where's the 10-year Treasury yield and gold right now?" was planned by the hosted
+        # model as a gold quote, and the yield went unanswered (2026-09-30): rates named beside a
+        # contract are the macro engine's, and the contract's price is added under its lead.
         return True
     if request.kind is ResearchKind.MACRO and any("does not forecast" in n for n in request.notes):
         # "What will the S&P 500 do after the next FOMC meeting?" is refused by the hosted model as

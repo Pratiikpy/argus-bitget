@@ -345,11 +345,16 @@ def evaluate_ledger(
             "and is not comparable to a traded strategy's drawdown"
         )
     elif len(trades) < MIN_TRADES_FOR_DRAWDOWN:
+        # The "every trade a winner" case is said only when it is the case: it was printed above a
+        # net loss on the one settled trade (a judge's audit, 2026-09-30).
+        winners = all(Decimal(str(t.net_pnl or "0")) > 0 for t in trades)
         undefined["max_drawdown"] = (
             f"{len(trades)} settled trade(s); a peak-to-trough needs at least "
-            f"{MIN_TRADES_FOR_DRAWDOWN} to describe risk rather than luck. With every settled "
-            f"trade a winner the arithmetic returns 0.00%, which reads as 'took risk, never lost' "
-            f"when the truth is 'has taken {len(trades)} position(s)'"
+            f"{MIN_TRADES_FOR_DRAWDOWN} to describe risk rather than luck"
+            + (f". With every settled trade a winner the arithmetic returns 0.00%, which reads as "
+               f"'took risk, never lost' when the truth is 'has taken {len(trades)} position(s)'"
+               if winners else
+               f", and {len(trades)} trade(s) cannot tell a drawdown from one bad outcome")
         )
     else:
         drawdown = max_drawdown(equity)
