@@ -278,9 +278,17 @@ refused as a trade instruction while the book engine computes exactly those weig
 round 3). The console still places nothing; it states the weights."""
 
 
+POSITION_THESIS = re.compile(
+    r"^\s*(?:(?:ok(?:ay)?|so|now|well)[\s,]+)*(?:long|short)\s+[A-Za-z][A-Za-z0-9]{1,9}\s+"
+    r"(?:because|since|as|given\s+that|on\s+the\s+back\s+of)\b", re.I)
+"""A position with its reason: "short TSLA because margins are falling" states a view to test, and
+was refused as an order while the same sentence with "I think" in front was tested (round 14, live).
+The console still places nothing; it tests the reason."""
+
+
 def is_order_instruction(raw: str) -> bool:
     """An instruction to trade, in any of the forms the console refuses."""
-    if PLAN_REQUEST.match(raw):
+    if PLAN_REQUEST.match(raw) or POSITION_THESIS.match(raw):
         return False
     return bool((ORDER_VERB.match(raw) and not INTERROGATIVE.match(raw))
                 or ORDER_CJK.search(raw) or _ORDER_REQUEST.search(raw)

@@ -1452,8 +1452,9 @@ dollar value."""
 
 _BOOK_COUNT = re.compile(
     # "3x ETH" is a leverage multiple, not three ETH: a number with "x" written against it is
-    # skipped; "2 x NVDAUSDT", spaced, is still a count.
-    r"(?<![\w.%$])(\d[\d,]*(?:\.\d+)?)(?!x\b)(?:\s+x(?=\s))?\s*"
+    # skipped; "2 x NVDAUSDT", spaced, is still a count. A number written against "=" is a weight
+    # ("NVDA=0.6 AAPL=0.4"), not a count of the name that follows it.
+    r"(?<![\w.%$=])(\d[\d,]*(?:\.\d+)?)(?!x\b)(?:\s+x(?=\s))?\s*"
     r"(?:(?:contracts?|units?|lots?|shares?|coins?|tokens?)\s+(?:of\s+)?)?"
     r"([A-Za-z][A-Za-z0-9.]{1,15})\b", re.I)
 """"long 2 NVDAUSDT", "2 contracts of TSLAUSDT", "0.5 BTC": a count of the contract's own unit,
@@ -1872,9 +1873,10 @@ _LARGE_ORDER = re.compile(r"\b(?:large|big|huge|block|size(?:able)?|whale)\b", r
 def is_an_order(raw: str) -> bool:
     """An instruction to trade ("sell 10 ETH at 5000") is refused as an order by the console; it
     must never be answered as a question about how to trade."""
-    from argus.lui.question import INTERROGATIVE, ORDER_VERB, PLAN_REQUEST
+    from argus.lui.question import INTERROGATIVE, ORDER_VERB, PLAN_REQUEST, POSITION_THESIS
 
-    if re.search(r"\bhow\b|\?|怎么|如何", raw, re.I) or PLAN_REQUEST.match(raw):
+    if (re.search(r"\bhow\b|\?|怎么|如何", raw, re.I) or PLAN_REQUEST.match(raw)
+            or POSITION_THESIS.match(raw)):
         return False
     if re.search(r"\b(?:and|then)\s+(?:show|tell|give)\b|\b(?:show|tell)\s+me\b|"
                  r"\b(?:resulting|new|net)\s+(?:exposure|risk|beta|concentration)\b", raw, re.I):
@@ -3372,6 +3374,13 @@ _REBOOK = re.compile(
 adding 20% NVDA to the old book (2026-09-25 audit, round 2)."""
 
 
+_OWN_QUESTION = re.compile(
+    r"[.;!]\s+(?:what|how|which|why|where|is|are|does|do|can|should|would|will)\b[^?]*\?", re.I)
+"""A book stated together with a question of its own ("I hold 40% rTSLA, 30% rCOIN, 30% BTC. What
+share of risk does rTSLA carry?") is that question, not a new book for the previous one: it was
+answered with the earlier SOL sizing (round 14, live)."""
+
+
 BARE_FOLLOW = re.compile(
     r"^\s*(?:and\s+|so\s+|ok(?:ay)?[,\s]+)?(?:what\s+about\s+(?:that|it|this)(?:\s+one)?|"
     r"(?:and\s+)?(?:that|it)(?:\s+one)?|more\s+on\s+(?:that|it|this)|go\s+on|tell\s+me\s+more|"
@@ -3501,7 +3510,7 @@ def _contextual_follow_up(text: str, prior: list[str],
             earlier, base = found
             return replace(base, notes=(*base.notes, f"read as the previous question — "
                                                      f"\"{earlier[:60]}\" — asked again"))
-    rebook = _REBOOK.match(text)
+    rebook = None if _OWN_QUESTION.search(text) else _REBOOK.match(text)
     new_book = parse_book(text) if rebook else {}
     if rebook and new_book:
         found = _previous_request(prior, book_text)

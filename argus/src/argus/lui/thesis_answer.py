@@ -58,7 +58,9 @@ _ORDER = {"contradicted": 0, "supported": 1, "not measurable": 2, "not tested": 
 
 
 def asks(text: str) -> bool:
-    return bool(THESIS_ASK.search(text))
+    from argus.lui.question import POSITION_THESIS
+
+    return bool(THESIS_ASK.search(text) or POSITION_THESIS.match(text))
 
 
 def answer(text: str, *, book: str = "", memory: str = ""
@@ -267,6 +269,25 @@ def _standing(turns: list[str], text: str = ""
         kept, gone = applied
         dropped += gone
     return (earlier, stated, kept, dropped) if kept else None
+
+
+_EXPLICIT_REVISION = re.compile(
+    r"\bi\s+was\s+wrong\s+about\b|\bmy\s+(?:real|only|main|actual)\s+reason\b|"
+    r"\b(?:scratch|drop|forget|ignore|set\s+aside)\b.{0,40}\b(?:point|reason|argument)\b", re.I)
+"""Wording that can only mean a reason in a thesis is being changed."""
+
+
+def nothing_to_revise(text: str, prior: list[str]
+                     ) -> tuple[list[str], list[Source], dict[str, Any]] | None:
+    """"I was wrong about margins, they are stable" with no thesis earlier in the conversation:
+    said plainly, instead of the nearest record the language model could find (a first-time user,
+    round 14, live: it was answered with an unrelated desk decision)."""
+    if not _EXPLICIT_REVISION.search(text) or _standing(list(prior), text) is not None:
+        return None
+    return (["Bottom line: there is no thesis earlier in this conversation to change. State it "
+             "with its reasons — for example \"short TSLA because margins are falling\" — and "
+             "each reason is tested; then this revision is applied to it."], [],
+            {"thesis": None, "revision_without_thesis": True})
 
 
 def strongest(text: str, prior: list[str], *, book: str = "", memory: str = ""

@@ -13,52 +13,52 @@
       "doc": "readme",
       "line": 55,
       "quoted": [
-        "10,934"
+        "10,939"
       ],
       "live": [
-        10934
+        10939
       ],
       "status": "OK",
-      "excerpt": "10,934 tests collected"
+      "excerpt": "10,939 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 201,
       "quoted": [
-        "10,934"
+        "10,939"
       ],
       "live": [
-        10934
+        10939
       ],
       "status": "OK",
-      "excerpt": "10,934 tests collected"
+      "excerpt": "10,939 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 205,
       "quoted": [
-        "10,934"
+        "10,939"
       ],
       "live": [
-        10934
+        10939
       ],
       "status": "OK",
-      "excerpt": "10,934 tests collected"
+      "excerpt": "10,939 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 225,
       "quoted": [
-        "10,934"
+        "10,939"
       ],
       "live": [
-        10934
+        10939
       ],
       "status": "OK",
-      "excerpt": "10,934 tests collected"
+      "excerpt": "10,939 tests collected"
     },
     {
       "claim": "tests_passing",
@@ -66,7 +66,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        10934
+        10939
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -76,52 +76,52 @@
       "doc": "explained",
       "line": 714,
       "quoted": [
-        "10,934"
+        "10,939"
       ],
       "live": [
-        10934
+        10939
       ],
       "status": "OK",
-      "excerpt": "10,934 tests"
+      "excerpt": "10,939 tests"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 1770,
       "quoted": [
-        "10,934"
+        "10,939"
       ],
       "live": [
-        10934
+        10939
       ],
       "status": "OK",
-      "excerpt": "10,934 tests collected"
+      "excerpt": "10,939 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 2419,
       "quoted": [
-        "10,934"
+        "10,939"
       ],
       "live": [
-        10934
+        10939
       ],
       "status": "OK",
-      "excerpt": "10,934 tests collected"
+      "excerpt": "10,939 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "architecture",
       "line": 13,
       "quoted": [
-        "10,934"
+        "10,939"
       ],
       "live": [
-        10934
+        10939
       ],
       "status": "OK",
-      "excerpt": "10,934 tests collected"
+      "excerpt": "10,939 tests collected"
     },
     {
       "claim": "source_files",
@@ -249,39 +249,39 @@
       "doc": "explained",
       "line": 1772,
       "quoted": [
-        "855"
+        "856"
       ],
       "live": [
-        855
+        856
       ],
       "status": "OK",
-      "excerpt": "855** files under `argus/data/`"
+      "excerpt": "856** files under `argus/data/`"
     },
     {
       "claim": "data_files",
       "doc": "explained",
       "line": 2421,
       "quoted": [
-        "855"
+        "856"
       ],
       "live": [
-        855
+        856
       ],
       "status": "OK",
-      "excerpt": "855 files under `argus/data/`"
+      "excerpt": "856 files under `argus/data/`"
     },
     {
       "claim": "data_files",
       "doc": "architecture",
       "line": 15,
       "quoted": [
-        "855"
+        "856"
       ],
       "live": [
-        855
+        856
       ],
       "status": "OK",
-      "excerpt": "855** files under `argus/data/`"
+      "excerpt": "856** files under `argus/data/`"
     },
     {
       "claim": "memory_effect",

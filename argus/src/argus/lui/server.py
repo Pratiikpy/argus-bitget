@@ -1149,6 +1149,8 @@ def _answer(
         # hostile review, round 12).
         return engine_payload(*loss_said, by="sizing")
     revised = thesis_answer.revise(text, prior, book=book) if prior else None
+    if revised is None:
+        revised = thesis_answer.nothing_to_revise(text, prior)
     if revised is not None:
         rev_lines, rev_sources, rev_data = revised
         clause = re.search(r"\b(?:and\s+)?(how\s+(?:big|much|large|small)\b[^?]*\?)", text, re.I)

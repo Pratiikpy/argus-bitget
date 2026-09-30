@@ -201,3 +201,48 @@ class TestShortWindowReadsEveryBar:
         full = {"SOLUSDT": [*quiet, *rally, *quiet]}
         short = worst_window(weights={"SOLUSDT": -1.0}, columns=full)
         assert short.move_pct is not None and short.move_pct < -9.0
+
+
+class TestLiveReplayFindings:
+    """Round 14, replayed on the live console: a stated book that brings its own question, a
+    position with its reason, a revision with no thesis, and a noun phrase kept as a thesis."""
+
+    def test_a_book_with_its_own_question_is_not_a_rebook(self) -> None:
+        from argus.lui.research.parse import _OWN_QUESTION, _REBOOK
+
+        own = "I hold 40% rTSLA, 30% rCOIN, 30% BTC. What share of risk does rTSLA carry?"
+        assert _REBOOK.match(own) and _OWN_QUESTION.search(own)
+        for bare in ("I hold 40% NVDA, 60% AAPL", "actually make it 70% NVDA 30% AAPL"):
+            assert not _OWN_QUESTION.search(bare)
+
+    def test_a_position_with_a_reason_is_a_thesis_not_an_order(self) -> None:
+        from argus.lui import thesis_answer
+        from argus.lui.question import is_order_instruction
+        from argus.lui.research.parse import is_an_order
+
+        said = "short TSLA because margins are falling and the multiple is stretched"
+        assert not is_order_instruction(said) and not is_an_order(said)
+        assert thesis_answer.asks(said)
+        for order in ("short TSLA", "buy SOL", "long ETH 3x"):
+            assert is_order_instruction(order)
+            assert not thesis_answer.asks(order)
+
+    def test_a_revision_with_no_thesis_says_so(self) -> None:
+        from argus.lui import thesis_answer
+
+        said = "I was wrong about margins, they are stable. Does that change your view?"
+        got = thesis_answer.nothing_to_revise(said, [])
+        assert got is not None and "no thesis earlier" in got[0][0]
+        assert thesis_answer.nothing_to_revise("what is BTC doing", []) is None
+
+    def test_a_noun_phrase_is_not_kept_as_a_thesis(self) -> None:
+        from argus.lui.memory_model import _valid
+
+        assert _valid("thesis", "bear", "SOLUSDT", "SOL short leg") is None
+        assert _valid("thesis", "bull", "SOLUSDT", "SOL will rally") is not None
+
+    def test_a_weight_written_with_equals_is_not_a_unit_count(self) -> None:
+        from argus.lui.research.parse import _BOOK_COUNT
+
+        assert _BOOK_COUNT.search("I hold NVDA=0.6 AAPL=0.4, should I add MSFT") is None
+        assert _BOOK_COUNT.search("I hold 0.6 AAPL").group(1) == "0.6"

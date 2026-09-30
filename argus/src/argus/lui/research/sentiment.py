@@ -189,7 +189,7 @@ def _sentiment(symbol: str | None = None) -> tuple[list[str], list[Source], dict
             change: float | None = float(own_ticker.change_24h) * 100
             crowd = ("crowded long" if rate > 0.03 else "crowded short" if rate < -0.03
                      else "not crowded either way")
-            own = (f"{_t(symbol)}'s own positioning is {crowd}"
+            own = (f"{_t(symbol)}'s own positioning is {crowd} on funding"
                    + (f" after a {change:+.1f}% day" if change is not None else ""))
             lines.append(f"{_t(symbol)} on Bitget: funding {rate:+.4f}% per interval"
                          + (f", {change:+.2f}% over 24h" if change is not None else "") + ".")

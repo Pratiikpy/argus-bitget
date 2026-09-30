@@ -96,6 +96,11 @@ _A_LIMIT = re.compile(r"\b(?:max(?:imum)?|no\s+more|at\s+most|up\s+to|cap|limit|
                       r"above|over|under|past|per\s+(?:trade|position|name))\b", re.I)
 _A_POSITION = re.compile(r"\W*\$?\d[\d,.]*[%k]?\s+(?:in\s+|of\s+)?\S+(?:\s+\S+){0,3}\W*$", re.I)
 """An amount then a name and a word or two ("50% ETH perp long"): what the trader holds, no view."""
+_A_CLAIM = re.compile(
+    r"\b(?:will|won'?t|is|are|was|going|gonna|should|could|can|keeps?|has|have|needs?|because|"
+    r"since|to)\b|\b(?:up|rise|rall|outperform|beat|higher|moon|rip|double|recover|bounce|down|fall|"
+    r"drop|crash|underperform|miss|lower|dump|tank|decline|lose|run|grow|slow)\w*", re.I)
+"""A thesis quote states something about the name; a bare noun phrase is not a view."""
 _AN_ORDER = re.compile(r"\s*(?:please\s+)?(?:go\s+)?(?:long|short|buy|sell|open|close)\b", re.I)
 
 
@@ -161,6 +166,10 @@ def _valid(kind: str, value: str, subject: str, quote: str, context: str = ""
         if kind == "thesis" and (_AN_ORDER.match(quote) or _A_POSITION.match(quote)):
             # "Long rNVDA over the weekend at 3x" is an order to price, not a view to keep: it
             # replaced the trader's stated NVDA thesis (a judge, round 13, 2026-09-30).
+            return None
+        if kind == "thesis" and not _A_CLAIM.search(quote):
+            # "SOL short leg", taken from a sizing question, is a noun phrase: it was kept as a
+            # thesis and later shown as the one a real thesis replaced (round 14, live).
             return None
         lean = value.strip().lower() if kind == "thesis" else "avoid"
         if kind == "thesis" and lean not in ("bull", "bear", "view"):
