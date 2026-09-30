@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-30T18:17:44.260275+00:00",
-  "log": "cycle_2026-09-30_2300.log",
+  "generated_at": "2026-09-30T20:12:39.675883+00:00",
+  "log": "cycle_2026-10-01_0100.log",
   "sound": true,
   "saw_price_discovery": true,
   "proposed_exposure": 0,
@@ -24,12 +24,12 @@
     {
       "check": "token_budget",
       "status": "PASS",
-      "detail": "305,530 of 330,000 spent (93%)"
+      "detail": "297,689 of 330,000 spent (90%)"
     },
     {
       "check": "cumulative_tokens",
       "status": "PASS",
-      "detail": "20,330,341 token(s) across 70 recorded cycle(s), 290,433 per cycle \u2014 roughly 1,161,734/day at four cycles. The key's remaining balance is not observable from here; this is the burn rate, not a runway"
+      "detail": "20,628,030 token(s) across 71 recorded cycle(s), 290,536 per cycle \u2014 roughly 1,162,143/day at four cycles. The key's remaining balance is not observable from here; this is the burn rate, not a runway"
     },
     {
       "check": "budget_not_exhausted",

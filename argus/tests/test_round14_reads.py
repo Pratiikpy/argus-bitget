@@ -246,3 +246,17 @@ class TestLiveReplayFindings:
 
         assert _BOOK_COUNT.search("I hold NVDA=0.6 AAPL=0.4, should I add MSFT") is None
         assert _BOOK_COUNT.search("I hold 0.6 AAPL").group(1) == "0.6"
+
+    def test_a_model_routed_book_keeps_tokenized_stock_holdings(self) -> None:
+        from argus.lui.research import ResearchKind, plan_with_model
+
+        class _Planner:
+            def complete_json(self, messages: object, **_: object) -> dict[str, object]:
+                return {"kind": "book", "confidence": 0.95,
+                        "holdings": {"rTSLA": 40, "rCOIN": 30, "BTC": 30}}
+
+        text = "I hold 40% rTSLA, 30% rCOIN, 30% BTC. What share of risk does rTSLA carry?"
+        request, _ = plan_with_model(text, _Planner())
+        assert request is not None and request.kind is ResearchKind.BOOK
+        assert dict(request.book) == pytest.approx(
+            {"TSLAUSDT": 0.4, "COINUSDT": 0.3, "BTCUSDT": 0.3})

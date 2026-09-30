@@ -1034,6 +1034,18 @@ def rtokens_named(text: str) -> list[tuple[str, str]]:
     return out
 
 
+def _model_name(name: str) -> str | None:
+    """The contract a name the model returned stands for: the resolver's reading, or the same
+    company's perpetual for a tokenized stock ("rTSLA"). The model echoes "rTSLA" and "rCOIN"
+    from a stated book and the plain resolver knew neither, so the live answer for "I hold 40%
+    rTSLA, 30% rCOIN, 30% BTC" was a one-name BTC book (round 14 live replay, 2026-09-30)."""
+    hit = resolve_name(name, trust_case=False) or resolve_name(name.upper())
+    if hit is not None:
+        return hit[0]
+    tokens = rtokens_named(name)
+    return tokens[0][1] if tokens else None
+
+
 def _read(text: str) -> dict[str, str]:
     """Every listed contract the text names, in the order named, each with the note on how it was
     read ("" when it was read literally)."""
@@ -3684,23 +3696,23 @@ def _value_holdings(raw: Mapping[str, Any], notes: list[str]) -> tuple[dict[str,
         if not isinstance(stated, dict):
             continue
         for name, value in stated.items():
-            hit = resolve_name(str(name), trust_case=False) or resolve_name(str(name).upper())
+            held = _model_name(str(name))
             try:
                 amount = float(value)
             except (TypeError, ValueError):
                 continue
-            if hit is None or amount <= 0:
+            if held is None or amount <= 0:
                 continue
             if field_name == "holdings_units":
-                price = _last_price(hit[0])
+                price = _last_price(held)
                 if price is None:
-                    notes.append(f"no live price for {_t(hit[0])}, so its {amount:g} units were "
+                    notes.append(f"no live price for {_t(held)}, so its {amount:g} units were "
                                  f"left out")
                     continue
-                notes.append(f"{amount:g} {_t(hit[0])} valued at ${amount * price:,.0f} "
+                notes.append(f"{amount:g} {_t(held)} valued at ${amount * price:,.0f} "
                              f"(Bitget last {price:,.2f})")
                 amount *= price
-            usd[hit[0]] = usd.get(hit[0], 0.0) + amount
+            usd[held] = usd.get(held, 0.0) + amount
     try:
         cash_usd = max(0.0, float(raw.get("cash_usd") or 0.0))
     except (TypeError, ValueError):
@@ -3774,8 +3786,7 @@ def plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, dic
     holdings = raw.get("holdings") or {}
     if isinstance(holdings, dict):
         for name, value in holdings.items():
-            hit = resolve_name(str(name), trust_case=False) or resolve_name(str(name).upper())
-            symbol = None if hit is None else hit[0]
+            symbol = _model_name(str(name))
             try:
                 weight = float(value) / 100.0
             except (TypeError, ValueError):
@@ -3791,9 +3802,7 @@ def plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, dic
         book = _normalise(book, notes)
         cash = 0.0
     named_by_model = str(raw.get("candidate") or "")
-    candidate_hit = (resolve_name(named_by_model, trust_case=False)
-                     or resolve_name(named_by_model.upper())) if named_by_model else None
-    candidate = None if candidate_hit is None else candidate_hit[0]
+    candidate = _model_name(named_by_model) if named_by_model else None
     size: float | None = None
     try:
         if raw.get("size_percent") is not None:
@@ -3814,9 +3823,9 @@ def plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, dic
     for name in listed_names if isinstance(listed_names, list) else []:
         # The model's list of every instrument asked about — the only way a compare reaches a
         # name the text resolver cannot spell ("comparame oro y bitcoin": oro -> XAU).
-        hit = resolve_name(str(name), trust_case=False) or resolve_name(str(name).upper())
-        if hit is not None:
-            named.append(hit[0])
+        symbol = _model_name(str(name))
+        if symbol is not None:
+            named.append(symbol)
     symbols = tuple(dict.fromkeys(
         [s for s in (candidate, *named, *book, *read_as) if s is not None]
     ))

@@ -198,11 +198,11 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 10,939 tests collected
+pytest -q                       # 10,940 tests collected
 ```
 
 Nothing above needs a credential. On 2026-09-29, with every outbound connection refused, 10,021
-passed, 39 skipped and 0 failed in 25 minutes, of the 10,939 tests collected that day (more have
+passed, 39 skipped and 0 failed in 25 minutes, of the 10,940 tests collected that day (more have
 been added since); the other 238 read a live venue, feed or model and run apart
 (`pytest -m network`). Tests that need a rival's source cloned beside the repository skip
 and say which. `ARGUS_BLOCK_NETWORK=1` refuses every outbound connection, so
@@ -222,7 +222,7 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **10,939 tests collected** — `pytest -q` |
+| Tests | **10,940 tests collected** — `pytest -q` |
 | Types | **`mypy --strict` clean on 577 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
@@ -254,8 +254,8 @@ a test that reaches the network shows itself.
   closed 2026-09-29 at 230.96: a net loss of 1.78 USDT, 0.29 of it costs. Every other decision on
   its ledger is a refusal. One trade is not a sample, so its Sharpe and drawdown are undefined and
   printed as such, and its win rate of 0% says nothing yet. Each refusal carried a direction, hashed before the
-  outcome existed: at about two hours, **279 of 493 directional calls were right**, which clears a
-  coin flip and does not beat calling "up" every time. The median refusal **forgave -7.93bps of
+  outcome existed: at about two hours, **284 of 505 directional calls were right**, which clears a
+  coin flip and does not beat calling "up" every time. The median refusal **forgave -7.95bps of
   net edge** after the 12bps round trip — the trades it passed
   on were mostly unprofitable. This workbench does not trade; trading is the separate Track 2
   project's job.
