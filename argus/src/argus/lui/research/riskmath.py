@@ -162,6 +162,15 @@ def _resolve_resize(request: ResearchRequest, before: dict[str, float],
     # With cash in the book, one risky name is a whole book: the rest of it is cash, and the
     # resized weight comes from or goes to cash ("cut my BTC by 30%" on 50% BTC, 50% cash asked
     # for a book it had just been given, 2026-09-25 audit).
+    if add not in book and len(book) >= 2:
+        # "What if I trim TSLA to 10% of my book?" on a book of NVDA, MSFT and AAPL was asked for
+        # the holdings it had just been given (a judge, round 13, 2026-09-30): the name is not in
+        # the book, and that is the answer.
+        held = ", ".join(f"{w:.0%} {_t(s)}" for s, w in book.items())
+        size = f"{request.target:.0%} " if request.target is not None else ""
+        return (f"{_t(add)} is not in your book ({held}), so there is nothing to trim or resize. "
+                f"To weigh buying it, ask \"what does adding {size or '10% '}{_t(add)} do to my "
+                f"book\".")
     if add not in book or (len(book) < 2 and not request.cash):
         others = [n for n in ("AAPL", "MSFT", "NVDA") if n != _t(add)][:2]
         return (f"Resizing {_t(add)} changes every other holding's share too, so I need what "

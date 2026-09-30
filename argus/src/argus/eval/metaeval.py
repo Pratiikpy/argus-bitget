@@ -159,6 +159,10 @@ NOT_JUDGES: Mapping[str, str] = {
     "argus/eval/leakage.py:753,770": "the model is the subject under test, not the grader",
     "argus/desk/rule_proposer.py:604": "writes a candidate rule; whether it is kept is decided "
                                        "by a replayed regression gate, not by a model",
+    "argus/lui/memory_model.py:163": "extracts what a trader said about themselves; each fact is "
+                                     "kept only if its quote is in the message, and recall and "
+                                     "false memories are scored against mem0 by "
+                                     "eval/memory_comparison.py",
     "argus/lui/kindmodel.py:74": "a local trained classifier behind the same interface, not an "
                                  "LLM; it is scored on held-out corpora by eval/kindtrain.py",
     "argus/lui/fanout.py:366": "a planner choosing which researchers run; every finding is "

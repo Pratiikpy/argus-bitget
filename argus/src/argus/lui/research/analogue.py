@@ -417,9 +417,9 @@ def _stress_band(symbol: str) -> str | None:
     half *= STRESS_BLEND_SCALE
     return (f"Next {h} sessions, 80% band: {centre - half:+.1%} to {centre + half:+.1%} — "
             f"{_t(symbol)}'s own {len(moves)} past {h}-session moves, widened or narrowed by "
-            f"its current volatility. On AnalogDesk's own 2,698-query test this band scored "
-            f"best of every method tried, AnalogDesk's included, though not by a significant "
-            f"margin.")
+            f"its current volatility. AnalogDesk, another Season 2 entry, built a 2,698-question "
+            f"test for this kind of band; run on it, this method scored best of every one tried, "
+            f"AnalogDesk's own method included, though not by a significant margin.")
 
 
 def _shape_line(closes: list[tuple[datetime, float]], symbol: str,

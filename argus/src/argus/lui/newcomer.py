@@ -66,10 +66,11 @@ _HOW_MUCH_BARE = re.compile(
 _GUARANTEE = re.compile(
     r"\bguarantee\s+(?:me|us|that|a|an|my)\b|\bcan\s+you\s+guarantee\b|\bguaranteed\s+(?:returns?|"
     r"profits?|gains?|money|win)\b|\brisk[\s-]*free\s+(?:trade|profit|return|bet|money)\b|"
-    r"\b(?:can'?t|cannot|won'?t)\s+lose\b|\bsure\s+(?:thing|bet|profit|win|money)\b|"
+    r"\b(?:can'?t|cannot|won'?t)\s+lose\b(?!\s+(?:more|over|above|beyond|past|than|up\s+to|[$\d]))|\bsure\s+(?:thing|bet|profit|win|money)\b|"
     r"\bpromise\s+(?:me\s+)?(?:a\s+)?(?:return|profit)", re.I)
 """A request for a certain return: "guarantee me a 50% return on BTC" was deflected into price data
-instead of being told no (a judge's audit, 2026-09-30)."""
+instead of being told no (a judge's audit, 2026-09-30). "I can't lose more than 10% of my book"
+is a loss limit, not a request for a sure thing, and was answered with this refusal (round 13)."""
 
 _DIP = re.compile(r"\bbuy(?:ing)?\s+(?:the|this)\s+dip\b|\bdip\s+buy", re.I)
 _BEGINNER_PICK = re.compile(
@@ -83,9 +84,29 @@ _BEGINNER_PICK = re.compile(
 _MONEY_SAFE = re.compile(
     r"\bis\s+my\s+(?:money|crypto|account|deposit|cash|capital)\s+safe\b|\bis\s+(?:this|it|argus|"
     r"this\s+site)\s+(?:a\s+)?(?:scam|safe|legit|legitimate)\b|\b(?:do|does|can)\s+(?:you|argus|"
-    r"this)\s+(?:hold|keep|take|touch|access)\s+my\s+(?:money|funds|crypto|account)\b", re.I)
+    r"this)\s+(?:hold|keep|take|touch|access)\s+my\s+(?:money|funds|crypto|account)\b|"
+    # "Is my BTC held on ARGUS insured?" got venue mechanics (a hostile review, round 12)
+    r"\b(?:held|kept|stored|custod\w*)\s+(?:on|by|with|at)\s+(?:argus|this\s+(?:site|console|app))\b|"
+    r"\b(?:safe|insured)\s+(?:with|on|at)\s+(?:argus|you|this\s+(?:site|console|app))\b|"
+    r"\bis\s+(?:my|it)\s+(?:\w+\s+)?(?:insured|protected)\b", re.I)
 """A newcomer asking whether their money is safe here (a first-time user, round 11: answered with
 how rTokens and perpetuals differ)."""
+
+_WITHDRAW = re.compile(
+    r"\bhow\s+(?:do|can|would)\s+i\s+(?:withdraw|take\s+out|cash\s+out|get\s+(?:my\s+)?money\s+out)"
+    r"|\bwithdraw(?:al|ing)?\s+(?:my\s+)?(?:money|funds|crypto|usdt|cash)\b", re.I)
+"""Taking money out, which happens on Bitget: "how do I withdraw my money" was declined (a
+first-time user, round 12)."""
+
+_WITHDRAWING = (
+    "Bottom line: withdrawals happen on Bitget, not here — this console holds no money, so there "
+    "is nothing in it to withdraw.",
+    "On Bitget: close or sell what you want to take out, move it to your spot account, then use "
+    "Withdraw (to a bank by selling for cash, or to a crypto address) — Bitget's own help pages "
+    "give the fees, the limits and the checks for your country.",
+    "Before a crypto withdrawal, check the network and the address twice: a transfer sent on the "
+    "wrong network is usually lost.",
+)
 
 _SAFE = (
     "Bottom line: this console never holds, moves or touches money: there is no account to open, "
@@ -149,7 +170,8 @@ _GOING_WRONG = (
 )
 
 
-explains(*_NOT_ADVICE, *_BUYING, *_LOSING, *_GOING_WRONG, *_NO_GUARANTEE, *_SAFE)
+explains(*_NOT_ADVICE, *_BUYING, *_LOSING, *_GOING_WRONG, *_NO_GUARANTEE, *_SAFE,
+         *_WITHDRAWING)
 
 def reply(text: str, *, named: bool = False) -> Reply | None:
     """The newcomer answer to ``text``, or None when it is not one of these questions.
@@ -166,6 +188,8 @@ def reply(text: str, *, named: bool = False) -> Reply | None:
         return Reply(lines=_NOT_ADVICE)
     if _MONEY_SAFE.search(text):
         return Reply(lines=_SAFE)
+    if _WITHDRAW.search(text):
+        return Reply(lines=_WITHDRAWING)
     if _LOSE_MORE.search(text):
         return Reply(lines=_LOSING)
     if _HOW_TO_BUY.search(text) or _HOW_BUYING_WORKS.search(text):

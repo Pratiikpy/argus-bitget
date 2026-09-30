@@ -137,8 +137,8 @@ BASE_CSS = """
       font:600 12px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase;
       padding:9px 12px; border:1px solid var(--line); border-radius:8px }
     .nav .menu summary::-webkit-details-marker { display:none }
-    .nav .menu summary::after { content:" \\25BE" }
-    .nav .menu[open] summary::after { content:" \\25B4" }
+    .nav .menu summary::after { content:" \\25BE"; content:" \\25BE" / "" }
+    .nav .menu[open] summary::after { content:" \\25B4"; content:" \\25B4" / "" }
     .nav .menu .menu-list { position:absolute; right:0; top:calc(100% + 6px); min-width:230px;
       display:flex; flex-direction:column; padding:6px; background:var(--panel);
       border:1px solid var(--line); border-radius:10px;

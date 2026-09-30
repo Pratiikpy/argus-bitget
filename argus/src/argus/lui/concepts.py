@@ -381,6 +381,14 @@ CONCEPTS: tuple[Concept, ...] = (
             "recent high.",
             "The labels describe what has happened, not what will; rallies inside bear markets are "
             "common and sharp."),
+    Concept("spot and futures", r"spot\s+(?:and|vs\.?|versus|or)\s+(?:futures|perps?|perpetuals?)|"
+            r"(?:futures|perps?|perpetuals?)\s+(?:and|vs\.?|versus|or)\s+spot",
+            "Spot is buying the asset itself: you own the coin or rToken, pay for all of it, and "
+            "the most you can lose is what you paid. Futures (on Bitget, perpetual contracts) are "
+            "a contract on the price: you put up margin, can use leverage and go short, and pay "
+            "or receive funding every few hours.",
+            "Spot is the simpler start; futures multiply both gains and losses and can be "
+            "liquidated — ask \"what is liquidation\" before using them."),
     Concept("Agent Hub dry run", r"dry[\s-]*runs?|agent\s+hub",
             "Agent Hub is Bitget's official toolkit for AI agents (its bgc command line, MCP "
             "server and SDK); a dry run (--dry-run) builds the exact order request and shows "
@@ -441,6 +449,10 @@ def concept_asked(text: str, named_symbols: tuple[str, ...] = ()) -> Concept | N
     text = re.sub(r"\b(?:what|wat|waht|whta|wht)'?s(?=\s)", "what is",
                   text, flags=re.I)
     text = re.sub(r"\b(?:waht|whta|wht|wat|wut|whaat)\b", "what", text, flags=re.I)
+    # "what does slippage men" got a $50,000 execution plan (a first-time user, round 12)
+    text = re.sub(r"\b(what\s+(?:does|do|is)\s+.+?\s+)(?:men|meen|mena|mea|maen)\b", r"\1mean",
+                  text, flags=re.I)
+    text = re.sub(r"\bdiff\b", "difference", text, flags=re.I)
     # Hinglish, as typed: "bitcoin kya hai" / "stop loss kya hota hai" is "what is ..." (a
     # first-time user, round 11, got BTC's trading cost).
     hinglish = re.fullmatch(r"\s*(.+?)\s+kya\s+(?:hai|hota\s+hai|hoti\s+hai|h)\s*[?.!]*\s*", text,

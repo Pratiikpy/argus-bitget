@@ -25,7 +25,11 @@ THESIS_ASK = re.compile(
     r"wrong|sound|valid|any\s+good|true)\b|\bam\s+i\s+(?:right|wrong)\s+(?:that|to\s+think)\b|"
     # "I think NVDA is undervalued because its P/E is low relative to growth. Is that thesis
     # right?" reached a data dump (a judge, round 11): a view with its reason is a thesis
-    r"\bi\s+(?:think|believe|reckon|expect|feel)\s+(?:that\s+)?[^?.]{0,160}\bbecause\b", re.I)
+    r"\bi\s+(?:think|believe|reckon|expect|feel)\s+(?:that\s+)?[^?.]{0,160}\bbecause\b|"
+    # "My bull case for BTC: ... Which of these is strongest?" (a judge, round 12)
+    r"\b(?:my|the)\s+(?:bull|bear)(?:ish)?\s+case\b|\bwhich\s+of\s+(?:these|my\s+reasons)\s+"
+    r"(?:is|are)\s+(?:the\s+)?(?:strongest|weakest|best)\b|\bmy\s+thesis\b[^?]{0,200}"
+    r"\btrue\s+or\s+false\b", re.I)
 """A trader stating a view and asking for it to be tested."""
 
 _NOT_NAMES = frozenset({
@@ -45,6 +49,10 @@ _MARKETS: tuple[tuple[str, str, str], ...] = (
      "(SP500USDT)"),
 )
 """A thesis about a whole market, and the one contract that stands for it."""
+
+STRONGEST = re.compile(r"\b(?:strongest|weakest|best\s+(?:reason|point|argument))\b", re.I)
+_STRENGTH = {"supported": 0, "not measurable": 1, "not tested": 2, "contradicted": 3}
+"""How a reason's verdict ranks when the question asks which reason is strongest."""
 
 _ORDER = {"contradicted": 0, "supported": 1, "not measurable": 2, "not tested": 3}
 
@@ -99,16 +107,40 @@ def answer(text: str, *, book: str = "", memory: str = ""
     reading = read_question(text, book)
     task = research_task(reading=None if isinstance(reading, str) else reading, asked=text,
                          name=symbol, memory=memory)
+    from argus.lui.task import _data_by_kind
+
+    quotes = (_data_by_kind(task.steps).get("quote") or {}).get("quotes") or {}
+    last = float((quotes.get(symbol) or {}).get("last") or 0) or None
+    premise = thesis.price_premise(text, name, last)
     tested = sorted(task.tested, key=lambda t: (t.implied, _ORDER.get(t.result.value, 9)))
+    if premise is not None:
+        tested = [premise, *tested]
+        tally_note = "; the price it states is wrong"
+    else:
+        tally_note = ""
     counts = {r: sum(1 for t in tested if not t.implied and t.result.value == r) for r in _ORDER}
-    tally = ", ".join(f"{n} {r}" for r, n in counts.items() if n)
+    tally = ", ".join(f"{n} {r}" for r, n in counts.items() if n) + tally_note
     lines = [f"Bottom line: your thesis on {name}, reason by reason — {tally}. Each verdict is "
              f"the one test named beside it; the figures under it inform, they do not vote."]
+    if STRONGEST.search(text):
+        # "Which of these is strongest?" asked for a ranking (a judge, round 12).
+        own = [t for t in tested if not t.implied]
+        ranked = sorted(own, key=lambda t: _STRENGTH.get(t.result.value, 9))
+        if ranked and ranked[0].result.value == "supported":
+            lines[0] = (f"Bottom line: on today's data the strongest of your reasons is "
+                        f"\"{ranked[0].reason}\", which the data backs; in all — "
+                        f"{tally}. Each verdict is the one test named beside it.")
+        elif ranked:
+            lines[0] = (f"Bottom line: none of your reasons is backed by today's data — {tally}; "
+                        f"the least contradicted is \"{ranked[0].reason}\" "
+                        f"({ranked[0].result.value}). Each verdict is the one test named beside "
+                        f"it.")
     sources: list[Source] = []
     seen: set[str] = set()
     said: dict[str, str] = {}
     for t in tested:
-        head = "Implied, and tested" if t.implied else t.result.value.capitalize()
+        head = ("Premise" if t.line.startswith("The premise does not hold") else
+                "Implied, and tested" if t.implied else t.result.value.capitalize())
         if t.line in said:
             # Two reasons read by one test ("NVDA is undervalued", "its P/E is low") say it once.
             lines.append(f"{head} — \"{t.reason}\": the same reading as \"{said[t.line]}\".")
@@ -129,5 +161,173 @@ def answer(text: str, *, book: str = "", memory: str = ""
     return lines, sources, {"thesis": {"name": name,
                                        "tested": [t.as_dict() for t in task.tested]}}
 
+
+
+REVISE = re.compile(
+    r"\b(?:scratch|drop|remove|forget|ignore|leave\s+out|take\s+out|set\s+aside)\b.{0,40}"
+    r"\b(?:point|reason|argument|part|one)\b|\bassume\b.{0,80}\binstead\b|\bdoes\s+(?:that|this)"
+    r"\s+change\s+(?:your|the|my)\s+(?:view|verdict|answer|read|sizing|size|position)|"
+    r"\bmy\s+(?:real|only|main|actual)\s+reason\b|\bi\s+was\s+wrong\s+about\b", re.I)
+"""A follow-up that changes the reasons of the thesis tested earlier in the conversation."""
+
+_DROPS = re.compile(
+    r"\b(?:scratch|drop|remove|forget(?:\s+about)?|ignore|leave\s+out|take\s+out|set\s+aside|"
+    r"wrong\s+about)\s+(?:the\s+|my\s+)?(?P<what>[^.?!;]{2,80}?)(?=\s*(?:[.?!;]|$|\s+-\s|,?\s+"
+    r"(?:it'?s|assume|my|and\s+(?:assume|my))\b))", re.I)
+"""The reasons a follow-up names to set aside: "Forget capex and margins." names two."""
+
+_KEEP_ONLY = re.compile(
+    r"\b(?:my\s+)?(?:real|only|main|actual)\s+reason\s+(?:now\s+)?(?:is\s+)?(?:now\s+)?"
+    r"(?:just\s+|only\s+|simply\s+)?(?:the\s+)?(?P<keep>[^.?!;]{3,120}?)(?=\s*(?:[.?!;]|$))", re.I)
+"""A follow-up that keeps one reason and drops the rest: "My real reason now is just the bookings
+backlog." — refused as an unlisted name (a judge, round 13, 2026-09-30)."""
+
+_NOT_NAMING = {
+    "the", "and", "that", "this", "point", "reason", "reasons", "scratch", "assume", "instead",
+    "does", "change", "your", "view", "actually", "drop", "remove", "forget", "ignore", "one",
+    "just", "now", "real", "only", "main", "was", "wrong", "about", "sizing", "size", "its",
+    "next", "quarter", "really", "all", "part", "argument"}
+
+
+def _words(text: str) -> set[str]:
+    return {w for w in re.findall(r"[a-z]{3,}", text.lower())} - _NOT_NAMING
+
+
+def _thesis_turn(prior: list[str]) -> int | None:
+    """The last turn that stated a thesis to test, looking back past earlier revisions of it."""
+    return next((i for i in range(len(prior) - 1, -1, -1) if asks(prior[i])
+                 and not REVISE.search(prior[i])), None)
+
+
+def _apply(revision: str, reasons: list[Any]) -> tuple[list[Any], list[Any]] | None:
+    """(kept, dropped) after one follow-up, or None when it names no reason that was stated."""
+    named = [m.group("what") for m in _DROPS.finditer(revision)]
+    dropped: list[Any] = []
+    for clause in named:
+        for item in re.split(r"\s*(?:,|\band\b|&|\bor\b)\s*", clause):
+            words = _words(item)
+            best = max(reasons, key=lambda r: len(words & _words(r.text)), default=None)
+            if best is not None and words & _words(best.text) and best not in dropped:
+                dropped.append(best)
+    if not named:
+        # "Actually, the capex point is wrong — does that change your view?": the reason whose
+        # words the follow-up shares most is the one it means (round 12).
+        words = _words(revision)
+        best = max(reasons, key=lambda r: len(words & _words(r.text)), default=None)
+        if best is not None and words & _words(best.text):
+            dropped.append(best)
+    kept = [r for r in reasons if r not in dropped]
+    only = _KEEP_ONLY.search(revision)
+    if only is not None:
+        keep_words = _words(only.group("keep"))
+        # The claim itself ("NVDA keeps running") is what the kept reason argues for, not a
+        # reason to drop.
+        chosen = [r for r in kept if keep_words & _words(r.text) or r.kind.name == "DIRECTION"]
+        if any(r.kind.name != "DIRECTION" for r in chosen):
+            dropped += [r for r in kept if r not in chosen]
+            kept = chosen
+    if not dropped:
+        return None
+    return kept, dropped
+
+
+def revise(text: str, prior: list[str] | str, *, book: str = "", memory: str = ""
+           ) -> tuple[list[str], list[Source], dict[str, Any]] | None:
+    """The thesis tested earlier, again, with the reasons the follow-ups name set aside.
+
+    "Actually scratch the ETF point — assume ETF flows go negative instead. Does that change your
+    view?" returned the previous answer word for word (a judge, round 12). The reason whose words
+    the follow-up names is removed and the rest re-tested; an assumed future ("flows go negative")
+    is not a fact the data can test, and the answer says so rather than pretending to.
+
+    Revisions accumulate: the thesis is found by looking back past earlier follow-ups, and every
+    follow-up since is applied in order, so "forget capex" and then "my real reason now is just the
+    backlog" leave the backlog alone (a judge, round 13: the second follow-up was refused as a
+    name Bitget does not list, because only the turn just before was read)."""
+    from argus.lui import thesis
+
+    turns = [prior] if isinstance(prior, str) else list(prior)
+    if not REVISE.search(text):
+        return None
+    at = _thesis_turn(turns)
+    if at is None:
+        return None
+    earlier = split_other_question(turns[at])[0]
+    stated = list(thesis.reasons(earlier))
+    kept = stated
+    dropped: list[Any] = []
+    for revision in [*(t for t in turns[at + 1:] if REVISE.search(t)), text]:
+        applied = _apply(revision, kept)
+        if applied is None:
+            if revision is text:
+                return None
+            continue
+        kept, gone = applied
+        dropped += gone
+    if not kept:
+        return None
+    from concurrent.futures import ThreadPoolExecutor
+
+    name = research_names(earlier)
+    rebuilt = f"My bull case for {name}: " + ", ".join(r.text for r in kept) + ", test my thesis"
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        before_job = pool.submit(answer, earlier, book=book, memory=memory)
+        lines, sources, data = answer(rebuilt, book=book, memory=memory)
+        before = before_job.result()[2]
+    was = {t.get("reason"): t.get("result")
+           for t in (before.get("thesis") or {}).get("tested", [])}
+    supported = [t for t in (data.get("thesis") or {}).get("tested", [])
+                 if t.get("result") == "supported" and not t.get("implied")]
+    verdict = ("what is left still has support: " + "; ".join(
+        f"\"{t['reason']}\"" for t in supported) if supported else
+               "none of the remaining reasons is backed by today's data")
+    lost = [r.text for r in dropped if was.get(r.text) == "supported"]
+    change = ("the reasons set aside were not backed by the data, so setting them aside changes "
+              "nothing" if dropped and not lost else
+              ("it was the only support the thesis had" if not supported else
+               "that support is gone, the rest stands") if lost else "")
+    aside = " and ".join(f"\"{r.text}\"" for r in dropped)
+    head = (f"Bottom line: with {aside} set aside, {verdict}"
+            + (f"; {change}" if change else "") + ".")
+    tail = []
+    if re.search(r"\bassume\b|\binstead\b|\bslowing\b|\bnext\s+(?:quarter|year|month)\b", text,
+                 re.I):
+        tail.append("What you assume in its place is a future the data cannot test, so it is not "
+                    "scored.")
+    if re.search(r"\bsiz(?:e|ing)\b|\bposition\b|\bhow\s+much\b", text, re.I):
+        tail.append(
+            f"On sizing: a thesis verdict does not set a size — how far {name} can go against "
+            f"you does. Ask \"how much should I put in {name}\" and it is sized to your loss "
+            f"limit and the book you gave, with fewer reasons behind it now than when you "
+            f"started ({len(kept)} of {len(stated)}).")
+    return ([head, *tail, *(line for line in lines[1:])], sources,
+            {**data, "dropped": [r.text for r in dropped]})
+
+
+def split_other_question(text: str) -> tuple[str, str]:
+    """(the thesis, a separate question asked after it about another name), or (text, "").
+
+    Only a closing sentence that names a contract the thesis does not, and is not itself one of
+    the tester's asking phrases ("test my thesis", "which is strongest"), is split off."""
+    from argus.lui.research import research_symbols
+
+    parts = re.split(r"(?<=[.!?])\s+(?=[A-Z])", text.strip())
+    if len(parts) < 2:
+        return text, ""
+    claim, last = " ".join(parts[:-1]), parts[-1]
+    if asks(last) and not asks(claim):
+        return text, ""
+    theirs = set(research_symbols(claim)[0])
+    named = set(research_symbols(last)[0])
+    if not theirs or not named or named <= theirs or STRONGEST.search(last):
+        return text, ""
+    return claim, last
+
+
+def research_names(text: str) -> str:
+    from argus.lui.research import research_symbols
+
+    named = research_symbols(text)[0]
+    return named[0].removesuffix("USDT") if named else "it"
 
 trace_module(globals())

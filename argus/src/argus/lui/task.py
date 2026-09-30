@@ -182,7 +182,12 @@ def read_question(text: str, saved_book: str = "") -> Reading | str:
         return ("Type a question, for example: I hold 40% NVDA, 30% MSFT, 30% AAPL — should I "
                 "add 15% TSLA?")
     request = with_book(detect(text), saved_book, text)
-    if request is not None and request.kind in _NOT_A_TASK:
+    if (request is not None and request.kind in _NOT_A_TASK
+            # "Should I go long ETH into next week's FOMC decision?" is about ETH, with the Fed as
+            # its context: it ran one step, the watchlist, not the eight engines (a judge, round
+            # 12). A macro question that names a contract is that contract's task, the macro
+            # reading its first step.
+            and not (request.kind is ResearchKind.MACRO and request.symbols)):
         return f"{_NOT_A_TASK[request.kind]}: open the console and ask it there."
     notes: list[str] = list(request.notes) if request is not None else []
     if request is None or not request.symbols:

@@ -1,0 +1,61 @@
+name = "Trader memory across sessions (what the trader says about themselves) vs. mem0"
+subtheme = "t3-personalisation"
+modules = [
+    "argus/lui/memory.py",
+    "argus/lui/memory_model.py",
+    "argus/eval/memory_comparison.py",
+    "argus/eval/baselines/mem0_runner.py",
+    "argus/eval/baselines/mem0_loader.py",
+]
+state = "tied"
+baseline = """\
+    mem0 (mem0ai, Apache-2.0), the most used open-source memory layer for LLM agents, run \
+    unmodified in its own environment with its default extraction prompt, Qwen as its model, a \
+    local sentence-transformers embedder and a local Qdrant store; both sides given the same \
+    frozen statements, sentences that are not about the trader, and effect tasks"""
+blockers = [
+    """\
+        LOST on recall, WON on false memories, on the only blind round that decides the grade \
+        (held_out_4, data/memory_comparison.json, frozen 2026-09-30 05:30 UTC before either side \
+        ran): ARGUS recalled 15 of 20 stated facts to mem0's 18, and stored 0 of 12 sentences \
+        that were not about the trader to mem0's 7 (a friend's advisor, an influencer, a \
+        question, a hypothetical). Precision 100% against 72%, F1 0.86 against 0.80 — neither \
+        side dominates, so the row is TIED. ARGUS's misses are facts typed with no subject \
+        ("keeping it under 7% per trade", "done with UST, never again").""",
+    """\
+        The route to this state is published, not smoothed: the pattern reader alone recalled 2 \
+        of 25 on the first blind round (held_out_2) to mem0's 25; lui/memory_model.py was built \
+        against that, and each round used for a fix was relabelled tuning (held_out_1, \
+        held_out_3) before a new blind round was frozen.""",
+    """\
+        Cost: mem0 spends one model call of about 8,600 tokens on every message (16s mean, 47s \
+        p95 per add); ARGUS spends none on a message that carries no fact word and one short \
+        call on one that does.""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    mem0/memory/main.py (add, search, the ADDITIVE_EXTRACTION_PROMPT) and its storage history, \
+    read at source (research/harvest/04-mem0.md)"""
+artefact = "data/memory_comparison.json"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    both sides read the same frozen statements, not-about-me sentences and effect tasks in \
+    each round; mem0 run as released, in its own venv"""
+artefact = "data/memory_comparison.json"
+
+[[proofs]]
+condition = "out_of_sample_test"
+how = """\
+    four rounds; the two used for tuning are labelled so, and held_out_4 was frozen before \
+    either side ran and never used to change the reader"""
+artefact = "data/memory_comparison.json"
+test = "test_memory_comparison.py::TestRecallArithmetic"
+
+[[proofs]]
+condition = "implementation_complete"
+how = "lui/memory_model.combined, called for every question by the console's server"
+test = "test_round12_reads.py::test_the_models_facts_are_kept_only_when_the_message_carries_them"

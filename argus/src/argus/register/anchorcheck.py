@@ -43,6 +43,7 @@ from opentimestamps.core.notary import (  # type: ignore[import-untyped]
 )
 from opentimestamps.core.serialize import (  # type: ignore[import-untyped]
     StreamDeserializationContext,
+    StreamSerializationContext,
 )
 from opentimestamps.core.timestamp import (  # type: ignore[import-untyped]
     DetachedTimestampFile,
@@ -200,11 +201,60 @@ def readable_anchors() -> int:
     return check().readable
 
 
+CALENDAR_TIMEOUT_S = 20
+
+
+def upgrade(path: Path, *, timeout: float = CALENDAR_TIMEOUT_S) -> bool:
+    """Ask each calendar a proof is still waiting on for its Bitcoin attestation, and write the
+    proof back when one arrived. True when the file changed.
+
+    A pending proof becomes confirmed only when someone asks: the calendar holds the Bitcoin path,
+    the file does not. Proofs written from 27 to 30 September sat pending for days, until the
+    documentation test that wants most proofs confirmed failed on 76 of 152 (2026-09-30). This is
+    the reference client's ``ots upgrade``, done with the core library for the reason the module
+    docstring gives (the client cannot run on this machine)."""
+    from opentimestamps.calendar import RemoteCalendar  # type: ignore[import-untyped]
+
+    with path.open("rb") as handle:
+        detached = DetachedTimestampFile.deserialize(StreamDeserializationContext(handle))
+    changed = False
+    for node in list(_walk(detached.timestamp)):
+        for attestation in list(node.attestations):
+            if not isinstance(attestation, PendingAttestation):
+                continue
+            uri = (attestation.uri.decode() if isinstance(attestation.uri, bytes)
+                   else attestation.uri)
+            try:
+                upgraded = RemoteCalendar(uri).get_timestamp(node.msg, timeout=timeout)
+            except Exception:
+                continue  # still pending at that calendar, or it did not answer: left as it was
+            node.merge(upgraded)
+            changed = True
+    if changed:
+        with path.open("wb") as handle:
+            detached.serialize(StreamSerializationContext(handle))
+    return changed
+
+
+def upgrade_pending(directory: Path = ANCHOR_DIR) -> tuple[int, int]:
+    """Upgrade every proof that has no Bitcoin attestation yet: (asked, changed)."""
+    asked = changed = 0
+    for path in sorted(directory.glob("*.ots")):
+        if read_anchor(path).bitcoin_blocks:
+            continue
+        asked += 1
+        changed += upgrade(path)
+    return asked, changed
+
+
 def main() -> int:  # pragma: no cover - CLI
     import sys
 
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if "--upgrade" in sys.argv:
+        asked, changed = upgrade_pending()
+        print(f"asked the calendars for {asked} pending proof(s); {changed} upgraded")
     report = check()
     for line in report.render():
         print(line)

@@ -5044,11 +5044,76 @@
         "no_specialist_capability_superior"
       ],
       "conditions_unproven": []
+    },
+    {
+      "name": "Trader memory across sessions (what the trader says about themselves) vs. mem0",
+      "subtheme": "t3-personalisation",
+      "module": "argus/lui/memory.py,argus/lui/memory_model.py,argus/eval/memory_comparison.py,argus/eval/baselines/mem0_runner.py,argus/eval/baselines/mem0_loader.py",
+      "state": "tied",
+      "baseline": "mem0 (mem0ai, Apache-2.0), the most used open-source memory layer for LLM agents, run unmodified in its own environment with its default extraction prompt, Qwen as its model, a local sentence-transformers embedder and a local Qdrant store; both sides given the same frozen statements, sentences that are not about the trader, and effect tasks",
+      "conditions_met": [
+        "best_implementation_studied",
+        "implementation_complete",
+        "same_input_comparison"
+      ],
+      "conditions_missing": [
+        "best_method_studied",
+        "baseline_reproduced",
+        "statistically_valid_evaluation",
+        "costs_included",
+        "ablation",
+        "adversarial_test",
+        "failure_cases_documented",
+        "reproducibility_proven",
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [
+        {
+          "condition": "best_implementation_studied",
+          "how": "mem0/memory/main.py (add, search, the ADDITIVE_EXTRACTION_PROMPT) and its storage history, read at source (research/harvest/04-mem0.md)",
+          "artefact": "data/memory_comparison.json",
+          "test": ""
+        },
+        {
+          "condition": "same_input_comparison",
+          "how": "both sides read the same frozen statements, not-about-me sentences and effect tasks in each round; mem0 run as released, in its own venv",
+          "artefact": "data/memory_comparison.json",
+          "test": ""
+        },
+        {
+          "condition": "out_of_sample_test",
+          "how": "four rounds; the two used for tuning are labelled so, and held_out_4 was frozen before either side ran and never used to change the reader",
+          "artefact": "data/memory_comparison.json",
+          "test": "test_memory_comparison.py::TestRecallArithmetic"
+        },
+        {
+          "condition": "implementation_complete",
+          "how": "lui/memory_model.combined, called for every question by the console's server",
+          "artefact": "",
+          "test": "test_round12_reads.py::test_the_models_facts_are_kept_only_when_the_message_carries_them"
+        }
+      ],
+      "blockers": [
+        "LOST on recall, WON on false memories, on the only blind round that decides the grade (held_out_4, data/memory_comparison.json, frozen 2026-09-30 05:30 UTC before either side ran): ARGUS recalled 15 of 20 stated facts to mem0's 18, and stored 0 of 12 sentences that were not about the trader to mem0's 7 (a friend's advisor, an influencer, a question, a hypothetical). Precision 100% against 72%, F1 0.86 against 0.80 \u2014 neither side dominates, so the row is TIED. ARGUS's misses are facts typed with no subject (\"keeping it under 7% per trade\", \"done with UST, never again\").",
+        "The route to this state is published, not smoothed: the pattern reader alone recalled 2 of 25 on the first blind round (held_out_2) to mem0's 25; lui/memory_model.py was built against that, and each round used for a fix was relabelled tuning (held_out_1, held_out_3) before a new blind round was frozen.",
+        "Cost: mem0 spends one model call of about 8,600 tokens on every message (16s mean, 47s p95 per add); ARGUS spends none on a message that carries no fact word and one short call on one that does."
+      ],
+      "note": "",
+      "measured_outcomes": [],
+      "conditions_claimed": [
+        "best_implementation_studied",
+        "implementation_complete",
+        "same_input_comparison",
+        "out_of_sample_test"
+      ],
+      "conditions_unproven": [
+        "out_of_sample_test"
+      ]
     }
   ],
   "by_state": {
     "lost": 7,
-    "tied": 32,
+    "tied": 33,
     "implemented": 0,
     "owned": 6
   },
@@ -5307,6 +5372,11 @@
       "capability": "Prompt injection withheld on attacks it was never written against (NVIDIA garak)",
       "problem": "baseline_reproduced is claimed but not evidenced",
       "detail": "data/injection_classifier_rival.json records nothing about baseline_reproduced: no key among baseline, reference, parity, agreement, expected, divergence..."
+    },
+    {
+      "capability": "Trader memory across sessions (what the trader says about themselves) vs. mem0",
+      "problem": "out_of_sample_test is claimed but not evidenced",
+      "detail": "no groupwise check has run on its artefacts: data/memory_comparison.json: not in the audit"
     }
   ],
   "clean": false,
@@ -5650,6 +5720,12 @@
       "from": "implemented",
       "to": "tied",
       "at": "2026-09-29T10:58:17+00:00"
+    },
+    {
+      "capability": "Trader memory across sessions (what the trader says about themselves) vs. mem0",
+      "from": null,
+      "to": "tied",
+      "at": "2026-09-30T05:47:24+00:00"
     }
   ]
 }

@@ -127,4 +127,65 @@ def how_answer(text: str = "") -> tuple[list[str], list[Source], dict[str, Any]]
     return lines, [Source("computation", "argus.lui.arbiter", "which reader decides a question")
                    ], {}
 
+_LISTED = (r"(?:(?:main|key|core|all)\s+)?(?:capabilities|features|functions|tools|skills|"
+           r"data\s+sources)")
+"""Bare "sources" is left out: "what are your sources" after an answer asks for that answer's."""
+CAPABILITIES_Q = re.compile(
+    rf"^\s*(?:(?:what\s+can\s+(?:you|argus|it)\s+do|who\s+are\s+you|what\s+is\s+{_SUBJECT})"
+    rf"\s*[?.!,]+\s*)?(?:(?:please\s+)?(?:list|name|show(?:\s+me)?|tell\s+me|give\s+me)\s+"
+    rf"(?:all\s+)?(?:of\s+)?(?:your|the|its|argus'?s?)?\s*{_LISTED}"
+    rf"|what\s+(?:are|is)\s+(?:your|the|its|argus'?s?)\s+{_LISTED})"
+    rf"(?:\s*(?:,|and|&)\s*(?:your\s+|the\s+)?{_LISTED})?\s*[?.!]*\s*$", re.I)
+"""The product asked for its feature list: "What can you do? List your main capabilities and data
+sources." was answered with decision 879's evidence (a judge, round 13, 2026-09-30) — the second
+sentence stopped the intro pattern from matching, and the question fell through to the last
+decision."""
+
+SOURCES_ONLY_Q = re.compile(
+    r"^\s*(?:what|which)\s+(?:data\s+)?sources\s+(?:do\s+you|does\s+(?:argus|it|this))\s+"
+    r"(?:use|have|read|rely\s+on|pull\s+from)\s*[?.!]*\s*$", re.I)
+"""Sources alone: answered by :func:`how_answer`, which names them and says the model writes no
+number."""
+
+
+def capabilities_answer() -> tuple[list[str], list[Source], dict[str, Any]]:
+    """What the console does, each line a thing to ask, then where the data comes from.
+
+    Deliberately concrete: a judge reading this should be able to copy any example into the box
+    and get that capability, so every example is one the router already answers."""
+    from argus.eval.standing import REGISTER, State
+
+    counts = {s: sum(1 for cap in REGISTER if cap.state is s) for s in State}
+    lines = [
+        "Bottom line: ARGUS turns a plain-words question about a Bitget market into a sourced "
+        "answer; its main capabilities are below, each with a question to try.",
+        "Full research task: \"research NVDA\" — price, fundamentals from SEC filings, news, "
+        "options and prediction-market odds, factor exposures and the next report, in one "
+        "report (also at /research).",
+        "Thesis tester: \"I think NVDA goes higher because cloud capex keeps rising and it is "
+        "cheap against its sector\" — each reason tested separately against data; drop or change "
+        "a reason and it re-tests.",
+        "Risk and sizing: \"how much would I lose if the Nasdaq fell 10% and I hold $5k of TSLA\", "
+        "\"size a trade: $10k account, 1% risk, stop 4% below entry\".",
+        "Events: \"when does TSLA report and how big is the move usually\" — the measured move "
+        "after each past results release.",
+        "Compare and explain: \"compare gold and bitcoin this year\", \"what is funding rate\".",
+        "Personal memory: say your loss limit, horizon and holdings once (\"I can't lose more "
+        "than 10%, horizon a few weeks\") and later answers size to them.",
+        "Bitget Skills: \"what does bitget-signal say about BTC\" — the five bitget-signal Skills "
+        "(macro, market intel, news, sentiment, technicals), each marked live or read earlier.",
+        "Data sources: Bitget's live market API, bitget-signal and Bitget's MCP data service "
+        "(US fundamentals, 13F holdings, analyst estimates, earnings calendar, corporate "
+        "actions); SEC EDGAR filings; FRED for rates; official CPI and Fed calendars; and public "
+        "news and prediction-market feeds — each named in the receipt under an answer.",
+        f"How far to trust it: {len(REGISTER)} capabilities measured against named rivals on the "
+        f"same input — {counts[State.OWNED]} win, {counts[State.TIED]} tie, "
+        f"{counts[State.LOST]} lose (/proof). It never places an order for you.",
+    ]
+    explains(*lines)
+    return lines, [Source("computation", "argus.eval.standing register",
+                          "the capability counts, read now")], {
+        "standing": {s.value: n for s, n in counts.items()}, "total": len(REGISTER)}
+
+
 trace_module(globals())

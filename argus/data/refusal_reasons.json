@@ -1,6 +1,6 @@
 {
-  "as_of": "2026-09-29T20:21:07.381014+00:00",
-  "refusals": 876,
+  "as_of": "2026-09-30T14:12:40.163832+00:00",
+  "refusals": 886,
   "refusals_with_a_gradeable_claim": 437,
   "hours_tolerance": 1.5,
   "round_trip_bps": 12.0,
@@ -37,7 +37,7 @@
     "moves_enough": {
       "consistent": 60,
       "contradicted": 26,
-      "ungradeable": 33
+      "ungradeable": 37
     },
     "move_too_small": {
       "consistent": 0,
@@ -268,6 +268,6 @@
       "verdict": "contradicted"
     }
   ],
-  "verdict": "876 refusal(s) on record; 437 carried at least one reason the record can check. Of 913 decision-time reason(s) graded, 913 agreed with the record and 0 contradicted it. `moves_enough` claims were borne out by the next ~2h move 60 of 86 time(s) (70%), against 70% for every ~2h refusal mark (one-sided exact binomial p = 0.57); no evidence the stated reason says more than the base rate does.",
+  "verdict": "886 refusal(s) on record; 437 carried at least one reason the record can check. Of 913 decision-time reason(s) graded, 913 agreed with the record and 0 contradicted it. `moves_enough` claims were borne out by the next ~2h move 60 of 86 time(s) (70%), against 70% for every ~2h refusal mark (one-sided exact binomial p = 0.57); no evidence the stated reason says more than the base rate does.",
   "method": "Each checkable reason in a no_trade thesis is matched by a fixed pattern and set beside the record: session_phase and hours_to_discovery from the ledger, the desk's own hedge-menu note, the risk ruling, and the next ~2h mark for claims about the size of the coming move. Question and binary verdict from VisualWebArena's llm_ua_match (evaluation_harness/helper_functions.py:610-642, MIT); graded here by the record, not by a model."
 }

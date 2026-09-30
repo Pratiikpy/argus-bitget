@@ -49,7 +49,9 @@ SKILLS_Q = re.compile(
     r"\b(?:macro-?analyst|market-?intel|sentiment-?analyst|technical-?analysis|news-?briefing)\s+"
     r"skill\b|\bwhat\s+(?:does|do|is|are)\s+(?:the\s+)?(?:bitget(?:[\s-]+signal)?\s+)?skills?\b"
     r"(?!\s+(?:say|think|read|show)\b)|\bwhich\s+(?:bitget\s+)?skills\s+(?:do\s+you|does\s+"
-    r"(?:argus|it))\s+use\b|\bwhat\s+is\s+bitget[\s-]+signal\b", re.I)
+    r"(?:argus|it))\s+use\b|\bwhat\s+is\s+bitget[\s-]+signal\b|"
+    # "How many Skills do you have?" after the Skills answer was refused (round 12)
+    r"\bhow\s+many\s+(?:bitget\s+)?skills\b", re.I)
 """A question about what the Skills are, not a request for one Skill's reading of a name."""
 
 

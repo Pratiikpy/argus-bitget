@@ -1420,7 +1420,9 @@ dollar value."""
 
 
 _BOOK_COUNT = re.compile(
-    r"(?<![\w.%$])(\d[\d,]*(?:\.\d+)?)\s*(?:x\s+)?"
+    # "3x ETH" is a leverage multiple, not three ETH: a number with "x" written against it is
+    # skipped; "2 x NVDAUSDT", spaced, is still a count.
+    r"(?<![\w.%$])(\d[\d,]*(?:\.\d+)?)(?!x\b)(?:\s+x(?=\s))?\s*"
     r"(?:(?:contracts?|units?|lots?|shares?|coins?|tokens?)\s+(?:of\s+)?)?"
     r"([A-Za-z][A-Za-z0-9.]{1,15})\b", re.I)
 """"long 2 NVDAUSDT", "2 contracts of TSLAUSDT", "0.5 BTC": a count of the contract's own unit,
@@ -2188,6 +2190,13 @@ def detect(text: str) -> ResearchRequest | None:
     holding, and a note saying it was read as NDX100USDT would describe a reading never used.
     """
     request = _with_leverage_exposure(_with_stated_cash(read_request(text), text), text)
+    if request is not None and request.book and request.notional is None:
+        # "I have $600 in SOL and $400 in TSLA, am I too risky?" was sized on the first amount,
+        # $600, not the $1,000 the book holds (a first-time user, round 12): a book stated in
+        # dollars carries its own value.
+        priced = priced_book(text)
+        if priced is not None and set(priced.weights) == set(request.book) and priced.value > 0:
+            request = replace(request, notional=Decimal(str(round(priced.value, 2))))
     if request is not None and request.book and _GROUP.search(text):
         request = replace(request, notes=(*request.notes, *_group_note(text)))
     if request is None:
@@ -2482,7 +2491,9 @@ def read_request(text: str) -> ResearchRequest | None:
                                       "— the research task under it runs every engine on it",))
     if (len(symbols) >= 2 and not is_an_order(raw) and re.search(
             r"\b(?:outperform\w*|underperform\w*|beat(?:s|ing|en)?|(?:done|doing|did)\s+better|"
-            r"better\s+than|worse\s+than|lagg?(?:ing|ed)?)\b", raw, re.I)):
+            r"better\s+than|worse\s+than|"
+            r"(?:stronger|better|safer|weaker|worse)\s+(?:buy|bet|pick|investment|choice|hold)"
+            r"\s+than|lagg?(?:ing|ed)?)\b", raw, re.I)):
         # "does BTC outperform QQQ", "is ETH beating BTC this month" were read as nothing, or as
         # one name's risk profile (2026-09-30): which rose more is the comparison's momentum lead.
         return ResearchRequest(kind=ResearchKind.COMPARE, symbols=symbols[:4])

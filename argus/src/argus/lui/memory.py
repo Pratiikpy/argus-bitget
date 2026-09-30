@@ -37,7 +37,8 @@ from argus.lui.research.kinds import bare_symbol
 MAX_FACTS = 40
 MAX_TEXT = 200
 
-KINDS = ("budget", "max_loss", "horizon", "style", "capital", "thesis", "avoid", "check")
+KINDS = ("budget", "max_loss", "horizon", "style", "capital", "thesis", "avoid", "check", "goal",
+         "book")
 """``check`` is one line of the checklist a review of the trader's own trades wrote
 (`lui/journal.py`): its subject is the habit's key, its text the check. It is kept so the check is
 run again on a later entry (:func:`after`), which the review promised and nothing did until
@@ -76,12 +77,32 @@ _MAX_LOSS = re.compile(
     r"\b(?:i\s+)?(?:can'?t|cannot|can\s+not|don'?t\s+want\s+to|won'?t|never)\s+(?:afford\s+to\s+)?"
     r"lose\s+"
     r"(?:more\s+than\s+)?(\d{1,2}(?:\.\d+)?)\s*%|\bmax(?:imum)?\s+(?:loss|drawdown)\s+(?:is\s+|of\s+)?"
-    r"(\d{1,2}(?:\.\d+)?)\s*%|\b(?:my\s+)?loss\s+limit\s+(?:is\s+)?(\d{1,2}(?:\.\d+)?)\s*%", re.I)
+    r"(\d{1,2}(?:\.\d+)?)\s*%|\b(?:my\s+)?loss\s+limit\s+(?:is\s+)?(\d{1,2}(?:\.\d+)?)\s*%|"
+    # "my max loss should probably be around 10%" (the mem0 comparison, round 12)
+    r"\bmax(?:imum)?\s+loss\s+(?:should\s+(?:probably\s+)?be|would\s+be|of)\s+(?:around\s+|about\s+|"
+    r"roughly\s+|~)?(\d{1,2}(?:\.\d+)?)\s*%", re.I)
 _HORIZON = re.compile(
     r"\bi(?:'?m|\s+am)\s+an?\s+(?:[\w-]+\s+){0,3}?(day|swing|position|long[\s-]term)\s+"
     r"(?:trader|investor)|"
-    r"\bi\s+(?:usually\s+|normally\s+|typically\s+)?hold\s+(?:for\s+)?(?:a\s+few\s+|several\s+)?"
-    r"(hours?|days?|weeks?|months?|years?)\b", re.I)
+    r"\bi(?:'?ll|\s+will|'?d)?\s+(?:usually\s+|normally\s+|typically\s+)?hold\s+(?:it\s+|this\s+(?:one\s+)?)?"
+    r"(?:for\s+)?(?P<n1>a\s+few|several|a\s+couple(?:\s+of)?|\d{1,3}|one|two|three|four|six)?\s*"
+    r"(?P<u1>hours?|days?|weeks?|months?|years?)\b|"
+    r"\b(?P<explicit>(?:my\s+)?(?:time\s+|trading\s+|holding\s+|investment\s+)?horizon\s+"
+    r"(?:is\s+|of\s+|=\s*|:\s*)?(?:about\s+|around\s+|roughly\s+)?)"
+    r"(?P<n2>a\s+few|several|a\s+couple(?:\s+of)?|\d{1,3}|one|two|three|four|six|an?)?\s*"
+    r"(?P<unit>hours?|days?|weeks?|months?|years?)\b", re.I)
+_HOLDS = re.compile(
+    r"\b(?:i\s+(?:currently\s+|now\s+)?(?:hold|own|have)|i(?:'?m|\s+am)\s+(?:holding|long|in)|"
+    r"my\s+(?:current\s+)?(?:book|portfolio|holdings?|allocation)\s+(?:is|are|reads|looks\s+like|:)"
+    r")\b[^.?!;\n]*", re.I)
+"""Holdings said in a sentence: "I hold 40% NVDA, 30% MSFT, 30% AAPL". Kept as the book, so a later
+"what are my exposures if I add 10% XOM" is asked of it (a judge, round 13, 2026-09-30: the book
+was said once in chat, and the next answer read "your book is 100% Energy")."""
+
+_HOW_MANY = {"a few": 3, "several": 4, "a couple": 2, "a couple of": 2, "one": 1, "a": 1, "an": 1,
+             "two": 2, "three": 3, "four": 4, "six": 6}
+""""A few weeks" is three weeks, not one: "my horizon is a few weeks" was stored as the swing-trader
+default of one week (a judge, round 13, 2026-09-30)."""
 _STYLE = re.compile(
     r"\bi(?:'?m|\s+am)\s+(?:a\s+|an\s+|pretty\s+|quite\s+|very\s+)?(conservative|aggressive|"
     r"risk[\s-]averse|cautious)\b|\bi\s+(?:mostly\s+|only\s+|usually\s+)?trade\s+(earnings|momentum|"
@@ -102,6 +123,22 @@ _THESIS = re.compile(
 """One view per match, ending at the clause's end, so "I think NVDA will rise and I think BTC will
 crash" is two theses. Until 2026-09-28 the claim ran to the end of the message and only the first
 view was kept (research/harvest/04-mem0.md, the multi-topic case mem0 is built for)."""
+_GOAL = re.compile(
+    r"\b(?:i'?m|i\s+am|we'?re|we\s+are)\s+(?:saving|trying\s+to\s+save|putting\s+money\s+aside)\s+"
+    r"(?:up\s+)?(?:for\s+)?(.{3,80}?)(?=\s*(?:[,.;!?]|\bso\b|\band\b|$))|"
+    r"\b(?:i'?m|i\s+am)\s+(?:trying|planning|hoping|aiming)\s+to\s+(retire(?:\s+early)?|buy\s+a\s+"
+    r"(?:house|home|car|flat)|pay\s+(?:off|for)\s+.{3,40}?)(?=\s*(?:[,.;!?]|\bso\b|\band\b|$))|"
+    r"\bmy\s+goal\s+is\s+(?:to\s+)?(.{3,80}?)(?=\s*(?:[,.;!?]|$))|"
+    r"\b(?:i|we)\s+need\s+(?:this|the)\s+money\s+(.{3,60}?)(?=\s*(?:[,.;!?]|$))", re.I)
+"""What the money is for, said in passing: "I am saving up for a house down payment next year",
+"I'm trying to retire early". No kind read these, and mem0 kept both (the mem0 comparison, round
+12, `eval/memory_comparison.py`). Kept as the trader's words and shown beside any answer about
+risk, never turned into a number the console did not hear."""
+
+_SENTENCE = re.compile(r"(?<=[.?!])\s+|\s+(?:--|—)\s+")
+"""Sentences and dashed asides: a message that opens with a question can still state a fact in its
+next sentence ("What is my risk tolerance? I think ... my max loss should be around 10%")."""
+
 _ASKING = re.compile(r"^\s*(?:what|how|should|is|are|does|do|can|could|why|when|which|will|would|"
                      r"where|who)\b|\?\s*$", re.I)
 """A question states nothing about the trader: "what if I can't lose more than 10%?" and "should
@@ -123,25 +160,56 @@ def extract(question: str, now: datetime | None = None,
     day = (now or datetime.now(UTC)).date().isoformat()
     text = question.strip()[:600]
     facts: list[Fact] = []
-    if _ASKING.search(text) and not re.match(r"\s*i\b", text, re.I):
+    # Questions state nothing about the trader, but the sentence after one can: "What is my risk
+    # tolerance? I think I can handle it but my max loss should probably be around 10%" kept
+    # nothing, because the whole message was dropped as a question (the mem0 comparison, round 12).
+    sentences = [part for part in _SENTENCE.split(text) if part.strip()]
+    kept = [part for part in sentences
+            if not (_ASKING.search(part) and not re.match(r"\s*i\b", part, re.I))]
+    if not kept:
         return facts
+    text = " ".join(kept)
 
     def add(kind: str, subject: str, value: str, words: str,
             price: float | None = None) -> None:
         facts.append(Fact(kind=kind, subject=subject, value=value, text=words.strip()[:MAX_TEXT],
                           at=day, price_at=price))
 
-    if (m := _BUDGET.search(text)) is not None:
+    def last(pattern: re.Pattern[str]) -> re.Match[str] | None:
+        """The last statement of a kind in the message, the earlier one noted as replaced: "My
+        risk budget is 20% -- actually, no single name above 30%" corrects itself, and "I hold for
+        weeks normally -- well, this one for months" too (the mem0 comparison, round 12)."""
+        found = list(pattern.finditer(text))
+        return found[-1] if found else None
+
+    def earlier(pattern: re.Pattern[str]) -> str:
+        found = list(pattern.finditer(text))
+        return f"“{found[0].group(0).strip()}” (earlier in the same message)" if len(found) > 1 \
+            else ""
+
+    if (m := last(_BUDGET)) is not None:
         add("budget", "", str(float(m.group(1) or m.group(2)) / 100), m.group(0))
-    if (m := _MAX_LOSS.search(text)) is not None:
-        add("max_loss", "", str(float(m.group(1) or m.group(2) or m.group(3)) / 100), m.group(0))
-    if (m := _HORIZON.search(text)) is not None:
-        word = (m.group(1) or m.group(2) or "").lower()
+        facts[-1] = replace(facts[-1], replaces=earlier(_BUDGET))
+    if (m := last(_MAX_LOSS)) is not None:
+        add("max_loss", "", str(float(m.group(1) or m.group(2) or m.group(3) or m.group(4))
+                                / 100), m.group(0))
+        facts[-1] = replace(facts[-1], replaces=earlier(_MAX_LOSS))
+    stated = [h for h in _HORIZON.finditer(text) if h.group("explicit") is not None]
+    if (m := stated[-1] if stated else last(_HORIZON)) is not None:
+        # A horizon said in words beats the one a trading style implies: "I'm a swing trader, my
+        # horizon is a few weeks" is three weeks, whichever order the two come in.
+        word = (m.group(1) or m.group("u1") or m.group("unit") or "").lower()
+        count = (m.group("n1") or m.group("n2") or "").lower()
+        count = re.sub(r"\s+", " ", count)
+        times = int(count) if count.isdigit() else _HOW_MANY.get(count, 1)
         hours = {"day": 24, "swing": 24 * 7, "position": 24 * 30}.get(word) or (
             24 * 90 if word.startswith("long") else
             1 if word.startswith("hour") else 24 if word.startswith("day") else
             168 if word.startswith("week") else 720 if word.startswith("month") else 24 * 365)
+        if word not in ("day", "swing", "position") and not word.startswith("long"):
+            hours *= max(1, times)
         add("horizon", "", str(hours), m.group(0))
+        facts[-1] = replace(facts[-1], replaces=earlier(_HORIZON))
     if (m := _STYLE.search(text)) is not None:
         add("style", "", re.sub(r"[\s-]+", "-", (m.group(1) or m.group(2) or m.group(3)
                                                   or "").lower()), m.group(0))
@@ -165,6 +233,15 @@ def extract(question: str, now: datetime | None = None,
                 except Exception:
                     price = None
             add("thesis", named[0], lean, m.group(0), price)
+    for m in _HOLDS.finditer(text):
+        from argus.lui.research.parse import holding_pairs
+
+        pairs = holding_pairs(m.group(0))
+        if pairs and sum(w for _, _, w in pairs) <= 1.0001:
+            add("book", "", str(len(pairs)), m.group(0))
+    if (m := _GOAL.search(text)) is not None:
+        goal = next(g for g in m.groups() if g)
+        add("goal", "", goal.strip(" ."), m.group(0))
     for m in _AVOID.finditer(text):
         named = research_symbols(m.group(1))[0]
         if named:
@@ -242,6 +319,12 @@ def get(facts: list[Fact], kind: str, subject: str = "") -> Fact | None:
     return next((f for f in facts if f.kind == kind and f.subject == subject), None)
 
 
+def remembered_book(facts: list[Fact]) -> Fact | None:
+    """The holdings the trader last said in chat, if any: the book an answer uses when none is
+    saved in My book."""
+    return get(facts, "book")
+
+
 def remembered_line(fact: Fact, use: str) -> str:
     """How a remembered fact is shown when it shapes an answer."""
     earlier = f" (replacing {fact.replaces})" if fact.replaces else ""
@@ -297,6 +380,11 @@ def apply(request: Any, facts: list[Fact], question: str) -> tuple[Any, list[str
     if request.kind is ResearchKind.IMPACT:
         request, mandate_used = _apply_mandate(request, facts, question)
         used.extend(mandate_used)
+    goal = get(facts, "goal")
+    if goal is not None and request.kind in (ResearchKind.IMPACT, ResearchKind.BOOK,
+                                             ResearchKind.STRESS, ResearchKind.LEVERAGE,
+                                             ResearchKind.CONSTRUCT, ResearchKind.HEDGE):
+        used.append(remembered_line(goal, "weigh this answer against what the money is for"))
     return request, used
 
 
@@ -314,9 +402,16 @@ def _apply_mandate(request: Any, facts: list[Fact], question: str) -> tuple[Any,
         return request, []
     said = [f for f in (get(facts, "style"), get(facts, "max_loss")) if f is not None]
     words = ". ".join(f.text for f in said)
+    horizon = get(facts, "horizon")
+    if said and horizon is not None and horizon.value.isdigit():
+        # A remembered horizon reaches the mandate in the words its reader takes: the mandate
+        # printed "a 1-week horizon (a default — say yours)" after "my horizon is a few weeks"
+        # (a judge, round 13, 2026-09-30).
+        said.append(horizon)
+        words += f". my horizon is {int(horizon.value)} hours"
     if not said or stated_profile(words) is None:
         return request, []
-    used = [remembered_line(f, "your mandate below is checked against it") for f in said]
+    used = [remembered_line(f, "the mandate in this answer is checked against it") for f in said]
     capital = get(facts, "capital")
     amount = None
     if capital is not None:
@@ -442,6 +537,7 @@ __all__ = [
     "merge",
     "merge_checks",
     "parse",
+    "remembered_book",
     "remembered_line",
     "thesis_line",
 ]

@@ -137,7 +137,7 @@ class TestARememberedMandateReachesTheCheck:
         request, used = mem.apply(self._impact(), facts, "should I add 15% TSLA?")
         assert request.mandate_text == "I'm conservative"
         assert str(request.mandate_capital) == "50000"
-        assert any("mandate below is checked against it" in line for line in used)
+        assert any("mandate in this answer is checked against it" in line for line in used)
         assert any("sizes on your $50,000" in line for line in used)
 
     def test_the_question_own_mandate_wins_and_memory_stays_out(self) -> None:

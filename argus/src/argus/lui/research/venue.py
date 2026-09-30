@@ -120,7 +120,8 @@ def _venue(symbol: str, is_open: Any, spot: str | None = None
         + _t(symbol) + ") that you own outright: no leverage and no funding. The stock perpetual ("
         + symbol + ") is a USDT-margined contract: leverage, shorting and a funding payment "
         "every few hours. Both trade around the clock, including when the stock's own market "
-        "is shut, and this desk trades the perpetuals.",
+        "is shut. ARGUS's own paper desk decides on the perpetuals and places no real orders; "
+        "this console holds no money and never trades for you.",
         (f"Listed now: {spot_count:,} spot rTokens, and " if spot_count else "Listed now: ")
         + f"{sum(kinds.values())} real-world-asset perpetuals beside {crypto} crypto ones — "
         f"{kinds['equity']} stocks and ETFs, {kinds['commodity']} commodities, {kinds['fx']} "

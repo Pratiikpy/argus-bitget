@@ -301,4 +301,41 @@ def answer(text: str, symbol: str | None = None, *,
     return lines, sources, {"sizing": data}
 
 
+
+LOSS_COMPARE = re.compile(
+    r"\b(?:drops?|falls?|crash(?:es)?|sinks?|loses?|goes\s+down)\s+(?:by\s+)?(?P<pct>\d+(?:\.\d+)?)"
+    r"\s*(?:%|(?:percent|pct)\b).{0,60}?\b(?:worse|bigger|more|larger)\s+than\s+(?:losing\s+|a\s+loss\s+of\s+)?"
+    r"\$?\s*(?P<usd>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k)?\s*(?:dollars?|usd|usdt|bucks)?", re.I | re.S)
+"""A percentage fall set against a dollar loss: "If BTC drops 50 percent, is that worse than losing
+10000 dollars?" shocked QQQ and never made the comparison (a hostile review, round 12)."""
+
+
+def loss_compare(text: str, symbol: str | None
+                 ) -> tuple[list[str], list[Any], dict[str, Any]] | None:
+    """Where a percentage fall and a dollar loss meet: the holding at which they are equal, and
+    the answer on the holding the question states, when it states one."""
+    m = LOSS_COMPARE.search(text)
+    if m is None:
+        return None
+    pct = float(m.group("pct")) / 100
+    usd = float(m.group("usd").replace(",", "")) * (1_000 if m.group("k") else 1)
+    if pct <= 0 or usd <= 0:
+        return None
+    name = symbol.removesuffix("USDT") if symbol else "the position"
+    even = usd / pct
+    held = stated_capital(text)
+    if held:
+        loss = held * pct
+        lead = (f"Bottom line: on your ${held:,.0f}, a {pct:.0%} fall in {name} costs "
+                f"${loss:,.0f} — {'more' if loss > usd else 'less' if loss < usd else 'exactly'} "
+                f"than ${usd:,.0f}.")
+    else:
+        lead = (f"Bottom line: it depends only on how much {name} you hold: a {pct:.0%} fall costs "
+                f"more than ${usd:,.0f} on any holding above ${even:,.0f}, and exactly that on "
+                f"${even:,.0f}. Say what you hold for your own figure.")
+    lines = [lead, f"Arithmetic: loss = holding x {pct:.0%}, so the holding where it equals "
+                   f"${usd:,.0f} is ${usd:,.0f} / {pct:.0%} = ${even:,.0f}. Ask \"how often has "
+                   f"{name} fallen {pct:.0%}\" for how rare such a fall has been."]
+    return lines, [], {"break_even_holding": even}
+
 trace_module(globals())

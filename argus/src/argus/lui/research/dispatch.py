@@ -1026,8 +1026,26 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             desk_lines, desk_sources = _desk_view(add, ledger)
             lines.extend(desk_lines)
             sources.extend(desk_sources)
-            mandate = _mandate_lines(add, request.size, data.raw, raw_text,
-                                     request.mandate_text, request.mandate_capital)
+            resizing = request.target is not None or request.resize_by is not None
+            mandate = [] if resizing else _mandate_lines(
+                add, request.size, data.raw, raw_text, request.mandate_text,
+                request.mandate_capital)
+            if resizing:
+                # A trim is judged by the weight it leaves, not as a purchase of that weight:
+                # "what if I trim NVDA to 30%" was answered "yes to NVDA, but at $10,000 rather
+                # than the 30% position asked" (round 13, 2026-09-30).
+                from argus.lui.research.parse import stated_profile
+
+                profile = stated_profile(raw_text) or (
+                    stated_profile(request.mandate_text) if request.mandate_text else None)
+                left = request.target
+                if profile is not None and left is not None and \
+                        Decimal(str(left * 100)) > profile.max_position_pct:
+                    defaulted = "max_position_pct" in (getattr(profile, "defaulted", ()) or ())
+                    lines.append(
+                        f"Against your mandate: {_t(add)} at {left:.0%} is still above the "
+                        f"{profile.max_position_pct:g}% one name may carry"
+                        + (" (a default — say yours)" if defaulted else "") + ".")
             if mandate:
                 # The trader's own mandate answers "should I" first; the risk view follows it.
                 # The engine's lead is not always first in its own list (the final sort puts it

@@ -1,28 +1,28 @@
 {
-  "generated_at": "2026-09-30T01:12:54.611121+00:00",
+  "generated_at": "2026-09-30T13:33:16.216297+00:00",
   "source": "SoSoValue /etfs/summary-history and /btc-treasuries (US spot ETFs; creations less redemptions)",
   "funds": {
     "BTC": {
       "asset": "BTC",
-      "date": "2026-09-28",
-      "net_inflow_usd": 31070566.45000001,
-      "five_day_usd": 1417908047.5349998,
-      "z_latest": -0.33,
-      "streak_days": 8,
-      "net_assets_usd": 107816350545.39796,
-      "cumulative_usd": 57577793375.643,
-      "days": 20
+      "date": "2026-09-29",
+      "net_inflow_usd": 66194702.4,
+      "five_day_usd": 769353764.43,
+      "z_latest": -0.23,
+      "streak_days": 9,
+      "net_assets_usd": 107961129364.433,
+      "cumulative_usd": 57643988078.043,
+      "days": 21
     },
     "ETH": {
       "asset": "ETH",
-      "date": "2026-09-28",
-      "net_inflow_usd": 17095930.08,
-      "five_day_usd": 436997187.265,
-      "z_latest": -0.29,
-      "streak_days": 7,
-      "net_assets_usd": 17692096382.795,
-      "cumulative_usd": 13957008763.491,
-      "days": 20
+      "date": "2026-09-29",
+      "net_inflow_usd": -2808550.54,
+      "five_day_usd": 271879240.55499995,
+      "z_latest": -0.45,
+      "streak_days": 1,
+      "net_assets_usd": 17792301243.434002,
+      "cumulative_usd": 13954200212.951,
+      "days": 21
     }
   },
   "errors": [],

@@ -72,6 +72,7 @@ class Kind(StrEnum):
     DRIVER = "a demand driver"
     RELATIVE = "one name against another"
     DIRECTION = "a direction"
+    FLOWS = "fund flows"
     EARNINGS = "earnings"
     MACRO = "macro"
     OTHER = "other"
@@ -85,6 +86,10 @@ class Result(StrEnum):
 
 
 _KINDS: tuple[tuple[Kind, re.Pattern[str]], ...] = (
+    # "ETF inflows are accelerating" was not read as anything (a judge, round 12); the spot ETF
+    # flows the console already keeps (data/etf_flows.json, SoSoValue) test it.
+    (Kind.FLOWS, re.compile(r"\betfs?\b.{0,30}\b(?:in|out)flows?\b|\b(?:in|out)flows?\b.{0,30}"
+                            r"\betfs?\b|\betf\s+(?:demand|buying|selling)\b", re.I)),
     (Kind.REVERSION, re.compile(
         r"pull\s?back|\bdip\b|correction|temporary|bounce|rebound|recover|oversold|bottom(ed| is)|"
         r"overdone|(rally|pump|move|run)\b.*\b(fade|reverse|unwind|won'?t last)|overbought", re.I)),
@@ -115,21 +120,32 @@ _KINDS: tuple[tuple[Kind, re.Pattern[str]], ...] = (
         re.I)),
 )
 
-_SPLIT = re.compile(r"\s*(?:[,;?]|\bbecause\b|\bsince\b|\bas\b|\band\b|\bgiven\b|\bplus\b)\s*",
-                    re.I)
+_SPLIT = re.compile(
+    # a comma, but not the one inside "$200,000" (a hostile review, round 12: the number was split
+    # into two "reasons"), and a sentence's end
+    r"\s*(?:,(?!\d{3}(?!\d))|[;?]|(?<=[a-z%)])\.\s+(?=[A-Za-z])|\bbecause\b|\bsince\b|\bas\b|"
+    r"\band\b|\bgiven\b|\bplus\b)\s*", re.I)
+_OPENER = re.compile(r"^i\s+(?:think|believe|reckon|expect|feel)\s+(?:that\s+)?", re.I)
+_PRICE_STATEMENT = re.compile(r"(?:[$€£]\s*\d|\d\s*(?:k|usd|dollars?|euros?)\b)", re.I)
+"""A fragment that only states a price ("Bitcoin is at $200,000 right now"): the premise check
+reads it (:func:`price_premise`), and it is not a reason of its own."""
 _STANCE = re.compile(r"^(?:i(?:'m| am)?\s+)?(?:going\s+|thinking of going\s+|considering\s+"
                      r"(?:going\s+)?)?(?:long|short|buy(?:ing)?|sell(?:ing)?|bullish|bearish)"
                      r"(?:\s+on)?\s+\S+$", re.I)
 
 _ASK_WORDS = re.compile(
     r"^\s*(?:i\s+(?:think|believe|reckon|expect|feel)\s+(?:that\s+)?|my\s+(?:thesis|view|take|"
-    r"idea)(?:\s+is)?(?:\s+that)?\s*:?\s*|here'?s\s+my\s+(?:thesis|view|take|idea):?\s*)|"
+    r"idea)(?:\s+is)?(?:\s+that)?\s*:?\s*|here'?s\s+my\s+(?:thesis|view|take|idea):?\s*|"
+    # "My bull case for BTC: ..." (a judge, round 12)
+    r"(?:my|the)\s+(?:bull|bear)(?:ish)?\s+case(?:\s+(?:for|on)\s+[\w$.&/-]+)?\s*[:,-]?\s*)|"
     r"\s*[-\u2013\u2014:,.]?\s*(?:please\s+|can\s+you\s+)?(?:test|check|challenge|"
     r"stress[\s-]*test|pressure[\s-]*test|poke\s+holes\s+in|kill|critique|evaluate|assess|validate)\s+"
     r"(?:(?:my|this|the|that)\s+(?:thesis|idea|view|take|theory|call)|it|this|that)\b[\s?.!]*$|"
     # a closing question about the thesis: "... Is that thesis right?", "am I wrong?" (round 11)
     r"\s*[.?!]?\s*(?:is\s+(?:that|this|my|the)\s+(?:thesis|view|idea|take|theory|reasoning)"
-    r"(?:\s+\w+){1,2}|am\s+i\s+(?:right|wrong)|what\s+do\s+you\s+think|thoughts)[\s?.!]*$",
+    r"(?:\s+\w+){1,2}|am\s+i\s+(?:right|wrong)|what\s+do\s+you\s+think|thoughts|"
+    r"which\s+(?:of\s+(?:these|them|those)\s+)?(?:one\s+)?(?:is|are)\s+(?:the\s+)?(?:strongest|"
+    r"weakest|best|worst|most\s+\w+)(?:\s+(?:one|reason|point))?|true\s+or\s+false)[\s?.!]*$",
     re.I)
 """The asking around a stated thesis ("I think ...", "... test my thesis"): not a reason."""
 
@@ -191,10 +207,14 @@ def reasons(text: str) -> tuple[Reason, ...]:
     stance and name ("long SOL") are not a reason; a fragment of two words or fewer that names no
     kind is not one either. Empty when the text states no reason."""
     out: list[Reason] = []
-    text = _ASK_WORDS.sub("", text.strip()).strip()
+    text = text.strip()
+    while (stripped := _ASK_WORDS.sub("", text).strip()) != text:
+        # more than one asking phrase: "... Test my thesis. Which of these is strongest?"
+        text = stripped
     for part in _SPLIT.split(text.rstrip(".?!")):
         # "because of institutional adoption" leaves "of ..." after the split (round 11)
         part = re.sub(r"^(?:of|to|on|that|the\s+fact\s+that)\s+", "", part.strip(" ."), flags=re.I)
+        part = _OPENER.sub("", part)
         if not part or _STANCE.match(part) or _ASKED.match(part):
             continue
         kind = next((k for k, pattern in _KINDS if pattern.search(part)), None)
@@ -205,8 +225,10 @@ def reasons(text: str) -> tuple[Reason, ...]:
             # "stocks will go up" was listed as nothing any engine reads (round 11)
             kind = Kind.DIRECTION
         if kind is None:
-            if len(part.split()) <= 2 or not re.search(r"\b(is|are|will|looks?|has|have|"
-                                                         r"getting|keeps?)\b", part, re.I):
+            # Kept unless it is two words or fewer, or only a stated price: "the halving cut new
+            # supply" was dropped for want of a listed verb, and the answer's count left it out
+            # without a word (a hostile review, round 12).
+            if len(part.split()) <= 2 or _PRICE_STATEMENT.search(part):
                 continue
             kind = Kind.OTHER
         out.append(Reason(text=part, kind=kind))
@@ -242,6 +264,27 @@ def relative_facts(reason: str) -> dict[str, Any] | None:
     return out
 
 
+def _is_coin(name: str) -> bool:
+    from argus.lui.research.parse import is_us_equity
+    from argus.market import universe
+
+    symbol = name if name.endswith("USDT") else f"{name}USDT"
+    return not is_us_equity(symbol) and universe.NOT_EQUITY.get(symbol, "crypto") == "crypto"
+
+
+_NAMED_WINDOW = re.compile(r"\b(?:over|in|during)\s+the\s+(?:past|last)\s+(?:(?P<n>\d+)\s+)?"
+                           r"(?P<unit>days?|weeks?|months?)\b|\bthis\s+(?P<unit2>week|month)\b",
+                           re.I)
+"""The window a backward-looking claim names; a month when it names none."""
+
+_PAST_WINDOW = re.compile(
+    r"\b(?:has|have)\s+been\b|\b(?:did|was|were|outperformed|underperformed|beat|lagged)\b|"
+    r"\b(?:over|in|during)\s+the\s+(?:past|last)\s+(?:(?P<n>\d+)\s+)?(?P<unit>days?|weeks?|"
+    r"months?)\b|\bthis\s+(?:week|month)\b", re.I)
+"""A claim about what already happened ("SOL has been outperforming ETH over the past month"),
+which the record settles, unlike one about what comes next."""
+
+
 def _relative(reason: Reason, found: Mapping[str, Any] | None) -> Tested:
     """Whether the first name has been beating the second over the last 30 days and the longest
     window Bitget serves; the claim itself is about what comes next, which no data tests."""
@@ -256,6 +299,26 @@ def _relative(reason: Reason, found: Mapping[str, Any] | None) -> Tested:
              f"{second.removesuffix('USDT')} {b[n]:+.1%}" for n in spans]
     ahead = [a[n] > b[n] for n in spans if n >= 30]
     claims_behind = bool(re.search(r"\b(?:lag|underperform)\w*\b", reason.text, re.I))
+    past = _PAST_WINDOW.search(reason.text)
+    if past is not None:
+        # A claim about the record is settled by the record, over the window it names (a judge,
+        # round 12: "SOL has been outperforming ETH over the past month" was "not measurable"
+        # beside +16.1% against +8.4%).
+        named = _NAMED_WINDOW.search(reason.text)
+        unit = ((named.group("unit") or named.group("unit2")) if named else "month").lower()
+        span = int((named.group("n") if named else None) or 1) * (1 if unit.startswith("day") else 7
+                                             if unit.startswith("week") else 30)
+        window = min(spans, key=lambda n: abs(n - span))
+        was_ahead = a[window] > b[window]
+        result = Result.SUPPORTED if was_ahead != claims_behind else Result.CONTRADICTED
+        return Tested(reason.text, reason.kind, result,
+                      f"Over {window} days {first.removesuffix('USDT')} returned "
+                      f"{a[window]:+.1%} against {second.removesuffix('USDT')}'s {b[window]:+.1%} "
+                      f"— {'true' if result is Result.SUPPORTED else 'not so'}, on Bitget's "
+                      f"daily closes.",
+                      evidence=tuple(Finding(f"{s.removesuffix('USDT')} daily closes, Bitget",
+                                             "Bitget market candles", _candles_url(s))
+                                     for s in (first, second)))
     if ahead and all(ahead):
         result = Result.CONTRADICTED if claims_behind else Result.SUPPORTED
     elif ahead and not any(ahead):
@@ -545,8 +608,78 @@ def _recent(quote: Mapping[str, Any]) -> tuple[float, float, float] | None:
 _DIRECTION = re.compile(
     r"\bwill\b.{0,20}\b(?:go\s+up|go\s+down|rise|fall|rally|drop|climb|sink|moon|crash|pump|dump|"
     r"higher|lower)\w*|\b(?:go|goes|going|head|heads|headed|heading|move|moves|trend|trends)"
-    r"\s+(?:up|down|higher|lower)\b", re.I)
-"""A bare direction: "X will go up", "BTC is heading lower"."""
+    r"\s+(?:up|down|higher|lower)\b|\b(?:keeps?|kept)\s+(?:running|rising|climbing|going\s+up|"
+    r"falling|sinking|going\s+down)\b|\b(?:runs?|keeps?\s+running)\s+(?:higher|further)\b", re.I)
+"""A bare direction: "X will go up", "BTC is heading lower", "NVDA keeps running" (read as nothing
+testable and scored "not tested", a judge, round 13)."""
+
+
+def etf_flows() -> dict[str, Any] | None:
+    """The spot-ETF flow summary the sweep keeps (`market/etf_flows.py`), or None."""
+    import json
+
+    from argus.truth.paths import DATA_DIR
+
+    try:
+        return dict(json.loads((DATA_DIR / "etf_flows.json").read_text(encoding="utf-8")))
+    except (OSError, ValueError):
+        return None
+
+
+def _flows(reason: Reason, snapshot: Mapping[str, Any] | None, name: str) -> Tested:
+    """A claim about spot-ETF flows, against the US spot ETFs' creations less redemptions: the
+    latest day, the last five, and how many days in a row they have run one way. "Accelerating"
+    is read as the latest day above the five-day average; "inflows" or "outflows" alone as the
+    direction of the five days."""
+    asset = name.removesuffix("USDT")
+    fund = ((snapshot or {}).get("funds") or {}).get(asset)
+    if not fund:
+        return Tested(reason.text, reason.kind, Result.NOT_TESTED,
+                      f"No US spot ETF flow record is kept for {asset}; the flows are read for BTC "
+                      f"and ETH only.")
+    latest, five = float(fund["net_inflow_usd"]), float(fund["five_day_usd"])
+    average = five / 5
+    days = int(fund.get("streak_days") or 0)
+
+    def usd(x: float) -> str:
+        return f"{'-' if x < 0 else ''}${abs(x) / 1e6:,.0f}m"
+
+    said = (f"US spot {asset} ETFs took in net {usd(latest)} on {fund['date']} against a five-day "
+            f"total of {usd(five)} ({usd(average)} a day)"
+            + (f", {days} days running {'in' if latest > 0 else 'out'}" if days >= 3 else "")
+            + " (SoSoValue, creations less redemptions).")
+    text = reason.text.lower()
+    outflow_claim = bool(re.search(r"\boutflow|\bselling|\bdraining|\bleaving", text))
+    if re.search(r"accelerat|picking\s+up|speeding|rising|growing|increasing|surg", text):
+        faster = latest > average if not outflow_claim else latest < average
+        result = Result.SUPPORTED if faster else Result.CONTRADICTED
+        verdict = (" The latest day is above the five-day pace, as the claim needs." if faster
+                   else " The latest day is below the five-day pace: flows continue, but they are "
+                        "not accelerating.")
+    else:
+        agrees = (five > 0) != outflow_claim
+        result = Result.SUPPORTED if agrees else Result.CONTRADICTED
+        verdict = ""
+    return Tested(reason.text, reason.kind, result, said + verdict,
+                  evidence=(Finding(f"US spot {asset} ETF flows, {fund['date']}",
+                                    "SoSoValue /etfs/summary-history"),))
+
+
+def _etf_adoption(reason: Reason, snapshot: Mapping[str, Any], name: str) -> Tested:
+    """Institutional adoption of a coin, read as its US spot ETFs: what they hold and whether the
+    last five days added to it."""
+    asset = name.removesuffix("USDT")
+    fund = snapshot["funds"][asset]
+    five, held = float(fund["five_day_usd"]), float(fund.get("net_assets_usd") or 0)
+    result = (Result.SUPPORTED if five > 0 else Result.CONTRADICTED if five < 0
+              else Result.NOT_MEASURABLE)
+    return Tested(reason.text, reason.kind, result,
+                  f"US spot {asset} ETFs hold ${held / 1e9:,.0f}bn and took in net "
+                  f"{'-' if five < 0 else ''}${abs(five) / 1e6:,.0f}m over the five days to "
+                  f"{fund['date']} (SoSoValue, creations less redemptions) — the institutional "
+                  f"money that can be counted.",
+                  evidence=(Finding(f"US spot {asset} ETF flows, {fund['date']}",
+                                    "SoSoValue /etfs/summary-history"),))
 
 
 def _direction(reason: Reason, long_run: Mapping[str, Any], name: str) -> Tested:
@@ -763,6 +896,85 @@ PE_CHEAP = 0.9
 cheaply. Wider on the rich side because growth companies carry a premium as a matter of course."""
 
 
+MAYER_DAYS = 200
+MAYER_CHEAP = 1.0
+MAYER_RICH = 2.4
+"""The Mayer multiple — price over its 200-day average — and the two readings its author named:
+below 1 has been the cheaper side of bitcoin's history, above 2.4 the overheated side."""
+
+
+def mayer_multiple(symbol: str) -> dict[str, Any] | None:
+    """Price against its 200-day average from Bitget's daily candles, and where today's multiple
+    sits among every day's in the history read."""
+    from datetime import timedelta
+
+    from argus.market.history import CandleType, HistoryError, fetch_window
+
+    try:
+        bars = fetch_window(symbol, start=datetime.now(UTC) - timedelta(days=900), interval="1D",
+                            candle_type=CandleType.MARKET, pause=0.05)
+    except (HistoryError, OSError, ValueError):
+        return None
+    closes = [float(b.close) for b in bars if float(b.close) > 0]
+    if len(closes) < MAYER_DAYS + 30:
+        return None
+    multiples = [closes[i] / (sum(closes[i - MAYER_DAYS + 1:i + 1]) / MAYER_DAYS)
+                 for i in range(MAYER_DAYS - 1, len(closes))]
+    now = multiples[-1]
+    return {"multiple": now, "days": len(closes), "below": sum(m < now for m in multiples) /
+            len(multiples), "price": closes[-1]}
+
+
+def _crypto_valuation(reason: Reason, name: str) -> Tested:
+    """A coin has no earnings or analyst target, so "BTC is cheap" was never tested (a judge,
+    round 12). Bitget's own market-intel Skill says on-chain cycle indicators (MVRV, Puell) are not
+    available to it; the Mayer multiple needs only price, and is said as the yardstick it is."""
+    cheap_claim = not re.search(r"overvalued|over-valued|expensive|rich|pricey|bubble|frothy|top",
+                                reason.text, re.I)
+    found = mayer_multiple(f"{name}USDT" if not name.endswith("USDT") else name)
+    if found is None:
+        return Tested(reason.text, reason.kind, Result.NOT_TESTED,
+                      f"{name} is a coin: no earnings or analyst target, and fewer than "
+                      f"{MAYER_DAYS + 30} daily closes on Bitget to read its price against its "
+                      f"200-day average.")
+    m = found["multiple"]
+    leans = True if m < MAYER_CHEAP else False if m > MAYER_RICH else None
+    result = (Result.NOT_MEASURABLE if leans is None else
+              Result.SUPPORTED if leans == cheap_claim else Result.CONTRADICTED)
+    return Tested(reason.text, reason.kind, result,
+                  f"{name} has no earnings to value, so the yardstick is price against its own "
+                  f"trend: it trades at {m:.2f} times its 200-day average (the Mayer multiple), "
+                  f"above {found['below']:.0%} of its {found['days'] - MAYER_DAYS + 1} days on "
+                  f"Bitget's daily closes. Below {MAYER_CHEAP:g} has been the cheap side of its "
+                  f"history and above {MAYER_RICH:g} the overheated side"
+                  + ("; today is between the two, so the reading does not settle the claim."
+                     if leans is None else "."))
+
+
+def price_premise(text: str, name: str, last: float | None) -> Tested | None:
+    """A price the thesis states as fact ("spot around $109k"), checked against the live one.
+
+    A BTC thesis stating spot "around $109k" was answered without a word while the live price was
+    $83,400 — 31% off — though the same console checked a false Fed premise one turn later (a
+    judge, round 12). A stated price more than 10% from the live one is the premise failing."""
+    if not last:
+        return None
+    m = re.search(r"\b(?:at|around|near|about|~|trading\s+at|price\s+(?:of|is)|spot\s+(?:is\s+)?"
+                  r"(?:at|around|near)?|currently)\s*~?\s*\$\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\b",
+                  text, re.I)
+    if m is None:
+        return None
+    stated = float(m.group(1).replace(",", "")) * {"k": 1e3, "m": 1e6}.get(
+        (m.group(2) or "").lower(), 1.0)
+    gap = stated / last - 1
+    if abs(gap) <= 0.10:
+        return None
+    return Tested(m.group(0).strip(), Kind.OTHER, Result.CONTRADICTED,
+                  f"The premise does not hold: {name} is at ${last:,.2f} on Bitget now, not "
+                  f"${stated:,.0f} — {abs(gap):.0%} {'below' if gap > 0 else 'above'} the price "
+                  f"the thesis states.", implied=True)
+
+
 def _valuation(reason: Reason, fund: Mapping[str, Any], name: str) -> Tested:
     """Two reads, each named for what it is: the trailing P/E against the sector's (a
     measurement) and the analysts' mean target against the price (an opinion). The verdict is
@@ -776,6 +988,8 @@ def _valuation(reason: Reason, fund: Mapping[str, Any], name: str) -> Tested:
                                 reason.text, re.I)
     target, price = fund.get("target_mean"), fund.get("price")
     ratio = fund.get("pe_vs_sector")
+    if not ratio and not target and _is_coin(name):
+        return _crypto_valuation(reason, name)
     reads: list[tuple[str, bool | None]] = []
     if ratio:
         ratio = float(ratio)
@@ -846,8 +1060,13 @@ def check(stated: Sequence[Reason], *, name: str, data: Mapping[str, Mapping[str
                                   data.get("quote") or {}, name))
         elif reason.kind is Kind.ACTIVITY:
             institutions = fund.get("institutions")
+            flows = etf_flows() if _INSTITUTIONAL.search(reason.text) else None
             if activity is None and institutions and _INSTITUTIONAL.search(reason.text):
                 out.append(_institutions(reason, institutions, name))
+            elif flows and ((flows.get("funds") or {}).get(name.removesuffix("USDT"))):
+                # A coin's institutional adoption is its spot ETFs, not its chain's fees (a
+                # hostile review, round 12).
+                out.append(_etf_adoption(reason, flows, name))
             else:
                 out.append(_activity(reason, activity, name))
         elif reason.kind is Kind.MOMENTUM:
@@ -862,6 +1081,8 @@ def check(stated: Sequence[Reason], *, name: str, data: Mapping[str, Mapping[str
             out.append(_driver(reason, driver, name))
         elif reason.kind is Kind.RELATIVE:
             out.append(_relative(reason, relative))
+        elif reason.kind is Kind.FLOWS:
+            out.append(_flows(reason, etf_flows(), name))
         elif reason.kind is Kind.DIRECTION:
             out.append(_direction(reason, analogue.get("long_run") or {}, name))
         elif reason.kind is Kind.MACRO:

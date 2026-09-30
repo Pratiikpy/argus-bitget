@@ -335,7 +335,9 @@ def pattern_reading_wins(request: ResearchRequest | None, text: str) -> bool:
         return True
     if request.kind is ResearchKind.COMPARE and re.search(
             r"\b(?:outperform\w*|underperform\w*|beat(?:s|ing|en)?|(?:done|doing|did)\s+better|"
-            r"better\s+than|worse\s+than)\b", text, re.I):
+            r"better\s+than|worse\s+than|"
+            r"(?:stronger|better|safer|weaker|worse)\s+(?:buy|bet|pick|investment|choice|hold)"
+            r"\s+than)\b", text, re.I):
         # "is ETH beating BTC this month" was planned by the hosted model as ETH's base rates
         # (2026-09-30): two names and "beating" is the comparison's momentum question.
         return True

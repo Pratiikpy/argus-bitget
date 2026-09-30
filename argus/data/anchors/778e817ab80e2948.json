@@ -1,0 +1,35 @@
+{
+  "digest": "778e817ab80e2948be50764ce593f0b5c5854943a77dda7368e53c0423978c4c",
+  "subject": "ARGUS capability register (data/standing.json)",
+  "anchored": true,
+  "independent_calendars": 4,
+  "receipts": [
+    {
+      "calendar": "https://a.pool.opentimestamps.org",
+      "proof_hex": "f0084ec11fbae14a8b7208f0200deb6dc20d259e1eb46cecd9481a23dfc9676d4229c0d324c9492e31f8617c2b08f020b706c53f98533baeb5b78b725eecd7f0c3767b6dfcb507bec60eaffe28dcbb2c08f01013ac661bdf188bcef274030aa24af30d08f1207380eedcfaa2a3ec6849af84137b9788c75b4d1d5b7a0be0696ae5a61e0c7dd108f020ad80e69ed9e698b443b6a92cefbb83ece0d59246922a5ae44984e77ec514d49108f0200af2adc77bf38d5d6026ab36035a5d82dadcd8b1cffa6694d401d2e0cde5503c08f1046abca272f008d315eaba1fdd7b2a0083dfe30d2ef90c8e2e2d68747470733a2f2f616c6963652e6274632e63616c656e6461722e6f70656e74696d657374616d70732e6f7267",
+      "proof_bytes": 277,
+      "submitted_at": "2026-09-30T05:47:24.515015+00:00"
+    },
+    {
+      "calendar": "https://b.pool.opentimestamps.org",
+      "proof_hex": "f008d33490f382ec6fd908f0106c49a8ed5afb6fd359b01421bc7a746c08f0204bef83c97356e27eddfa86e734dd99d00a91244c7e8940d46fee4250f7a19ff408f1205e8fa9197f2724951d9def504cea6270ff7e442d146de1181c266ebb59f69b5808f1046abca274f008f4232809ce54e5230083dfe30d2ef90c8e2c2b68747470733a2f2f626f622e6274632e63616c656e6461722e6f70656e74696d657374616d70732e6f7267",
+      "proof_bytes": 170,
+      "submitted_at": "2026-09-30T05:47:24.515015+00:00"
+    },
+    {
+      "calendar": "https://alice.btc.calendar.opentimestamps.org",
+      "proof_hex": "f008a2d3495c7f5f748f08f01099ca5c4275100cde0aaece1e5d7b061108f0208359cd615ee2f096838fd77c4b4f60ff83a474d486c6b7782e4bcfe47393450508f1046abca276f008aadbb0606000e3de0083dfe30d2ef90c8e2e2d68747470733a2f2f616c6963652e6274632e63616c656e6461722e6f70656e74696d657374616d70732e6f7267",
+      "proof_bytes": 137,
+      "submitted_at": "2026-09-30T05:47:24.515015+00:00"
+    },
+    {
+      "calendar": "https://finney.calendar.eternitywall.com",
+      "proof_hex": "f01072b8580b5b143f51864c474ff0e8c72b08f1203aa5401e1483a08c6306beb9170f07b4fe1cf81c89112d954c441334018b118008f1046abca278f008384684644a0aeaa40083dfe30d2ef90c8e292868747470733a2f2f66696e6e65792e63616c656e6461722e657465726e69747977616c6c2e636f6d",
+      "proof_bytes": 121,
+      "submitted_at": "2026-09-30T05:47:24.515015+00:00"
+    }
+  ],
+  "failures": [],
+  "status": "pending-bitcoin-confirmation",
+  "note": ""
+}

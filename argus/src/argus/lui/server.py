@@ -642,6 +642,9 @@ _ALLOWANCE_ASKED = re.compile(
 _WHY_THAT = re.compile(
     # "why not?" after "why did you skip NVDA?" read the whole record's abstentions (round 10)
     r"^\s*(?:but\s+|and\s+|so\s+|ok\s+|okay\s+)?why(?:\s+not)?\s*[?.!]*\s*$|"
+    # "are you sure?" after a thesis answer was declined (a first-time user, round 12)
+    r"^\s*(?:but\s+|and\s+|so\s+)?(?:are\s+you\s+sure|you\s+sure|really|is\s+that\s+(?:right|true|"
+    r"correct)|how\s+(?:sure|confident)\s+are\s+you(?:\s+about\s+(?:that|this|it))?)\s*[?.!]*\s*$|"
     r"^\s*(?:but\s+|and\s+)?why\s+(?:do|did|would)\s+you\s+(?:say|think|conclude|recommend|suggest)"
     r"\s+(?:that|this|so)\b[^?]*[?.!]*\s*$|"
     r"^\s*(?:how|why)\s+(?:do|did)\s+you\s+(?:know|get|work\s+(?:that|it)\s+out)\b[^?]*[?.!]*\s*$|"
@@ -911,7 +914,12 @@ def handle_ask(
                     "memory": memory, "remembered": []}
         read_as, text = text, english
     facts = mem.parse(memory)
-    new = mem.extract(text, now, price_of=_price_now)
+    # The model reads what the patterns miss, every fact checked against the message
+    # (`lui/memory_model.py`; the patterns recalled 2 of 25 facts on a blind set, round 12).
+    from argus.lui import memory_model
+
+    new = memory_model.combined(text, _model_for(visitor, count=False), now,
+                                price_of=_price_now)
     facts = mem.merge(facts, new)
     token = _MEMORY.set(tuple(facts))
     try:
@@ -920,7 +928,26 @@ def handle_ask(
         # "13/02/2024" and "02/13/2024" read as the date they are before anything else reads the
         # question (a hostile review, 2026-09-30); an order that had to be assumed is said.
         text, date_note = iso_dates(text)
+        # Holdings said in chat stand in for My book when that field is empty: "I hold 40% NVDA,
+        # 30% MSFT, 30% AAPL" was forgotten by the next question, which read a book of XOM alone
+        # (a judge, round 13, 2026-09-30). The field, when filled, is the trader's saved word and
+        # wins.
+        said_book = mem.remembered_book(facts) if not book.strip() else None
+        if said_book is not None:
+            book = said_book.text
         payload = _answer(text, prior, now=now, visitor=visitor, book=book)
+        if said_book is not None and payload.get("lines"):
+            payload["lines"] = [
+                str(line).replace("used your saved book",
+                                  f"used the book you gave on {said_book.at}")
+                .replace("your saved book reads as",
+                         f"the book you gave on {said_book.at} reads as")
+                .replace("read against your saved book in My book",
+                         f"read against the book you gave on {said_book.at}")
+                .replace("; clear it to ask without it.",
+                         "; say a new one to replace it, or forget it from the list under My "
+                         "book.")
+                for line in payload["lines"]]
         if date_note and payload.get("lines"):
             payload["lines"] = [*payload["lines"], f"Assumed: {date_note}."]
         from argus.lui.honesty import order_prefix
@@ -1069,6 +1096,10 @@ def _answer(
         # "What is this site and who is it for" was told "that" had nothing to refer to (a
         # first-time user, 2026-09-30).
         return engine_payload(*intro.answer(), by="intro")
+    if intro.CAPABILITIES_Q.search(text):
+        return engine_payload(*intro.capabilities_answer(), by="intro")
+    if intro.SOURCES_ONLY_Q.search(text):
+        return engine_payload(*intro.how_answer(text), by="intro")
     if intro.STANDING_Q.search(text):
         return engine_payload(*intro.standing_answer(), by="standing")
     if intro.HOW_Q.search(text):
@@ -1080,10 +1111,37 @@ def _answer(
         return engine_payload(*skills_explain.answer(text), by="skills")
     from argus.lui import thesis_answer
 
+    if (prior and thesis_answer.asks(prior[-1]) and thesis_answer.STRONGEST.search(text)
+            and not thesis_answer.asks(text)):
+        # "Which of those reasons is strongest?" after a thesis was told "that" had nothing to
+        # refer to (a hostile review, round 12): the thesis just tested, ranked.
+        return engine_payload(*thesis_answer.answer(f"{prior[-1]} Which of these is strongest?",
+                                                    book=book), by="thesis")
+    from argus.lui.research import sizing as loss_sizing
+
+    loss_said = loss_sizing.loss_compare(text, (research_symbols(text)[0] or (None,))[0])
+    if loss_said is not None:
+        # Before the research engines, which read the fall as a market shock on a book (a
+        # hostile review, round 12).
+        return engine_payload(*loss_said, by="sizing")
+    revised = thesis_answer.revise(text, prior, book=book) if prior else None
+    if revised is not None:
+        return engine_payload(*revised, by="thesis")
     if thesis_answer.asks(text):
         # "I think NVDA runs on AI capex through 2027 - test my thesis" got the next day's base
         # rates, and the reason itself was never tested (judge audit, 2026-09-30).
-        return engine_payload(*thesis_answer.answer(text, book=book), by="thesis")
+        claim, also = thesis_answer.split_other_question(text)
+        tested_lines, tested_sources, tested_data = thesis_answer.answer(claim, book=book)
+        if also:
+            # "I think NVDA keeps running because ... Should I add 15% TSLA?" measured TSLA's
+            # revenue as the NVDA thesis's driver and never answered the TSLA question (a judge,
+            # round 13, 2026-09-30): the thesis is tested on its own name, and the question after
+            # it is answered as asked, after it.
+            other = _answer(also, [*prior, claim], now=now, visitor=visitor, book=book)
+            tested_lines = [*tested_lines, f"And on “{also}”:",
+                            *(str(line) for line in other.get("lines") or [])]
+            tested_data = {**tested_data, "also_asked": also}
+        return engine_payload(tested_lines, tested_sources, tested_data, by="thesis")
     # Three questions a trader asks of their own book that no engine owned until 2026-09-25 (the
     # readiness audit found each refused or answered with the desk's statistics): a review of the
     # trader's OWN pasted trades (`lui/journal.py`, first, because a pasted journal names
@@ -1392,14 +1450,35 @@ def _answer(
             again["turns"] = [*prior, text][-12:]
             again["classified_by"] = "research-follow-up"
             return again
+    instead = _INSTEAD.match(text)
+    if instead and prior and "," in prior[-1] and research_symbols(instead.group("book"))[0]:
+        # "what if it was 600 in SOL and 400 in AAPL instead" after "I have $600 in SOL and $400
+        # in TSLA, am I too risky?" compared SOL with AAPL (a first-time user, round 12): the same
+        # question, asked of the new holdings.
+        asked = prior[-1].rsplit(",", 1)[1].strip()
+        new_holdings = instead.group("book")
+        if "$" in prior[-1]:
+            # "600 in SOL" after "$600 in SOL": the same unit as the question it changes
+            new_holdings = re.sub(r"(?<![\d$.,])(\d[\d,]*(?:\.\d+)?)(?=\s*k?\s+(?:in|of)\b)",
+                                  r"$\1", new_holdings)
+        again = _answer(f"I have {new_holdings}, {asked}", prior[:-1], now=now,
+                        visitor=visitor, book=book)
+        again["lines"] = [*again.get("lines", []),
+                          f"Assumed: read as \"{asked}\" asked again of {instead.group('book')}."]
+        again["turns"] = [*prior, text][-12:]
+        return again
     day_again = _DAY_FOLLOW_UP.match(text)
     if day_again and prior and resolve_window(prior[-1], now=clock) is not None:
         # "why not Thursday?" after "what happened last Friday" dumped every abstention on record
         # (a hostile review, round 11): the same question, over the day now named.
         day = day_again.group("day").capitalize()
         last = "last " if re.search(r"\blast\b", prior[-1], re.I) or day_again.group("last") else ""
-        again = _answer(f"what did the desk do {last or 'on '}{day}", prior[:-1], now=now,
-                        visitor=visitor, book=book)
+        # The previous question itself, with its day swapped: "Why not Thursday?" after "What
+        # happened in BTC on Monday?" was answered with the desk's Thursday decisions, BTC
+        # dropped (a hostile review, round 12).
+        swapped, count = _DAY_PHRASE.subn(f"{last or 'on '}{day}", prior[-1], count=1)
+        asked_again = swapped if count else f"what did the desk do {last or 'on '}{day}"
+        again = _answer(asked_again, prior[:-1], now=now, visitor=visitor, book=book)
         again["lines"] = [*again.get("lines", []),
                           f"Assumed: read as the previous question asked of {last}{day}."]
         again["turns"] = [*prior, text][-12:]
@@ -1968,6 +2047,18 @@ _DAY_FOLLOW_UP = re.compile(
 """Another day asked of the previous day question."""
 
 
+_INSTEAD = re.compile(
+    r"^\s*(?:and\s+|so\s+)?(?:what|how)\s+(?:if|about\s+if)\s+(?:it\s+(?:was|were)|i\s+(?:had|have|"
+    r"held|hold))\s+(?P<book>.+?)\s+instead\s*[?.!]*\s*$", re.I)
+"""The previous question asked of different holdings."""
+
+
+_DAY_PHRASE = re.compile(
+    r"\b(?:(?:on|last|this\s+past)\s+)?(?:monday|tuesday|wednesday|thursday|friday|saturday|"
+    r"sunday|yesterday|today)\b", re.I)
+"""The day a previous question named, to be swapped for the one a follow-up names."""
+
+
 _IT_FOLLOW_UP = re.compile(r"^\s*(?:(?:and|so|but)\s+)?(?:does|do|is|can|will|would)\s+(?:it|that|"
                            r"they|this)\b", re.I)
 """A yes/no follow-up about the thing just discussed."""
@@ -2359,7 +2450,9 @@ class Handler(BaseHTTPRequestHandler):
                 self._send(json.dumps(EMPTY_QUESTION).encode(), "application/json", 400)
                 return
             book = repair_mojibake(first("book"))[:300]
-            memory_text = first("memory")[:12000]
+            # parse() keeps MAX_FACTS; a cut mid-JSON would drop them all (was 12,000 characters,
+            # under what 40 facts with their replaced-text history can take).
+            memory_text = first("memory")[:64000]
             if _traced():
                 # Where each line comes from — live, computed, record, desk, assumed, missing —
                 # decided by the engine step that produced it (`lui/trace.py`); a line no step
