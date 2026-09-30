@@ -295,7 +295,13 @@ def gate_ledger_reading(question: Question, classified_by: str, text: str, *, pr
     carries its real probability on the plan's scale (`kindmodel.plan_confidence`), which a
     language model's 0.8 bar would read differently (audit 159)."""
     if ((classified_by == "ngram" or (classified_by == "patterns" and not prior))
-            and not in_domain(text) and question.intent is not Intent.ORDER and not desk_first):
+            and not in_domain(text) and question.intent is not Intent.ORDER and not desk_first
+            # "上周五做了什么" (what was done last Friday) names a day and asks what was done: the
+            # record's own question, declined as off-topic for want of a desk word (2026-09-30).
+            # English names its subject ("the desk", "you") and is read by `in_domain`; "what did
+            # the Lakers do last Friday" must still be declined.
+            and not (classified_by == "patterns" and question.intent is Intent.DECISION_LIST
+                     and question.window is not None and not re.search(r"[A-Za-z]", text))):
         question = replace(question, intent=Intent.UNKNOWN,
                            reason="nothing in the question is about markets or the desk's record")
         classified_by = "declined-off-topic"

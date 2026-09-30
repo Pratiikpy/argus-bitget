@@ -304,7 +304,12 @@ for (const [id, list] of [['chips-research', RESEARCH], ['chips', SUGGEST]]) {
     if (e.target.textContent === REVIEW_CHIP) {
       qEl.value = REVIEW_EXAMPLE; grow(); qEl.focus(); return;
     }
+    // A question typed and not yet asked survives a suggestion: tabbing from the box to a chip and
+    // pressing Enter asked the chip and threw the typed words away (a first-time user, round 10).
+    // The chip is asked, and the draft is put back in the box to ask next.
+    const draft = qEl.value.trim() && qEl.value !== e.target.textContent ? qEl.value : '';
     qEl.value = e.target.textContent; document.getElementById('f').requestSubmit();
+    if (draft) { qEl.value = draft; grow(); }
   });
 }
 function esc0(s) {
@@ -443,9 +448,11 @@ document.getElementById('f').addEventListener('submit', async ev => {
           ${a.refused ? '<span class="tag over">refused</span>' : ''}
           ${a.model_left !== undefined && a.model_left <= 10 ? `<span class="tag" title="` +
             `Counted per network address. After these, the console's own readers answer, in ` +
-            `English, for up to an hour.">` +
-            `language model: ${a.model_left} question${a.model_left === 1 ? '' : 's'} left ` +
-            `this hour</span>` : ''}
+            `English, until the hour is up.">` +
+            (a.model_left > 0 ? `language model: ${a.model_left} question` +
+              `${a.model_left === 1 ? '' : 's'} left this hour` :
+              `language model paused` + (a.model_back_in ? ` for ~${a.model_back_in} min` : '') +
+              ` — answers still computed live`) + `</span>` : ''}
         </div>
         <div class="lines">${collapseLines(a.lines.map((l, i) =>
           `<div class="${lineClass(l)}">${pv((a.line_labels || [])[i])}${linked(l)}</div>`),
@@ -633,7 +640,8 @@ _ALLOWANCE_ASKED = re.compile(
 """A question about the hourly allowance itself."""
 
 _WHY_THAT = re.compile(
-    r"^\s*(?:but\s+|and\s+|so\s+|ok\s+|okay\s+)?why\s*[?.!]*\s*$|"
+    # "why not?" after "why did you skip NVDA?" read the whole record's abstentions (round 10)
+    r"^\s*(?:but\s+|and\s+|so\s+|ok\s+|okay\s+)?why(?:\s+not)?\s*[?.!]*\s*$|"
     r"^\s*(?:but\s+|and\s+)?why\s+(?:do|did|would)\s+you\s+(?:say|think|conclude|recommend|suggest)"
     r"\s+(?:that|this|so)\b[^?]*[?.!]*\s*$|"
     r"^\s*(?:how|why)\s+(?:do|did)\s+you\s+(?:know|get|work\s+(?:that|it)\s+out)\b[^?]*[?.!]*\s*$|"
@@ -699,7 +707,8 @@ def _compare_last_two_books(text: str, prior: list[str], book: str, ledger: Any,
     return second
 
 
-_BARE_WHY = re.compile(r"^\s*(?:but\s+|and\s+|so\s+)?(?:why|how\s+come|what\s+was\s+the\s+"
+_BARE_WHY = re.compile(r"^\s*(?:but\s+|and\s+|so\s+)?(?:why(?:\s+not)?|how\s+come|"
+                       r"what\s+was\s+the\s+"
                        r"reason(?:ing)?|explain(?:\s+(?:that|it|why))?|reasoning)\s*[?.!]*\s*$",
                        re.I)
 
@@ -975,8 +984,9 @@ def handle_ask(
     if visitor != "local" and allowance_spent(visitor) and payload.get("lines"):
         # Over the hourly allowance the console still answers, from its own readers; it says so,
         # so a worse reading is never mistaken for the console's best (a judge's audit, 2026-09-29).
-        payload["lines"] = [*payload["lines"], ALLOWANCE_NOTE]
+        payload["lines"] = [*payload["lines"], allowance_note(visitor)]
         payload["model_paused"] = True
+        payload["model_back_in"] = allowance_back_in(visitor)
     if read_as and payload.get("lines"):
         # Said on the answer, so a misreading is visible rather than silently answered.
         payload["lines"] = [f'Read as: "{text}" (restated in English by the language model; every '
@@ -1037,6 +1047,18 @@ def _answer(
                      turns=[*prior, text][-12:])
         return built
 
+    from argus.lui import intro
+
+    if intro.INTRO_Q.search(text):
+        # "What is this site and who is it for" was told "that" had nothing to refer to (a
+        # first-time user, 2026-09-30).
+        return engine_payload(*intro.answer(), by="intro")
+    from argus.lui import thesis_answer
+
+    if thesis_answer.asks(text):
+        # "I think NVDA runs on AI capex through 2027 - test my thesis" got the next day's base
+        # rates, and the reason itself was never tested (judge audit, 2026-09-30).
+        return engine_payload(*thesis_answer.answer(text, book=book), by="thesis")
     # Three questions a trader asks of their own book that no engine owned until 2026-09-25 (the
     # readiness audit found each refused or answered with the desk's statistics): a review of the
     # trader's OWN pasted trades (`lui/journal.py`, first, because a pasted journal names
@@ -1132,7 +1154,8 @@ def _answer(
             f"Bottom line: {left} of {MODEL_CALLS_PER_VISITOR_PER_HOUR} questions are left this "
             f"hour for the language model to read; the count is per network address, so people "
             f"on the same network share it.",
-            "After that, for up to an hour, the console's own readers answer, in English — every "
+            "After that, until the oldest counted question is an hour old (sooner if the server "
+            "restarts), the console's own readers answer, in English — every "
             "figure is still computed from live data, and questions that name what they want "
             "(\"NVDA price\", \"is TSLA riskier than NVDA\") read just as well."], [],
             {"model_left": left}, by="allowance")
@@ -1435,7 +1458,7 @@ def _answer(
                            force=prose)
     if filed is not None:
         return filed
-    if _SKILLS_Q.search(text):
+    if _SKILLS_Q.search(text) and not _a_skill_reading(text):
         # Track 3 scores "Skill integration count and effectiveness": asked how well Bitget's
         # Skills work, the console answers from its own sweeps of every tool, outages included.
         from argus.eval.skill_matrix import console_lines
@@ -1808,16 +1831,35 @@ def allowance_left(visitor: str) -> int:
     return max(0, MODEL_CALLS_PER_VISITOR_PER_HOUR - used)
 
 
+def allowance_back_in(visitor: str) -> int:
+    """Minutes until this visitor's oldest counted question leaves the hour, freeing one more;
+    0 when none is counted. Kept by the server instance that answered: a restart clears it, so
+    this is the longest the pause lasts, not the shortest (a judge saw it lift in five minutes
+    while the note said an hour, round 10)."""
+    import math
+    import time
+
+    now = time.monotonic()
+    live = [t for t in _VISITS.get(visitor, []) if now - t < 3600.0]
+    return math.ceil((3600.0 - (now - min(live))) / 60) if live else 0
+
+
+def allowance_note(visitor: str) -> str:
+    """The pause, said with when it lifts."""
+    back = allowance_back_in(visitor)
+    when = (f"for about {back} more minute{'' if back == 1 else 's'} at most"
+            if back else "for a few minutes")
+    return (f"The language model is paused for you {when} (the hourly allowance on this public "
+            f"console, counted per network address, is used; a server restart can lift it "
+            f"sooner), so this was read by the console's own readers and stays in English. Every "
+            f"figure is still computed from live data, and a question that names the instrument "
+            f"and what you want (\"NVDA price\", \"is TSLA overbought\") reads as well as before.")
+
+
 def allowance_spent(visitor: str) -> bool:
     """Whether this visitor's hourly allowance is used up, so an answer can say so."""
     return allowance_left(visitor) == 0
 
-
-ALLOWANCE_NOTE = ("The language model is paused for you for up to an hour (the hourly allowance on "
-                  "this public console, counted per network address, is used), so this was read "
-                  "by the console's own readers and stays in English. Every figure is still "
-                  "computed from live data, and a question that names the instrument and what you "
-                  "want (\"NVDA price\", \"is TSLA overbought\") reads as well as before.")
 
 
 _FILING_Q = re.compile(
@@ -1859,6 +1901,21 @@ _SKILLS_Q = re.compile(
     r"answer\w*|up|down|status|health)\b|\bskill\s+(?:integration|effectiveness|matrix|health)\b|"
     r"\bbitget-(?:signal|mcp)\b|\bwhich\s+bitget\s+(?:tools|skills|data\s+sources)\b", re.I)
 """A question about how well Bitget's own Skills and data server answer (`eval/skill_matrix.py`)."""
+
+
+_SKILL_HEALTH = re.compile(
+    r"\b(?:work|working|effective\w*|integrat\w*|reliab\w*|up|down|status|health|how\s+well|"
+    r"which|how\s+many|count)\b", re.I)
+
+
+def _a_skill_reading(text: str) -> bool:
+    """Bitget's Skill named beside an instrument, asking for its reading of that name rather than
+    how well the Skills answer: "show me the bitget-signal technical analysis for SOL" was
+    answered with the Skill-health table and no SOL reading (judge audit, 2026-09-30)."""
+    if _SKILL_HEALTH.search(text):
+        return False
+    request = detect_research(text)
+    return request is not None and bool(request.symbols)
 
 _FILINGS: BoundedDict[str, tuple[float, list[Any]]] = BoundedDict(256)
 """Filings read this process, by ticker, with when they were read: one EDGAR read serves every
@@ -2273,7 +2330,7 @@ class Handler(BaseHTTPRequestHandler):
             # Said, not silent: the lines come back in English with the reason in the reader's
             # language slot (a judge's audit, 2026-09-29: all six languages returned English and
             # no note).
-            result = {**result, "note": ALLOWANCE_NOTE}
+            result = {**result, "note": allowance_note(visitor)}
         self._send(json.dumps(result, ensure_ascii=False).encode(), "application/json")
 
     def _research_route(self, params: dict[str, list[str]]) -> None:

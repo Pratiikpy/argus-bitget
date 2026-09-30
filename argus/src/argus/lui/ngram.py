@@ -443,7 +443,10 @@ def reclassify(question: Any, *, path: Path | None = None) -> tuple[Any, str]:
 
     reached = question.intent
     if (str(reached) in PATTERN_WINS or getattr(question, "matched", "") in DECISIVE_PATTERNS
-            or not available(path)):
+            or not available(path)
+            # A list of decisions over a window the patterns resolved: "what did the desk do last
+            # Friday" was relabelled into one decision's evidence (a hostile review, 2026-09-30).
+            or (str(reached) == "decision_list" and getattr(question, "window", None) is not None)):
         return question, "patterns"
     if str(reached) in _GAVE_UP and str(reached) not in MODEL_MAY_RESCUE:
         # AMBIGUOUS: the patterns understood the question and found a referent missing. See

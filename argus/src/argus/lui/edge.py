@@ -95,14 +95,17 @@ def answer(ledger: PaperLedger, *, closes: Callable[[str], Sequence[tuple[dateti
     voided = sum(1 for e in ledger.entries if is_voided(e.seq))
     lines = [
         lead,
-        f"The record: {decisions} decisions, {decisions - voided - trades} of them abstentions, "
+        # Abstentions counted as the ledger counts them (`Entry.is_abstention`), voided rows
+        # included — the desk refused both — so this answer and the track record agree (878, not
+        # 876: a hostile review, 2026-09-30).
+        f"The record: {decisions} decisions, {perf.abstentions} of them abstentions, "
         f"{trades} settled trade{'' if trades == 1 else 's'}, net {float(perf.net_pnl):+,.2f} "
         f"USDT on a stated {float(perf.capital):,.0f} USDT. Most of what the desk did was decide "
         f"not to trade, and those decisions are graded against the moves that followed — ask "
         f"\"what is your track record\" for that grading."
-        + (f" {voided} more rows are voided — fills recorded after the risk layer had refused "
-           f"them, a runner defect fixed on 20 Sep 2026 — and are kept in the chain but counted "
-           f"nowhere."
+        + (f" {voided} of those abstentions are rows first written as trades by a runner defect "
+           f"fixed on 20 Sep 2026 — the risk layer had refused them — kept in the chain, voided, "
+           f"and never counted as trades."
            if voided else ""),
         "How this is measured: holding QQQ (Bitget's QQQUSDT) from the first daily close on or "
         "after the desk's first decision to the latest close, with no fee charged to the holder, "

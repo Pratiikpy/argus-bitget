@@ -29,7 +29,11 @@ STARTER_Q = re.compile(
     r"i\s+(?:put|invest|start)|how\s+(?:should|do|can)\s+i\s+(?:invest|start|begin)|what\s+(?:should|"
     r"do)\s+i\s+(?:buy|invest\s+in)|to\s+invest|invest\s+it|where\s+to\s+start|what\s+to\s+buy|"
     r"any\s+(?:advice|ideas|suggestions)|(?:don'?t|do\s+not)\s+know\s+where\s+to\s+start|"
-    r"crypto\s+or\s+stocks|stocks\s+or\s+crypto)", re.I | re.S)
+    r"crypto\s+or\s+stocks|stocks\s+or\s+crypto|"
+    # "I have $800 saved, can you help me start investing" was declined (a first-time user,
+    # 2026-09-30).
+    r"help\s+me\s+(?:start|begin|get\s+started)|start(?:ing)?\s+(?:to\s+)?invest\w*|"
+    r"get(?:ting)?\s+started)", re.I | re.S)
 """A first-money question: an amount, and a request for what to do with it."""
 
 _MARKETS: tuple[tuple[str, str], ...] = (("QQQ", "the Nasdaq-100 (QQQ)"), ("BTC-USD", "bitcoin"),

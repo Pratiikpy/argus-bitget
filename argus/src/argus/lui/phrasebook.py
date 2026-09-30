@@ -65,6 +65,21 @@ PHRASES: dict[str, dict[Language, str]] = {
             "夏普比率、胜率和回撤都需要成交才能计算；放弃交易另行评分，按放弃价值衡量。"
         ),
     },
+    "perf.few_trades": {
+        Language.EN: (
+            "Track record: {trades} settled trade(s) and {abstentions} abstention(s) over {days} "
+            "day(s), net {net} — too few trades for a win rate, Sharpe or drawdown to say anything "
+            "yet{win}. Abstentions are scored separately, by abstention value."
+        ),
+        Language.ZH: (
+            "交易记录：{days} 天内 {trades} 笔已结算交易、{abstentions} 次放弃交易，净盈亏 {net}——"
+            "交易太少，胜率、夏普比率和回撤暂无意义{win}。放弃交易另行评分，按放弃价值衡量。"
+        ),
+    },
+    "perf.few_trades_win": {
+        Language.EN: " (the win rate over them is {pct:.0f}%, {wins} of {trades})",
+        Language.ZH: "（其胜率为 {pct:.0f}%，{trades} 笔中 {wins} 笔盈利）",
+    },
     "perf.headline": {
         Language.EN: (
             "Sharpe {sharpe:.3f} · max drawdown {drawdown:.2f}% · win rate {win_rate:.1f}% over "
@@ -79,8 +94,20 @@ PHRASES: dict[str, dict[Language, str]] = {
         Language.EN: "Largest contributor: {symbol} at {share}% of gross PnL ({trades} trade(s)).",
         Language.ZH: "最大贡献者：{symbol}，占毛盈亏的 {share}%（{trades} 笔交易）。",
     },
+    # "What's the desk's win rate so far?" was answered from this ledger alone, while /agent shows
+    # the Track 2 agent's own record under the same word (judge audit, 2026-09-30).
+    "perf.agent_elsewhere": {
+        Language.EN: "This is the research console's own paper desk. The team's Track 2 agent, "
+                     "which places orders on Bitget's demo venue, keeps a separate record: ask "
+                     "\"how is the Track 2 agent doing\" or open /agent.",
+        Language.ZH: "以上是本研究控制台自有的模拟交易台。"
+                     "团队的 Track 2 智能体在 Bitget 模拟盘下单，"
+                     "另有独立记录：可问“Track 2 智能体表现如何”，或打开 /agent。",
+    },
     "perf.net_pnl": {
         Language.EN: "Net PnL {net} on stated capital {capital}.",
+        # dollars formatted by the caller ("-$1.78", "$10,000"): "-1.7781 on stated capital 10000"
+        # read as a raw ledger field (judge audit, 2026-09-30)
         Language.ZH: "净盈亏 {net}，声明本金 {capital}。",
     },
     # --- one decision ------------------------------------------------------------------------
@@ -227,9 +254,11 @@ PHRASES: dict[str, dict[Language, str]] = {
     # that quietly shrinks is the same defect as one that quietly includes a refused position.
     "list.voided": {
         Language.EN: (
-            "  {voided} row(s) excluded from these counts: they record positions the risk layer "
-            "refused and the ledger booked anyway (see paper/corrections.py). They remain in the "
-            "chain, listed but not counted."
+            "  {voided} row(s) excluded from these verdict counts: they record positions the risk "
+            "layer refused and the ledger booked anyway (see paper/corrections.py). They remain in "
+            "the chain, and since the desk refused them they count as abstentions everywhere "
+            "abstentions are totalled — which is why that total is {voided} higher than no_trade "
+            "here."
         ),
         Language.ZH: (
             "  {voided} 条记录未计入统计：风险层已拒绝的仓位被错误写入账本"

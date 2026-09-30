@@ -656,6 +656,74 @@ def _agent_hub_lines(symbol: str, request: ResearchRequest, plan: Any,
         return []
 
 
+_MOVE_ON_RESULTS = re.compile(
+    r"\bhow\s+(?:big|much|large|far)\b[^?]{0,40}\bmove|\b(?:usual|typical|average)\w*\s+"
+    r"(?:earnings\s+)?move|\bmove\s+(?:after|around|on)\s+(?:its\s+|the\s+)?(?:earnings|results|"
+    r"report)|\b(?:react|reaction)\w*\s+(?:to|after)\s+(?:its\s+|the\s+)?(?:earnings|results)",
+    re.I)
+"""The size of the move around a report asked beside its date."""
+
+
+def _with_the_measured_move(lines: list[str], sources: list[Source], symbol: str,
+                            raw_text: str) -> list[str]:
+    """The event study's measured move around the name's own reports, under the date.
+
+    "When does TSLA report and how big is the move usually" was planned by the hosted model as a
+    fundamentals question, which answers the date and never the move (2026-09-30); the move is
+    the event study's (`_event_reaction`), read the same way the event question reads it."""
+    found, extra = _event_reaction(symbol, raw_text)
+    if not found:
+        return [*lines, "The measured move around its reports is not available right now: the "
+                        "event study is computed once a day."]
+    move = [LEAD.sub("On the move around its reports: ", line, count=1) if LEAD.match(line)
+            else line for line in found
+            if not line.startswith(("Data:", "Sources reached", "Scheduled:"))]
+    sources.extend(extra)
+    lead = next((i for i, x in enumerate(lines) if LEAD.match(x)), -1)
+    return [*lines[:lead + 1], *move, *lines[lead + 1:]]
+
+
+_ASKS_FOR_DRY_RUN = re.compile(r"\bdry[\s-]*run\b|\bagent\s+hub\b|\bbgc\b", re.I)
+"""A question about the Agent Hub preview itself, which then leads the execution answer."""
+
+_WHEN_REPORTS = re.compile(
+    r"\bwhen\b.{0,40}\b(?:reports?|earnings|results)\b|\bnext\s+(?:earnings|report|results)\b|"
+    r"\b(?:earnings|report)\s+date\b", re.I | re.S)
+"""A question asking the date of the next report, not only how big the move around it is."""
+
+
+def _next_report(found: list[str], symbol: str, raw_text: str,
+                 sources: list[Source]) -> list[str]:
+    """The date of the name's next report, first, when the question asked when it reports.
+
+    "When does TSLA report and how big is the move usually" was answered with the size of the
+    move and the CPI and FOMC dates, and never the report's own date (a first-time user,
+    2026-09-30). The date comes from the same two calendars the watchlist reads."""
+    if not _WHEN_REPORTS.search(raw_text):
+        return found
+    from argus.lui.watchlist import earnings_date
+
+    ticker = _t(symbol)
+    report = earnings_date(ticker, datetime.now(UTC).date())
+    if report is None:
+        said = (f"{ticker}'s next report date could not be read from Bitget's equity calendar "
+                f"or Yahoo's just now, so it is not given.")
+    else:
+        said = (f"{ticker} next reports on {report.day:%a %d %b %Y}"
+                + (f", {report.timing}" if report.timing else "")
+                + f", per the {report.source}"
+                + ("; the company has not confirmed the date" if report.estimated else "")
+                + ".")
+        sources.append(Source(kind="venue", ref=report.source,
+                              detail=f"{ticker} next report date"))
+    lead = next((i for i, x in enumerate(found) if bool(LEAD.match(x))), None)
+    if lead is None:
+        return [f"Bottom line: {said}", *found]
+    rest = LEAD.sub("", found[lead], count=1)
+    return [f"Bottom line: {said} On the move: {rest[:1].lower()}{rest[1:]}",
+            *found[:lead], *found[lead + 1:]]
+
+
 def _earnings_straddle(found: list[str], symbol: str, sources: list[Source]) -> list[str]:
     """The options line priced on the first expiry that spans the next report, when earnings were
     asked about and the nearest expiry falls before it (a judge's audit, 2026-09-30: TSLA's move
@@ -808,6 +876,8 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                       data={"request": request.as_dict(), request.kind.value: backdrop})
     if request.kind is ResearchKind.EVENT and request.symbols:
         found, extra = _event_reaction(request.symbols[0], raw_text)
+        if found:
+            found = _next_report(found, request.symbols[0], raw_text, extra)
         if not found:
             return Answer(question=question, refused=True,
                           reason="the event study has not been computed",
@@ -1086,7 +1156,24 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             # A book priced from coins and dollars carries its own value; the first amount in
             # the text is only one holding (2026-09-30).
             worth = request.notional or parse_notional(raw_text)
-            if worth and request.book:
+            if worth and len(request.book) == 1:
+                # One holding in dollars: what the stated amount goes through, in dollars, beside
+                # the one-name lead ("I am long $5,000 of NVDA — my exposure?", 2026-09-30).
+                worst = (book_payload.get("worst_window") or {}).get("move_pct")
+                book_beta = book_payload.get("book_beta")
+                said = []
+                def signed(value: float) -> str:
+                    return f"{'-' if value < 0 else '+'}${abs(value):,.0f}"
+
+                if worst is not None:
+                    said.append(f"its worst 24 hours in the window would be "
+                                f"{signed(float(worth) * float(worst) / 100)}")
+                if book_beta is not None:
+                    said.append(f"a 10% fall in QQQ about "
+                                f"{signed(-float(worth) * float(book_beta) * 0.10)} through beta")
+                if said:
+                    lines.insert(1, f"On your ${float(worth):,.0f}: " + "; ".join(said) + ".")
+            elif worth and request.book:
                 dollar_lines = _book_dollar_lines(request, data, is_open, float(worth))
                 if dollar_lines:
                     lines = [dollar_lines[0], *(re.sub(r"^(?:Actionable|Bottom line):\s*(\w)",
@@ -1506,6 +1593,8 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                 lines, extra = _fundamentals(request.symbols[0], raw_text, found=figures)
                 if figures:
                     payload["fundamentals"] = figures
+                if _MOVE_ON_RESULTS.search(raw_text):
+                    lines = _with_the_measured_move(lines, extra, request.symbols[0], raw_text)
             lines = _lead_with_what_was_asked(lines, raw_text)
             if len(request.symbols) > 1 and _VALUATION.search(raw_text):
                 try:
@@ -1630,7 +1719,18 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
     lines = [clean_line(line) for line in lines]
     lines = [line[:1].upper() + line[1:] for line in lines]
     lines.sort(key=lambda line: 0 if bool(LEAD.match(line)) else 1)
-    lines.extend(agent_hub_lines)
+    if agent_hub_lines and _ASKS_FOR_DRY_RUN.search(raw_text) and lines and LEAD.match(lines[0]):
+        # Asked for the Agent Hub dry-run itself, the command leads and the cost follows: it was
+        # the sixth line under a cost figure nobody had asked for (judge audit, 2026-09-30).
+        cost = LEAD.sub("", lines[0], count=1)
+        command = agent_hub_lines[0].replace(
+            "Agent Hub preview of the first child, which sends nothing:",
+            "the Agent Hub dry-run for " + ("the first slice" if len(plan.slices) > 1
+                                              else "this order") + ", which sends nothing, is")
+        lines = [f"Bottom line: {command}", f"On cost: {cost}", *lines[1:],
+                 *agent_hub_lines[1:]]
+    else:
+        lines.extend(agent_hub_lines)
     # A "read as" note names both contracts on purpose (CVXSTOCKUSDT vs CVXUSDT); stripping the
     # suffixes there would make the two identical and the note meaningless.
     lines.extend(f"Assumed: {note if ' read as ' in note else clean_line(note)}."

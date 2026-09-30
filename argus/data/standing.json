@@ -5236,7 +5236,7 @@
     {
       "capability": "LUI intent routing, measured against Rasa's real DIET classifier",
       "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "the per-item headline favours the rival: data/lui_comparison.json :: sealed intent routing: ARGUS's cascade vs Rasa's DIET"
+      "detail": "the groupwise audit predates the current data/lui_comparison.json; re-run python -m argus.eval.groupwise_audit"
     },
     {
       "capability": "Numeric decision grounding vs. TradingAgents' real, unchecked TraderProposal",

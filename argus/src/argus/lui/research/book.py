@@ -371,6 +371,48 @@ _EVENT_TYPES = (
 )
 
 
+def _moves_one_by_one(symbol: str, days: Sequence[str]) -> str | None:
+    """Each results release's 24-hour move, listed rather than averaged, beside the ordinary one.
+
+    Once delivery reports stopped counting as results (2026-09-30), every name had four releases
+    in Bitget's hourly history and the study, which needs five, gave no figure — so "how big is
+    the move usually" was answered with nothing. Four moves are too few for a rate, not too few
+    to show. Each is 20:00 UTC on the release day (before a US after-close release) to 20:00 the
+    next day, from Bitget's hourly candles; the ordinary move is the median absolute 24-hour move
+    over the 30 days before the latest release."""
+    from argus.market.history import HistoryError, fetch_window
+
+    moves: list[str] = []
+    for day in days:
+        start = datetime.fromisoformat(day).replace(hour=20, tzinfo=UTC)
+        try:
+            candles = fetch_window(symbol, start=start - timedelta(hours=1),
+                                   end=start + timedelta(hours=26), interval="1H", pause=0.05)
+        except (HistoryError, OSError, ValueError):
+            return None
+        closes = {c.ts: float(c.close) for c in candles}
+        before, after = closes.get(start), closes.get(start + timedelta(hours=24))
+        if not before or not after:
+            continue
+        moves.append(f"{start:%d %b %Y} {after / before - 1:+.1%}")
+    if not moves:
+        return None
+    try:
+        latest = datetime.fromisoformat(days[-1]).replace(hour=20, tzinfo=UTC)
+        month = fetch_window(symbol, start=latest - timedelta(days=31), end=latest,
+                             interval="1H", pause=0.05)
+    except (HistoryError, OSError, ValueError):
+        month = []
+    by_hour = {c.ts: float(c.close) for c in month}
+    ordinary = sorted(abs(by_hour[t + timedelta(hours=24)] / v - 1) for t, v in by_hour.items()
+                      if v and by_hour.get(t + timedelta(hours=24)))
+    usual = (f", against an ordinary 24-hour move of {ordinary[len(ordinary) // 2]:.1%} in the "
+             f"month before the latest" if ordinary else "")
+    return (f"The {len(moves)} moves one by one, 24 hours from each release (Bitget hourly "
+            f"closes): {'; '.join(moves)}{usual} — too few to call a usual size, listed so you "
+            f"can see them.")
+
+
 def _event_reaction(symbol: str, raw_text: str) -> tuple[list[str], list[Source]]:
     """How ``symbol`` has reacted to the event types the question names, from the artefact
     `research/event_reactions.py` writes each day."""
@@ -407,6 +449,10 @@ def _event_reaction(symbol: str, raw_text: str) -> tuple[list[str], list[Source]
                    f"event's alone." if left_out else "")
         if row.get("average_car_bps") is None:
             lines.append(f"{ticker} around {label}: {row['verdict']}.")
+            if kind == "earnings" and row.get("dates"):
+                one_by_one = _moves_one_by_one(symbol, [str(d) for d in row["dates"]])
+                if one_by_one:
+                    lines.append(one_by_one)
             if dropped:
                 lines.append(dropped)
             continue
@@ -467,7 +513,10 @@ def _event_reaction(symbol: str, raw_text: str) -> tuple[list[str], list[Source]
     else:
         lines.insert(0, f"Bottom line: not enough clean events to measure {ticker}'s reaction yet "
                         f"— a figure from fewer than five would look like evidence and not be "
-                        f"any; until then, treat it as an event of unknown size.")
+                        f"any" + ("; the moves themselves are listed below."
+                                  if any(x.startswith("The ") and " moves one by one" in x
+                                         for x in lines)
+                                  else "; until then, treat it as an event of unknown size."))
     upcoming, _ = _event_lines(raw_text, always=True)
     lines.extend(upcoming)
     return lines, [Source(kind="computation", ref="argus.research.event_reactions",

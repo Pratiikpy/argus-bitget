@@ -47,7 +47,8 @@ def _raw(block: Any, key: str) -> float | None:
 
 
 def sector_valuation(ticker: str, fetch: Any = None,
-                     own: Mapping[str, float | None] | None = None) -> tuple[str, Source] | None:
+                     own: Mapping[str, float | None] | None = None,
+                     found: dict[str, Any] | None = None) -> tuple[str, Source] | None:
     """One line setting ``ticker``'s trailing P/E and P/B beside its sector fund's, or ``None``
     when the sector or either side's figures are not published (a fund, an unlisted sector).
 
@@ -82,6 +83,12 @@ def sector_valuation(ticker: str, fetch: Any = None,
     verdict = ""
     if own_pe is not None and fund_pe is not None:
         ratio = own_pe / fund_pe
+        if found is not None:
+            # The thesis tester's valuation check reads the multiple beside the analysts' target:
+            # it called TSLA "not overvalued" on a +11% target gap while its trailing P/E stood at
+            # 14.6 times its sector's (round-10 thesis test, 2026-09-30).
+            found.update(pe=own_pe, sector_pe=fund_pe, pe_vs_sector=ratio, sector_fund=fund,
+                         sector=sector)
         verdict = ("priced above its sector on earnings" if ratio > 1.1 else
                    "priced below its sector on earnings" if ratio < 0.9 else
                    "priced in line with its sector on earnings")

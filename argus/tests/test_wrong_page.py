@@ -96,8 +96,10 @@ class TestTheLivePageKeepsItsPromises:
         assert f"{len(found)} entries" in box
         lost = sum(1 for c in found if c.kind == "loss")
         assert f"{lost} of them" in box
-        # nothing that already led the page was removed
-        assert page.index("Every entry is read out of the artefact") < plain_at
+        # The plain summary leads the page, ahead of the intro on how entries are read: a
+        # first-time user found the page dense before reaching it (round 10, 2026-09-30). The
+        # intro stays, after it.
+        assert plain_at < page.index("Every entry is read out of the artefact") < first_entry_at
 
     def test_an_empty_record_still_carries_the_plain_summary(self) -> None:
         page = render([])

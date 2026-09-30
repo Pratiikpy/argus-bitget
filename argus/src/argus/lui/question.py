@@ -392,6 +392,11 @@ def resolve_window(text: str, *, now: datetime) -> Window | None:
     if now.tzinfo is None:
         raise ValueError("now must be timezone-aware; a naive clock cannot place a decision")
     low = text.lower()
+    if _WEEKDAY_ZH.search(text):
+        # "上周五" is a day, and "上周" inside it would otherwise read as the whole week
+        day = _named_weekday(text, now.date())
+        assert day is not None
+        return _day_window(day, now, f"{day:%d %b %Y}")
     for pattern, label in _TEMPORAL:
         if not re.search(pattern, low):
             continue
@@ -427,7 +432,7 @@ def resolve_window(text: str, *, now: datetime) -> Window | None:
             )
         if label == "all time":
             return Window(datetime(2000, 1, 1, tzinfo=UTC), now, "all time")
-    day = _named_day(text, now.date())
+    day = _named_day(text, now.date()) or _named_weekday(text, now.date())
     if day is not None:
         # "what did we do on 2026-09-20" returned every decision on record: a named day was not a
         # window at all (2026-09-30).
@@ -445,6 +450,34 @@ _MONTH = (r"(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|au
 _MONTH_DAY = re.compile(
     r"\b(?:(\d{1,2})(?:st|nd|rd|th)?\s+" + _MONTH + r"|" + _MONTH.replace("(", "(", 1)
     + r"\.?\s+(\d{1,2})(?:st|nd|rd|th)?)(?:,?\s+(\d{4}))?\b", re.I)
+
+
+_WEEKDAYS = ("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
+_WEEKDAY = re.compile(
+    r"\b(?:(last|this\s+past|past|on)\s+)(mon|tues?|wed(?:nes)?|thu(?:rs?)?|fri|sat(?:ur)?|sun)"
+    r"(?:day)?\b", re.I)
+_WEEKDAY_ZH = re.compile(r"上(?:周|週|个星期|個星期|星期)([一二三四五六日天])")
+_ZH_DAY = {"一": 0, "二": 1, "三": 2, "四": 3, "五": 4, "六": 5, "日": 6, "天": 6}
+
+
+def _named_weekday(text: str, today: date) -> date | None:
+    """A past weekday the text names: "last Friday" and "this past Monday" are the latest one
+    before today, "on Friday" the latest one up to today, "上周五" Friday of the week before.
+
+    "What did the desk do last Friday" was answered over the whole record (a hostile review,
+    2026-09-30): only "last week" and named dates were windows."""
+    zh = _WEEKDAY_ZH.search(text)
+    if zh is not None:
+        monday = today - timedelta(days=today.weekday() + 7)
+        return monday + timedelta(days=_ZH_DAY[zh.group(1)])
+    m = _WEEKDAY.search(text)
+    if m is None:
+        return None
+    target = next(i for i, name in enumerate(_WEEKDAYS) if name.startswith(m.group(2).lower()[:3]))
+    back = (today.weekday() - target) % 7
+    if back == 0 and m.group(1).lower() != "on":
+        back = 7  # asked on a Friday, "last Friday" is a week ago
+    return today - timedelta(days=back)
 
 
 def _named_day(text: str, today: date) -> date | None:
@@ -646,7 +679,12 @@ def _listed_on_bitget(token: str) -> bool:
 
 # Order matters: the first pattern to match wins, so the more specific question comes first.
 # "why did you do nothing on NVDA" must reach ABSTENTION_WHY, not DECISION_WHY.
-TRACK_RECORD = r"\btrack\s+record\b"
+TRACK_RECORD = (r"\btrack\s+record\b|"
+                # "how has the desk performed" was listed as the last five decisions by the n-gram
+                # model (round 10): the desk's own results, asked of the desk.
+                r"\bhow\s+(?:has|have|is|are|did)\s+(?:the\s+desk|argus|you|your\s+desk)\s+"
+                r"(?:perform(?:ed|ing)?|done|doing|been\s+doing|fared)\b|"
+                r"\b(?:the\s+desk'?s|your|argus'?s?)\s+(?:overall\s+)?performance\b")
 EVER_TRADED = (r"\b(?:did|have|has)\s+(?:the\s+desk|you|argus|it)\s+(?:ever\s+|actually\s+)?"
                r"(?:trade[ds]?|placed?\s+(?:a\s+|any\s+)?(?:trades?|orders?)|made\s+(?:a\s+|any\s+)?"
                r"trades?)\s*(?:yet|ever|at\s+all|so\s+far)?\s*[?.!]*\s*$|"

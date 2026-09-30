@@ -191,7 +191,10 @@ _EXECUTION = re.compile(
     # "I want to buy $500 of DOGEUSDT, does it matter how I place it?" (2026-09-25 audit)
     r"(?:does\s+it\s+matter|what'?s\s+the\s+best\s+way)\s+how\s+(?:i|to)\s+(?:place|enter|buy|"
     r"sell)|"
-    r"how\s+(?:should|do|would|to)\s+(?:i\s+)?place\s+(?:it|the|my|an?|this|that)\b)",
+    r"how\s+(?:should|do|would|to)\s+(?:i\s+)?place\s+(?:it|the|my|an?|this|that)\b|"
+    # "what does the Agent Hub dry-run for a $2k BTC buy look like" was refused as not a desk
+    # stock (judge audit, round 10): the execution answer carries the `bgc` dry-run command.
+    r"\bdry[\s-]*run\b|\bagent\s+hub\b|\bbgc\s+order\b)",
     re.I,
 )
 
@@ -1115,7 +1118,10 @@ def research_symbols(text: str) -> tuple[tuple[str, ...], tuple[str, ...]]:
 
 
 _HOLDING_CUE = re.compile(
-    r"\b(?:i\s+(?:hold|own|have|got|am\s+holding)|i'?ve\s+got|my\s+(?:book|portfolio|holdings?|"
+    # "I am long $5,000 of NVDA" states a holding too; its size was dropped (a hostile review,
+    # 2026-09-30).
+    r"\b(?:i\s+(?:hold|own|have|got|am\s+holding)|i(?:'m|\s+am)\s+(?:long|short)|i'?ve\s+got|"
+    r"my\s+(?:book|portfolio|holdings?|"
     r"positions?)\s+(?:is|are|=|:)|holding|currently\s+(?:hold|own))\b|持有|我有|我现在有|手里有|"
     r"仓位里有|持仓有", re.I)
 
@@ -1147,6 +1153,10 @@ def _amount_pairs(text: str) -> list[tuple[int, str, float]]:
     size, not a book. Found on the 2026-09-25 blind corpus: "我持有200股苹果和50股特斯拉,现在加仓
     英伟达合适吗" (200 AAPL, 50 TSLA, add NVDA?) was refused because only percentages were read."""
     if not _HOLDING_CUE.search(text):
+        return []
+    if re.search(r"\bshort(?:ing|ed)?\b", text, re.I):
+        # This reader has no sign, so "short $2k of TSLA" came back long (a hostile review,
+        # 2026-09-30); `priced_book` reads each short as a negative weight, and is left to.
         return []
     units: dict[str, float] = {}
     usd: dict[str, float] = {}

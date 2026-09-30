@@ -43,6 +43,11 @@ def _book_dollar_lines(request: ResearchRequest, data: MarketData, is_open: Any,
     columns = _open_columns(data.raw, is_open)
     parts = []
     for sym, weight in sorted(request.book.items(), key=lambda kv: -kv[1]):
+        if weight < 0:
+            # A short is said as one, with no long-side ceiling: "TSLA $-2,000 now, at most
+            # $2,240" read as a long cap on a short (a hostile review, 2026-09-30).
+            parts.append(f"{_t(sym)} short ${-weight * worth:,.0f}")
+            continue
         others = {s: w for s, w in request.book.items() if s != sym}
         ceiling = (max_size_within_budget(add=sym, before=request.book, columns=columns,
                                           budget=request.budget, as_target=True)

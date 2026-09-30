@@ -23,9 +23,14 @@ test —
 * **network activity** ("ecosystem activity strengthening", "adoption growing"): the chain's
   daily fees, DEX volume and TVL on DeFiLlama, the last 30 days against the 30 before, placed in
   the distribution of every such 30-day change over the past three years;
-* **momentum**, **positioning** (funding), **sentiment** (Fear & Greed) and **valuation**
-  (analysts' mean target) read the figure the task already holds and say whether it agrees — and
-  where agreeing is not an edge (technicals, a target), the line says so.
+* **a demand driver** ("runs on AI capex", "demand is slowing"): the company's revenue and, for
+  AI or cloud capex, the four largest US cloud builders' capital spending, quarter by quarter from
+  SEC XBRL (`lui/drivers.py`) — whether the driver and the company are growing today, and which
+  part of a forward claim no filing can test;
+* **valuation**: the trailing P/E against the sector fund's (a measurement) and the analysts' mean
+  target against the price (an opinion); a verdict only where they agree or one alone leans;
+* **momentum**, **positioning** (funding) and **sentiment** (Fear & Greed) read the figure the task
+  already holds and say whether it agrees — and where agreeing is not an edge, the line says so.
 
 A reason no engine reads is listed as *not tested*, with what would test it.
 
@@ -60,6 +65,7 @@ class Kind(StrEnum):
     POSITIONING = "positioning"
     SENTIMENT = "sentiment"
     VALUATION = "valuation"
+    DRIVER = "a demand driver"
     EARNINGS = "earnings"
     MACRO = "macro"
     OTHER = "other"
@@ -90,6 +96,13 @@ _KINDS: tuple[tuple[Kind, re.Pattern[str]], ...] = (
     (Kind.VALUATION, re.compile(
         r"cheap|undervalued|overvalued|expensive|valuation|\bp/?e\b|price target|fair value",
         re.I)),
+    # "NVDA runs on AI capex" matched no kind and was not even listed (judge audit, 2026-09-30);
+    # tested against the filings by `lui/drivers.py`. Before EARNINGS, which "revenue" would take.
+    (Kind.DRIVER, re.compile(
+        r"\bcapex\b|capital\s+spend|data[\s-]*cent(?:er|re)|hyperscal|\bai\s+(?:spend|demand|"
+        r"build|boom|infrastructure|investment|chips?|servers?)|cloud\s+spend|\bdemand\b|"
+        r"runs?\s+on\b|driven\s+by|(?:revenue|sales)\s+(?:growth|keeps?\s+growing|(?:is|are)\s+"
+        r"(?:growing|accelerating))", re.I)),
     (Kind.EARNINGS, re.compile(r"earnings|revenue|guidance|profit|margins?|\beps\b|beat", re.I)),
     (Kind.MACRO, re.compile(
         r"\bfed\b|rates?\b|rate cuts?|\bcpi\b|inflation|dollar|\bdxy\b|macro|liquidity|yields?",
@@ -101,6 +114,15 @@ _SPLIT = re.compile(r"\s*(?:[,;?]|\bbecause\b|\bsince\b|\bas\b|\band\b|\bgiven\b
 _STANCE = re.compile(r"^(?:i(?:'m| am)?\s+)?(?:going\s+|thinking of going\s+|considering\s+"
                      r"(?:going\s+)?)?(?:long|short|buy(?:ing)?|sell(?:ing)?|bullish|bearish)"
                      r"(?:\s+on)?\s+\S+$", re.I)
+
+_ASK_WORDS = re.compile(
+    r"^\s*(?:i\s+(?:think|believe|reckon|expect|feel)\s+(?:that\s+)?|my\s+(?:thesis|view|take|"
+    r"idea)\s+(?:is\s+)?(?:that\s+)?:?\s*|here'?s\s+my\s+(?:thesis|view|take|idea):?\s*)|"
+    r"\s*[-\u2013\u2014:,.]?\s*(?:please\s+|can\s+you\s+)?(?:test|check|challenge|"
+    r"stress[\s-]*test|pressure[\s-]*test|poke\s+holes\s+in|kill|critique|evaluate|assess|validate)\s+"
+    r"(?:(?:my|this|the|that)\s+(?:thesis|idea|view|take|theory|call)|it|this|that)\b[\s?.!]*$",
+    re.I)
+"""The asking around a stated thesis ("I think ...", "... test my thesis"): not a reason."""
 
 _ASKED = re.compile(r"^(?:should|would|could|can|do|does|is|are)\s+(?:i|we|it|you)\b", re.I)
 """The question itself ("should I buy NVDA") is not a reason."""
@@ -160,7 +182,8 @@ def reasons(text: str) -> tuple[Reason, ...]:
     stance and name ("long SOL") are not a reason; a fragment of two words or fewer that names no
     kind is not one either. Empty when the text states no reason."""
     out: list[Reason] = []
-    for part in _SPLIT.split(text.strip().rstrip(".?!")):
+    text = _ASK_WORDS.sub("", text.strip()).strip()
+    for part in _SPLIT.split(text.rstrip(".?!")):
         part = part.strip(" .")
         if not part or _STANCE.match(part) or _ASKED.match(part):
             continue
@@ -596,22 +619,67 @@ def _sentiment(reason: Reason, fear_greed: Mapping[str, Any] | None) -> Tested:
                   f"alternative.me. It describes the whole crypto market, not this name.")
 
 
+PE_RICH = 1.5
+PE_CHEAP = 0.9
+"""Trailing P/E against the sector fund's: above 1.5 times reads as priced richly, below 0.9 as
+cheaply. Wider on the rich side because growth companies carry a premium as a matter of course."""
+
+
 def _valuation(reason: Reason, fund: Mapping[str, Any], name: str) -> Tested:
+    """Two reads, each named for what it is: the trailing P/E against the sector's (a
+    measurement) and the analysts' mean target against the price (an opinion). The verdict is
+    theirs when they agree or only one answered; when they point opposite ways it is not
+    measurable, and the line says why.
+
+    Before 2026-09-30 only the target was read, and only when Yahoo supplied it — with Bitget's
+    targets present it said "no analyst target answered", and it called TSLA "not overvalued" on
+    an 11% target gap while its P/E stood at 14.6 times its sector's."""
+    cheap_claim = not re.search(r"overvalued|over-valued|expensive|rich|pricey|bubble|frothy",
+                                reason.text, re.I)
     target, price = fund.get("target_mean"), fund.get("price")
-    if not target or not price:
+    ratio = fund.get("pe_vs_sector")
+    reads: list[tuple[str, bool | None]] = []
+    if ratio:
+        ratio = float(ratio)
+        cheap = False if ratio > PE_RICH else True if ratio < PE_CHEAP else None
+        sector = fund.get("sector") or "its sector"
+        reads.append((f"trailing P/E {float(fund['pe']):.1f} against {sector}'s "
+                      f"{float(fund['sector_pe']):.1f} ({fund.get('sector_fund')}), "
+                      f"{ratio:.1f} times — a measurement, and one a growth company can justify",
+                      cheap))
+    if target and price:
+        gap = float(target) / float(price) - 1
+        cheap = True if gap > 0.10 else False if gap < -0.10 else None
+        reads.append((f"analysts' mean target ${float(target):,.2f}, {abs(gap):.0%} "
+                      f"{'above' if gap > 0 else 'below'} the last close — an opinion", cheap))
+    if not reads:
         return Tested(reason.text, reason.kind, Result.NOT_TESTED,
-                      f"No analyst target answered for {name}; ARGUS does not value companies "
-                      f"itself.")
-    gap = float(target) / float(price) - 1
-    cheap_claim = not re.search(r"overvalued|expensive|rich", reason.text, re.I)
-    if abs(gap) < 0.10:
-        result = Result.NOT_MEASURABLE
+                      f"Neither {name}'s sector multiple nor an analyst target answered; ARGUS "
+                      f"does not value companies itself.")
+    said = "; ".join(r for r, _ in reads)
+    leans = {c for _, c in reads if c is not None}
+    if len(leans) == 1:
+        result = Result.SUPPORTED if leans == {cheap_claim} else Result.CONTRADICTED
+        how = ("both reads agree" if len(reads) == 2 and all(c is not None for _, c in reads)
+               else "the one read that leans either way")
+    elif len(leans) == 2:
+        result, how = Result.NOT_MEASURABLE, "the two reads point opposite ways"
     else:
-        result = Result.SUPPORTED if (gap > 0) == cheap_claim else Result.CONTRADICTED
+        result, how = Result.NOT_MEASURABLE, "neither read leans far enough to call"
     return Tested(reason.text, reason.kind, result,
-                  f"Analysts' mean target is ${float(target):,.2f}, {abs(gap):.0%} "
-                  f"{'above' if gap > 0 else 'below'} the last close — an opinion, not a "
-                  f"measurement, and the only valuation read in this task.")
+                  f"{said[:1].upper()}{said[1:]}. Verdict: {how}.")
+
+
+def _driver(reason: Reason, found: Mapping[str, Any] | None, name: str) -> Tested:
+    """A demand driver against the filings (`lui/drivers.py`)."""
+    from argus.lui import drivers
+
+    if found is None:
+        return Tested(reason.text, reason.kind, Result.NOT_TESTED,
+                      f"{name}'s filings did not answer in time, so the driver is not tested.")
+    result, line, evidence = drivers.test(reason.text, found)
+    return Tested(reason.text, reason.kind, Result(result), line,
+                  evidence=tuple(Finding(text, source, url) for text, source, url in evidence))
 
 
 _UNTESTED: Mapping[Kind, str] = {
@@ -626,7 +694,8 @@ _UNTESTED: Mapping[Kind, str] = {
 def check(stated: Sequence[Reason], *, name: str, data: Mapping[str, Mapping[str, Any]],
          activity: Mapping[str, Any] | None = None,
          fear_greed: Mapping[str, Any] | None = None,
-         ctx: Mapping[str, Any] | None = None, side: str | None = None) -> tuple[Tested, ...]:
+         ctx: Mapping[str, Any] | None = None, side: str | None = None,
+         driver: Mapping[str, Any] | None = None) -> tuple[Tested, ...]:
     """Each stated reason against the measurement that bears on it. ``data`` is the research
     task's step data by kind, as :func:`argus.lui.weigh.weigh` takes it."""
     analogue = data.get("analogue") or {}
@@ -647,6 +716,8 @@ def check(stated: Sequence[Reason], *, name: str, data: Mapping[str, Mapping[str
             out.append(_sentiment(reason, fear_greed))
         elif reason.kind is Kind.VALUATION:
             out.append(_valuation(reason, fund, name))
+        elif reason.kind is Kind.DRIVER:
+            out.append(_driver(reason, driver, name))
         else:
             out.append(Tested(reason.text, reason.kind, Result.NOT_TESTED, _UNTESTED[reason.kind]))
     ctx = ctx or {}

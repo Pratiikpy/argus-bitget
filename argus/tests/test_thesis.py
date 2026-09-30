@@ -156,7 +156,8 @@ class TestTheFiguresTheTaskHolds:
     def test_valuation_reads_the_analysts_target_as_opinion(self) -> None:
         fund = {"target_mean": 327.7, "price": 225.07}
         [got] = check(reasons("It looks cheap"), name="NVDA", data=data(fund=fund))
-        assert got.result is Result.SUPPORTED and "an opinion, not a measurement" in got.line
+        assert got.result is Result.SUPPORTED and "— an opinion" in got.line
+        assert "the one read that leans either way" in got.line
 
     def test_what_no_engine_reads_is_said_to_be_untested(self) -> None:
         [got] = check(reasons("the new CEO is a proven operator"), name="NVDA", data=data())

@@ -37,8 +37,16 @@ def rival_tokens(text: str) -> list[str]:
     """The words in the question that could name a system: four letters or more, not generic."""
     from argus.lui.question import resolve_symbol
 
+    # Words with a letter only, and no month names: "position on 30/09/2026 versus September 30
+    # 2026" matched rivals measured "against 2026" and was answered with the scoreboard (a hostile
+    # review, 2026-09-30).
     return [w for w in _norm(text).split()
-            if len(w) >= 4 and w not in _GENERIC and resolve_symbol(w) is None]
+            if len(w) >= 4 and w not in _GENERIC and resolve_symbol(w) is None
+            and re.search(r"[a-z]", w) and w not in _MONTHS]
+
+
+_MONTHS = frozenset({"january", "february", "march", "april", "june", "july", "august",
+                     "september", "october", "november", "december", "sept"})
 
 
 _SELF = re.compile(r"\bargus\b|\byou(?:r|rs)?\b|\bthis\s+(?:desk|tool|console|product|system)\b",

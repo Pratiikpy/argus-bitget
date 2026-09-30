@@ -880,6 +880,10 @@ CLAIMS: tuple[Claim, ...] = (
           r"(?P<q1>\d+) TIED\W+(?P<q2>\d+) IMPLEMENTED\W+(?P<q3>\d+) LOST",
           lambda: standing_states()[1:], ("readme", "public-readme", "submission", "explained",
                                            "architecture")),
+    # The Chinese summary's total said 48 while the English, /proof and /materials said 45
+    # (judge audit, 2026-09-30): only the four states were gated, not the count before them.
+    Claim("standing_total_zh", r"全部 (?P<q>\d+) 项能力",
+          lambda: standing_counts()[1], ("readme", "public-readme")),
     Claim("standing_states_zh",
           r"(?P<q1>\d+) 项领先（OWNED）、(?P<q2>\d+) 项\s*持平、(?P<q3>\d+) 项已实现、"  # noqa: RUF001 - the summary's own punctuation
           r"(?P<q4>\d+) 项落后",

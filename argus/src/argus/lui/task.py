@@ -40,7 +40,7 @@ from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Any
 
-from argus.lui import thesis
+from argus.lui import drivers, thesis
 from argus.lui.answer import LEAD
 from argus.lui.research import (
     ANALOGUE_DAYS,
@@ -443,6 +443,10 @@ def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
         activity = (pool.submit(thesis.chain_activity, symbol)
                     if thesis.Kind.ACTIVITY in kinds else None)
         mood = pool.submit(thesis.fear_greed_now) if thesis.Kind.SENTIMENT in kinds else None
+        # A demand driver is tested against the filings (`lui/drivers.py`), read beside the engines.
+        driven = next((r.text for r in stated if r.kind is thesis.Kind.DRIVER), None)
+        driver = (pool.submit(drivers.facts, symbol.removesuffix("USDT"), driven)
+                  if driven is not None else None)
         around = pool.submit(thesis.context, symbol) if stated else None
         futures = [pool.submit(one, step) for step in STEPS]
         direct = reading.direct if reading is not None else None
@@ -490,7 +494,8 @@ def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
             tested = thesis.check(stated, name=symbol.removesuffix("USDT"),
                                   data=_data_by_kind(steps), activity=extra(activity),
                                   fear_greed=extra(mood), ctx=extra(around),
-                                  side=thesis.stated_side(asked))
+                                  side=thesis.stated_side(asked),
+                                  driver=extra(driver))
     finally:
         pool.shutdown(wait=False, cancel_futures=True)
     return Task(question=question, name=symbol.removesuffix("USDT"), size_pct=size * 100,

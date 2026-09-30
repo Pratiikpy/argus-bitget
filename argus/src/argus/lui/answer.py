@@ -178,6 +178,12 @@ def _window_phrase(question: Question) -> str:
         return ""
     lang = question.language
     if lang is not Language.ZH:
+        # A single day reads "on 25 Sep 2026", "yesterday" and "today" stand alone; "34 decisions
+        # in 25 Sep 2026" and "43 abstentions in yesterday" read as machine output (2026-09-30).
+        if window.label in ("today", "yesterday"):
+            return f" {window.label}"
+        if re.fullmatch(r"\d{1,2} [A-Z][a-z]{2} \d{4}", window.label):
+            return f" on {window.label}"
         return f" in {window.label}"
     for unit in ("weekend", "week"):
         if window.label.startswith(f"the {unit} of "):
@@ -186,6 +192,10 @@ def _window_phrase(question: Question) -> str:
             break
     else:
         label = WINDOW_LABELS_ZH.get(window.label, window.label)
+        if re.fullmatch(r"\d{1,2} [A-Z][a-z]{2} \d{4}", label):
+            # A named day in Chinese form, not "25 Sep 2026" inside a Chinese header.
+            day = datetime.strptime(label, "%d %b %Y")
+            label = f"{day.year}年{day.month}月{day.day}日"
     return WINDOW_IN_ZH.format(label=label)
 
 
@@ -255,6 +265,21 @@ def _lean_grading() -> str | None:
     return line + f" — graded {str(report.get('as_of', ''))[:10]}, `python -m argus.eval.refusal`."
 
 
+_STAT_NAMES = {"sharpe": "Sharpe", "sortino": "Sortino", "max_drawdown": "Max drawdown",
+               "win_rate": "Win rate"}
+_STAT_NAMES_ZH = {"sharpe": "夏普比率", "sortino": "索提诺比率", "max_drawdown": "最大回撤",
+                  "win_rate": "胜率"}
+
+
+def _dollars(value: Any, *, signed: bool = True) -> str:
+    """A ledger amount as money: "-$1.78", "+$12.40", "$10,000"."""
+    amount = float(value)
+    body = f"${abs(amount):,.2f}".removesuffix(".00")
+    if not signed:
+        return body
+    return ("-" if amount < 0 else "+" if amount > 0 else "") + body
+
+
 def answer_performance(ledger: PaperLedger, question: Question) -> Answer:
     """The three scored numbers, or a named reason why they do not exist yet."""
     perf = evaluate_ledger(ledger)
@@ -271,13 +296,28 @@ def answer_performance(ledger: PaperLedger, question: Question) -> Answer:
     # best-looking risk number on the page, earned by not participating.
     undefined: list[str] = []
     if perf.sharpe is None or perf.win_rate is None or perf.max_drawdown is None:
-        undefined = [t("perf.undefined_stat", lang, stat=stat, why=why)
+        # The metric's name as a reader says it, not its field name ("max_drawdown: not available").
+        names = _STAT_NAMES_ZH if lang == "zh" else _STAT_NAMES
+        undefined = [t("perf.undefined_stat", lang, stat=names.get(stat, stat), why=why)
                      for stat, why in perf.undefined.items()]
-        lines.extend(undefined)
-        lines.append(
-            t("perf.no_trades", lang, abstentions=perf.abstentions, trades=perf.trades,
-              days=perf.window_days)
-        )
+        if perf.trades:
+            # One settled trade defines a win rate and nothing else: the answer said "Sharpe, win
+            # rate and drawdown need trades" beside a trade, and never gave the win rate asked
+            # for (judge audit, 2026-09-30). The count leads and the rate is given with it.
+            wins = sum(c.wins for c in perf.by_symbol)
+            win = ("" if perf.win_rate is None else
+                   t("perf.few_trades_win", lang, pct=100 * perf.win_rate, wins=wins,
+                     trades=perf.trades))
+            lines.append(t("perf.few_trades", lang, trades=perf.trades,
+                           abstentions=perf.abstentions, days=perf.window_days,
+                           net=_dollars(perf.net_pnl), win=win))
+            lines.extend(undefined)
+        else:
+            lines.extend(undefined)
+            lines.append(
+                t("perf.no_trades", lang, abstentions=perf.abstentions, trades=perf.trades,
+                  days=perf.window_days)
+            )
     else:
         lines.append(
             t("perf.headline", lang, sharpe=perf.sharpe, drawdown=100 * perf.max_drawdown,
@@ -289,7 +329,9 @@ def answer_performance(ledger: PaperLedger, question: Question) -> Answer:
                 t("perf.largest", lang, symbol=top.symbol,
                   share=perf.as_dict()["largest_symbol_share_pct"], trades=top.trades)
             )
-    lines.append(t("perf.net_pnl", lang, net=perf.net_pnl, capital=perf.capital))
+    if not (undefined and perf.trades):  # the few-trades line already carries the net
+        lines.append(t("perf.net_pnl", lang, net=_dollars(perf.net_pnl),
+                       capital=_dollars(perf.capital, signed=False)))
     no_trades_en = perf.trades == 0 and lang == "en"
     if no_trades_en:
         # A track-record question deserves its answer first, not a list of undefined ratios:
@@ -319,6 +361,9 @@ def answer_performance(ledger: PaperLedger, question: Question) -> Answer:
                                   "refusal reasons checked against the record"))
     for entry in [e for e in ledger.entries if e.is_settled and not e.is_abstention][:3]:
         sources.append(_src(entry))
+    elsewhere = t("perf.agent_elsewhere", lang)
+    emit([elsewhere], "explained")
+    lines.append(elsewhere)
     return Answer(question=question, lines=lines, sources=sources, data=perf.as_dict())
 
 

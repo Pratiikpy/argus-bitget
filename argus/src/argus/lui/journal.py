@@ -909,14 +909,15 @@ def daily_history(symbol: str) -> History:
 
 
 def earnings_releases(symbol: str, since: date) -> Releases:
-    """Every 8-K item 2.02 acceptance time on EDGAR since ``since`` (the issuer's own record, as
-    `research/event_reactions.earnings_releases` reads it), for a stock only."""
+    """Every quarterly results release on EDGAR since ``since`` (the issuer's own record, read
+    as `research/event_reactions.results_releases` reads it: an 8-K item 2.02 that is not a
+    production or deliveries update), for a stock only."""
     from argus.market.evidence import EdgarSource
+    from argus.research.event_reactions import results_releases
 
     start = datetime.combine(since - timedelta(days=5), clock_time(0), tzinfo=UTC)
-    found = [f.accepted for f in EdgarSource().filings(_short(symbol), since=start, limit=400)
-             if f.form == "8-K" and "2.02" in f.items]
-    return sorted(found), f"SEC EDGAR 8-K item 2.02 for {_short(symbol)}"
+    found = results_releases(EdgarSource().filings(_short(symbol), since=start, limit=400))
+    return found, f"SEC EDGAR 8-K item 2.02 results releases for {_short(symbol)}"
 
 
 def _holidays() -> frozenset[date] | None:

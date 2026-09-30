@@ -53,6 +53,8 @@ def render(corrections: list[Correction]) -> str:
     # (first-user audit, 2026-09-29). The counts are read from the same `corrections` list `rows`
     # is built from, never retyped.
     lost = sum(1 for c in corrections if c.kind == "loss")
+    kinds = {k: sum(1 for c in corrections if c.kind == k) for k in label}
+    tally = ", ".join(f"{n} {label[k]}" for k, n in kinds.items() if n)
     plain = (
         "<div class='plain'><p>In plain terms: this is everything wrong with ARGUS that we can "
         "point to real evidence for &mdash; things we shipped broken, times a named competitor "
@@ -61,7 +63,7 @@ def render(corrections: list[Correction]) -> str:
         "the ones worth trusting are the ones that say when they lost. "
         f"{len(corrections)} entries follow, {lost} of them a competitor we lost to by name, and "
         "each is checked against its own record every time this page loads, not written once and "
-        "left to go stale.</p></div>"
+        f"left to go stale.</p><p class='tally'>By kind: {esc(tally)}.</p></div>"
     )
     head = design.head("ARGUS — what we got wrong",
                        "Every loss, bug and withdrawn claim, with its number and the artefact "
@@ -86,13 +88,14 @@ def render(corrections: list[Correction]) -> str:
  .plain {{ background:var(--panel); border:1px solid var(--line); border-radius:10px;
    padding:14px 16px; margin:0 0 16px }}
  .plain p {{ margin:0; font-size:14.5px; max-width:none }}
+ .plain p.tally {{ margin-top:8px; color:var(--dim); font-size:13.5px }}
 {design.BASE_CSS}</style></head><body>{design.nav('/wrong')}<div class="wrap">
 <h1>What we got wrong</h1>
+{plain}
 <p class="sub">Every entry is read out of the artefact that recorded it, at the moment you load
 this page &mdash; not written down once and left to drift. A finding whose artefact cannot be read
 is listed as unreadable rather than dropped, because a losses page that silently shortens is the
 most flattering possible lie. <a href="/">back to the console</a></p>
-{plain}
 {rows}
 <p class="sub">This is not everything wrong with ARGUS &mdash; nothing could be, and claiming
 completeness would be its own overstatement. It is the set of findings that already have an

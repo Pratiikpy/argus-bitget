@@ -77,7 +77,7 @@ a 2016 target on NVDA says nothing about today. The window keeps each firm's lat
 
 
 def _price_target_line(ticker: str, rows: Sequence[Mapping[str, Any]], stock: Any,
-                       today: Any) -> str | None:
+                       today: Any, found: dict[str, Any] | None = None) -> str | None:
     """Where analysts' current price targets sit against the stock, from the last 90 days only,
     one target per firm (its latest). The consensus row the same server returns is often years
     old and is withheld; these rows are dated, so they can be used."""
@@ -110,6 +110,12 @@ def _price_target_line(ticker: str, rows: Sequence[Mapping[str, Any]], stock: An
     cut = sum(1 for v in latest.values() if v.get("price_target_previous") is not None
               and float(v["price_target"]) < float(v["price_target_previous"]))
     last = float(stock.get("last_price") or 0) if isinstance(stock, dict) else 0.0
+    if found is not None and last > 0:
+        # The thesis tester's valuation check and the task's verdict read these; only the Yahoo
+        # fallback used to fill them, so with Bitget's targets present both said no analyst target
+        # answered (round-10 thesis test, 2026-09-30).
+        found.update(target_mean=sum(targets) / len(targets), target_median=mid, price=last,
+                     analysts=len(latest))
     upside = f", {(mid / last - 1) * 100:+.0f}% from the stock's {last:g}" if last > 0 else ""
     return (
         f"Analyst price targets, last {PRICE_TARGET_WINDOW_DAYS} days ({len(latest)} firms, each "
@@ -293,7 +299,17 @@ def pattern_reading_wins(request: ResearchRequest | None, text: str) -> bool:
         # A directional question is read by every model as a forecast and refused; it has one
         # engine that answers it without forecasting (`desk/odds.py`).
         return True
-    if request.kind is ResearchKind.TECHNICALS and daily_technicals_asked(text):
+    if request.kind is ResearchKind.TECHNICALS and (daily_technicals_asked(text) or re.search(
+            r"\btechnical\s+(?:analysis|indicators?|levels?|read(?:ing)?|picture|view)\b|"
+            r"\brsi\b|\bmacd\b", text, re.I)):
+        # "show me the bitget-signal technical analysis for SOL" was read by the kind model as a
+        # venue question (2026-09-30): the words name one engine.
+        return True
+    if request.symbols and re.search(r"\bbitget[\s-]+signal\b|\bskills?\b", text, re.I) and (
+            request.kind in (ResearchKind.TECHNICALS, ResearchKind.SENTIMENT, ResearchKind.NEWS,
+                             ResearchKind.MACRO)):
+        # Naming Bitget's own Skill beside a name asks for that Skill's reading of the name, which
+        # these four engines call; it went to the Skill-health table instead (judge audit, r10).
         return True
     if (request.kind is ResearchKind.BOOK and not ADD_VERB.search(text)
             and (request.book or request.cash or _BOOK_QUESTION_STRONG.search(text))):
@@ -741,7 +757,7 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
                 sector_reads[(symbol, modules)] = EstimatesSource().summary(symbol, modules)
                 return sector_reads[(symbol, modules)]
 
-            pending["sector"] = pool.submit(sector_valuation, ticker, recording)
+            pending["sector"] = pool.submit(sector_valuation, ticker, recording, None, found)
 
     def safe(name: str) -> Any:
         try:
@@ -817,8 +833,8 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
                               detail=f"{ticker} period {latest}"))
 
     targets = safe("price_targets")
-    target_line = _price_target_line(ticker, targets, safe("quote"), today) if isinstance(
-        targets, list) else None
+    target_line = _price_target_line(ticker, targets, safe("quote"), today,
+                                     found) if isinstance(targets, list) else None
     if target_line is not None:
         lines.append(target_line)
         sources.append(Source(kind="venue", ref="bitget-mcp-server equity_estimates_price_target",
@@ -955,7 +971,8 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
         with contextlib.suppress(KeyError):
             against_sector = sector_valuation(
                 ticker, fetch=lambda symbol, modules: sector_reads[(symbol, modules)],
-                own={"pe": ratio_row.get("pe_ttm_ed"), "pb": ratio_row.get("pb_mrq")}) \
+                own={"pe": ratio_row.get("pe_ttm_ed"), "pb": ratio_row.get("pb_mrq")},
+                found=found) \
                 or against_sector
     if isinstance(against_sector, tuple):
         # Ahead of the multiples, so the verdict is read before the figures behind it.

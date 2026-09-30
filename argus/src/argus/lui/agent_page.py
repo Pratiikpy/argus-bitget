@@ -57,9 +57,23 @@ def _metrics(metrics: Mapping[str, Any], envelope: Mapping[str, Any]) -> str:
         f"<tr><td>{escape(label)}</td><td class='n'>{escape(value)}</td>"
         f"<td class='env'>{escape(str(env)) if env else '—'}</td></tr>"
         for label, value, env in rows)
+    # "Win rate 0%" on three closed trades stood with nothing beside it (a first-time user, round
+    # 10): on a handful of trades one more moves it by tens of points, and the Sharpe is read from
+    # the whole book's equity, open positions included, so the two can point opposite ways.
+    few = ""
+    if isinstance(closed, int) and 0 < closed < SAMPLE_TO_READ:
+        few = (f"<p class='dim few'>On {closed} closed trade{'' if closed == 1 else 's'} these "
+               f"figures say little yet: one more trade moves the win rate by "
+               f"{100 / (closed + 1):.0f} points or more. The Sharpe is read from the whole "
+               f"book's equity, open positions included; the win rate from closed trades "
+               f"alone.</p>")
     return ("<div class='tw'><table class='m'><thead><tr><th>Metric</th><th>Agent</th>"
             "<th>A no-edge book over the same window</th></tr></thead><tbody>" + body
-            + "</tbody></table></div>")
+            + "</tbody></table></div>" + few)
+
+
+SAMPLE_TO_READ = 30
+"""Closed trades below which the page says the figures are too few to read."""
 
 
 def _funnel(counts: Mapping[str, Any]) -> str:

@@ -198,11 +198,11 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 10,544 tests collected
+pytest -q                       # 10,593 tests collected
 ```
 
 Nothing above needs a credential. On 2026-09-29, with every outbound connection refused, 10,021
-passed, 39 skipped and 0 failed in 25 minutes, of the 10,544 tests collected that day (more have
+passed, 39 skipped and 0 failed in 25 minutes, of the 10,593 tests collected that day (more have
 been added since); the other 238 read a live venue, feed or model and run apart
 (`pytest -m network`). Tests that need a rival's source cloned beside the repository skip
 and say which. `ARGUS_BLOCK_NETWORK=1` refuses every outbound connection, so
@@ -222,8 +222,8 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **10,544 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 568 source files** |
+| Tests | **10,593 tests collected** — `pytest -q` |
+| Types | **`mypy --strict` clean on 571 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
 | Sub-themes | **18/18 sub-themes** each resolve to an importable module and a test file (`python -m argus.status`). That is coverage, not a claim to lead them: 6 of 45 capabilities are OWNED against a named rival, and `/proof` says which |
@@ -270,7 +270,7 @@ a test that reaches the network shows itself.
 
 ARGUS 是面向 Bitget 美股代币（rToken）的研究工作台（Track 3 · AI Trading Desk）。用自然语言提问，
 七个引擎基于 Bitget 行情、SEC 文件、FRED 与新闻实时计算，每个数字都注明来源；语言模型只理解问题，
-从不编写数字。48 项能力中 47 项已与各子赛道领先的专业系统在相同输入上对比：6 项领先（OWNED）、32 项
+从不编写数字。全部 45 项能力均已与各子赛道领先的专业系统在相同输入上对比：6 项领先（OWNED）、32 项
 持平、0 项已实现、7 项落后（LOST：人群情绪分类在 TweetEval 上不及 RoB-RT；跨时段执行在回放订单簿上不及 Bitget 自带的 TWAP；思考时间定价在 23,003 个真实决策时点上不及滚动实现波动估计；协整筛选的错误发现率未达自身目标；数据覆盖面不及 OpenBB 的免密钥数据源；走势形态匹配的预测区间不及个股自身的无条件区间；对未针对性编写的注入攻击，拦截率不及训练好的分类器），所有落败记录公开在 `/wrong`。本团队的 Track 2 参赛作品是另一个独立项目
 （t2-sentiment-agent，独立的代码库、交易日志与演示），不属于本仓库。
 

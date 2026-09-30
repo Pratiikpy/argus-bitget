@@ -156,10 +156,10 @@ def test_whether_one_market_moves_another_is_their_co_movement(text: str) -> Non
 
 
 def test_the_console_keeps_answers_in_the_order_asked_and_shows_a_saved_book() -> None:
-    from argus.lui.server import ALLOWANCE_NOTE, PAGE
+    from argus.lui.server import PAGE, allowance_note
 
     assert "pending-${++askSeq}" in PAGE and "id=\"clearbook\"" in PAGE.replace("'", '"')
-    assert "counted per network address" in ALLOWANCE_NOTE
+    assert "counted per network address" in allowance_note("203.0.113.9")
 
 
 def test_the_proof_page_explains_its_words() -> None:

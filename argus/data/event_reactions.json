@@ -1,55 +1,55 @@
 {
- "generated_at": "2026-09-29T13:36:20.586671+00:00",
+ "generated_at": "2026-09-30T02:42:50.503464+00:00",
  "history": {
   "interval": "1H",
   "per_symbol": {
    "NVDAUSDT": [
-    "2025-08-25T15:00:00+00:00",
-    "2026-09-29T12:00:00+00:00"
+    "2025-08-26T04:00:00+00:00",
+    "2026-09-30T01:00:00+00:00"
    ],
    "TSLAUSDT": [
-    "2025-08-25T15:00:00+00:00",
-    "2026-09-29T12:00:00+00:00"
+    "2025-08-26T04:00:00+00:00",
+    "2026-09-30T01:00:00+00:00"
    ],
    "AAPLUSDT": [
     "2025-08-26T11:00:00+00:00",
-    "2026-09-29T12:00:00+00:00"
+    "2026-09-30T01:00:00+00:00"
    ],
    "MSFTUSDT": [
     "2025-09-22T11:00:00+00:00",
-    "2026-09-29T12:00:00+00:00"
+    "2026-09-30T01:00:00+00:00"
    ],
    "METAUSDT": [
     "2025-08-26T11:00:00+00:00",
-    "2026-09-29T12:00:00+00:00"
+    "2026-09-30T01:00:00+00:00"
    ],
    "GOOGLUSDT": [
     "2025-08-26T11:00:00+00:00",
-    "2026-09-29T12:00:00+00:00"
+    "2026-09-30T01:00:00+00:00"
    ],
    "AMZNUSDT": [
     "2025-08-26T11:00:00+00:00",
-    "2026-09-29T12:00:00+00:00"
+    "2026-09-30T01:00:00+00:00"
    ],
    "COINUSDT": [
     "2025-08-27T09:00:00+00:00",
-    "2026-09-29T12:00:00+00:00"
+    "2026-09-30T01:00:00+00:00"
    ],
    "MSTRUSDT": [
     "2025-08-27T09:00:00+00:00",
-    "2026-09-29T12:00:00+00:00"
+    "2026-09-30T01:00:00+00:00"
    ],
    "QQQUSDT": [
     "2025-10-28T12:00:00+00:00",
-    "2026-09-29T12:00:00+00:00"
+    "2026-09-30T01:00:00+00:00"
    ],
    "TQQQUSDT": [
     "2026-03-31T08:00:00+00:00",
-    "2026-09-29T12:00:00+00:00"
+    "2026-09-30T01:00:00+00:00"
    ],
    "SQQQUSDT": [
     "2026-03-31T08:00:00+00:00",
-    "2026-09-29T12:00:00+00:00"
+    "2026-09-30T01:00:00+00:00"
    ]
   },
   "unavailable": {}
@@ -63,7 +63,7 @@
  "sources": {
   "cpi": "BLS CPI release archive (reader)",
   "fomc": "Federal Reserve FOMC calendar (market/calendar.py snapshot)",
-  "earnings": "SEC EDGAR 8-K item 2.02, acceptanceDateTime",
+  "earnings": "SEC EDGAR 8-K item 2.02 results releases (delivery and pre-announcement filings excluded), acceptanceDateTime",
   "prices": "Bitget hourly market candles"
  },
  "reactions": [
@@ -291,48 +291,15 @@
   {
    "symbol": "TSLAUSDT",
    "kind": "earnings",
-   "events": 8,
-   "average_car_bps": -367.1,
-   "size_ratio": 3.22,
-   "verdict": "PARTIAL: a negative average abnormal return of -367.1bps rejects under patell, bmp, corrado_rank but not under generalised_sign. Where a parametric test rejects and the rank test does not, the result is usually being carried by one or two events",
-   "tests": {
-    "patell": {
-     "statistic": -5.4537,
-     "adjusted": -5.1732,
-     "p_value": 0.0,
-     "adjusted_p_value": 0.0,
-     "clustering_adjusted": true
-    },
-    "bmp": {
-     "statistic": -3.0331,
-     "adjusted": -2.877,
-     "p_value": 0.002421,
-     "adjusted_p_value": 0.004015,
-     "clustering_adjusted": true
-    },
-    "corrado_rank": {
-     "statistic": -2.3034,
-     "adjusted": -2.3034,
-     "p_value": 0.021255,
-     "adjusted_p_value": 0.021255,
-     "clustering_adjusted": false
-    },
-    "generalised_sign": {
-     "statistic": -1.8797,
-     "adjusted": -1.8797,
-     "p_value": 0.060155,
-     "adjusted_p_value": 0.060155,
-     "clustering_adjusted": false
-    }
-   },
+   "events": 4,
+   "average_car_bps": null,
+   "size_ratio": null,
+   "verdict": "4 earnings event(s) have enough hourly history around them; the study needs 5, so no figure is given",
+   "tests": {},
    "dates": [
-    "2025-10-02",
     "2025-10-22",
-    "2026-01-02",
     "2026-01-28",
-    "2026-04-02",
     "2026-04-22",
-    "2026-07-02",
     "2026-07-22"
    ],
    "confounded": []
@@ -1134,42 +1101,12 @@
   {
    "symbol": "MSTRUSDT",
    "kind": "earnings",
-   "events": 5,
-   "average_car_bps": 274.5,
-   "size_ratio": 4.04,
-   "verdict": "PARTIAL: a positive average abnormal return of +274.5bps rejects under patell but not under bmp, corrado_rank, generalised_sign. Where a parametric test rejects and the rank test does not, the result is usually being carried by one or two events",
-   "tests": {
-    "patell": {
-     "statistic": 2.1521,
-     "adjusted": 2.1306,
-     "p_value": 0.031387,
-     "adjusted_p_value": 0.033118,
-     "clustering_adjusted": true
-    },
-    "bmp": {
-     "statistic": 0.5774,
-     "adjusted": 0.5717,
-     "p_value": 0.56364,
-     "adjusted_p_value": 0.567539,
-     "clustering_adjusted": true
-    },
-    "corrado_rank": {
-     "statistic": 0.6025,
-     "adjusted": 0.6025,
-     "p_value": 0.546826,
-     "adjusted_p_value": 0.546826,
-     "clustering_adjusted": false
-    },
-    "generalised_sign": {
-     "statistic": -0.5145,
-     "adjusted": -0.5145,
-     "p_value": 0.606883,
-     "adjusted_p_value": 0.606883,
-     "clustering_adjusted": false
-    }
-   },
+   "events": 4,
+   "average_car_bps": null,
+   "size_ratio": null,
+   "verdict": "4 earnings event(s) have enough hourly history around them; the study needs 5, so no figure is given",
+   "tests": {},
    "dates": [
-    "2025-10-06",
     "2025-10-30",
     "2026-02-05",
     "2026-05-05",

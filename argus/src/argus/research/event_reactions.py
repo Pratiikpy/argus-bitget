@@ -142,13 +142,49 @@ def fomc_decisions(snapshot: Path = DATA / "event_calendar.json") -> list[dateti
             for d in days]
 
 
+RESULTS_TO_REPORT_DAYS = 45
+"""A quarter's results release precedes its 10-Q or 10-K by at most this many days."""
+LATE_IN_QUARTER_DAYS = 14
+"""A release this long after its calendar quarter ended can be results; production and delivery
+figures land in the first days of the quarter."""
+
+
+def results_releases(filings: Sequence[Any]) -> list[datetime]:
+    """The 8-K item 2.02 filings that release a quarter's results, by acceptance time.
+
+    Item 2.02 ("results of operations") is also used for other figures: Tesla files its quarterly
+    production and deliveries under it, on the second day of each quarter, three weeks before its
+    results — so its "earnings" study counted eight events, four of them delivery reports (SEC
+    EDGAR, checked 2026-09-30). A results release is the last 2.02 before a 10-Q or 10-K, within
+    45 days of it; a 2.02 after the latest periodic report counts only when it came at least 14
+    days after its calendar quarter ended, so a delivery report is not taken for results before
+    the 10-Q that would place it arrives."""
+    releases = sorted(f.accepted for f in filings
+                      if f.form in ("8-K", "8-K/A") and "2.02" in f.items)
+    periodic = sorted(f.accepted for f in filings
+                      if f.form in ("10-Q", "10-K", "10-Q/A", "10-K/A"))
+    kept: set[datetime] = set()
+    for report in periodic:
+        before = [r for r in releases
+                  if timedelta(0) <= report - r <= timedelta(days=RESULTS_TO_REPORT_DAYS)]
+        if before:
+            kept.add(before[-1])
+    last = periodic[-1] if periodic else None
+    for release in releases:
+        if last is not None and release <= last:
+            continue
+        quarter_end = date(release.year, 3 * ((release.month - 1) // 3) + 1, 1) - timedelta(days=1)
+        if (release.date() - quarter_end).days >= LATE_IN_QUARTER_DAYS:
+            kept.add(release)
+    return sorted(kept)
+
+
 def earnings_releases(ticker: str) -> list[datetime]:
-    """The acceptance time of every 8-K item 2.02 (results of operations) on EDGAR."""
+    """Every quarterly results release on EDGAR, by acceptance time (:func:`results_releases`)."""
     from argus.market.evidence import EdgarSource
 
     since = datetime.now(UTC) - timedelta(days=HISTORY_DAYS + 30)
-    return [f.accepted for f in EdgarSource().filings(ticker, since=since, limit=200)
-            if f.form == "8-K" and "2.02" in f.items]
+    return results_releases(EdgarSource().filings(ticker, since=since, limit=200))
 
 
 FETCH_ATTEMPTS = 5
@@ -315,7 +351,8 @@ def build(now: datetime | None = None) -> dict[str, Any]:
                    "gap_bars": GAP_BARS, "min_events": MIN_EVENTS},
         "sources": {"cpi": f"BLS CPI release archive ({cpi_route})",
                     "fomc": "Federal Reserve FOMC calendar (market/calendar.py snapshot)",
-                    "earnings": "SEC EDGAR 8-K item 2.02, acceptanceDateTime",
+                    "earnings": ("SEC EDGAR 8-K item 2.02 results releases (delivery and "
+                                 "pre-announcement filings excluded), acceptanceDateTime"),
                     "prices": "Bitget hourly market candles"},
         "reactions": rows,
     }
