@@ -989,7 +989,7 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                              raw=data.raw, benchmark=BENCHMARK, is_open=is_open,
                              target=request.target)
             columns = _open_columns(data.raw, is_open)
-            lines = _impact_lines(report, request, columns)
+            lines = _impact_lines(report, request, columns, align(data.raw)[1])
             if not before:
                 lines = _standalone_lead(lines, add, data.raw, request, raw_text)
             exposure_lines, exposure_sources = _exposure_lines(exposure_future)

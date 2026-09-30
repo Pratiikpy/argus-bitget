@@ -76,8 +76,9 @@ _BUDGET = re.compile(r"\b(?:my\s+)?risk\s+budget\s+(?:is\s+|of\s+)?(\d{1,2}(?:\.
 _MAX_LOSS = re.compile(
     r"\b(?:i\s+)?(?:can'?t|cannot|can\s+not|don'?t\s+want\s+to|won'?t|never)\s+(?:afford\s+to\s+)?"
     r"lose\s+"
-    r"(?:more\s+than\s+)?(\d{1,2}(?:\.\d+)?)\s*%|\bmax(?:imum)?\s+(?:loss|drawdown)\s+(?:is\s+|of\s+)?"
-    r"(\d{1,2}(?:\.\d+)?)\s*%|\b(?:my\s+)?loss\s+limit\s+(?:is\s+)?(\d{1,2}(?:\.\d+)?)\s*%|"
+    r"(?:more\s+than\s+)?(\d{1,2}(?:\.\d+)?)\s*%|\bmax(?:imum)?\s+(?:loss|drawdown)\s+(?:limit\s+)?(?:is\s+|of\s+)?"
+    r"(\d{1,2}(?:\.\d+)?)\s*%|\b(?:my\s+)?(?:loss|drawdown)\s+limit\s+(?:is\s+|of\s+)?"
+    r"(\d{1,2}(?:\.\d+)?)\s*%|"
     # "my max loss should probably be around 10%" (the mem0 comparison, round 12)
     r"\bmax(?:imum)?\s+loss\s+(?:should\s+(?:probably\s+)?be|would\s+be|of)\s+(?:around\s+|about\s+|"
     r"roughly\s+|~)?(\d{1,2}(?:\.\d+)?)\s*%", re.I)
@@ -430,7 +431,34 @@ def after(lines: list[str], request: Any, facts: list[Fact],
 
     extra: list[str] = []
     limit = get(facts, "max_loss")
-    if limit is not None:
+    capital = get(facts, "capital")
+    if limit is not None and capital is None:
+        held = get(facts, "book")
+        if held is not None:
+            from argus.lui.research.sizing import stated_capital
+
+            said = stated_capital(held.text)
+            if said:
+                capital = Fact(kind="capital", subject="", value=str(said), text=held.text,
+                               at=held.at)
+    sized = next((m for line in lines
+                  for m in [re.match(r"Bottom line: size \S+ so that its worst observed 24 hours "
+                                     r"\((-\d+(?:\.\d+)?)%\)", line)] if m), None)
+    if limit is not None and capital is not None and sized is not None:
+        # "How big should the SOL short leg be given my 4% drawdown limit?" was answered on a
+        # $10,000 default that ignored both (a judge, round 14): the stated limit and book, sized.
+        drop = abs(float(sized.group(1))) / 100
+        money = float(capital.value)
+        allowed = money * float(limit.value)
+        if drop > 0:
+            leg = min(allowed / drop, money)
+            extra.append(remembered_line(limit, (
+                f"{float(limit.value):.0%} of your ${money:,.0f} is ${allowed:,.0f}; a repeat of "
+                f"the worst 24 hours above ({-drop:.1%}) on a ${leg:,.0f} leg "
+                f"({leg / money:.0%} of the book) costs exactly that, and any larger leg costs "
+                f"more — the ceiling for this leg alone, before what your other holdings do "
+                f"beside it")))
+    if limit is not None and not (capital is not None and sized is not None):
         worst = [abs(float(m.group(1))) for line in lines
                  for m in re.finditer(r"(?:book|position)\s+moves\s+(?:about\s+)?(-\d+(?:\.\d+)?)%",
                                       line)]
@@ -512,6 +540,48 @@ def _span(hours: int) -> str:
     return f"{hours}-hour"
 
 
+_RECALL = re.compile(
+    r"\bwhat\s+(?:do|did|have)\s+(?:you|u)\s+(?:still\s+)?(?:remember|know|recall|noted?|stored?|"
+    r"kept?|got|have)\b.*\b(?:about\s+me|me\b|my\s+\w+)|"
+    r"\bwhat\s+(?:have|did)\s+i\s+(?:told|tell|said|say)\s+you\b|"
+    r"\b(?:list|show|tell)\s+(?:me\s+)?(?:everything|all)\s+(?:you\s+)?(?:remember|know|noted)\b|"
+    r"\bwhat\s+(?:is|are)\s+(?:in\s+)?(?:your|the)\s+memory\b", re.I)
+"""A question about what the console has kept of the trader (round 14: "What do you remember about
+me, my book, my horizon and my limits?" was declined while memory held seven facts)."""
+
+_RECALL_ORDER = ("book", "capital", "budget", "max_loss", "horizon", "style", "goal", "thesis",
+                 "avoid", "check")
+_RECALL_LABEL = {
+    "book": "Your book", "capital": "Your account size", "budget": "Your risk budget",
+    "max_loss": "Your loss limit", "horizon": "Your horizon", "style": "Your style",
+    "goal": "Your goal", "thesis": "Your thesis", "avoid": "What you avoid",
+    "check": "A check kept from a review",
+}
+
+
+def recall_asked(question: str) -> bool:
+    return bool(_RECALL.search(question))
+
+
+def recall_lines(facts: list[Fact]) -> list[str]:
+    """Every remembered fact, in the trader's own words with the date each was said."""
+    if not facts:
+        return ["Bottom line: nothing is remembered about you yet. Tell it in a sentence — "
+                "\"I hold 50% ETH and 50% SOL\", \"my loss limit is 5%\", \"I trade over two "
+                "weeks\" — and it is kept in this browser only and shapes the answers it applies "
+                "to."]
+    order = {kind: i for i, kind in enumerate(_RECALL_ORDER)}
+    ranked = sorted(facts, key=lambda f: (order.get(f.kind, 99), f.subject))
+    lines = [f"Bottom line: {len(facts)} thing{'s' if len(facts) != 1 else ''} remembered about "
+             f"you, all in your own words and kept in this browser only."]
+    for fact in ranked:
+        label = _RECALL_LABEL.get(fact.kind, fact.kind.capitalize())
+        earlier = f" (replacing {fact.replaces})" if fact.replaces else ""
+        lines.append(f"{label}: “{fact.text}” — said {fact.at}{earlier}.")
+    lines.append("Forget any of them from the list under My book.")
+    return lines
+
+
 def acknowledgement(new: list[Fact]) -> list[str]:
     """The reply to a message that only tells the console something about the trader."""
     said = "; ".join(f"“{f.text}”" + (f", replacing {f.replaces}" if f.replaces else "")
@@ -537,6 +607,8 @@ __all__ = [
     "merge",
     "merge_checks",
     "parse",
+    "recall_asked",
+    "recall_lines",
     "remembered_book",
     "remembered_line",
     "thesis_line",

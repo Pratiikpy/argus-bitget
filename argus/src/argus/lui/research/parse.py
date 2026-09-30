@@ -302,7 +302,7 @@ _PERIOD_Q = re.compile(
 
 _PERIOD_MOVE = re.compile(
     r"\b(?:done|doing|moved?|move|perform\w*|chang\w*|up|down|gain\w*|lost|return\w*|"
-    r"high|low|range|"
+    r"high|low|rang(?:e|es|ed|ing)|"
     r"compare\w*|vs\.?|versus|went)\b", re.I)
 """A move over a stated period ("how has BTC done over the last week", "and how does that compare
 to last week"): answered with the change over that period from Bitget's daily candles. Neither was
@@ -892,6 +892,24 @@ _MY_BOOK = re.compile(
 """The trader's own holdings, named without weights — the saved book is what they mean."""
 
 
+SIZE_Q = re.compile(
+    r"\bhow\s+(?:big|large|small)\b[^?]{0,40}\b(?:position|leg|stake|bet|short|long|holding)\b|"
+    r"\bwhat\s+size\b[^?]{0,40}\b(?:position|leg|short|long)\b|"
+    r"^\W*size\s+(?:the|a|my|this)\s+[\w/ -]{0,30}\b(?:position|leg|short|long)\b", re.I)
+"""How big a position or leg should be: a sizing question, worked from the worst observed day
+against a loss the trader would accept, not as the add-a-name risk question it was read as."""
+
+
+_RISK_SHARE_Q = re.compile(
+    r"\b(?:(?:what|which)\s+(?:share|part|portion|fraction|percent(?:age)?)\s+of\s+(?:my\s+|the\s+)?"
+    r"(?:book|portfolio|holdings)'?s?\s+risk|"
+    r"(?:share|portion|part)\s+of\s+(?:my\s+|the\s+)?(?:book|portfolio)'?s?\s+risk|"
+    r"(?:carr(?:y|ies)|contribut\w*|account\w*\s+for)\s+(?:more|most|less|so\s+much|too\s+much)"
+    r"\s+(?:of\s+)?(?:the\s+)?risk\s+than\s+(?:its|their|the)\s+weight)", re.I)
+"""Which holding carries what share of the book's risk, and why that differs from its weight: the
+book report's own question, asked with a name in it."""
+
+
 _BIGGEST_RISK = re.compile(
     r"\b(?:biggest|main|largest|top|worst)\s+risks?\b|\bwhat\s+could\s+hurt\b|"
     r"\bwhere\s+am\s+i\s+(?:exposed|vulnerable)\b", re.I)
@@ -997,15 +1015,23 @@ def rtoken_named(text: str) -> tuple[str, str] | None:
     """(spot symbol, same-company perpetual) for an rToken the text names — "rNVDA",
     "RNVDAUSDT" — or None. "What's the price of RNVDAUSDT" resolved to nothing and was answered
     with an unrelated ledger decision (2026-09-25 audit, round 2)."""
+    every = rtokens_named(text)
+    return every[0] if every else None
+
+
+def rtokens_named(text: str) -> list[tuple[str, str]]:
+    """Every rToken the text names, in order: "rTSLA and rCOIN" is two, and only the first was
+    read until 2026-09-30, so the second holding vanished from the book."""
     from argus.lui.question import resolve_symbol
 
+    out: list[tuple[str, str]] = []
     for match in _RTOKEN_NAME.finditer(text):
         ticker = match.group(1) or match.group(2)
         perp = resolve_symbol(ticker) or (f"{ticker}USDT" if is_us_equity(f"{ticker}USDT")
                                           else None)
-        if perp is not None:
-            return f"R{ticker}USDT", perp
-    return None
+        if perp is not None and all(perp != other for _, other in out):
+            out.append((f"R{ticker}USDT", perp))
+    return out
 
 
 def _read(text: str) -> dict[str, str]:
@@ -1026,9 +1052,8 @@ def _read(text: str) -> dict[str, str]:
                   text)
     trust = not _shouting(text)
     found: dict[str, str] = {}
-    rtoken = rtoken_named(text)
-    if rtoken is not None:
-        found[rtoken[1]] = ""
+    for _, perp in rtokens_named(text):
+        found[perp] = ""
     for name, symbol in sorted(CJK_ALIASES.items(), key=lambda kv: text.find(kv[0])):
         if name in text and symbol not in found:
             found[symbol] = ""
@@ -1281,6 +1306,11 @@ def holding_pairs(text: str) -> list[tuple[int, str, float]]:
         symbol = None if hit is None else hit[0]
         if symbol is None and re.search(r"[一-鿿]", name):
             symbol = _resolve_any(name)  # a Chinese name ("英伟达"), resolved by its alias
+        if symbol is None:
+            # "10% rTSLA": a tokenized stock held as a weight is the same company's name, which
+            # the reader of names already resolved but the weight pairing did not (2026-09-30).
+            token = rtokens_named(name)
+            symbol = token[0][1] if token else None
         if symbol is None and name.islower():
             # "spy etf 30%": a lowercase ticker is not trusted on its own, but when the reader of
             # names already took it as one (a market cue beside it), its weight is kept too.
@@ -1355,7 +1385,8 @@ _REST = re.compile(r"\b(?:the\s+)?rest\s+(?:is\s+|in\s+|into\s+|of\s+it\s+in\s+)
 
 _GROUP = re.compile(
     r"(\d+(?:\.\d+)?)\s*%\s*(?:in\s+|of\s+|is\s+)?(crypto\w*|tech\w*|semi\w*|chips?|"
-    r"commodit\w*)(?:\s+(?:stocks?|names|coins|shares))?\s*(?:\(([^)]{2,60})\))?", re.I)
+    r"commodit\w*|(?:tokeni[sz]ed\s+)?(?:stocks?|equit(?:y|ies)|shares)|r-?tokens?)"
+    r"(?:\s+(?:stocks?|names|coins|shares))?\s*(?:\(([^)]{2,60})\))?", re.I)
 """A weight on a group rather than a name: "60% crypto (btc+eth), 40% tech stocks". Read as
 nothing until 2026-09-25 (`eval/figurecheck.py`), so the book was whatever else was named."""
 
@@ -2296,7 +2327,7 @@ def _cjk_request(raw: str, symbols: tuple[str, ...]) -> ResearchRequest | None:
 
 
 _NAMED_SHOCK = re.compile(
-    r"(?:drop\w*|fall\w*|fell|crash\w*|crater\w*|tank\w*|dump\w*|plung\w*|spik\w*|jump\w*|"
+    r"(?<![a-z])(?:drop\w*|fall\w*|fell|crash\w*|crater\w*|tank\w*|dump\w*|plung\w*|spik\w*|jump\w*|"
     r"surg\w*|rall\w*|gap\w*\s+(?:down|up)|sell[\s-]?off|sells?\s+off|stress|shock|down|up|move)"
     r"[^?.]{0,20}?-?\d+(?:\.\d+)?\s*%|-?\d+(?:\.\d+)?\s*%\s*(?:\w+\s+){0,3}(?:drop|fall|crash|"
     r"shock|move|gap|stress|sell[\s-]?off|decline|spike|rally)|\s-\d+(?:\.\d+)?\s*%", re.I)
@@ -2993,6 +3024,9 @@ def read_request(text: str) -> ResearchRequest | None:
 
     add_match = ADD_VERB.search(raw)
     holdings_match = _HOLDINGS.search(raw)
+    if (not pairs and not add_match and _RISK_SHARE_Q.search(raw)
+            and not about_the_record(raw)):
+        return ResearchRequest(kind=ResearchKind.BOOK, symbols=())
     if pairs and not add_match and _BOOK_RISK.search(raw) and not (
             _STRESS.search(raw) or _STRESS_BARE.search(raw)):
         owned: dict[str, float] = {}
@@ -3002,6 +3036,11 @@ def read_request(text: str) -> ResearchRequest | None:
         if owned:
             return ResearchRequest(kind=ResearchKind.BOOK, symbols=tuple(owned), book=owned,
                                    notes=tuple(notes))
+    if (symbols and not pairs and not add_match and SIZE_Q.search(raw)
+            and not about_the_record(raw)):
+        return ResearchRequest(
+            kind=ResearchKind.IMPACT, symbols=symbols[:1], side="short" if _SHORT.search(raw)
+            else "long", notes=tuple(notes))
     candidate: str | None = None
     size: float | None = None
     book: dict[str, float] = {}
@@ -3260,7 +3299,8 @@ def with_book(request: ResearchRequest | None, book_text: str,
         # 10% Nasdaq drop" came back as 100% QQQ, the shock itself, every time (a judge's audit,
         # 2026-09-30), with its "read as equal weight" note beside the saved book's.
         request = replace(request, book={}, notes=tuple(
-            n for n in request.notes if "equal weight" not in n))
+            n for n in request.notes
+            if "equal weight" not in n and "were scaled to 100%" not in n))
     if request.book:
         return request
     book, cash = split_cash(book_text, parse_book(book_text))

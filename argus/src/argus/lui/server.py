@@ -649,9 +649,25 @@ _WHY_THAT = re.compile(
     r"\s+(?:that|this|so)\b[^?]*[?.!]*\s*$|"
     r"^\s*(?:how|why)\s+(?:do|did)\s+you\s+(?:know|get|work\s+(?:that|it)\s+out)\b[^?]*[?.!]*\s*$|"
     r"^\s*(?:what'?s|what\s+is)\s+(?:that|this)\s+based\s+on\s*[?.!]*\s*$|"
-    r"^\s*(?:explain|show)\s+(?:me\s+)?(?:your|the)\s+(?:reasoning|working|evidence)\s*[?.!]*\s*$",
+    r"^\s*(?:explain|show)\s+(?:me\s+)?(?:your|the)\s+(?:reasoning|working|evidence)\s*[?.!]*\s*$|"
+    # "Explain your previous answer: why does ETH carry 58% of the risk?" reached the Ethereum
+    # concept card (a judge, round 14)
+    r"^\s*(?:please\s+)?(?:explain|justify|defend)\s+(?:your|the)\s+(?:previous|last|prior|earlier)"
+    r"\s+(?:answer|reply|response|number|figure)s?\b[^?]*\??[^?]*[?.!]*\s*$",
     re.I)
 """A request for the reasons behind the previous answer."""
+
+_EXPLAIN_PREV_Q = re.compile(
+    r"^\s*(?:please\s+)?(?:explain|justify|defend)\s+(?:your|the)\s+(?:previous|last|prior|earlier)"
+    r"\s+(?:answer|reply|response|number|figure)s?\s*[:\-—]\s*(?P<q>[^\n]{12,}\?)\s*$", re.I)
+"""A request to explain the last answer that carries its own question after a colon."""
+
+_TRUST = re.compile(
+    r"\bwhich\s+(?:of\s+)?(?:the\s+|these\s+|those\s+)?(?:numbers?|figures?|answers?|claims?|"
+    r"results?)\b[^?]{0,80}\b(?:trust|rely\s+on|believe|weak(?:est)?|least\s+(?:reliable|solid)|"
+    r"most\s+(?:reliable|solid))\b|\bwhich\s+of\s+(?:the\s+)?(?:things|numbers|figures)\s+you'?ve\s+"
+    r"(?:told|said|given)\b[^?]{0,80}\b(?:trust|weak|reliable)", re.I)
+""""Which numbers should I trust and which are weakest?" — asked of the whole conversation."""
 
 _SIMPLER = re.compile(
     r"^\s*(?:(?:can\s+you\s+|please\s+)?(?:explain|say|put)\s+(?:it|that|this)?\s*(?:again\s+)?"
@@ -921,6 +937,12 @@ def handle_ask(
     new = memory_model.combined(text, _model_for(visitor, count=False), now,
                                 price_of=_price_now)
     facts = mem.merge(facts, new)
+    if mem.recall_asked(text) and not new:
+        # "What do you remember about me?" is answered from the memory the browser sent, in the
+        # trader's own words; it was declined while seven facts were held (a judge, round 14).
+        return {"lines": mem.recall_lines(facts), "sources": [], "data": {}, "refused": False,
+                "reason": "", "classified_by": "memory", "memory": mem.dumps(facts),
+                "remembered": []}
     token = _MEMORY.set(tuple(facts))
     try:
         from argus.lui.honesty import iso_dates
@@ -1111,12 +1133,14 @@ def _answer(
         return engine_payload(*skills_explain.answer(text), by="skills")
     from argus.lui import thesis_answer
 
-    if (prior and thesis_answer.asks(prior[-1]) and thesis_answer.STRONGEST.search(text)
-            and not thesis_answer.asks(text)):
+    ranked = (thesis_answer.strongest(text, prior, book=book)
+              if prior and (thesis_answer.asks(prior[-1]) or thesis_answer.REVISE.search(prior[-1]))
+              else None)
+    if ranked is not None:
         # "Which of those reasons is strongest?" after a thesis was told "that" had nothing to
-        # refer to (a hostile review, round 12): the thesis just tested, ranked.
-        return engine_payload(*thesis_answer.answer(f"{prior[-1]} Which of these is strongest?",
-                                                    book=book), by="thesis")
+        # refer to (round 12), and after a revision of it too (round 14): the reasons still
+        # standing, ranked.
+        return engine_payload(*ranked, by="thesis")
     from argus.lui.research import sizing as loss_sizing
 
     loss_said = loss_sizing.loss_compare(text, (research_symbols(text)[0] or (None,))[0])
@@ -1126,7 +1150,18 @@ def _answer(
         return engine_payload(*loss_said, by="sizing")
     revised = thesis_answer.revise(text, prior, book=book) if prior else None
     if revised is not None:
-        return engine_payload(*revised, by="thesis")
+        rev_lines, rev_sources, rev_data = revised
+        clause = re.search(r"\b(?:and\s+)?(how\s+(?:big|much|large|small)\b[^?]*\?)", text, re.I)
+        if clause is not None and research_symbols(clause.group(1))[0]:
+            # "…and how big should the SOL short leg be given my 4% drawdown limit?" got a pointer
+            # to another question (a judge, round 14): the size is asked of the engine, here, with
+            # the loss limit the trader stated.
+            sized = _answer(clause.group(1), prior, now=now, visitor=visitor, book=book)
+            if not sized.get("refused") and sized.get("lines"):
+                rev_lines = [line for line in rev_lines if not line.startswith("On sizing:")]
+                rev_lines = [*rev_lines, f"And on “{clause.group(1)}”:",
+                             *(str(line) for line in sized["lines"])]
+        return engine_payload(rev_lines, rev_sources, rev_data, by="thesis")
     if thesis_answer.asks(text):
         # "I think NVDA runs on AI capex through 2027 - test my thesis" got the next day's base
         # rates, and the reason itself was never tested (judge audit, 2026-09-30).
@@ -1226,8 +1261,9 @@ def _answer(
     if sizing.asks_for_size(text) and not about_the_record(text):
         # "$50,000 account, risk at most 2% per trade with a 4% stop — what position size" was
         # answered with the desk's abstention count (a judge's audit, 2026-09-29).
-        sized = research_symbols(text)[0]
-        return engine_payload(*sizing.answer(text, sized[0] if sized else None, price=_price_now,
+        named_for_size = research_symbols(text)[0]
+        return engine_payload(*sizing.answer(text, named_for_size[0] if named_for_size else None,
+                                             price=_price_now,
                                              worst_day=_worst_day), by="sizing")
     if _ALLOWANCE_ASKED.search(text):
         # "how many questions do i have left" was declined while the tag on the same card showed
@@ -1274,6 +1310,16 @@ def _answer(
         return engine_payload(*starter.answer(text, today=clock.date()), by="starter")
     from argus.lui import concepts
 
+    unwrapped = _EXPLAIN_PREV_Q.match(text) if prior else None
+    if unwrapped is not None:
+        # "Explain your previous answer: why does ETH carry 58% of the risk when I told you it's
+        # 50%?" was read as a request to define ETH (a judge, round 14): the question after the
+        # colon is the question, asked in this conversation.
+        inner = _answer(unwrapped.group("q").strip(), prior, now=now, visitor=visitor, book=book)
+        inner["lines"] = [*inner.get("lines", []),
+                          "Assumed: read as the question after “explain your previous answer”."]
+        inner["turns"] = [*prior, text][-12:]
+        return inner
     named_now = research_symbols(text)[0]
     concept = concepts.concept_asked(text, named_now)
     if concept is not None and len(text) > 220 and not re.match(
@@ -1483,6 +1529,42 @@ def _answer(
                           f"Assumed: read as the previous question asked of {last}{day}."]
         again["turns"] = [*prior, text][-12:]
         return again
+    if _TRUST.search(text) and prior:
+        # "Of everything you've told me today, which numbers should I trust and which are weakest?"
+        # got the calibration refusal (a judge, round 14). The answers this conversation was given
+        # are read again; each is placed by what it rests on, not by a confidence figure.
+        firm: list[str] = []
+        soft: list[str] = []
+        seen: set[str] = set()
+        for at in range(len(prior) - 1, max(len(prior) - 9, -1), -1):
+            asked = prior[at]
+            if asked in seen or _TRUST.search(asked):
+                continue
+            seen.add(asked)
+            if len(seen) > 4:
+                break
+            answered = _answer(asked, prior[:at], now=now, visitor=visitor, book=book)
+            said = [str(x) for x in answered.get("lines") or []]
+            if not said:
+                continue
+            kinds = sorted({str(s.get("kind")) for s in (answered.get("sources") or [])
+                            if isinstance(s, dict)})
+            assumed = next((x for x in said if x.startswith("Assumed:")), "")
+            label = f"“{asked[:70]}”"
+            if answered.get("refused") or not kinds:
+                soft.append(f"{label} — nothing measured behind it, so no number to trust.")
+            elif assumed:
+                soft.append(f"{label} — its figures rest on something assumed: "
+                            f"{assumed.removeprefix('Assumed:').strip()[:140]}")
+            else:
+                firm.append(f"{label} — read from {', '.join(kinds)}; recomputable.")
+        if firm or soft:
+            return engine_payload([
+                f"Bottom line: {len(firm)} of the last {len(firm) + len(soft)} answers stand on "
+                f"measured data alone; {len(soft)} lean on an assumption or have none behind them. "
+                f"This is a ranking by what each rests on, not a probability of being right.",
+                *(f"Firmest: {x}" for x in firm[:3]), *(f"Weakest: {x}" for x in soft[:3])],
+                [], {"trust": {"firm": firm, "weak": soft}}, by="trust")
     if _WHY_THAT.match(text) and prior:
         # "Why do you say that?" after a research answer was declined, and a bare "why" returned
         # an answer from three questions earlier (the round-7 judge and first-user audits,
@@ -1790,12 +1872,34 @@ def _research_payload(
     import time
 
     from argus.lui import memory as mem
+    from argus.lui.research.parse import SIZE_Q
 
     facts = list(_MEMORY.get())
     used: list[str] = []
+    if request is not None and request.kind is not ResearchKind.IMPACT and SIZE_Q.search(text):
+        # The planner reads "how big should a SOL short leg be" as a hedge; the question is the
+        # leg's own size, which the deterministic reader knows (a judge, round 14).
+        sized = detect_research(text)
+        if sized is not None and sized.kind is ResearchKind.IMPACT:
+            request = sized
     if facts:
         request, used = mem.apply(request, facts, text)
+    sizing_leg = (request is not None and request.kind is ResearchKind.IMPACT
+                  and SIZE_Q.search(text) is not None)
+    if sizing_leg:
+        used = [line for line in used if "the mandate" not in line]
+    if (facts and mem.get(facts, "max_loss") is not None and request is not None
+            and request.kind is ResearchKind.IMPACT and SIZE_Q.search(text)):
+        # "How big should a SOL short leg be given my 4% drawdown limit?" is a sizing question on
+        # one leg: worked on the leg alone so the remembered limit sets its ceiling, instead of as
+        # the book's risk after adding the name (a judge, round 14).
+        request = replace(request, book={}, symbols=request.symbols[:1], mandate_text="",
+                          mandate_capital=None, notes=tuple(
+            n for n in request.notes if "saved book" not in n and "no current holdings" not in n))
     result = run_research(text, request, ledger=ledger)
+    if facts and mem.get(facts, "book") is not None:
+        result.lines[:] = [line.replace("; tell me what you hold to see its share of your risk.",
+                                        ".") for line in result.lines]
     if facts:
         extra = [*used, *mem.after(result.lines, request, facts, price_now=_price_now)]
         if extra:
@@ -1804,6 +1908,12 @@ def _research_payload(
             result.lines[at:at] = extra
     payload = result.as_dict()
     if not result.refused:
+        from argus.lui.research.book import risk_premise_line
+
+        premise = risk_premise_line(text, [str(line) for line in payload.get("lines") or []])
+        if premise is not None:
+            body = list(payload.get("lines") or [])
+            payload["lines"] = [*body[:1], premise, *body[1:]]
         asked = _prices_left_out(text, [str(line) for line in payload.get("lines") or []])
         if asked:
             # "Where's the 10-year yield and gold right now?" gave the yield and never gold's

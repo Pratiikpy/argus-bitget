@@ -128,6 +128,41 @@ def _book_history_lines(book: Mapping[str, float], cash: float,
                                 detail=f"Bitget daily candles, {len(days)} shared days")
 
 
+_MORE_THAN_WEIGHT = re.compile(
+    r"\b(?:more|higher|bigger|greater|larger)\s+(?:risk\s+)?than\s+(?:its|their|the)\s+"
+    r"(?:\d+(?:\.\d+)?%\s*)?(?:weight|size|share\s+of\s+(?:the\s+)?(?:money|book))", re.I)
+_RISK_ROW = re.compile(r"(\w+)\s+(-?\d+)%\s+of\s+the\s+money,\s+(-?\d+)%\s+of\s+the\s+risk")
+
+
+def risk_premise_line(text: str, lines: list[str]) -> str | None:
+    """Checks a question's premise against the decomposition the answer just gave: "why does ETH
+    carry more risk than its weight" is answered from the ``Where the risk sits`` line, which is
+    the truth whichever way it falls. A premise that does not hold is said not to, with the names
+    that do carry more risk than money (a judge's round 14: the answer explained nothing and
+    never said whether ETH carried more than its weight at all)."""
+    if not _MORE_THAN_WEIGHT.search(text):
+        return None
+    sits = next((line for line in lines if line.startswith("Where the risk sits:")), None)
+    if sits is None:
+        return None
+    rows = _RISK_ROW.findall(sits)
+    named = [row for row in rows if re.search(rf"\b{re.escape(row[0])}\b", text, re.I)]
+    if not named:
+        return None
+    name, weight, share = named[0][0], int(named[0][1]), int(named[0][2])
+    if share > weight:
+        return (f"Why: {name} carries {share}% of the risk on {weight}% of the money because it "
+                f"swings harder than the book as a whole or moves with the rest of it — a "
+                f"holding's share of the risk runs past its weight exactly when its beta to the "
+                f"whole book is above 1.")
+    heavier = [f"{n} ({r}% of the risk on {m}% of the money)" for n, m, r in rows
+               if int(r) > int(m) and n != name]
+    return (f"Premise check: {name} carries {share}% of the risk on {weight}% of the money, "
+            f"{'the same as' if share == weight else 'less than'} its weight, not more"
+            + (f"; the holdings carrying more risk than money are {', '.join(heavier)}"
+               if heavier else "") + ".")
+
+
 def _book_report(request: ResearchRequest, data: MarketData,
                  is_open: Any) -> tuple[list[str], list[Source], dict[str, Any]]:
     """The whole book as held: risk by holding against weight, volatility, beta and how much of the
@@ -850,11 +885,16 @@ def impact_sizing(report: CopilotReport, request: ResearchRequest,
 
 
 def _impact_lines(report: CopilotReport, request: ResearchRequest,
-                  columns: Mapping[str, Sequence[float]]) -> list[str]:
+                  columns: Mapping[str, Sequence[float]],
+                  full_columns: Mapping[str, Sequence[float]] | None = None) -> list[str]:
     add = report.symbol
     impact = report.impact
     lines: list[str] = []
     standalone = not request.book
+    # The realised worst window reads every aligned bar, as the long side's does (`copilot`).
+    history = full_columns if full_columns is not None else columns
+    short = standalone and request.side == "short" and add in history
+    short_window = worst_window(weights={add: -1.0}, columns=history) if short else None
     if standalone:
         betas = {str(k): v.beta for k, v in report.session_beta.items()}
         o, s = betas.get("open"), betas.get("shut")
@@ -865,11 +905,15 @@ def _impact_lines(report: CopilotReport, request: ResearchRequest,
                 + " — the open-session figure is the one that prices it."
             )
         worst_day = report.worst.move_pct
+        if short_window is not None:
+            # A short loses on the rally, not the fall: the long's worst day is the wrong day.
+            worst_day = short_window.move_pct
         if worst_day is not None and worst_day < 0:
             # With no book there is no risk share to budget against; the sizing rule a trader can
             # act on is the one the realised record gives — the worst day it has actually had.
             lines.append(
-                f"Bottom line: size {add} so that its worst observed 24 hours ({worst_day:+.1f}%) "
+                f"Bottom line: size {add} so that its worst observed 24 hours ({worst_day:+.1f}%)"
+                f"{' as a short, the loss on its biggest rally,' if short else ''} "
                 f"is a "
                 f"loss you would accept — on a $10,000 position that is about "
                 f"${abs(worst_day) * 100:,.0f}; tell me what you hold to see its share of your "
@@ -968,12 +1012,13 @@ def _impact_lines(report: CopilotReport, request: ResearchRequest,
         if outcome.portfolio_move_pct is not None and outcome.shock in (
             "benchmark -5%", "benchmark -10%"
         ):
+            beta_move = -outcome.portfolio_move_pct if short else outcome.portfolio_move_pct
             lines.append(
                 f"If QQQ falls {outcome.shock.split('-')[-1]}, "
-                + ("this position" if standalone else "the book")
-                + f" moves about {outcome.portfolio_move_pct:+.1f}% through beta alone."
+                + ("this short" if short else "this position" if standalone else "the book")
+                + f" moves about {beta_move:+.1f}% through beta alone."
             )
-    worst = report.worst.render().replace("[stress] ", "Realised worst case: ")
+    worst = (short_window or report.worst).render().replace("[stress] ", "Realised worst case: ")
     if standalone:
         worst = worst.replace("this book", "this position")
     lines.append(worst)

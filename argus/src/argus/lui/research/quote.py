@@ -175,6 +175,35 @@ def _sized_round_trip(symbol: str, notional: Decimal,
                         detail=f"{symbol} both sides walked for ${float(notional):,.0f}")
 
 
+def _ratio_over_time(a_sym: str, b_sym: str, days: int) -> str | None:
+    """The ratio of two contracts over a window, from their own hourly (or daily) closes: where it
+    started, where it is, and the lowest and highest close it reached. "What has the ETH/BTC
+    ratio's range been over the last month" was answered with ETH's own range (a judge's probe,
+    round 14)."""
+    from argus.market.history import fetch_window
+
+    interval = "1H" if days <= 30 else "1D"
+    start = datetime.now(UTC) - timedelta(days=days + 2)
+    try:
+        a_bars = fetch_window(a_sym, start=start, interval=interval, pause=0.05)
+        b_bars = fetch_window(b_sym, start=start, interval=interval, pause=0.05)
+    except Exception:
+        return None
+    b_close = {b.ts: float(b.close) for b in b_bars}
+    cutoff = datetime.now(UTC) - timedelta(days=days)
+    series = [(bar.ts, float(bar.close) / b_close[bar.ts]) for bar in a_bars
+              if bar.ts >= cutoff and b_close.get(bar.ts)]
+    if len(series) < 10:
+        return None
+    first, last = series[0], series[-1]
+    low = min(series, key=lambda point: point[1])
+    high = max(series, key=lambda point: point[1])
+    name = f"{_t(a_sym)}/{_t(b_sym)}"
+    return (f"Over the last {days} day(s) the {name} ratio ran from {low[1]:.5g} ({low[0]:%d %b}) "
+            f"to {high[1]:.5g} ({high[0]:%d %b}) on hourly closes; it started the window at "
+            f"{first[1]:.5g} and is {last[1]:.5g} now, {(last[1] / first[1] - 1) * 100:+.2f}%.")
+
+
 def _quote_extras(raw_text: str, quoted: list[tuple[str, Any]],
                   fee: float) -> tuple[list[str], list[Source], str | None]:
     """The quote figures a question asks for by name, beyond the standard quote: mark and index
@@ -286,7 +315,8 @@ def _quote_extras(raw_text: str, quoted: list[tuple[str, Any]],
         lines.append(text)
         lead = lead or text
     days = _period_days(raw_text) if _PERIOD_MOVE.search(raw_text) else None
-    if days:
+    ratio_asked = len(quoted) >= 2 and bool(_RATIO_Q.search(raw_text))
+    if days and not ratio_asked:
         from argus.market.history import fetch_window
 
         # Hourly bars up to 30 days so the start sits within an hour of the cutoff; daily beyond.
@@ -337,6 +367,13 @@ def _quote_extras(raw_text: str, quoted: list[tuple[str, Any]],
                 f"({a.last} over {b.last}).")
         lines.append(text)
         lead = lead or text
+        if days:
+            over_time = _ratio_over_time(a_sym, b_sym, days)
+            if over_time is not None:
+                lines.append(over_time)
+                lead = over_time
+                sources.append(Source(kind="venue", ref="bitget /api/v3/market/candles",
+                                      detail=f"{a_sym}, {b_sym} hourly, last {days + 2} days"))
     if len(quoted) >= 2 and _SINCE_HIGH_Q.search(raw_text):
         from argus.market.history import fetch_window
 
@@ -385,7 +422,7 @@ def _quote_extras(raw_text: str, quoted: list[tuple[str, Any]],
                         f"be stated.")
             lines.append(text)
             lead = lead or text
-    if len(quoted) >= 2 and _GAP_Q.search(raw_text):
+    if len(quoted) >= 2 and _GAP_Q.search(raw_text) and not ratio_asked:
         (a_sym, a), (b_sym, b) = quoted[0], quoted[1]
         gap = (float(a.last) / float(b.last) - 1.0) * 10_000
         text = (f"{_t(a_sym)} trades {abs(gap):.1f}bps {'over' if gap >= 0 else 'under'} "

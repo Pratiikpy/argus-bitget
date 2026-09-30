@@ -1,12 +1,12 @@
 {
-  "as_of": "2026-09-30T14:12:40.163832+00:00",
-  "refusals": 886,
-  "refusals_with_a_gradeable_claim": 437,
+  "as_of": "2026-09-30T18:17:46.865818+00:00",
+  "refusals": 908,
+  "refusals_with_a_gradeable_claim": 443,
   "hours_tolerance": 1.5,
   "round_trip_bps": 12.0,
   "base_clearance_about_2h": {
-    "cleared": 333,
-    "marks": 476
+    "cleared": 349,
+    "marks": 496
   },
   "by_claim": {
     "session_closed": {
@@ -35,9 +35,9 @@
       "ungradeable": 0
     },
     "moves_enough": {
-      "consistent": 60,
-      "contradicted": 26,
-      "ungradeable": 37
+      "consistent": 65,
+      "contradicted": 27,
+      "ungradeable": 39
     },
     "move_too_small": {
       "consistent": 0,
@@ -48,10 +48,10 @@
   "forward_against_base": {
     "move_too_small": null,
     "moves_enough": {
-      "borne_out": 60,
-      "graded": 86,
-      "base_rate": 0.6996,
-      "p_one_sided": 0.568
+      "borne_out": 65,
+      "graded": 92,
+      "base_rate": 0.7036,
+      "p_one_sided": 0.5275
     }
   },
   "forward_claims": [
@@ -266,8 +266,16 @@
       "stated": "\u2026e abstentions on this name where the binding constraint was direction, not size. Standing aside is the correct call when the fundamental st\u2026",
       "recorded": "next move +2.8bps over 1.99h against a 12bps round trip (refusal_marks.jsonl)",
       "verdict": "contradicted"
+    },
+    {
+      "seq": 899,
+      "symbol": "MSTRUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026e market moved a median 203bps \u2014 the binding constraint was direction, not size \u2014 and nothing in today's evidence resolves that directional\u2026",
+      "recorded": "next move +5.2bps over 2.00h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
     }
   ],
-  "verdict": "886 refusal(s) on record; 437 carried at least one reason the record can check. Of 913 decision-time reason(s) graded, 913 agreed with the record and 0 contradicted it. `moves_enough` claims were borne out by the next ~2h move 60 of 86 time(s) (70%), against 70% for every ~2h refusal mark (one-sided exact binomial p = 0.57); no evidence the stated reason says more than the base rate does.",
+  "verdict": "908 refusal(s) on record; 443 carried at least one reason the record can check. Of 913 decision-time reason(s) graded, 913 agreed with the record and 0 contradicted it. `moves_enough` claims were borne out by the next ~2h move 65 of 92 time(s) (71%), against 70% for every ~2h refusal mark (one-sided exact binomial p = 0.53); no evidence the stated reason says more than the base rate does.",
   "method": "Each checkable reason in a no_trade thesis is matched by a fixed pattern and set beside the record: session_phase and hours_to_discovery from the ledger, the desk's own hedge-menu note, the risk ruling, and the next ~2h mark for claims about the size of the coming move. Question and binary verdict from VisualWebArena's llm_ua_match (evaluation_harness/helper_functions.py:610-642, MIT); graded here by the record, not by a model."
 }

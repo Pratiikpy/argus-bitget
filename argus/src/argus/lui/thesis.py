@@ -92,7 +92,11 @@ _KINDS: tuple[tuple[Kind, re.Pattern[str]], ...] = (
                             r"\betfs?\b|\betf\s+(?:demand|buying|selling)\b", re.I)),
     (Kind.REVERSION, re.compile(
         r"pull\s?back|\bdip\b|correction|temporary|bounce|rebound|recover|oversold|bottom(ed| is)|"
-        r"overdone|(rally|pump|move|run)\b.*\b(fade|reverse|unwind|won'?t last)|overbought", re.I)),
+        r"overdone|(rally|pump|move|run)\b.*\b(fade|reverse|unwind|won'?t last)|overbought|"
+        # "SOL has run too far above its 20-day average", "should mean-revert": read as nothing
+        # and answered "no engine reads this" although the console tests it (a judge, round 14)
+        r"too\s+far\s+(?:above|below|from)|mean[\s-]*revert|revert\s+to\s+(?:the\s+)?mean|"
+        r"stretched\s+(?:above|below|from)", re.I)),
     (Kind.ACTIVITY, re.compile(
         r"ecosystem|activity|adoption|usage|\busers?\b|\btvl\b|on-?chain|network (growth|use)|"
         r"developers?|\bfees?\b|transactions?|\bdapps?\b", re.I)),
@@ -202,6 +206,9 @@ class Tested:
                 "evidence": [f.as_dict() for f in self.evidence]}
 
 
+_RATIO = re.compile(r"\b[A-Za-z]{2,6}\s*/\s*[A-Za-z]{2,6}\b")
+
+
 def reasons(text: str) -> tuple[Reason, ...]:
     """The reasons a thesis states, each with the kind of evidence that could test it. The
     stance and name ("long SOL") are not a reason; a fragment of two words or fewer that names no
@@ -221,6 +228,10 @@ def reasons(text: str) -> tuple[Reason, ...]:
         if _RELATIVE.search(part) and len(_two_names(part)) == 2:
             # "SOL will outrun ETH" named two contracts and was left "not tested" (round 11).
             kind = Kind.RELATIVE
+        if kind is Kind.REVERSION and _RATIO.search(part):
+            # "ETH/BTC should mean-revert" is about a ratio; the price test reads one name's own
+            # history and answered it with the other claim's numbers (a judge, round 14).
+            kind = Kind.OTHER
         if kind is None and _DIRECTION.search(part):
             # "stocks will go up" was listed as nothing any engine reads (round 11)
             kind = Kind.DIRECTION
@@ -728,7 +739,9 @@ def _reversion(reason: Reason, long_run: Mapping[str, Any], quote: Mapping[str, 
                       f"No long-run daily history answered for {name}, so whether moves like "
                       f"this one reversed could not be counted.")
     trailing = float(trailing)
-    fade = bool(re.search(r"rally|pump|\brun\b|overbought|fade|won'?t last", reason.text, re.I))
+    fade = bool(re.search(
+        r"rally|pump|\brun\b|overbought|fade|won'?t last|(?:too\s+far|stretched)\s+above",
+        reason.text, re.I))
     recent = _recent(quote)
     if fade:
         premise = trailing > 0 or (recent is not None and (
@@ -855,6 +868,10 @@ def _momentum(reason: Reason, tech: Mapping[str, Any], name: str) -> Tested:
                     "not clear costs.")
 
 
+_HEAT = re.compile(
+    r"overheat|crowded|extreme|elevated|stretched|over-?leveraged|\bhot\b|too\s+high", re.I)
+
+
 def _positioning(reason: Reason, quote: Mapping[str, Any], name: str) -> Tested:
     ticker: Mapping[str, Any] = next(iter((quote.get("quotes") or {}).values()), {})
     try:
@@ -864,6 +881,13 @@ def _positioning(reason: Reason, quote: Mapping[str, Any], name: str) -> Tested:
                       f"No funding rate answered for {name} this time.")
     shorts_claim = bool(re.search(r"short|squeeze", reason.text, re.I))
     if abs(funding) < 0.005:
+        if _HEAT.search(reason.text) and re.search(r"funding|overheat|leverag", reason.text, re.I):
+            # "funding is overheated" with funding at zero is a claim the number answers, and the
+            # answer is no (a judge, round 14, 2026-09-30). "Shorts are crowded" is not a claim
+            # about funding, so flat funding leaves it unmeasured.
+            return Tested(reason.text, reason.kind, Result.CONTRADICTED,
+                          f"Funding is {funding:+.4f}% per interval: neither side is paying to "
+                          f"hold, so nothing looks overheated or crowded in it.")
         return Tested(reason.text, reason.kind, Result.NOT_MEASURABLE,
                       f"Funding is {funding:+.4f}% per interval: neither side is paying to hold, "
                       f"so no crowding shows in it.")

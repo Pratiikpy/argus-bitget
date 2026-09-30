@@ -40,13 +40,14 @@ SIZING_Q = re.compile(
 
 _ACCOUNT = (
     re.compile(r"\$\s*(?P<n>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k|m|thousand|million)?\s*(?:dollars?\s+|usd\s+)?"
-               r"(?:account|capital|portfolio|balance|bankroll)", re.I),
-    re.compile(r"\b(?:account|capital|portfolio|balance|bankroll)\s+(?:of|is|=|:|size\s+(?:of|is))?\s*"
+               r"(?:account|capital|portfolio|balance|bankroll|book)\b", re.I),
+    re.compile(r"\b(?:account|capital|portfolio|balance|bankroll|my\s+book|book\s+(?:size|value))\s+"
+               r"(?:of|is|=|:|size\s+(?:of|is))?\s*(?:about\s+|around\s+|roughly\s+|~)?"
                # not a percentage: "10k account 1% risk" read the account as $1 (round 11)
                r"\$?\s*(?P<n>\d[\d,]*(?:\.\d+)?)(?![\d.,]|\s*%)\s*(?P<k>k|m|thousand|million)?",
                re.I),
     re.compile(r"\b(?P<n>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k|m|thousand|million)?\s+(?:dollars?\s+|usd\s+|"
-               r"usdt\s+)?(?:account|capital|portfolio|balance|bankroll)", re.I),
+               r"usdt\s+)?(?:account|capital|portfolio|balance|bankroll|book)\b", re.I),
 )
 """The account size, written "$50,000 account", "account of 50k" or "50k account"."""
 _RISK_PCT = re.compile(

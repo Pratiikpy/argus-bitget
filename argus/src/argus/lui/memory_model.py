@@ -94,6 +94,8 @@ def reads_as_disclosure(text: str) -> bool:
 _A_HOLDING = re.compile(r"\b(?:i\s+(?:hold|own|have)|holding|i'?m\s+(?:long|in))\b", re.I)
 _A_LIMIT = re.compile(r"\b(?:max(?:imum)?|no\s+more|at\s+most|up\s+to|cap|limit|budget|rule|never|"
                       r"above|over|under|past|per\s+(?:trade|position|name))\b", re.I)
+_A_POSITION = re.compile(r"\W*\$?\d[\d,.]*[%k]?\s+(?:in\s+|of\s+)?\S+(?:\s+\S+){0,3}\W*$", re.I)
+"""An amount then a name and a word or two ("50% ETH perp long"): what the trader holds, no view."""
 _AN_ORDER = re.compile(r"\s*(?:please\s+)?(?:go\s+)?(?:long|short|buy|sell|open|close)\b", re.I)
 
 
@@ -115,6 +117,10 @@ def _valid(kind: str, value: str, subject: str, quote: str, context: str = ""
         if kind == "budget" and _A_HOLDING.search(around) and not _A_LIMIT.search(around):
             # "I hold 40% NVDA" is what the book holds, not what one name may carry: it was kept
             # as a 40% risk budget (a judge, round 13, 2026-09-30). The book keeps it instead.
+            return None
+        if kind == "budget" and not _A_LIMIT.search(quote):
+            # "50% ETH perp long" in a message that also names a limit elsewhere: the limit word
+            # must sit in the quote itself, or the quote is a holding (round 14, 2026-09-30).
             return None
         return str(pct / 100), ""
     if kind == "capital":
@@ -152,7 +158,7 @@ def _valid(kind: str, value: str, subject: str, quote: str, context: str = ""
             if not raw or not re.search(rf"\b{re.escape(raw)}\b", quote, re.I):
                 return None
             named = (raw,)
-        if kind == "thesis" and _AN_ORDER.match(quote):
+        if kind == "thesis" and (_AN_ORDER.match(quote) or _A_POSITION.match(quote)):
             # "Long rNVDA over the weekend at 3x" is an order to price, not a view to keep: it
             # replaced the trader's stated NVDA thesis (a judge, round 13, 2026-09-30).
             return None

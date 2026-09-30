@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-09-29T19:40:11.348353+00:00",
-  "decisions": 879,
-  "gate_population": 797,
-  "proposed_exposure": 1,
+  "generated_at": "2026-09-30T17:41:20.428721+00:00",
+  "decisions": 912,
+  "gate_population": 830,
+  "proposed_exposure": 2,
   "session_coverage": {
     "by_phase": {
       "extended": 1,
-      "rth": 511,
+      "rth": 544,
       "weekend": 367
     },
-    "with_price_discovery": 511,
+    "with_price_discovery": 544,
     "median_hours_to_discovery": 0.0,
     "min_hours_to_discovery": 0.0,
     "single_phase_only": false,
-    "note": "879 decision(s) across 3 session phase(s): extended=1, rth=511, weekend=367. 511 were taken while the anchor market had price discovery"
+    "note": "912 decision(s) across 3 session phase(s): extended=1, rth=544, weekend=367. 544 were taken while the anchor market had price discovery"
   },
   "gates": [
     {
@@ -21,145 +21,145 @@
       "name": "no_exposure",
       "checks": "verdict carries no quantity, or quantity <= 0",
       "status": "FIRED",
-      "reached": 797,
-      "fired": 796,
-      "note": "bound on 796 of 797 decision(s) that reached it"
+      "reached": 830,
+      "fired": 828,
+      "note": "bound on 828 of 830 decision(s) that reached it"
     },
     {
       "order": 2,
       "name": "min_confidence",
       "checks": "stated confidence below the 0.55 floor",
       "status": "PASSED",
-      "reached": 1,
+      "reached": 2,
       "fired": 0,
-      "note": "evaluated 1 decision(s) and allowed every one"
+      "note": "evaluated 2 decision(s) and allowed every one"
     },
     {
       "order": 3,
       "name": "oracle_stale",
       "checks": "NAV stale while the anchor is shut",
       "status": "PASSED",
-      "reached": 1,
+      "reached": 2,
       "fired": 0,
-      "note": "evaluated 1 decision(s) and allowed every one"
+      "note": "evaluated 2 decision(s) and allowed every one"
     },
     {
       "order": 4,
       "name": "unhedgeable_gap",
       "checks": "no hedge placeable and size above the unhedged cap",
       "status": "PASSED",
-      "reached": 1,
+      "reached": 2,
       "fired": 0,
-      "note": "evaluated 1 decision(s) and allowed every one"
+      "note": "evaluated 2 decision(s) and allowed every one"
     },
     {
       "order": 5,
       "name": "gross_exposure",
       "checks": "whole-book gross notional above the configured cap",
       "status": "PASSED",
-      "reached": 1,
+      "reached": 2,
       "fired": 0,
-      "note": "evaluated 1 decision(s) and allowed every one"
+      "note": "evaluated 2 decision(s) and allowed every one"
     },
     {
       "order": 6,
       "name": "signed_exposure",
       "checks": "whole-book net directional notional above the configured cap",
       "status": "PASSED",
-      "reached": 1,
+      "reached": 2,
       "fired": 0,
-      "note": "evaluated 1 decision(s) and allowed every one"
+      "note": "evaluated 2 decision(s) and allowed every one"
     },
     {
       "order": 7,
       "name": "hedge_integrity",
       "checks": "REDUCE would leave a linked hedge position's partner exposed",
       "status": "PASSED",
-      "reached": 1,
+      "reached": 2,
       "fired": 0,
-      "note": "evaluated 1 decision(s) and allowed every one"
+      "note": "evaluated 2 decision(s) and allowed every one"
     },
     {
       "order": 8,
       "name": "margin_usage",
       "checks": "venue-reported margin ratio at or above the policy cap",
       "status": "PASSED",
-      "reached": 1,
+      "reached": 2,
       "fired": 0,
-      "note": "evaluated 1 decision(s) and allowed every one"
+      "note": "evaluated 2 decision(s) and allowed every one"
     },
     {
       "order": 9,
       "name": "factor_exposure",
       "checks": "measured book exposure to a named factor above its configured cap",
       "status": "PASSED",
-      "reached": 1,
+      "reached": 2,
       "fired": 0,
-      "note": "evaluated 1 decision(s) and allowed every one"
+      "note": "evaluated 2 decision(s) and allowed every one"
     },
     {
       "order": 10,
       "name": "scenario_loss",
       "checks": "worst modelled benchmark shock already past the loss floor",
       "status": "PASSED",
-      "reached": 1,
+      "reached": 2,
       "fired": 0,
-      "note": "evaluated 1 decision(s) and allowed every one"
+      "note": "evaluated 2 decision(s) and allowed every one"
     },
     {
       "order": 11,
       "name": "liquidation_cost",
       "checks": "worst position's forced-exit slippage proxy at or above the policy cap",
       "status": "PASSED",
-      "reached": 1,
+      "reached": 2,
       "fired": 0,
-      "note": "evaluated 1 decision(s) and allowed every one"
+      "note": "evaluated 2 decision(s) and allowed every one"
     },
     {
       "order": 12,
       "name": "per_symbol_underperformance",
       "checks": "one symbol's windowed realized PnL below its configured floor \u2014 narrows that symbol only, not the whole order",
       "status": "PASSED",
-      "reached": 1,
+      "reached": 2,
       "fired": 0,
-      "note": "evaluated 1 decision(s) and allowed every one"
+      "note": "evaluated 2 decision(s) and allowed every one"
     },
     {
       "order": 13,
       "name": "risk_budget",
       "checks": "circuit breaker's drawdown ladder sizes the book below the request",
       "status": "PASSED",
-      "reached": 1,
+      "reached": 2,
       "fired": 0,
-      "note": "evaluated 1 decision(s) and allowed every one"
+      "note": "evaluated 2 decision(s) and allowed every one"
     },
     {
       "order": 14,
       "name": "session_volatility",
       "checks": "measured path volatility above the regular-hours baseline",
       "status": "PASSED",
-      "reached": 1,
+      "reached": 2,
       "fired": 0,
-      "note": "evaluated 1 decision(s) and allowed every one"
+      "note": "evaluated 2 decision(s) and allowed every one"
     },
     {
       "order": 15,
       "name": "max_position",
       "checks": "size above the position cap",
       "status": "PASSED",
-      "reached": 1,
+      "reached": 2,
       "fired": 0,
-      "note": "evaluated 1 decision(s) and allowed every one"
+      "note": "evaluated 2 decision(s) and allowed every one"
     }
   ],
   "unreached_gates": [],
   "confidence_median": 0.62,
-  "confidence_mean": 0.6739,
+  "confidence_mean": 0.6697,
   "confidence_min": 0.38,
   "confidence_would_have_bound": true,
-  "verdict": "1 of 879 decision(s) proposed exposure, so the risk chain has live inputs and its outcomes below are exercised rather than unreached",
+  "verdict": "2 of 912 decision(s) proposed exposure, so the risk chain has live inputs and its outcomes below are exercised rather than unreached",
   "falsifier": "the next session with price discovery is 0.0h away, and the committed cycle schedule (13:30/15:30/17:30/19:30 UTC) sits inside US regular hours. If the desk abstains through a full session of those, the cause is the desk and this conclusion is refuted",
   "triggered_by": [
-    "20 settlements since the last postmortem"
+    "11 settlements since the last postmortem"
   ]
 }

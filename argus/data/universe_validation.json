@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-30T15:36:36.450863+00:00",
+  "generated_at": "2026-09-30T17:36:49.000363+00:00",
   "threshold": 2.5,
   "shipped": [
     "NVDAUSDT",
@@ -33,34 +33,34 @@
   "evidence": {
     "NVDAUSDT": {
       "symbol": "NVDAUSDT",
-      "last_index": 230.8038,
-      "rth_bps_per_hour": 32.83,
+      "last_index": 230.6564,
+      "rth_bps_per_hour": 32.36,
       "weekend_bps_per_hour": 4.32,
-      "attenuation": 7.6,
+      "attenuation": 7.49,
       "has_anchor": true,
       "observations": 2159
     },
     "TSLAUSDT": {
       "symbol": "TSLAUSDT",
-      "last_index": 349.2851,
-      "rth_bps_per_hour": 35.21,
+      "last_index": 351.5064,
+      "rth_bps_per_hour": 35.38,
       "weekend_bps_per_hour": 5.67,
-      "attenuation": 6.21,
+      "attenuation": 6.24,
       "has_anchor": true,
       "observations": 2159
     },
     "AAPLUSDT": {
       "symbol": "AAPLUSDT",
-      "last_index": 338.5781,
-      "rth_bps_per_hour": 22.47,
+      "last_index": 336.6178,
+      "rth_bps_per_hour": 22.6,
       "weekend_bps_per_hour": 4.24,
-      "attenuation": 5.3,
+      "attenuation": 5.33,
       "has_anchor": true,
       "observations": 2159
     },
     "MSFTUSDT": {
       "symbol": "MSFTUSDT",
-      "last_index": 518.5255,
+      "last_index": 518.2513,
       "rth_bps_per_hour": 25.19,
       "weekend_bps_per_hour": 4.15,
       "attenuation": 6.07,
@@ -69,73 +69,73 @@
     },
     "METAUSDT": {
       "symbol": "METAUSDT",
-      "last_index": 729.9627,
-      "rth_bps_per_hour": 36.93,
+      "last_index": 736.9398,
+      "rth_bps_per_hour": 37.15,
       "weekend_bps_per_hour": 5.41,
-      "attenuation": 6.83,
+      "attenuation": 6.87,
       "has_anchor": true,
       "observations": 2159
     },
     "GOOGLUSDT": {
       "symbol": "GOOGLUSDT",
-      "last_index": 348.4322,
-      "rth_bps_per_hour": 24.79,
+      "last_index": 352.0507,
+      "rth_bps_per_hour": 24.67,
       "weekend_bps_per_hour": 5.14,
-      "attenuation": 4.82,
+      "attenuation": 4.8,
       "has_anchor": true,
       "observations": 2159
     },
     "AMZNUSDT": {
       "symbol": "AMZNUSDT",
-      "last_index": 251.973,
-      "rth_bps_per_hour": 24.37,
+      "last_index": 251.5743,
+      "rth_bps_per_hour": 24.28,
       "weekend_bps_per_hour": 4.04,
-      "attenuation": 6.03,
+      "attenuation": 6.01,
       "has_anchor": true,
       "observations": 2159
     },
     "COINUSDT": {
       "symbol": "COINUSDT",
-      "last_index": 186.3106,
-      "rth_bps_per_hour": 62.46,
+      "last_index": 187.6623,
+      "rth_bps_per_hour": 61.33,
       "weekend_bps_per_hour": 11.91,
-      "attenuation": 5.24,
+      "attenuation": 5.15,
       "has_anchor": true,
       "observations": 2159
     },
     "MSTRUSDT": {
       "symbol": "MSTRUSDT",
-      "last_index": 153.1793,
-      "rth_bps_per_hour": 60.47,
+      "last_index": 154.577,
+      "rth_bps_per_hour": 59.13,
       "weekend_bps_per_hour": 17.38,
-      "attenuation": 3.48,
+      "attenuation": 3.4,
       "has_anchor": true,
       "observations": 2159
     },
     "QQQUSDT": {
       "symbol": "QQQUSDT",
-      "last_index": 744.0419,
-      "rth_bps_per_hour": 14.88,
+      "last_index": 744.4757,
+      "rth_bps_per_hour": 14.61,
       "weekend_bps_per_hour": 3.27,
-      "attenuation": 4.55,
+      "attenuation": 4.47,
       "has_anchor": true,
       "observations": 2159
     },
     "TQQQUSDT": {
       "symbol": "TQQQUSDT",
-      "last_index": 79.2741,
-      "rth_bps_per_hour": 44.91,
+      "last_index": 79.39,
+      "rth_bps_per_hour": 44.02,
       "weekend_bps_per_hour": 7.53,
-      "attenuation": 5.96,
+      "attenuation": 5.85,
       "has_anchor": true,
       "observations": 2159
     },
     "SQQQUSDT": {
       "symbol": "SQQQUSDT",
-      "last_index": 33.8822,
-      "rth_bps_per_hour": 45.41,
+      "last_index": 33.8329,
+      "rth_bps_per_hour": 44.84,
       "weekend_bps_per_hour": 6.39,
-      "attenuation": 7.11,
+      "attenuation": 7.02,
       "has_anchor": true,
       "observations": 2159
     }

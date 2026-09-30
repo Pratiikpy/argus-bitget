@@ -67,7 +67,10 @@ _GUARANTEE = re.compile(
     r"\bguarantee\s+(?:me|us|that|a|an|my)\b|\bcan\s+you\s+guarantee\b|\bguaranteed\s+(?:returns?|"
     r"profits?|gains?|money|win)\b|\brisk[\s-]*free\s+(?:trade|profit|return|bet|money)\b|"
     r"\b(?:can'?t|cannot|won'?t)\s+lose\b(?!\s+(?:more|over|above|beyond|past|than|up\s+to|[$\d]))|\bsure\s+(?:thing|bet|profit|win|money)\b|"
-    r"\bpromise\s+(?:me\s+)?(?:a\s+)?(?:return|profit)", re.I)
+    r"\bpromise\s+(?:me\s+)?(?:a\s+)?(?:return|profit)|"
+    r"\bguaranteed\s+to\s+(?:make|win|profit|pay|go\s+up|rise|earn)\b|"
+    r"\bguaranteed\s+(?:trade|pick|winner|call)\b|\b(?:certain|sure)\s+to\s+(?:make|win|profit|go\s+up|rise)\b",
+    re.I)
 """A request for a certain return: "guarantee me a 50% return on BTC" was deflected into price data
 instead of being told no (a judge's audit, 2026-09-30). "I can't lose more than 10% of my book"
 is a loss limit, not a request for a sure thing, and was answered with this refusal (round 13)."""

@@ -231,6 +231,66 @@ def _apply(revision: str, reasons: list[Any]) -> tuple[list[Any], list[Any]] | N
     return kept, dropped
 
 
+SIZE_ASKED = re.compile(r"\bsiz(?:e|ing)\b|\bposition\b|\bhow\s+(?:much|big|large|small)\b", re.I)
+"""A follow-up that also asks how big the position should be."""
+
+_BEARISH = re.compile(r"\b(?:short(?:ing)?|bearish|bear\s+case|fade|sell(?:ing)?)\b", re.I)
+
+
+def _case(earlier: str) -> str:
+    """``bear`` for a thesis that argues for a fall, else ``bull``: the rebuilt question and the
+    research link under the answer name the side the trader took (a judge, round 14: a short
+    thesis was labelled "My bull case")."""
+    return "bear" if _BEARISH.search(earlier) else "bull"
+
+
+def _standing(turns: list[str], text: str = ""
+              ) -> tuple[str, list[Any], list[Any], list[Any]] | None:
+    """(the thesis as first stated, its reasons, the reasons still standing, the reasons set
+    aside) after every revision in ``turns`` and, when given, in ``text`` too; None when no thesis
+    was stated, no revision applies where ``text`` is one, or nothing is left."""
+    from argus.lui import thesis
+
+    at = _thesis_turn(turns)
+    if at is None:
+        return None
+    earlier = split_other_question(turns[at])[0]
+    stated = list(thesis.reasons(earlier))
+    kept = stated
+    dropped: list[Any] = []
+    for revision in [*(t for t in turns[at + 1:] if REVISE.search(t)), *([text] if text else [])]:
+        applied = _apply(revision, kept)
+        if applied is None:
+            if revision is text:
+                return None
+            continue
+        kept, gone = applied
+        dropped += gone
+    return (earlier, stated, kept, dropped) if kept else None
+
+
+def strongest(text: str, prior: list[str], *, book: str = "", memory: str = ""
+              ) -> tuple[list[str], list[Source], dict[str, Any]] | None:
+    """"Which of those two remaining reasons is the strongest?" after a thesis and its
+    revisions: the reasons still standing, ranked (a judge, round 14: it was told "that" had
+    nothing to refer to, because the turn just before was a revision, not the thesis)."""
+    if not STRONGEST.search(text) or asks(text):
+        return None
+    current = _standing(list(prior))
+    if current is None:
+        return None
+    earlier, _stated, kept, dropped = current
+    name = research_names(earlier)
+    rebuilt = (f"My {_case(earlier)} case for {name}: " + ", ".join(r.text for r in kept)
+               + ", test my thesis. Which of these is strongest?")
+    lines, sources, data = answer(rebuilt, book=book, memory=memory)
+    if dropped:
+        aside = " and ".join(f"\"{r.text}\"" for r in dropped)
+        lines = [lines[0], f"Assumed: {aside} stays set aside, as you said; only the reasons "
+                           f"still standing are ranked.", *lines[1:]]
+    return lines, sources, {**data, "dropped": [r.text for r in dropped]}
+
+
 def revise(text: str, prior: list[str] | str, *, book: str = "", memory: str = ""
            ) -> tuple[list[str], list[Source], dict[str, Any]] | None:
     """The thesis tested earlier, again, with the reasons the follow-ups name set aside.
@@ -244,32 +304,20 @@ def revise(text: str, prior: list[str] | str, *, book: str = "", memory: str = "
     follow-up since is applied in order, so "forget capex" and then "my real reason now is just the
     backlog" leave the backlog alone (a judge, round 13: the second follow-up was refused as a
     name Bitget does not list, because only the turn just before was read)."""
-    from argus.lui import thesis
-
     turns = [prior] if isinstance(prior, str) else list(prior)
     if not REVISE.search(text):
         return None
-    at = _thesis_turn(turns)
-    if at is None:
+    current = _standing(turns, text)
+    if current is None:
         return None
-    earlier = split_other_question(turns[at])[0]
-    stated = list(thesis.reasons(earlier))
-    kept = stated
-    dropped: list[Any] = []
-    for revision in [*(t for t in turns[at + 1:] if REVISE.search(t)), text]:
-        applied = _apply(revision, kept)
-        if applied is None:
-            if revision is text:
-                return None
-            continue
-        kept, gone = applied
-        dropped += gone
+    earlier, stated, kept, dropped = current
     if not kept:
         return None
     from concurrent.futures import ThreadPoolExecutor
 
     name = research_names(earlier)
-    rebuilt = f"My bull case for {name}: " + ", ".join(r.text for r in kept) + ", test my thesis"
+    rebuilt = (f"My {_case(earlier)} case for {name}: " + ", ".join(r.text for r in kept)
+               + ", test my thesis")
     with ThreadPoolExecutor(max_workers=2) as pool:
         before_job = pool.submit(answer, earlier, book=book, memory=memory)
         lines, sources, data = answer(rebuilt, book=book, memory=memory)
@@ -285,7 +333,8 @@ def revise(text: str, prior: list[str] | str, *, book: str = "", memory: str = "
     change = ("the reasons set aside were not backed by the data, so setting them aside changes "
               "nothing" if dropped and not lost else
               ("it was the only support the thesis had" if not supported else
-               "that support is gone, the rest stands") if lost else "")
+               "the support that came from " + " and ".join(f"\"{x}\"" for x in lost)
+               + " is gone, the rest stands") if lost else "")
     aside = " and ".join(f"\"{r.text}\"" for r in dropped)
     head = (f"Bottom line: with {aside} set aside, {verdict}"
             + (f"; {change}" if change else "") + ".")
@@ -294,7 +343,7 @@ def revise(text: str, prior: list[str] | str, *, book: str = "", memory: str = "
                  re.I):
         tail.append("What you assume in its place is a future the data cannot test, so it is not "
                     "scored.")
-    if re.search(r"\bsiz(?:e|ing)\b|\bposition\b|\bhow\s+much\b", text, re.I):
+    if SIZE_ASKED.search(text):
         tail.append(
             f"On sizing: a thesis verdict does not set a size — how far {name} can go against "
             f"you does. Ask \"how much should I put in {name}\" and it is sized to your loss "
