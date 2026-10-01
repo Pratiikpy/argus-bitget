@@ -104,6 +104,14 @@ reads these and ARGUS did not (2026-09-25); the live book is one call away, so i
 LIQUIDITY_DEFAULT_USD = Decimal(50_000)
 
 
+_METRIC_SUBJECT = re.compile(
+    r"\b(?:margins?|revenues?|sales|earnings|profits?|deliveries|eps|income|guidance|demand|"
+    r"orders|growth|cash\s+flow|costs?|expenses|yields?|rates?|inflation|unemployment|"
+    r"estimates|forecasts?|backlog|shipments|bookings|subscribers|users)\s+(?:\w+\s+){0,2}$",
+    re.IGNORECASE)
+"""A financial metric as the subject of the move word ("gross margin fell"): not the price."""
+
+
 _HYPOTHETICAL = re.compile(r"\b(?:if|what\s+if|suppose|assuming)\b", re.IGNORECASE)
 """"If NVDA dropped 10%" is a scenario, not a claim about the tape; the stress engine owns it."""
 
@@ -148,6 +156,8 @@ def _claim_check(raw_text: str, symbol: str) -> tuple[list[str], list[Source]] |
     move = None if not symbol or (_DIRECTIONAL.search(raw_text) and not re.search(
         r"\bwhy\b", raw_text, re.I)) or _HYPOTHETICAL.search(raw_text) \
         else _MOVE_CLAIM.search(raw_text)
+    if move is not None and _METRIC_SUBJECT.search(raw_text[:move.start()][-40:]):
+        move = None  # "gross margin fell" says nothing about the price
     session = SESSION_CLAIM.search(raw_text)
     liquidity = _LIQUIDITY_CLAIM.search(raw_text) if symbol else None
     if not funding and not premium and not move and not session and not liquidity:

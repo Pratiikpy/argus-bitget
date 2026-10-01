@@ -187,3 +187,31 @@ class TestABookWrittenAsBareNumbers:
 
         assert not list(_BOOK_COUNT.finditer("META 30, GOOGL 30, AMZN 40"))
         assert [m.group(1) for m in _BOOK_COUNT.finditer("I hold 1,200 NVDA")] == ["1,200"]
+
+
+class TestAFundamentalThatFellIsNotAPriceClaim:
+    """"gross margin fell" was read as the premise that the stock fell and checked against the
+    tape, so a short thesis was told its price premise did not hold when none had been stated."""
+
+    @pytest.mark.parametrize("text", [
+        "I want to short TSLA because its last quarter deliveries missed estimates and gross "
+        "margin fell.",
+        "short NVDA because revenue growth slowed and guidance fell"])
+    def test_a_metric_falling_makes_no_price_premise(self, text: str,
+                                                     monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui.research import claims
+
+        symbol = "TSLAUSDT" if "TSLA" in text else "NVDAUSDT"
+        assert claims._claim_check(text, symbol) is None
+
+    def test_the_price_itself_falling_is_still_checked(self,
+                                                       monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui.research import claims
+        from argus.market import bitget
+
+        class _T:
+            change_24h = 0.02
+
+        monkeypatch.setattr(bitget, "fetch_tickers", lambda: {"TSLAUSDT": _T()})
+        got = claims._claim_check("why did TSLA drop today", "TSLAUSDT")
+        assert got is not None and "does not hold" in got[0][0]
