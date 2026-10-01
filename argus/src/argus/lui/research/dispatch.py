@@ -318,6 +318,12 @@ _PERIOD_ASKED = re.compile(
     r"\b(?:this|last)\s+(?:month|week)\b|\bhow\s+(?:did|has|have)\b|\breturns?\b", re.I)
 _RISK_ASKED = re.compile(r"\brisk\w*|\bvolatil\w*|\bbeta\b|\bsafe\w*|\bcorrelat\w*|\bdrawdown",
                          re.I)
+_WEEK_WINDOW = re.compile(
+    r"(?<![\d.])7\s*-?\s*(?:d\b|days?\b)"
+    r"|(?<![\d.])7\s+(?:and|or|vs\.?)\s+\d+\s*-?\s*days?\b"
+    r"|\b(?:a|one|last|past)\s+week\b", re.I)
+"""A seven-day window named in a question: a compare of risk adds the week's own figure."""
+
 _WEEK_ASKED = re.compile(r"\bweek\b|\b7\s+days\b", re.I)
 
 
@@ -417,6 +423,12 @@ def _compounded(hourly: Sequence[Any]) -> float | None:
     for r in values:
         growth *= 1.0 + r
     return growth - 1.0
+
+
+def _annualised(hourly: Sequence[float]) -> float | None:
+    """Realised volatility of hourly returns, annualised on 24 x 365 hours."""
+    var = variance(list(hourly))
+    return None if var is None else math.sqrt(var) * math.sqrt(24 * 365)
 
 
 def _momentum_lead(rows: Sequence[Mapping[str, Any]], *, week: bool = False) -> str:
@@ -1435,7 +1447,8 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                 rows.append({"symbol": symbol, "beta_open": betas.get("open"),
                              "beta_shut": betas.get("shut"), "qqq_minus_10": ten,
                              "worst_24h": rep.worst.move_pct, "realised_vol": vol,
-                             "ret_30d": _compounded(hourly), "ret_7d": _compounded(hourly[-168:])})
+                             "ret_30d": _compounded(hourly), "ret_7d": _compounded(hourly[-168:]),
+                             "vol_7d": _annualised(hourly[-168:])})
             for row in sorted(rows, key=lambda r: -(r["realised_vol"] or 0.0)):
                 vol_text = ("n/a" if row["realised_vol"] is None
                             else f"{row['realised_vol']:.0%}")
@@ -1445,6 +1458,13 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                     f"-10% implies {(row['qqq_minus_10'] or 0):+.1f}%; worst 24-hour window "
                     f"{(row['worst_24h'] or 0):+.1f}%."
                 )
+            if (_WEEK_WINDOW.search(raw_text) and _RISK_ASKED.search(raw_text)
+                    and all(r["vol_7d"] is not None for r in rows)):
+                lines.insert(0, "Over the last 7 days alone, the same measure: " + "; ".join(
+                    f"{_t(r['symbol'])} {r['vol_7d']:.0%} a year (30 days: "
+                    f"{(r['realised_vol'] or 0):.0%})" for r in sorted(
+                        rows, key=lambda x: -(x["vol_7d"] or 0.0))) + ". A week is a short "
+                    "sample, so read it beside the 30-day figure.")
             a, b = request.symbols[0], request.symbols[1]
             # Two contracts without a US-stock anchor trade on one 24/7 clock, so their
             # co-movement is read over every hour; restricting it to US hours dropped 70% of the

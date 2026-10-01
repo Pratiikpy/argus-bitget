@@ -144,3 +144,31 @@ class TestAFutureQuarterIsNotAnEarningsFigure:
 
         pattern = r"\bQ([1-4])\s*(?:of\s+)?(?:FY\s*)?'?(20\d\d|\d\d)\b"
         assert re.search(pattern, "what is TSLA Q3 2027 EPS?", re.I)
+
+
+class TestAWeekWindowOnACompare:
+    @pytest.mark.parametrize("text", [
+        "how volatile is NVDA vs TSLA over 7 and 30 days",
+        "which is riskier over the last week, AMD or INTC",
+        "TSLA vs NVDA volatility, 7 days",
+    ])
+    def test_a_named_week_is_recognised(self, text: str) -> None:
+        from argus.lui.research.dispatch import _WEEK_WINDOW
+
+        assert _WEEK_WINDOW.search(text)
+
+    def test_no_week_named_is_no_week_line(self) -> None:
+        from argus.lui.research.dispatch import _WEEK_WINDOW
+
+        assert not _WEEK_WINDOW.search("compare TSLA and NVDA over 30 days")
+
+    def test_the_annualised_week_matches_the_formula(self) -> None:
+        import math
+
+        from argus.lui.research.dispatch import _annualised
+
+        hourly = [0.01, -0.01] * 84
+        assert _annualised(hourly) == pytest.approx(
+            math.sqrt(sum(r * r for r in hourly) / (len(hourly) - 1)) * math.sqrt(24 * 365),
+            rel=0.02)
+        assert _annualised([0.01]) is None
