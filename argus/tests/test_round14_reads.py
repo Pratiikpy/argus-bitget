@@ -260,3 +260,38 @@ class TestLiveReplayFindings:
         assert request is not None and request.kind is ResearchKind.BOOK
         assert dict(request.book) == pytest.approx(
             {"TSLAUSDT": 0.4, "COINUSDT": 0.3, "BTCUSDT": 0.3})
+
+
+class TestRound15ThesisClaims:
+    """A judge's round 15: a funding-sign claim, a forecast of relative strength and a ratio at
+    an extreme each used to be answered "not tested" beside figures that settled them."""
+
+    def test_a_funding_sign_claim_is_read(self) -> None:
+        from argus.lui.thesis import _funding_sign_claim
+
+        assert _funding_sign_claim("ETH funding is negative") == -1
+        assert _funding_sign_claim("funding is still positive on SOL") == 1
+        assert _funding_sign_claim("shorts are paying longs") == -1
+        assert _funding_sign_claim("funding looks interesting") is None
+
+    def test_a_ratio_at_an_extreme_is_recognised(self) -> None:
+        from argus.lui.thesis import _RATIO_EXTREME
+
+        m = _RATIO_EXTREME.search("the ETH/BTC ratio is near a 90-day low")
+        assert m is not None and m.group("n") == "90" and m.group("side").lower() == "low"
+        assert _RATIO_EXTREME.search("ETH will rally") is None
+
+    def test_the_ratio_is_placed_in_its_own_range(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui import thesis
+        from argus.lui.thesis import Kind, Reason, Result
+
+        def closes(symbol: str) -> list[tuple[float, float, float, float]]:
+            base = 2000.0 if symbol == "ETHUSDT" else 80000.0
+            drift = 1.0 if symbol == "ETHUSDT" else 1.3
+            return [(0.0, 0.0, base * (1 + 0.002 * drift * i), 0.0) for i in range(90)]
+
+        monkeypatch.setattr(thesis, "_closes", closes)
+        got = thesis._ratio_extreme(Reason(
+            "the ETH/BTC ratio is near a 90-day low", Kind.OTHER))
+        assert got.result is Result.SUPPORTED
+        assert "ETH/BTC ratio" in got.line and "of the way up" in got.line

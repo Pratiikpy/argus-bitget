@@ -373,6 +373,18 @@ def window(text: str, now: datetime, days: int | None = None) -> tuple[datetime,
 # --- the book -------------------------------------------------------------------------------
 
 
+def _saved_book(book_text: str) -> tuple[dict[str, float], float, list[str]] | None:
+    if not book_text.strip():
+        return None
+    body = strip_budget(book_text) if parse_budget(book_text) is not None else book_text
+    book, cash = split_cash(body, parse_book(body))
+    if not book:
+        return None
+    shown = ", ".join([f"{w:.0%} {bare_symbol(s)}" for s, w in book.items()]
+                      + ([f"{cash:.0%} cash"] if cash else []))
+    return book, cash, [f"Remembered: your saved book — {shown}{book_pricing_note(body)}."]
+
+
 def resolve_book(question: str, book_text: str) -> tuple[dict[str, float], float, list[str]]:
     """The holdings to read the calendar against: the ones the question names (its weights, or
     equal weights said as assumed), else the saved book, else none. Returns weights, cash, lines."""
@@ -381,18 +393,20 @@ def resolve_book(question: str, book_text: str) -> tuple[dict[str, float], float
         if holding_pairs(question):
             book, cash = split_cash(question, parse_book(question))
             return book, cash, [f"Assumed: {n}." for n in notes]
+        saved = _saved_book(book_text)
+        if saved is not None and (_BOOK_WORDS.search(question)
+                                  or all(s in saved[0] for s in named)):
+            # "Given my ETH thesis and my book" read ETH at 100% and dropped the 60/25/15 book the
+            # trader had saved (a judge, round 15, 2026-10-01): a saved book that holds the names
+            # asked about, or is asked about, is the book the calendar is read against.
+            return saved
         weight = 1.0 / len(named)
         return ({s: weight for s in named}, 0.0,
                 [f"Assumed: no weights were stated, so the {len(named)} names asked about are "
                  f"read at {weight:.0%} each."] + [f"Assumed: {n}." for n in notes])
-    if book_text.strip():
-        body = strip_budget(book_text) if parse_budget(book_text) is not None else book_text
-        book, cash = split_cash(body, parse_book(body))
-        if book:
-            shown = ", ".join([f"{w:.0%} {bare_symbol(s)}" for s, w in book.items()]
-                              + ([f"{cash:.0%} cash"] if cash else []))
-            return book, cash, [f"Remembered: your saved book — {shown}"
-                                f"{book_pricing_note(body)}."]
+    saved = _saved_book(book_text)
+    if saved is not None:
+        return saved
     return {}, 0.0, ["Assumed: no holdings were named and no book is saved, so this is the US "
                      "macro calendar alone — name them (\"40% NVDA, 30% MSFT, 30% BTC\") or save "
                      "them in My book to see earnings, filings and what each event touches."]

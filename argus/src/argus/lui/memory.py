@@ -124,6 +124,12 @@ _THESIS = re.compile(
 """One view per match, ending at the clause's end, so "I think NVDA will rise and I think BTC will
 crash" is two theses. Until 2026-09-28 the claim ran to the end of the message and only the first
 view was kept (research/harvest/04-mem0.md, the multi-topic case mem0 is built for)."""
+_IDEA = re.compile(
+    r"\bi\s+(?:want|plan|intend|would\s+like)\s+to\s+(short|long|buy|sell)\s+(?:some\s+)?"
+    r"(.{2,30}?)\s+(?:because|since|as)\s+(.{3,120}?)(?=\s*(?:[,.;!?]|$))", re.I)
+"""A trade idea said with its reason: "I want to short TSLA because its deliveries missed" is a
+thesis to keep, though it carries no "I think ... will". A judge asked for it back as "my TSLA idea"
+and it was never stored (round 15, 2026-10-01)."""
 _GOAL = re.compile(
     r"\b(?:i'?m|i\s+am|we'?re|we\s+are)\s+(?:saving|trying\s+to\s+save|putting\s+money\s+aside)\s+"
     r"(?:up\s+)?(?:for\s+)?(.{3,80}?)(?=\s*(?:[,.;!?]|\bso\b|\band\b|$))|"
@@ -234,6 +240,17 @@ def extract(question: str, now: datetime | None = None,
                 except Exception:
                     price = None
             add("thesis", named[0], lean, m.group(0), price)
+    for m in _IDEA.finditer(text):
+        named = research_symbols(m.group(2))[0]
+        if named:
+            price = None
+            if price_of is not None:
+                try:
+                    price = float(price_of(named[0]))
+                except Exception:
+                    price = None
+            add("thesis", named[0], "bear" if m.group(1).lower() in ("short", "sell") else "bull",
+                m.group(0), price)
     for m in _HOLDS.finditer(text):
         from argus.lui.research.parse import holding_pairs
 
@@ -458,6 +475,21 @@ def after(lines: list[str], request: Any, facts: list[Fact],
                 f"({leg / money:.0%} of the book) costs exactly that, and any larger leg costs "
                 f"more — the ceiling for this leg alone, before what your other holdings do "
                 f"beside it")))
+    shock = next((m for line in lines
+                  for m in [re.match(r"Bottom line: If (\S+) moves (-?\d+(?:\.\d+)?)%: your "
+                                     r"book moves about (-\d+(?:\.\d+)?)%", line)] if m), None)
+    if limit is not None and shock is not None:
+        # "How much of my drawdown budget would a 10% NVDA drop use?" got the book's move and no
+        # share of the stated limit (a judge, round 15, 2026-10-01): the stated shock, as a share
+        # of the limit, before the worst of the scenarios below it.
+        cap = float(limit.value) * 100
+        move = abs(float(shock.group(3)))
+        dollars = (f", ${move / 100 * float(capital.value):,.0f} of your "
+                   f"${float(capital.value):,.0f}" if capital is not None else "")
+        extra.append(remembered_line(limit, (
+            f"the {shock.group(1)} {float(shock.group(2)):+g}% shock moves the book -{move:.2f}%"
+            f"{dollars}, which uses {move / cap:.0%} of your {cap:g}% limit"
+            + (f" — {move - cap:.2f} points past it" if move > cap else " — inside it"))))
     if limit is not None and not (capital is not None and sized is not None):
         worst = [abs(float(m.group(1))) for line in lines
                  for m in re.finditer(r"(?:book|position)\s+moves\s+(?:about\s+)?(-\d+(?:\.\d+)?)%",
@@ -544,6 +576,8 @@ _RECALL = re.compile(
     r"\bwhat\s+(?:do|did|have)\s+(?:you|u)\s+(?:still\s+)?(?:remember|know|recall|noted?|stored?|"
     r"kept?|got|have)\b.*\b(?:about\s+me|me\b|my\s+\w+)|"
     r"\bwhat\s+(?:have|did)\s+i\s+(?:told|tell|said|say)\s+you\b|"
+    r"\b(?:remind|tell|show)\s+me\s+(?:again\s+)?what\s+(?:i|we)\s+(?:told|said|gave)\s+you\b|"
+    r"\bwhat\s+(?:was|were)\s+(?:it|that|those|the\s+\w+)\s+(?:i|we)\s+(?:told|said|gave)\s+you\b|"
     r"\b(?:list|show|tell)\s+(?:me\s+)?(?:everything|all)\s+(?:you\s+)?(?:remember|know|noted)\b|"
     r"\bwhat\s+(?:is|are)\s+(?:in\s+)?(?:your|the)\s+memory\b", re.I)
 """A question about what the console has kept of the trader (round 14: "What do you remember about

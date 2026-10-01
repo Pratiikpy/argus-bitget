@@ -85,9 +85,11 @@ def test_after_sets_a_loss_limit_against_the_loss_found() -> None:
     request = ResearchRequest(kind=ResearchKind.STRESS, symbols=("NVDAUSDT",))
     lines = ["Bottom line: If QQQ moves -10%: your book moves about -12.40%, hardest hit NVDA."]
     extra = mem.after(lines, request, facts)
-    assert extra and "past that limit" in extra[0] and "-12.4%" in extra[0]
+    joined = " ".join(extra)
+    assert extra and "past that limit" in joined and "-12.4%" in joined
+    assert "uses 124% of your 10% limit" in joined
     inside = mem.after(["If QQQ moves -5%: your book moves about -6.00%"], request, facts)
-    assert "stays inside it" in inside[0]
+    assert "stays inside it" in " ".join(inside)
 
 
 def test_the_server_acknowledges_a_statement_and_returns_the_memory(

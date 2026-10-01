@@ -235,6 +235,7 @@ class TestTheNewestEnginesAreReachable:
 
         monkeypatch.setattr(task, "run", run)
         monkeypatch.setattr(task, "_price_path", lambda symbol: [])
+        monkeypatch.setattr(task.thesis, "context", lambda symbol: {})
         from argus.lui import exposures
         monkeypatch.setattr(exposures, "exposures_answer",
                             lambda before, after: (["exposure reading"], [], {}))

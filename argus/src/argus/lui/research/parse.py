@@ -65,6 +65,16 @@ _PAIR_NAME_FIRST = re.compile(
 read with no holdings at all, so SPY — the holding — was analysed as the add."""
 
 
+_WORD_WEIGHT = {"half": 0.5, "a third": 1 / 3, "third": 1 / 3, "a quarter": 0.25, "quarter": 0.25,
+               "two thirds": 2 / 3, "three quarters": 0.75, "a fifth": 0.2, "fifth": 0.2}
+_PAIR_WORD = re.compile(
+    rf"\b(half|two thirds|three quarters|(?:a\s+)?(?:third|quarter|fifth))"
+    rf"\s+(?:in\s+|of\s+)?(?:my\s+)?({_WORDISH})", re.I)
+"""A weight said in words: "half NVDA, half ETH", "a third BTC". Only the percentage forms were
+read, so a book said the way people say it ("im long half rNVDA half ETH") was no book at all
+(a judge, round 15, 2026-10-01)."""
+
+
 _PAIR_FRACTION = re.compile(rf"({_WORDISH})\s*=\s*(0?\.\d+|1(?:\.0+)?)\b", re.I)
 
 
@@ -1348,6 +1358,8 @@ def holding_pairs(text: str) -> list[tuple[int, str, float]]:
         keep(match.span(), match.group(1), float(match.group(2)))
     for match in _PAIR_PCT_FIRST.finditer(text):
         keep(match.span(), match.group(2), float(match.group(1)) / 100.0)
+    for match in _PAIR_WORD.finditer(text):
+        keep(match.span(), match.group(2), _WORD_WEIGHT[match.group(1).lower()])
     for match in _PAIR_NAME_FIRST.finditer(text):
         keep(match.span(), match.group(1), float(match.group(2)) / 100.0)
     # The alias must touch the figure: "50%苹果" is a pair, "50%和苹果" is not (the 50% there
@@ -1388,7 +1400,32 @@ def holding_pairs(text: str) -> list[tuple[int, str, float]]:
             found.append((rest.start(), hit[0],
                           1.0 - float(cash.group(1) or cash.group(2)) / 100))
     found.sort()
-    return found or _amount_pairs(text)
+    return found or _bare_weight_pairs(text) or _amount_pairs(text)
+
+
+_BARE_PAIR = re.compile(
+    r"(?<![\w.%$])([A-Za-z][A-Za-z.]{1,11})\s*[:=]?\s*(\d{1,3}(?:\.\d)?)(?![\d.]*[%$a-z])", re.I)
+
+
+def _bare_weight_pairs(text: str) -> list[tuple[int, str, float]]:
+    """"META 30, GOOGL 30, AMZN 40": a number beside each name with no sign, and the numbers add
+    to 100, is a book written in percent. Read as an equal-weight book until 2026-10-01, with a
+    note that no book was stated, which described a reading the trader never wrote. Two names at
+    least, and the total must be 100 to within half a point, so "NVDA 50" alone or a list of
+    share counts is left to the readers that own it."""
+    if "%" in text or "$" in text:
+        return []
+    trust = not _shouting(text)
+    out: list[tuple[int, str, float]] = []
+    for match in _BARE_PAIR.finditer(text):
+        hit = resolve_name(match.group(1), trust_case=trust)
+        if hit is None:
+            continue
+        out.append((match.start(), hit[0], float(match.group(2)) / 100.0))
+    total = sum(w for _, _, w in out)
+    if len(out) >= 2 and len({sym for _, sym, _ in out}) == len(out) and abs(total - 1.0) <= 0.005:
+        return out
+    return []
 
 
 _REST = re.compile(r"\b(?:the\s+)?rest\s+(?:is\s+|in\s+|into\s+|of\s+it\s+in\s+)?"
@@ -1466,7 +1503,7 @@ _BOOK_COUNT = re.compile(
     # "3x ETH" is a leverage multiple, not three ETH: a number with "x" written against it is
     # skipped; "2 x NVDAUSDT", spaced, is still a count. A number written against "=" is a weight
     # ("NVDA=0.6 AAPL=0.4"), not a count of the name that follows it.
-    r"(?<![\w.%$=])(\d[\d,]*(?:\.\d+)?)(?!x\b)(?:\s+x(?=\s))?\s*"
+    r"(?<![\w.%$=])(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)(?!x\b)(?:\s+x(?=\s))?\s*"
     r"(?:(?:contracts?|units?|lots?|shares?|coins?|tokens?)\s+(?:of\s+)?)?"
     r"([A-Za-z][A-Za-z0-9.]{1,15})\b", re.I)
 """"long 2 NVDAUSDT", "2 contracts of TSLAUSDT", "0.5 BTC": a count of the contract's own unit,
@@ -2845,6 +2882,14 @@ def read_request(text: str) -> ResearchRequest | None:
                                    notes=(*_forecast_note(raw), "crypto read as bitcoin"))
         return ResearchRequest(kind=ResearchKind.MACRO, symbols=symbols[:1],
                                notes=_forecast_note(raw))
+    if (_NEWS.search(raw) and not symbols and _CRYPTO_WORD.search(raw)
+            and not about_the_record(raw)
+            and not re.search(r"\b(?:stocks?|equities|nasdaq|s&p|wall\s+street)\b", raw, re.I)):
+        # "What news is moving crypto today?" named no contract, so it fell to the evidence
+        # question about the desk's own decisions (a judge, round 15); "the crypto market" was
+        # read through QQQ. Crypto is read as bitcoin, as the macro reading already does.
+        return ResearchRequest(kind=ResearchKind.NEWS, symbols=("BTCUSDT",),
+                               notes=("crypto read as bitcoin",))
     if _NEWS.search(raw) and not symbols and _MARKET_WIDE.search(raw) and not about_the_record(raw):
         return ResearchRequest(kind=ResearchKind.NEWS, symbols=(BENCHMARK,),
                                notes=("the market read as the Nasdaq-100 through QQQ",))
@@ -3513,10 +3558,12 @@ def _contextual_follow_up(text: str, prior: list[str],
                           book_text: str) -> ResearchRequest | None:
     """A new book, a bare "and that?", or "is that bullish?" — each read against the previous
     research question in the client's own history."""
-    if GIVEN_THAT.search(text) and not research_symbols(text)[0]:
+    if GIVEN_THAT.search(text) and not research_symbols(text)[0] and detect(text) is None:
         # "what should I do differently given that", after stating 2 ETH and $5k in an S&P
         # fund, was answered for ETH alone (a first-time-user audit, 2026-09-30): the earlier
-        # question, with everything it stated.
+        # question, with everything it stated. A question that is a request on its own ("What
+        # news is moving crypto today and what should I do about it?") is not one of these: it
+        # was answered with the DOGE quote of the turn before.
         found = _previous_request(prior, book_text)
         if found is not None:
             earlier, base = found

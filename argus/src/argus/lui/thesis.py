@@ -330,15 +330,13 @@ def _relative(reason: Reason, found: Mapping[str, Any] | None) -> Tested:
                       evidence=tuple(Finding(f"{s.removesuffix('USDT')} daily closes, Bitget",
                                              "Bitget market candles", _candles_url(s))
                                      for s in (first, second)))
-    if ahead and all(ahead):
-        result = Result.CONTRADICTED if claims_behind else Result.SUPPORTED
-    elif ahead and not any(ahead):
-        result = Result.SUPPORTED if claims_behind else Result.CONTRADICTED
-    else:
-        result = Result.NOT_MEASURABLE
-    return Tested(reason.text, reason.kind, result,
-                  "So far: " + "; ".join(parts) + ". That is the recent record, not the claim: "
-                  "whether it keeps up is what comes next, and no data tests that.",
+    # A claim about what comes next is not settled by what already happened: "Supported" on a
+    # forecast, beside the line "no data tests that", contradicted itself (a judge, round 15).
+    del ahead, claims_behind
+    return Tested(reason.text, reason.kind, Result.NOT_MEASURABLE,
+                  "A forecast, so the record is context and not a test — so far: "
+                  + "; ".join(parts) + ". Whether it keeps up is what comes next, and no data "
+                  "tests that.",
                   evidence=tuple(Finding(f"{s.removesuffix('USDT')} daily closes, Bitget",
                                          "Bitget market candles", _candles_url(s))
                                  for s in (first, second)))
@@ -432,6 +430,55 @@ def _closes(symbol: str) -> list[tuple[float, float, float, float]]:
                                 "granularity": "1D", "limit": "100"}) or []
     ordered = sorted(rows, key=lambda r: int(r[0]))
     return [(float(r[2]), float(r[3]), float(r[4]), float(r[6])) for r in ordered]
+
+
+_RATIO_EXTREME = re.compile(
+    r"\b[A-Za-z]{2,6}\s*/\s*[A-Za-z]{2,6}\b.{0,60}\b(?:near|at|hit(?:ting)?|close to|around)\b"
+    r".{0,25}?\b(?:(?P<n>\d+)[- ]?(?:day|d)\s+)?(?P<side>low|high|bottom|top)s?\b", re.I)
+"""A claim that a ratio of two contracts sits at an extreme of its recent range."""
+
+
+def _ratio_extreme(reason: Reason) -> Tested:
+    """Where the ratio stands in its own range over the days the claim names (90 at most: Bitget
+    serves no more daily bars). The price test reads one name's history, so a ratio claim was
+    left "not tested" beside figures that answered it (a judge, round 15)."""
+    m = _RATIO_EXTREME.search(reason.text)
+    names = _two_names(reason.text)
+    if m is None or len(names) != 2:
+        return Tested(reason.text, reason.kind, Result.NOT_TESTED, _UNTESTED[Kind.OTHER])
+    try:
+        top, bottom = _closes(names[0]), _closes(names[1])
+    except Exception:
+        top = bottom = []
+    n = min(len(top), len(bottom))
+    if n < 30:
+        return Tested(reason.text, reason.kind, Result.NOT_TESTED,
+                      "The two names' daily candles did not answer, so the ratio is not tested.")
+    window = min(int(m.group("n") or n), n)
+    series = [top[-window + i][2] / bottom[-window + i][2] for i in range(window)]
+    low, high, now = min(series), max(series), series[-1]
+    place = (now - low) / (high - low) if high > low else 0.5
+    wants_low = m.group("side").lower() in ("low", "bottom")
+    near = place <= 0.2 if wants_low else place >= 0.8
+    label = f"{names[0].removesuffix('USDT')}/{names[1].removesuffix('USDT')}"
+    asked = int(m.group("n") or 0)
+    short = f" ({window} days is the most Bitget's daily history holds)" if asked > window else ""
+    return Tested(
+        reason.text, reason.kind, Result.SUPPORTED if near else Result.CONTRADICTED,
+        f"The {label} ratio is {now:.5g} now against a {window}-day range of {low:.5g} to "
+        f"{high:.5g}{short} — {place:.0%} of the way up that range, so it is "
+        f"{'' if near else 'not '}near the {'low' if wants_low else 'high'} "
+        f"(within 20% of it counts as near).",
+        evidence=tuple(Finding(f"{s.removesuffix('USDT')} daily closes, Bitget",
+                               "Bitget market candles", _candles_url(s)) for s in names))
+
+
+def ratio_extreme(text: str) -> Tested | None:
+    """The range test for a question or claim about a ratio at a low or high, or ``None`` when
+    ``text`` asks no such thing."""
+    if _RATIO_EXTREME.search(text) is None:
+        return None
+    return _ratio_extreme(Reason(text, Kind.OTHER))
 
 
 def _taker_flow(symbol: str) -> float | None:
@@ -872,6 +919,22 @@ _HEAT = re.compile(
     r"overheat|crowded|extreme|elevated|stretched|over-?leveraged|\bhot\b|too\s+high", re.I)
 
 
+_FUNDING_NEGATIVE = re.compile(
+    r"\bfunding\b[^.;]{0,40}\b(negative|below zero|under zero)\b|\bnegative funding\b|"
+    r"\bshorts? (are )?pay(ing)?\b", re.I)
+_FUNDING_POSITIVE = re.compile(
+    r"\bfunding\b[^.;]{0,40}\b(positive|above zero|over zero)\b|\bpositive funding\b|"
+    r"\blongs? (are )?pay(ing)?\b", re.I)
+
+
+def _funding_sign_claim(text: str) -> int | None:
+    """-1 when the reason says funding is negative, +1 when it says positive, else None: a claim
+    about the sign is answered by the sign, not by which side is crowded (a judge, round 15,
+    2026-10-01: "funding is negative" was marked Supported at +0.0100%)."""
+    neg, pos = bool(_FUNDING_NEGATIVE.search(text)), bool(_FUNDING_POSITIVE.search(text))
+    return -1 if neg and not pos else 1 if pos and not neg else None
+
+
 def _positioning(reason: Reason, quote: Mapping[str, Any], name: str) -> Tested:
     ticker: Mapping[str, Any] = next(iter((quote.get("quotes") or {}).values()), {})
     try:
@@ -879,6 +942,15 @@ def _positioning(reason: Reason, quote: Mapping[str, Any], name: str) -> Tested:
     except (KeyError, TypeError, ValueError):
         return Tested(reason.text, reason.kind, Result.NOT_TESTED,
                       f"No funding rate answered for {name} this time.")
+    sign = _funding_sign_claim(reason.text)
+    if sign is not None and funding != 0:
+        agrees = (funding < 0) == (sign < 0)
+        side = "shorts pay longs" if funding < 0 else "longs pay shorts"
+        return Tested(reason.text, reason.kind,
+                      Result.SUPPORTED if agrees else Result.CONTRADICTED,
+                      f"Funding is {funding:+.4f}% per interval on Bitget — {side}, so it is "
+                      f"{'negative' if funding < 0 else 'positive'}, "
+                      f"{'as' if agrees else 'not as'} the claim says.")
     shorts_claim = bool(re.search(r"short|squeeze", reason.text, re.I))
     if abs(funding) < 0.005:
         if _HEAT.search(reason.text) and re.search(r"funding|overheat|leverag", reason.text, re.I):
@@ -1115,6 +1187,8 @@ def check(stated: Sequence[Reason], *, name: str, data: Mapping[str, Mapping[str
             result, line, notes = macro_thesis.test(reason.text, macro, name)
             out.append(Tested(reason.text, reason.kind, Result(result), line, evidence=tuple(
                 Finding(note, "event study and FRED snapshot") for note in notes)))
+        elif reason.kind is Kind.OTHER and _RATIO_EXTREME.search(reason.text):
+            out.append(_ratio_extreme(reason))
         else:
             out.append(Tested(reason.text, reason.kind, Result.NOT_TESTED, _UNTESTED[reason.kind]))
     ctx = ctx or {}

@@ -674,8 +674,10 @@ _SIMPLER = re.compile(
     r"(?:simpler|more\s+simply|simply|in\s+simple(?:r)?\s+(?:terms|words|english)|in\s+plain\s+"
     r"(?:english|words|terms)|like\s+i'?m\s+(?:5|five|new))|simpler(?:\s+please)?|eli5|"
     r"in\s+plain\s+english|i\s+don'?t\s+(?:understand|get\s+it)|what\s+does\s+that\s+mean)"
+    r"\s*(?:[,;]?\s*(?:i'?m|i\s+am)\s+(?:new|a\s+(?:beginner|newbie|noob))\b[^?.!]*)?"
     r"\s*(?:please)?\s*[?.!]*\s*$", re.I)
-"""A request to say the last answer again, simply."""
+"""A request to say the last answer again, simply, with or without "I'm new to trading" after it
+("explain that in simple words, I'm new to trading" was declined, a judge, round 15)."""
 
 _WHICH_ONE = re.compile(
     r"^\s*(?:so\s+|and\s+)?which\s+(?:one|of\s+(?:them|the\s+two)|is)\s+"
@@ -1148,6 +1150,19 @@ def _answer(
         # Before the research engines, which read the fall as a market shock on a book (a
         # hostile review, round 12).
         return engine_payload(*loss_said, by="sizing")
+    falsified = thesis_answer.falsify(text, prior, book=book)
+    if falsified is not None:
+        f_lines, f_sources, f_data = falsified
+        if thesis_answer.SIZE_ASKED.search(text) and f_data.get("thesis"):
+            # "...and how should I size it given my limit?" is the second half of one question
+            # (a judge, round 15): asked of the sizing engine, with the limit the trader stated.
+            case = f_data["thesis"]
+            sized = _answer(
+                f"How big should my {case['name']} {'short' if case['case'] == 'bear' else 'long'}"
+                f" position be given my limit?", prior, now=now, visitor=visitor, book=book)
+            if not sized.get("refused") and sized.get("lines"):
+                f_lines = [*f_lines, "And on sizing it:", *(str(x) for x in sized["lines"])]
+        return engine_payload(f_lines, f_sources, f_data, by="thesis")
     revised = thesis_answer.revise(text, prior, book=book) if prior else None
     if revised is None:
         revised = thesis_answer.nothing_to_revise(text, prior)
@@ -1490,8 +1505,9 @@ def _answer(
             spaced = re.sub(r"(\d)(bps?)\b", r"\1 \2", " ".join(before[:4]))
             words = [c for c in concepts.CONCEPTS
                      if re.search(rf"\b(?:{c.pattern})\b", spaced, re.I)][:4]
+            plain = head if head[1:2].isupper() else head[:1].lower() + head[1:]
             again["lines"] = [
-                f"Bottom line: in plain words, {head[:1].lower() + head[1:]}",
+                f"Bottom line: in plain words, {plain}",
                 *(f"{c.name[:1].upper() + c.name[1:]}: {c.definition}" for c in words),
                 f"Assumed: read as asking the previous question again more simply — "
                 f"\"{prior[-1][:60]}\"; ask it with a name to change the subject."]

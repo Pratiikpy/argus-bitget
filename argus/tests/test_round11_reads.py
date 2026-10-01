@@ -222,7 +222,7 @@ def test_one_name_against_another_reads_the_record_so_far() -> None:
     assert split.result is Result.NOT_MEASURABLE and "no data tests that" in split.line
     ahead = dict(found, ETHUSDT={7: 0.0, 30: 0.0, 89: 0.1})
     assert _relative(Reason("SOL will outrun ETH", Kind.RELATIVE), ahead).result \
-        is Result.SUPPORTED
+        is Result.NOT_MEASURABLE
 
 
 def test_a_macro_premise_is_checked_against_the_fed_funds_rate() -> None:

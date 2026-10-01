@@ -59,6 +59,7 @@ def engines(monkeypatch: pytest.MonkeyPatch) -> list[ResearchRequest]:
 
     monkeypatch.setattr(task_mod, "run", run)
     monkeypatch.setattr(task_mod, "_price_path", lambda symbol: [])
+    monkeypatch.setattr(task_mod.thesis, "context", lambda symbol: {})
     monkeypatch.setattr(task_mod, "contracts", lambda: dict.fromkeys(LISTED))
     monkeypatch.setattr(exposures, "exposures_answer", _exposures([]))
     return seen
@@ -371,6 +372,7 @@ def figures(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
 
     monkeypatch.setattr(task_mod, "run", run)
     monkeypatch.setattr(task_mod, "_price_path", lambda symbol: [])
+    monkeypatch.setattr(task_mod.thesis, "context", lambda symbol: {})
     monkeypatch.setattr(task_mod, "contracts", lambda: dict.fromkeys(LISTED))
     monkeypatch.setattr(exposures, "exposures_answer", _exposures([]))
     return state

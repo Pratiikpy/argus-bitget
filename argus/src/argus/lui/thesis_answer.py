@@ -290,6 +290,88 @@ def nothing_to_revise(text: str, prior: list[str]
             {"thesis": None, "revision_without_thesis": True})
 
 
+FALSIFY = re.compile(
+    r"\bwhat\s+(?:would|could|will)(?:\s+it)?\s+(?:prove|show|make|mean|tell)"
+    r"\b[^?.]{0,40}\b(?:wrong|invalid\w*)|\bwhat\s+would\s+change\s+my\s+mind\b|"
+    r"\bhow\s+(?:would|will|do)\s+i\s+know\s+(?:if\s+)?(?:i(?:'m|\s+am))?\s*wrong\b", re.I)
+"""A follow-up asking what would show the trader's thesis is wrong."""
+
+_BREAKS = {
+    "REVERSION": "the price keeps going the way it has — a fresh extreme, not a return",
+    "ACTIVITY": "the activity figure it rests on turns down in the next two readings",
+    "MOMENTUM": "the trend turns — a daily close beyond the stop level below",
+    "POSITIONING": "the crowd and funding move to the other side of the claim and stay there",
+    "SENTIMENT": "the sentiment reading moves away from the claim and holds there for a week",
+    "VALUATION": "the market stops paying that multiple — the ratio moves further from the claim",
+    "DRIVER": "the driver's next report comes in against the claim",
+    "RELATIVE": "the gap to the other name closes or reverses over the next two weeks",
+    "FLOWS": "net flows turn the other way for a week running",
+    "EARNINGS": "the next earnings report misses the claim",
+    "MACRO": "the next release of the macro series comes in the other way",
+    "DIRECTION": "price closes beyond the stop level below",
+    "OTHER": "the figure the claim rests on moves against it",
+}
+
+
+def falsify(text: str, prior: list[str], *, book: str = "", memory: str = ""
+            ) -> tuple[list[str], list[Source], dict[str, Any]] | None:
+    """"What would prove my thesis wrong, and how should I size it?" after a thesis: for each
+    reason still standing, what would break it, what today's data already says of it, and a stop
+    level from the last 20 daily bars (a judge, round 15: it was told "that" had nothing to refer
+    to, and the reasons were not turned into things that can be watched)."""
+    if not FALSIFY.search(text) or asks(text):
+        return None
+    current = _standing(list(prior))
+    if current is None:
+        return (["Bottom line: there is no thesis earlier in this conversation to test. State it "
+                 "with its reasons — for example \"ETH beats BTC because funding is negative\" — "
+                 "and what would prove it wrong is worked out reason by reason."], [],
+                {"thesis": None, "falsify_without_thesis": True})
+    from argus.lui import thesis
+
+    earlier, _stated, kept, dropped = current
+    name = research_names(earlier)
+    case = _case(earlier)
+    now_said: dict[str, str] = {}
+    try:
+        _lines, _sources, data = answer(earlier, book=book, memory=memory)
+        for row in (data.get("thesis") or {}).get("tested", []):
+            now_said[str(row.get("reason"))] = str(row.get("result"))
+    except Exception:
+        pass
+    out = [f"Bottom line: your {case} case for {name} is wrong if any of these happens; each is "
+           f"set beside what today's data already says of that reason."]
+    for r in kept:
+        state = now_said.get(r.text)
+        today = {"contradicted": " Today's data already contradicts it.",
+                 "supported": " Today's data backs it.",
+                 "not_measurable": " No data tests it today.",
+                 "not_tested": " Not tested today."}.get(state or "", "")
+        breaks = _BREAKS.get(r.kind.name, _BREAKS["OTHER"])
+        if r.kind.name == "OTHER" and thesis._RATIO_EXTREME.search(r.text):
+            breaks = "the ratio breaks through that extreme and keeps going instead of turning"
+        out.append(f"\"{r.text}\": wrong if {breaks}.{today}")
+    stop = ""
+    try:
+        rows = thesis._closes(name + "USDT")[-20:]
+        if len(rows) >= 10:
+            last = rows[-1][2]
+            level = min(r[1] for r in rows) if case == "bull" else max(r[0] for r in rows)
+            away = (level / last - 1) * 100
+            stop = (f"Stop level: the {'lowest low' if case == 'bull' else 'highest high'} of the "
+                    f"last {len(rows)} daily bars is {level:,.4g}, {away:+.1f}% from the last "
+                    f"close of {last:,.4g} — a daily close beyond it breaks the trade whatever the "
+                    f"reasons say.")
+    except Exception:
+        stop = ""
+    if stop:
+        out.append(stop)
+    if dropped:
+        out.append("Assumed: " + " and ".join(f"\"{r.text}\"" for r in dropped)
+                   + " stays set aside, as you said.")
+    return out, [], {"thesis": {"name": name, "case": case}, "falsifiers": [r.text for r in kept]}
+
+
 def strongest(text: str, prior: list[str], *, book: str = "", memory: str = ""
               ) -> tuple[list[str], list[Source], dict[str, Any]] | None:
     """"Which of those two remaining reasons is the strongest?" after a thesis and its

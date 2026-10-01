@@ -367,6 +367,17 @@ def _quote_extras(raw_text: str, quoted: list[tuple[str, Any]],
                 f"({a.last} over {b.last}).")
         lines.append(text)
         lead = lead or text
+        from argus.lui import thesis
+
+        # "is the eth/btc ratio near its 90 day low?" got the current ratio and two quotes and
+        # no place in the range (a judge, round 15): the thesis engine's range test answers it.
+        placed = thesis.ratio_extreme(raw_text)
+        if placed is not None and placed.result in (thesis.Result.SUPPORTED,
+                                                    thesis.Result.CONTRADICTED):
+            lines.insert(0, placed.line)
+            lead = placed.line
+            sources.extend(Source(kind="venue", ref=f.url, detail=f.text)
+                           for f in placed.evidence)
         if days:
             over_time = _ratio_over_time(a_sym, b_sym, days)
             if over_time is not None:
