@@ -127,6 +127,34 @@ def tests_answer() -> tuple[list[str], list[Source], dict[str, Any]]:
         "tests_quoted": quoted or None}
 
 
+VS_Q = re.compile(
+    r"\b(?:what\s+(?:can|does)\s+(?:you|argus|this|it)\s+do\s+(?:that|which)\s+(?:chat\s*gpt|gpt|"
+    r"claude|gemini|a\s+chatbot|an?\s+(?:ai|llm))\s+(?:can(?:'?t|not)|doesn'?t|does\s+not)|"
+    r"how\s+(?:are|is)\s+(?:you|this|argus|it)\s+(?:different|better)\s+(?:from|than)\s+"
+    r"(?:chat\s*gpt|gpt|claude|gemini|a\s+chatbot|just\s+asking\s+an?\s+(?:ai|llm))|"
+    r"why\s+(?:use|not\s+just\s+use)\s+(?:you|this|argus)\s+(?:instead\s+of|over|rather\s+than)\s+"
+    r"(?:chat\s*gpt|gpt|claude|gemini|a\s+chatbot))\b", re.I)
+"""The product against a general chatbot: "what can you do that ChatGPT cannot" was declined with
+"that has nothing to refer to" (round 17)."""
+
+
+def vs_answer() -> tuple[list[str], list[Source], dict[str, Any]]:
+    lines = [
+        "Bottom line: it does not write the numbers. The language model only reads your question "
+        "and picks an engine; each figure is computed at that moment from Bitget's live data or "
+        "SEC filings, and the receipt under the answer names the source.",
+        "What that buys you: a price, a cost, a loss range or a position size you can trace to "
+        "its inputs; \"I don't know\" and a stated reason when the data is missing, not a "
+        "plausible guess; and a record of the paper desk's decisions that is hash-chained, so a "
+        "past row cannot be quietly edited.",
+        "What a general chatbot does better: write, code and talk about anything else. This "
+        "console only answers questions about Bitget's markets, and it is not advice.",
+    ]
+    explains(*lines)
+    return lines, [Source("computation", "argus.lui.arbiter", "which reader decides a question")
+                   ], {}
+
+
 HOW_Q = re.compile(
     r"^\s*(?:(?:and|so|but)\s+)?(?:how\s+do\s+you\s+know\s+(?:all\s+)?(?:this|that|these|it)|"
     r"where\s+(?:do|does)\s+(?:you|this|the\s+data|your\s+data|the\s+numbers)\s+(?:get|come\s+from)"

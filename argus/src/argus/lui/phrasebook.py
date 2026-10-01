@@ -333,8 +333,8 @@ PHRASES: dict[str, dict[Language, str]] = {
         ),
     },
     "pos.header": {
-        Language.EN: "{count} open position(s):",
-        Language.ZH: "{count} 个持仓：",
+        Language.EN: "{count} open position(s) held by the paper desk (not your own book):",
+        Language.ZH: "模拟盘持有 {count} 个持仓（不是你自己的持仓）：",
     },
     "pos.row": {
         Language.EN: "  seq {seq} {symbol} {side} {quantity} @ {price}",

@@ -51,6 +51,19 @@ _LOSE_MORE = re.compile(
 _HOW_BUYING_WORKS = re.compile(
     r"\bhow\s+(?:does|do)\s+(?:buying|trading|investing|it|this)\s+(?:actually\s+|really\s+)?work\b|"
     r"\bhow\s+(?:buying|trading)\s+works\b", re.I)
+_PLACE_TRADE = re.compile(
+    r"\bhow\s+(?:do|can|would|should)\s+i\s+(?:place|make|open|enter|put\s+in|execute|submit)\s+"
+    r"(?:a\s+|an\s+|my\s+(?:first\s+)?)?(?:trade|order|position|bet)\b|"
+    r"\bhow\s+to\s+(?:place|make|open|enter|put\s+in|execute)\s+(?:a\s+|an\s+)?"
+    r"(?:trade|order|position)\b", re.I)
+"""Placing a trade, which happens on Bitget: "how do I place a trade" was declined (round 17)."""
+_FREE = re.compile(
+    r"\b(?:is|are)\s+(?:this|it|argus|the\s+(?:console|tool|app|site|service))\s+(?:really\s+)?"
+    r"(?:free|paid|free\s+to\s+use)\b|\bdo\s+i\s+(?:have\s+to|need\s+to)\s+(?:pay|sign\s*up|"
+    r"register|log\s*in|create\s+an?\s+account)\b|\bhow\s+much\s+(?:does|is)\s+(?:argus|this\s+"
+    r"(?:console|tool|app|site|service))\s+(?:cost|to\s+use)\b|\bany\s+(?:fees?|charges?|"
+    r"subscription)\s+(?:to\s+use|for\s+using)\b", re.I)
+"""Whether using the console costs anything: "is this free?" was declined (round 17)."""
 _GO_WRONG = re.compile(
     r"\bwhat\s+(?:could|can|might|would)\s+go\s+wrong\b|\bwhat\s+are\s+the\s+(?:main\s+|biggest\s+)?"
     r"risks\b|\bwhat\s+(?:could|can)\s+i\s+lose\b", re.I)
@@ -69,7 +82,8 @@ _GUARANTEE = re.compile(
     r"\b(?:can'?t|cannot|won'?t)\s+lose\b(?!\s+(?:more|over|above|beyond|past|than|up\s+to|[$\d]))|\bsure\s+(?:thing|bet|profit|win|money)\b|"
     r"\bpromise\s+(?:me\s+)?(?:a\s+)?(?:return|profit)|"
     r"\bguaranteed\s+to\s+(?:make|win|profit|pay|go\s+up|rise|earn)\b|"
-    r"\bguaranteed\s+(?:trade|pick|winner|call)\b|\b(?:certain|sure)\s+to\s+(?:make|win|profit|go\s+up|rise)\b",
+    r"\bguaranteed\s+(?:trade|pick|winner|call)\b|\bguaranteed\s+(?:\d+x|\d+%|(?:\w+\s+){0,2}?"
+    r"(?:coins?|tokens?|stocks?|crypto|investments?|multibaggers?|moonshots?))\b|\b(?:certain|sure)\s+to\s+(?:make|win|profit|go\s+up|rise)\b",
     re.I)
 """A request for a certain return: "guarantee me a 50% return on BTC" was deflected into price data
 instead of being told no (a judge's audit, 2026-09-30). "I can't lose more than 10% of my book"
@@ -122,6 +136,26 @@ _SAFE = (
     "--dry-run, which previews an order and sends nothing.",
 )
 
+_PLACING = (
+    "Bottom line: not here — this console never places an order; trades are placed on Bitget "
+    "itself, after you have opened and funded an account there.",
+    "On Bitget: open the page for the contract, choose the order type (a market order fills now "
+    "at the best price on offer; a limit order waits at the price you set), enter the size and "
+    "confirm. For a futures contract, set isolated or cross margin and the leverage first.",
+    "Before you do, ask this console what it would cost and how far it could go against you: "
+    "\"what does it cost to buy $500 of BTC\" or \"how much can I lose on TSLA this week\". The "
+    "trading commands it shows are marked --dry-run, which previews an order and sends nothing.",
+)
+_FREE_TO_USE = (
+    "Bottom line: yes — using this console costs nothing: there is no account, no login, no card "
+    "and no subscription.",
+    "One limit: the language model that reads oddly phrased questions answers up to 40 questions "
+    "an hour from one network address. Past that, the console's own readers answer, in English, "
+    "and every figure is still computed from live data.",
+    "Trading is separate: Bitget charges its own fees when you trade there, and this console "
+    "never places an order. Ask \"what does it cost to buy $500 of BTC\" for the fee on a real "
+    "order book.",
+)
 _NOT_ADVICE = (
     "Bottom line: no — this console never tells anyone what to buy or sell. It computes from live "
     "market data and says where each figure came from, and the decision and the risk stay yours.",
@@ -152,6 +186,64 @@ _LOSING = (
     "Ask \"what is liquidation\" or \"how much can I lose on TSLA this week\" for figures on a "
     "real name.",
 )
+_LOOKAHEAD = re.compile(
+    r"\blook[\s-]?ahead\b|\bfuture\s+(?:data\s+)?leak\w*|\b(?:data|label|target)\s+leak\w*|"
+    r"\bpeek\w*\s+(?:at|into)\s+the\s+future\b", re.I)
+_OVERFIT = re.compile(
+    r"\boverfit\w*|\bover[\s-]fit\w*|\bcurve[\s-]?fit\w*|\bdata[\s-]?snoop\w*|\bp[\s-]?hack\w*|"
+    r"\bmultiple[\s-]testing\b|\bcherry[\s-]?pick\w*\s+(?:backtest|result)", re.I)
+_SURVIVOR = re.compile(r"\bsurvivor(?:ship)?\s+bias\b|\bsurvivorship\b|\bpoint[\s-]in[\s-]time\b",
+                       re.I)
+_BACKTEST_COSTS = re.compile(
+    r"\b(?:back[\s-]?tests?\w*|simulat\w+|paper\s+results?)\b.{0,60}\b(?:fees?|costs?|slippage|"
+    r"commissions?|spreads?)\b|\b(?:fees?|costs?|slippage|commissions?)\b.{0,60}\b(?:back[\s-]?"
+    r"tests?\w*|simulat\w+)\b", re.I)
+"""Questions about how this system's own testing is done — each is answered from what the code
+does and says what it does not cover (round 17: "is the lookahead bias a problem in your
+backtests" was answered with the hash-chain integrity check)."""
+
+_LOOKAHEAD_A = (
+    "Bottom line: it is guarded against where it can occur, and not proven absent — here is what "
+    "is guarded and what is not.",
+    "A backtest rule is shown only the bars up to the decision bar, and its order fills on the "
+    "next bar (the engine's signal signature, `backtest/engine.py`).",
+    "\"Has this been here before\" matches only states stamped at or before the question's date, "
+    "and a past state's outcome counts only once its window has closed — a rival review found "
+    "this leak in September and it was closed.",
+    "As-of questions on filings drop every line filed after the date asked about. Not covered: "
+    "prices that a data vendor later restated (adjusted closes are re-adjusted after later "
+    "splits and dividends) — that effect has not been measured here.",
+)
+_OVERFIT_A = (
+    "Bottom line: the guard is a test run after the search, not trust in the winner — a search "
+    "that tries many rules will find one that looks good by chance.",
+    "Rules found by searching a pool go through a multiple-testing gate (Hansen's SPA and Romano-"
+    "Wolf StepM, `backtest/snooping.py`), and the out-of-sample half is reported separately: a "
+    "Sharpe that keeps less than half of its in-sample value out of sample is flagged as "
+    "overfitted, not hidden.",
+    "A Sharpe or a distribution built on too few observations is refused with the count, not "
+    "printed. Not covered: no gate removes the choice of which rules were tried in the first "
+    "place; a result here is a candidate, not a proof.",
+)
+_SURVIVOR_A = (
+    "Bottom line: survivorship is a real limit here and has not been measured.",
+    "History is read for the contracts Bitget lists today, so a contract that was delisted is "
+    "not in it — a result over \"the stocks on the list\" is a result over the survivors.",
+    "For as-of filing questions, a figure is only taken from a filing dated on or before the "
+    "date asked about. Not covered: index membership as of a past date, which this console does "
+    "not hold.",
+)
+_COSTS_A = (
+    "Bottom line: yes — the backtest engine cannot be run without a cost: there is no zero-fee "
+    "setting.",
+    "The cost model cannot be built without explicit rates, and a frictionless research model "
+    "raises an error if a decision is gated on it (`cost/model.py`). The taker round trip on "
+    "Bitget is 0.12% (12 bps) — larger than the typical intraday edge measured, which is why "
+    "most quick strategies lose once it is counted.",
+    "Not covered: market impact on a size larger than the order book shows.",
+)
+
+
 _NO_GUARANTEE = (
     "Bottom line: no — no return can be guaranteed, by this console or by anyone honest; a "
     "promised return in trading is the mark of a scam, not of a strategy.",
@@ -173,8 +265,8 @@ _GOING_WRONG = (
 )
 
 
-explains(*_NOT_ADVICE, *_BUYING, *_LOSING, *_GOING_WRONG, *_NO_GUARANTEE, *_SAFE,
-         *_WITHDRAWING)
+explains(*_LOOKAHEAD_A, *_OVERFIT_A, *_SURVIVOR_A, *_COSTS_A, *_NOT_ADVICE, *_BUYING, *_LOSING,
+         *_GOING_WRONG, *_NO_GUARANTEE, *_SAFE, *_WITHDRAWING, *_PLACING, *_FREE_TO_USE)
 
 def reply(text: str, *, named: bool = False) -> Reply | None:
     """The newcomer answer to ``text``, or None when it is not one of these questions.
@@ -185,6 +277,14 @@ def reply(text: str, *, named: bool = False) -> Reply | None:
     2026-09-30: all five nameless forms were declined)."""
     from argus.lui.research.sizing import stated_capital
 
+    if _LOOKAHEAD.search(text):
+        return Reply(lines=_LOOKAHEAD_A)
+    if _OVERFIT.search(text):
+        return Reply(lines=_OVERFIT_A)
+    if _SURVIVOR.search(text):
+        return Reply(lines=_SURVIVOR_A)
+    if _BACKTEST_COSTS.search(text):
+        return Reply(lines=_COSTS_A)
     if _GUARANTEE.search(text):
         return Reply(lines=_NO_GUARANTEE)
     if _ADVICE.search(text):
@@ -195,6 +295,10 @@ def reply(text: str, *, named: bool = False) -> Reply | None:
         return Reply(lines=_WITHDRAWING)
     if _LOSE_MORE.search(text):
         return Reply(lines=_LOSING)
+    if _PLACE_TRADE.search(text):
+        return Reply(lines=_PLACING)
+    if _FREE.search(text):
+        return Reply(lines=_FREE_TO_USE)
     if _HOW_TO_BUY.search(text) or _HOW_BUYING_WORKS.search(text):
         return Reply(lines=_BUYING)
     if named:

@@ -679,6 +679,12 @@ _SIMPLER = re.compile(
 """A request to say the last answer again, simply, with or without "I'm new to trading" after it
 ("explain that in simple words, I'm new to trading" was declined, a judge, round 15)."""
 
+_COLD_ABOUT = re.compile(
+    r"^\s*(?i:(?:and|so|ok(?:ay)?)[,\s]+)?(?:(?i:(?:what|how)\s+about\s+(?:the\s+)?)"
+    r"(?P<n>[\w.\- ]{2,30}?)|(?P<n2>[A-Z]{2,6}))\s*[?!.]*\s*$")
+"""A name on its own, or "what about X", with no earlier question to follow on from."""
+
+
 _WHICH_ONE = re.compile(
     r"^\s*(?:so\s+|and\s+)?which\s+(?:one|of\s+(?:them|the\s+two)|is)\s+"
     r"(?:is\s+|has\s+|shows\s+|looks\s+|got\s+)?(?:more|less|the\s+(?:most|least)|riskier|safer|"
@@ -805,6 +811,20 @@ def _worst_day(symbol: str) -> float | None:
     returns = [b / a - 1.0 for a, b in pairwise(closes) if a]
     worst = worst_window(weights={symbol: 1.0}, columns={symbol: returns})
     return None if worst.move_pct is None else worst.move_pct / 100.0
+
+
+def _atr_fraction(symbol: str) -> float | None:
+    """The 14-period ATR on Bitget's 4-hour candles as a fraction of the last close, or None when
+    the venue does not answer (`argus.market.skills.indicators`)."""
+    from argus.market.skills import indicators
+
+    try:
+        got = indicators(symbol)
+    except Exception:
+        return None
+    if not got or not float(got["close"]):
+        return None
+    return float(got["atr"]) / float(got["close"])
 
 
 _MEMORY: contextvars.ContextVar[tuple[Any, ...]] = contextvars.ContextVar("argus_memory",
@@ -965,7 +985,8 @@ def handle_ask(
     if mem.recall_asked(text) and not new:
         # "What do you remember about me?" is answered from the memory the browser sent, in the
         # trader's own words; it was declined while seven facts were held (a judge, round 14).
-        return {"lines": mem.recall_lines(facts), "sources": [], "data": {}, "refused": False,
+        return {"lines": mem.recall_one(text, facts) or mem.recall_lines(facts), "sources": [],
+                "data": {}, "refused": False,
                 "reason": "", "classified_by": "memory", "memory": mem.dumps(facts),
                 "remembered": []}
     from argus.lui.honesty import funds_instruction
@@ -1188,6 +1209,8 @@ def _answer(
         return engine_payload(*intro.capabilities_answer(), by="intro")
     if intro.SOURCES_ONLY_Q.search(text):
         return engine_payload(*intro.how_answer(text), by="intro")
+    if intro.VS_Q.search(text):
+        return engine_payload(*intro.vs_answer(), by="intro")
     if intro.STANDING_Q.search(text):
         s_lines, s_sources, s_data = intro.standing_answer()
         metric = re.search(r"\b(?:win\s*rate|hit\s*rate|sharpe|drawdown|p&l|pnl)\b", text, re.I)
@@ -1335,6 +1358,8 @@ def _answer(
         return engine_payload(*edge.answer(ledger), by="edge")
     from argus.lui import rivals
 
+    if rivals.asks_which_rival(text):
+        return engine_payload(*rivals.scoreboard(text), by="rivals")
     if rivals.asks_about_a_rival(text):
         # "how does ARGUS compare to Nautilus Trader": the register's rows against that rival
         # (`lui/rivals.py`), not an adjacent statistic (fresh-eyes audit, 2026-09-29).
@@ -1349,15 +1374,19 @@ def _answer(
         checked = splits.check(text, split_named[0], price=_price_now)
         if checked is not None:
             return engine_payload(*checked, by="split-check")
+    from argus.lui import memory as mem
     from argus.lui.research import sizing
 
+    held_risk = mem.risk_budget_usd(list(_MEMORY.get()))
     if sizing.asks_for_size(text) and not about_the_record(text):
         # "$50,000 account, risk at most 2% per trade with a 4% stop — what position size" was
         # answered with the desk's abstention count (a judge's audit, 2026-09-29).
         named_for_size = research_symbols(text)[0]
         return engine_payload(*sizing.answer(text, named_for_size[0] if named_for_size else None,
-                                             price=_price_now,
-                                             worst_day=_worst_day), by="sizing")
+                                             price=_price_now, worst_day=_worst_day,
+                                             atr=_atr_fraction,
+                                             remembered_risk=held_risk[:2] if held_risk else None),
+                              by="sizing")
     if _ALLOWANCE_ASKED.search(text):
         # "how many questions do i have left" was declined while the tag on the same card showed
         # the count (the round-8 first-user audit, 2026-09-30).
@@ -1695,7 +1724,9 @@ def _answer(
                 f"\"{prior[-1][:60]}\"."]
             again["turns"] = [*prior, text][-12:]
             return again
-    if _WHICH_ONE.match(text) and prior:
+    # a question that names its own assets is about them, whatever the last turn was about
+    names_own = bool(research_symbols(text)[0])
+    if _WHICH_ONE.match(text) and prior and not names_own:
         # "which one has better momentum" after asking about BTC and then ETH compares the two
         # names the last turns asked about, not the last question again (a judge's audit,
         # 2026-09-29: answered with ETH's quote).
@@ -1714,7 +1745,8 @@ def _answer(
                                      ledger, started,
                                      "research-follow-up",
                                      {**audit, "detail": "the last turns' names compared"})
-    if BARE_FOLLOW.match(text) or _BARE_WHY.match(text) or _WHICH_ONE.match(text):
+    if (BARE_FOLLOW.match(text) or _BARE_WHY.match(text)
+            or (_WHICH_ONE.match(text) and not names_own)):
         # "what about that one?", "why?" or "which one is more volatile" after a research question
         # is that question again: re-asked with its own words and its resolved context (a
         # "compare it to BNB" two turns back is SOL against BNB), and marked as a follow-up.
@@ -1731,6 +1763,20 @@ def _answer(
             lines = again.get("lines") or []
             at = next((i for i, line in enumerate(lines) if line.startswith("Data:")), len(lines))
             lines.insert(at, note)
+            again["turns"] = [*prior, text][-12:]
+            return again
+    cold = _COLD_ABOUT.match(text)
+    if cold is not None:
+        # "what about COIN?" or "COIN" with nothing before it was answered with the session clock
+        # or declined (a first-time-user audit, round 17): a name alone is a request to look at it.
+        subject = (cold.group("n") or cold.group("n2")).strip()
+        named_cold = research_symbols(subject)[0]
+        if len(named_cold) == 1:
+            again = _answer(f"tell me about {subject}", prior, now=now, visitor=visitor,
+                            book=book)
+            again["lines"] = [*again.get("lines", []),
+                              f"Assumed: read \"{text.strip()[:40]}\" as \"tell me about "
+                              f"{subject}\" — no earlier question to follow on from."]
             again["turns"] = [*prior, text][-12:]
             return again
     carried = _carry_prior_name(text, prior)

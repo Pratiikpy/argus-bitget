@@ -57,12 +57,22 @@ _RISK_PCT = re.compile(
 _RISK_USD = re.compile(
     r"\brisk(?:ing)?\s+(?:at\s+most\s+|max(?:imum)?\s+|no\s+more\s+than\s+|up\s+to\s+|only\s+|exactly\s+|about\s+|around\s+|roughly\s+|just\s+)?"
     r"\$\s*(?P<n>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k)?", re.I)
+LOSS_USD = re.compile(
+    r"\b(?:max(?:imum)?\s+loss|loss\s+limit|drawdown\s+limit)\s+(?:limit\s+)?(?:is\s+|of\s+|=\s*|"
+    r"should\s+be\s+)?(?:around\s+|about\s+|roughly\s+|~)?\$\s*(?P<n>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k)?"
+    r"(?![\d%])|\b(?:can'?t|cannot|can\s+not|don'?t\s+want\s+to|won'?t|never)\s+(?:afford\s+to\s+)?"
+    r"lose\s+(?:more\s+than\s+)?\$\s*(?P<n2>\d[\d,]*(?:\.\d+)?)\s*(?P<k2>k)?(?![\d%])", re.I)
+"""A loss limit in dollars: "max loss $300", "loss limit of $500", "can't lose more than $1,000"."""
+_STOP_ATR = re.compile(
+    r"\b(?:stop\w*\s+(?:loss\s+)?(?:at\s+|of\s+|is\s+|=\s*|set\s+at\s+)?)?(?P<m>\d+(?:\.\d+)?)\s*"
+    r"(?:x|\u00d7|times)?\s*(?:the\s+)?atrs?\b", re.I)
+"""A stop set in average true ranges: "stop at 2x ATR", "1.5 ATR stop"."""
 _STOP_PCT = re.compile(
     r"(?P<p>\d+(?:\.\d+)?)\s*%\s*(?:stop|stop[-\s]loss|sl)\b|\b(?:stop|stop[-\s]loss|sl)\s+(?:of|at|"
     r"is|=)?\s*(?P<p2>\d+(?:\.\d+)?)\s*%", re.I)
 _STOP_PRICE = re.compile(
     r"\b(?:stop|stop[-\s]loss|sl)\s+(?:at|of|is|=)?\s*\$?\s*"
-    r"(?P<v>\d[\d,]*(?:\.\d+)?)(?!\s*%)", re.I)
+    r"(?P<v>\d[\d,]*(?:\.\d+)?)(?!\s*%|\s*(?:x|\u00d7|times)?\s*atr)", re.I)
 _ENTRY_PRICE = re.compile(
     r"\b(?:entry|enter|entering|buy(?:ing)?|in)\s+(?:at|@|is|=)?\s*\$?\s*(?P<v>\d[\d,]*(?:\.\d+)?)"
     r"(?!\s*%)|@\s*\$?\s*(?P<v2>\d[\d,]*(?:\.\d+)?)|"
@@ -163,6 +173,15 @@ def spelled_out(text: str) -> str:
     return re.sub(r"(\d+(?:\.\d+)?)\s*(?:percent|per\s+cent|pct)\b", r"\1%", text, flags=re.I)
 
 
+def stated_risk_usd(text: str) -> float | None:
+    """The dollars the trader said they will risk or can lose, if they said it."""
+    if (m := _RISK_USD.search(text)) is not None:
+        return _value(m.group("n"), m.group("k"))
+    if (m := LOSS_USD.search(text)) is not None:
+        return _value(_group(m, "n", "n2") or "0", _group(m, "k", "k2"))
+    return None
+
+
 def asks_for_size(text: str) -> bool:
     """A risk budget with a stop, or a risk budget with a request for a size.
 
@@ -171,9 +190,13 @@ def asks_for_size(text: str) -> bool:
     stress and execution engines, one of which planned a $250,000 order for an empty account. A
     budget with a size asked for and no stop is answered by asking for the stop."""
     text = spelled_out(text)
-    budget = bool(_RISK_PCT.search(text) or _RISK_USD.search(text))
-    stop = bool(_STOP_PCT.search(text) or _STOP_PRICE.search(text))
-    return budget and (stop or bool(SIZING_Q.search(text)))
+    budget = bool(_RISK_PCT.search(text) or stated_risk_usd(text) is not None)
+    stop = bool(_STOP_PCT.search(text) or _STOP_ATR.search(text) or _STOP_PRICE.search(text))
+    # A stop with a request for a size is a sizing question even with no budget stated in it: the
+    # answer is then the budget it needs (said earlier, or asked for), never a leverage reading of
+    # "2x ATR" (round 17).
+    return (budget and (stop or bool(SIZING_Q.search(text)))) or (
+        stop and bool(SIZING_Q.search(text)))
 
 
 def _refusal(line: str) -> tuple[list[str], list[Source], dict[str, Any]]:
@@ -184,24 +207,33 @@ def _refusal(line: str) -> tuple[list[str], list[Source], dict[str, Any]]:
 def answer(text: str, symbol: str | None = None, *,
            price: Callable[[str], float] | None = None,
            worst_day: Callable[[str], float | None] | None = None,
+           atr: Callable[[str], float | None] | None = None,
+           remembered_risk: tuple[float, str] | None = None,
            ) -> tuple[list[str], list[Source], dict[str, Any]]:
-    """The fixed-fractional size, net of costs, in dollars and (for a named name) in units."""
+    """The fixed-fractional size, net of costs, in dollars and (for a named name) in units.
+
+    ``atr(symbol)`` is the average true range as a fraction of price; ``remembered_risk`` is the
+    dollars at risk the trader said in an earlier message, with where it came from."""
     text = spelled_out(text)
     notes: list[str] = []
     # "I have $25k" is the account as much as "a $25k account": it was sized on $10,000 when a
     # ticker was named (a hostile review, 2026-09-30).
     account = stated_capital(text)
-    risk_usd: float | None = None
-    if (m := _RISK_USD.search(text)) is not None:
-        risk_usd = _value(m.group("n"), m.group("k"))
-    elif (m := _RISK_PCT.search(text)) is not None:
+    risk_usd = stated_risk_usd(text)
+    if risk_usd is None and (m := _RISK_PCT.search(text)) is not None:
         fraction = float(_group(m, "p", "p2") or 0) / 100
         if account is None:
             account = 10_000.0
             notes.append("no account size was given, so $10,000 is worked — the sizes scale "
                          "with it")
         risk_usd = account * fraction
-    assert risk_usd is not None  # asks_for_size() guaranteed a risk budget
+    if risk_usd is None and remembered_risk is not None:
+        risk_usd = remembered_risk[0]
+        notes.append(f"the ${risk_usd:,.0f} at risk is your {remembered_risk[1]}, said earlier")
+    if risk_usd is None:
+        return _refusal("a size follows from what you are willing to lose on the trade and how far "
+                        "away the stop is, and no loss limit was given — add one, as in \"risking "
+                        "$300\" or \"risk 1% of a $20,000 account\".")
     if account is not None and account <= 0:
         return _refusal("an account of $0 has nothing to risk, so no position size follows from "
                         "it — give the account size, as in \"a $10,000 account, risk 1%, a 4% "
@@ -230,6 +262,20 @@ def answer(text: str, symbol: str | None = None, *,
     side = "short" if re.search(r"\bshort", text, re.I) else "long"
     if (m := _STOP_PCT.search(text)) is not None:
         stop_frac = float(_group(m, "p", "p2") or 0) / 100
+    elif (m := _STOP_ATR.search(text)) is not None:
+        if not symbol or atr is None:
+            return _refusal("a stop in ATRs needs the instrument it is an ATR of — name it, or "
+                            "give the stop as a percentage (\"a 4% stop\").")
+        one = atr(symbol)
+        if not one:
+            return _refusal(f"{symbol.removesuffix('USDT')}'s ATR could not be read just now, so "
+                            f"an ATR stop cannot be turned into a distance — give the stop as a "
+                            f"percentage (\"a 4% stop\") or a price.")
+        multiple = float(m.group("m"))
+        stop_frac = multiple * one
+        notes.append(f"the {multiple:g}x ATR stop is {stop_frac:.2%} of price: "
+                     f"{symbol.removesuffix('USDT')}'s 14-period ATR on Bitget's 4-hour candles is "
+                     f"{one:.2%} of price (say \"a 4% stop\" to use your own distance)")
     elif (m := _STOP_PRICE.search(text)) is not None and entry:
         stop_price = float(m.group("v").replace(",", ""))
         if stop_price > entry and side == "long":

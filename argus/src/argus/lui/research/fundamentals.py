@@ -525,6 +525,15 @@ def _line_item_lines(ticker: str, raw_text: str) -> tuple[list[str], list[Source
         moves.append(f"{change(latest.value, year_ago.value)} on the same quarter a year earlier")
     lead += (", " + " and ".join(moves) if moves else "") + "."
     lines = [lead]
+    named = re.search(r"\bQ([1-4])\s*(?:of\s+)?(?:FY\s*)?'?(20\d\d|\d\d)\b", raw_text, re.I)
+    if named:
+        year = int(named.group(2)) + (2000 if len(named.group(2)) == 2 else 0)
+        # Fiscal calendars run up to a quarter off the calendar one, hence the one-quarter margin.
+        if year * 4 + int(named.group(1)) > latest.end.year * 4 + (latest.end.month - 1) // 3 + 2:
+            lines.insert(0, f"Q{named.group(1)} {year} has not been reported yet, so there is no "
+                            f"figure for it: an actual is only available once the company files, "
+                            f"and this desk does not publish forecasts of earnings. The latest "
+                            f"filed quarter is below.")
     trail = facts[-5:-1]
     if trail:
         window = [*trail, latest]

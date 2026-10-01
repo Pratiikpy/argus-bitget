@@ -80,6 +80,36 @@ def _first_sentence(blocker: str) -> str:
     return (first[:297] + "...") if len(first) > 300 else first + "."
 
 
+_WHICH_RIVAL = re.compile(
+    r"\b(?:which|what|who)\b[^?.]{0,40}\b(?:rivals?|competitors?|systems?|tools?|repos?)\b[^?.]{0,60}"
+    r"\b(?:lose|loses|lost|beat|beats|beaten|ahead|behind|better\s+than\s+(?:you|argus))\b",
+    re.I)
+"""\"Which rival do you lose to?\": the scoreboard, not a rival's name."""
+
+
+def asks_which_rival(text: str) -> bool:
+    return bool(_WHICH_RIVAL.search(text)) and bool(_SELF.search(text))
+
+
+def scoreboard(text: str) -> tuple[list[str], list[Source], dict[str, Any]]:
+    """The rows ARGUS has not won, said by name, with the rival and the register's own state."""
+    from argus.eval.standing import REGISTER
+
+    counts = {s: sum(1 for c in REGISTER if c.state.value == s)
+              for s in ("owned", "tied", "implemented", "lost")}
+    lost = [c for c in REGISTER if c.state.value == "lost"]
+    lines = [f"Bottom line: ARGUS loses to a named rival on {counts['lost']} of its "
+             f"{len(REGISTER)} measured capabilities, ties on {counts['tied']} and owns "
+             f"{counts['owned']}. Each is the register's own state, re-derived from its artefacts."]
+    for cap in lost[:7]:
+        rival = cap.baseline.split(";")[0].split(" (")[0][:90]
+        lines.append(f"LOST — {cap.name}, against {rival}.")
+    lines.append("Every row, with the measurement behind it, is on the proof page (/proof).")
+    return lines, [Source(kind="computation", ref="argus.eval.standing register",
+                          detail="register rows in the LOST state")], {
+        "rival_rows": [{"name": c.name, "state": c.state.value} for c in lost]}
+
+
 def answer(text: str) -> tuple[list[str], list[Source], dict[str, Any]]:
     rows = rows_naming(text)
     hits = {w for w in rival_tokens(text)
@@ -97,8 +127,11 @@ def answer(text: str) -> tuple[list[str], list[Source], dict[str, Any]]:
              f"from its artefacts, not a claim written for this answer."]
     for cap in rows[:6]:
         why = _first_sentence(cap.blockers[0]) if cap.blockers else ""
+        mixed = (" TIED here means no win either way on the matched measure; the row also records "
+                 "a loss on a wider one." if cap.state.value == "tied" and cap.blockers
+                 and "LOSES" in cap.blockers[0] else "")
         lines.append(f"{cap.state.value.upper()} — {cap.name}"
-                     + (f": {why}" if why else "."))
+                     + (f": {why}" if why else ".") + mixed)
     if len(rows) > 6:
         lines.append(f"{len(rows) - 6} more on the proof page (/proof).")
     return lines, [Source(kind="computation", ref="argus.eval.standing register",

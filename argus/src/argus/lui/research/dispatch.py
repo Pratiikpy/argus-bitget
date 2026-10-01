@@ -104,6 +104,7 @@ from argus.lui.research.parse import (
     _SINGLE_NAME,
     _STOP_QUESTION,
     _TAKE_PROFIT_Q,
+    _TWO_WINDOWS,
     _VAR,
     _WEEKEND_GAP_Q,
     CRYPTO_ETF_QUESTION,
@@ -184,6 +185,10 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
     contract's own settlement history and the verdict stated: holds, does not hold, or unclear.
     """
     request = _idea_request(raw_text, request)
+    if (request.kind is ResearchKind.IMPACT and len(request.symbols) == 1
+            and not request.book and _TWO_WINDOWS.search(raw_text)):
+        # "7 days vs 90 days for TSLA" is the move over each window, however the planner read it.
+        request = replace(request, kind=ResearchKind.QUOTE)
     with coverage.recording() as reached:
         answer = _run(raw_text, request, ledger=ledger)
         symbol = request.symbols[0] if request.symbols else ""
@@ -369,6 +374,19 @@ def _standalone_lead(lines: list[str], add: str, raw: Mapping[str, Mapping[Any, 
             return [f"Bottom line: {price_first}{said}" if price_first
                     else f"Bottom line: {beta_line}",
                     *(line for line in rest if line is not beta_line)]
+    if re.search(r"\bhow\s+(?:volatile|risky)\b|\bis\s+\S+\s+(?:very\s+)?volatile\b|"
+                 r"\bvolatility\s+(?:of|for|in)\b", raw_text, re.I):
+        # "how volatile is TSLA" opened on a sizing rule instead of the volatility (the round-17
+        # audit, 2026-10-01).
+        swing = statistics.pstdev(series[-720:]) * math.sqrt(24 * 365)
+        month = _compounded(series[-720:])
+        return [f"Bottom line: {name} has swung about {swing:.0%} a year over its last 30 days "
+                f"(its hourly moves, annualised)"
+                + (f"; its worst 24 hours in that time was {worst_day:+.1%}"
+                   if worst_day is not None else "")
+                + (f", and it moved {month:+.1%} over the period" if month is not None else "")
+                + ". Past movement, not a forecast; the figures below size it against a book.",
+                *rest]
     should = re.search(r"\bshould\s+i\s+(?:buy|get\s+into|invest\s+in|add)\b|\bis\s+\S+\s+a\s+"
                        r"(?:good\s+)?buy\b|\bworth\s+buying\b", raw_text, re.I)
     if TAKE_ON.search(raw_text) or RISKS_OF.search(raw_text) or should:
@@ -1446,6 +1464,12 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                                 f"together at {rho:+.2f} {when} — {read}.")
             actionable = (_momentum_lead(rows, week=bool(_WEEK_ASKED.search(raw_text)))
                           if _asks_for_the_move(raw_text) else _compare_lead(rows))
+            if re.search(r"\b(?:better|best)\s+(?:buy|bet|pick|investment|stock|one)\b|"
+                         r"\bwhich\s+(?:one\s+)?(?:should|would)\s+i\s+(?:buy|pick|choose)\b",
+                         raw_text, re.I):
+                lines.insert(1, "This desk does not say which to buy — that depends on your goal "
+                                "and horizon, and it does not give advice. What it can measure "
+                                "is the risk.")
             lines.insert(1, actionable + ". Listed from most to least volatile.")
             from argus.lui.research.parse import AFFECTS
 

@@ -319,6 +319,13 @@ to last week"): answered with the change over that period from Bitget's daily ca
 answered on 2026-09-25 (audit)."""
 
 
+_TWO_WINDOWS = re.compile(
+    r"\b\d{1,3}\s*-?\s*(?:days?|d|weeks?|w|months?)\s*(?:vs\.?|versus|and|&|compared\s+(?:to|with))\s*"
+    r"\d{1,3}\s*-?\s*(?:days?|d|weeks?|w|months?)\b", re.I)
+"""Two windows set side by side — "7 days vs 90 days for TSLA" — is a question about the move over
+each (round 17)."""
+
+
 _ABOUT_THE_DESK = re.compile(r"\bthe\s+desk\b|\b(?:did|do|have)\s+you\b|\byour\s+(?:trades?|"
                              r"decisions?|calls?|positions?)\b", re.I)
 """A period question about the desk's own trades ("What trades did the desk make on AAPL last week
@@ -583,6 +590,14 @@ def _theme(text: str) -> tuple[str, tuple[str, ...]] | None:
     return key, THEMES[key]
 
 
+_PAST_DIRECTION = re.compile(
+    r"^(?!.*\b(?:will|would|could|gonna|going\s+to|next|tomorrow|tonight|forecast|predict\w*)\b)"
+    r".*\b(?:(?:over|in|during|for|across)\s+the\s+(?:last|past)\s+(?:\d+\s+)?(?:days?|weeks?|months?)"
+    r"|(?:this|last|past)\s+(?:week|month)(?:\s+so\s+far)?)\b", re.I | re.S)
+"""A direction asked of a period that is already over: "is TSLA up or down over the last 30 days"
+was answered as a forecast one day ahead (round 17) — it is a move over a past window."""
+
+
 _DIRECTIONAL = re.compile(
     r"\b(?:will|would|could|is|does|do|gonna|going\s+to)\s+(?:\w+\s+){0,3}?"
     r"(?:be\s+(?:higher|lower|up|down|green|red)|go(?:ing)?\s+(?:up|down|higher|lower)|"
@@ -762,7 +777,8 @@ def price_forecast_asked(text: str) -> bool:
     return bool(PRICE_FORECAST.search(text)) and not PAST_PREDICTION.search(text)
 
 
-_LEVERAGE = re.compile(r"\b(\d+(?:\.\d+)?)\s*x\b|\bleverage\w*|\bliquidat\w*|\bmargin\b", re.I)
+_LEVERAGE = re.compile(r"\b(\d+(?:\.\d+)?)\s*x\b(?!\s*(?:the\s+)?atr)|\bleverage\w*|"
+                       r"\bliquidat\w*|\bmargin\b", re.I)
 
 
 _SHORT = re.compile(r"\bshort\w*\b|\bsell(?:ing)?\s+short\b|\bbearish\s+bet\b", re.I)
@@ -3002,6 +3018,7 @@ def read_request(text: str) -> ResearchRequest | None:
                    "a stop was asked for; the line that answers it is how far against the "
                    "position ordinary movement went in past windows of this length"))
     if (symbols and not pairs and _DIRECTIONAL.search(raw) and not PRICE_FORECAST.search(raw)
+            and not _PAST_DIRECTION.search(raw)
             and not _STRESS.search(raw) and not is_an_order(raw)):
         # "Will MSTR be higher in 48 hours?" fell through to "did not recognise" (2026-09-25).
         hours, weekend, assumed = _horizon(raw)
@@ -3061,7 +3078,8 @@ def read_request(text: str) -> ResearchRequest | None:
             and not is_an_order(raw)):
         return ResearchRequest(kind=ResearchKind.SENTIMENT, symbols=symbols[:1])
     # One name only: "btc vs eth vol comparison this month" is a comparison (held-out corpus).
-    if (simple and len(symbols) == 1 and _PERIOD_Q.search(raw) and _PERIOD_MOVE.search(raw)
+    if (simple and len(symbols) == 1 and ((_PERIOD_Q.search(raw) and _PERIOD_MOVE.search(raw))
+            or _TWO_WINDOWS.search(raw))
             and not about_the_record(raw) and not _ABOUT_THE_DESK.search(raw)
             and not _FORECAST.search(raw) and not _STRESS.search(raw) and not is_an_order(raw)):
         return ResearchRequest(kind=ResearchKind.QUOTE, symbols=symbols[:4])
@@ -3487,7 +3505,9 @@ def follow_up(text: str, prior: list[str], book_text: str = "") -> ResearchReque
         # the earlier question, asked of both names.
         added, _ = research_symbols(text)
         earlier_request = _previous_request(prior, book_text)
-        if added and earlier_request is not None:
+        # "compare gold and bitcoin" names both sides itself: it is a question on its own, and was
+        # answered as the previous name against gold (a first-time-user audit, round 17).
+        if len(added) < 2 and added and earlier_request is not None:
             earlier, base = earlier_request
             kept = tuple(s for s in base.symbols if s not in added)[:1]
             if kept:
@@ -4028,7 +4048,7 @@ TAKE_ON = re.compile(
     r"\b(?:quick\s+|short\s+|honest\s+|your\s+)?(?:take|view|thoughts?|opinion|read|thesis|"
     r"(?:bull|bear)(?:ish)?\s+case)\s+(?:on|of|about|for)"
     r"\b|\bwhat\s+do\s+you\s+(?:think|make)\s+(?:of|about)\b|\bhow\s+do\s+you\s+(?:see|feel\s+about)"
-    r"\b", re.I)
+    r"\b|\btell\s+me\s+(?:more\s+)?about\b", re.I)
 """An open-ended view asked of a name: "quick take on ETH", "what do you think of COIN"."""
 
 AFFECTS = re.compile(

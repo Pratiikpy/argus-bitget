@@ -40,6 +40,7 @@ from argus.lui.research.parse import (
     _SHARE_OF_BOOK,
     _SINCE_HIGH_Q,
     _SPREAD_WIDEN_Q,
+    _TWO_WINDOWS,
     _WEEKEND_TRADING_Q,
     _number,
     _period_days,
@@ -68,6 +69,23 @@ _PRICE_ASKED = re.compile(
     r"\bwhere\s+is\s+\S+\s+(?:trading|now|at)\b|\bwhat(?:'s|\s+is)\s+\S+\s+at\b|\blast\s+price\b|"
     r"\bcurrent(?:ly)?\s+(?:price|trading)\b|\bpreis\b|\bprecio\b|\bprix\b|价格|現価|価格|가격",
     re.I)
+
+
+_WINDOW_WORD = re.compile(r"\b(\d{1,3})\s*-?\s*(days?|d|weeks?|w|months?|m)\b", re.I)
+_WINDOW_VS = re.compile(r"\bvs\.?\b|\bversus\b|\bcompar\w*\b|\band\b|&", re.I)
+
+
+def _windows(text: str, first: int | None) -> list[int]:
+    """Every window a question names: "7 days vs 90 days" asks for both, not the last one only."""
+    if first is None:
+        return []
+    found: list[int] = []
+    if _WINDOW_VS.search(text):
+        for number, unit in _WINDOW_WORD.findall(text):
+            scale = 30 if unit.lower().startswith("m") else 7 if unit.lower().startswith("w") else 1
+            if int(number) * scale not in found:
+                found.append(int(number) * scale)
+    return found if len(found) >= 2 else [first]
 
 
 def _lead_with(lines: list[str], prefix: str) -> list[str]:
@@ -315,9 +333,14 @@ def _quote_extras(raw_text: str, quoted: list[tuple[str, Any]],
         lines.append(text)
         lead = lead or text
     days = _period_days(raw_text) if _PERIOD_MOVE.search(raw_text) else None
+    if days is None and _TWO_WINDOWS.search(raw_text):
+        days = _windows(raw_text, 1)[0]
     ratio_asked = len(quoted) >= 2 and bool(_RATIO_Q.search(raw_text))
-    if days and not ratio_asked:
+    period_lines: list[str] = []
+    for span in ([] if ratio_asked else _windows(raw_text, days)):
         from argus.market.history import fetch_window
+
+        days = span
 
         # Hourly bars up to 30 days so the start sits within an hour of the cutoff; daily beyond.
         step = timedelta(hours=1) if days <= 30 else timedelta(days=1)
@@ -341,9 +364,12 @@ def _quote_extras(raw_text: str, quoted: list[tuple[str, Any]],
                     f"{closed:%d %b %H:%M} UTC close to {ticker.last} now; its range in that "
                     f"time was {low:g} to {high:g}.")
             lines.append(text)
+            period_lines.append(text)
             lead = lead or text
             sources.append(Source(kind="venue", ref="bitget /api/v3/market/candles",
                                   detail=f"{symbol} hourly, last {days + 2} days"))
+    if len(period_lines) > 1:
+        lead = " ".join(t.split(" its range")[0].rstrip(";,. ") + "." for t in period_lines)
     if _WEEKEND_TRADING_Q.search(raw_text):
         kind_of = universe.NOT_EQUITY.get(symbol)
         underlying = ("its stock trades only on weekdays, 09:30 to 16:00 New York time"

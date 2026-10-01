@@ -37,8 +37,8 @@ from argus.lui.research.kinds import bare_symbol
 MAX_FACTS = 40
 MAX_TEXT = 200
 
-KINDS = ("budget", "max_loss", "horizon", "style", "capital", "thesis", "avoid", "check", "goal",
-         "book")
+KINDS = ("budget", "max_loss", "loss_usd", "horizon", "style", "capital", "thesis", "avoid",
+         "check", "goal", "book")
 """``check`` is one line of the checklist a review of the trader's own trades wrote
 (`lui/journal.py`): its subject is the habit's key, its text the check. It is kept so the check is
 run again on a later entry (:func:`after`), which the review promised and nothing did until
@@ -201,6 +201,17 @@ def extract(question: str, now: datetime | None = None,
         add("max_loss", "", str(float(m.group(1) or m.group(2) or m.group(3) or m.group(4))
                                 / 100), m.group(0))
         facts[-1] = replace(facts[-1], replaces=earlier(_MAX_LOSS))
+    from argus.lui.research.sizing import LOSS_USD
+
+    dollars = list(LOSS_USD.finditer(text))
+    if dollars:
+        m = dollars[-1]
+        amount = float((m.group("n") or m.group("n2")).replace(",", "")) * (
+            1000 if (m.group("k") or m.group("k2")) else 1)
+        add("loss_usd", "", f"{amount:.0f}", m.group(0))
+        if len(dollars) > 1:
+            facts[-1] = replace(facts[-1], replaces=f"“{dollars[0].group(0).strip()}” (earlier in "
+                                                    f"the same message)")
     stated = [h for h in _HORIZON.finditer(text) if h.group("explicit") is not None]
     if (m := stated[-1] if stated else last(_HORIZON)) is not None:
         # A horizon said in words beats the one a trading style implies: "I'm a swing trader, my
@@ -335,6 +346,31 @@ def dumps(facts: list[Fact]) -> str:
 
 def get(facts: list[Fact], kind: str, subject: str = "") -> Fact | None:
     return next((f for f in facts if f.kind == kind and f.subject == subject), None)
+
+
+def risk_budget_usd(facts: list[Fact]) -> tuple[float, str, Fact] | None:
+    """The dollars the trader said they can lose on a trade: a limit stated in dollars, else a
+    percentage limit on the account size they gave (or the book they described). None when
+    neither is held, so an answer asks instead of assuming one."""
+    dollars = get(facts, "loss_usd")
+    if dollars is not None:
+        return float(dollars.value), f"loss limit of ${float(dollars.value):,.0f}", dollars
+    limit = get(facts, "max_loss")
+    capital = get(facts, "capital")
+    if limit is not None and capital is None:
+        held = get(facts, "book")
+        if held is not None:
+            from argus.lui.research.sizing import stated_capital
+
+            said = stated_capital(held.text)
+            if said:
+                capital = Fact(kind="capital", subject="", value=str(said), text=held.text,
+                               at=held.at)
+    if limit is not None and capital is not None:
+        usd = float(limit.value) * float(capital.value)
+        return usd, (f"{float(limit.value):.0%} loss limit on your "
+                     f"${float(capital.value):,.0f}"), limit
+    return None
 
 
 def remembered_book(facts: list[Fact]) -> Fact | None:
@@ -583,11 +619,12 @@ _RECALL = re.compile(
 """A question about what the console has kept of the trader (round 14: "What do you remember about
 me, my book, my horizon and my limits?" was declined while memory held seven facts)."""
 
-_RECALL_ORDER = ("book", "capital", "budget", "max_loss", "horizon", "style", "goal", "thesis",
-                 "avoid", "check")
+_RECALL_ORDER = ("book", "capital", "budget", "max_loss", "loss_usd", "horizon", "style", "goal",
+                 "thesis", "avoid", "check")
 _RECALL_LABEL = {
     "book": "Your book", "capital": "Your account size", "budget": "Your risk budget",
-    "max_loss": "Your loss limit", "horizon": "Your horizon", "style": "Your style",
+    "max_loss": "Your loss limit", "loss_usd": "Your loss limit", "horizon": "Your horizon",
+    "style": "Your style",
     "goal": "Your goal", "thesis": "Your thesis", "avoid": "What you avoid",
     "check": "A check kept from a review",
 }
@@ -598,7 +635,8 @@ _EARLIER = re.compile(
     r"(?:\s+(?:you|u))?\b.*\b(?:first|original(?:ly)?|earliest|at\s+the\s+(?:start|beginning)|"
     r"(?:previous|last)\s+(?:message|question|one))\b|"
     r"\bmy\s+(?:very\s+)?(?:first|earliest|original|previous|last)\s+(?:message|question|"
-    r"statement|sentence)\b", re.I)
+    r"statement|sentence)\b|"
+    r"\b(?:very\s+)?first\s+(?:thing|words?)\s+i\s+(?:said|told|asked|wrote|typed)\b", re.I)
 """A question about the trader's own earlier messages, not about what is remembered now: "What did
 I say I hold in my very first message?" after the book was changed was answered with the desk's own
 open position (a hostile review, 2026-10-01)."""
@@ -630,8 +668,38 @@ def earlier_lines(question: str, prior: list[str], facts: list[Fact]) -> list[st
     return lines
 
 
+_RECALL_ONE = re.compile(
+    r"\bwhat\s+(?:was|is|were|are|'?s)\s+(?:my|the)\s+(?P<what>(?:max(?:imum)?\s+)?loss(?:\s+limit)?|"
+    r"drawdown(?:\s+limit)?|risk\s+budget|horizon|(?:trading\s+)?style|account(?:\s+size)?|"
+    r"capital|goal)\b(?:\s+(?:i|we)\s+(?:told|gave|said|set|mentioned)\b[^?]*)?\s*\??\s*$", re.I)
+"""One remembered fact asked for by name: "what was my loss limit" went to a desk-decision reader
+and returned a stale decision (a first-user audit, round 17, 2026-10-01)."""
+_RECALL_KINDS = {"loss": ("loss_usd", "max_loss"), "drawdown": ("max_loss", "loss_usd"),
+                 "risk": ("budget",), "horizon": ("horizon",), "style": ("style",),
+                 "trading": ("style",), "account": ("capital", "book"), "capital": ("capital",),
+                 "goal": ("goal",), "max": ("loss_usd", "max_loss"), "maximum": ("loss_usd",
+                                                                                   "max_loss")}
+
+
 def recall_asked(question: str) -> bool:
-    return bool(_RECALL.search(question))
+    return bool(_RECALL.search(question)) or bool(_RECALL_ONE.search(question))
+
+
+def recall_one(question: str, facts: list[Fact]) -> list[str] | None:
+    """The one fact asked for, in the trader's own words; None when the question is not that."""
+    m = _RECALL_ONE.search(question)
+    if m is None:
+        return None
+    word = m.group("what").split()[0].lower()
+    kinds = _RECALL_KINDS.get(word, ())
+    held = [f for k in kinds for f in facts if f.kind == k and not f.subject]
+    label = m.group("what").strip().lower()
+    if not held:
+        return [f"Bottom line: no {label} is remembered for you in this browser — say it in a "
+                f"sentence (\"my loss limit is $300\") and it is kept."]
+    fact = held[0]
+    earlier = f", replacing {fact.replaces}" if fact.replaces else ""
+    return [f"Bottom line: you said “{fact.text}” on {fact.at}{earlier}."]
 
 
 def recall_lines(facts: list[Fact]) -> list[str]:
@@ -655,8 +723,10 @@ def recall_lines(facts: list[Fact]) -> list[str]:
 
 def acknowledgement(new: list[Fact]) -> list[str]:
     """The reply to a message that only tells the console something about the trader."""
+    # One sentence can carry the same words as two facts (a style and a horizon): said once.
+    unique = list({(f.text, f.replaces): f for f in new}.values())
     said = "; ".join(f"“{f.text}”" + (f", replacing {f.replaces}" if f.replaces else "")
-                     for f in new)
+                     for f in unique)
     return [f"Bottom line: noted — {said}. It is kept in this browser only and shapes every later "
             f"answer it applies to, each time with a Remembered: line saying so; forget it from "
             f"the list under your book."]

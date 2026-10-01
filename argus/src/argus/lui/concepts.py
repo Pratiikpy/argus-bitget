@@ -106,7 +106,8 @@ CONCEPTS: tuple[Concept, ...] = (
             "of margin holds a $5,000 position.",
             "Gains and losses are both multiplied by the leverage, and so is how quickly a move "
             "against you reaches liquidation."),
-    Concept("perpetual contract", r"perpetuals?|perps?(?:\s+contracts?)?",
+    Concept("perpetual contract",
+            r"perpetuals?(?:\s+(?:futures?|swaps?))?|perps?(?:\s+contracts?)?",
             "A perpetual contract is a futures contract with no expiry date; the funding payment "
             "between longs and shorts keeps its price close to the underlying's.",
             "On Bitget a stock perpetual (NVDAUSDT, TSLAUSDT) trades around the clock while the "
