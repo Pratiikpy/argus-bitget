@@ -202,6 +202,12 @@ class StressInputs:
     check wants every window the instrument has, not only the ones the book shares."""
 
     horizon_bars: int = WINDOW_BARS
+    assumed: bool = False
+    """True when the question named no size, so the shock is the console's own -10%."""
+
+    @property
+    def word(self) -> str:
+        return "assumed" if self.assumed else "stated"
 
     @property
     def held(self) -> dict[str, float]:
@@ -233,6 +239,7 @@ def prepare(
     cash: float = 0.0,
     shocked_label: str | None = None,
     horizon_bars: int = WINDOW_BARS,
+    assumed: bool = False,
 ) -> StressInputs:
     """Align the loaded returns once and fix the inputs every node reads.
 
@@ -255,6 +262,7 @@ def prepare(
         stamps=tuple(stamps), columns={k: tuple(v) for k, v in columns.items()},
         open_rows=tuple(i for i, t in enumerate(stamps) if is_open(t)),
         shocked_series=tuple(sorted(raw[shocked].items())), horizon_bars=horizon_bars,
+        assumed=assumed,
     )
 
 
@@ -323,8 +331,9 @@ def _beta_shock(inputs: StressInputs, probe: Probe) -> tuple[str, Figures]:
     book_beta = _book_beta(inputs, cols)
     figures: Figures = {"book_move_pct": move, "book_beta": book_beta or 0.0,
                         "open_hours": float(len(inputs.open_rows))}
-    text = (f"Stated shock through beta: {inputs.shocked_label} {inputs.shock_pct:+g}% moves the "
-            f"book {_pct(move)} (book beta {book_beta or 0.0:.2f}, open-session hours)")
+    text = (f"{inputs.word.capitalize()} shock through beta: {inputs.shocked_label} "
+            f"{inputs.shock_pct:+g}% moves the book {_pct(move)} (book beta "
+            f"{book_beta or 0.0:.2f}, open-session hours)")
     if worst is not None:
         figures["hardest_hit_move_pct"] = worst[1]
         text += f"; hardest hit {_ticker(worst[0])} {_pct(worst[1])}"
@@ -420,7 +429,7 @@ def _idiosyncratic(inputs: StressInputs, probe: Probe) -> tuple[str, Figures]:
     name_move = own.contributors[0][1]
     text = (f"{_ticker(symbol)} on its own: its worst realised {inputs.horizon_bars} hours cost "
             f"the book {_pct(own.move_pct)} ({_ticker(symbol)} itself {_pct(name_move)}), "
-            f"against {_pct(implied)} that its beta share of the stated shock implies")
+            f"against {_pct(implied)} that its beta share of the {inputs.word} shock implies")
     if implied < 0 and own.move_pct < implied:
         text += (f" — its own worst day was {own.move_pct / implied:.1f}x its beta share, risk "
                  f"no index hedge touches")
@@ -603,7 +612,7 @@ def _shock_frequency(inputs: StressInputs, probe: Probe) -> tuple[str, Figures]:
             f"{inputs.horizon_bars} hours in {read.occurrences} of {read.observations} windows in "
             f"the last {days} days (its most extreme: {_pct(float(read.extreme_pct))})")
     if read.beyond_history:
-        text += " — the stated shock is beyond everything in this history"
+        text += f" — the {inputs.word} shock is beyond everything in this history"
     elif read.last_seen is not None:
         text += f", most recently {read.last_seen:%d %b}"
     return text + ".", {"occurrences": float(read.occurrences),
@@ -626,7 +635,7 @@ def _history_shock(inputs: StressInputs, probe: Probe) -> tuple[str, Figures]:
     stated, _ = _shock_move(inputs, cols, inputs.shock_pct, "stated")
     text = (f"At the most extreme {inputs.horizon_bars}-hour move {inputs.shocked_label} actually "
             f"made in this history ({_pct(extreme)}), the book moves {_pct(at_extreme)} through "
-            f"beta — against {_pct(stated)} at the stated {inputs.shock_pct:+g}%.")
+            f"beta — against {_pct(stated)} at the {inputs.word} {inputs.shock_pct:+g}%.")
     return text, {"extreme_pct": extreme, "book_move_at_extreme_pct": at_extreme,
                   "book_move_at_stated_pct": stated}
 
@@ -741,8 +750,8 @@ class StressTree:
     def render(self) -> list[str]:
         """The tree as answer lines, depth first, each child indented under its parent."""
         second = sum(1 for n in self.answered if n.depth > 1)
-        head = (f"Scenario tree: {len(self.answered)} scenarios grown from the stated "
-                f"{self.inputs.shocked_label} {self.inputs.shock_pct:+g}%, "
+        head = (f"Scenario tree: {len(self.answered)} scenarios grown from the "
+                f"{self.inputs.word} {self.inputs.shocked_label} {self.inputs.shock_pct:+g}%, "
                 f"{len(self.answered) - second} first-order and {second} grown from what those "
                 f"found, {self.levels} level{'s' if self.levels != 1 else ''} deep — every "
                 f"figure from the desk's own engines over the same history.")
@@ -912,10 +921,12 @@ def research_lines(
     """
     from argus.truth.source import Source
 
-    stated = shock_pct if shock_pct not in (None, 0) else -10.0
+    assumed = shock_pct in (None, 0)
+    stated = shock_pct or -10.0
     try:
         inputs = prepare(raw, is_open=is_open, weights=book, shocked=shocked,
-                         shock_pct=float(stated), cash=cash, shocked_label=shocked_label)
+                         shock_pct=float(stated), cash=cash, shocked_label=shocked_label,
+                         assumed=assumed)
     except StressTreeError as exc:
         return [], [], {"grown": False, "reason": str(exc)}
     tree = grow(inputs)

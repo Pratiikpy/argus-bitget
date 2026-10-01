@@ -85,6 +85,9 @@ ALIASES: dict[str, str] = {
     "TESLA": "TSLAUSDT", "APPLE": "AAPLUSDT",
     "MICROSOFT": "MSFTUSDT", "GOOGLE": "GOOGLUSDT", "COINBASE": "COINUSDT",
     "XAU": "XAUUSDT",
+    "GLD": "XAUUSDT",           # a gold ETF is no contract; gold is, and the answer says so
+    "IAU": "XAUUSDT",
+    "SLV": "XAGUSDT",
     "SILVER": "XAGUSDT",        # 65.37
     "XAG": "XAGUSDT",
     "PLATINUM": "XPTUSDT",      # 1,773

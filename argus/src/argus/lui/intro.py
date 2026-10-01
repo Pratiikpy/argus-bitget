@@ -60,7 +60,8 @@ def answer() -> tuple[list[str], list[Source], dict[str, Any]]:
 
 
 STANDING_Q = re.compile(
-    r"\bhow\s+many\s+(?:capabilities|features|things|comparisons|rivals|competitors)\b|"
+    r"\bhow\s+many\s+(?:of\s+(?:your|the|its|argus'?s?)\s+)?(?:capabilities|features|things|"
+    r"comparisons|rivals|competitors)\b|"
     r"\bwhat\s+(?:have\s+you|has\s+argus|did\s+you)\s+(?:beaten|beat|won|lost|tested)\b|"
     r"\bhow\s+(?:do\s+you|does\s+argus)\s+(?:compare|stack\s+up)\s+(?:to|with|against)\s+"
     r"(?:rivals|competitors|others|the\s+competition)\b|\bwhere\s+(?:do\s+you|does\s+argus)\s+"
@@ -90,6 +91,40 @@ def standing_answer() -> tuple[list[str], list[Source], dict[str, Any]]:
     return lines, [Source("computation", "argus.eval.standing register",
                           "every capability's state, read now")], {
         "standing": {s.value: n for s, n in counts.items()}, "total": len(REGISTER)}
+
+
+TESTS_Q = re.compile(
+    r"\bhow\s+many\s+tests\b|\b(?:are|do)\s+(?:all\s+)?(?:the\s+|your\s+|its\s+)?tests\s+"
+    r"(?:all\s+)?(?:pass|passing|green)\b|\btest\s+(?:suite|count|coverage)\b", re.I)
+"""The test suite asked about: "how many tests does ARGUS have and are they all passing" was
+answered with the hash-chain status (a hostile review, round 16, 2026-10-01)."""
+
+
+def tests_answer() -> tuple[list[str], list[Source], dict[str, Any]]:
+    import json
+
+    from argus.truth.paths import DATA_DIR
+
+    quoted = ""
+    try:
+        report = json.loads((DATA_DIR / "doc_claims.json").read_text(encoding="utf-8"))
+        for found in report.get("findings", []):
+            if found.get("claim") == "tests_passing" and found.get("quoted"):
+                quoted = str(found["quoted"][0])
+                break
+    except (OSError, ValueError):
+        quoted = ""
+    count = f"{quoted} tests are collected by pytest" if quoted else "the suite is published"
+    lines = [
+        f"Bottom line: the repository's README states that {count}, with lint and strict type "
+        "checks clean. That is a published figure, not something this console ran.",
+        "This live console does not run the tests, so it cannot tell you they pass right now. "
+        "To check yourself, clone the repository and run pytest in the argus folder; the "
+        "last full run's result is written in the README.",
+    ]
+    explains(*lines)
+    return lines, [Source("artefact", "README.md", "the published test count, as quoted")], {
+        "tests_quoted": quoted or None}
 
 
 HOW_Q = re.compile(

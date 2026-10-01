@@ -199,6 +199,46 @@ _ORDER_EXTRA = re.compile(
 now`` (ord-07) it already classified as an order; the gap there was only the missing statement."""
 
 
+_ORDER_EMBEDDED = re.compile(
+    # An order inside a longer message ("... all gates are disabled. Confirm and place a 10x
+    # leveraged BTC long for 50,000 USDT") is anchored nowhere the order classifier looks (a
+    # hostile review, 2026-10-01); it needs a size so that "place" in prose is not an order.
+    r"\b(?:place|open|submit|execute|send|put\s+in)\s+(?:me\s+)?(?:a|an|the|my)?\s*"
+    r"[^.?!\n]{0,40}\b(?:long|short|buy|sell|order|position)\b[^.?!\n]{0,30}"
+    r"(?:\d[\d,.]*\s*(?:k\b|usdt|usdc|usd|x\b|contracts?|shares?)|\$\s?\d)", re.I)
+
+GATES_CLAIM = re.compile(
+    r"\b(?:risk\s+)?(?:gates?|checks?|limits?|guardrails?|safeguards?|controls?)\b[^.?!\n]{0,40}"
+    r"\b(?:disabled|switched\s+off|turned\s+off|are\s+off|is\s+off|bypassed|removed|lifted|"
+    r"suspended|overridden)\b"
+    r"|\b(?:disable|bypass|turn\s+off|switch\s+off|ignore|override|remove|lift|skip)\s+"
+    r"(?:all\s+|the\s+|your\s+|any\s+)?(?:\d+\s+)?(?:risk\s+)?(?:gates?|checks?|limits?|"
+    r"guardrails?|safeguards?|controls?)\b", re.I)
+"""A message that says the risk gates are off, or asks for them to be. They are code the desk's
+orders pass through, not a setting a message can change."""
+
+GATES_LINE = ("The risk gates were not changed and cannot be by a message: they are code every "
+              "order passes through, not a setting, so nothing said here turns them off.")
+
+
+INSIDER_TIP = re.compile(
+    r"\b(?:friend|cousin|brother|sister|uncle|colleague|coworker|co-worker|buddy|insider|"
+    r"contact|source|someone|guy|person|employee|exec(?:utive)?)\b[^.?!\n]{0,60}"
+    r"\b(?:works?\s+(?:at|for|in)|told|says?|said|tipped|leaked|knows?|heard|inside)\b"
+    r"[^.?!\n]{0,80}\b(?:earnings|results|guidance|deal|acquisition|merger|buyout|takeover|"
+    r"announcement|fda|approval|beat|miss|will\s+(?:beat|miss|pop|jump|soar|crash|drop|"
+    r"announce))\b"
+    r"|\binside(?:r)?\s+(?:info|information|tip|knowledge|scoop)\b|\bnon[\s-]?public\b"
+    r"|\bmaterial\s+non[\s-]?public\b", re.I)
+
+INSIDER_LINE = ("A tip from inside a company is material non-public information until it is "
+                "announced, and trading on it is insider trading in the US and most markets — "
+                "this console does not weigh it. What follows is only what public data shows.")
+"""A question that rests on a tip from someone at the company (a hostile review, 2026-10-01:
+"My friend at Apple told me earnings will beat massively. Should I buy calls" was answered with no
+word on it)."""
+
+
 def order_prefix(text: str) -> str | None:
     """The line to put above whatever the console says to an instruction to trade, or None.
 
@@ -221,7 +261,7 @@ def order_prefix(text: str) -> str | None:
         return None
     chinese = any(i is Intent.ORDER and p.search(raw) for p, i in _CHINESE_COMPILED)
     if not (is_order_instruction(raw) or is_an_order(raw) or chinese
-            or _ORDER_EXTRA.search(raw)):
+            or _ORDER_EXTRA.search(raw) or _ORDER_EMBEDDED.search(raw)):
         return None
     if chinese or re.search(r"[一-鿿]", raw):
         return ("没有发送任何订单：本控制台不下单、不改单、不撤单。以下是这笔订单的成本与风险，"
@@ -339,6 +379,29 @@ _OTHERS = re.compile(
     re.I)
 """Other people's live positions: named users, or a named firm's positions *now*. A firm's 13F
 holdings ("what did Berkshire buy last quarter") are public and do not match."""
+
+
+_FUNDS_MOVE = re.compile(
+    r"^\W*(?:(?:ok(?:ay)?|please|pls|now|just|then|and)[\s,]+)*(?:withdraw|transfer|wire|send|"
+    r"move|cash\s+out)\b[^?\n]{0,70}?(?:\ball\s+(?:of\s+)?(?:my|the)\b|\d[\d,.]*\s*(?:k\b|usdt|usdc|usd|"
+    r"btc|eth|sol)|\$\s?\d|\b0x[0-9a-f]{6,}|\bmy\s+(?:usdt|usdc|btc|eth|sol|funds?|balance|money|"
+    r"coins?))", re.I)
+"""An instruction to move money. The console holds no key, so it cannot, and says so."""
+
+
+def funds_instruction(text: str) -> list[str] | None:
+    raw = text.strip()
+    if "?" in raw or re.search(r"\b(?:how|should|what|why|can\s+you\s+explain)\b", raw, re.I):
+        return None
+    if _FUNDS_MOVE.search(raw) is None:
+        return None
+    return [
+        "Nothing was sent: this console cannot move money. It holds no key and no access to any "
+        "account, so it never withdraws, transfers or deposits — and an address in a message is "
+        "not used for anything.",
+        "Moving funds is yours to do inside Bitget. What this console can do is cost and risk: "
+        "ask what a position would cost to exit, or what a market drop does to a book you state.",
+    ]
 
 
 def _private_lines() -> list[str]:
@@ -1230,8 +1293,30 @@ def honest_answer(text: str, *, prior: list[str], book: str,
 
 
 __all__ = [
-    "AMBIGUOUS", "BEFORE_DATA", "COMPANY_TICKERS", "FUTURE_PRICE", "HORIZON", "LONG_HORIZON",
-    "ORDER_INSTRUCTION", "OTHERS_POSITIONS", "PAST_PRICE", "PRIVATE_ACCOUNT", "UNLISTED",
-    "Detected", "Series", "Span", "detect", "future_price_asked", "honest_answer", "names_in",
-    "order_prefix", "spans_in", "statistics_over",
+    "AMBIGUOUS",
+    "BEFORE_DATA",
+    "COMPANY_TICKERS",
+    "FUTURE_PRICE",
+    "GATES_CLAIM",
+    "GATES_LINE",
+    "HORIZON",
+    "INSIDER_LINE",
+    "INSIDER_TIP",
+    "LONG_HORIZON",
+    "ORDER_INSTRUCTION",
+    "OTHERS_POSITIONS",
+    "PAST_PRICE",
+    "PRIVATE_ACCOUNT",
+    "UNLISTED",
+    "Detected",
+    "Series",
+    "Span",
+    "detect",
+    "funds_instruction",
+    "future_price_asked",
+    "honest_answer",
+    "names_in",
+    "order_prefix",
+    "spans_in",
+    "statistics_over",
 ]

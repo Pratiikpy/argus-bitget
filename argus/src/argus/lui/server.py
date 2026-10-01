@@ -894,11 +894,30 @@ def _price_premise(text: str) -> str | None:
             f"read at the real price.")
 
 
+_ETF_PROXY = re.compile(r"\b(GLD|IAU|SLV)\b", re.I)
+_ETF_PROXY_OF = {"GLD": ("gold", "XAUUSDT"), "IAU": ("gold", "XAUUSDT"),
+                 "SLV": ("silver", "XAGUSDT")}
+"""ETFs that track a metal, read as the metal's own contract — said on the answer, so the name is
+not silently swapped (`SPY versus GLD` read SPY alone, a hostile review, 2026-10-01)."""
+
+OTHER_VISITOR = re.compile(
+    r"\b(?:the\s+)?(?:previous|last|other|another|earlier|prior|next|first)\s+(?:user|person|"
+    r"visitor|trader|session|customer)\b|\b(?:user|person|visitor|trader|someone|anyone)s?\s+"
+    r"(?:who|that)\s+(?:used|visited|asked|was\s+here|came|logged)\b|\bother\s+(?:users|people|"
+    r"visitors|traders|sessions|customers)\b|\bright\s+before\s+me\b", re.I)
+"""A question about another visitor. Each browser holds its own memory and book, and the server
+shows nobody else's; "the user who used ARGUS right before me" was answered with the desk's
+position (a hostile review, 2026-10-01)."""
+
 SOMEONE_ELSE = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+|\b(?:for|of)\s+(?:user|account|client|"
                           r"customer)\s+\S+|\b(?:user|account)\s+(?:id|number|#)\s*\S+", re.I)
 """A question that names a person or an account. The console keeps no accounts, so what it answers
 is the desk's own record or the book the asker gave; "positions for user x@y.com" was answered with
 the desk's position and no word that the name was not used (hostile review, 2026-09-29)."""
+
+
+PICTOGRAPHS = re.compile("[🀀-🫿☀-➿⬀-⯿️‍]+")
+"""Emoji carry no question: "🚀🚀 DOGE 🌕🌕 ??" got a scope note, not DOGE's data (round 16)."""
 
 
 def handle_ask(
@@ -911,6 +930,10 @@ def handle_ask(
     message that only tells the console something ("I can't lose more than 10%") is answered
     with what was noted."""
     from argus.lui import memory as mem
+
+    plain = " ".join(PICTOGRAPHS.sub(" ", text).split())
+    if plain and plain != text.strip() and any(c.isalnum() for c in plain):
+        text = plain
 
     read_as = ""
     from argus.lui import translate as _translate
@@ -945,6 +968,27 @@ def handle_ask(
         return {"lines": mem.recall_lines(facts), "sources": [], "data": {}, "refused": False,
                 "reason": "", "classified_by": "memory", "memory": mem.dumps(facts),
                 "remembered": []}
+    from argus.lui.honesty import funds_instruction
+
+    moved = funds_instruction(text)
+    if moved is not None and not new:
+        return {"lines": moved, "sources": [], "data": {}, "refused": False, "reason": "",
+                "classified_by": "honest:funds", "memory": mem.dumps(facts), "remembered": []}
+    if OTHER_VISITOR.search(text) and re.search(
+            r"\b(?:portfolio|positions?|book|holdings|questions?|asked|trades?|history|"
+            r"conversation|messages?)\b", text, re.I) and not new:
+        return {"lines": [
+            "Bottom line: this console shows you nothing from other visitors — each browser keeps "
+            "its own memory and book, and no one else's questions, book or positions can be "
+            "reached from here.",
+            "What it can show is its own paper desk, in the open, and whatever you tell it: ask "
+            "\"what is the desk holding\" or state a book in My book."],
+                "sources": [], "data": {}, "refused": False, "reason": "",
+                "classified_by": "honest:others", "memory": mem.dumps(facts), "remembered": []}
+    if mem.earlier_asked(text) and not new:
+        return {"lines": mem.earlier_lines(text, prior, facts), "sources": [], "data": {},
+                "refused": False, "reason": "", "classified_by": "memory",
+                "memory": mem.dumps(facts), "remembered": []}
     token = _MEMORY.set(tuple(facts))
     try:
         from argus.lui.honesty import iso_dates
@@ -981,6 +1025,26 @@ def handle_ask(
             # An order instruction answered with analysis says first that nothing was sent: the
             # console places, changes and cancels no orders (infeasibility bench, order rows).
             payload["lines"] = [prefix, *payload["lines"]]
+        proxy = _ETF_PROXY.search(text)
+        if proxy is not None and payload.get("lines"):
+            kind, contract = _ETF_PROXY_OF[proxy.group(1).upper()]
+            note = (f"{proxy.group(1).upper()} is a {kind} ETF, not a Bitget contract; {kind} "
+                    f"itself ({contract}) is what is read here.")
+            if note not in payload["lines"]:
+                payload["lines"] = [*payload["lines"], note]
+        from argus.lui.honesty import (
+            GATES_CLAIM,
+            GATES_LINE,
+            INSIDER_LINE,
+            INSIDER_TIP,
+        )
+
+        if (INSIDER_TIP.search(text) and payload.get("lines")
+                and INSIDER_LINE not in payload["lines"]):
+            payload["lines"] = [INSIDER_LINE, *payload["lines"]]
+
+        if GATES_CLAIM.search(text) and payload.get("lines") and GATES_LINE not in payload["lines"]:
+            payload["lines"] = [GATES_LINE, *payload["lines"]]
     finally:
         _MEMORY.reset(token)
     if book.strip() and payload.get("lines"):
@@ -1125,7 +1189,19 @@ def _answer(
     if intro.SOURCES_ONLY_Q.search(text):
         return engine_payload(*intro.how_answer(text), by="intro")
     if intro.STANDING_Q.search(text):
-        return engine_payload(*intro.standing_answer(), by="standing")
+        s_lines, s_sources, s_data = intro.standing_answer()
+        metric = re.search(r"\b(?:win\s*rate|hit\s*rate|sharpe|drawdown|p&l|pnl)\b", text, re.I)
+        if metric is not None:
+            # "How many capabilities are OWNED, and what is your trading win rate?" is two
+            # questions (a hostile review, 2026-10-01): the second is asked of the desk's record.
+            record = _answer(f"What is your {metric.group(0).lower()}?", prior, now=now,
+                             visitor=visitor, book=book)
+            if not record.get("refused") and record.get("lines"):
+                s_lines = [*s_lines, f"And the desk's {metric.group(0).lower()}:",
+                           *(str(x) for x in record["lines"])]
+        return engine_payload(s_lines, s_sources, s_data, by="standing")
+    if intro.TESTS_Q.search(text):
+        return engine_payload(*intro.tests_answer(), by="intro")
     if intro.HOW_Q.search(text):
         return engine_payload(*intro.how_answer(text), by="intro")
     from argus.lui import skills_explain

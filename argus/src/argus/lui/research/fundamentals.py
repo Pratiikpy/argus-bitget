@@ -185,14 +185,23 @@ def _earnings_surprise(ticker: str) -> tuple[str, Source] | None:
     (`research/pead_study.py`) is what would license that, and the sentence stays descriptive.
     """
     from argus.market.fundamentals import FundamentalsSource
-    from argus.market.sue import MIN_QUARTERS
-    from argus.market.sue import read as sue_read
+    from argus.market.sue import MIN_QUARTERS, SueError, read_dated, yoy_window
 
     facts, _ = FundamentalsSource().facts(ticker, concept="eps_diluted", as_of=datetime.now(UTC))
     if len(facts) < MIN_QUARTERS:
         return None
-    window = facts[:MIN_QUARTERS]
-    sue = sue_read(ticker, [f.value for f in window])
+    # Dated, year-over-year pairing — the form the desk's own evidence uses
+    # (`market/fundamentals.py`). The positional reader paired a quarter with its neighbour when
+    # a fiscal fourth quarter was missing, so one answer gave SUE +0.54 beside the desk's +2.99
+    # (a hostile review, 2026-10-01).
+    points = [(f.end, f.value) for f in facts]
+    try:
+        yoy_window(points)
+        sue = read_dated(ticker, points)
+    except SueError:
+        return None
+    newest = max(f.end for f in facts)
+    window = [next(f for f in facts if f.end == newest)]
     size = ("a large" if abs(sue.sue) >= 2 else "a moderate" if abs(sue.sue) >= 1 else "a small")
     direction = "beat" if sue.sue > 0 else "shortfall" if sue.sue < 0 else "in-line print"
     return (

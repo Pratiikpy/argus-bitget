@@ -27,6 +27,7 @@ from argus.lui.question import (
     TRADED_SYMBOLS,
     Question,
 )
+from argus.lui.research import episodes
 from argus.lui.research.analogue import (
     _NO_CANDLES,
     _analogue,
@@ -815,7 +816,8 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             *(f"Assumed: {note}." for note in request.notes)])
     if request.kind in (ResearchKind.MACRO, ResearchKind.SENTIMENT):
         found, extra, backdrop = (_macro(request.symbols[0] if request.symbols else None,
-                                         request.book or None, raw_text)
+                                         request.book or None, raw_text,
+                                         request.symbols[1:] if not request.book else ())
                                   if request.kind is ResearchKind.MACRO
                                   else _sentiment(request.symbols[0] if request.symbols
                                                   else None))
@@ -1240,6 +1242,19 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
         elif request.kind is ResearchKind.STRESS:
             columns = _open_columns(data.raw, is_open)
             vol_multiple = _vol_multiple(raw_text)
+            episode = episodes.named(raw_text) if request.shock_pct is None else None
+            episode_fall = episodes.nasdaq_fall(episode) if episode is not None else None
+            if episode is not None and episode_fall is not None:
+                # "a March-2020 style crash" named no size and was shocked at the default -10%,
+                # a third of what the Nasdaq-100 lost in that episode
+                request = replace(request, shock_pct=round(episode_fall[0], 1), notes=(
+                    *request.notes,
+                    f"{episode.name} is read as the Nasdaq-100 ETF's own peak-to-trough fall in "
+                    f"it, {episode_fall[0]:.1f}% ({episode_fall[1]:%d %b %Y} to "
+                    f"{episode_fall[2]:%d %b %Y}, Yahoo "
+                    f"adjusted closes). Each holding moves by its measured beta to QQQ, so a "
+                    f"name that fell for its own reasons then (crypto in particular) is not "
+                    f"captured by it"))
             if request.book and (vol_multiple is not None or _VAR.search(raw_text)):
                 # "What is the VaR of 50% BTC, 50% ETH" is answered with the book's VaR and
                 # expected shortfall first; it used to get the Nasdaq stress lines alone

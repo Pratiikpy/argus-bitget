@@ -593,6 +593,43 @@ _RECALL_LABEL = {
 }
 
 
+_EARLIER = re.compile(
+    r"\bwhat\s+(?:did|have)\s+i\s+(?:say|said|tell|told|write|wrote|type|typed|ask|asked)\b"
+    r"(?:\s+(?:you|u))?\b.*\b(?:first|original(?:ly)?|earliest|at\s+the\s+(?:start|beginning)|"
+    r"(?:previous|last)\s+(?:message|question|one))\b|"
+    r"\bmy\s+(?:very\s+)?(?:first|earliest|original|previous|last)\s+(?:message|question|"
+    r"statement|sentence)\b", re.I)
+"""A question about the trader's own earlier messages, not about what is remembered now: "What did
+I say I hold in my very first message?" after the book was changed was answered with the desk's own
+open position (a hostile review, 2026-10-01)."""
+
+
+def earlier_asked(question: str) -> bool:
+    return bool(_EARLIER.search(question))
+
+
+def earlier_lines(question: str, prior: list[str], facts: list[Fact]) -> list[str]:
+    """The trader's own earlier message, quoted, and what is held now beside it. The messages come
+    from the turn history the page keeps (the last twelve), so a longer conversation is said to be
+    cut rather than passed off as complete."""
+    if not prior:
+        return ["Bottom line: this is your first message in this conversation, so there is nothing "
+                "earlier to repeat."]
+    wants_last = re.search(r"\b(?:previous|last)\b", question, re.I) is not None
+    quoted = prior[-1] if wants_last else prior[0]
+    cut = not wants_last and len(prior) >= 12
+    which = "previous" if wants_last else ("earliest kept" if cut else "first")
+    lines = [f"Bottom line: your {which} message was “{quoted.strip()}”."]
+    if cut:
+        lines.append("Only the last twelve messages are kept, so an earlier one may have been "
+                     "dropped.")
+    changed = [f for f in facts if f.replaces]
+    for fact in changed:
+        lines.append(f"{_RECALL_LABEL.get(fact.kind, fact.kind.capitalize())} now: “{fact.text}” "
+                     f"— said {fact.at}, replacing {fact.replaces}.")
+    return lines
+
+
 def recall_asked(question: str) -> bool:
     return bool(_RECALL.search(question))
 
@@ -636,6 +673,8 @@ __all__ = [
     "checklist_lines",
     "checks_from",
     "dumps",
+    "earlier_asked",
+    "earlier_lines",
     "extract",
     "get",
     "merge",

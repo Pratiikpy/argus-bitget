@@ -1057,7 +1057,7 @@ class TestMacroAndSentiment:
         lines, _, readings = research.macro._macro(None)
         joined = " ".join(lines)
         assert lines[0].startswith("Bottom line: the 10-year is 4.90%")
-        assert "rates have been driving it" in lines[0]
+        assert "rates have been driving tech (QQQ)" in lines[0]
         assert "10-year minus 2-year is +20bp" in joined
         assert readings["DGS10"]["value"] == pytest.approx(4.9)
 

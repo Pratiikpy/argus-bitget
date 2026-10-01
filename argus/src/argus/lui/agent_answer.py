@@ -62,7 +62,9 @@ def answer(fetch: Callable[[str], Any] = fetch_json
         f"venue, not this console's research desk — is {hours} hours into its scoring window: "
         f"return {ret:+.2%}, Sharpe {sharpe:.2f}"
         + (f" with a standard error of {float(se):.1f}" if se is not None else "")
-        + (f" (90% interval {float(ci[0]):.1f} to {float(ci[1]):.1f})" if len(ci) == 2 else "")
+        + (f" (90% interval {float(ci[0]):.1f} to {float(ci[1]):.1f}"
+           + (", which spans zero, so it cannot be told from no skill" if len(ci) == 2
+              and float(ci[0]) < 0 < float(ci[1]) else "") + ")" if len(ci) == 2 else "")
         + f", win rate {win:.0%} on {closed} closed trade{'' if closed == 1 else 's'}, max "
           f"drawdown {drawdown:.2%} — too few trades for any of it to show skill either way.",
         f"How the two are measured: the Sharpe is read from {hours} hourly marks of the whole "

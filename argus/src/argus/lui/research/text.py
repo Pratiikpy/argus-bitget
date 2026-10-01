@@ -33,7 +33,9 @@ def sentence_cut(text: str, limit: int = 240) -> str:
         # Already clipped upstream (the ledger stores a bounded thesis): drop the broken tail.
         whole = [e for e in ends if e > 20]
         if whole:
-            return text[: whole[-1] + 1].strip()
+            cut = text[: whole[-1] + 1].strip()
+            # a clause cut at a semicolon reads as an unfinished thought; say it was shortened
+            return cut[:-1].rstrip() + " …" if cut.endswith(";") else cut
     if len(text) <= limit:
         return text
     # A full stop beats a semicolon, and neither counts inside an open parenthesis: "(VIX 14.81,

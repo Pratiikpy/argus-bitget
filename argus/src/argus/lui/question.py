@@ -544,6 +544,7 @@ _NOT_A_TICKER = frozenset({
     "OK", "NO", "YES", "WHY", "HOW", "AND", "OR", "THE", "ARGUS", "IT", "WE", "Q", "FY",
     "FOMC", "FED", "CPI", "PPI", "GDP", "PCE", "NFP", "ECB", "BOJ", "PMI", "ETF", "IPO", "CEO",
     "RSI", "MACD", "ATR", "DXY", "VIX", "YTD", "EOD", "ATH",
+    "OWNED", "TIED", "LOST", "IMPLEMENTED", "PASS", "FAIL", "PENDING", "BLOCKED",
 })
 """Capitalised tokens that are words, units or our own vocabulary rather than instruments."""
 

@@ -2558,7 +2558,8 @@ def read_request(text: str) -> ResearchRequest | None:
         # market is one name's profile, which states it, with the price first when it is asked.
         return ResearchRequest(kind=ResearchKind.IMPACT, symbols=beta_names)
     if (len(symbols) == 1 and RISKS_OF.search(raw) and not is_an_order(raw)
-            and not about_the_record(raw) and not _LEVERED_OR_SHORT.search(raw)):
+            and not about_the_record(raw) and not _LEVERED_OR_SHORT.search(raw)
+            and not _EVENT_REACTION.search(raw)):
         return ResearchRequest(kind=ResearchKind.IMPACT, symbols=symbols,
                                notes=("the risks were asked, so this is the name's risk profile — "
                                       "its worst day, how it moves with the market, and what that "
@@ -2880,7 +2881,7 @@ def read_request(text: str) -> ResearchRequest | None:
         if not symbols and _CRYPTO_WORD.search(raw):
             return ResearchRequest(kind=ResearchKind.MACRO, symbols=("BTCUSDT",),
                                    notes=(*_forecast_note(raw), "crypto read as bitcoin"))
-        return ResearchRequest(kind=ResearchKind.MACRO, symbols=symbols[:1],
+        return ResearchRequest(kind=ResearchKind.MACRO, symbols=symbols[:3],
                                notes=_forecast_note(raw))
     if (_NEWS.search(raw) and not symbols and _CRYPTO_WORD.search(raw)
             and not about_the_record(raw)
@@ -3086,7 +3087,7 @@ def read_request(text: str) -> ResearchRequest | None:
     if (not pairs and not add_match and _RISK_SHARE_Q.search(raw)
             and not about_the_record(raw)):
         return ResearchRequest(kind=ResearchKind.BOOK, symbols=())
-    if pairs and not add_match and _BOOK_RISK.search(raw) and not (
+    if pairs and not add_match and (_BOOK_RISK.search(raw) or _BIGGEST_RISK.search(raw)) and not (
             _STRESS.search(raw) or _STRESS_BARE.search(raw)):
         owned: dict[str, float] = {}
         for _, symbol, weight in pairs:
@@ -3888,7 +3889,8 @@ def plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, dic
     if kind in (ResearchKind.MACRO, ResearchKind.SENTIMENT):
         # The backdrop needs no instrument; a named one is the name to measure against it.
         audit["applied"] = True
-        return ResearchRequest(kind=kind, symbols=symbols[:1], parsed_by="model",
+        width = 3 if kind is ResearchKind.MACRO else 1
+        return ResearchRequest(kind=kind, symbols=symbols[:width], parsed_by="model",
                                notes=_forecast_note(text)), audit
     if kind is ResearchKind.HEDGE:
         audit["applied"] = True
@@ -4078,6 +4080,11 @@ _EVENT_REACTION = re.compile(
     r"(?:\b(?:the\s+)?(?:cpi|inflation\s+(?:data|print|reports?|releases?)|fomc|fed(?:\s+"
     r"(?:decisions?|meetings?|days?|cuts?|hikes?))?|rate\s+(?:decisions?|cuts?|hikes?)|"
     r"earnings(?:\s+(?:days?|reports?|releases?))?)\b)|"
+    # "the risk of holding TSLA through its next earnings report" was answered with the stock's
+    # ordinary risk and no earnings date or earnings-day history (a hostile review, 2026-10-01).
+    r"\b(?:risks?|risky|holding|hold|carry\w*|owning|go\s+wrong)\b.{0,40}?"
+    r"\b(?:through|into|over|during|before|ahead\s+of)\s+(?:(?:its|the|their|next|upcoming)\s+){0,3}"
+    r"earnings\b|"
     # "coin's typical earnings day move", "meta earnings day average move": the move comes last.
     r"\bearnings[\s-]*days?\s+(?:\w+\s+){0,2}(?:moves?|reactions?|swings?|size)\b|"
     r"\b(?:typical|average|usual|historical)\s+(?:\w+\s+){0,2}(?:move|reaction|swing)\s+"

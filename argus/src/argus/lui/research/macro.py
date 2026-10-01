@@ -324,8 +324,25 @@ def fed_premise_line(raw_text: str,
     return line, Source(kind="venue", ref="FRED DFF", detail=f"effective fed funds to {end_day}")
 
 
+def _sensitivity_text(target: str, sensitivity: Mapping[str, Any]) -> str:
+    name = "tech (QQQ)" if target == BENCHMARK else _t(target)
+    rho = sensitivity["corr_10y"]
+    strength = ("strongly" if abs(rho) >= 0.5 else "moderately" if abs(rho) >= 0.25
+                else "barely")
+    text = (f"{name} has moved {strength} with rates over {sensitivity['days']} trading days — "
+            f"correlation {rho:+.2f} between its daily return and the daily change in the "
+            f"10-year yield, about {sensitivity['pct_per_10bp']:+.2f}% for each +10bp")
+    if sensitivity.get("corr_dollar") is not None:
+        usd = sensitivity["corr_dollar"]
+        text += (f"; {usd:+.2f} with the broad dollar index, so a stronger dollar has "
+                 + ("helped" if usd > 0.1 else "hurt" if usd < -0.1 else "barely moved")
+                 + f" {name}")
+    return text + ". Correlation, not a cause."
+
+
 def _macro(symbol: str | None, book: Mapping[str, float] | None = None,
-           raw_text: str = "") -> tuple[list[str], list[Source], dict[str, Any]]:
+           raw_text: str = "",
+           also: tuple[str, ...] = ()) -> tuple[list[str], list[Source], dict[str, Any]]:
     """Rates, the Fed, inflation and the dollar from FRED, and how ``symbol`` (QQQ when none) — or
     the whole ``book`` when one is held — has traded against the 10-year yield and the dollar."""
     from argus.market.evidence import RSS_FEEDS, RssSource
@@ -396,19 +413,19 @@ def _macro(symbol: str | None, book: Mapping[str, float] | None = None,
         sensitivity = None  # the backdrop still stands without the co-movement line
     if sensitivity is not None:
         readings["sensitivity"] = sensitivity
-        name = "tech (QQQ)" if target == BENCHMARK else _t(target)
-        rho = sensitivity["corr_10y"]
-        strength = ("strongly" if abs(rho) >= 0.5 else "moderately" if abs(rho) >= 0.25
-                    else "barely")
-        text = (f"{name} has moved {strength} with rates over {sensitivity['days']} trading days — "
-                f"correlation {rho:+.2f} between its daily return and the daily change in the "
-                f"10-year yield, about {sensitivity['pct_per_10bp']:+.2f}% for each +10bp")
-        if sensitivity.get("corr_dollar") is not None:
-            usd = sensitivity["corr_dollar"]
-            text += (f"; {usd:+.2f} with the broad dollar index, so a stronger dollar has "
-                     + ("helped" if usd > 0.1 else "hurt" if usd < -0.1 else "barely moved")
-                     + f" {name}")
-        lines.append(text + ". Correlation, not a cause.")
+        lines.append(_sensitivity_text(target, sensitivity))
+    for other in also:
+        # "what happens to QQQ and BTC" names two; each gets its own co-movement reading
+        try:
+            more = _rate_sensitivity(other)
+        except Exception:
+            more = None
+        if more is not None:
+            readings.setdefault("also", {})[other] = more
+            lines.append(_sensitivity_text(other, more))
+        else:
+            lines.append(f"{_t(other)}: no rate co-movement reading, its price history did not "
+                         f"answer just now.")
     policy = re.compile(r"\b(?:FOMC|monetary\s+policy|federal\s+funds|minutes|statement|"
                         r"Powell|rate|speech|testimony|economic\s+projections)\b", re.I)
     fed = [h for h in fed if policy.search(h.title)]
@@ -432,17 +449,19 @@ def _macro(symbol: str | None, book: Mapping[str, float] | None = None,
                "the dollar has not been what moves " + name)
             + " — the lines below give the rates side."))
     elif ten is not None:
+        subject = "tech (QQQ)" if target == BENCHMARK else _t(target)
         head = (f"Bottom line: the 10-year is {ten:.2f}%"
                 + (f" and the curve {'inverted' if two is not None and ten < two else 'upward'}"
                    if two is not None else ""))
         if sensitivity is not None:
             rho = sensitivity["corr_10y"]
-            head += (" — and rates have been driving it: rising yields have come with falling "
-                     "prices, so size it against the rates calendar." if rho <= -0.25 else
-                     " — and it has been rising with yields, trading on growth rather than "
-                     "rates." if rho >= 0.25 else
-                     " — but it has not been trading on rates; the backdrop is context, not the "
-                     "driver.")
+            head += (f" — and rates have been driving {subject}: rising yields have come with "
+                     f"falling prices, so size it against the rates calendar."
+                     if rho <= -0.25 else
+                     f" — and {subject} has been rising with yields, trading on growth rather "
+                     "than rates." if rho >= 0.25 else
+                     f" — but {subject} has not been trading on rates; the backdrop is context, "
+                     "not the driver.")
         else:
             head += "."
         lines.insert(0, head)
