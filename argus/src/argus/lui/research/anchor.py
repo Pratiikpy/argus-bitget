@@ -8,7 +8,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any
 
-from argus.lui.answer import Source
+from argus.lui.answer import Source, plural
 from argus.lui.question import (
     TRADED_SYMBOLS,
 )
@@ -37,7 +37,7 @@ def _rtoken_tracking(spot: str, perp: str, days: int) -> tuple[str, Source] | No
     mean = sum(gaps) / len(gaps)
     median = gaps[len(gaps) // 2]
     base = "r" + spot.removeprefix("R").removesuffix("USDT")
-    return (f"Over the last {days} day(s), hour by hour ({len(gaps)} hours), {base} sat "
+    return (f"Over the last {plural(days, 'day')}, hour by hour ({len(gaps)} hours), {base} sat "
             f"{median:+.1f}bps from the {_t(perp)} perpetual at the median and {mean:+.1f}bps on "
             f"average, ranging {gaps[0]:+.1f} to {gaps[-1]:+.1f}bps.",
             Source(kind="computation", ref="argus.market.rtoken_spot.hourly_bars",

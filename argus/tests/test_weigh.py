@@ -67,7 +67,7 @@ def test_a_significant_base_rate_that_clears_the_cost_makes_the_call() -> None:
 
 def test_earnings_inside_a_week_means_wait() -> None:
     w = weigh(engines(days=3, hit=0.8, episodes=30, median=40), name="TSLA")
-    assert w is not None and w.call == "Wait: TSLA reports in 3 day(s)"
+    assert w is not None and w.call == "Wait: TSLA reports in 3 days"
 
 
 def test_a_long_run_signal_decides_when_the_hourly_one_cannot() -> None:

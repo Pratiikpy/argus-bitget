@@ -711,7 +711,7 @@ python -m argus.market.skills --symbol NVDAUSDT
 And to check the whole thing is what this document says it is:
 
 ```bash
-pytest                    # 11,113 tests
+pytest                    # 11,135 tests
 python -m argus.status    # 152/152 modules importable, 18/18 sub-themes, artefacts on disk
 ```
 
@@ -1198,7 +1198,7 @@ why.
 
 ## Part 11 — The quantitative half, brutally
 
-**The paper-trading log has 964 decisions on record (2026-10-01). Two were trades — seq 797, BUY 1 NVDAUSDT at 232.45, opened 2026-09-28 13:47 UTC and settled 2026-09-29 at 230.96, a net loss of 1.78 USDT after 0.29 of costs; and seq 884, SELL 1 METAUSDT at 728.17, opened 2026-09-30 13:41 UTC and settled 2026-10-01 at 731.55, a net loss of 4.45 USDT after 1.07 of costs. Every other one is a refusal, and 920 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
+**The paper-trading log has 994 decisions on record (2026-10-01). Two were trades — seq 797, BUY 1 NVDAUSDT at 232.45, opened 2026-09-28 13:47 UTC and settled 2026-09-29 at 230.96, a net loss of 1.78 USDT after 0.29 of costs; and seq 884, SELL 1 METAUSDT at 728.17, opened 2026-09-30 13:41 UTC and settled 2026-10-01 at 731.55, a net loss of 4.45 USDT after 1.07 of costs. Every other one is a refusal, and 950 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
 
 Track 2 is 50% scored on Sharpe ratio, maximum drawdown and win rate computed from that log. With
 two settled trades, Sharpe and maximum drawdown **do not exist** and the win rate is 0% of two. Not
@@ -1767,9 +1767,9 @@ takes, and every artefact the system writes.
 |---|---|
 | Source modules | **581** files across **20 packages** (2026-09-27) |
 | Registered and importable | **152/152** (`python -m argus.status` checks this at runtime) |
-| Test files / tests | **449 files**, **11,113 tests collected** |
+| Test files / tests | **450 files**, **11,135 tests collected** |
 | Type and lint | `ruff` clean, `mypy --strict` clean on **578 source files** |
-| Artefacts written | **1,870** files under `argus/data/` |
+| Artefacts written | **883** files under `argus/data/` |
 | Code-level teardowns of other people's systems | **56** under `research/architecture/` |
 | Runtime dependencies | **two**: `pydantic`, `python-dateutil`. No numpy, no pandas, no scipy |
 
@@ -2009,7 +2009,7 @@ Also in this package, each described by the first sentence of its own docstring:
 `resolve` — the auto-resolver and the scoreboard, structurally unable to answer early.
 `open_register` — commits a batch and submits its head to four Bitcoin calendars.
 
-Live: **391 claims across all twelve stock perpetuals** (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — what the chain's head was when that proof was taken, so it timestamps the first 36 claims and not the 120 added after. Each scheduled cycle appends and re-anchors; the live head is `41f21e5d743cbb46`. Anchored
+Live: **406 claims across all twelve stock perpetuals** (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — what the chain's head was when that proof was taken, so it timestamps the first 36 claims and not the 120 added after. Each scheduled cycle appends and re-anchors; the live head is `41f21e5d743cbb46`. Anchored
 2026-09-14. The resolver runs on every scheduled cycle.
 
 Also in this package, each described by the first sentence of its own docstring:
@@ -2416,9 +2416,9 @@ source is a build failure, not a typo.
 | Source modules | 581 files, 20 packages; `mypy --strict` clean on 578 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 152/152 modules importable |
-| Tests | 11,113 tests collected, `ruff` clean |
+| Tests | 11,135 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
-| Artefacts on disk | 1,870 files under `argus/data/`, every one produced by running something |
+| Artefacts on disk | 883 files under `argus/data/`, every one produced by running something |
 | Code-level teardowns of other systems | 62, each citing file and line |
 | Competitor entries read at source | 5, each cloned and verified or refuted |
 | Live data sources reaching a decision | 15 |
@@ -2456,6 +2456,31 @@ overnight hedge, lost to the S2 entry Ballast and
 rebuilt to parity on 2026-09-24. It read 27 of 31 until 2026-09-24, when a review of the right rivals per sub-theme withdrew
 seven OWNED grades won against a rival that does not lead the sub-theme, and split two more into
 the narrow thing proven (OWNED) and the sub-theme itself (IMPLEMENTED).
+
+## How the register got stricter
+
+The register got stricter on 2026-09-25, 26 and 27, and the OWNED count fell from 20 to 8, then
+to 6, then to 2. A proof that rests on a population figure must now survive a per-group check, by
+symbol and by half of the sample, and 12 capabilities went back to IMPLEMENTED: five because their
+headline was carried by one symbol or flipped between halves, seven because their proof is a
+designed case set. Breadth rotation went to TIED: it beat pytaa, but a general-purpose validator
+(pandera with pydantic) configured to the same contract handles the same 36 cases. rToken factor
+divergence went to IMPLEMENTED when its statement was rewritten from intervals that include zero.
+On 2026-09-27 cross-sectional ranking went to TIED with qlib (the one input where ARGUS was safer,
+a one-name group, never reaches a decision), and numeric decision grounding went back to
+IMPLEMENTED (its twelve cases were fabrications the author chose, and a general pydantic range
+check was never run against them), and so did sentiment integrity and earnings-surprise ranking,
+the second once the register began reading each headline's bootstrap interval and found its
+own included zero. That left 2. Each row names its route back (`data/standing.json`).
+On 2026-09-29 four rows reached OWNED by taking that route, for 6: earnings-surprise ranking,
+re-measured on 7,258 SEC filers with a holdout the rule was never fitted on, against
+QuantConnect's own formula on every one of them, and against the real edgartools package; the
+research workbench's data breadth, ahead of OpenBB's keyless providers on two days and on the
+categories both can reach; point-in-time filings, ahead of OpenBB's platform, edgartools and Qlib
+on 619 real questions; and the perpetual-implied overnight open, which also beats gloaming as a
+trade entered at the 09:00 price, net of costs. The same day every other open row was settled:
+sentiment integrity and market sentiment TIED on real posts, and three rows removed (they served
+no flow, or duplicated another), each with its reason on `/wrong`.
 
 ## Part 26 — What we checked the competition and found
 
@@ -3017,7 +3042,7 @@ and anchored. That opening head is `bc36478291a06bc3`, submitted to four indepen
 calendars: `a.pool.opentimestamps.org`, `b.pool.opentimestamps.org`,
 `alice.btc.calendar.opentimestamps.org` and `finney.calendar.eternitywall.com`. The `.ots` proofs
 are in `argus/data/anchors/`, and anyone can verify them with the reference OpenTimestamps client
-without our cooperation. **148 of the 168 carry a Bitcoin block-header attestation** (blocks
+without our cooperation. **148 of the 176 carry a Bitcoin block-header attestation** (blocks
 966,822–969,251); the other 20 are still calendar-pending, which is what a proof honestly
 says until Bitcoin has confirmed it. `python -m argus.register.anchorcheck` re-counts both.
 
@@ -3028,7 +3053,7 @@ says until Bitcoin has confirmed it. `python -m argus.register.anchorcheck` re-c
 > were upgraded against their calendars and rewritten in the standard format. Nothing committed
 > changed; upgrading only appends the path from our digest to a block header.
 
-Each scheduled cycle appends and re-anchors, so the register grows: it now holds **391 falsifiable
+Each scheduled cycle appends and re-anchors, so the register grows: it now holds **406 falsifiable
 claims about all twelve stock perpetuals**, head `41f21e5d743cbb46`. The opening figures above are kept as
 the dated historical record — a register that quietly restates its own opening head would be
 defeating its own purpose — and `eval/docclaims.py` checks the live count on every run.

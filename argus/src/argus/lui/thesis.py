@@ -53,7 +53,7 @@ import re
 import urllib.parse
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, replace
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from typing import Any
 
@@ -116,7 +116,7 @@ _KINDS: tuple[tuple[Kind, re.Pattern[str]], ...] = (
     # "NVDA runs on AI capex" matched no kind and was not even listed (judge audit, 2026-09-30);
     # tested against the filings by `lui/drivers.py`. Before EARNINGS, which "revenue" would take.
     (Kind.DRIVER, re.compile(
-        r"\bcapex\b|capital\s+spend|data[\s-]*cent(?:er|re)|hyperscal|\bai\s+(?:spend|demand|"
+        r"\bcapex\b|capital\s+spend|capital\s+expenditure|data[\s-]*cent(?:er|re)|hyperscal|\bai\s+(?:spend|demand|"
         r"build|boom|infrastructure|investment|chips?|servers?)|cloud\s+spend|\bdemand\b|"
         r"runs?\s+on\b|driven\s+by|(?:revenue|sales)\s+(?:growth|keeps?\s+growing|(?:is|are)\s+"
         r"(?:growing|accelerating))|"
@@ -152,8 +152,14 @@ PROFILE_PART = re.compile(
     r"^\s*(?:i(?:'?m|\s+am)\s+(?:a\s+|an\s+)?(?:swing|day|position|long[\s-]term|short[\s-]term|"
     r"momentum|value|conservative|aggressive|cautious|risk[\s-]averse)\b|i\s+(?:can'?t|cannot|"
     r"won'?t|don'?t\s+want\s+to)\s+(?:afford\s+to\s+)?lose\b|my\s+(?:horizon|loss\s+limit|"
-    r"risk\s+budget|max(?:imum)?\s+(?:loss|drawdown)|account)\b|i\s+(?:usually\s+|normally\s+)?"
-    r"hold\s+(?:for|positions?\s+for)\b|i\s+have\s+\$)", re.I)
+    r"risk\s+budget|max(?:imum)?\s+(?:loss|drawdown)|account)\b|(?:my\s+)?(?:time\s+|holding\s+)?"
+    r"horizon\b|i\s+(?:usually\s+|normally\s+)?"
+    r"hold\s+(?:for|positions?\s+for)\b|i\s+have\s+\$|"
+    # "I won't risk more than 2% of my account per trade" was graded as a thesis reason (a judge,
+    # round 21)
+    r"i\s+(?:won'?t|will\s+not|never|don'?t)\s+risk\b|i\s+(?:only\s+)?risk\s+(?:\d|up\s+to|no\s+more)|"
+    r"(?:no\s+single\s+)?position\s+(?:may|can|should)\s+(?:not\s+)?exceed\b|"
+    r"no\s+(?:single\s+)?position\s+(?:above|over|bigger\s+than)\b)", re.I)
 """Who the trader is, said inside a thesis: "I'm a swing trader, I can't lose more than 10%, and I
 think TSLA is overvalued…" graded the first two as reasons "no engine reads" (a judge, round 19,
 row 669). They are the trader's profile, kept by memory and said back as such."""
@@ -161,18 +167,23 @@ row 669). They are the trader's profile, kept by memory and said back as such.""
 
 def profile_parts(text: str) -> list[str]:
     """The profile statements a thesis message carries, in the trader's words."""
-    return [part.strip(" .") for part in _SPLIT.split(text.rstrip(".?!"))
+    # cut at the sentence's end: "my account is $50,000. Test my thesis" kept the instruction as
+    # part of the profile (a judge, round 21)
+    return [re.split(r"[.?!]\s+", part.strip(), maxsplit=1)[0].strip(" .")
+            for part in _SPLIT.split(text.rstrip(".?!"))
             if part and PROFILE_PART.match(part)]
 
 
 _ASK_WORDS = re.compile(
     r"^\s*(?:i\s+(?:think|believe|reckon|expect|feel)\s+(?:that\s+)?|my\s+(?:thesis|view|take|"
-    r"idea)(?:\s+is)?(?:\s+that)?\s*:?\s*|here'?s\s+my\s+(?:thesis|view|take|idea):?\s*|"
+    r"idea|argument|claim)(?:\s+is)?(?:\s+that)?\s*:?\s*|here'?s\s+my\s+(?:thesis|view|take|idea):?\s*|"
     # "My bull case for BTC: ..." (a judge, round 12)
     r"(?:my|the)\s+(?:bull|bear)(?:ish)?\s+case(?:\s+(?:for|on)\s+[\w$.&/-]+)?\s*[:,-]?\s*)|"
     r"\s*[-\u2013\u2014:,.]?\s*(?:please\s+|can\s+you\s+)?(?:test|check|challenge|"
     r"stress[\s-]*test|pressure[\s-]*test|poke\s+holes\s+in|kill|critique|evaluate|assess|validate)\s+"
-    r"(?:(?:my|this|the|that)\s+(?:thesis|idea|view|take|theory|call)|it|this|that)\b[\s?.!]*$|"
+    r"(?:(?:my|this|the|that)\s+(?:thesis|idea|view|take|theory|call|argument)|it|this|that)\b"
+    r"[\s?.!]*$|\s*[.?!]?\s*help\s+me\s+(?:test|check|verify|validate|stress[\s-]*test)\s+"
+    r"(?:it|this|that)(?:\s+(?:thesis|argument|idea))?\b[\s?.!]*$|"
     # a closing question about the thesis: "... Is that thesis right?", "am I wrong?" (round 11)
     r"\s*[.?!]?\s*(?:is\s+(?:that|this|my|the)\s+(?:thesis|view|idea|take|theory|reasoning)"
     r"(?:\s+\w+){1,2}|am\s+i\s+(?:right|wrong)|what\s+do\s+you\s+think|thoughts|"
@@ -253,6 +264,10 @@ def reasons(text: str) -> tuple[Reason, ...]:
     for part in _SPLIT.split(text.rstrip(".?!")):
         # "because of institutional adoption" leaves "of ..." after the split (round 11)
         part = re.sub(r"^(?:of|to|on|that|the\s+fact\s+that)\s+", "", part.strip(" ."), flags=re.I)
+        # "..., and my thesis is AI capex keeps accelerating" kept the preamble in the reason (a
+        # judge, round 21)
+        part = re.sub(r"^(?:and\s+)?my\s+(?:thesis|view|idea|argument|take)\s+is\s+(?:that\s+)?",
+                      "", part, flags=re.I)
         part = _OPENER.sub("", part)
         if not part or _STANCE.match(part) or _ASKED.match(part) or PROFILE_PART.match(part):
             continue
@@ -835,7 +850,7 @@ def _direction(reason: Reason, long_run: Mapping[str, Any], name: str) -> Tested
 
 
 def _reversion(reason: Reason, long_run: Mapping[str, Any], quote: Mapping[str, Any],
-               name: str) -> Tested:
+               name: str, tech: Mapping[str, Any] | None = None) -> Tested:
     """Whether the move the reason describes exists — over 20 days, or as a dip or a pop inside
     the last 24 hours — and then whether states like today's 20-day one were followed by the
     direction the reason expects more often than an ordinary day was.
@@ -855,16 +870,25 @@ def _reversion(reason: Reason, long_run: Mapping[str, Any], quote: Mapping[str, 
         r"rally|pump|\brun\b|overbought|fade|won'?t last|(?:too\s+far|stretched)\s+above",
         reason.text, re.I))
     recent = _recent(quote)
+    rsi = (tech or {}).get("rsi")
+    # "Overbought" is an RSI word: the premise is read on RSI as well as on the 20-day move, and
+    # the reading is said (a judge, round 21: graded on the move alone beside an RSI of 72)
+    rsi_said = (f"; RSI {float(rsi):.0f} on {(tech or {}).get('timeframe') or '4h'}"
+                f"{' (above 70, overbought by the usual reading)' if float(rsi) >= 70 else ''}"
+                f"{' (below 30, oversold by the usual reading)' if float(rsi) <= 30 else ''}"
+                if rsi is not None else "")
     if fade:
         premise = trailing > 0 or (recent is not None and (
-            recent[0] >= SHORT_MOVE_PCT or recent[2] >= SHORT_MOVE_PCT))
+            recent[0] >= SHORT_MOVE_PCT or recent[2] >= SHORT_MOVE_PCT)) or (
+            rsi is not None and float(rsi) >= 70)
         where = (f"{name} is {trailing:+.1f}% over {window} days"
-                 + (f" and {recent[0]:+.1f}% over 24 hours" if recent else ""))
+                 + (f" and {recent[0]:+.1f}% over 24 hours" if recent else "") + rsi_said)
     else:
         premise = trailing < 0 or (recent is not None and (
             recent[0] <= -SHORT_MOVE_PCT or recent[1] <= -SHORT_MOVE_PCT))
         where = (f"{name} is {trailing:+.1f}% over {window} days"
-                 + (f" and {abs(recent[1]):.1f}% below its 24-hour high" if recent else ""))
+                 + (f" and {abs(recent[1]):.1f}% below its 24-hour high" if recent else "")
+                 + rsi_said)
     if not premise:
         return Tested(reason.text, reason.kind, Result.CONTRADICTED,
                       f"The premise does not hold: {where}, so there is no "
@@ -956,8 +980,12 @@ def _activity(reason: Reason, activity: Mapping[str, Any] | None, name: str) -> 
         result = Result.SUPPORTED if weakening else Result.CONTRADICTED
     else:
         result = Result.NOT_MEASURABLE
+    # "Within the usual swing" was printed beside fees at the 94th percentile (a judge, round 21):
+    # the reads disagree, and that is what is said
+    mixed = any(ups) or any(downs)
     lead = {Result.SUPPORTED: "The data agrees", Result.CONTRADICTED: "The data disagrees",
-            Result.NOT_MEASURABLE: "Within the usual month-to-month swing"}[result]
+            Result.NOT_MEASURABLE: ("The measures disagree" if mixed else
+                                    "Within the usual month-to-month swing")}[result]
     return Tested(reason.text, reason.kind, result,
                   f"{lead}: {chain} " + ", ".join(lines) + f", month on month against three "
                   f"years of monthly changes (DeFiLlama, to {read[0][1]['as_of']})." + note,
@@ -969,7 +997,11 @@ def _momentum(reason: Reason, tech: Mapping[str, Any], name: str) -> Tested:
     if hist is None:
         return Tested(reason.text, reason.kind, Result.NOT_TESTED,
                       f"No technical reading answered for {name} this time.")
-    down_claim = bool(re.search(r"down|lower lows|falling|weak", reason.text, re.I))
+    # "momentum is fading" was read as a claim of rising momentum and "supported" by a positive
+    # histogram (a judge-style re-ask, round 21)
+    down_claim = bool(re.search(r"down|lower lows|falling|weak|fad(?:e|es|ing)|slow(?:s|ing)?\b|"
+                                r"stall|los(?:e|es|ing)\s+steam|roll(?:s|ing)?\s+over|"
+                                r"exhaust|peter", reason.text, re.I))
     agrees = (float(hist) < 0) == down_claim
     return Tested(reason.text, reason.kind,
                   Result.SUPPORTED if agrees else Result.CONTRADICTED,
@@ -1145,8 +1177,11 @@ def _valuation(reason: Reason, fund: Mapping[str, Any], name: str) -> Tested:
     Before 2026-09-30 only the target was read, and only when Yahoo supplied it — with Bitget's
     targets present it said "no analyst target answered", and it called TSLA "not overvalued" on
     an 11% target gap while its P/E stood at 14.6 times its sector's."""
-    cheap_claim = not re.search(r"overvalued|over-valued|expensive|rich|pricey|bubble|frothy",
-                                reason.text, re.I)
+    # "valuations look stretched" is a claim of expensive, and was scored as a claim of cheap:
+    # "Supported" beside a P/E below the sector's and a target 46% above (round 20, row 713)
+    cheap_claim = not re.search(r"overvalued|over-valued|expensive|rich|pricey|bubble|frothy|"
+                                r"stretched|lofty|inflated|elevated|too\s+high|priced\s+for\s+"
+                                r"perfection", reason.text, re.I)
     target, price = fund.get("target_mean"), fund.get("price")
     ratio = fund.get("pe_vs_sector")
     if not ratio and not target and _is_coin(name):
@@ -1173,8 +1208,11 @@ def _valuation(reason: Reason, fund: Mapping[str, Any], name: str) -> Tested:
     leans = {c for _, c in reads if c is not None}
     if len(leans) == 1:
         result = Result.SUPPORTED if leans == {cheap_claim} else Result.CONTRADICTED
-        how = ("both reads agree" if len(reads) == 2 and all(c is not None for _, c in reads)
-               else "the one read that leans either way")
+        lean = "cheap" if leans == {True} else "expensive"
+        how = ((f"both reads say {lean}, " + ("as the thesis does" if result is Result.SUPPORTED
+                                               else "against the thesis"))
+               if len(reads) == 2 and all(c is not None for _, c in reads)
+               else f"the one read that leans either way says {lean}")
     elif len(leans) == 2:
         result, how = Result.NOT_MEASURABLE, "the two reads point opposite ways"
     else:
@@ -1236,6 +1274,133 @@ def _versus_consensus(reason: Reason, name: str) -> Tested:
                                                source.ref),))
 
 
+_INSIDERS = re.compile(r"\binsiders?\b|\bexecutives?\s+(?:are\s+)?(?:selling|buying|dumping)\b|"
+                       r"\bmanagement\s+(?:is\s+)?(?:selling|buying)\b", re.I)
+
+
+def _insiders(reason: Reason, name: str) -> Tested:
+    """"Insiders are selling", against the company's own insiders' net trades over six months,
+    from the SEC Form 4 filings Yahoo Finance aggregates. It was "not tested" while the console
+    listed the same filings elsewhere (a judge, round 21)."""
+    from argus.market.estimates import EstimatesError, EstimatesSource
+
+    try:
+        net = (EstimatesSource().summary(name, "netSharePurchaseActivity")
+               .get("netSharePurchaseActivity") or {})
+    except EstimatesError:
+        net = {}
+
+    def raw(key: str) -> float | None:
+        node = net.get(key)
+        value = node.get("raw") if isinstance(node, dict) else node
+        return float(value) if isinstance(value, (int, float)) else None
+
+    sold, bought = raw("sellInfoShares"), raw("buyInfoShares")
+    if sold is None or bought is None:
+        return Tested(reason.text, reason.kind, Result.NOT_TESTED,
+                      f"{name}'s insider trades did not answer just now, so the claim is not "
+                      f"tested.")
+    sells, buys = int(raw("sellInfoCount") or 0), int(raw("buyInfoCount") or 0)
+    share = raw("netPercentInsiderShares")
+    net_shares = bought - sold
+    claims_buying = bool(re.search(r"\bbuy", reason.text, re.I))
+    selling = net_shares < 0
+    result = Result.SUPPORTED if selling != claims_buying else Result.CONTRADICTED
+    return Tested(reason.text, reason.kind, result,
+                  f"Over the last six months {name}'s insiders sold {sold:,.0f} shares in {sells} "
+                  f"filings and bought or received {bought:,.0f} in {buys}, net "
+                  f"{net_shares:+,.0f}"
+                  + (f" ({share:+.2%} of their holdings)" if share is not None else "")
+                  + " (SEC Form 4, as Yahoo Finance aggregates them). Most insider sales are "
+                    "pre-planned (10b5-1) or for taxes, so net selling is a weak signal on its "
+                    "own; net buying is the rarer and stronger one.",
+                  evidence=(Finding(f"{name} insider net share activity, 6 months",
+                                    "Yahoo Finance netSharePurchaseActivity"),))
+
+
+_REVISIONS = re.compile(
+    r"\banalysts?\b[^.;]{0,30}\b(?:rais\w*|lift\w*|hik\w*|upgrad\w*|cut\w*|lower\w*|downgrad\w*)"
+    r"|\b(?:upgrades?|downgrades?|target\s+(?:hikes?|raises?|cuts?))\b", re.I)
+
+
+def _revisions(reason: Reason, fund: Mapping[str, Any], name: str) -> Tested:
+    """"Analysts are raising their targets", against the firms' own last target changes over the
+    last 90 days. It was tested on the gap to the mean target, which is a valuation and not a
+    revision (a judge, round 21)."""
+    raised, cut = fund.get("targets_raised"), fund.get("targets_cut")
+    if raised is None or cut is None:
+        return Tested(reason.text, reason.kind, Result.NOT_TESTED,
+                      f"{name}'s analyst target changes did not answer just now, so the claim is "
+                      f"not tested.")
+    firms = int(fund.get("target_firms") or 0)
+    claims_cuts = bool(re.search(r"\bcut|\blower|\bdowngrad", reason.text, re.I))
+    leaning = int(cut) > int(raised) if claims_cuts else int(raised) > int(cut)
+    result = (Result.SUPPORTED if leaning else
+              Result.NOT_MEASURABLE if int(raised) == int(cut) else Result.CONTRADICTED)
+    return Tested(reason.text, reason.kind, result,
+                  f"Of the {firms} firms with a {name} target in the last 90 days, {raised} raised "
+                  f"theirs and {cut} cut it at their latest change (bitget-mcp-server analyst "
+                  f"ratings, each firm's latest).",
+                  evidence=(Finding(f"{name} analyst target changes, 90 days",
+                                    "bitget-mcp-server analyst ratings"),))
+
+
+_NEW_HIGH = re.compile(r"\b(?:new\s+)?all[\s-]*time\s+high|\bnew\s+(?:record\s+)?high|\bATH\b|"
+                       r"\bbreak(?:s|ing)?\s+(?:through\s+)?(?:to\s+)?(?:a\s+)?(?:new\s+)?high",
+                       re.I)
+
+
+def _new_high(reason: Reason, name: str) -> Tested:
+    """"Bitcoin makes a new all-time high before year end": how far the price is from its highest
+    close on record here, how long is left, and how often a move that size has happened inside a
+    span that long. It was "not tested" while the price, the high and the date were all known (a
+    judge, round 21). A base rate, not a forecast."""
+    from datetime import date as _date
+
+    from argus.lui.research.dispatch import span_moves
+    from argus.market.history import CandleType, fetch_window
+
+    today = datetime.now(UTC).date()
+    by_year_end = re.search(r"year[\s-]*end|end\s+of\s+(?:the\s+)?year|by\s+december|"
+                            r"before\s+(?:the\s+)?(?:new\s+)?year", reason.text, re.I)
+    deadline = _date(today.year, 12, 31) if by_year_end else None
+    try:
+        bars = fetch_window(f"{name}USDT", start=datetime.now(UTC) - timedelta(days=1100),
+                            interval="1D", candle_type=CandleType.MARKET, pause=0.05)
+    except Exception:
+        bars = []
+    closes = [(b.ts.date(), float(b.close)) for b in bars if float(b.close) > 0]
+    if len(closes) < 60:
+        return Tested(reason.text, reason.kind, Result.NOT_TESTED,
+                      f"Not enough daily history for {name} answered to measure the distance to "
+                      f"its high.")
+    high_day, high = max(closes, key=lambda c: c[1])
+    last = closes[-1][1]
+    need = high / last - 1
+    if need <= 0:
+        return Tested(reason.text, reason.kind, Result.SUPPORTED,
+                      f"{name} closed at its highest on record here ({high:,.2f}, "
+                      f"{high_day:%d %b %Y}) on the last day read.")
+    days = (deadline - today).days if deadline else 90
+    spans = span_moves(f"{name}USDT", max(1, days))
+    reached = None
+    if spans is not None:
+        moves = spans[0]
+        reached = sum(1 for m in moves if m >= need) / len(moves)
+    span = f"by {deadline:%d %b %Y}, {days} days away" if deadline else f"within {days} days"
+    return Tested(reason.text, reason.kind, Result.NOT_MEASURABLE,
+                  f"{name} is at {last:,.2f}, {1 - last / high:.1%} below its highest close "
+                  f"here ({high:,.2f} on {high_day:%d %b %Y}, Bitget daily closes since "
+                  f"{closes[0][0]:%b %Y}). It needs a {need:.1%} rise {span}"
+                  + (f"; {name} has risen that much over a span that long in {reached:.0%} of "
+                     f"past windows — a base rate, not a forecast, so the claim is left open."
+                     if reached is not None else "; the base rate did not answer.")
+                  + (" The record here starts in "
+                     f"{closes[0][0]:%Y}, so an older high would set a higher bar."),
+                  evidence=(Finding(f"{name} highest close {high:,.2f} ({high_day:%d %b %Y})",
+                                    "Bitget daily candles"),))
+
+
 def check(stated: Sequence[Reason], *, name: str, data: Mapping[str, Mapping[str, Any]],
          activity: Mapping[str, Any] | None = None,
          fear_greed: Mapping[str, Any] | None = None,
@@ -1250,9 +1415,18 @@ def check(stated: Sequence[Reason], *, name: str, data: Mapping[str, Mapping[str
     fund = (data.get("fundamentals") or {}).get("fundamentals") or {}
     out: list[Tested] = []
     for reason in stated:
+        if _INSIDERS.search(reason.text):
+            out.append(_insiders(reason, name))
+            continue
+        if _REVISIONS.search(reason.text):
+            out.append(_revisions(reason, fund, name))
+            continue
+        if _NEW_HIGH.search(reason.text):
+            out.append(_new_high(reason, name))
+            continue
         if reason.kind is Kind.REVERSION:
             out.append(_reversion(reason, analogue.get("long_run") or {},
-                                  data.get("quote") or {}, name))
+                                  data.get("quote") or {}, name, tech))
         elif reason.kind is Kind.ACTIVITY:
             institutions = fund.get("institutions")
             flows = etf_flows() if _INSTITUTIONAL.search(reason.text) else None
@@ -1267,6 +1441,12 @@ def check(stated: Sequence[Reason], *, name: str, data: Mapping[str, Mapping[str
         elif reason.kind is Kind.MOMENTUM:
             out.append(_momentum(reason, tech, name))
         elif reason.kind is Kind.POSITIONING:
+            out.append(_positioning(reason, data.get("quote") or {}, name))
+        elif (reason.kind is Kind.SENTIMENT and not _is_coin(name)
+              and re.search(r"\bcrowd|\blong\b|\bshort\b|\bpositioned|\bpositioning",
+                            reason.text, re.I)):
+            # "the crowd is already long" on NVDA was tested on the crypto market's Fear & Greed
+            # (round 21): a stock's crowd is the positioning on its own perpetual
             out.append(_positioning(reason, data.get("quote") or {}, name))
         elif reason.kind is Kind.SENTIMENT:
             out.append(_sentiment(reason, fear_greed))
@@ -1298,7 +1478,8 @@ def check(stated: Sequence[Reason], *, name: str, data: Mapping[str, Mapping[str
     extra: dict[Kind, tuple[Finding, ...]] = {
         Kind.REVERSION: price, Kind.MOMENTUM: price, Kind.POSITIONING: crowd,
     }
-    if fear_greed:
+    if fear_greed and _is_coin(name):
+        # the crypto market's mood says nothing of a stock's crowd (round 21)
         extra[Kind.SENTIMENT] = (Finding(
             f"Crypto Fear & Greed {int(fear_greed['value'])} "
             f"({fear_greed.get('classification')}), market-wide.", "alternative.me",

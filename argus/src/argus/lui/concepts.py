@@ -465,6 +465,35 @@ _MEANS_FOR = re.compile(
 """What an event means *for* something held is an impact question, not a definition."""
 
 
+def for_you(concept: Concept, text: str) -> str | None:
+    """The part of a beginner's question the definition does not answer: "do i need one", "is
+    10x ok for a small account" (a first-time user, round 21: the definition came back alone)."""
+    if concept.name == "leverage":
+        multiple = re.search(r"\b(\d+(?:\.\d+)?)\s*x\b", text, re.I)
+        if multiple is None and not re.search(r"\b(?:ok|okay|safe|fine|good|smart|wise)\b",
+                                              text, re.I):
+            return None
+        times = float(multiple.group(1)) if multiple else 10.0
+        if times <= 1:
+            return None
+        move = 100 / times
+        small = bool(re.search(r"\bsmall\b|\bbeginner|\bnew\b|\$\s*\d", text, re.I))
+        return (f"For you: at {times:g}x, a move of about {move:.0f}% against the position uses "
+                f"up the whole margin and the exchange closes it — "
+                + ("on a small account that one move is the account. " if small else "")
+                + f"With no leverage, the same move is a {move:.0f}% loss you can wait out. "
+                  f"Ask \"how much BTC can I lose in a day\" to see how often moves that size "
+                  f"have happened.")
+    if concept.name == "stop loss" and re.search(r"\b(?:do|should|would)\s+i\s+(?:need|use|"
+                                                   r"want|get|set)\b", text, re.I):
+        return ("For you: with leverage, yes — a stop is what turns a bad move into a capped loss "
+                "instead of a liquidation. Without leverage it is a choice: it caps the loss at a "
+                "level you decide in advance, at the cost of sometimes being stopped out by "
+                "ordinary noise before the price recovers. Ask \"where should my stop go on "
+                "NVDA\" for one placed outside its usual swing.")
+    return None
+
+
 def concept_asked(text: str, named_symbols: tuple[str, ...] = ()) -> Concept | None:
     """The concept a question asks the meaning of, or None.
 
@@ -489,7 +518,11 @@ def concept_asked(text: str, named_symbols: tuple[str, ...] = ()) -> Concept | N
         text = f"what is {hinglish.group(1)}"
     # "how risky is leverage trading" asks what the term carries (round 11).
     risky = (re.match(r"^\s*how\s+risky\s+(?:is|are)\s+(.+?)[?.!\s]*$", text, re.I)
-             or re.match(r"^\s*(?:is|are)\s+(.+?)\s+(?:risky|dangerous)[?.!\s]*$", text, re.I))
+             or re.match(r"^\s*(?:is|are)\s+(.+?)\s+(?:risky|dangerous)[?.!\s]*$", text, re.I)
+             # "is 10x leverage ok for small acount" got the generic refusal (a first-time user,
+             # round 21): whether a term is safe for someone is what the term carries
+             or re.match(r"^\s*(?:is|are)\s+(?:using\s+)?(.+?)\s+(?:ok|okay|safe|fine|good|"
+                         r"a\s+good\s+idea|smart|wise)\b[^?]{0,40}[?.!\s]*$", text, re.I))
     if risky is not None:
         text = f"explain {risky.group(1)}"
     if not _ASK.search(text) or (_OWNED.search(text) and not _MEANS.search(text)):
@@ -507,6 +540,12 @@ def concept_asked(text: str, named_symbols: tuple[str, ...] = ()) -> Concept | N
         bare = re.fullmatch(rf"\s*what(?:'s|\s+is|\s+are)\s+(?:an?\s+)?{term}s?\s*[?.!]*\s*",
                             text, re.I)
         if bare is not None and (not named_symbols or concept.asset):
+            return concept
+        # "what is a stop loss and do i need one" (a first-time user, round 21): the term asked
+        # about, with whether the asker needs it
+        needs = re.match(rf"\s*what(?:'s|\s+is|\s+are)\s+(?:an?\s+)?{term}s?\b[^?]{{0,40}}\b(?:do|"
+                         rf"should|would)\s+i\s+(?:need|use|want|get|set)\b", text, re.I)
+        if needs is not None and not named_symbols:
             return concept
     return None
 

@@ -1,33 +1,33 @@
 {
   "symbol": "MSTRUSDT",
   "phase": "rth",
-  "started_at": "2026-10-01T19:30:09.154006+00:00",
+  "started_at": "2026-10-02T17:30:05.006209+00:00",
   "window_seconds": 90,
   "samples": 69,
-  "prints_seen": 86,
-  "rpi_share": 0.0,
+  "prints_seen": 100,
+  "rpi_share": 0.02,
   "maker_bps": 2.0,
   "markouts": [
     {
       "horizon_seconds": 5,
-      "prints": 70,
-      "median_bps": -0.0,
-      "mean_bps": -0.5973,
-      "worst_bps": -4.3672
+      "prints": 99,
+      "median_bps": -0.6347,
+      "mean_bps": 0.2821,
+      "worst_bps": -5.0779
     },
     {
       "horizon_seconds": 15,
-      "prints": 67,
-      "median_bps": -0.936,
-      "mean_bps": -0.773,
-      "worst_bps": -3.7436
+      "prints": 61,
+      "median_bps": -0.9521,
+      "mean_bps": -0.6766,
+      "worst_bps": -6.3502
     },
     {
       "horizon_seconds": 30,
-      "prints": 37,
-      "median_bps": -3.1196,
-      "mean_bps": -1.636,
-      "worst_bps": -4.9927
+      "prints": 4,
+      "median_bps": -8.2569,
+      "mean_bps": -6.1133,
+      "worst_bps": -8.2569
     },
     {
       "horizon_seconds": 60,
@@ -37,5 +37,5 @@
       "worst_bps": 0.0
     }
   ],
-  "verdict": "Resting on MSTRUSDT (rth) cost a median 3.12bps of adverse selection over 30s across 37 print(s), worst 4.99bps. That exceeds the 2bps maker fee it would save, so passive execution is not free money here and `cost/model.py`'s refusal to credit the maker side stands"
+  "verdict": "Resting on MSTRUSDT (rth) cost a median 0.95bps of adverse selection over 15s across 61 print(s), worst 6.35bps. That is inside the 2bps maker fee it would save, so the blanket refusal to credit maker treatment is now costing measurable edge and deserves a number rather than a rule"
 }

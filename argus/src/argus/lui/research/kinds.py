@@ -194,6 +194,10 @@ class ResearchRequest:
     level: float | None = None
     """A price level a directional question names ("closes above 70000 this week")."""
 
+    swap_from: str | None = None
+    """A held name sold to fund the first symbol: "sell TSLA and buy more NVDA" moves TSLA's whole
+    weight into NVDA, leaving the rest of the book as it is."""
+
     mandate_text: str = ""
     """The trader's own earlier words about their mandate ("I'm conservative", "I can't lose more
     than 8%"), from `lui/memory.py`, read by the mandate check when the question states none."""
@@ -226,6 +230,7 @@ class ResearchRequest:
             "resize_from": self.resize_from,
             "resize_by": self.resize_by,
             "level": self.level,
+            "swap_from": self.swap_from,
         }
 
 

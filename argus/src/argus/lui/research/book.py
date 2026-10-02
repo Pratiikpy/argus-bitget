@@ -613,6 +613,10 @@ def _hedge_plan(book: Mapping[str, float], value: Decimal,
     candidates = [c for c in HEDGE_CANDIDATES_EQUITY if equity and c not in book]
     if crypto:
         candidates += [c for c in (*HEDGE_CANDIDATES_CRYPTO, "QQQUSDT") if c not in candidates]
+    from argus.lui.research.parse import CRYPTO_LINKED_EQUITIES
+
+    if any(s in CRYPTO_LINKED_EQUITIES for s in book):
+        candidates += [c for c in HEDGE_CANDIDATES_CRYPTO if c not in candidates and c not in book]
     named = [c for c in hedge_instruments(raw_text) if c not in book]
     candidates = [*named, *(c for c in candidates if c not in named)]
     if not candidates:
@@ -720,7 +724,7 @@ def _hedge_plan(book: Mapping[str, float], value: Decimal,
         head = (f"Bottom line: no listed hedge explains much of this book — the most, "
                 f"{_t(pickable[0]['leg'])}, removes {pickable[0]['r2']:.0%} of its "
                 f"variance — so the "
-                f"risk is mostly its own; reduce the largest holding rather than hedge it.")
+                f"risk is mostly its own; cut the largest position rather than hedge it.")
     else:
         runner = next((r for r in rows if r is not best), None)
         head = (f"Bottom line: hedge with a {'short' if best['beta'] >= 0 else 'long'} in "

@@ -756,6 +756,12 @@ _WONDERING = re.compile(r"\?|\b(?:should|shall|would|could|do)\s+i\b|"
 
 TRIM_ASKED = re.compile(r"\b(?:trim|trimming|cut\s+back|scale\s+(?:back|down)|reduce|lighten|"
                         r"take\s+some\s+(?:off|profit)|sell\s+(?:some|part)\s+of)\b", re.I)
+_SWAP = re.compile(
+    r"\b(?:sell|dump|exit|close|get\s+out\s+of|ditch)\s+(?:all\s+(?:of\s+)?)?(?:my\s+|the\s+)?"
+    r"(?P<out>\$?[A-Za-z][\w.]{1,15})\s+(?:and|to|then|&)\s+(?:then\s+)?(?:buy|add|get|put\s+"
+    r"(?:it|that|the\s+money)\s+(?:in|into))\s+(?:more\s+|some\s+)?(?P<into>\$?[A-Za-z][\w.]{1,15})\b",
+    re.I)
+"""Selling one held name to buy another: "should i sell tsla and buy more nvda"."""
 TRIM_TO_BUDGET = -1.0
 """A target meaning "trim to the risk budget", resolved once the book's history is loaded."""
 
@@ -1471,7 +1477,10 @@ def holding_pairs(text: str) -> list[tuple[int, str, float]]:
         before = text[max(0, span[0] - 14): span[0]]
         inside = text[span[0]: span[1]]
         if (re.search(r"\bshort(?:ing)?\s*(?:\w+\s+)?$|-\s*$", before, re.I)
-                or re.search(r"\bshort\b", inside, re.I)):
+                or re.search(r"\bshort\b", inside, re.I)
+                # "NVDA 50%, TSLA -30%, AAPL 20%": the minus sits inside a name-first pair, and
+                # was dropped (a hostile review, round 21)
+                or re.search(r"(?<![\w.])-\s*\d", inside)):
             value = -value
         found.append((span[0], symbol, value))
 
@@ -1629,6 +1638,12 @@ _BOOK_COUNT = re.compile(
     r"([A-Za-z][A-Za-z0-9.]{1,15})\b", re.I)
 """"long 2 NVDAUSDT", "2 contracts of TSLAUSDT", "0.5 BTC": a count of the contract's own unit,
 the way an order ticket and Bitget's position page state a position."""
+_BOOK_COUNT_AFTER = re.compile(
+    r"\b([A-Za-z][A-Za-z0-9.]{1,15})\s*(?::|-|x|\u00d7)?\s*"
+    r"(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)\s*"
+    r"(?:shares?|units?|contracts?|coins?|tokens?|lots?)\b", re.I)
+""""NVDA 5 shares", "TSLA: 3 shares": the name first and the count after it, with the unit word
+that makes the number a count (a bare "NVDA 40" stays unread rather than guessed)."""
 
 
 _BOOK_SHORT = re.compile(r"(?:\bshort(?:ing)?\s+|-\s*)$", re.I)
@@ -1719,6 +1734,16 @@ def _price_book(text: str) -> PricedBook | None:
             usd[symbol] = usd.get(symbol, 0.0) + sign(match.start()) * value
             taken.append(match.span())
     units: dict[str, float] = {}
+    for match in _BOOK_COUNT_AFTER.finditer(text):
+        # "NVDA 5 shares, TSLA 3 shares, 0.01 BTC" was read as the BTC alone, and every risk
+        # answer was about a book the trader does not hold (a first-time user, round 21)
+        symbol = holding(match.group(1))
+        if symbol is None or not free(match.span()):
+            continue
+        count = _number(match.group(2))
+        if count > 0:
+            units[symbol] = units.get(symbol, 0.0) + sign(match.start()) * count
+            taken.append(match.span())
     for match in _BOOK_COUNT.finditer(text):
         symbol = holding(match.group(2))
         if symbol is None or not free(match.span()):
@@ -1787,6 +1812,15 @@ _LEVEL = re.compile(
 """A VaR or expected-shortfall confidence level: "ES at 99%", "95% VaR", "99% confidence"."""
 
 
+RULE_PCT = re.compile(
+    r"\b(?:my|a|the|your|our)\s+(?P<a>\d+(?:\.\d+)?)\s*%\s+(?:(?:max(?:imum)?|loss|drawdown|"
+    r"position|risk|stop)\s+)?(?:rule|limit|cap|max(?:imum)?|budget|tolerance|threshold|line)\b|"
+    r"\b(?:rule|limit|cap|max(?:imum)?|tolerance|budget|threshold)\s+(?:of|is|at|=|:)\s*"
+    r"(?P<b>\d+(?:\.\d+)?)\s*%", re.I)
+"""A percentage that names a rule, not a move: "does that break my 30% rule" was stressed at -30%
+when the question said the Nasdaq drops 20% (a judge, round 21)."""
+
+
 def shock_numbers(raw: str, weights: Sequence[int] = (), *, near: int = 2) -> list[re.Match[str]]:
     """The percentages in ``raw`` that can be a shock size: not a holding weight (a pair starting
     within ``near`` characters), not cash ("70% cash"), not a VaR confidence level ("99%
@@ -1794,7 +1828,7 @@ def shock_numbers(raw: str, weights: Sequence[int] = (), *, near: int = 2) -> li
     "expected shortfall at 99% confidence" with a +99% one (a ten-agent answer audit,
     2026-09-25)."""
     skip: set[int] = set()
-    for found in (*_CASH_PCT.finditer(raw), *_LEVEL.finditer(raw)):
+    for found in (*_CASH_PCT.finditer(raw), *_LEVEL.finditer(raw), *RULE_PCT.finditer(raw)):
         skip.update(range(found.start(), found.end()))
     return [m for m in _SHOCK_NUMBER.finditer(raw)
             if m.start() not in skip and not any(abs(pos - m.start()) < near for pos in weights)]
@@ -2024,6 +2058,15 @@ def without_hedges(request: ResearchRequest, raw: str) -> ResearchRequest:
     if request.kind is not ResearchKind.HEDGE or not request.symbols:
         return request
     hedges = set(hedge_instruments(raw))
+    # A name the question says is held is the position, even when it is named again as a hedge:
+    # "I'm short TSLA. Should I hedge it with a TSLA call or with QQQ?" dropped TSLA from the
+    # book, hedged a default SPY book and recommended adding to the short (a hostile review,
+    # round 21)
+    held = {s for s in request.symbols if _held_short(raw, s) or re.search(
+        rf"\bi(?:'?m|\s+am)\s+long\s+(?:\S+\s+)?{re.escape(s.removesuffix('USDT'))}\b|"
+        rf"\bi\s+(?:hold|own)\s+(?:\S+\s+)?{re.escape(s.removesuffix('USDT'))}\b", raw, re.I)}
+    hedges -= held
+    request = _signed_held(request, raw, held)
     kept = tuple(sym for sym in request.symbols if sym not in hedges)
     if not hedges or kept == request.symbols:
         return request
@@ -2031,7 +2074,23 @@ def without_hedges(request: ResearchRequest, raw: str) -> ResearchRequest:
                    book={k: v for k, v in request.book.items() if k not in hedges})
 
 
+def _signed_held(request: ResearchRequest, raw: str, held: set[str]) -> ResearchRequest:
+    """The held names of a hedge request as a book, a short one negative, when the request
+    carries no book of its own."""
+    if request.book or not held:
+        return request
+    book = {s: (-1.0 if _held_short(raw, s) else 1.0) / len(held) for s in held}
+    return replace(request, book=book, symbols=tuple(held) + tuple(
+        s for s in request.symbols if s not in held), notes=(
+        *request.notes, "the position to hedge is the one the question states: "
+        + ", ".join(f"{'short' if w < 0 else 'long'} {_t(s)}" for s, w in book.items())))
+
+
 HEDGE_CANDIDATES_CRYPTO = ("BTCUSDT", "ETHUSDT")
+CRYPTO_LINKED_EQUITIES = frozenset({"COINUSDT", "MSTRUSDT", "MARAUSDT", "RIOTUSDT", "CLSKUSDT",
+                                    "HUTUSDT", "BITFUSDT", "GLXYUSDT"})
+"""Stocks whose price follows bitcoin's: BTC is a hedge candidate for them as well as the indexes
+(a judge, round 21: the COIN hedge never offered BTC)."""
 
 
 _ORDER_WORDS = re.compile(
@@ -2103,7 +2162,8 @@ def _unit_notional(raw: str, symbol: str) -> tuple[Decimal, str] | None:
         if amount:
             break
     if not amount:
-        own = re.search(rf"(\d[\d,]*(?:\.\d+)?)\s*{re.escape(base)}\b", raw, re.I)
+        # "50 NVDAUSDT" names the contract itself (a hostile review, round 21)
+        own = re.search(rf"(\d[\d,]*(?:\.\d+)?)\s*{re.escape(base)}(?:USDT)?\b", raw, re.I)
         amount = _number(own.group(1)) if own else None
     if not amount or amount <= 0:
         return None
@@ -2418,6 +2478,26 @@ def about_the_desk(text: str) -> bool:
     return bool(_THE_DESK_ACTS.search(text)) and not _A_PLAN_NOT_A_RECORD.search(text)
 
 
+ESTIMATES_ASKED = re.compile(
+    r"\b(?:the\s+)?(?:street|analysts?|wall\s+street|consensus|estimates?)\b[^?]{0,40}\b(?:expect\w*|"
+    r"forecast\w*|estimat\w*|think|see|project\w*|want)\b|\bexpect\w*\s+(?:for\s+)?(?:\w+\s+){0,3}"
+    r"next\s+(?:quarter|report|earnings|print)\b|\b(?:next\s+quarter'?s?|upcoming)\s+(?:consensus|"
+    r"estimates?|eps|revenue)\b|\b(?:consensus|estimates?)\s+for\s+(?:the\s+)?next\b", re.I)
+"""What analysts expect from a company's next report: "what does the street expect for NVDA next
+quarter" was read as a price forecast and answered with base rates (a judge, round 21)."""
+
+
+def with_estimates(request: ResearchRequest | None, text: str) -> ResearchRequest | None:
+    """A question about analysts' expectations, read as the company-fundamentals question it is,
+    whichever reader built the request."""
+    if (request is None or not request.symbols or not ESTIMATES_ASKED.search(text)
+            or request.kind in (ResearchKind.FUNDAMENTALS, ResearchKind.COMPARE)
+            or not all(is_us_equity(s) for s in request.symbols[:1])):
+        return request
+    return replace(request, kind=ResearchKind.FUNDAMENTALS, notes=tuple(
+        n for n in request.notes if "forecast" not in n))
+
+
 def detect(text: str) -> ResearchRequest | None:
     """A research request, or None when the question is not one — see :func:`read_request`.
 
@@ -2425,9 +2505,9 @@ def detect(text: str) -> ResearchRequest | None:
     analyses: in "what if the Nasdaq drops 10%? I hold 40% gold" the Nasdaq is the shock, not a
     holding, and a note saying it was read as NDX100USDT would describe a reading never used.
     """
-    request = with_named_shock(with_short_side(as_comparison(
+    request = with_estimates(with_named_shock(with_short_side(as_comparison(
         _with_leverage_exposure(_with_stated_cash(read_request(text), text), text), text), text),
-        text)
+        text), text)
     if request is not None and request.book and request.notional is None:
         # "I have $600 in SOL and $400 in TSLA, am I too risky?" was sized on the first amount,
         # $600, not the $1,000 the book holds (a first-time user, round 12): a book stated in
@@ -2497,6 +2577,8 @@ def _held_short(text: str, symbol: str) -> bool:
     reading it as one flipped a held long (a hostile review, round 20, row 700)."""
     name = re.escape(symbol.removesuffix("USDT"))
     return bool(re.search(rf"\bi(?:'?m|\s+am)\s+(?:also\s+)?short\s+(?:\$?\d[\d,.]*\s*(?:%|k)?\s+"
+                          # "I'm short 200 shares of NVDA" read long (a hostile review, round 21)
+                          rf"(?:(?:shares?|units?|contracts?|coins?)\s+)?"
                           rf"(?:of\s+)?)?{name}\b|(?<!\ba\s)(?<!\d%\s)\bshort\s+\$?\d[\d,.]*\s*(?:%|k)?\s+"
                           rf"(?:of\s+)?{name}\b|\b{name}\s+short\b(?!\s+(?:do|does|would|position\s+do))",
                           text, re.I))
@@ -3691,6 +3773,17 @@ def with_book(request: ResearchRequest | None, book_text: str,
         if (request.kind is ResearchKind.IMPACT and request.target is None
                 and request.resize_by is None and HOLD_MAX_ASKED.search(question)):
             request = replace(request, target=HOLD_TO_LIMIT, size_stated=True)
+        swap = _SWAP.search(question)
+        if swap is not None:
+            sold = research_symbols(swap.group("out"))[0]
+            bought = research_symbols(swap.group("into"))[0]
+            if sold and bought and sold[0] != bought[0]:
+                # "should i sell tsla and buy more nvda" sized an add of NVDA at the default 20%
+                # and never sold TSLA (a first-time user, round 21): a swap, read as one
+                request = replace(request, kind=ResearchKind.IMPACT, swap_from=sold[0],
+                                  symbols=(bought[0], *(s for s in request.symbols
+                                                        if s not in (bought[0], sold[0]))),
+                                  size_stated=True, target=None, side="long")
         if (request.kind is ResearchKind.IMPACT and request.target is None
                 and selling_asked(question)):
             # either planner reads "should I sell my SOL?" as an add of the default 20% (row 634)
@@ -3751,6 +3844,24 @@ def with_book(request: ResearchRequest | None, book_text: str,
         return replace(request, book=book, symbols=tuple(book), notes=(*kept, note))
     if request.kind is ResearchKind.MACRO and not request.symbols:
         return replace(request, book=book, symbols=tuple(book), notes=(*kept, note))
+    if (request.kind is ResearchKind.HEDGE and len(request.symbols) == 1
+            and request.symbols[0] in book and len(book) > 1 and question
+            # the name itself, said beside "position": "hedge my crypto" names no one holding
+            and re.search(rf"\b\$?{re.escape(_t(request.symbols[0]))}\b", question, re.I)
+            and re.search(r"\b(?:position|holding|stake|leg|bag|exposure)\b|"
+                          rf"\bmy\s+\$?{re.escape(_t(request.symbols[0]))}\b", question, re.I)):
+        # "How would I hedge the COIN position?" with COIN 30% of the saved book was hedged as a
+        # whole $100,000 book of COIN (a judge, round 21): the position is its weight of the book
+        weight = book[request.symbols[0]]
+        priced = priced_book(book_text)
+        total = (Decimal(str(round(priced.value, 2))) if priced is not None and priced.value
+                 else HEDGE_BOOK_VALUE)
+        return replace(request, book={request.symbols[0]: 1.0},
+                       notional=total * Decimal(str(round(weight, 6))), notes=(
+            *kept, f"the {_t(request.symbols[0])} position is {weight:.0%} of your saved book, "
+                   f"so it is hedged as ${float(total) * weight:,.0f}"
+                   + ("" if priced is not None and priced.value else
+                      f" of a ${float(HEDGE_BOOK_VALUE):,.0f} book (no book value was given)")))
     if request.kind is ResearchKind.HEDGE and (
             not request.symbols
             or (question and _MY_BOOK.search(question) and not _states_holdings(question)
@@ -4144,6 +4255,12 @@ def _value_holdings(raw: Mapping[str, Any], notes: list[str]) -> tuple[dict[str,
     return {s: v / total for s, v in usd.items()}, cash_usd / total
 
 
+def last_price(symbol: str) -> float | None:
+    """Bitget's last price for ``symbol``, or None: the public face of :func:`_last_price` for
+    other packages (the memory's currency conversion), resolved at call time."""
+    return _last_price(symbol)
+
+
 def _last_price(symbol: str) -> float | None:
     from argus.market.bitget import fetch_tickers
 
@@ -4160,7 +4277,8 @@ def plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, dic
     early, and those skipped them: a proposed 30% short came back at the default 20% (round 20)."""
     request, audit = _plan_with_model(text, client)
     if request is not None:
-        request = with_named_shock(with_short_side(as_comparison(request, text), text), text)
+        request = with_estimates(
+            with_named_shock(with_short_side(as_comparison(request, text), text), text), text)
     return request, audit
 
 

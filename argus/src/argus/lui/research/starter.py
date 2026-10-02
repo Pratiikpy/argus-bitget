@@ -24,7 +24,7 @@ from argus.lui.trace import trace_module
 
 STARTER_Q = re.compile(
     r"\bi\s+(?:have|got|own|saved|can\s+(?:put|invest|spare))\s+(?:about\s+|around\s+|roughly\s+|"
-    r"only\s+)?\$?\s*(?P<amount>\d[\d,]*(?:\.\d+)?)\s*(?P<unit>k|thousand|grand|dollars?|usd|usdt|"
+    r"only\s+|like\s+|maybe\s+|just\s+)?\$?\s*(?P<amount>\d[\d,]*(?:\.\d+)?)\s*(?P<unit>k|thousand|grand|dollars?|usd|usdt|"
     r"bucks)?\b.{0,300}?(?:what\s+(?:should|do|can|would)\s+i\s+do|where\s+(?:should|do|can)\s+"
     r"i\s+(?:put|invest|start)|how\s+(?:should|do|can)\s+i\s+(?:invest|start|begin)|what\s+(?:should|"
     r"do)\s+i\s+(?:buy|invest\s+in)|to\s+invest|invest\s+it|where\s+to\s+start|what\s+to\s+buy|"

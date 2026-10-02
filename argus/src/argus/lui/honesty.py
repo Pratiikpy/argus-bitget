@@ -205,7 +205,9 @@ _ORDER_EMBEDDED = re.compile(
     # hostile review, 2026-10-01); it needs a size so that "place" in prose is not an order.
     r"\b(?:place|open|submit|execute|send|put\s+in)\s+(?:me\s+)?(?:a|an|the|my)?\s*"
     r"[^.?!\n]{0,40}\b(?:long|short|buy|sell|order|position)\b[^.?!\n]{0,30}"
-    r"(?:\d[\d,.]*\s*(?:k\b|usdt|usdc|usd|x\b|contracts?|shares?)|\$\s?\d)", re.I)
+    r"(?:\d[\d,.]*\s*(?:k\b|usdt|usdc|usd|x\b|contracts?|shares?)|\$\s?\d|"
+    # "place a market buy of 50 NVDAUSDT on my live Bitget account" (a hostile review, round 21)
+    r"\d[\d,.]*\s+(?:units?\s+(?:of\s+)?)?[A-Za-z]{2,12}USDT\b)", re.I)
 
 GATES_CLAIM = re.compile(
     r"\b(?:risk\s+)?(?:gates?|checks?|limits?|guardrails?|safeguards?|controls?)\b[^.?!\n]{0,40}"

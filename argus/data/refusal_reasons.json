@@ -1,12 +1,12 @@
 {
-  "as_of": "2026-10-01T20:12:06.159039+00:00",
-  "refusals": 960,
-  "refusals_with_a_gradeable_claim": 457,
+  "as_of": "2026-10-02T18:16:33.204544+00:00",
+  "refusals": 988,
+  "refusals_with_a_gradeable_claim": 462,
   "hours_tolerance": 1.5,
   "round_trip_bps": 12.0,
   "base_clearance_about_2h": {
-    "cleared": 382,
-    "marks": 538
+    "cleared": 399,
+    "marks": 556
   },
   "by_claim": {
     "session_closed": {
@@ -25,7 +25,7 @@
       "ungradeable": 0
     },
     "no_hedge": {
-      "consistent": 210,
+      "consistent": 211,
       "contradicted": 0,
       "ungradeable": 52
     },
@@ -35,28 +35,28 @@
       "ungradeable": 0
     },
     "moves_enough": {
-      "consistent": 76,
+      "consistent": 80,
       "contradicted": 30,
-      "ungradeable": 38
+      "ungradeable": 41
     },
     "move_too_small": {
       "consistent": 0,
-      "contradicted": 1,
+      "contradicted": 2,
       "ungradeable": 3
     }
   },
   "forward_against_base": {
     "move_too_small": {
       "borne_out": 0,
-      "graded": 1,
-      "base_rate": 0.29,
+      "graded": 2,
+      "base_rate": 0.2824,
       "p_one_sided": 1.0
     },
     "moves_enough": {
-      "borne_out": 76,
-      "graded": 106,
-      "base_rate": 0.71,
-      "p_one_sided": 0.4859
+      "borne_out": 80,
+      "graded": 110,
+      "base_rate": 0.7176,
+      "p_one_sided": 0.4588
     }
   },
   "forward_claims": [
@@ -311,8 +311,16 @@
       "stated": "\u2026hurdle in absolute terms \u2014 the binding constraint has been direction, not size, and direction remains unresolvable today.",
       "recorded": "next move +1.3bps over 2.00h against a 12bps round trip (refusal_marks.jsonl)",
       "verdict": "contradicted"
+    },
+    {
+      "seq": 976,
+      "symbol": "TSLAUSDT",
+      "claim": "move_too_small",
+      "stated": "\u2026vs 4 up current quarter, 16 down vs 3 up next quarter). The remaining upside from here is unlikely to clear the 16.27bps total hurdle with sufficient probability given\u2026",
+      "recorded": "next move -12.1bps over 1.99h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
     }
   ],
-  "verdict": "960 refusal(s) on record; 457 carried at least one reason the record can check. Of 913 decision-time reason(s) graded, 913 agreed with the record and 0 contradicted it. `move_too_small` claims were borne out by the next ~2h move 0 of 1 time(s) (0%), against 29% for every ~2h refusal mark (one-sided exact binomial p = 1.00); no evidence the stated reason says more than the base rate does. `moves_enough` claims were borne out by the next ~2h move 76 of 106 time(s) (72%), against 71% for every ~2h refusal mark (one-sided exact binomial p = 0.49); no evidence the stated reason says more than the base rate does.",
+  "verdict": "988 refusal(s) on record; 462 carried at least one reason the record can check. Of 914 decision-time reason(s) graded, 914 agreed with the record and 0 contradicted it. `move_too_small` claims were borne out by the next ~2h move 0 of 2 time(s) (0%), against 28% for every ~2h refusal mark (one-sided exact binomial p = 1.00); no evidence the stated reason says more than the base rate does. `moves_enough` claims were borne out by the next ~2h move 80 of 110 time(s) (73%), against 72% for every ~2h refusal mark (one-sided exact binomial p = 0.46); no evidence the stated reason says more than the base rate does.",
   "method": "Each checkable reason in a no_trade thesis is matched by a fixed pattern and set beside the record: session_phase and hours_to_discovery from the ledger, the desk's own hedge-menu note, the risk ruling, and the next ~2h mark for claims about the size of the coming move. Question and binary verdict from VisualWebArena's llm_ua_match (evaluation_harness/helper_functions.py:610-642, MIT); graded here by the record, not by a model."
 }

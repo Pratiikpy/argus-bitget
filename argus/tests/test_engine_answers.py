@@ -87,7 +87,7 @@ def test_daily_technicals_compute_average_rsi_and_the_last_cross(
         monkeypatch.setattr(_module, "_daily_closes", lambda symbol: (closes, "test closes"))
     lines, _ = research.quote._daily_technicals("SPYUSDT", "is SPY in a death cross?")
     assert lines[0].startswith("Bottom line: No — SPY is in golden-cross territory.")
-    assert "golden cross" in lines[0] and "trading day(s) ago" in lines[0]
+    assert "golden cross" in lines[0] and "trading days ago" in lines[0]
     assert any(line.startswith("RSI(14, 1D)") for line in lines)
     average = next(line for line in lines if "200-day simple moving average" in line)
     assert f"{sum(closes[-200:]) / 200:,.2f}" in average
@@ -236,7 +236,7 @@ def test_yahoo_fills_the_earnings_date_and_targets() -> None:
                                                  need_date=True, need_targets=True,
                                                  need_consensus=True)
     text = " ".join(lines)
-    assert "2026-11-17" in text and "53 day(s)" in text
+    assert "2026-11-17" in text and "53 days" in text
     assert "59 analysts" in text and "$327.70" in text and "strong buy" in text
     assert "EPS 2.47" in text
 

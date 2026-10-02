@@ -130,6 +130,15 @@ def _valid(kind: str, value: str, subject: str, quote: str, context: str = ""
             # "I hold 40% NVDA" is what the book holds, not what one name may carry: it was kept
             # as a 40% risk budget (a judge, round 13, 2026-09-30). The book keeps it instead.
             return None
+        if kind == "budget" and re.search(r"\b(?:per|each|a|any\s+one|one)\s+(?:single\s+)?"
+                                          r"(?:trade|bet)\b|\bposition\s+(?:may|can|should)\s+"
+                                          r"(?:not\s+)?exceed\b|\bno\s+single\s+position\b",
+                                          quote, re.I) and not re.search(r"\bof\s+(?:my\s+)?risk\b",
+                                                                        quote, re.I):
+            # "I won't risk more than 2% per trade" is a per-trade risk and "no single position
+            # above 30%" a weight cap; both are kept by their own readers, and read as a risk
+            # budget they mis-sized every later answer (a judge, round 21)
+            return None
         if kind == "budget" and not _A_LIMIT.search(quote):
             # "50% ETH perp long" in a message that also names a limit elsewhere: the limit word
             # must sit in the quote itself, or the quote is a holding (round 14, 2026-09-30).

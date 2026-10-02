@@ -36,7 +36,7 @@ import time
 from collections.abc import Callable
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from concurrent.futures import TimeoutError as FuturesTimeout
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from decimal import Decimal
 from typing import Any
 
@@ -215,6 +215,13 @@ def read_question(text: str, saved_book: str = "") -> Reading | str:
         return Reading(name=named[0], size_pct=UNSTATED_SIZE_PCT, book=book, cash=cash,
                        notes=tuple(notes))
     name = request.symbols[0]
+    stated, _ = research_symbols(text)
+    if stated and name not in stated and request.kind is not ResearchKind.COMPARE:
+        # "I am bullish on SOL because ... ETF inflows are coming" was read by the sentiment
+        # pattern as BTC, and every reason was tested on Bitcoin's data (a judge, round 21): the
+        # name the question itself states is the one researched
+        name = stated[0]
+        request = replace(request, symbols=(name, *(s for s in request.symbols if s != name)))
     if request.kind is ResearchKind.COMPARE and len(request.symbols) > 1:
         notes.append(f"a comparison names several contracts; the task researches the first, "
                      f"{name.removesuffix('USDT')}")

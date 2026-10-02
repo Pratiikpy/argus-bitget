@@ -50,6 +50,12 @@ leads that were not actions ("NYSE and Nasdaq are shut all day"); it is still re
 recorded answers carry it."""
 
 
+def plural(count: float, word: str) -> str:
+    """"3 days", "1 day": the count with its word, so answers stop printing "day(s)"."""
+    shown = f"{count:g}" if isinstance(count, float) else f"{count}"
+    return f"{shown} {word}{'' if count == 1 else 's'}"
+
+
 def unlead(line: str) -> str:
     """``line`` with its lead label removed and its first letter capitalised, for a lead that
     steps down behind another; any other line unchanged."""
@@ -286,7 +292,7 @@ def answer_performance(ledger: PaperLedger, question: Question) -> Answer:
     lines: list[str] = []
     sources = [
         Source("computation", "argus.paper.performance:evaluate_ledger",
-               f"over {perf.window_days} day(s), {perf.trades} settled trade(s)")
+               f"over {plural(perf.window_days, 'day')}, {perf.trades} settled trade(s)")
     ]
 
     lang = question.language

@@ -334,12 +334,16 @@ def _book(raw: Any) -> dict[str, float]:
             weight = float(value) / 100.0
         except (TypeError, ValueError) as exc:
             raise ToolError(f"weight for {name!r} is not a number") from exc
-        if weight <= 0:
-            raise ToolError(f"weight for {name!r} must be positive")
+        if weight == 0:
+            raise ToolError(f"weight for {name!r} must not be zero")
+        # A negative weight is a short, as the console reads "-30% TSLA": the tool rejected any
+        # short while the console accepted them (a hostile review, round 21)
         symbol = _symbol(str(name))
         weights[symbol] = weights.get(symbol, 0.0) + weight
-    total = sum(weights.values())
-    return {s: w / total for s, w in weights.items()}
+    gross = sum(abs(w) for w in weights.values())
+    if gross == 0:
+        raise ToolError("book has no weight")
+    return {s: w / gross for s, w in weights.items()}
 
 
 def _answer_text(payload: Mapping[str, Any]) -> str:

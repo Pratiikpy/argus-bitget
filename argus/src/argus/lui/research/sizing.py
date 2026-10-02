@@ -101,6 +101,13 @@ ROUND_TRIP = float(CostModel.bitget_perp().taker_bps * Decimal(2)) / 10_000
 """The taker round trip a stopped trade pays: 0.06% a side on Bitget's perpetuals."""
 
 
+_PLANNED_POSITION = re.compile(
+    r"\b(?:put|putting|invest|investing|buy|buying|allocate|place)\s+\$\s*(?P<n>\d[\d,]*(?:\.\d+)?)"
+    r"\s*(?P<k>k|thousand|grand|m|million)?\s+(?:into|in|of|on)\b", re.I)
+"""A position size the trader states for the trade itself ("put $20,000 into MSFT"), set beside
+the size their rule allows."""
+
+
 def _value(n: str, k: str | None) -> float:
     base = float(n.replace(",", ""))
     scale = {"k": 1e3, "thousand": 1e3, "grand": 1e3, "m": 1e6, "million": 1e6}.get(
@@ -192,6 +199,12 @@ def spelled_out(text: str) -> str:
     text = re.sub(r"(?<![\d.,])(\d{1,3}(?:\.\d{3})+)(?![\d.,]\d)",
                   lambda m: m.group(1).replace(".", ""), text)
     text = re.sub(r"(?<![\d.,])(\d+),(\d{1,2})(?=\s*%)", r"\1.\2", text)
+    # "half a percent" and "a quarter of a percent" (a hostile review, round 21: a 0.5% drawdown
+    # limit said that way was lost)
+    text = re.sub(r"\bhalf\s+(?:a|of\s+a|one)\s+(?:percent|per\s+cent|pct|%)",
+                  "0.5%", text, flags=re.I)
+    text = re.sub(r"\b(?:a\s+)?quarter\s+(?:of\s+)?(?:a|one)\s+(?:percent|per\s+cent|pct|%)",
+                  "0.25%", text, flags=re.I)
     text = re.sub(r"\b(" + "|".join(_NUMBER_WORDS) + r")\s+(?:percent|per\s+cent|pct)\b",
                   lambda m: _NUMBER_WORDS[m.group(1).lower()] + "%", text, flags=re.I)
     return re.sub(r"(\d+(?:\.\d+)?)\s*(?:percent|per\s+cent|pct)\b", r"\1%", text, flags=re.I)
@@ -403,6 +416,16 @@ def _answer(text: str, symbol: str | None = None, *,
     if entry:
         lines.append(f"At {entry:,.2f} that is {net / entry:,.4g} units ({gross / entry:,.4g} "
                      f"without costs).")
+    planned = _PLANNED_POSITION.search(text)
+    if planned is not None:
+        # "If I put $20,000 into MSFT with a stop at 5% ... risk 1% of a $200,000 account" was
+        # answered "$39,062" and never set beside the trader's own $20,000 (a judge, round 21)
+        amount = _value(planned.group("n"), planned.group("k"))
+        loses = amount * (stop_frac + ROUND_TRIP)
+        lines.insert(1, f"Your ${amount:,.0f} would lose about ${loses:,.0f} at that stop, costs "
+                        f"included — {loses / risk_usd:.0%} of the ${risk_usd:,.0f} budget, so "
+                        + ("it fits; the budget would allow up to " if amount <= net else
+                           "it is over; cut it to ") + f"${net:,.0f}.")
     if account:
         ratio = net / account
         lines.append(

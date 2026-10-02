@@ -158,6 +158,20 @@ _PLACING = (
     "\"what does it cost to buy $500 of BTC\" or \"how much can I lose on TSLA this week\". The "
     "trading commands it shows are marked --dry-run, which previews an order and sends nothing.",
 )
+_FOR_ME = re.compile(
+    r"\b(?:can|could|will|would)\s+(?:u|you|ya|it)\s+(?:just\s+|please\s+)?(?:trade|invest|buy|"
+    r"sell|do\s+(?:it|the\s+trading|everything))\s+(?:for|on\s+behalf\s+of)\s+me\b|"
+    r"\bmanage\s+my\s+(?:money|account|portfolio|funds)\b|\bauto[\s-]?trade\s+for\s+me\b", re.I)
+"""Handing the trading over: "can u just trade for me" got the generic refusal (round 21)."""
+_TRADING_FOR_YOU = (
+    "Bottom line: no — this console never trades for anyone, holds no money and cannot reach "
+    "your account. Every trade is yours to place, on Bitget.",
+    "What it does instead: tells you what a trade would cost and how far it could go against "
+    "you before you place it — \"what does $500 of BTC cost me and what could I lose in a "
+    "week?\" — and shows its own paper desk's decisions, every one logged, at /status.",
+    "Bitget offers copy trading and trading bots for people who want trading done for them; "
+    "read how each one has done, and what it can lose, before you follow it.",
+)
 _FREE_TO_USE = (
     "Bottom line: yes — using this console costs nothing: there is no account, no login, no card "
     "and no subscription.",
@@ -333,6 +347,8 @@ def reply(text: str, *, named: bool = False) -> Reply | None:
         return Reply(lines=_LOSS_HAPPENS_A)
     if _BEGINNER_SAFE.search(text):
         return Reply(lines=_BEGINNER_SAFE_A)
+    if _FOR_ME.search(text):
+        return Reply(lines=_TRADING_FOR_YOU)
     if _PLACE_TRADE.search(text):
         return Reply(lines=_PLACING)
     if _FREE.search(text):

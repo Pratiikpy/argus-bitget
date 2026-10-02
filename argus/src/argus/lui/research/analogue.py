@@ -422,9 +422,9 @@ def _stress_band(symbol: str) -> str | None:
     half *= STRESS_BLEND_SCALE
     return (f"Next {h} sessions, 80% band: {centre - half:+.1%} to {centre + half:+.1%} — "
             f"{_t(symbol)}'s own {len(moves)} past {h}-session moves, widened or narrowed by "
-            f"its current volatility. AnalogDesk, another Season 2 entry, built a 2,698-question "
-            f"test for this kind of band; run on it, this method scored best of every one tried, "
-            f"AnalogDesk's own method included, though not by a significant margin.")
+            f"its current volatility. On a 2,698-question test built for bands like this one, the "
+            f"method scored best of every one tried, though not by a significant margin (the "
+            f"comparison is on /proof).")
 
 
 def _shape_line(closes: list[tuple[datetime, float]], symbol: str,
@@ -459,8 +459,8 @@ def _shape_line(closes: list[tuple[datetime, float]], symbol: str,
                 f"past stretch ended {when}. After the {len(shape.outcomes)} close matches the "
                 f"next 24 hours moved a median {shape.median_outcome:+.2f}% and rose "
                 f"{shape.upside_share:.0%} of the time; shuffling {_t(symbol)}'s own returns got "
-                f"that close in only {p:.0%} of {shape.null_trials} tries, so the shape is real — "
-                f"a base rate, not a forecast.")
+                f"that close in only {p:.0%} of {shape.null_trials} tries, so the match is "
+                f"unlikely to be chance — a base rate, not a forecast.")
     elif p is not None and best.distance <= 1.0:
         text = (f"Path match (the shape of the last 24 hours, not only its size): the closest "
                 f"past stretch ended {when} and looks alike, but shuffling {_t(symbol)}'s own "
@@ -488,7 +488,11 @@ def _shape_caveat() -> str:
         naive = report["predictors"]["uncondNamePIT"]["winkler_pct"]
         test = report["diebold_mariano"]["argusShape vs uncondNamePIT"]
     except (OSError, ValueError, KeyError, TypeError):
-        return ""
+        # The caveat must not depend on a file being deployed beside the answer: "so the shape is
+        # real" reached a reader with no word that the method is a published loss (a hostile
+        # review, round 21)
+        return (" Path-shape matching is a published loss on /wrong: as a forecast band it did "
+                "worse than the name's own range, so read the match as history, not as a guide.")
     if test["p"] >= 0.05 or mine <= naive:
         return ""
     return (f" Measured on {test['paired_queries']:,} past queries, a band built from path "

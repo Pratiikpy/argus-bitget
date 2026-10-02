@@ -152,7 +152,8 @@ def test_the_schedule_is_the_almgren_chriss_optimum_priced_against_an_even_split
     rest = [line for line in lines[1:] if not line.startswith("Cadence:")]
     # The frontier's worst-case line comes second (`execution/frontier.py`): the 95% worst case
     # of the chosen schedule, never above the even split's.
-    assert rest[0].startswith("Worst case: at 95% confidence")
+    assert rest[0].startswith("Worst case, a different choice: if what matters is the 95% "
+                              "worst case")
     chosen, even = (float(x.split("bps")[0]) for x in rest[0].split("worst case is ")[1]
                     .split(" against ", 1))
     assert chosen <= even

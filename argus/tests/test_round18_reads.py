@@ -302,4 +302,4 @@ class TestRound19LiveFindings:
                                 high=Decimal(130), low=Decimal(90)) for h in range(200, 0, -1)]
         monkeypatch.setattr(history, "fetch_window", lambda *_a, **_k: bars)
         line = period_move("BTCUSDT", 7, Decimal("110"))
-        assert line is not None and line.startswith("Over the last 7 day(s) BTC moved")
+        assert line is not None and line.startswith("Over the last 7 days BTC moved")

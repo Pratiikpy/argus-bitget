@@ -340,6 +340,11 @@ def _desk_view(symbol: str, ledger: Any) -> tuple[list[str], list[Source]]:
         + f" at stated confidence {float(last.stated_confidence):.2f}"
         + (f" — {sentence_cut(thesis)}" if thesis else "")
     )
+    if re.search(r"\brevision", thesis, re.I) and re.search(r"\d+\s+up\s*/\s*\d+\s+down", thesis):
+        # "35 up / 1 down" sat beside "12 raised and 0 cut their target" with nothing saying they
+        # count different things (a judge, round 21)
+        line += (" (its revision count is analysts' earnings-estimate changes over 30 days; a "
+                 "price-target line elsewhere counts firms' target changes — different measures)")
     return [line], [Source(kind="ledger", ref=f"seq {last.seq}",
                            detail=f"{symbol} {last.verdict} @ {last.decided_at}")]
 

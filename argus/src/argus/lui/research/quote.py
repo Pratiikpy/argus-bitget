@@ -8,7 +8,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any
 
-from argus.lui.answer import Source, unlead
+from argus.lui.answer import Source, plural, unlead
 from argus.lui.question import (
     TRADED_SYMBOLS,
 )
@@ -218,7 +218,7 @@ def period_move(symbol: str, days: int, last: Any) -> str | None:
     low = min(float(b.low) for b in window)
     move = (float(last) / start - 1) * 100
     closed = before[-1].ts + step
-    return (f"Over the last {days} day(s) {base} moved {move:+.2f}%, from {start:g} at the "
+    return (f"Over the last {plural(days, 'day')} {base} moved {move:+.2f}%, from {start:g} at the "
             f"{closed:%d %b %H:%M} UTC close to {last} now; its range in that time was {low:g} "
             f"to {high:g}.")
 
@@ -246,7 +246,8 @@ def _ratio_over_time(a_sym: str, b_sym: str, days: int) -> str | None:
     low = min(series, key=lambda point: point[1])
     high = max(series, key=lambda point: point[1])
     name = f"{_t(a_sym)}/{_t(b_sym)}"
-    return (f"Over the last {days} day(s) the {name} ratio ran from {low[1]:.5g} ({low[0]:%d %b}) "
+    return (f"Over the last {plural(days, 'day')} the {name} ratio ran from {low[1]:.5g} "
+            f"({low[0]:%d %b}) "
             f"to {high[1]:.5g} ({high[0]:%d %b}) on hourly closes; it started the window at "
             f"{first[1]:.5g} and is {last[1]:.5g} now, {(last[1] / first[1] - 1) * 100:+.2f}%.")
 
@@ -351,6 +352,12 @@ def _quote_extras(raw_text: str, quoted: list[tuple[str, Any]],
         else:
             size = parse_notional(raw_text)
             worth = float(size) if size else None
+        if not worth:
+            # "I have 20 grand. How many shares of AAPL can I buy?" was told to name the amount
+            # (a hostile review, round 21): the money said in the question is the amount
+            from argus.lui.research.sizing import stated_capital
+
+            worth = stated_capital(raw_text)
         if worth:
             units = worth / float(ticker.last)
             text = (f"{how}${worth:,.0f} of {base} at Bitget's last {ticker.last} is about "
@@ -649,7 +656,7 @@ def _daily_technicals(symbol: str, question: str) -> tuple[list[str], list[Sourc
             "death cross (the 50-day falling through the 200-day)"
         cross_line = (f"{ticker}'s 50-day average is {abs(now / averages[200] * 100):.1f}% "
                       f"{'above' if now > 0 else 'below'} its 200-day"
-                      + (f"; the last cross was a {kind} {since} trading day(s) ago"
+                      + (f"; the last cross was a {kind} {plural(since, 'trading day')} ago"
                          if since is not None else
                          "; the two have not crossed in the history read here")
                       + ".")

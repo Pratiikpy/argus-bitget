@@ -483,7 +483,7 @@ class TradeImpact:
         ):
             lines.append(
                 f"[portfolio] risk spread across {self.effective_positions_before:.1f} → "
-                f"{self.effective_positions_after:.1f} effective position(s)"
+                f"{self.effective_positions_after:.1f} effective position(s) by share of risk"
             )
         if self.max_correlation is not None:
             other, rho = self.max_correlation
@@ -1079,6 +1079,7 @@ def copilot(
     benchmark: str,
     is_open: Any,
     target: float | None = None,
+    after: Mapping[str, float] | None = None,
 ) -> CopilotReport:
     """The whole portfolio-copilot research task over already-fetched returns.
 
@@ -1089,7 +1090,8 @@ def copilot(
     worst window and factor exposures use every aligned bar, because the book is exposed to the
     shut session too and a stress test that skipped 82% of the hours would understate it.
     """
-    after = resize(before, add, target) if target is not None else rebalance(before, add, size)
+    if after is None:
+        after = resize(before, add, target) if target is not None else rebalance(before, add, size)
     stamps, columns = align(raw)
     if benchmark not in columns:
         raise PortfolioError(f"no aligned returns for the benchmark {benchmark}")

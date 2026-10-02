@@ -216,18 +216,19 @@ def _beta_track_record() -> str | None:
     except (OSError, ValueError, KeyError, TypeError):
         return None
     text = (f"How far to trust that beta: on {books:,} test books, it missed the next four "
-            f"weeks' realised beta by {err['argus_open']:.2f} on average. weekend-copilot, an S2 "
-            f"entry answering this same question, missed by {err['rival_spy']:.2f} as it ships "
-            f"(p = {shipped['wilcoxon_p']:.2f}) and by {err['rival_qqq']:.2f} on the same "
-            f"benchmark (p = {same['wilcoxon_p']:.2f}, not significant); simply assuming a beta "
-            f"of 1.0 missed by {err['naive_one']:.2f}")
+            f"weeks' realised beta by {err['argus_open']:.2f} on average, against "
+            f"{err['rival_spy']:.2f} for the best other tool measured on the same books "
+            f"(p = {shipped['wilcoxon_p']:.2f}; {err['rival_qqq']:.2f} on the same benchmark, "
+            f"p = {same['wilcoxon_p']:.2f}, not significant) and {err['naive_one']:.2f} for "
+            f"simply assuming a beta of 1.0 — the comparison is on /proof")
     try:
         stress = _json.loads((desk_notes_path().parent / "copilot_stress.json")
                              .read_text(encoding="utf-8"))["down_1pct"]
         miss = stress["mean_abs_error_pp"]
         text += (f". The QQQ-fall lines were off by {miss['argus_beta']:.2f} points on the "
-                 f"{stress['days']} days QQQ really fell 1% or more (skfolio's vine copula: "
-                 f"{miss['skfolio_vine']:.2f}), and they are a centre, not a worst case")
+                 f"{stress['days']} days QQQ really fell 1% or more ({miss['skfolio_vine']:.2f} "
+                 f"for the strongest statistical model tested), and they are a centre, not a "
+                 f"worst case")
     except (OSError, ValueError, KeyError, TypeError):
         pass
     return text

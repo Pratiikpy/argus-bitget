@@ -1,6 +1,11 @@
 # ARGUS
 
 [![CI](https://github.com/Pratiikpy/argus-bitget/actions/workflows/ci.yml/badge.svg)](https://github.com/Pratiikpy/argus-bitget/actions/workflows/ci.yml)
+![tests](https://img.shields.io/badge/tests-11%2C135%20collected-2ea44f)
+![mypy](https://img.shields.io/badge/mypy-strict%20clean-2ea44f)
+![register](https://img.shields.io/badge/register-6%20owned%20%C2%B7%2033%20tied%20%C2%B7%207%20lost-555)
+![languages](https://img.shields.io/badge/answers%20in-8%20languages-555)
+![MCP](https://img.shields.io/badge/MCP-10%20tools-555)
 
 **A research desk for Bitget's tokenized US stocks. Ask in plain language; every number is
 computed from live data and names its source.**
@@ -18,18 +23,50 @@ live](https://deploy-topaz-seven-64.vercel.app/research) · [what we beat](https
 Built for Bitget AI Base Camp / Genesis Hackathon Season 2. Nothing on this page needs an account
 or a key to try.
 
+> **Read this before judging.**
+> - ARGUS is this team's **Track 3 — AI Trading Desk** entry, a natural-language research
+>   workbench. The team's Track 2 entry is a **separate project**,
+>   [t2-sentiment-agent](https://github.com/Pratiikpy/t2-sentiment-agent), with its own code,
+>   paper-trading ledger, demo and form (Basic Competition Rules, rule 2). Nothing here is part of it.
+> - It is **not a signal service**. No strategy in it has cleared its own deflation gate, and the
+>   console says so; the trader makes every call.
+> - Every capability is measured against a named rival on the same input, and the losses are
+>   published beside the wins: [the full register](#what-we-beat-and-what-beat-us) and
+>   [`/wrong`](https://deploy-topaz-seven-64.vercel.app/wrong).
+
 ---
 
-## What this entry is
+## Head to head with Season 2
 
-ARGUS is this team's **Track 3 — AI Trading Desk** entry: a natural-language research workbench.
-A trader asks; the engines answer from Bitget's market data, SEC filings, FRED and the news; every
-answer ends in a receipt naming its sources, and the trader makes the call.
+Every rival below was cloned or called and run on the same input as ARGUS. Ties and losses are
+kept; the full table, rival by rival, is on [`/proof`](https://deploy-topaz-seven-64.vercel.app/proof).
 
-The same team entered Track 2 with a **separate project**,
-[t2-sentiment-agent](https://github.com/Pratiikpy/t2-sentiment-agent): its own repository, code,
-paper-trading ledger and demo, submitted through its own form, as the handbook requires of a second
-entry (Basic Competition Rules, rule 2). Nothing in this repository is part of that entry.
+| Rival | What it does | Result |
+|---|---|---|
+| gloaming (S2) | estimates the open while the US market is shut | missed by 81bps over 113 nights and 8 stocks against 30bps for ARGUS (93% of directions right) and 90bps for no gap; ahead on all 8 stocks, narrowest on QQQ (12.5 against 14.3bps). The stock's own pre-market price at 09:00, the general tool, missed by 36bps; ARGUS is ahead of it on all 8 stocks |
+| Rook (S2) | ends each thesis with an invalidation price | its stops, 0.1-1.7% away, were reached on 62% of held-out days against 11% for ARGUS's fitted stop: ahead on that measure, six names, one run |
+| baserate (S2) | prices a leveraged weekend hold | ARGUS rebuilt to read 1,443 NVDA weekends since 1999 and Bitget's live margin tier; its regime match scored worse than ARGUS's volatility-scaled band over 17,044 weekends, but baserate's own forecasts are not yet scored on the same weekends: a tie |
+| MirrorLine (S2) | checks a trader's claims about the tape | first run 18 of 38 verdicts to its 38; fixed the same morning, re-run tied at 30 of 30 gradable claims |
+| optic-bitget (S2) | debates a thesis with a model judge | abstained on two of three theses for want of earnings and positioning data ARGUS answered; still gives one synthesised call ARGUS does not: a tie |
+| Ballast (S2) | hedges an rToken holder's nights | beat ARGUS's index hedge on 2026-09-24; now a tie |
+| nocturne (S2) | fades the rToken's weekend move | level on its own question (1.92% against 2.07%); on the stock's real Monday open the weekend move carried through (slope +0.83, 160 stock-weekends) |
+| Bitget's 60-second TWAP | slices an order | beat the console's schedule (6.9 against 12.2bps on $100k) on 2026-09-24; now a tie |
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/proof-dark.png">
+  <img alt="The /proof page: 46 capabilities measured against a named rival — 6 OWNED, 33 TIED, 0 IMPLEMENTED, 7 LOST — each linked to its evidence." src="docs/img/proof-light.png" width="720">
+</picture>
+
+---
+
+## Where each judging line is answered
+
+| Track 3 judges | Where to look | What to check |
+|---|---|---|
+| **Feature depth** — data sources, Skill integration count and effectiveness | [Bitget's toolkit, used and measured](#bitgets-toolkit-used-and-measured); `/status` | Which Bitget surfaces answer today and which do not, counted live; data breadth against OpenBB on the same stocks the same day |
+| **Research quality** | [`/research`](https://deploy-topaz-seven-64.vercel.app/research); [what we beat](#what-we-beat-and-what-beat-us) | One full research task from question to verdict, eight engines side by side; every capability graded against a named rival |
+| **LUI fluency** | [Try it in a minute](#try-it-in-a-minute); the console | Plain questions, slang, typos, follow-ups, Chinese and seven other languages; 81.7% of 240 blind questions read correctly with no model |
+| **Personalised thesis** | [It remembers you](#it-remembers-you); ask *test my thesis* | A stated thesis tested reason by reason against live data; your loss limit, horizon, account and book applied to every later answer |
 
 ---
 
@@ -40,9 +77,18 @@ Open the console and ask any of these. Each one exercises something different.
 | Ask | What it shows |
 |---|---|
 | *I hold 40% NVDA, 30% MSFT, 30% AAPL — should I add 15% TSLA?* | Your book's risk before and after, sized to a risk budget, a hedge, stress cases, and how far to trust the beta — scored against weekend-copilot, an S2 rival answering the same question. |
+| *I'm bullish on NVDA because AI capex keeps accelerating. Test my thesis.* | Each reason tested on its own measurement — hyperscaler capex and NVDA's revenue from SEC filings; ask *what would prove it wrong?* next. |
 | *How should I split a $50k order in NVDA?* | An execution schedule priced on the live order book, measured against Bitget's own TWAP on a full-depth replay, and the first child written as the Agent Hub `bgc --dry-run` command that previews it without sending. |
-| *What are my sector and factor exposures if I add 10% XOM?* | Sectors, industries and eight factor betas with their t-statistics — market, size, momentum, value, quality, low volatility, rates and crypto, widened from four after the eight explained 9 of 13 names better out of sample. |
 | *Long rNVDA over the weekend at 3x* | The stock's weekends since 1999, a band for Monday's open scaled to its volatility now, which covered 79% of 17,044 weekends out of sample against an 80% target, and the perpetual's own path to the liquidation line. |
+| *Where will NVDA open?* | While the US market is shut: the price the stock's own perpetual implies for the next open, with that reading's measured miss beside two S2 rivals'. |
+| *I have $1,000 and I'm new — where should I start?* | No pick: what that sum went through in a year in three broad markets, and how to place a first trade on Bitget. |
+
+<details>
+<summary><b>Thirteen more questions, one per engine</b></summary>
+
+| Ask | What it shows |
+|---|---|
+| *What are my sector and factor exposures if I add 10% XOM?* | Sectors, industries and eight factor betas with their t-statistics — market, size, momentum, value, quality, low volatility, rates and crypto, widened from four after the eight explained 9 of 13 names better out of sample. |
 | *Review my trades: bought NVDA at 188, sold at 176 …* | Your habits across the trades and a checklist, kept and run again the next time you ask about adding a name. |
 | *What's trending right now?* | The coins drawing the crowd, checked against Bitget's board: listed or not, the 24-hour move, the funding rate. Also: *top DeFi protocols by TVL*, *how much is ETH gas*. |
 | *How does NVDA react to CPI?* | An event study over past releases, with the tests that say whether the reaction is real. |
@@ -51,38 +97,56 @@ Open the console and ask any of these. Each one exercises something different.
 | *Long MSTR perp into earnings — funding looks cheap* | Your own premise tested first — funding against the contract's last 100 settlements — then the earnings half: report date, analyst targets, the last surprise, holders, filings. |
 | *Will MSTR be higher in 48 hours?* | Not a forecast: how often it finished higher over every past 48-hour window, with an interval that counts overlapping windows honestly, the cost of holding, and what Polymarket prices. |
 | *What if I trim TSLA to 10% of my book?* | A resize, not an add: every other holding rescaled, risk share before and after, and the weight that fits your budget. |
-| *Where will NVDA open?* | While the US market is shut: the price the stock's own perpetual implies for the next open, with that reading's measured miss beside two S2 rivals'. |
 | *ETH open interest* | How much is held open, how many days of today's volume that is, and where it ranks among every liquid Bitget perpetual. |
 | *What is the long/short ratio on SOL?* | Bitget's own split for any perpetual: the share of accounts long, its change on the day, and the share of position size — the crowd against the larger money. |
 | *How much does TQQQ decay if QQQ goes sideways for a month?* | What the fund actually lost against 3× its index in every sideways month of its history, beside the compounding formula at today's volatility. |
 | *Should I hedge with gold or with TLT?* | The hedges you named measured against your book first, then the listed leg that does the job better, sized and costed. |
+
+</details>
+
+**Who it is for:** a trader holding or weighing Bitget's tokenized US equities who wants a second
+desk that shows its work, and a newcomer who wants to see what a sum of money would have been
+through before risking it. **Who it is not for:** anyone wanting signals or trades placed for them —
+it places no orders, holds no money and says so.
+
+---
+
+## What makes an answer trustworthy
+
+### Every line says where it came from
 
 Every line of an answer is tagged with where it comes from: **live** (read just now),
 **computed** (worked out for this answer), **record** (a measured past result, its sample
 named), **desk** (quoted from the agent's logged decision), **assumed** (a default the question
 left open) or **missing** (could not be read). On 18 questions never seen while the tags were
 written, 94% of content lines carried one; a line no rule recognises carries none rather than a
-guess (`python -m argus.eval.provenance_audit`).
+guess (`python -m argus.eval.provenance_audit`). Every answer ends by naming the sources it reached
+and any that did not answer. If the desk cannot source a figure, it refuses and says why.
+
+### It remembers you
 
 Put your holdings in **My book** once and every answer uses them. Tell it about yourself — *I
 can't lose more than 10%*, *I'm a swing trader*, *I think NVDA runs on AI capex* — and it remembers,
 in your browser only: later answers apply your loss limit, holding period and risk budget, and show
 your thesis beside every answer about that name with the move since you stated it, each time on a
 **memory** line saying so. Measured on 20 two-session tasks: 20 answers changed by memory, none
-with memory off, none reaching another trader (`python -m argus.eval.memory_eval`). Every answer ends by naming the
-sources it reached and any that did not answer. If the desk cannot source a figure, it refuses and
-says why. Ask in Chinese, Japanese, Korean, Spanish, Portuguese, French or German and the answer
-comes back in that language on the console page: the engines write English, which shows at once,
-and Qwen's translation replaces it a few seconds later (the page's second call, `/translate`); every
-number in each translated line is checked against the English, and a line whose figures do not
-match stays English. A direct `POST /ask` returns the English with a one-line note in the asker's
+with memory off, none reaching another trader (`python -m argus.eval.memory_eval`).
+
+### It answers in your language
+
+Ask in Chinese, Japanese, Korean, Spanish, Portuguese, French or German and the answer comes back in
+that language on the console page: the engines write English, which shows at once, and Qwen's
+translation replaces it a few seconds later (the page's second call, `/translate`); every number
+in each translated line is checked against the English, and a line whose figures do not match
+stays English. A direct `POST /ask` returns the English with a one-line note in the asker's
 language, and the signed token that `/translate` accepts.
 
-The same desk answers in Telegram at [@argusbitgetbot](https://t.me/argusbitgetbot): `/book` saves
-your holdings for the chat, and orders are refused there as everywhere.
+### It is in Telegram, and you can run your own
 
-**Run your own.** Like OpenClaw or Hermes Agent, the desk also runs as your own Telegram bot, on
-your machine, with your token — nothing of yours passes through our servers:
+The same desk answers in Telegram at [@argusbitgetbot](https://t.me/argusbitgetbot): `/book` saves
+your holdings for the chat, and orders are refused there as everywhere. Like OpenClaw or Hermes
+Agent, it also runs as your own Telegram bot, on your machine, with your token — nothing of yours
+passes through our servers:
 
 ```bash
 pip install -e argus                                  # or: uv sync --frozen, in argus/
@@ -97,9 +161,15 @@ the desk and your alerts stay in `~/.argus` across restarts, and alerts fire whi
 `/watch NVDA below 170`, `/watch MSTR funding 0.05%`. No model key is needed; the desk reads
 questions with its own classifier.
 
-**Who it is for:** a trader holding Bitget's tokenized US equities who wants a second desk that
-shows its work. **What it is not:** a signal service. No strategy here has cleared its own
-deflation gate, and the console says so.
+### Any agent can call it
+
+ARGUS is also a **Model Context Protocol server**: any MCP client can add
+`https://deploy-topaz-seven-64.vercel.app/mcp` (Streamable HTTP) and call ten tools — `argus_ask`
+(the whole console, any language), `argus_quote`, `argus_portfolio_impact`, `argus_stress` (a shock
+on the Nasdaq or on any instrument, long or short book), `argus_execution_plan`,
+`argus_scoreboard`, `argus_research_task` (the eight-engine report), `argus_week_ahead`,
+`argus_exposures` and `argus_review_trades`. They run the same engines as the page; none of them
+writes or trades.
 
 ---
 
@@ -107,49 +177,35 @@ deflation gate, and the console says so.
 
 Every capability is graded against the specialist that leads its sub-theme, by a register that
 opens the evidence rather than trusting a filename (`python -m argus.eval.standing`), and may claim
-OWNED only after that rival has been run on the same input and beaten.
-**6 of 46 capabilities are OWNED, 33 are TIED, 0 are IMPLEMENTED, and 7 are LOST: crowd sentiment classification, to RoB-RT on TweetEval (0.544 against 0.729 macro-recall on the same 12,284 tweets); session-aware execution, to Bitget's own TWAP on replayed order books (0.62 bps dearer on boundary-crossing orders, interval [0.01, 1.53]); the price of thinking time, to a trailing realised-move estimator on 23,003 real decision instants (production's excess error 9.89, interval [9.20, 10.57]); cointegration screening, whose false-discovery rate misses its own target where 128 general pipelines hold it; perception breadth, to OpenBB's keyless providers (12.4 data categories per stock against the desk's 6.2, same stocks, same day); path-shape matching, whose forecast band is worse than a stock's own unconditional range on 2,698 held-out queries (Winkler 16.4% against 15.1%, p = 0.001); and injection screening on attacks it was not written for, where a trained classifier withholds 41% of an external corpus's attacks to ARGUS's 16% (while withholding 12.4% of the desk's real text, which ARGUS never does).** OWNED needs
-all thirteen conditions: the rival's best implementation read and reproduced, a same-input
-comparison with costs, out-of-sample, ablation, an adversarial test, documented failure cases and
-reproducibility.
+OWNED only after that rival has been run on the same input and beaten. OWNED needs all thirteen
+conditions: the rival's best implementation read and reproduced, a same-input comparison with
+costs, out-of-sample, ablation, an adversarial test, documented failure cases and reproducibility.
 
-The register got stricter on 2026-09-25, 26 and 27, and the OWNED count fell from 20 to 8, then
-to 6, then to 2. A proof that rests on a population figure must now survive a per-group check, by
-symbol and by half of the sample, and 12 capabilities went back to IMPLEMENTED: five because their
-headline was carried by one symbol or flipped between halves, seven because their proof is a
-designed case set. Breadth rotation went to TIED: it beat pytaa, but a general-purpose validator
-(pandera with pydantic) configured to the same contract handles the same 36 cases. rToken factor
-divergence went to IMPLEMENTED when its statement was rewritten from intervals that include zero.
-On 2026-09-27 cross-sectional ranking went to TIED with qlib (the one input where ARGUS was safer,
-a one-name group, never reaches a decision), and numeric decision grounding went back to
-IMPLEMENTED (its twelve cases were fabrications the author chose, and a general pydantic range
-check was never run against them), and so did sentiment integrity and earnings-surprise ranking,
-the second once the register began reading each headline's bootstrap interval and found its
-own included zero. That left 2. Each row names its route back (`data/standing.json`).
-On 2026-09-29 four rows reached OWNED by taking that route, for 6: earnings-surprise ranking,
-re-measured on 7,258 SEC filers with a holdout the rule was never fitted on, against
-QuantConnect's own formula on every one of them, and against the real edgartools package; the research workbench's data breadth, ahead of OpenBB's keyless providers on
-two days and on the categories both can reach; point-in-time filings, ahead of OpenBB's platform,
-edgartools and Qlib on 619 real questions; and the perpetual-implied overnight open, which also
-beats gloaming as a trade entered at the 09:00 price, net of costs. The same day every other open
-row was settled: sentiment integrity and market sentiment TIED on real posts, and three rows
-removed (they served no flow, or duplicated another), each with its reason on `/wrong`.
+**6 of 46 capabilities are OWNED, 33 are TIED, 0 are IMPLEMENTED, and 7 are LOST.**
+
+| OWNED | Against |
+|---|---|
+| Earnings-surprise ranking | QuantConnect's own formula on 7,258 SEC filers with a holdout the rule was never fitted on, and the real edgartools package |
+| Research workbench data breadth | OpenBB's keyless providers, on two days and on the categories both can reach |
+| Point-in-time filings | OpenBB's platform, edgartools and Qlib, on 619 real questions |
+| The perpetual-implied overnight open | gloaming as a trade entered at the 09:00 price, net of costs, and the stock's own pre-market price |
+| Per-profile mandate that changes the verdict | Vibe-Trading, the one system of sixteen whose mandate changes a verdict on identical state |
+| Risk layer proved by domain sweep | Nautilus Trader's risk engine, QuantConnect's brokerage models and freqtrade's protections |
+
+| LOST | Lost to | By how much |
+|---|---|---|
+| Crowd sentiment classification | RoB-RT on TweetEval | 0.544 against 0.729 macro-recall on the same 12,284 tweets |
+| Session-aware execution | Bitget's own TWAP on replayed order books | 0.62 bps dearer on boundary-crossing orders, interval [0.01, 1.53] |
+| The price of thinking time | a trailing realised-move estimator, on 23,003 real decision instants | production's excess error 9.89, interval [9.20, 10.57] |
+| Cointegration screening | 128 general pipelines | its false-discovery rate misses its own target where they hold it |
+| Perception breadth (the trading desk's own feed) | OpenBB's keyless providers | 12.4 data categories per stock against the desk's 6.2, same stocks, same day |
+| Path-shape matching | a stock's own unconditional range | forecast band worse on 2,698 held-out queries (Winkler 16.4% against 15.1%, p = 0.001) |
+| Injection screening on attacks it was not written for | a trained classifier | it withholds 41% of an external corpus's attacks to ARGUS's 16% (while withholding 12.4% of the desk's real text, which ARGUS never does) |
 
 Losses are published the moment they are found, on
-[`/wrong`](https://deploy-topaz-seven-64.vercel.app/wrong). Rivals run on the same input:
-
-| Rival | What it does | Result |
-|---|---|---|
-| Bitget's 60-second TWAP | slices an order | beat the console's schedule (6.9 against 12.2bps on $100k) on 2026-09-24; now a tie |
-| Ballast (S2) | hedges an rToken holder's nights | beat ARGUS's index hedge on 2026-09-24; now a tie |
-| MirrorLine (S2) | checks a trader's claims about the tape | first run 18 of 38 verdicts to its 38; fixed the same morning, re-run tied at 30 of 30 gradable claims |
-| optic-bitget (S2) | debates a thesis with a model judge | abstained on two of three theses for want of earnings and positioning data ARGUS answered; still gives one synthesised call ARGUS does not: a tie |
-| baserate (S2) | prices a leveraged weekend hold | ARGUS rebuilt to read 1,443 NVDA weekends since 1999 and Bitget's live margin tier; its regime match scored worse than ARGUS's volatility-scaled band over 17,044 weekends, but baserate's own forecasts are not yet scored on the same weekends: a tie |
-| Rook (S2) | ends each thesis with an invalidation price | its stops, 0.1-1.7% away, were reached on 62% of held-out days against 11% for ARGUS's fitted stop: ahead on that measure, six names, one run |
-| gloaming (S2) | estimates the open while the US market is shut | missed by 81bps over 113 nights and 8 stocks against 30bps for ARGUS (93% of directions right) and 90bps for no gap; ahead on all 8 stocks, narrowest on QQQ (12.5 against 14.3bps). The stock's own pre-market price at 09:00, the general tool, missed by 36bps; ARGUS is ahead of it on all 8 stocks |
-| nocturne (S2) | fades the rToken's weekend move | level on its own question (1.92% against 2.07%); on the stock's real Monday open the weekend move carried through (slope +0.83, 160 stock-weekends) |
-
-The full table, rival by rival, is on [`/proof`](https://deploy-topaz-seven-64.vercel.app/proof).
+[`/wrong`](https://deploy-topaz-seven-64.vercel.app/wrong). The register has been made stricter
+three times, and the OWNED count fell each time before it rose again on new evidence; that history,
+date by date, is in [`ARGUS-EXPLAINED.md`](ARGUS-EXPLAINED.md#how-the-register-got-stricter).
 
 ---
 
@@ -161,6 +217,7 @@ The full table, rival by rival, is on [`/proof`](https://deploy-topaz-seven-64.v
 | Order-book websocket (`books5`, trades) | Execution replay and the order-splitting comparison | Recorded locally, RFC 6455 client |
 | `bitget-mcp-server` | US fundamentals, 13F holders, analyst estimates, earnings calendar, the stock behind each rToken | 37 of 67 catalog entries answer in the latest sweep (`data/data_coverage.json`, dated inside and on `/status`); on 26 Sep every entry refused while its upstream answered 503 |
 | `bitget-signal` Skills | The console asks the Skill first for technicals (MACD corrected against Bitget's own candles), crypto sentiment and the rates curve, and checks BTC against `crypto_derivatives` | 2 of bitget-signal's 19 tools answered all three attempts on 2026-09-26 (crypto_derivatives, technical_analysis), from 1 of its 5 Skills (technical-analysis) plus 1 tool no SKILL.md names; when a Skill is silent the answer names the public source it read instead |
+| Agent Hub (`bgc`) | The first child of every execution plan, written as the `--dry-run` command that previews it | Mapping checked against `bgc`'s own dry-run output (`data/agenthub_preview.json`) |
 
 When a Skill's hosted server fails, ARGUS reads the source that Skill names (alternative.me,
 Binance futures data, FRED, Yahoo, DeFiLlama, CoinGecko, the RSS feeds). Every such answer says
@@ -176,21 +233,9 @@ OpenBB's 12.4**, ahead on 9 of 10 and level on QQQ; read again the next day with
 to +4.1, `argus/data/groupwise_audit.json`). Most of the lead is what OpenBB's free tier has no
 endpoint for (X and Reddit, Bitget funding and positioning, prediction markets); scored only on the
 categories OpenBB can reach, the workbench is still ahead by 1.0 and 1.2 a stock (interval +0.7 to
-+1.5), from the upcoming earnings date and corporate actions. Options chains, dark-pool and short
-volume, ownership, filings and fund holdings were added after the first measurement showed them
-missing, and Bitget's own data service carries 4.7 of the categories. The trading desk's own evidence panel is still narrower, **6.2 against 12.4**, and that loss
-is on the record. With paid keys OpenBB is wider; those twelve providers are named, not counted.
-
----
-
-## Call it from an agent
-
-ARGUS is also a **Model Context Protocol server**: any MCP client can add
-`https://deploy-topaz-seven-64.vercel.app/mcp` (Streamable HTTP) and call ten tools — `argus_ask`
-(the whole console, any language), `argus_quote`, `argus_portfolio_impact`, `argus_stress` (a shock
-on the Nasdaq or on any instrument), `argus_execution_plan`, `argus_scoreboard`,
-`argus_research_task` (the eight-engine report), `argus_week_ahead`, `argus_exposures` and
-`argus_review_trades`. They run the same engines as the page; none of them writes or trades.
++1.5), from the upcoming earnings date and corporate actions. The trading desk's own evidence panel
+is still narrower, **6.2 against 12.4**, and that loss is on the record. With paid keys OpenBB is
+wider; those twelve providers are named, not counted.
 
 ---
 
@@ -201,11 +246,11 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 11,113 tests collected
+pytest -q                       # 11,135 tests collected
 ```
 
-Nothing above needs a credential. On 2026-10-02, with every outbound connection refused, 10,800
-passed, 75 skipped and 0 failed of the 11,113 tests collected; the other 238 read a live
+Nothing above needs a credential. On 2026-10-02, with every outbound connection refused, 10,822
+passed, 75 skipped and 0 failed of the 11,135 tests collected; the other 238 read a live
 venue, feed or model and run apart
 (`pytest -m network`). Tests that need a rival's source cloned beside the repository skip
 and say which. `ARGUS_BLOCK_NETWORK=1` refuses every outbound connection, so
@@ -225,7 +270,7 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **11,113 tests collected** — `pytest -q` |
+| Tests | **11,135 tests collected** — `pytest -q` |
 | Types | **`mypy --strict` clean on 578 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
@@ -261,8 +306,8 @@ a test that reaches the network shows itself.
   refused. Every other decision on its ledger is a refusal. Two settled trades are not a
   sample, so its Sharpe and drawdown are undefined and printed as such, and its win rate of 0%
   says nothing yet. Each refusal carried a direction, hashed before the
-  outcome existed: at about two hours, **297 of 535 directional calls were right**, which clears a
-  coin flip and does not beat calling "up" every time. The median refusal **forgave -8.40bps of
+  outcome existed: at about two hours, **305 of 553 directional calls were right**, which clears a
+  coin flip and does not beat calling "up" every time. The median refusal **forgave -8.77bps of
   net edge** after the 12bps round trip — the trades it passed
   on were mostly unprofitable. This workbench does not trade; trading is the separate Track 2
   project's job.
@@ -278,7 +323,17 @@ a test that reaches the network shows itself.
 ARGUS 是面向 Bitget 美股代币（rToken）的研究工作台（Track 3 · AI Trading Desk）。用自然语言提问，
 八个引擎基于 Bitget 行情、SEC 文件、FRED 与新闻实时计算，每个数字都注明来源；语言模型只理解问题，
 从不编写数字。全部 46 项能力均已与各子赛道领先的专业系统在相同输入上对比：6 项领先（OWNED）、33 项
-持平、0 项已实现、7 项落后（LOST：人群情绪分类在 TweetEval 上不及 RoB-RT；跨时段执行在回放订单簿上不及 Bitget 自带的 TWAP；思考时间定价在 23,003 个真实决策时点上不及滚动实现波动估计；协整筛选的错误发现率未达自身目标；数据覆盖面不及 OpenBB 的免密钥数据源；走势形态匹配的预测区间不及个股自身的无条件区间；对未针对性编写的注入攻击，拦截率不及训练好的分类器），所有落败记录公开在 `/wrong`。本团队的 Track 2 参赛作品是另一个独立项目
+持平、0 项已实现、7 项落后。落后的七项：
+
+- 人群情绪分类：在 TweetEval 上不及 RoB-RT；
+- 跨时段执行：在回放订单簿上不及 Bitget 自带的 TWAP；
+- 思考时间定价：在 23,003 个真实决策时点上不及滚动实现波动估计；
+- 协整筛选：错误发现率未达自身目标；
+- 数据覆盖面（交易台自身数据）：不及 OpenBB 的免密钥数据源；
+- 走势形态匹配：预测区间不及个股自身的无条件区间；
+- 对未针对性编写的注入攻击：拦截率不及训练好的分类器。
+
+所有落败记录公开在 `/wrong`。本团队的 Track 2 参赛作品是另一个独立项目
 （t2-sentiment-agent，独立的代码库、交易日志与演示），不属于本仓库。
 
 ---

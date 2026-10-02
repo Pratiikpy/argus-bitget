@@ -45,8 +45,12 @@ paragraph as "what is this" (a first-time user, round 18, row 632)."""
 NO_NAME_BUY_Q = re.compile(
     r"^\W*(?:(?:ok(?:ay)?|so|well|hmm|right|alright)\W+)*(?:what\s+should\s+i\s+(?:buy|invest\s+in|"
     r"get|trade|put\s+(?:my\s+)?money\s+in)|what\s+(?:do\s+you\s+recommend|would\s+you\s+buy)|"
-    r"what'?s\s+a\s+good\s+(?:buy|investment|trade)|should\s+i(?:\s+(?:buy|invest|do\s+it|go\s+for\s+"
-    r"it|buy\s+(?:it|now|something)))?)\s*(?:now|then|today)?\s*[?.!]*\s*$", re.I)
+    r"what'?s\s+a\s+good\s+(?:buy|investment|trade)|"
+    # "whats a good thing to buy rn" was declined (a first-time user, round 21)
+    r"what(?:'?s|\s+is)\s+(?:a\s+)?(?:good|smart|safe)\s+(?:thing|stock|coin|crypto|one)\s+to\s+"
+    r"(?:buy|get|invest\s+in)|should\s+i(?:\s+(?:buy|invest|do\s+it|go\s+for\s+"
+    r"it|buy\s+(?:it|now|something)))?)\s*(?:now|then|today|rn|right\s+now|atm)?\s*[?.!]*\s*$",
+    re.I)
 """A buy question with nothing named: "what should I buy", "ok so should I?" (a first-time user,
 round 19, row 636 — both were declined with the record reader's list)."""
 
@@ -58,7 +62,12 @@ THANKS_Q = re.compile(
 THAT_NUMBER_Q = re.compile(
     r"^\W*(?:and\s+|so\s+)?what\s+(?:does|do)\s+(?:that|this|those|these)\s+(?:number|figure|"
     r"numbers|figures|percentage|stat)s?\s+mean\b|^\W*(?:i\s+)?(?:don'?t|do\s+not)\s+understand"
-    r"(?:\s+(?:that|this|the\s+numbers?))?\W*$|^\W*what\s+does\s+(?:that|this|it)\s+mean\W*$",
+    r"(?:\s+(?:that|this|the\s+numbers?))?\W*(?:lol|lmao|tbh|tho|bro|pls|please)?\W*$|"
+    # "what does that mean lol" was told "that" had nothing to refer to (round 21)
+    r"^\W*(?:ok(?:ay)?\W+|so\W+|um+\W+)?(?:wh?at|wut|wat)\s+(?:does|do|did)\s+(?:that|this|it|"
+    r"all\s+that)\s+(?:even\s+)?mean\W*(?:lol|lmao|tbh|tho|bro|pls|please|for\s+me)?\W*$|"
+    r"^\W*(?:explain|say)\s+(?:that|this|it)\s+(?:simpler|more\s+simply|in\s+plain\s+"
+    r"(?:english|words)|like\s+i'?m\s+(?:5|five|new))\W*$",
     re.I)
 """Asking what the last answer's figures mean, which named nothing to look up (row 637)."""
 

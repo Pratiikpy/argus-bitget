@@ -390,7 +390,9 @@ def _fit_caveat(rho: float) -> str:
             f"moves, so most of any real move would come from something else.")
 
 
-_NEXT_RELEASE_Q = re.compile(r"\b(?:when|what\s+day|which\s+day|what\s+date)\b|\bnext\b", re.I)
+_NEXT_RELEASE_Q = re.compile(r"\b(?:when|what\s+day|which\s+day|what\s+date)\b|\bnext\b|"
+                             # a Chinese "when is the next FOMC" buried the date (round 21)
+                             r"什么时候|何时|下次|下一次|哪天|几号", re.I)
 _RELEASE_KINDS = (
     (re.compile(r"\bfomc\b|\bfed\s+(?:meeting|decision)|\brate\s+decision\b", re.I), "FOMC",
      "FOMC rate decision"),

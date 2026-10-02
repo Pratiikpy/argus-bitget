@@ -832,10 +832,11 @@ def exposures_answer(
         direction = "more" if (eff_a or 0) > eff_b else "less"
         lead = (f"Bottom line: {trade_words} moves {bucket} from {_pct(sec_b.get(bucket, 0.0))} to "
                 f"{_pct(sec_a.get(bucket, 0.0))} of the book — the biggest sector change — and "
-                f"market beta from {load_b['market']:.2f} to {load_a['market']:.2f}; the largest "
+                f"market-factor beta (daily, eight-factor regression) from "
+                f"{load_b['market']:.2f} to {load_a['market']:.2f}; the largest "
                 f"factor change is {factor.replace('_', ' ')} ({_signed(fdelta)}), and the book "
                 f"becomes {direction} spread by name ({eff_b:.1f} → {(eff_a or 0):.1f} "
-                f"effective positions).")
+                f"effective positions by weight).")
         if (eff_sec_a or 0) < eff_sec_b and max(sec_a.values(), default=0.0) >= 0.5:
             heavy = max(sec_a.items(), key=lambda kv: kv[1])
             lead += (f" {heavy[0]} would be {_pct(heavy[1])} of the book; size the trade down if "
@@ -902,7 +903,7 @@ def exposures_answer(
                      f"read, so the book's loadings cover {_pct(cover_b)} of it.")
 
     # concentration and correlation
-    conc = (f"effective positions {eff_b:.1f}"
+    conc = (f"effective positions by weight {eff_b:.1f}"
             + (f" → {eff_a:.1f}" if eff_a is not None else "")
             + f" (1/Σw²), effective sectors {eff_sec_b:.1f}"
             + (f" → {eff_sec_a:.1f}" if eff_sec_a is not None else ""))

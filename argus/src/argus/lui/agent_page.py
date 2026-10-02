@@ -112,6 +112,27 @@ _DRAWDOWN_SAID = re.compile(
 _DRAWDOWN_HELD = re.compile(r"book\.drawdown_pct\s*=\s*(-?\d+(?:\.\d+)?)")
 
 
+STALE_AFTER_HOURS = 2
+"""A record older than this is said to be behind: the publisher runs hourly."""
+
+
+def _staleness(summary: Mapping[str, Any], now: Any = None) -> str:
+    """A pill saying how old the published record is, when it is older than the publisher's
+    hourly cycle: the page said "recomputed hourly" beside a record five hours old (a judge, round
+    21; the publisher had stopped while the disk was full)."""
+    from datetime import UTC, datetime
+
+    try:
+        made = datetime.fromisoformat(str(summary["generated_at"]).replace("Z", "+00:00"))
+    except (KeyError, TypeError, ValueError):
+        return ""
+    hours = ((now or datetime.now(UTC)) - made).total_seconds() / 3600
+    if hours < STALE_AFTER_HOURS:
+        return ""
+    return (f"<span class='pill red'>{hours:.0f} hours old — the hourly publish has not run "
+            f"since; the agent's own log keeps running</span>")
+
+
 def narration_check(row: Mapping[str, Any]) -> str | None:
     """A drawdown the agent's summary claims, checked against the drawdown its own record holds.
 
@@ -195,7 +216,7 @@ def render(fetch: Fetch = fetch_json) -> str:
             f"<span class='mono'>genesis {escape(genesis[:12])}… · "
             f"{escape(str(ledger.get('first_ts', ''))[:16])}Z</span>"
             f"<span class='mono dim'>published {escape(str(summary.get('generated_at', ''))[:16])}"
-            f"Z</span></div>"
+            f"Z</span>{_staleness(summary)}</div>"
             f"<h2>Scored so far</h2>"
             f"{_metrics(summary.get('metrics') or {}, summary.get('expected_envelope') or {})}"
             f"<p class='dim'>The right-hand column was committed in the genesis event before the "
@@ -243,8 +264,9 @@ now, places no order on any venue: its own paper desk fills its decisions in its
 recorded price, and nowhere else.</div>
 <p class="sub">ARGUS researches; its sibling project trades. Qwen decides, a risk kernel that can
 only reduce stands between it and the venue, and Bitget's Agent Hub places every order on Bitget
-Demo. Everything below is read live from the agent's own record, recomputed hourly from its
-hash-chained log — <a href="{RECORD}">full record</a> · <a href="{REPO}">source</a>. This is run 2,
+Demo. Everything below is read live from the agent's own published record, which its
+publisher rebuilds hourly from the hash-chained log — <a href="{RECORD}">full record</a> ·
+<a href="{REPO}">source</a>. This is run 2,
 the scored run; run 1, which came before it, is disclosed and not scored —
 <a href="{RUN_1_RECORD}">its record</a>.</p>
 {body}

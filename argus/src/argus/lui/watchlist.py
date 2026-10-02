@@ -358,7 +358,16 @@ def window(text: str, now: datetime, days: int | None = None) -> tuple[datetime,
         return now, now + timedelta(days=max(1, min(n, MAX_DAYS))), True
     if re.search(r"\b(?:next|coming)\s+(?:two|2)\s+weeks\b", text, re.I):
         return now, now + timedelta(days=14), True
-    if re.search(r"\b(?:next|coming|this)\s+month\b|下个?月", text, re.I):
+    if re.search(r"\bnext\s+month\b|下个月", text, re.I):
+        # "if CPI comes in hot next month" covered this month's print, 2 Oct to 2 Nov (a judge,
+        # round 21): next month is the calendar month after this one, New York time
+        local = now.astimezone(NEW_YORK).date()
+        first = date(local.year + (local.month == 12), local.month % 12 + 1, 1)
+        after = date(first.year + (first.month == 12), first.month % 12 + 1, 1)
+        start = datetime.combine(first, time(0), NEW_YORK).astimezone(UTC)
+        end = datetime.combine(after, time(0), NEW_YORK).astimezone(UTC)
+        return start, min(end, now + timedelta(days=MAX_DAYS + 31)), True
+    if re.search(r"\b(?:coming|this)\s+month\b|这个月|本月", text, re.I):
         # "what earnings are coming up next month" was read as the next seven days (a judge's
         # audit, 2026-09-29).
         return now, now + timedelta(days=MAX_DAYS), True
@@ -778,8 +787,28 @@ def watchlist(question: str, book_text: str = "", *, now: datetime | None = None
                 f"Federal Reserve's own calendar" if upcoming else "")
         lines.insert(1, f"No Fed rate decision falls in {span}{when}.")
     for kind, asked in _MACRO_ASKED.items():
-        if (calendar is None or not asked.search(question) or not book
-                or any(event.kind == kind for event in events)):
+        if calendar is None or not asked.search(question) or not book:
+            continue
+        inside = next((e for e in events if e.kind == kind), None)
+        if inside is not None:
+            # "What happens to my book if CPI comes in hot next month?" led with an FOMC decision
+            # (a judge, round 21): the release asked about leads, with the book's measured
+            # reaction to it
+            local_at = inside.at.astimezone(NEW_YORK)
+            rest = lines[0].removeprefix("Bottom line: ")
+            lines[0] = rest[:1].upper() + rest[1:]
+            hot = bool(re.search(r"\bhot|\bhigh(?:er)?\b|\babove|\bbeat|\bcool|\blow(?:er)?\b|"
+                                 r"\bbelow|\bmiss|\bsoft", question, re.I))
+            lines[0:0] = [
+                f"Bottom line: {inside.title} is due {local_at:%a %d %b} at {local_at:%H:%M} New "
+                f"York ({PUBLISHER[kind]}). How this book's names moved on past releases:",
+                *(inside.history or []),
+                *(["Whether a print is hot or cool is set against its consensus, which is not "
+                   "read here; the moves above are their size on release days, not their "
+                   "direction after a hot print — ARGUS has no event study split by surprise, "
+                   "so it does not say which way a hot print moves this book."] if hot else [])]
+            continue
+        if any(event.kind == kind for event in events):
             continue
         # "What does the CPI print next week mean for my book?" was answered with FOMC minutes
         # and never said there was no CPI print that week (a judge, round 20, row 712): the

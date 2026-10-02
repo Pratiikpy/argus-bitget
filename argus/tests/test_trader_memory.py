@@ -72,9 +72,14 @@ def test_apply_fills_what_the_question_left_out_and_says_so() -> None:
     request = ResearchRequest(kind=ResearchKind.ANALOGUE, symbols=("BTCUSDT",), horizon_hours=24,
                               notes=("no horizon was stated, so the next 24 hours are read",))
     applied, used = mem.apply(request, facts, "will BTC go up?")
-    assert applied.budget == 0.2 and applied.budget_stated
+    # a base-rate answer uses no risk budget, so none is said to be applied (a judge, round 21)
+    assert not applied.budget_stated
     assert applied.horizon_hours == 168 and not applied.notes
-    assert len(used) == 2 and all(label(line) == "memory" for line in used)
+    assert len(used) == 1 and all(label(line) == "memory" for line in used)
+    sized = ResearchRequest(kind=ResearchKind.IMPACT, symbols=("BTCUSDT",))
+    budgeted, said = mem.apply(sized, facts, "should I add 10% BTC?")
+    assert budgeted.budget == 0.2 and budgeted.budget_stated
+    assert any("risk budget is applied" in line for line in said)
     stated = ResearchRequest(kind=ResearchKind.ANALOGUE, symbols=("BTCUSDT",), horizon_hours=72)
     kept, _ = mem.apply(stated, facts, "will BTC go up over 3 days?")
     assert kept.horizon_hours == 72
@@ -252,7 +257,7 @@ def test_earnings_closures_and_repeats_are_tested_on_the_named_stock() -> None:
     today = date(2026, 9, 28)  # a Monday
     inside = journal.retest("earnings_losers", "NVDAUSDT", "long", today=today, horizon_days=5,
                             next_report=lambda s: date(2026, 10, 1))
-    assert inside is not None and "reports on 2026-10-01, 3 day(s) away" in inside
+    assert inside is not None and "reports on 2026-10-01, 3 days away" in inside
     after = journal.retest("earnings_losers", "NVDAUSDT", "long", today=today, horizon_days=5,
                            next_report=lambda s: date(2026, 11, 19))
     assert after is not None and "after your 5-day hold" in after

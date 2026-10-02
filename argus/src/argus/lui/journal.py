@@ -81,7 +81,7 @@ from datetime import time as clock_time
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from argus.lui.answer import Source
+from argus.lui.answer import Source, plural
 from argus.lui.research.parse import is_us_equity
 from argus.lui.trace import every, traced
 
@@ -1074,7 +1074,8 @@ def retest(key: str, symbol: str, side: str, *, today: date, horizon_days: int,
             return f"{name}'s next report date could not be read, so this check is not passed"
         days = (report - today).days
         if 0 <= days <= horizon_days:
-            return (f"{name} reports on {report.isoformat()}, {days} day(s) away, inside your "
+            return (f"{name} reports on {report.isoformat()}, {plural(days, 'day')} away, "
+                    f"inside your "
                     f"{horizon_days}-day hold: decide now whether to hold through it, at a size "
                     f"you can take the gap on")
         return f"{name}'s next report ({report.isoformat()}) is after your {horizon_days}-day hold"
@@ -1761,7 +1762,8 @@ def review_trades(text: str, *, now: datetime | None = None, explicit: bool = Fa
                        "counted")
     undated = sum(1 for t in trades if t.opened is None or t.closed is None)
     if opened and undated:
-        missing.append(f"{undated} trade(s) without both dates were not checked for earnings, "
+        missing.append(f"{plural(undated, 'trade')} without both dates were not checked for "
+                       f"earnings, "
                        f"closures or chasing")
     no_edgar = [s for s in symbols if _is_equity(s) and s not in found and releases is not None
                 and earliest is not None]

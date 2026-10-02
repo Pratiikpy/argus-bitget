@@ -264,4 +264,5 @@ def test_an_earnings_question_with_no_book_checks_the_desks_stocks_and_leads_wit
     month, _, _ = wl.watchlist("what earnings are coming up next month",
                                now=datetime(2026, 9, 29, 16, 0, tzinfo=UTC),
                                earnings_lookup=lookup, filings_lookup=lambda s, t: {})
-    assert month[0].startswith("Bottom line: 2 of these report in Tue 29 Sep to")
+    # "next month" asked on 29 Sep is October, the calendar month after (a judge, round 21)
+    assert month[0].startswith("Bottom line: 2 of these report in Thu 01 Oct to Sat 31 Oct")

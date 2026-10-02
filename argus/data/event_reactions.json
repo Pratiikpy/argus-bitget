@@ -1,55 +1,55 @@
 {
- "generated_at": "2026-10-01T13:36:29.296744+00:00",
+ "generated_at": "2026-10-02T13:37:12.640315+00:00",
  "history": {
   "interval": "1H",
   "per_symbol": {
    "NVDAUSDT": [
-    "2025-08-27T15:00:00+00:00",
-    "2026-10-01T12:00:00+00:00"
+    "2025-08-28T15:00:00+00:00",
+    "2026-10-02T12:00:00+00:00"
    ],
    "TSLAUSDT": [
-    "2025-08-27T15:00:00+00:00",
-    "2026-10-01T12:00:00+00:00"
+    "2025-08-28T15:00:00+00:00",
+    "2026-10-02T12:00:00+00:00"
    ],
    "AAPLUSDT": [
-    "2025-08-27T15:00:00+00:00",
-    "2026-10-01T12:00:00+00:00"
+    "2025-08-28T15:00:00+00:00",
+    "2026-10-02T12:00:00+00:00"
    ],
    "MSFTUSDT": [
     "2025-09-22T11:00:00+00:00",
-    "2026-10-01T12:00:00+00:00"
+    "2026-10-02T12:00:00+00:00"
    ],
    "METAUSDT": [
-    "2025-08-27T15:00:00+00:00",
-    "2026-10-01T12:00:00+00:00"
+    "2025-08-28T15:00:00+00:00",
+    "2026-10-02T12:00:00+00:00"
    ],
    "GOOGLUSDT": [
-    "2025-08-27T15:00:00+00:00",
-    "2026-10-01T12:00:00+00:00"
+    "2025-08-28T15:00:00+00:00",
+    "2026-10-02T12:00:00+00:00"
    ],
    "AMZNUSDT": [
-    "2025-08-27T15:00:00+00:00",
-    "2026-10-01T12:00:00+00:00"
+    "2025-08-28T15:00:00+00:00",
+    "2026-10-02T12:00:00+00:00"
    ],
    "COINUSDT": [
-    "2025-08-27T15:00:00+00:00",
-    "2026-10-01T12:00:00+00:00"
+    "2025-08-28T15:00:00+00:00",
+    "2026-10-02T12:00:00+00:00"
    ],
    "MSTRUSDT": [
-    "2025-08-27T15:00:00+00:00",
-    "2026-10-01T12:00:00+00:00"
+    "2025-08-28T15:00:00+00:00",
+    "2026-10-02T12:00:00+00:00"
    ],
    "QQQUSDT": [
     "2025-10-28T12:00:00+00:00",
-    "2026-10-01T12:00:00+00:00"
+    "2026-10-02T12:00:00+00:00"
    ],
    "TQQQUSDT": [
     "2026-03-31T08:00:00+00:00",
-    "2026-10-01T12:00:00+00:00"
+    "2026-10-02T12:00:00+00:00"
    ],
    "SQQQUSDT": [
     "2026-03-31T08:00:00+00:00",
-    "2026-10-01T12:00:00+00:00"
+    "2026-10-02T12:00:00+00:00"
    ]
   },
   "unavailable": {}
@@ -122,42 +122,41 @@
   {
    "symbol": "NVDAUSDT",
    "kind": "FOMC",
-   "events": 9,
-   "average_car_bps": 41.1,
-   "size_ratio": 1.52,
-   "verdict": "PARTIAL: a positive average abnormal return of +41.1bps rejects under corrado_rank but not under patell, bmp, generalised_sign. Where a parametric test rejects and the rank test does not, the result is usually being carried by one or two events",
+   "events": 8,
+   "average_car_bps": 12.2,
+   "size_ratio": 1.4,
+   "verdict": "PARTIAL: a positive average abnormal return of +12.2bps rejects under corrado_rank but not under patell, bmp, generalised_sign. Where a parametric test rejects and the rank test does not, the result is usually being carried by one or two events",
    "tests": {
     "patell": {
-     "statistic": 0.645,
-     "adjusted": 0.645,
-     "p_value": 0.518918,
-     "adjusted_p_value": 0.518918,
+     "statistic": 0.2122,
+     "adjusted": 0.2122,
+     "p_value": 0.831928,
+     "adjusted_p_value": 0.831928,
      "clustering_adjusted": true
     },
     "bmp": {
-     "statistic": 0.5006,
-     "adjusted": 0.5006,
-     "p_value": 0.616641,
-     "adjusted_p_value": 0.616641,
+     "statistic": 0.163,
+     "adjusted": 0.163,
+     "p_value": 0.870535,
+     "adjusted_p_value": 0.870535,
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": 2.6258,
-     "adjusted": 2.6258,
-     "p_value": 0.008643,
-     "adjusted_p_value": 0.008643,
+     "statistic": 2.0931,
+     "adjusted": 2.0931,
+     "p_value": 0.036337,
+     "adjusted_p_value": 0.036337,
      "clustering_adjusted": false
     },
     "generalised_sign": {
-     "statistic": 1.0097,
-     "adjusted": 1.0097,
-     "p_value": 0.312626,
-     "adjusted_p_value": 0.312626,
+     "statistic": 0.8406,
+     "adjusted": 0.8406,
+     "p_value": 0.400565,
+     "adjusted_p_value": 0.400565,
      "clustering_adjusted": false
     }
    },
    "dates": [
-    "2025-09-17",
     "2025-10-29",
     "2025-12-10",
     "2026-01-28",
@@ -240,42 +239,41 @@
   {
    "symbol": "TSLAUSDT",
    "kind": "FOMC",
-   "events": 8,
-   "average_car_bps": 11.4,
-   "size_ratio": 0.89,
-   "verdict": "NO EFFECT ESTABLISHED across 8 event(s). The average cumulative abnormal return is +11.4bps and no test rejects at 5% after the clustering adjustment. An average that looks large and a statistic that does not reject is the ordinary case with few, correlated events",
+   "events": 7,
+   "average_car_bps": 19.4,
+   "size_ratio": 1.02,
+   "verdict": "NO EFFECT ESTABLISHED across 7 event(s). The average cumulative abnormal return is +19.4bps and no test rejects at 5% after the clustering adjustment. An average that looks large and a statistic that does not reject is the ordinary case with few, correlated events",
    "tests": {
     "patell": {
-     "statistic": -0.0277,
-     "adjusted": -0.0277,
-     "p_value": 0.977894,
-     "adjusted_p_value": 0.977894,
+     "statistic": 0.0309,
+     "adjusted": 0.0309,
+     "p_value": 0.975343,
+     "adjusted_p_value": 0.975343,
      "clustering_adjusted": true
     },
     "bmp": {
-     "statistic": -0.0336,
-     "adjusted": -0.0336,
-     "p_value": 0.973197,
-     "adjusted_p_value": 0.973197,
+     "statistic": 0.0348,
+     "adjusted": 0.0348,
+     "p_value": 0.972245,
+     "adjusted_p_value": 0.972245,
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": 0.319,
-     "adjusted": 0.319,
-     "p_value": 0.74972,
-     "adjusted_p_value": 0.74972,
+     "statistic": 0.5492,
+     "adjusted": 0.5492,
+     "p_value": 0.582841,
+     "adjusted_p_value": 0.582841,
      "clustering_adjusted": false
     },
     "generalised_sign": {
-     "statistic": -0.3856,
-     "adjusted": -0.3856,
-     "p_value": 0.699826,
-     "adjusted_p_value": 0.699826,
+     "statistic": -0.1517,
+     "adjusted": -0.1517,
+     "p_value": 0.879389,
+     "adjusted_p_value": 0.879389,
      "clustering_adjusted": false
     }
    },
    "dates": [
-    "2025-09-17",
     "2025-10-29",
     "2025-12-10",
     "2026-03-18",
@@ -359,42 +357,12 @@
   {
    "symbol": "AAPLUSDT",
    "kind": "FOMC",
-   "events": 5,
-   "average_car_bps": -0.6,
-   "size_ratio": 1.08,
-   "verdict": "NO EFFECT ESTABLISHED across 5 event(s). The average cumulative abnormal return is -0.6bps and no test rejects at 5% after the clustering adjustment. An average that looks large and a statistic that does not reject is the ordinary case with few, correlated events",
-   "tests": {
-    "patell": {
-     "statistic": 0.105,
-     "adjusted": 0.1002,
-     "p_value": 0.916399,
-     "adjusted_p_value": 0.920184,
-     "clustering_adjusted": true
-    },
-    "bmp": {
-     "statistic": 0.1371,
-     "adjusted": 0.1309,
-     "p_value": 0.890916,
-     "adjusted_p_value": 0.895843,
-     "clustering_adjusted": true
-    },
-    "corrado_rank": {
-     "statistic": -0.0322,
-     "adjusted": -0.0322,
-     "p_value": 0.974334,
-     "adjusted_p_value": 0.974334,
-     "clustering_adjusted": false
-    },
-    "generalised_sign": {
-     "statistic": 0.8215,
-     "adjusted": 0.8215,
-     "p_value": 0.411365,
-     "adjusted_p_value": 0.411365,
-     "clustering_adjusted": false
-    }
-   },
+   "events": 4,
+   "average_car_bps": null,
+   "size_ratio": null,
+   "verdict": "4 FOMC event(s) have enough hourly history around them; the study needs 5, so no figure is given",
+   "tests": {},
    "dates": [
-    "2025-09-17",
     "2025-12-10",
     "2026-03-18",
     "2026-06-17",
@@ -417,10 +385,10 @@
    "verdict": "4 earnings event(s) have enough hourly history around them; the study needs 5, so no figure is given",
    "tests": {},
    "dates": [
-    "2025-10-30",
-    "2026-01-29",
-    "2026-04-30",
-    "2026-07-30"
+    "2025-10-31",
+    "2026-01-30",
+    "2026-05-01",
+    "2026-07-31"
    ],
    "confounded": []
   },
@@ -569,42 +537,12 @@
   {
    "symbol": "METAUSDT",
    "kind": "FOMC",
-   "events": 5,
-   "average_car_bps": -16.4,
-   "size_ratio": 1.09,
-   "verdict": "NO EFFECT ESTABLISHED across 5 event(s). The average cumulative abnormal return is -16.4bps and no test rejects at 5% after the clustering adjustment. An average that looks large and a statistic that does not reject is the ordinary case with few, correlated events",
-   "tests": {
-    "patell": {
-     "statistic": -0.1664,
-     "adjusted": -0.1639,
-     "p_value": 0.867837,
-     "adjusted_p_value": 0.869838,
-     "clustering_adjusted": true
-    },
-    "bmp": {
-     "statistic": -0.1821,
-     "adjusted": -0.1793,
-     "p_value": 0.855527,
-     "adjusted_p_value": 0.857711,
-     "clustering_adjusted": true
-    },
-    "corrado_rank": {
-     "statistic": -0.8193,
-     "adjusted": -0.8193,
-     "p_value": 0.412631,
-     "adjusted_p_value": 0.412631,
-     "clustering_adjusted": false
-    },
-    "generalised_sign": {
-     "statistic": 0.9523,
-     "adjusted": 0.9523,
-     "p_value": 0.340957,
-     "adjusted_p_value": 0.340957,
-     "clustering_adjusted": false
-    }
-   },
+   "events": 4,
+   "average_car_bps": null,
+   "size_ratio": null,
+   "verdict": "4 FOMC event(s) have enough hourly history around them; the study needs 5, so no figure is given",
+   "tests": {},
    "dates": [
-    "2025-09-17",
     "2025-12-10",
     "2026-03-18",
     "2026-06-17",
@@ -689,42 +627,41 @@
   {
    "symbol": "GOOGLUSDT",
    "kind": "FOMC",
-   "events": 7,
-   "average_car_bps": -5.3,
-   "size_ratio": 1.24,
-   "verdict": "NO EFFECT ESTABLISHED across 7 event(s). The average cumulative abnormal return is -5.3bps and no test rejects at 5% after the clustering adjustment. An average that looks large and a statistic that does not reject is the ordinary case with few, correlated events",
+   "events": 6,
+   "average_car_bps": 5.1,
+   "size_ratio": 1.42,
+   "verdict": "NO EFFECT ESTABLISHED across 6 event(s). The average cumulative abnormal return is +5.1bps and no test rejects at 5% after the clustering adjustment. An average that looks large and a statistic that does not reject is the ordinary case with few, correlated events",
    "tests": {
     "patell": {
-     "statistic": 0.2468,
-     "adjusted": 0.2248,
-     "p_value": 0.805044,
-     "adjusted_p_value": 0.82217,
+     "statistic": 0.3785,
+     "adjusted": 0.3665,
+     "p_value": 0.705057,
+     "adjusted_p_value": 0.713995,
      "clustering_adjusted": true
     },
     "bmp": {
-     "statistic": 0.256,
-     "adjusted": 0.2331,
-     "p_value": 0.797956,
-     "adjusted_p_value": 0.815681,
+     "statistic": 0.3635,
+     "adjusted": 0.352,
+     "p_value": 0.716212,
+     "adjusted_p_value": 0.724842,
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": 1.3574,
-     "adjusted": 1.3574,
-     "p_value": 0.174661,
-     "adjusted_p_value": 0.174661,
+     "statistic": 1.5758,
+     "adjusted": 1.5758,
+     "p_value": 0.115065,
+     "adjusted_p_value": 0.115065,
      "clustering_adjusted": false
     },
     "generalised_sign": {
-     "statistic": 0.0655,
-     "adjusted": 0.0655,
-     "p_value": 0.947783,
-     "adjusted_p_value": 0.947783,
+     "statistic": 0.2895,
+     "adjusted": 0.2895,
+     "p_value": 0.772218,
+     "adjusted_p_value": 0.772218,
      "clustering_adjusted": false
     }
    },
    "dates": [
-    "2025-09-17",
     "2025-12-10",
     "2026-01-28",
     "2026-03-18",
@@ -808,42 +745,41 @@
   {
    "symbol": "AMZNUSDT",
    "kind": "FOMC",
-   "events": 6,
-   "average_car_bps": 91.5,
-   "size_ratio": 1.12,
-   "verdict": "NO EFFECT ESTABLISHED across 6 event(s). The average cumulative abnormal return is +91.5bps and no test rejects at 5% after the clustering adjustment. An average that looks large and a statistic that does not reject is the ordinary case with few, correlated events",
+   "events": 5,
+   "average_car_bps": 105.9,
+   "size_ratio": 1.39,
+   "verdict": "NO EFFECT ESTABLISHED across 5 event(s). The average cumulative abnormal return is +105.9bps and no test rejects at 5% after the clustering adjustment. An average that looks large and a statistic that does not reject is the ordinary case with few, correlated events",
    "tests": {
     "patell": {
-     "statistic": 1.5951,
-     "adjusted": 1.5951,
-     "p_value": 0.11069,
-     "adjusted_p_value": 0.11069,
+     "statistic": 1.7094,
+     "adjusted": 1.7094,
+     "p_value": 0.087385,
+     "adjusted_p_value": 0.087385,
      "clustering_adjusted": true
     },
     "bmp": {
-     "statistic": 1.7362,
-     "adjusted": 1.7362,
-     "p_value": 0.082528,
-     "adjusted_p_value": 0.082528,
+     "statistic": 1.7456,
+     "adjusted": 1.7456,
+     "p_value": 0.080878,
+     "adjusted_p_value": 0.080878,
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": 1.6753,
-     "adjusted": 1.6753,
-     "p_value": 0.093879,
-     "adjusted_p_value": 0.093879,
+     "statistic": 1.3954,
+     "adjusted": 1.3954,
+     "p_value": 0.162903,
+     "adjusted_p_value": 0.162903,
      "clustering_adjusted": false
     },
     "generalised_sign": {
-     "statistic": 0.9506,
-     "adjusted": 0.9506,
-     "p_value": 0.341821,
-     "adjusted_p_value": 0.341821,
+     "statistic": 0.4026,
+     "adjusted": 0.4026,
+     "p_value": 0.687263,
+     "adjusted_p_value": 0.687263,
      "clustering_adjusted": false
     }
    },
    "dates": [
-    "2025-09-17",
     "2025-12-10",
     "2026-01-28",
     "2026-03-18",
@@ -929,42 +865,41 @@
   {
    "symbol": "COINUSDT",
    "kind": "FOMC",
-   "events": 7,
-   "average_car_bps": 120.3,
-   "size_ratio": 2.48,
-   "verdict": "NO EFFECT ESTABLISHED across 7 event(s). The average cumulative abnormal return is +120.3bps and no test rejects at 5% after the clustering adjustment. An average that looks large and a statistic that does not reject is the ordinary case with few, correlated events",
+   "events": 6,
+   "average_car_bps": -21.2,
+   "size_ratio": 1.67,
+   "verdict": "NO EFFECT ESTABLISHED across 6 event(s). The average cumulative abnormal return is -21.2bps and no test rejects at 5% after the clustering adjustment. An average that looks large and a statistic that does not reject is the ordinary case with few, correlated events",
    "tests": {
     "patell": {
-     "statistic": 1.5011,
-     "adjusted": 1.5011,
-     "p_value": 0.133323,
-     "adjusted_p_value": 0.133323,
+     "statistic": -0.1432,
+     "adjusted": -0.1432,
+     "p_value": 0.886109,
+     "adjusted_p_value": 0.886109,
      "clustering_adjusted": true
     },
     "bmp": {
-     "statistic": 0.7275,
-     "adjusted": 0.7275,
-     "p_value": 0.466902,
-     "adjusted_p_value": 0.466902,
+     "statistic": -0.1062,
+     "adjusted": -0.1062,
+     "p_value": 0.915417,
+     "adjusted_p_value": 0.915417,
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": -0.0433,
-     "adjusted": -0.0433,
-     "p_value": 0.965426,
-     "adjusted_p_value": 0.965426,
+     "statistic": -0.6929,
+     "adjusted": -0.6929,
+     "p_value": 0.488378,
+     "adjusted_p_value": 0.488378,
      "clustering_adjusted": false
     },
     "generalised_sign": {
-     "statistic": 0.5268,
-     "adjusted": 0.5268,
-     "p_value": 0.598315,
-     "adjusted_p_value": 0.598315,
+     "statistic": -0.0102,
+     "adjusted": -0.0102,
+     "p_value": 0.991857,
+     "adjusted_p_value": 0.991857,
      "clustering_adjusted": false
     }
    },
    "dates": [
-    "2025-09-17",
     "2025-12-10",
     "2026-01-28",
     "2026-03-18",
@@ -987,10 +922,10 @@
    "verdict": "4 earnings event(s) have enough hourly history around them; the study needs 5, so no figure is given",
    "tests": {},
    "dates": [
-    "2025-10-30",
-    "2026-02-12",
-    "2026-05-07",
-    "2026-07-30"
+    "2025-10-31",
+    "2026-02-13",
+    "2026-05-08",
+    "2026-07-31"
    ],
    "confounded": []
   },
@@ -1049,42 +984,41 @@
   {
    "symbol": "MSTRUSDT",
    "kind": "FOMC",
-   "events": 7,
-   "average_car_bps": -104.3,
-   "size_ratio": 2.37,
-   "verdict": "NO EFFECT ESTABLISHED across 7 event(s). The average cumulative abnormal return is -104.3bps and no test rejects at 5% after the clustering adjustment. An average that looks large and a statistic that does not reject is the ordinary case with few, correlated events",
+   "events": 6,
+   "average_car_bps": -247.9,
+   "size_ratio": 2.05,
+   "verdict": "NO EFFECT ESTABLISHED across 6 event(s). The average cumulative abnormal return is -247.9bps and no test rejects at 5% after the clustering adjustment. An average that looks large and a statistic that does not reject is the ordinary case with few, correlated events",
    "tests": {
     "patell": {
-     "statistic": -0.358,
-     "adjusted": -0.358,
-     "p_value": 0.720377,
-     "adjusted_p_value": 0.720377,
+     "statistic": -1.6497,
+     "adjusted": -1.6497,
+     "p_value": 0.098995,
+     "adjusted_p_value": 0.098995,
      "clustering_adjusted": true
     },
     "bmp": {
-     "statistic": -0.1751,
-     "adjusted": -0.1751,
-     "p_value": 0.860978,
-     "adjusted_p_value": 0.860978,
+     "statistic": -1.0271,
+     "adjusted": -1.0271,
+     "p_value": 0.30438,
+     "adjusted_p_value": 0.30438,
      "clustering_adjusted": true
     },
     "corrado_rank": {
-     "statistic": -0.9026,
-     "adjusted": -0.9026,
-     "p_value": 0.366758,
-     "adjusted_p_value": 0.366758,
+     "statistic": -1.9578,
+     "adjusted": -1.9578,
+     "p_value": 0.050259,
+     "adjusted_p_value": 0.050259,
      "clustering_adjusted": false
     },
     "generalised_sign": {
-     "statistic": -0.4427,
-     "adjusted": -0.4427,
-     "p_value": 0.658008,
-     "adjusted_p_value": 0.658008,
+     "statistic": -0.7437,
+     "adjusted": -0.7437,
+     "p_value": 0.457068,
+     "adjusted_p_value": 0.457068,
      "clustering_adjusted": false
     }
    },
    "dates": [
-    "2025-09-17",
     "2025-12-10",
     "2026-01-28",
     "2026-03-18",
@@ -1107,10 +1041,10 @@
    "verdict": "4 earnings event(s) have enough hourly history around them; the study needs 5, so no figure is given",
    "tests": {},
    "dates": [
-    "2025-10-30",
-    "2026-02-05",
-    "2026-05-05",
-    "2026-07-30"
+    "2025-10-31",
+    "2026-02-06",
+    "2026-05-06",
+    "2026-07-31"
    ],
    "confounded": []
   },

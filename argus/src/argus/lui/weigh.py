@@ -28,6 +28,8 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
+from argus.lui.answer import plural
+
 EARNINGS_WAIT_DAYS = 7
 """A report inside this many days makes the call "wait": the position would carry the gap
 (the same window the fundamentals engine warns on, `research.fundamentals.EARNINGS_NEAR_DAYS`)."""
@@ -119,7 +121,7 @@ def weigh(data: Mapping[str, Mapping[str, Any]], *, name: str, side: str = "long
 
     # --- the call ----------------------------------------------------------------------------
     if days is not None and int(days) <= EARNINGS_WAIT_DAYS:
-        call = f"Wait: {name} reports in {int(days)} day(s)"
+        call = f"Wait: {name} reports in {plural(int(days), 'day')}"
         reason = (f"A position opened now carries the earnings gap on {fund.get('earnings_date')}; "
                   f"nothing below prices that gap, so the honest read is after the report.")
     elif edge is not None and edge["significant"] and edge["clears_cost"]:
@@ -263,8 +265,14 @@ def weigh(data: Mapping[str, Mapping[str, Any]], *, name: str, side: str = "long
         questions.append(
             "Where would you be wrong? "
             + (f"The nearest support is {support:g}" if support else "")
-            + ("; its" if support and worst is not None else "Its" if worst is not None else "")
-            + (f" worst 24 hours in the data was {worst:+.1f}%" if worst is not None else "")
+            # With a book, the figure is the book's worst window with the name in it, not the
+            # name's own: "its worst 24 hours was -2.0%" sat beside TSLA's own -7.83% on the same
+            # page (a judge, round 21)
+            + (("; the book's" if support else "The book's") if worst is not None and book_given
+               else "; its" if support and worst is not None else "Its" if worst is not None
+               else "")
+            + (f" worst 24 hours in the data{' with it added' if book_given else ''} was "
+               f"{worst:+.1f}%" if worst is not None else "")
             + " — an exit decided now is one a move cannot talk you out of.")
     return Weighing(call=call, reason=reason, disagreements=tuple(disagreements),
                     triggers=tuple(triggers), questions=tuple(questions), figures=figures)

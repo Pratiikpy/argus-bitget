@@ -182,6 +182,41 @@ def parts(question: str, book: str = "") -> list[Part] | None:
     return found if len(found) >= 2 else None
 
 
+_LEVERED = re.compile(r"\b(?P<x>\d+(?:\.\d+)?)\s*x\s+(?:leveraged\s+)?(?P<side>long|short)\b|"
+                      r"\b(?P<side2>long|short)\b[^.?]{0,30}?\bat\s+(?P<x2>\d+(?:\.\d+)?)\s*x\b",
+                      re.I)
+_MOVE_ASKED = re.compile(r"\b(?P<dir>fall|falls|fell|drop|drops|crash\w*|tank\w*|sink\w*|rise|"
+                         r"rises|rall\w*|jump\w*|gain\w*)\s+(?:by\s+)?(?P<pct>\d+(?:\.\d+)?)\s*%",
+                         re.I)
+
+
+def _levered_move(question: str) -> str | None:
+    """A move asked of a leveraged position stated in the same message, as one figure: the move
+    times the leverage, on the margin and in dollars when the size is given."""
+    lev, moved = _LEVERED.search(question), _MOVE_ASKED.search(question)
+    if lev is None or moved is None:
+        return None
+    times = float(lev.group("x") or lev.group("x2"))
+    side = (lev.group("side") or lev.group("side2")).lower()
+    pct = float(moved.group("pct")) / 100
+    down = moved.group("dir").lower().startswith(("fall", "fell", "drop", "crash", "tank", "sink"))
+    against = down == (side == "long")
+    on_margin = pct * times * (-1 if against else 1)
+    size = re.search(r"\$\s*(\d[\d,]*(?:\.\d+)?)\s*(k)?", question, re.I)
+    money = ""
+    if size is not None:
+        position = float(size.group(1).replace(",", "")) * (1000 if size.group(2) else 1)
+        margin = position / times
+        money = (f" — {'a loss' if on_margin < 0 else 'a gain'} of about "
+                 f"${abs(position * pct):,.0f} on the ${position:,.0f} position, against "
+                 f"${margin:,.0f} of margin")
+    wiped = on_margin <= -1
+    return (f"Bottom line: at {times:g}x {side}, that {pct:.0%} move is {on_margin:+.0%} on the "
+            f"margin{money}"
+            + (" — more than the margin, so the position is liquidated before it gets there."
+               if wiped else "; the liquidation line is in part 1.") )
+
+
 def answer(question: str, found: list[Part], run: Any) -> tuple[list[str], list[Any], int]:
     """Run each part (in parallel, up to :data:`MAX_PARTS`) with ``run(text, request)`` and
     compose one answer: a lead naming the parts, each part's own lead, then each part in full.
@@ -214,6 +249,12 @@ def answer(question: str, found: list[Part], run: Any) -> tuple[list[str], list[
     head = (f"Bottom line: your question has {len(budget)} parts, each answered by its own "
             f"engine below" + (f"; {unread} could not be answered and say why" if unread else "")
             + ":")
+    levered = _levered_move(question)
+    if levered:
+        # "I'm 3x leveraged long $30k of TSLA perp. What happens if TSLA falls 25%?" answered the
+        # fall at -25% with the leverage dropped (a hostile review, round 21): the two parts
+        # together are one figure, and it leads
+        head = levered + " " + head.removeprefix("Bottom line: ").capitalize()
     tail = []
     if len(found) > MAX_PARTS:
         tail.append(f"Assumed: only the first {MAX_PARTS} parts were run; ask the rest on its own: "

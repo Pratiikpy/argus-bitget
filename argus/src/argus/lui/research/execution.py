@@ -178,7 +178,11 @@ def _optimal_schedule(symbol: str, notional: Decimal, adv: Decimal, book: Any, f
     lines = [
         f"Schedule (Almgren-Chriss optimum, inventory decaying "
         f"{'e-cubed' if urgent else 'e-fold'} over {hours} hour(s)): trade {shape}{more} of "
-        f"${float(part):,.0f} hour by hour — expected cost {bps(best.expected_cost):.1f}bps with "
+        f"${float(part):,.0f} hour by hour"
+        + (f" — the {float(share):.2%} of the ${float(notional):,.0f} order that fits before the "
+           f"session changes, so the cost that follows is that slice's, not the whole order's"
+           if share < 1 else "")
+        + f" — expected cost {bps(best.expected_cost):.1f}bps with "
         f"a one-standard-deviation risk of ±{bps(best.variance.sqrt()):.1f}bps, against "
         f"{bps(even.expected_cost):.1f}bps ± {bps(even.variance.sqrt()):.1f}bps for an even "
         f"split, with the slice styles above applied inside each hour. Impact is priced from "
@@ -222,9 +226,12 @@ def _worst_case_line(shares: Decimal, hours: int, impact: Any,
         choice = choose_by_confidence(frontier, WORST_CASE_CONFIDENCE)
     except (ScheduleError, ArithmeticError, ValueError):
         return None
-    return (f"Worst case: at {WORST_CASE_CONFIDENCE:.0%} confidence, the schedule that keeps the "
-            f"cost lowest does {float(choice.point.front_loading):.0%} of the order in the first "
-            f"half, and its {WORST_CASE_CONFIDENCE:.0%} worst case is "
+    # Named as a different schedule from the one above: "trade 30%, 26%, 23%..." and "does 99%
+    # in the first half" read as one plan contradicting itself (a hostile review, round 21)
+    return (f"Worst case, a different choice: if what matters is the {WORST_CASE_CONFIDENCE:.0%} "
+            f"worst case rather than the expected cost, the schedule that keeps it lowest does "
+            f"{float(choice.point.front_loading):.0%} of the order in the first half, and its "
+            f"{WORST_CASE_CONFIDENCE:.0%} worst case is "
             f"{bps(choice.value_at_risk):.1f}bps against {bps(choice.twap_value_at_risk):.1f}bps "
             f"for an even split — read off {len(frontier)} optimal schedules, cost against risk.")
 

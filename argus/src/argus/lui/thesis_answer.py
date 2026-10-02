@@ -19,13 +19,19 @@ from argus.lui.trace import emit, trace_module
 
 THESIS_ASK = re.compile(
     r"\b(?:test|check|challenge|stress[\s-]*test|pressure[\s-]*test|poke\s+holes\s+in|kill|"
-    r"critique|validate|evaluate|assess)\s+(?:my|this|the|that)\s+(?:thesis|idea|view|theory|"
-    r"take|call)\b|\bmy\s+thesis\s*(?:is\b|:)|\bhere'?s\s+my\s+(?:thesis|view)\b|"
+    r"critique|validate|evaluate|assess|verify)\s+(?:my|this|the|that)\s+(?:thesis|idea|view|theory|"
+    r"take|call|argument|claim)\b|\bhelp\s+me\s+(?:test|check|verify|validate|stress[\s-]*test)\s+"
+    r"(?:it|this|that)\b|\bmy\s+(?:argument|claim)\s+is\b|\bmy\s+thesis\s*(?:is\b|:)|\bhere'?s\s+my\s+(?:thesis|view)\b|"
     r"\bis\s+(?:my|that|this|the)\s+(?:thesis|view|idea|take|theory|reasoning)\s+(?:right|correct|"
     r"wrong|sound|valid|any\s+good|true)\b|\bam\s+i\s+(?:right|wrong)\s+(?:that|to\s+think)\b|"
     # "I think NVDA is undervalued because its P/E is low relative to growth. Is that thesis
     # right?" reached a data dump (a judge, round 11): a view with its reason is a thesis
     r"\bi\s+(?:think|believe|reckon|expect|feel)\s+(?:that\s+)?[^?.]{0,160}\bbecause\b|"
+    # "I am bearish on NVDA because valuations look stretched. Is that a good thesis?" reached
+    # the valuation figures with no verdict on the reason (round 20, row 713)
+    r"\bi(?:'?m|\s+am)\s+(?:now\s+|still\s+|very\s+)?(?:bullish|bearish)\b[^?.]{0,80}"
+    r"\bbecause\b|\bis\s+(?:that|this|it)\s+a\s+(?:good|sound|valid|strong|bad|weak)\s+"
+    r"(?:thesis|reason|idea|view|call|take)\b|"
     # "My bull case for BTC: ... Which of these is strongest?" (a judge, round 12)
     r"\b(?:my|the)\s+(?:bull|bear)(?:ish)?\s+case\b|\bwhich\s+of\s+(?:these|my\s+reasons)\s+"
     r"(?:is|are)\s+(?:the\s+)?(?:strongest|weakest|best)\b|\bmy\s+thesis\b[^?]{0,200}"
@@ -64,6 +70,37 @@ _STRENGTH = {"supported": 0, "not measurable": 1, "not tested": 2, "contradicted
 _ORDER = {"contradicted": 0, "supported": 1, "not measurable": 2, "not tested": 3}
 
 
+_STANDARD_CASE = re.compile(
+    r"\b(?P<side>bull|bear)(?:ish)?\s+case\s+(?:for|on|against)\s+(?P<name>\$?[A-Za-z][\w.$]{1,15})\b",
+    re.I)
+_STANDARD_REASONS = {
+    "bear": "valuations look stretched, momentum is fading, the stock is overbought, the crowd is "
+            "already long and insiders are selling",
+    "bull": "it is cheap against its sector, momentum is rising, the crowd is not yet long, "
+            "insiders are buying and analysts expect earnings to beat",
+}
+
+
+def standard_case(text: str) -> tuple[str, str] | None:
+    """A bull or bear case asked for with no reasons of the asker's own: "Test my thesis: bearish
+    case for NVDA with reasons" was graded as one reason no engine reads (a judge, round 21). The
+    standard reasons of that side are stated and each is tested, and the answer says they are
+    the standard ones, not the asker's. Returns (the claim to test, its side)."""
+    from argus.lui import thesis
+    from argus.lui.research import research_symbols
+
+    found = _STANDARD_CASE.search(text)
+    if found is None or not research_symbols(found.group("name"))[0]:
+        return None
+    own = [r for r in thesis.reasons(text) if r.kind is not thesis.Kind.OTHER]
+    if own:
+        return None
+    side = found.group("side").lower()
+    name = research_symbols(found.group("name"))[0][0].removesuffix("USDT")
+    feel = "bearish" if side == "bear" else "bullish"
+    return f"I am {feel} on {name} because {_STANDARD_REASONS[side]}.", side
+
+
 def asks(text: str) -> bool:
     from argus.lui.question import POSITION_THESIS
 
@@ -98,6 +135,17 @@ def answer(text: str, *, book: str = "", memory: str = ""
                  f"listed name — any US stock or ETF Bitget carries, gold, oil, an index or a "
                  f"coin."]
         return lines, [], {"thesis": None, "unlisted": unlisted[0]}
+    if not named and book.strip():
+        # "my thesis is AI capex keeps accelerating" with a book saved was told to name a stock
+        # (a judge, round 21): the thesis is about what the trader holds, tested on the largest
+        # holding and said so
+        from argus.lui.research.parse import holding_pairs
+
+        held = sorted(((w, s) for _at, s, w in holding_pairs(book) if w > 0), reverse=True)
+        if held:
+            named = (held[0][1],)
+            market_note = (f"no name was given, so the thesis is tested on "
+                           f"{held[0][1].removesuffix('USDT')}, your largest holding")
     if not named:
         lines = ["Bottom line: name the stock or coin the thesis is about, and why you hold it — "
                  "for example \"I think NVDA runs on AI capex through 2027, test my thesis\" or "
@@ -149,7 +197,10 @@ def answer(text: str, *, book: str = "", memory: str = ""
     said: dict[str, str] = {}
     for t in tested:
         head = ("Premise" if t.line.startswith("The premise does not hold") else
-                "Implied, and tested" if t.implied else t.result.value.capitalize())
+                # an implied test whose data did not answer is not "tested" (a judge, round 21)
+                ("Implied, not tested" if t.result is thesis.Result.NOT_TESTED else
+                 f"Implied, and {t.result.value}") if t.implied
+                else t.result.value.capitalize())
         if t.line in said:
             # Two reasons read by one test ("NVDA is undervalued", "its P/E is low") say it once.
             lines.append(f"{head} — \"{t.reason}\": the same reading as \"{said[t.line]}\".")
@@ -568,6 +619,12 @@ def split_other_question(text: str) -> tuple[str, str]:
     if len(parts) < 2:
         return text, ""
     claim, last = " ".join(parts[:-1]), parts[-1]
+    if re.search(r"\b(?:what(?:'s|\s+is)\s+my\s+(?:biggest|main|largest)\s+risk|how\s+risky\s+is\s+"
+                 r"my|what\s+should\s+i\s+(?:change|do)|where\s+(?:is|does)\s+my\s+risk)\b", last,
+                 re.I) and not asks(last):
+        # "...my thesis is AI capex keeps accelerating. What is my biggest risk right now?" asks
+        # about the book as well as stating a thesis (a judge, round 21)
+        return claim, last
     if asks(last) and not asks(claim):
         return text, ""
     theirs = set(research_symbols(claim)[0])

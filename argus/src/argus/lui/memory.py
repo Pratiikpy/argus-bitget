@@ -38,7 +38,10 @@ MAX_FACTS = 40
 MAX_TEXT = 200
 
 KINDS = ("budget", "max_loss", "loss_usd", "horizon", "style", "capital", "thesis", "avoid",
-         "check", "goal", "book")
+         "check", "goal", "book", "trade_risk", "cap")
+"""``trade_risk`` is the share of the account the trader risks on one trade ("I won't risk more
+than 2% per trade"), and ``cap`` the largest weight one position may have ("no single position
+above 30% of the book"). Both were lost or misread as a risk budget (a judge, round 21)."""
 """``check`` is one line of the checklist a review of the trader's own trades wrote
 (`lui/journal.py`): its subject is the habit's key, its text the check. It is kept so the check is
 run again on a later entry (:func:`after`), which the review promised and nothing did until
@@ -73,10 +76,24 @@ class Fact:
 _BUDGET = re.compile(r"\b(?:my\s+)?risk\s+budget\s+(?:is\s+|of\s+)?(\d{1,2}(?:\.\d+)?)\s*%|"
                      r"\bno\s+(?:single\s+)?(?:name|position|holding)\s+(?:above|over|more\s+than)\s+"
                      r"(\d{1,2}(?:\.\d+)?)\s*%\s+of\s+(?:my\s+)?risk", re.I)
+_TRADE_RISK = re.compile(
+    r"\b(?:i\s+)?(?:won'?t|will\s+not|never|don'?t|do\s+not)\s+risk\s+(?:more\s+than\s+)?"
+    r"(?P<a>\d{1,2}(?:\.\d+)?)\s*%(?:\s+of\s+(?:my\s+)?(?:account|capital|money|portfolio|book))?"
+    r"\s+(?:per|a|each|on\s+(?:any|a|one))\s+(?:single\s+)?(?:trade|position|bet)\b|"
+    r"\b(?:i\s+)?(?:only\s+)?risk\s+(?P<b>\d{1,2}(?:\.\d+)?)\s*%\s+(?:of\s+(?:my\s+)?(?:account|"
+    r"capital)\s+)?(?:per|a|each)\s+trade\b|\brisk\s+per\s+trade\s+(?:is\s+|of\s+)?"
+    r"(?P<c>\d{1,2}(?:\.\d+)?)\s*%", re.I)
+_CAP = re.compile(
+    r"\bno\s+(?:single\s+)?(?:position|name|holding|stock|coin|asset)\s+(?:may\s+|can\s+|should\s+|"
+    r"will\s+|is\s+to\s+)?(?:exceed|be\s+(?:above|over|more\s+than|bigger\s+than)|above|over|"
+    r"bigger\s+than|larger\s+than|more\s+than)\s+(?P<a>\d{1,2}(?:\.\d+)?)\s*%(?!\s+of\s+(?:my\s+)?"
+    r"(?:the\s+)?risk)|\bmax(?:imum)?\s+(?P<b>\d{1,2}(?:\.\d+)?)\s*%\s+(?:per|in\s+(?:any\s+)?one|"
+    r"in\s+a\s+single)\s+(?:position|name|holding|stock)\b|\b(?:position|single[\s-]name)\s+cap\s+"
+    r"(?:is\s+|of\s+)?(?P<c>\d{1,2}(?:\.\d+)?)\s*%", re.I)
 _MAX_LOSS = re.compile(
     r"\b(?:i\s+)?(?:can'?t|cannot|can\s+not|don'?t\s+want\s+to|won'?t|never)\s+(?:afford\s+to\s+)?"
     r"lose\s+"
-    r"(?:more\s+than\s+)?(\d{1,2}(?:\.\d+)?)\s*%|\bmax(?:imum)?\s+(?:loss|drawdown)\s+(?:limit\s+)?(?:is\s+|of\s+)?"
+    r"(?:more\s+than\s+)?(\d{1,2}(?:\.\d+)?)\s*%|\bmax(?:imum)?\s+(?:loss|drawdown)\s+(?:limit\s+|tolerance\s+)?(?:is\s+|of\s+)?"
     r"(\d{1,2}(?:\.\d+)?)\s*%|\b(?:my\s+)?(?:loss|drawdown)\s+limit\s+(?:is\s+|of\s+)?"
     r"(\d{1,2}(?:\.\d+)?)\s*%|"
     # "my max loss should probably be around 10%" (the mem0 comparison, round 12)
@@ -85,8 +102,10 @@ _MAX_LOSS = re.compile(
 _HORIZON = re.compile(
     r"\bi(?:'?m|\s+am)\s+an?\s+(?:[\w-]+\s+){0,3}?(day|swing|position|long[\s-]term)\s+"
     r"(?:trader|investor)|"
-    r"\bi(?:'?ll|\s+will|'?d)?\s+(?:usually\s+|normally\s+|typically\s+)?hold\s+(?:it\s+|this\s+(?:one\s+)?)?"
-    r"(?:for\s+)?(?P<n1>a\s+few|several|a\s+couple(?:\s+of)?|\d{1,3}|one|two|three|four|six)?\s*"
+    r"\bi(?:'?ll|\s+will|'?d)?\s+(?:usually\s+|normally\s+|typically\s+|only\s+|plan\s+to\s+)?"
+    r"hold\s+(?:it\s+|this\s+(?:one\s+)?|positions?\s+)?"
+    r"(?:for\s+)?(?:about\s+|around\s+|roughly\s+|up\s+to\s+)?"
+    r"(?P<n1>a\s+few|several|a\s+couple(?:\s+of)?|\d{1,3}|one|two|three|four|six|an?)?\s*"
     r"(?P<u1>hours?|days?|weeks?|months?|years?)\b|"
     r"\b(?P<explicit>(?:my\s+)?(?:time\s+|trading\s+|holding\s+|investment\s+)?horizon\s+"
     r"(?:is\s+|of\s+|=\s*|:\s*)?(?:about\s+|around\s+|roughly\s+)?)"
@@ -236,6 +255,11 @@ def extract(question: str, now: datetime | None = None,
     if (m := last(_BUDGET)) is not None:
         add("budget", "", str(float(m.group(1) or m.group(2)) / 100), m.group(0))
         facts[-1] = replace(facts[-1], replaces=earlier(_BUDGET))
+    if (m := last(_TRADE_RISK)) is not None:
+        add("trade_risk", "", str(float(m.group("a") or m.group("b") or m.group("c")) / 100),
+            m.group(0))
+    if (m := last(_CAP)) is not None:
+        add("cap", "", str(float(m.group("a") or m.group("b") or m.group("c")) / 100), m.group(0))
     if (m := last(_MAX_LOSS)) is not None:
         add("max_loss", "", str(float(m.group(1) or m.group(2) or m.group(3) or m.group(4))
                                 / 100), m.group(0))
@@ -499,6 +523,36 @@ def get(facts: list[Fact], kind: str, subject: str = "") -> Fact | None:
     return next((f for f in facts if f.kind == kind and f.subject == subject), None)
 
 
+_FX = (("€", re.compile(r"€|\beur(?:os?)?\b", re.I), "EURUSDUSDT"),
+       ("£", re.compile(r"£|\bgbp\b|\bpounds?\b", re.I), "GBPUSDUSDT"))
+
+
+def in_dollars(capital: Fact) -> tuple[float, str]:
+    """A remembered account in US dollars, with how it was said: "€1,234,568" was priced as
+    $1,234,568 (a hostile review, round 21). Converted at Bitget's own EURUSD or GBPUSD perpetual,
+    and said so; dollars, or a rate that does not answer, are taken as stated."""
+    amount = float(capital.value)
+    for sign, said, pair in _FX:
+        if said.search(capital.text):
+            try:
+                from argus.lui.research.parse import last_price
+
+                rate = last_price(pair)
+            except Exception:
+                rate = None
+            if rate:
+                return amount * rate, (f"{sign}{amount:,.0f} (about ${amount * rate:,.0f} at "
+                                       f"Bitget's {pair.removesuffix('USDT')} {rate:.4f})")
+            return amount, f"{sign}{amount:,.0f} (no exchange rate answered, so taken as dollars)"
+    return amount, f"${amount:,.0f}"
+
+
+_SHARE_OF_CAPITAL = re.compile(
+    r"(?P<pct>\d+(?:\.\d+)?)\s*%\s+(?:of\s+)?(?:it|that|this|my\s+(?:account|capital|money|"
+    r"portfolio|savings))\b", re.I)
+""""How much is 5% of that in NVDA?": a share of the remembered account, not all of it."""
+
+
 def risk_budget_usd(facts: list[Fact]) -> tuple[float, str, Fact] | None:
     """The dollars the trader said they can lose on a trade: a limit stated in dollars, else a
     percentage limit on the account size they gave (or the book they described). None when
@@ -506,6 +560,13 @@ def risk_budget_usd(facts: list[Fact]) -> tuple[float, str, Fact] | None:
     dollars = get(facts, "loss_usd")
     if dollars is not None:
         return float(dollars.value), f"loss limit of ${float(dollars.value):,.0f}", dollars
+    per_trade, account = get(facts, "trade_risk"), get(facts, "capital")
+    if per_trade is not None and account is not None:
+        # "I won't risk more than 2% per trade" and "$50,000" were both kept, and sizing still
+        # said no loss limit was given (a judge, round 21)
+        usd = float(per_trade.value) * float(account.value)
+        return usd, (f"{float(per_trade.value):.0%} per trade on your "
+                     f"${float(account.value):,.0f}"), per_trade
     limit = get(facts, "max_loss")
     capital = get(facts, "capital")
     if limit is not None and capital is None:
@@ -562,7 +623,10 @@ def apply(request: Any, facts: list[Fact], question: str) -> tuple[Any, list[str
 
     used: list[str] = []
     budget = get(facts, "budget")
-    if budget is not None and not request.budget_stated:
+    if (budget is not None and not request.budget_stated
+            # "your 2% risk budget is applied" was printed on a return comparison and a rates
+            # answer that use no budget (a judge, round 21)
+            and request.kind in (ResearchKind.IMPACT, ResearchKind.BOOK, ResearchKind.CONSTRUCT)):
         request = replace(request, budget=float(budget.value), budget_stated=True)
         used.append(remembered_line(budget, f"your {float(budget.value):.0%} risk budget is "
                                             f"applied"))
@@ -589,8 +653,13 @@ def apply(request: Any, facts: list[Fact], question: str) -> tuple[Any, list[str
         # is the position a one-name answer is priced on
         from decimal import Decimal
 
-        request = replace(request, notional=Decimal(capital.value))
-        used.append(remembered_line(capital, f"priced on your ${float(capital.value):,.0f}" + (
+        dollars, said = in_dollars(capital)
+        share = _SHARE_OF_CAPITAL.search(question)
+        part = float(share.group("pct")) / 100 if share else 1.0
+        request = replace(request, notional=Decimal(str(round(dollars * part, 2))))
+        used.append(remembered_line(capital, (
+            f"priced on {part:.0%} of your {said}, ${dollars * part:,.0f}" if share else
+            f"priced on your {said}") + (
             " as an unlevered position — margin lets you hold more than that, and lose more"
             if re.search(r"\bmargin\b", capital.text, re.I) else "")))
     if request.kind is ResearchKind.IMPACT:
@@ -613,7 +682,16 @@ def _apply_mandate(request: Any, facts: list[Fact], question: str) -> tuple[Any,
     from decimal import Decimal
 
     from argus.lui.research import stated_profile
+    from argus.lui.research.parse import TRIM_TO_BUDGET
 
+    limit, horizon_fact = get(facts, "max_loss"), get(facts, "horizon")
+    if request.target == TRIM_TO_BUDGET and limit is not None:
+        # "size the trim so I stay inside my drawdown limit" names the limit without its number;
+        # the remembered one sizes it (a judge, round 21)
+        words = limit.text + (f". my horizon is {int(horizon_fact.value)} hours"
+                              if horizon_fact is not None and horizon_fact.value.isdigit() else "")
+        return replace(request, mandate_text=words), [
+            remembered_line(limit, "the trim is sized inside it")]
     if stated_profile(question) is not None:
         return request, []
     said = [f for f in (get(facts, "style"), get(facts, "max_loss")) if f is not None]
@@ -728,7 +806,7 @@ def after(lines: list[str], request: Any, facts: list[Fact],
                  for m in re.finditer(r"(?:book|position)\s+(?:moves|falls)\s+(?:about\s+)?"
                                       r"-?(\d+(?:\.\d+)?)%", line)]
         priced = next((float(m.group(1).replace(",", "")) for line in lines
-                       for m in [re.search(r"\bof \$(\d[\d,]*)\)", line)] if m), None)
+                       for m in [re.search(r"\b(?:of|on) \$(\d[\d,]*)\)", line)] if m), None)
         base = priced or account
         if cap_usd > 0 and moves and base:
             deepest = max(moves)
@@ -738,6 +816,30 @@ def after(lines: list[str], request: Any, facts: list[Fact],
                 f"${base:,.0f} — " + (f"${cost - cap_usd:,.0f} past your ${cap_usd:,.0f} limit"
                                       if cost > cap_usd else
                                       f"inside your ${cap_usd:,.0f} limit"))))
+    cap_fact = get(facts, "cap")
+    book = dict(getattr(request, "book", {}) or {})
+    if cap_fact is not None and book:
+        # "No single position may exceed 30%" was never held against the book (a judge, round 21)
+        cap_limit = float(cap_fact.value)
+        weights = {s: w for s, w in book.items()}
+        moved = next((m for line in lines for m in [re.search(
+            r"(?:takes it from|from) \d+(?:\.\d+)?% to (\d+(?:\.\d+)?)%|"
+            r"^At (\d+(?:\.\d+)?)% of the book", line)] if m), None)
+        named = (getattr(request, "symbols", ()) or (None,))[0]
+        if moved is not None and named:
+            after_weight = float(moved.group(1) or moved.group(2)) / 100
+            before_weight = weights.get(named, 0.0)
+            rest = 1.0 - before_weight
+            scale = (1.0 - after_weight) / rest if rest > 0 else 0.0
+            weights = {s: (after_weight if s == named else w * scale) for s, w in weights.items()}
+            weights.setdefault(named, after_weight)
+        over = sorted(((s, w) for s, w in weights.items() if w > cap_limit + 1e-9),
+                      key=lambda kv: -kv[1])
+        where = "after this trade" if moved is not None else "as the book stands"
+        extra.append(remembered_line(cap_fact, (
+            f"{', '.join(f'{bare_symbol(s)} at {w:.0%}' for s, w in over)} "
+            f"{'is' if len(over) == 1 else 'are'} over your {cap_limit:.0%} cap {where}"
+            if over else f"every position is inside your {cap_limit:.0%} cap {where}")))
     for avoided in (f for f in facts if f.kind == "avoid" and not f.subject.endswith("USDT")):
         kind_of = avoided.value
         if kind_of == "leverage" and any(re.search(r"\bHedge: (?:short|long)\b|\b\d+x\b", line)
@@ -892,10 +994,11 @@ _RECALL = re.compile(
 """A question about what the console has kept of the trader (round 14: "What do you remember about
 me, my book, my horizon and my limits?" was declined while memory held seven facts)."""
 
-_RECALL_ORDER = ("book", "capital", "budget", "max_loss", "loss_usd", "horizon", "style", "goal",
-                 "thesis", "avoid", "check")
+_RECALL_ORDER = ("book", "capital", "budget", "cap", "trade_risk", "max_loss", "loss_usd",
+                 "horizon", "style", "goal", "thesis", "avoid", "check")
 _RECALL_LABEL = {
     "book": "Your book", "capital": "Your account size", "budget": "Your risk budget",
+    "cap": "Your position cap", "trade_risk": "Your risk per trade",
     "max_loss": "Your loss limit", "loss_usd": "Your loss limit", "horizon": "Your horizon",
     "style": "Your style",
     "goal": "Your goal", "thesis": "Your thesis", "avoid": "What you avoid",

@@ -493,7 +493,7 @@ class TestFundamentals:
     def test_a_near_report_leads_the_answer(self, monkeypatch: pytest.MonkeyPatch) -> None:
         _service(monkeypatch, report=_days_from_today(3), scraped="2018-10-25", holders=3)
         lines, _ = research.fundamentals._fundamentals("NVDAUSDT")
-        assert lines[0].startswith("Bottom line: NVDA reports in 3 day(s)")
+        assert lines[0].startswith("Bottom line: NVDA reports in 3 days")
 
     def test_a_past_report_gives_an_estimate_labelled_as_one(
             self, monkeypatch: pytest.MonkeyPatch) -> None:
