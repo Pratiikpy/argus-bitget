@@ -224,7 +224,7 @@ _VALUATION = re.compile(
 
 VALUATION_MEASURES: tuple[tuple[str, str], ...] = (
     ("P/E (trailing 12m)", "pe_ttm_ed"), ("P/S (trailing 12m)", "ps_ttm_ed"),
-    ("P/B (latest quarter)", "pb_mrq"), ("EV/EBITDA", "ent_multi"))
+    ("P/B (latest quarter)", "pb_mrq"))
 
 
 def _valuation_compare(symbols: tuple[str, ...]) -> list[str]:
@@ -975,7 +975,7 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
     if ratio_row is not None:
         parts = [(label, ratio_row.get(key)) for label, key in (
             ("P/E (trailing 12m)", "pe_ttm_ed"), ("P/S (trailing 12m)", "ps_ttm_ed"),
-            ("P/B (latest quarter)", "pb_mrq"), ("EV/EBITDA", "ent_multi"))]
+            ("P/B (latest quarter)", "pb_mrq"))]
         shown = [f"{label} {float(value):.1f}" for label, value in parts
                  if isinstance(value, (int, float)) and value > 0]
         dividend = ratio_row.get("div_yield_12m")

@@ -198,12 +198,12 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 11,020 tests collected
+pytest -q                       # 11,048 tests collected
 ```
 
-Nothing above needs a credential. On 2026-09-29, with every outbound connection refused, 10,021
-passed, 39 skipped and 0 failed in 25 minutes, of the 11,020 tests collected that day (more have
-been added since); the other 238 read a live venue, feed or model and run apart
+Nothing above needs a credential. On 2026-10-02, with every outbound connection refused, 10,735
+passed, 75 skipped and 0 failed of the 11,048 tests collected; the other 238 read a live
+venue, feed or model and run apart
 (`pytest -m network`). Tests that need a rival's source cloned beside the repository skip
 and say which. `ARGUS_BLOCK_NETWORK=1` refuses every outbound connection, so
 a test that reaches the network shows itself.
@@ -222,7 +222,7 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **11,020 tests collected** — `pytest -q` |
+| Tests | **11,048 tests collected** — `pytest -q` |
 | Types | **`mypy --strict` clean on 578 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
@@ -250,12 +250,15 @@ a test that reaches the network shows itself.
 
 ## Honest limits
 
-- **ARGUS's own paper desk has settled 1 trade.** BUY 1 NVDAUSDT, opened 2026-09-28 at 232.45 and
-  closed 2026-09-29 at 230.96: a net loss of 1.78 USDT, 0.29 of it costs. Every other decision on
-  its ledger is a refusal. One trade is not a sample, so its Sharpe and drawdown are undefined and
-  printed as such, and its win rate of 0% says nothing yet. Each refusal carried a direction, hashed before the
-  outcome existed: at about two hours, **284 of 505 directional calls were right**, which clears a
-  coin flip and does not beat calling "up" every time. The median refusal **forgave -7.95bps of
+- **ARGUS's own paper desk has settled 2 trades, both losses.** BUY 1 NVDAUSDT, opened 2026-09-28
+  at 232.45 and closed 2026-09-29 at 230.96: a net loss of 1.78 USDT, 0.29 of it costs. SELL 1
+  METAUSDT, opened 2026-09-30 at 728.17 and closed 2026-10-01 at 731.55: a net loss of 4.45 USDT,
+  1.07 of it costs. Two rows (seq 264, 265) are void: they record fills the risk layer had
+  refused. Every other decision on its ledger is a refusal. Two settled trades are not a
+  sample, so its Sharpe and drawdown are undefined and printed as such, and its win rate of 0%
+  says nothing yet. Each refusal carried a direction, hashed before the
+  outcome existed: at about two hours, **297 of 535 directional calls were right**, which clears a
+  coin flip and does not beat calling "up" every time. The median refusal **forgave -8.40bps of
   net edge** after the 12bps round trip — the trades it passed
   on were mostly unprofitable. This workbench does not trade; trading is the separate Track 2
   project's job.

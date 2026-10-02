@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-09-30T20:12:39.675883+00:00",
-  "log": "cycle_2026-10-01_0100.log",
-  "sound": true,
+  "generated_at": "2026-10-01T20:12:04.252591+00:00",
+  "log": "cycle_2026-10-02_0100.log",
+  "sound": false,
   "saw_price_discovery": true,
   "proposed_exposure": 0,
   "falsifier_fired": true,
@@ -13,28 +13,28 @@
     },
     {
       "check": "symbols_decided",
-      "status": "PASS",
-      "detail": "12 of 12 symbols produced a decision"
+      "status": "FAIL",
+      "detail": "10 of 12 symbols produced a decision"
     },
     {
       "check": "ran_to_completion",
-      "status": "PASS",
-      "detail": "the cycle reached every symbol it was given"
+      "status": "FAIL",
+      "detail": "stopped after 10 of 12 symbol(s): 18589 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them."
     },
     {
       "check": "token_budget",
       "status": "PASS",
-      "detail": "297,689 of 330,000 spent (90%)"
+      "detail": "311,411 of 330,000 spent (94%)"
     },
     {
       "check": "cumulative_tokens",
       "status": "PASS",
-      "detail": "20,628,030 token(s) across 71 recorded cycle(s), 290,536 per cycle \u2014 roughly 1,162,143/day at four cycles. The key's remaining balance is not observable from here; this is the burn rate, not a runway"
+      "detail": "21,889,187 token(s) across 75 recorded cycle(s), 291,856 per cycle \u2014 roughly 1,167,423/day at four cycles. The key's remaining balance is not observable from here; this is the burn rate, not a runway"
     },
     {
       "check": "budget_not_exhausted",
-      "status": "PASS",
-      "detail": "the guard did not fire"
+      "status": "FAIL",
+      "detail": "the budget ended the cycle before the guard had to \u2014 stopped after 10 of 12 symbol(s): 18589 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them."
     },
     {
       "check": "chain_intact",
@@ -44,12 +44,12 @@
     {
       "check": "leans_recorded",
       "status": "PASS",
-      "detail": "12 of 12 row(s) carry a lean and a lean_confidence"
+      "detail": "10 of 10 row(s) carry a lean and a lean_confidence"
     },
     {
       "check": "leans_gradeable",
       "status": "PASS",
-      "detail": "12 of 12 decision(s) state a direction (7 up, 5 down, 0 none)"
+      "detail": "10 of 10 decision(s) state a direction (7 up, 3 down, 0 none)"
     },
     {
       "check": "verdicts_parsed",
@@ -62,5 +62,5 @@
       "detail": "session phase(s) seen: rth  <-- price discovery"
     }
   ],
-  "verdict": "11/11 checks passed. **FALSIFIER FIRED**: this cycle had price discovery and the desk still proposed no exposure on any symbol. eval/autopsy.py named exactly this as the observation that moves the cause of the abstentions from the sampling to the desk. Its conclusion is now refuted and must be rewritten, not defended"
+  "verdict": "8/11 checks passed. FAILED \u2014 symbols_decided: 10 of 12 symbols produced a decision; ran_to_completion: stopped after 10 of 12 symbol(s): 18589 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them.; budget_not_exhausted: the budget ended the cycle before the guard had to \u2014 stopped after 10 of 12 symbol(s): 18589 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them.. **FALSIFIER FIRED**: this cycle had price discovery and the desk still proposed no exposure on any symbol. eval/autopsy.py named exactly this as the observation that moves the cause of the abstentions from the sampling to the desk. Its conclusion is now refuted and must be rewritten, not defended"
 }

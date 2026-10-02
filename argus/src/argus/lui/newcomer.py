@@ -43,11 +43,23 @@ _HOW_TO_BUY = re.compile(
     r"\bhow\s+(?:do\s+i|to|can\s+i|would\s+i)\s+(?:buy|get|purchase|start\s+(?:buying|trading|"
     r"investing))\s*(?:(?:some\s+)?(?:crypto|bitcoin|btc|ethereum|eth|stocks?|shares?|coins?|"
     r"tokens?)\b|[?.!]*\s*$)|\bhow\s+(?:do\s+i|to|can\s+i)\s+(?:start|begin)\s+(?:trading|investing)\b|\bwhere\s+(?:do|"
-    r"can)\s+i\s+buy\b", re.I)
+    r"can)\s+i\s+buy\b|\b(?:i['\u2019]?m|i\s+am)\s+(?:brand\s+)?new\b[^?]*\b(?:where|how)\b[^?]*"
+    r"\b(?:start|begin)\b|\bwhere\s+(?:do|should)\s+i\s+(?:start|begin)\b[?.!]*\s*$", re.I)
 _LOSE_MORE = re.compile(
     r"\b(?:can|could|will|do)\s+i\s+lose\s+(?:more\s+(?:money\s+)?than|everything|all\s+(?:of\s+)?"
     r"my\s+money)|\blose\s+more\s+than\s+(?:i|you)\s+(?:put|invest)|\bowe\s+(?:money|the\s+exchange)"
     r"|\bnegative\s+balance\b", re.I)
+_LOSS_HAPPENS = re.compile(
+    r"\bwhat\s+(?:happens|would\s+happen|if)\b[^?]*\bif\s+i\s+(?:lose|lost|start\s+losing)\s+"
+    r"(?:some\s+|a\s+lot\s+of\s+|all\s+(?:my\s+|of\s+my\s+)?)?(?:money|everything|it\s+all)\b|"
+    r"\bwhat\s+if\s+i\s+(?:lose|lost)\s+(?:some\s+|a\s+lot\s+of\s+)?(?:money|everything)\b", re.I)
+"""A trader asking what a loss means, with no position named: it carries the word "lose" and went to
+the desk's own track record (a first-user audit, round 18)."""
+_BEGINNER_SAFE = re.compile(
+    r"\bis\s+(?:crypto|bitcoin|trading|investing|leverage|leveraged\s+trading|futures|perps?|"
+    r"perpetuals?|day\s+trading)\s+(?:safe|risky|dangerous|a\s+(?:good|bad)\s+idea|worth\s+it)"
+    r"\s+(?:for\s+(?:a\s+)?(?:beginners?|newbies?|someone\s+new|me|starters?)|to\s+start)\b|"
+    r"\bam\s+i\s+(?:ready|too\s+new)\s+(?:to|for)\s+(?:trade|trading|crypto|invest\w*)\b", re.I)
 _HOW_BUYING_WORKS = re.compile(
     r"\bhow\s+(?:does|do)\s+(?:buying|trading|investing|it|this)\s+(?:actually\s+|really\s+)?work\b|"
     r"\bhow\s+(?:buying|trading)\s+works\b", re.I)
@@ -186,6 +198,27 @@ _LOSING = (
     "Ask \"what is liquidation\" or \"how much can I lose on TSLA this week\" for figures on a "
     "real name.",
 )
+_LOSS_HAPPENS_A = (
+    "Bottom line: a loss is the position being worth less than you paid. On spot you still own "
+    "the coin, so the loss is on paper until you sell, and it can shrink or grow; with leverage "
+    "the exchange closes (liquidates) the position when the loss reaches the margin held against "
+    "it, so the loss becomes final without a decision from you.",
+    "Nothing here touches your money — this console places no orders and holds no funds. To see "
+    "a loss before it happens, give it a position: \"how much would I lose if NVDA fell 10% and "
+    "I hold $5k\".",
+    "A loss you cannot afford is a sizing mistake, not a market one: say \"my loss limit is 5%\" "
+    "and the answers that size a position are held to it.",
+)
+_BEGINNER_SAFE_A = (
+    "Bottom line: not safe in the sense of guaranteed — prices can fall a long way, and the "
+    "market runs around the clock, so a loss can arrive while you sleep. What a beginner controls "
+    "is how much is exposed.",
+    "Spot is the gentler start: the most you can lose is what you paid. Futures (\"perpetuals\") "
+    "add leverage, funding payments and liquidation, which is where beginners lose the most.",
+    "Start with an amount you could lose without it changing your month, and measure before you "
+    "buy: \"how much can I lose on BTC this week\" and \"what does it cost to buy $500 of BTC\" "
+    "are answered on live Bitget data. This is analysis, not advice.",
+)
 _LOOKAHEAD = re.compile(
     r"\blook[\s-]?ahead\b|\bfuture\s+(?:data\s+)?leak\w*|\b(?:data|label|target)\s+leak\w*|"
     r"\bpeek\w*\s+(?:at|into)\s+the\s+future\b", re.I)
@@ -266,6 +299,7 @@ _GOING_WRONG = (
 
 
 explains(*_LOOKAHEAD_A, *_OVERFIT_A, *_SURVIVOR_A, *_COSTS_A, *_NOT_ADVICE, *_BUYING, *_LOSING,
+         *_LOSS_HAPPENS_A, *_BEGINNER_SAFE_A,
          *_GOING_WRONG, *_NO_GUARANTEE, *_SAFE, *_WITHDRAWING, *_PLACING, *_FREE_TO_USE)
 
 def reply(text: str, *, named: bool = False) -> Reply | None:
@@ -295,6 +329,10 @@ def reply(text: str, *, named: bool = False) -> Reply | None:
         return Reply(lines=_WITHDRAWING)
     if _LOSE_MORE.search(text):
         return Reply(lines=_LOSING)
+    if _LOSS_HAPPENS.search(text):
+        return Reply(lines=_LOSS_HAPPENS_A)
+    if _BEGINNER_SAFE.search(text):
+        return Reply(lines=_BEGINNER_SAFE_A)
     if _PLACE_TRADE.search(text):
         return Reply(lines=_PLACING)
     if _FREE.search(text):

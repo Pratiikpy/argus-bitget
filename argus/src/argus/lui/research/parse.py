@@ -486,7 +486,7 @@ _FUNDAMENTALS = re.compile(
 
 _VALUE_WORDS = re.compile(r"\b(?:expensive|cheap|pricey|rich|stretched\s+valuation)\b", re.I)
 """"Is AAPL expensive right now": for a stock, a valuation question (the fundamentals engine
-carries P/E, P/S, P/B and EV/EBITDA). It was answered with the desk's open positions."""
+carries P/E, P/S and P/B). It was answered with the desk's open positions."""
 
 
 _TECHNICALS = re.compile(
@@ -780,7 +780,12 @@ def price_forecast_asked(text: str) -> bool:
 _LEVERAGE = re.compile(r"\b(\d+(?:\.\d+)?)\s*x\b(?!\s*(?:the\s+)?atr)|\bleverage\w*|"
                        r"\bliquidat\w*|\bmargin\b", re.I)
 
-
+_NEW_MONEY = re.compile(
+    r"\b(?:put|invest(?:ing)?|buy(?:ing)?|add(?:ing)?|get\s+into|start)\b", re.I)
+_OWNS = re.compile(r"\bmy\s+(?:book|portfolio|holdings?|positions?)\b|\bi\s+(?:already\s+)?"
+                   r"(?:hold|own|have\s+(?:\d|\$|a\s+\w+\s+(?:book|portfolio)))|\bholding\b", re.I)
+_SIZE_WORDED = re.compile(
+    r"(\d+(?:\.\d+)?)\s*%\s*(?:more\s+|extra\s+)?(?:leverage|exposure|allocation|position)\b", re.I)
 _SHORT = re.compile(r"\bshort\w*\b|\bsell(?:ing)?\s+short\b|\bbearish\s+bet\b", re.I)
 
 
@@ -1306,6 +1311,35 @@ def unread_holdings(text: str) -> list[tuple[str, float]]:
             continue
         if resolve_name(name, trust_case=trust) is None:
             out.append((name, weight))
+    return out
+
+
+_JOINED_CAPS = re.compile(
+    r"(?=\b([A-Z]{2,5})\b\s*(?:,|and|vs\.?|versus|or|against|with)\s+\b([A-Z]{2,5})\b)")
+"""Two capitalised names joined as a trader joins the things compared: "NVDA and ZZZQX"."""
+
+_FINANCE_ACRONYMS = frozenset({
+    "AI", "PE", "EPS", "IPO", "CEO", "CFO", "FOMC", "CPI", "GDP", "ROE", "ROI", "ROA", "ETF",
+    "USD", "EUR", "GBP", "JPY", "CNY", "US", "UK", "EU", "EV", "FX", "YTD", "QOQ", "YOY", "ATH",
+    "IV", "RSI", "MACD", "SMA", "EMA", "VIX", "DXY", "PEG", "FCF", "SEC", "PCE", "NFP", "OPEC",
+    "AND", "OR", "VS", "THE", "BUY", "SELL", "HOLD", "LONG", "SHORT", "NOT", "ALL", "ANY",
+    "OUT", "FOR", "ARE", "WAS", "HOW", "WHY", "WHO", "ITS", "MY", "ME", "I", "A"})
+
+
+def unread_names(text: str) -> list[str]:
+    """Capitalised names joined to a name that did resolve and that Bitget does not list: "Compare
+    NVDA and ZZZQX" was answered for NVDA alone with no word about ZZZQX (a hostile review,
+    2026-10-01, round 18). Only a name written beside a resolved one, in capitals as typed, so a
+    capitalised acronym elsewhere in the sentence is never called a ticker."""
+    if _shouting(text):
+        return []
+    out: list[str] = []
+    for match in _JOINED_CAPS.finditer(split_notation(text)):
+        for here, other in ((match.group(1), match.group(2)), (match.group(2), match.group(1))):
+            if (here not in out and here not in _FINANCE_ACRONYMS
+                    and resolve_name(here, trust_case=True) is None
+                    and resolve_name(other, trust_case=True) is not None):
+                out.append(here)
     return out
 
 
@@ -1866,6 +1900,12 @@ HEDGE_CANDIDATES_EQUITY = ("QQQUSDT", "SPYUSDT", "SMHUSDT")
 
 
 _HEDGE_WITH = re.compile(r"\b(?:with|using|via|through|by\s+shorting)\s+([^?.;]{2,60})", re.I)
+_HEDGE_IS = re.compile(
+    r"\b(?:is|are|would|will|does|do|could|can)\s+([^?.;]{2,40}?)\s+(?:be\s+)?(?:an?\s+)?"
+    r"(?:good\s+|better\s+|useful\s+|effective\s+|decent\s+|reliable\s+)?"
+    r"(?:hedges?|protection|safe\s+haven)\b", re.I)
+"""'Is gold a good hedge for my tech-heavy portfolio': the instrument asked about is the one to
+measure; the question named it and the answer showed QQQ, ETH and BTC and never gold."""
 
 
 def hedge_instruments(raw: str) -> tuple[str, ...]:
@@ -1873,7 +1913,7 @@ def hedge_instruments(raw: str) -> tuple[str, ...]:
     "hedge my Apple position with oil or gold" — which are candidates to measure, not holdings.
     They were ignored and QQQ/SPY/SMH measured instead (2026-09-25 audit, round 2)."""
     named: list[str] = []
-    for match in _HEDGE_WITH.finditer(raw):
+    for match in (*_HEDGE_WITH.finditer(raw), *_HEDGE_IS.finditer(raw)):
         for symbol in research_symbols(match.group(1))[0]:
             if symbol not in named:
                 named.append(symbol)
@@ -2446,7 +2486,11 @@ def shock_subject(raw: str, weighted: set[str]) -> str | None:
     # NVDA dropped 10%, what happens to my book? I hold 50% NVDA, 50% AAPL" shocked the Nasdaq,
     # because two holdings were named and neither was "outside" (found 2026-09-25).
     for shock in _NAMED_SHOCK.finditer(raw):
-        before, _ = research_symbols(raw[max(0, shock.start() - 24): shock.start() + 1])
+        # only the clause the shock verb sits in: "...50% AAPL. If NVDA drops 10%" has AAPL inside
+        # the 24 characters before it, and two names read as no subject (2026-10-01 audit)
+        clause = re.split(r"[.;,?!]|\band\b|\bif\b|\bwhat\b", raw[max(0, shock.start() - 24):
+                                                                  shock.start() + 1], flags=re.I)
+        before, _ = research_symbols(clause[-1])
         if len(before) == 1 and before[0] in named:
             return None if before[0] == BENCHMARK else before[0]
         # ...and so is the name just after it: "a 10% drop in gold", "a 20% crash in NVDA"
@@ -2459,6 +2503,41 @@ def shock_subject(raw: str, weighted: set[str]) -> str | None:
     if len(named) == 1:
         return None if named[0] == BENCHMARK else named[0]
     return None
+
+
+_HOLDING_SHOCK = re.compile(
+    r"(?<![A-Za-z0-9])(?P<name>[A-Za-z][A-Za-z0-9.&-]{1,14})\s+"
+    r"(?:(?:is|are|was|were|will|would|to|should|gets?|goes?)\s+)*"
+    r"(?P<verb>drops?|dropped|falls?|fell|crash\w*|crater\w*|tank\w*|dump\w*|plung\w*|loses?|lost|"
+    r"sinks?|rall\w*|jumps?|surg\w*|spik\w*|gains?|rises?|rose|climbs?|down|up)\s+"
+    r"(?:by\s+)?(?P<pct>\d+(?:\.\d+)?)\s*%"
+    r"|(?<![A-Za-z0-9])(?P<name2>[A-Za-z][A-Za-z0-9.&-]{1,14})\s*(?:to|:|=)?\s*"
+    r"(?P<sign>[+-])(?P<pct2>\d+(?:\.\d+)?)\s*%", re.I)
+_SHOCK_FALLS = re.compile(r"^(?:drop|fall|fell|crash|crater|tank|dump|plung|lose|lost|sink|down)",
+                          re.I)
+
+
+def holding_shocks(raw: str) -> dict[str, float]:
+    """A move stated for each of several names in one question, as symbol -> percent.
+
+    "If NVDA drops 20% and TSLA drops 15%" is two shocks that happen together. The stress engine
+    reads one shock and one instrument, so it shocked the Nasdaq by a single figure and priced the
+    book through beta: a $50,000 book the asker said would lose $9,000 was answered as -3.26%
+    (a judge-style audit of the live console, 2026-10-01). Fewer than two named names is empty:
+    one stated shock is the ordinary stress question and keeps its engine."""
+    found: dict[str, float] = {}
+    for match in _HOLDING_SHOCK.finditer(raw):
+        name = match.group("name") or match.group("name2")
+        if match.group("name"):
+            size = float(match.group("pct"))
+            move = -size if _SHOCK_FALLS.match(match.group("verb")) else size
+        else:
+            size = float(match.group("pct2"))
+            move = -size if match.group("sign") == "-" else size
+        symbols, _ = research_symbols(name)
+        if len(symbols) == 1:
+            found[symbols[0]] = move
+    return found if len(found) >= 2 else {}
 
 
 def _named_shock_request(raw: str) -> ResearchRequest | None:
@@ -2492,7 +2571,7 @@ def _named_shock_request(raw: str) -> ResearchRequest | None:
         down = (DOWN_WORDS.search(raw) or match.group(1).startswith("-")
                 or re.search(r"crater|跌|崩|跳水", raw))
         shock = -value if down else value
-    if subject is not None:
+    if subject is not None and len(holding_shocks(raw)) < 2:
         notes.append(f"the shock is applied to {_t(subject)}; each holding moves through its "
                      f"beta to {_t(subject)}")
     return ResearchRequest(kind=ResearchKind.STRESS, symbols=tuple(book), book=book,
@@ -3138,6 +3217,14 @@ def read_request(text: str) -> ResearchRequest | None:
                 book[symbol] = book.get(symbol, 0.0) + weight
         for _, symbol, weight in before_verb:
             book[symbol] = book.get(symbol, 0.0) + weight
+        if size is None and candidate:
+            # "add 50% leverage on MSTR": the figure sits before a word, not against the name, so
+            # it was dropped and the 20% default replaced it (round 18, 2026-10-01)
+            worded = _SIZE_WORDED.search(raw[add_match.start():])
+            if worded and 0 < float(worded.group(1)) <= 100:
+                size = float(worded.group(1)) / 100
+                notes.append(f"\"{worded.group(0).strip()}\" is read as a {size:.0%} position in "
+                             f"{_t(candidate)}, not as a borrowing multiple")
         if size is None and not tail_symbols:
             candidate = None
     else:
@@ -3200,6 +3287,7 @@ def read_request(text: str) -> ResearchRequest | None:
             symbols=(candidate, *[s for s in book if s != candidate]),
             book=book, size=min(max(size or DEFAULT_SIZE, 0.01), 1.0),
             size_stated=size is not None, notes=tuple(notes),
+            notional=None if book else parse_notional(raw),
         )
 
     if len(symbols) >= 2 and (_COMPARE.search(raw) or _PROFILE.search(raw)):
@@ -3926,6 +4014,11 @@ def plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, dic
         # name on its own; sized against itself it answered "even a 1% position would carry more
         # than 25% of this book's risk" (fourth blind corpus, 2026-09-23).
         book = {}
+    if (candidate is None and len(book) == 1 and kind is ResearchKind.IMPACT
+            and _NEW_MONEY.search(text) and not _OWNS.search(text)):
+        # "Should I put $500 in Bitcoin?" came back as holdings {BTC: 100}: money not yet invested
+        # is a name to add, not a book already held — it was sized against itself (round 18).
+        candidate, book = next(iter(book)), {}
     if kind in (ResearchKind.QUOTE, ResearchKind.FUNDAMENTALS) and (
             _FORECAST.search(text) or (_PRICE_TARGET.search(text) and not all(
                 s in TRADED_SYMBOLS or is_us_equity(s) for s in symbols))):
@@ -4018,6 +4111,7 @@ def plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, dic
             symbols=(lead, *[s for s in book if s != lead]),
             book=book, size=size or DEFAULT_SIZE, size_stated=size is not None,
             parsed_by="model", notes=tuple(notes),
+            notional=None if book else parse_notional(text),
         )
     budget = parse_budget(text)
     if request is not None and budget is not None:

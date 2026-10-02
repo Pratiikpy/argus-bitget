@@ -791,6 +791,14 @@ _MY_HOLDINGS = re.compile(r"\bmy\s+(?:\w+\s+){0,2}(?:book|portfolio|holdings|pos
 _TAKE_PROFIT = re.compile(r"\btake[\s-]?profits?\b|\bprofit\s+target\b|\btp\s+(?:level|at)\b",
                           re.I)
 _THE_DESK = re.compile(r"\b(?:your|the\s+desk'?s?|argus'?s?|our)\b", re.I)
+_OWN_TOLERANCE = re.compile(
+    r"\bi\s*(?:can'?t|cannot|couldn'?t|won'?t|don'?t\s+want\s+to|do\s+not\s+want\s+to|"
+    r"wouldn'?t\s+want\s+to)\s+(?:\w+\s+)?(?:lose|stomach|take|afford|handle|see)\b|"
+    r"\b(?:if|when)\s+i\s+(?:lose|lost)\b|\b(?:what|which)\s+\w+(?:\s+\w+)?\s+i\s+"
+    r"(?:said|told|set|mentioned)\b", re.I)
+"""The trader's own tolerance or an earlier statement of it — "I can't lose more than 10%", "what
+happens if I lose money", "remind me what drawdown I said" — which carries the performance words
+(lose, drawdown) and was answered with the desk's own track record (a first-user audit, r18)."""
 
 _SOMEONE_ELSES = re.compile(
     r"\b(?P<who>[A-Z][\w.&-]*(?:\s+[A-Z][\w.&-]*){0,3})(?:'s|\u2019s|s')\s+"
@@ -1347,7 +1355,8 @@ def classify(
                     f"weeks after the quarter it describes"),
         )
 
-    if intent is Intent.PERFORMANCE and (_MY_HOLDINGS.search(raw) or _TAKE_PROFIT.search(raw)) \
+    if intent is Intent.PERFORMANCE and (_MY_HOLDINGS.search(raw) or _TAKE_PROFIT.search(raw)
+                                         or _OWN_TOLERANCE.search(raw)) \
             and not _THE_DESK.search(raw):
         # "what is the sharpe ratio of my book", "what's my max drawdown" and "good take profit
         # for a nvda long" were answered with the desk's own track record (answer audit, round 3):

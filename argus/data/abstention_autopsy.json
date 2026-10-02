@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-09-30T17:41:20.428721+00:00",
-  "decisions": 912,
-  "gate_population": 830,
+  "generated_at": "2026-10-01T19:40:39.452233+00:00",
+  "decisions": 964,
+  "gate_population": 882,
   "proposed_exposure": 2,
   "session_coverage": {
     "by_phase": {
       "extended": 1,
-      "rth": 544,
+      "rth": 596,
       "weekend": 367
     },
-    "with_price_discovery": 544,
+    "with_price_discovery": 596,
     "median_hours_to_discovery": 0.0,
     "min_hours_to_discovery": 0.0,
     "single_phase_only": false,
-    "note": "912 decision(s) across 3 session phase(s): extended=1, rth=544, weekend=367. 544 were taken while the anchor market had price discovery"
+    "note": "964 decision(s) across 3 session phase(s): extended=1, rth=596, weekend=367. 596 were taken while the anchor market had price discovery"
   },
   "gates": [
     {
@@ -21,9 +21,9 @@
       "name": "no_exposure",
       "checks": "verdict carries no quantity, or quantity <= 0",
       "status": "FIRED",
-      "reached": 830,
-      "fired": 828,
-      "note": "bound on 828 of 830 decision(s) that reached it"
+      "reached": 882,
+      "fired": 880,
+      "note": "bound on 880 of 882 decision(s) that reached it"
     },
     {
       "order": 2,
@@ -154,12 +154,12 @@
   ],
   "unreached_gates": [],
   "confidence_median": 0.62,
-  "confidence_mean": 0.6697,
+  "confidence_mean": 0.662,
   "confidence_min": 0.38,
   "confidence_would_have_bound": true,
-  "verdict": "2 of 912 decision(s) proposed exposure, so the risk chain has live inputs and its outcomes below are exercised rather than unreached",
+  "verdict": "2 of 964 decision(s) proposed exposure, so the risk chain has live inputs and its outcomes below are exercised rather than unreached",
   "falsifier": "the next session with price discovery is 0.0h away, and the committed cycle schedule (13:30/15:30/17:30/19:30 UTC) sits inside US regular hours. If the desk abstains through a full session of those, the cause is the desk and this conclusion is refuted",
   "triggered_by": [
-    "11 settlements since the last postmortem"
+    "24 settlements since the last postmortem"
   ]
 }

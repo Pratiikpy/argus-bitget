@@ -721,16 +721,28 @@ def _options_scope(raw: str, symbol: str, ticker: str,
 
 def _other_scope(raw: str, symbol: str, ticker: str) -> list[str]:
     if _ALL_IN_Q.search(raw):
+        from argus.lui.research.parse import _SHORT
+
+        short = _SHORT.search(raw) is not None
         lines = [f"Bottom line: that is a decision about your whole financial life, and I am not a "
                  f"licensed adviser and do not know your circumstances — take it to one. What "
-                 f"the record says about holding only {ticker} is below: the size of the falls "
-                 f"you would have to sit through."]
+                 f"the record says about {'shorting' if short else 'holding'} only {ticker} is "
+                 f"below: the size of the {'rallies' if short else 'falls'} you would have to "
+                 f"sit through."]
         if symbol:
             try:
                 closes, whose = _daily_closes(symbol)
             except Exception:
                 closes, whose = [], ""
-            if len(closes) >= 60:
+            if len(closes) >= 60 and short:
+                worst_month = max(b / a - 1 for a, b in zip(closes, closes[21:], strict=False)
+                                  if a > 0)
+                lines.append(
+                    f"Over the {len(closes)} days of {whose} read here, {ticker}'s worst 21-bar "
+                    f"rally was {worst_month:+.0%} — against a short of $100,000 that is "
+                    f"${worst_month * 100_000:,.0f} lost. A short's loss has no ceiling; a "
+                    f"long's stops at what was put in.")
+            elif len(closes) >= 60:
                 peak, deepest = closes[0], 0.0
                 for close in closes:
                     peak = max(peak, close)

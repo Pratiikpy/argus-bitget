@@ -28,6 +28,7 @@ _GENERIC = frozenset({
     # "how many capabilities have you tested against rivals" named a rival "tested" (round 11)
     "tested", "test", "tests", "capability", "capabilities", "many", "rival", "rivals",
     "named", "measured", "competitors", "competitor", "systems", "beaten",
+    "every", "theme", "themes", "other", "others", "ahead", "stronger",
 })
 """Words a question and a baseline share without naming a rival."""
 
@@ -52,8 +53,8 @@ _MONTHS = frozenset({"january", "february", "march", "april", "june", "july", "a
                      "september", "october", "november", "december", "sept"})
 
 
-_SELF = re.compile(r"\bargus\b|\byou(?:r|rs)?\b|\bthis\s+(?:desk|tool|console|product|system)\b",
-                   re.I)
+_SELF = re.compile(r"\bargus\b|\byou(?:r|rs)?\b|\b(?:this|the)\s+(?:desk|tool|console|product|"
+                   r"system)\b", re.I)
 """The question has to be about ARGUS: "compare gold and bitcoin" is a comparison of two assets."""
 
 
@@ -87,8 +88,17 @@ _WHICH_RIVAL = re.compile(
 """\"Which rival do you lose to?\": the scoreboard, not a rival's name."""
 
 
+_ALL_RIVALS = re.compile(
+    r"\b(?:better|best|stronger|ahead\s+of|beat\w*|outperform\w*)\s+(?:than\s+)?(?:every|all|any|"
+    r"each)(?:\s+of)?\s+(?:the\s+|its\s+|your\s+)?(?:other\s+)?(?:rivals?|competitors?|"
+    r"alternatives?|tools?|systems?|agents?)\b", re.I)
+"""\"Is it better than every rival?\": a claim over all of them, answered with the scoreboard that
+shows where it does not hold."""
+
+
 def asks_which_rival(text: str) -> bool:
-    return bool(_WHICH_RIVAL.search(text)) and bool(_SELF.search(text))
+    return ((bool(_WHICH_RIVAL.search(text)) and bool(_SELF.search(text)))
+            or bool(_ALL_RIVALS.search(text)))
 
 
 def scoreboard(text: str) -> tuple[list[str], list[Source], dict[str, Any]]:

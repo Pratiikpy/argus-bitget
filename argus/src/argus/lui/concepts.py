@@ -111,7 +111,10 @@ CONCEPTS: tuple[Concept, ...] = (
             "A perpetual contract is a futures contract with no expiry date; the funding payment "
             "between longs and shorts keeps its price close to the underlying's.",
             "On Bitget a stock perpetual (NVDAUSDT, TSLAUSDT) trades around the clock while the "
-            "stock itself trades only in US hours."),
+            "stock itself trades only in US hours. Perpetuals are usually traded with leverage: "
+            "you put up a fraction of the position as margin, so a move against you can use the "
+            "margin up and the exchange closes the position (liquidation) — ask \"what is "
+            "liquidation\" before using one."),
     Concept("spread", r"(?:bid[\s-]*ask\s+)?spread",
             "The spread is the gap between the best price a buyer is offering (bid) and the best "
             "price a seller is asking (ask).",

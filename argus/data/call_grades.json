@@ -1,13 +1,13 @@
 {
- "graded_at": "2026-09-30T19:55:08+00:00",
- "calls": 16,
+ "graded_at": "2026-10-01T19:55:04+00:00",
+ "calls": 20,
  "first_call": "2026-09-27T02:28:00+00:00",
  "risk_graded": 0,
  "mean_beta_error": null,
  "mean_risk_share_error": null,
- "direction_graded": 12,
- "brier": 0.25169166666666665,
- "brier_base_rate": 0.2432072800022506,
+ "direction_graded": 16,
+ "brier": 0.25413125,
+ "brier_base_rate": 0.2497692476744166,
  "calls_graded": [
   {
    "recorded_at": "2026-09-27T02:28:00+00:00",
@@ -169,22 +169,74 @@
    "recorded_at": "2026-09-30T13:55:04+00:00",
    "question": "I hold 40% NVDA, 30% MSFT, 30% AAPL — should I add 15% TSLA?",
    "risk": null,
-   "direction": []
+   "direction": [
+    {
+     "days": 1,
+     "up": false,
+     "brier": 0.2916,
+     "brier_base": 0.26879980624998395
+    }
+   ]
   },
   {
    "recorded_at": "2026-09-30T13:55:04+00:00",
    "question": "I hold 50% NVDA, 50% AAPL — should I add 20% COIN?",
    "risk": null,
-   "direction": []
+   "direction": [
+    {
+     "days": 1,
+     "up": true,
+     "brier": 0.20249999999999996,
+     "brier_base": 0.2812450763278596
+    }
+   ]
   },
   {
    "recorded_at": "2026-09-30T13:55:04+00:00",
    "question": "I hold 60% QQQ, 40% MSFT — should I add 10% MSTR?",
    "risk": null,
-   "direction": []
+   "direction": [
+    {
+     "days": 1,
+     "up": true,
+     "brier": 0.2916,
+     "brier_base": 0.24719890165383163
+    }
+   ]
   },
   {
    "recorded_at": "2026-09-30T13:55:04+00:00",
+   "question": "I hold 40% TSLA, 30% META, 30% GOOGL — should I add 15% AMZN?",
+   "risk": null,
+   "direction": [
+    {
+     "days": 1,
+     "up": false,
+     "brier": 0.2601,
+     "brier_base": 0.28057681853198285
+    }
+   ]
+  },
+  {
+   "recorded_at": "2026-10-01T13:55:04+00:00",
+   "question": "I hold 40% NVDA, 30% MSFT, 30% AAPL — should I add 15% TSLA?",
+   "risk": null,
+   "direction": []
+  },
+  {
+   "recorded_at": "2026-10-01T13:55:04+00:00",
+   "question": "I hold 50% NVDA, 50% AAPL — should I add 20% COIN?",
+   "risk": null,
+   "direction": []
+  },
+  {
+   "recorded_at": "2026-10-01T13:55:04+00:00",
+   "question": "I hold 60% QQQ, 40% MSFT — should I add 10% MSTR?",
+   "risk": null,
+   "direction": []
+  },
+  {
+   "recorded_at": "2026-10-01T13:55:04+00:00",
    "question": "I hold 40% TSLA, 30% META, 30% GOOGL — should I add 15% AMZN?",
    "risk": null,
    "direction": []

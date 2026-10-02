@@ -188,6 +188,13 @@ def extract(text: str, client: Any, now: datetime | None = None) -> list[Fact]:
     is not self-disclosure, no model is available, or nothing checks out."""
     if client is None or not reads_as_disclosure(text):
         return []
+    from argus.lui.question import ORDER_VERB
+
+    first_person = re.search(r"\b(?:i|i['\u2019](?:m|ve|d|ll)|my|me|mine)\b", text, re.I)
+    if ORDER_VERB.match(text) and not first_person:
+        # "buy $500 of BTC" is an order to price: the model read the amount as the trader's
+        # capital and the answer became "noted — $500" (a first-user audit, round 18, row 631).
+        return []
     try:
         from argus.llm.qwen import Thinking
 

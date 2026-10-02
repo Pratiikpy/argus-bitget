@@ -1,41 +1,41 @@
 {
   "symbol": "MSTRUSDT",
   "phase": "rth",
-  "started_at": "2026-09-30T19:30:05.679921+00:00",
+  "started_at": "2026-10-01T19:30:09.154006+00:00",
   "window_seconds": 90,
-  "samples": 70,
-  "prints_seen": 61,
+  "samples": 69,
+  "prints_seen": 86,
   "rpi_share": 0.0,
   "maker_bps": 2.0,
   "markouts": [
     {
       "horizon_seconds": 5,
-      "prints": 57,
-      "median_bps": 0.9722,
-      "mean_bps": 1.2231,
-      "worst_bps": -4.2123
+      "prints": 70,
+      "median_bps": -0.0,
+      "mean_bps": -0.5973,
+      "worst_bps": -4.3672
     },
     {
       "horizon_seconds": 15,
-      "prints": 49,
-      "median_bps": 1.6219,
-      "mean_bps": 1.7607,
-      "worst_bps": -10.0447
+      "prints": 67,
+      "median_bps": -0.936,
+      "mean_bps": -0.773,
+      "worst_bps": -3.7436
     },
     {
       "horizon_seconds": 30,
-      "prints": 40,
-      "median_bps": 5.3481,
-      "mean_bps": 4.0694,
-      "worst_bps": -15.2479
+      "prints": 37,
+      "median_bps": -3.1196,
+      "mean_bps": -1.636,
+      "worst_bps": -4.9927
     },
     {
       "horizon_seconds": 60,
-      "prints": 19,
-      "median_bps": 1.2976,
-      "mean_bps": -1.1097,
-      "worst_bps": -10.7046
+      "prints": 0,
+      "median_bps": 0.0,
+      "mean_bps": 0.0,
+      "worst_bps": 0.0
     }
   ],
-  "verdict": "Over 30s the passive side of 40 print(s) gained a median +5.35bps on MSTRUSDT (rth). No measurable adverse selection in this window \u2014 which is a statement about 90 seconds, not about the instrument"
+  "verdict": "Resting on MSTRUSDT (rth) cost a median 3.12bps of adverse selection over 30s across 37 print(s), worst 4.99bps. That exceeds the 2bps maker fee it would save, so passive execution is not free money here and `cost/model.py`'s refusal to credit the maker side stands"
 }

@@ -30,6 +30,33 @@ INTRO_Q = re.compile(
 """A question about the product itself, asked whole: "what is this site and who is it for"."""
 
 
+ASK_Q = re.compile(
+    r"^\s*(?:(?:hi|hello|hey)\W+)?(?:so\s+)?what\s+(?:can|should|could)\s+i\s+ask"
+    r"(?:\s+(?:you|it|argus|here|this))?\s*[?.!]*\s*$|^\s*(?:give\s+me|show\s+me)\s+(?:some\s+)?"
+    r"(?:example\s+questions|examples|ideas)\s*[?.!]*\s*$", re.I)
+"""The question a visitor asks right after the introduction: "what can I ask" returned the same
+paragraph as "what is this" (a first-time user, round 18, row 632)."""
+
+
+def ask_answer() -> tuple[list[str], list[Source], dict[str, Any]]:
+    lines = [
+        "Bottom line: ask it anything about Bitget's markets in plain words — the questions below "
+        "each work as written, and you can change the symbol or the number.",
+        "A market: \"what is NVDA doing today\", \"compare gold and bitcoin this year\", "
+        "\"how volatile is bitcoin\".",
+        "A position: \"how much would I lose if the Nasdaq fell 10% and I hold $5k of TSLA\", "
+        "\"size a trade: $10k account, 1% risk, stop 4% below entry\".",
+        "A company: \"when does TSLA report and how big is the move usually\", "
+        "\"is NVDA expensive versus MSFT\".",
+        "Starting out: \"I have $1,000, where do I start\", \"what happens if I lose money\". "
+        "Tell it your horizon or the most you can bear losing and it remembers.",
+        "About this desk: \"how is your desk doing\", \"what did it get wrong\", \"how does ARGUS "
+        "compare to Nautilus Trader\".",
+    ]
+    explains(*lines)
+    return lines, [Source("computation", "argus.lui.intro", "example questions")], {}
+
+
 def answer() -> tuple[list[str], list[Source], dict[str, Any]]:
     from argus.eval.standing import REGISTER, State
 

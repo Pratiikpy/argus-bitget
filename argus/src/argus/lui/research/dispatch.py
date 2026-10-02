@@ -119,11 +119,14 @@ from argus.lui.research.parse import (
     _idea_request,
     _mandate_lines,
     daily_technicals_asked,
+    holding_shocks,
     is_us_equity,
     leveraged_fund_asked,
     parse_notional,
+    priced_book,
     stated_limits,
     unread_holdings,
+    unread_names,
     without_hedges,
 )
 from argus.lui.research.quote import (
@@ -256,6 +259,16 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
                            if not line.startswith("Assumed: your holdings add up to")] \
             if any(line.startswith("Assumed: your holdings add up to") for line in answer.lines) \
             else answer.lines
+    stray = unread_names(raw_text) if request.symbols and not unread else []
+    if stray:
+        one = len(stray) == 1
+        verb = "is not a contract" if one else "are not contracts"
+        note = (f"Assumed: {', '.join(stray)} {verb} "
+                f"Bitget lists, so {'it was' if one else 'they were'} left out of every figure "
+                f"above — check the ticker.")
+        at = next((i for i, line in enumerate(answer.lines) if line.startswith("Data:")),
+                  len(answer.lines))
+        answer.lines.insert(at, note)
     # Every research answer, just above its Data line: which sources it reached and which did not
     # answer (`truth/coverage.py`), so a reader can tell a complete answer from one built on part
     # of its inputs. Refusals carry it too — "Bitget did not answer" is the reason for many of them.
@@ -381,7 +394,9 @@ def _standalone_lead(lines: list[str], add: str, raw: Mapping[str, Mapping[Any, 
                     else f"Bottom line: {beta_line}",
                     *(line for line in rest if line is not beta_line)]
     if re.search(r"\bhow\s+(?:volatile|risky)\b|\bis\s+\S+\s+(?:very\s+)?volatile\b|"
-                 r"\bvolatility\s+(?:of|for|in)\b", raw_text, re.I):
+                 r"\bvolatility\s+(?:of|for|in)\b|\b\w+['\u2019]s\s+volatility\b|"
+                 r"\bwhat(?:['\u2019]s|\s+is)\s+(?:its|the)\s+volatility\b|"
+                 r"^\W*(?:and\s+)?(?:its|the)\s+volatility\b", raw_text, re.I):
         # "how volatile is TSLA" opened on a sizing rule instead of the volatility (the round-17
         # audit, 2026-10-01).
         swing = statistics.pstdev(series[-720:]) * math.sqrt(24 * 365)
@@ -423,6 +438,53 @@ def _compounded(hourly: Sequence[Any]) -> float | None:
     for r in values:
         growth *= 1.0 + r
     return growth - 1.0
+
+
+def _own_move_lines(raw_text: str, request: ResearchRequest,
+                    moves: Mapping[str, float]) -> list[str]:
+    """The book's move when each named holding moves by the amount stated for it.
+
+    Weight times the stated move, summed: no beta and no correlation, because the asker gave each
+    name's own move. A holding with no stated move is held flat, a shocked name that is not held
+    adds nothing, and both are said."""
+    priced = priced_book(raw_text)
+    if priced is not None and priced.weights:
+        weights = {s: w * (1.0 - priced.cash) for s, w in priced.weights.items()}
+        cash, value = priced.cash, priced.value
+    else:
+        weights, cash, value = dict(request.book), request.cash, 0.0
+    held = {s: w for s, w in weights.items() if s in moves}
+    flat = [s for s in weights if s not in moves]
+    absent = [s for s in moves if s not in weights]
+    total = sum(w * moves[s] for s, w in held.items())
+
+    def money(fraction: float) -> str:
+        return f" (${abs(fraction) * value / 100:,.0f})" if value > 0 else ""
+
+    parts = [f"{_t(s)} {moves[s]:+g}%" for s in moves if s in held]
+    contrib = "; ".join(
+        f"{_t(s)} {w * moves[s]:+.1f}% of the book{money(w * moves[s])}"
+        for s, w in sorted(held.items(), key=lambda kv: kv[1] * moves[kv[0]]))
+    if not held:
+        names = ", ".join(_t(s) for s in moves)
+        return [f"Bottom line: none of the names you gave a move for ({names}) is in the book, "
+                f"so these moves do not reach it."]
+    verb = "falls" if total < 0 else "rises"
+    lines = [f"Bottom line: if {' and '.join(parts)} together, your book {verb} about "
+             f"{abs(total):.1f}%{money(total)} — {contrib}."]
+    notes = []
+    if flat:
+        notes.append(f"{', '.join(_t(s) for s in flat)} held flat")
+    if cash:
+        notes.append(f"{cash:.0%} in cash unchanged")
+    if notes:
+        lines.append("Assumed: " + "; ".join(notes) + ".")
+    if absent:
+        lines.append(f"Not in your book, so no effect: {', '.join(_t(s) for s in absent)}.")
+    lines.append("Each holding moves by exactly the figure you gave for it — no beta or "
+                 "correlation is applied. Ask for the same book \"if the Nasdaq falls 10%\" to see "
+                 "the beta-propagated version.")
+    return lines
 
 
 def _annualised(hourly: Sequence[float]) -> float | None:
@@ -1268,6 +1330,13 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                                                     lambda m: m.group(1).upper(), x)
                                              for x in lines)]
                     sources.append(beta_line[1])
+
+        elif (request.kind is ResearchKind.STRESS
+              and len(own_moves := holding_shocks(raw_text)) >= 2):
+            lines.extend(_own_move_lines(raw_text, request, own_moves))
+            sources.append(Source(
+                kind="computation", ref="argus.lui.research.dispatch._own_move_lines",
+                detail="sum of each holding's weight times the move stated for it"))
 
         elif request.kind is ResearchKind.STRESS:
             columns = _open_columns(data.raw, is_open)

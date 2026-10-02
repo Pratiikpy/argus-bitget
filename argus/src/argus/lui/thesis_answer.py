@@ -290,6 +290,10 @@ def nothing_to_revise(text: str, prior: list[str]
             {"thesis": None, "revision_without_thesis": True})
 
 
+_A_VIEW = re.compile(r"\bi\s+(?:think|believe|feel|expect|reckon|bet)\b|\bmy\s+(?:view|thesis|bet|"
+                     r"take|call)\b", re.I)
+"""A trader's stated opinion, with or without a reason."""
+
 FALSIFY = re.compile(
     r"\bwhat\s+(?:would|could|will)(?:\s+it)?\s+(?:prove|show|make|mean|tell)"
     r"\b[^?.]{0,40}\b(?:wrong|invalid\w*)|\bwhat\s+would\s+change\s+my\s+mind\b|"
@@ -323,6 +327,17 @@ def falsify(text: str, prior: list[str], *, book: str = "", memory: str = ""
         return None
     current = _standing(list(prior))
     if current is None:
+        view = next((t for t in reversed(prior) if _A_VIEW.search(t)), None)
+        if view is not None:
+            # A view with no reason in it is not nothing: saying "there is no thesis" straight
+            # after the trader stated one read as the console not listening (round 18).
+            said = re.sub(r"\s+", " ", view).strip()
+            said = said if len(said) <= 110 else said[:107].rstrip() + "..."
+            return ([f"Bottom line: you said “{said}” — a view, but it carries no reason that can "
+                     f"be tested, so nothing can yet be shown wrong. Add the market and why — for "
+                     f"example \"QQQ beats SPY this year because earnings are growing faster\" — "
+                     f"and what would prove it wrong is worked out reason by reason."], [],
+                    {"thesis": None, "falsify_without_thesis": True, "untestable_view": True})
         return (["Bottom line: there is no thesis earlier in this conversation to test. State it "
                  "with its reasons — for example \"ETH beats BTC because funding is negative\" — "
                  "and what would prove it wrong is worked out reason by reason."], [],

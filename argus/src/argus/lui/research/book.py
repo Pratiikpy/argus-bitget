@@ -911,13 +911,17 @@ def _impact_lines(report: CopilotReport, request: ResearchRequest,
         if worst_day is not None and worst_day < 0:
             # With no book there is no risk share to budget against; the sizing rule a trader can
             # act on is the one the realised record gives — the worst day it has actually had.
+            # the dollar figure the asker gave ("should I put $500 in Bitcoin") is the position
+            # priced; $10,000 stands in only when none was given (round 18, 2026-10-01)
+            stated = float(request.notional) if request.notional else None
+            position = stated if stated else 10_000.0
             lines.append(
                 f"Bottom line: size {add} so that its worst observed 24 hours ({worst_day:+.1f}%)"
                 f"{' as a short, the loss on its biggest rally,' if short else ''} "
                 f"is a "
-                f"loss you would accept — on a $10,000 position that is about "
-                f"${abs(worst_day) * 100:,.0f}; tell me what you hold to see its share of your "
-                f"risk."
+                f"loss you would accept — on a ${position:,.0f} position that is about "
+                f"${abs(worst_day) / 100 * position:,.0f}; tell me what you hold to see its share "
+                f"of your risk."
             )
     else:
         share = impact.risk_share_after

@@ -94,7 +94,9 @@ def lines_for(order: Order | str) -> list[str]:
                    f"(data/agenthub_preview.json).")
     return [f"Agent Hub preview of the first child, which sends nothing: `{order.command()}` — "
             f"bgc answers with the request it would POST to {PLACE_PATH} on Bitget's Demo "
-            f"account: {json.dumps(order.would_send(), separators=(',', ':'))}.{checked}"]
+            f"account: {json.dumps(order.would_send(), separators=(',', ':'))}. It is a "
+            f"USDT-perpetual order, the market this desk reads books and sizes on; spot is a "
+            f"different market with its own book.{checked}"]
 
 
 def _bgc() -> list[str] | None:

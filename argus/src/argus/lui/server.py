@@ -914,6 +914,10 @@ def _price_premise(text: str) -> str | None:
             f"read at the real price.")
 
 
+_PRICEABLE_ORDER = re.compile(
+    r"^\W*(?:(?:ok(?:ay)?|yes|please|pls|just|now)[\s,]+)*(?:buy|sell|short|long)\s+\$\d", re.I)
+"""A plain buy, sell, long or short order with a dollar size, which is priced rather than declined.
+An order sized in units ("buy 0.5 BTC at market") stays refused."""
 _ETF_PROXY = re.compile(r"\b(GLD|IAU|SLV)\b", re.I)
 _ETF_PROXY_OF = {"GLD": ("gold", "XAUUSDT"), "IAU": ("gold", "XAUUSDT"),
                  "SLV": ("silver", "XAGUSDT")}
@@ -1042,7 +1046,8 @@ def handle_ask(
         from argus.lui.honesty import order_prefix
 
         prefix = order_prefix(text)
-        if prefix and payload.get("lines") and not str(payload["lines"][0]).startswith(prefix):
+        if (prefix and payload.get("lines") and not payload.get("refused")
+                and not str(payload["lines"][0]).startswith(prefix)):
             # An order instruction answered with analysis says first that nothing was sent: the
             # console places, changes and cancels no orders (infeasibility bench, order rows).
             payload["lines"] = [prefix, *payload["lines"]]
@@ -1201,6 +1206,8 @@ def _answer(
 
     from argus.lui import intro
 
+    if intro.ASK_Q.search(text):
+        return engine_payload(*intro.ask_answer(), by="intro")
     if intro.INTRO_Q.search(text):
         # "What is this site and who is it for" was told "that" had nothing to refer to (a
         # first-time user, 2026-09-30).
@@ -1896,6 +1903,17 @@ def _answer(
     reading = arbitrate(text, book=book, model=model, instruction=instruction,
                         desk_first=desk_first, audit=audit)
     audit = reading.audit
+    if instruction and _PRICEABLE_ORDER.match(text) and not (
+            reading.via in ("research-model", "research-patterns") and reading.request is not None):
+        # "buy $500 of BTC" says nothing was sent and then declined, though the reader's next
+        # question is what it would cost (first-user audit, round 18, row 631). Read as that.
+        costed = f"what does it cost to {text.strip().rstrip('.!')}"
+        priced = arbitrate(costed, book=book, model=model, instruction=False,
+                           desk_first=desk_first, audit=audit)
+        if (priced.via in ("research-model", "research-patterns") and priced.request is not None
+                and priced.request.notional is not None):
+            return _research_payload(costed, prior, priced.request, ledger, started, priced.via,
+                                     priced.audit)
     if reading.via in ("research-model", "research-patterns") and reading.request is not None:
         return _research_payload(text, prior, reading.request, ledger, started, reading.via,
                                  audit)

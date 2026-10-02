@@ -504,13 +504,22 @@ def after(lines: list[str], request: Any, facts: list[Fact],
         money = float(capital.value)
         allowed = money * float(limit.value)
         if drop > 0:
-            leg = min(allowed / drop, money)
-            extra.append(remembered_line(limit, (
-                f"{float(limit.value):.0%} of your ${money:,.0f} is ${allowed:,.0f}; a repeat of "
-                f"the worst 24 hours above ({-drop:.1%}) on a ${leg:,.0f} leg "
-                f"({leg / money:.0%} of the book) costs exactly that, and any larger leg costs "
-                f"more — the ceiling for this leg alone, before what your other holdings do "
-                f"beside it")))
+            if allowed / drop > money:
+                # the limit never binds: even the whole account in this leg loses less than it
+                # allows, so "costs exactly that" would be false (round 18, 2026-10-01)
+                extra.append(remembered_line(limit, (
+                    f"{float(limit.value):.0%} of your ${money:,.0f} is ${allowed:,.0f}; a repeat "
+                    f"of the worst 24 hours above ({-drop:.1%}) would cost ${money * drop:,.0f} "
+                    f"even if this leg were the whole ${money:,.0f} — inside your limit at any "
+                    f"size up to the account, before what your other holdings do beside it")))
+            else:
+                leg = allowed / drop
+                extra.append(remembered_line(limit, (
+                    f"{float(limit.value):.0%} of your ${money:,.0f} is ${allowed:,.0f}; a repeat "
+                    f"of the worst 24 hours above ({-drop:.1%}) on a ${leg:,.0f} leg "
+                    f"({leg / money:.0%} of the book) costs exactly that, and any larger leg "
+                    f"costs more — the ceiling for this leg alone, before what your other "
+                    f"holdings do beside it")))
     shock = next((m for line in lines
                   for m in [re.match(r"Bottom line: If (\S+) moves (-?\d+(?:\.\d+)?)%: your "
                                      r"book moves about (-\d+(?:\.\d+)?)%", line)] if m), None)
@@ -668,10 +677,19 @@ def earlier_lines(question: str, prior: list[str], facts: list[Fact]) -> list[st
     return lines
 
 
-_RECALL_ONE = re.compile(
-    r"\bwhat\s+(?:was|is|were|are|'?s)\s+(?:my|the)\s+(?P<what>(?:max(?:imum)?\s+)?loss(?:\s+limit)?|"
-    r"drawdown(?:\s+limit)?|risk\s+budget|horizon|(?:trading\s+)?style|account(?:\s+size)?|"
-    r"capital|goal)\b(?:\s+(?:i|we)\s+(?:told|gave|said|set|mentioned)\b[^?]*)?\s*\??\s*$", re.I)
+_WHAT_KEPT = (r"(?P<what>(?:max(?:imum)?\s+)?loss(?:\s+limit)?|drawdown(?:\s+limit)?|"
+              r"risk\s+budget|horizon|(?:trading\s+)?style|account(?:\s+size)?|capital|goal)")
+_RECALL_ONE_FORMS = tuple(re.compile(p, re.I) for p in (
+    r"\bwhat(?:\s+(?:was|is|were|are)|'?s)\s+my\s+" + _WHAT_KEPT
+    + r"\b(?:\s+(?:i|we)\s+(?:told|gave|said|set|mentioned)\b[^?]*)?\s*\??\s*$",
+    # "the" only with "I told you": "stress test my book ..., what's the drawdown" asks for a
+    # computed figure, not a remembered one.
+    r"\bwhat(?:\s+(?:was|is|were|are)|'?s)\s+the\s+" + _WHAT_KEPT
+    + r"\s+(?:i|we)\s+(?:told|gave|said|set|mentioned)\b[^?]*\??\s*$",
+    r"\b(?:remind|tell)\s+me\s+(?:again\s+)?what\s+(?:my\s+)?" + _WHAT_KEPT
+    + r"\b(?:\s+(?:was|is))?(?:\s+(?:i|we)\s+(?:told|gave|said|set|mentioned)\b[^?]*)?\s*\??\s*$",
+    r"\bwhat\s+" + _WHAT_KEPT + r"\s+did\s+(?:i|we)\s+(?:tell|give|say|set|mention)\b[^?]*\??\s*$",
+))
 """One remembered fact asked for by name: "what was my loss limit" went to a desk-decision reader
 and returned a stale decision (a first-user audit, round 17, 2026-10-01)."""
 _RECALL_KINDS = {"loss": ("loss_usd", "max_loss"), "drawdown": ("max_loss", "loss_usd"),
@@ -681,13 +699,17 @@ _RECALL_KINDS = {"loss": ("loss_usd", "max_loss"), "drawdown": ("max_loss", "los
                                                                                    "max_loss")}
 
 
+def _recall_match(question: str) -> re.Match[str] | None:
+    return next((m for p in _RECALL_ONE_FORMS if (m := p.search(question))), None)
+
+
 def recall_asked(question: str) -> bool:
-    return bool(_RECALL.search(question)) or bool(_RECALL_ONE.search(question))
+    return bool(_RECALL.search(question)) or _recall_match(question) is not None
 
 
 def recall_one(question: str, facts: list[Fact]) -> list[str] | None:
     """The one fact asked for, in the trader's own words; None when the question is not that."""
-    m = _RECALL_ONE.search(question)
+    m = _recall_match(question)
     if m is None:
         return None
     word = m.group("what").split()[0].lower()

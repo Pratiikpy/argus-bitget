@@ -1,12 +1,12 @@
 {
-  "as_of": "2026-09-30T20:12:41.457688+00:00",
-  "refusals": 920,
-  "refusals_with_a_gradeable_claim": 449,
+  "as_of": "2026-10-01T20:12:06.159039+00:00",
+  "refusals": 960,
+  "refusals_with_a_gradeable_claim": 457,
   "hours_tolerance": 1.5,
   "round_trip_bps": 12.0,
   "base_clearance_about_2h": {
-    "cleared": 359,
-    "marks": 508
+    "cleared": 382,
+    "marks": 538
   },
   "by_claim": {
     "session_closed": {
@@ -35,23 +35,28 @@
       "ungradeable": 0
     },
     "moves_enough": {
-      "consistent": 70,
-      "contradicted": 28,
-      "ungradeable": 35
+      "consistent": 76,
+      "contradicted": 30,
+      "ungradeable": 38
     },
     "move_too_small": {
       "consistent": 0,
-      "contradicted": 0,
+      "contradicted": 1,
       "ungradeable": 3
     }
   },
   "forward_against_base": {
-    "move_too_small": null,
+    "move_too_small": {
+      "borne_out": 0,
+      "graded": 1,
+      "base_rate": 0.29,
+      "p_one_sided": 1.0
+    },
     "moves_enough": {
-      "borne_out": 70,
-      "graded": 98,
-      "base_rate": 0.7067,
-      "p_one_sided": 0.4845
+      "borne_out": 76,
+      "graded": 106,
+      "base_rate": 0.71,
+      "p_one_sided": 0.4859
     }
   },
   "forward_claims": [
@@ -282,8 +287,32 @@
       "stated": "\u2026t moved a median 111.3bps \u2014 the binding constraint has been direction, not size \u2014 and I still lack a high-conviction directional call here.",
       "recorded": "next move +2.9bps over 1.98h against a 12bps round trip (refusal_marks.jsonl)",
       "verdict": "contradicted"
+    },
+    {
+      "seq": 944,
+      "symbol": "NVDAUSDT",
+      "claim": "move_too_small",
+      "stated": "\u2026and, and the 24h move is only +0.36% \u2014 the edge is real but not large enough to clear the 14.27bps hurdle with sufficient margin for a same-sessi\u2026",
+      "recorded": "next move +15.1bps over 2.00h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
+    },
+    {
+      "seq": 945,
+      "symbol": "TSLAUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026ves exceeded the hurdle, confirms the binding constraint is direction, not size \u2014 and direction remains unresolved here.",
+      "recorded": "next move +8.4bps over 2.00h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
+    },
+    {
+      "seq": 954,
+      "symbol": "TQQQUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026hurdle in absolute terms \u2014 the binding constraint has been direction, not size, and direction remains unresolvable today.",
+      "recorded": "next move +1.3bps over 2.00h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
     }
   ],
-  "verdict": "920 refusal(s) on record; 449 carried at least one reason the record can check. Of 913 decision-time reason(s) graded, 913 agreed with the record and 0 contradicted it. `moves_enough` claims were borne out by the next ~2h move 70 of 98 time(s) (71%), against 71% for every ~2h refusal mark (one-sided exact binomial p = 0.48); no evidence the stated reason says more than the base rate does.",
+  "verdict": "960 refusal(s) on record; 457 carried at least one reason the record can check. Of 913 decision-time reason(s) graded, 913 agreed with the record and 0 contradicted it. `move_too_small` claims were borne out by the next ~2h move 0 of 1 time(s) (0%), against 29% for every ~2h refusal mark (one-sided exact binomial p = 1.00); no evidence the stated reason says more than the base rate does. `moves_enough` claims were borne out by the next ~2h move 76 of 106 time(s) (72%), against 71% for every ~2h refusal mark (one-sided exact binomial p = 0.49); no evidence the stated reason says more than the base rate does.",
   "method": "Each checkable reason in a no_trade thesis is matched by a fixed pattern and set beside the record: session_phase and hours_to_discovery from the ledger, the desk's own hedge-menu note, the risk ruling, and the next ~2h mark for claims about the size of the coming move. Question and binary verdict from VisualWebArena's llm_ua_match (evaluation_harness/helper_functions.py:610-642, MIT); graded here by the record, not by a model."
 }
