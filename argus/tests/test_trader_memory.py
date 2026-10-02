@@ -86,7 +86,7 @@ def test_after_sets_a_loss_limit_against_the_loss_found() -> None:
     lines = ["Bottom line: If QQQ moves -10%: your book moves about -12.40%, hardest hit NVDA."]
     extra = mem.after(lines, request, facts)
     joined = " ".join(extra)
-    assert extra and "past that limit" in joined and "-12.4%" in joined
+    assert extra and "past your 10% limit" in joined and "-12.4%" in joined
     assert "uses 124% of your 10% limit" in joined
     inside = mem.after(["If QQQ moves -5%: your book moves about -6.00%"], request, facts)
     assert "stays inside it" in " ".join(inside)

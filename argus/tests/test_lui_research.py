@@ -761,7 +761,7 @@ class TestASingleNamesProfile:
 
     def test_a_standalone_question_leads_with_a_sizing_rule_and_shows_the_shape(self) -> None:
         answer = run("q", ResearchRequest(kind=ResearchKind.IMPACT, symbols=("MSTRUSDT",)))
-        assert answer.lines[0].startswith("Bottom line: size MSTR")
+        assert answer.lines[0].startswith("Bottom line: MSTR's worst observed 24 hours")
         assert any(line.startswith("Return shape") and "kurtosis" in line and "R²" in line
                    for line in answer.lines)
 

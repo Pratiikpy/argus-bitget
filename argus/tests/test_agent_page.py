@@ -40,8 +40,8 @@ def test_renders_the_record_metrics_envelope_and_decisions() -> None:
     assert "undefined" not in html
     assert "n/a" in html  # a null Sharpe is printed as n/a with its reason, never as zero
     assert "median -2.3, p05 -20.2, p95 +16.8" in html
-    assert "kernel changed it" in html and "bound by gross_cap" in html
-    assert "proposed 30%, approved 20%" in html
+    assert "kernel changed it by up to 10.00 pt" in html and "bound by gross_cap" in html
+    assert "proposed 30.00%, approved 20.00%" in html
     # The logged reasons are kept, behind a control (first-user audit, 2026-09-29).
     assert "<details><summary>The logged reasons" in html and "no edge after costs" in html
     assert "<b>nothing</b>" not in html and "&lt;b&gt;nothing&lt;/b&gt;" in html
@@ -84,3 +84,29 @@ def test_the_page_says_plainly_it_is_a_separate_project_before_the_reader_can_co
     assert "no real money" in html
     assert "ARGUS" in html and "places no order on any venue" in html
     assert html.index("The agent that trades.") < html.index("separate project")
+
+
+def test_the_no_edge_envelope_is_shown_in_the_agent_columns_units() -> None:
+    # Return is kept in basis points and win rate as a fraction; both stood bare beside the
+    # agent's percentages (a judge, round 20, row 716).
+    assert agent_page._in_units("median -3.5, p05 -75.9, p95 +93.6", "%", 0.01) == (
+        "median -0.04%, p05 -0.76%, p95 +0.94%")
+    assert agent_page._in_units("median 0.45", "%", 100.0) == "median 45.0%"
+
+
+def test_refused_orders_are_counted_and_explained() -> None:
+    orders = {"counts": {"sent": 4}, "orders": [
+        *({"symbol": "METAUSDT", "purpose": "protective_exit", "state": "rejected",
+           "submitted_at": f"2026-09-28T09:{m:02d}:00Z",
+           "rejection": {"message": "HTTP 400 from Bitget: Parameter METAUSDT_UMCBL does "
+                                    "not exist"}}
+          for m in (10, 20, 30, 40)),
+        {"symbol": "METAUSDT", "purpose": "close", "state": "filled",
+         "submitted_at": "2026-09-28T16:06:00Z"}]}
+    count, note = agent_page.rejections(orders)
+    assert count == 4
+    assert "4 protective exits on METAUSDT" in note and "METAUSDT_UMCBL" in note
+    assert "later order filled" in note and "sent the same one 4 times" in note
+    html = agent_page.render(_fetch({"summary.json": SUMMARY, "decisions.json": DECISIONS,
+                                     "orders.json": orders}))
+    assert "refused by the venue" in html and "The venue refused 4 of the 4 orders" in html

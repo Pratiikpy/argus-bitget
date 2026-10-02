@@ -13,7 +13,7 @@ against.
 from __future__ import annotations
 
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from typing import Any
 
 from argus.lui.agent_record import RECORD, fetch_json
@@ -110,6 +110,19 @@ def breaker_answer(fetch: Callable[[str], Any] = fetch_json
                           "the agent's decisions and the facts each was given")], {}
 
 
+def _elapsed_hours(summary: Mapping[str, Any]) -> int:
+    """Whole hours from the scoring window's start to the record's publication, or 0 unread."""
+    from datetime import datetime
+
+    try:
+        start = datetime.fromisoformat(str((summary.get("scoring_window") or {})["start"])
+                                       .replace("Z", "+00:00"))
+        made = datetime.fromisoformat(str(summary["generated_at"]).replace("Z", "+00:00"))
+    except (KeyError, TypeError, ValueError):
+        return 0
+    return max(0, int((made - start).total_seconds() // 3600))
+
+
 def answer(fetch: Callable[[str], Any] = fetch_json
            ) -> tuple[list[str], list[Source], dict[str, Any]]:
     """The agent's scored metrics, its activity counts, and the envelope a no-edge book lands in."""
@@ -132,9 +145,15 @@ def answer(fetch: Callable[[str], Any] = fetch_json
     win = float(metrics.get("win_rate") or 0.0)
     drawdown = float(metrics.get("max_drawdown") or 0.0)
     hours = int(metrics.get("n_hours") or 0)
+    # n_hours counts the hourly marks recorded, not the time elapsed: 92 marks stood as "92 hours
+    # into its scoring window" about 103 hours after it opened (a judge, round 20, row 718).
+    elapsed = _elapsed_hours(summary)
+    into = (f"{elapsed} hours into its scoring window ({hours} hourly marks recorded"
+            + (f"; {elapsed - hours} hours have no mark" if hours < elapsed else "") + ")"
+            if elapsed else f"{hours} hourly marks into its scoring window")
     lines = [
         f"Bottom line: the Track 2 agent — a separate project that paper-trades on Bitget's demo "
-        f"venue, not this console's research desk — is {hours} hours into its scoring window: "
+        f"venue, not this console's research desk — is {into}: "
         f"return {ret:+.2%}, Sharpe {sharpe:.2f}"
         + (f" with a standard error of {float(se):.1f}" if se is not None else "")
         + (f" (90% interval {float(ci[0]):.1f} to {float(ci[1]):.1f}"

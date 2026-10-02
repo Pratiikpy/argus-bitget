@@ -171,8 +171,9 @@ TOOLS: tuple[dict[str, Any], ...] = (
     },
     {
         "name": "argus_exposures",
-        "description": "A book's sector weights and its loadings on four factors (market, size, "
-                       "momentum, bitcoin), before and after an optional added position.",
+        "description": "A book's sector weights and its loadings on eight factors (market, size, "
+                       "momentum, value, quality, low volatility, rates, crypto), before and "
+                       "after an optional added position.",
         "inputSchema": {"type": "object", "properties": {
             "book": {"type": "string", "description": "Holdings, e.g. '50% NVDA, 50% AAPL'."},
             "add": {"type": "string",

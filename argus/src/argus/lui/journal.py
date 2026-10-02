@@ -943,7 +943,11 @@ def next_report_date(symbol: str) -> date | None:
 
         found = shared_service().next_earnings(ticker)
         if isinstance(found, dict) and found.get("report_date"):
-            return date.fromisoformat(str(found["report_date"])[:10])
+            day = date.fromisoformat(str(found["report_date"])[:10])
+            # The service can still hold the last report once it has passed (NVDA read 26 Aug on
+            # 2 Oct 2026); a past date is not the next one, so Yahoo's calendar is asked instead.
+            if day >= datetime.now(UTC).date():
+                return day
     except Exception:
         pass
     from argus.lui.research.fundamentals import yahoo_summary

@@ -137,6 +137,24 @@ CONCEPTS: tuple[Concept, ...] = (
             "beta of 1.5 against the Nasdaq means about 1.5% for each 1%.",
             "It measures sensitivity to the market, not the asset's own risk; two assets with the "
             "same beta can have very different volatility."),
+    # Three words the answers print and could not explain: "what is R²" was refused (a first-time
+    # user, round 20, row 685)
+    Concept("R-squared", r"r²|r2|r\s*-?\s*squared?",
+            "R² is the share of an asset's moves that a benchmark explains: 0.7 (70%) means the "
+            "benchmark's moves account for most of its moves, 0.1 (10%) means almost none.",
+            "A high R² makes a beta hedge work; a low one means the asset mostly moves on its "
+            "own, so hedging it with the benchmark removes little risk."),
+    Concept("kurtosis", r"(?:excess\s+)?kurtosis|fat\s+tails?",
+            "Kurtosis measures how often an asset makes outsized moves compared with a normal "
+            "bell curve; excess kurtosis above 0 means big moves happen more often than that "
+            "curve expects.",
+            "High kurtosis (say 9) is a warning that the worst day can be far worse than the "
+            "typical swing suggests — size for the tail, not the average."),
+    Concept("skew", r"skew(?:ness)?",
+            "Skew says whether an asset's large moves lean up or down: positive skew means the "
+            "big moves have more often been up, negative means down.",
+            "It describes the past window only; a positive skew does not protect against a "
+            "large fall tomorrow."),
     Concept("volatility", r"volatility|\bvol\b",
             "Volatility is how much a price typically moves, measured as the standard deviation "
             "of its returns, usually stated per year.",
@@ -441,6 +459,12 @@ _OWNED = re.compile(r"\b(?:my|your|our|the\s+desk'?s?|this\s+book)\b", re.I)
 questions for the book and the desk's record, not for a definition."""
 
 
+_MEANS_FOR = re.compile(
+    r"\bmeans?\s+for\s+(?:me|us|my|our|the\s+(?:book|portfolio|market|stocks?)|"
+    r"[A-Z$][\w.$]{0,11}\b(?!\s+(?:as\s+a\s+)?(?:term|word)))", re.I)
+"""What an event means *for* something held is an impact question, not a definition."""
+
+
 def concept_asked(text: str, named_symbols: tuple[str, ...] = ()) -> Concept | None:
     """The concept a question asks the meaning of, or None.
 
@@ -469,6 +493,10 @@ def concept_asked(text: str, named_symbols: tuple[str, ...] = ()) -> Concept | N
     if risky is not None:
         text = f"explain {risky.group(1)}"
     if not _ASK.search(text) or (_OWNED.search(text) and not _MEANS.search(text)):
+        return None
+    if _MEANS_FOR.search(text):
+        # "What does the CPI print next week mean for my book?" asks what the event does to the
+        # holdings, and got the definition of CPI (a judge, round 20, row 712)
         return None
     for concept in CONCEPTS:
         term = rf"(?:{concept.pattern})"

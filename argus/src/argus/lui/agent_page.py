@@ -54,9 +54,10 @@ def _metrics(metrics: Mapping[str, Any], envelope: Mapping[str, Any]) -> str:
          envelope.get("return_on_equity_bps")),
         ("Fees paid (USDT)", _num(metrics.get("fees_paid"), ".2f"), None),
     )
+    units = {"Max drawdown": ("%", 1.0), "Win rate": ("%", 100.0), "Return": ("%", 0.01)}
     body = "".join(
         f"<tr><td>{escape(label)}</td><td class='n'>{escape(value)}</td>"
-        f"<td class='env'>{escape(str(env)) if env else '—'}</td></tr>"
+        f"<td class='env'>{escape(_env_cell(label, env, units))}</td></tr>"
         for label, value, env in rows)
     # "Win rate 0%" on three closed trades stood with nothing beside it (a first-time user, round
     # 10): on a handful of trades one more moves it by tens of points, and the Sharpe is read from
@@ -73,6 +74,24 @@ def _metrics(metrics: Mapping[str, Any], envelope: Mapping[str, Any]) -> str:
             + "</tbody></table></div>" + few)
 
 
+def _in_units(text: str, unit: str, scale: float) -> str:
+    """The no-edge envelope in the agent column's own units. Its return is kept in basis points
+    and its win rate as a fraction, and both stood bare beside the agent's percentages ("-0.01%"
+    beside "median -3.5"), which read as a return three hundred times worse (a judge, round 20,
+    row 716)."""
+    def one(m: re.Match[str]) -> str:
+        value = float(m.group(0)) * scale
+        sign = "+" if m.group(0).startswith("+") else ""
+        return f"{sign}{value:.2f}{unit}" if abs(value) < 10 else f"{sign}{value:.1f}{unit}"
+    return re.sub(r"(?<![\w.])[+-]?\d+(?:\.\d+)?", one, text)
+
+
+def _env_cell(label: str, env: Any, units: Mapping[str, tuple[str, float]]) -> str:
+    if not env:
+        return "—"
+    return _in_units(str(env), *units[label]) if label in units else str(env)
+
+
 SAMPLE_TO_READ = 30
 """Closed trades below which the page says the figures are too few to read."""
 
@@ -81,6 +100,7 @@ def _funnel(counts: Mapping[str, Any]) -> str:
     order = (("decisions", "decisions"), ("flat_with_reasons", "flat, with reasons"),
              ("kernel_changed_decisions", "changed by the risk kernel"),
              ("orders_sent", "orders sent"), ("fills", "fills"),
+             ("rejected", "refused by the venue"),
              ("closed_trades", "closed trades"), ("protective_rulings", "protective rulings"))
     return "".join(f"<div class='stat'><b>{escape(str(counts.get(key, 0)))}</b>"
                    f"<span>{escape(label)}</span></div>" for key, label in order)
@@ -89,6 +109,46 @@ def _funnel(counts: Mapping[str, Any]) -> str:
 _DRAWDOWN_SAID = re.compile(
     r"drawdown\s+(?:beyond|above|over|past|exceed\w*)\s+(\d+(?:\.\d+)?)\s*%", re.I)
 _DRAWDOWN_HELD = re.compile(r"book\.drawdown_pct\s*=\s*(-?\d+(?:\.\d+)?)")
+
+
+def rejections(orders: Mapping[str, Any] | None) -> tuple[int, str]:
+    """The orders the venue refused, counted and explained from the record's own order log.
+
+    Run 2 sent 93 orders and 74 were refused, and the page showed "93 orders sent, 19 fills" with
+    nothing between them (a judge, round 20, row 717). Grouped by what was refused and why, with
+    the time span, so a reader sees a cluster of retries rather than 74 separate failures."""
+    rows = [o for o in (orders or {}).get("orders") or [] if o.get("state") == "rejected"]
+    if not rows:
+        return 0, ""
+    groups: dict[tuple[str, str, str], list[Mapping[str, Any]]] = {}
+    for o in rows:
+        message = str((o.get("rejection") or {}).get("message") or "no message")
+        message = re.sub(r"^HTTP \d+ from Bitget:\s*", "", message)[:90]
+        key = (str(o.get("symbol")), str(o.get("purpose") or "order").replace("_", " "), message)
+        groups.setdefault(key, []).append(o)
+    parts = []
+    for (symbol, purpose, message), group in sorted(groups.items(), key=lambda kv: -len(kv[1])):
+        stamps = sorted(str(o.get("submitted_at") or "")[:16] for o in group)
+        span = (f"{stamps[0]}Z" if stamps[0] == stamps[-1] else
+                f"{stamps[0]}Z to {stamps[-1][11:]}Z") if stamps and stamps[0] else ""
+        parts.append(f"{len(group)} {purpose}{'s' if len(group) > 1 else ''} on {symbol}"
+                     + (f", {span}" if span else "") + f" — “{message}”")
+    every = (orders or {}).get("orders") or []
+    later = all(any(o.get("state") == "filled" and o.get("symbol") == symbol
+                    and str(o.get("submitted_at") or "") > max(str(g.get("submitted_at") or "")
+                                                               for g in group)
+                    for o in every)
+                for (symbol, _, _), group in groups.items())
+    retried = max(len(g) for g in groups.values())
+    sent = (orders or {}).get("counts", {}).get("sent")
+    return len(rows), (
+        f"The venue refused {len(rows)}" + (f" of the {sent} orders sent" if sent else " orders")
+        + ": " + "; ".join(parts) + "."
+        + (" Each name had a later order filled, so the refusals were the venue's "
+           "state at the time rather than an order it could never take." if later else "")
+        + (f" The agent has no back-off on a refused exit: it sent the same one {retried} times. "
+           f"Recorded as a known defect and not changed mid-run, so the scored record stays the "
+           f"one that ran." if retried > 3 else ""))
 
 
 def narration_check(row: Mapping[str, Any]) -> str | None:
@@ -114,13 +174,20 @@ def _decision(row: Mapping[str, Any]) -> str:
     targets = row.get("targets") or []
     legs = "; ".join(
         f"{t.get('symbol')} {t.get('target')} "
-        f"(proposed {_num(t.get('proposed_weight'), '.0%', '—')}, "
-        f"approved {_num(t.get('approved_weight'), '.0%', '—')}"
+        f"(proposed {_num(t.get('proposed_weight'), '.2%', '—')}, "
+        f"approved {_num(t.get('approved_weight'), '.2%', '—')}"
         + (f", bound by {t.get('binding_guard')}" if t.get("binding_guard") else "") + ")"
         for t in targets)
     reasons = "; ".join(str(r) for r in row.get("flat_reasons") or [])
     kernel = row.get("changed_by_kernel")
-    pill = ("<span class='pill red'>kernel changed it</span>" if kernel
+    # The kernel's cuts are often hundredths of a point; at whole percents "proposed -2%,
+    # approved -2%" sat under "kernel changed it" (a judge, round 20, row 717), so the size of
+    # the largest change is said in the pill.
+    cut = max((abs(float(t.get("proposed_weight") or 0) - float(t.get("approved_weight") or 0))
+               for t in targets), default=0.0)
+    pill = (f"<span class='pill red'>kernel changed it by up to {cut * 100:.2f} pt</span>"
+            if kernel and cut else
+            "<span class='pill red'>kernel changed it</span>" if kernel
             else "<span class='pill'>kernel passed it</span>" if kernel is not None else "")
     # Targets read plainly and stay in view; the logged reasons for standing flat are the
     # kernel's own field names and values, so they sit behind a control rather than in the prose
@@ -151,6 +218,10 @@ def render(fetch: Fetch = fetch_json) -> str:
         envelope_source = (summary.get("expected_envelope") or {}).get("source")
         genesis = str(ledger.get("genesis_hash") or "")
         rows = list((decisions or {}).get("decisions") or [])[-8:][::-1]
+        refused, refused_note = rejections(fetch("orders.json"))
+        counts = dict(summary.get("counts") or {})
+        if refused:
+            counts["rejected"] = refused
         recent = ("<ol class='dec'>" + "".join(_decision(r) for r in rows) + "</ol>" if rows else
                   "<p class='dim'>No decision yet. The agent decides on pre-registered heartbeats "
                   "(the US open and each funding settlement) and on event triggers; every tick "
@@ -169,8 +240,9 @@ def render(fetch: Fetch = fetch_json) -> str:
             f"first decision: what a book with no edge produces over the same window"
             + (f" ({escape(str(envelope_source))})" if envelope_source else "")
             + ". The agent is judged against it, not against zero.</p>"
-            f"<h2>What it has done</h2><div class='funnel'>{_funnel(summary.get('counts') or {})}"
-            f"</div><h2>Latest decisions</h2>{recent}")
+            f"<h2>What it has done</h2><div class='funnel'>{_funnel(counts)}</div>"
+            + (f"<p class='dim'>{escape(refused_note)}</p>" if refused_note else "")
+            + f"<h2>Latest decisions</h2>{recent}")
     return f"""<!doctype html><html lang="en"><head>{design.head(
         "ARGUS · the Track 2 agent, live",
         "The Track 2 sentiment agent's paper run on Bitget Demo, read from its public record.")}

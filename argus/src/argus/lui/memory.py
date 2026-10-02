@@ -114,14 +114,18 @@ _STYLE = re.compile(
 remembered at all on the hosted console (readiness audit, finding 40)."""
 _CAPITAL = re.compile(
     r"\bmy\s+(?:account|book|portfolio|capital)\s+is\s+(?:actually\s+|now\s+|really\s+)?"
-    r"(?:about\s+|around\s+)?\$?\s*"
+    r"(?:about\s+|around\s+)?[$€£]?\s*"
     r"(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\b|\bi\s+have\s+(?:about\s+|around\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)"
     r"\s*(k|m)?\s+(?:to\s+(?:trade|invest)|in\s+my\s+account)|"
     r"\b(?:an?|my)\s+\$\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\s+(?:account|book|portfolio)\b|"
     r"\b(?:trading|investing)\s+(?:with\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\b|"
     # "I only have about $1,000 total" was not kept (a first-time user, round 19, row 635)
     r"\bi\s+(?:only\s+)?have\s+(?:about\s+|around\s+|roughly\s+|only\s+|just\s+)?\$\s*"
-    r"(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\s+(?:total|in\s+total|altogether|overall|saved|to\s+my\s+name)\b",
+    r"(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\s+(?:total|in\s+total|altogether|overall|saved|to\s+my\s+name)\b|"
+    # "I have $5,000 of margin in my account" was kept by the model as a bare "$5,000" and read
+    # as a position (a judge, round 20, row 713); the words are kept with it
+    r"\bi\s+have\s+(?:about\s+|around\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\s+(?:of\s+)?"
+    r"(?:margin|collateral|buying\s+power)\b",
     re.I)
 _THESIS = re.compile(
     r"\bi\s+(?:think|believe|expect|reckon|bet)\s+(?:that\s+)?(.{2,40}?)\s+(?:will|is\s+going\s+to|"
@@ -164,10 +168,25 @@ _STANCE = re.compile(
 """A view said as a stance: "I'm bearish on TSLA", "Actually I'm now bullish on TSLA". Neither was
 kept, and "What's my view on TSLA?" was told nothing was remembered (a hostile review, round 19,
 row 649)."""
+_UNTIL_REPORT = re.compile(
+    r"\b(?:hold|keep|stay\s+in|ride)\w*\s+(?:it\s+|them\s+|this\s+|the\s+position\s+)?"
+    r"(?:until|till|through|into|past|over)\s+(?:its\s+|their\s+|the\s+)?(?:next\s+)?"
+    r"(?:earnings|results|report|print)\b", re.I)
+"""A holding period tied to the name's next report."""
 _AVOID_CLASS = re.compile(
-    r"\bi\s+(?:really\s+)?(?:hate|avoid|don'?t\s+(?:like|trust|do)|can'?t\s+stand|never\s+(?:trade|"
-    r"touch|buy|use))\s+(?P<what>crypto(?:currenc(?:y|ies))?|coins|stocks|equities|leverage|"
-    r"options|meme\s*coins|altcoins|futures|perps?|perpetuals)\b", re.I)
+    r"\bi\s+(?:really\s+)?(?:hate|avoid|don'?t\s+(?:like|trust|do|want|use)|do\s+not\s+want|"
+    r"can'?t\s+stand|never\s+(?:trade|touch|buy|use))\s+(?:to\s+(?:use|trade|touch|buy)\s+)?"
+    r"(?:anything\s+(?:with|in|like)\s+|any\s+|to\s+use\s+)?(?P<what>[^.;!?]{2,60})", re.I)
+_AVOID_WORDS = re.compile(
+    r"\b(?P<w>meme\s*coins?|memecoins?|altcoins?|crypto(?:currenc(?:y|ies))?|coins|stocks|equities|"
+    r"leverage|margin|options|futures|perps?|perpetuals|shorting|shorts)\b", re.I)
+_AVOID_SAME = {"memecoin": "meme coins", "memecoins": "meme coins", "meme coin": "meme coins",
+               "altcoin": "altcoins", "cryptocurrency": "crypto", "cryptocurrencies": "crypto",
+               "coins": "crypto", "equities": "stocks", "perp": "perpetuals", "perps": "perpetuals",
+               "margin": "leverage", "shorts": "shorting"}
+"""The classes a trader stays away from, each kept as said: "I avoid meme coins" was kept as all of
+crypto, and "anything with leverage or meme coins" kept nothing (a first-time user, round 20,
+rows 680-681)."""
 """A whole class of instrument the trader stays away from: "I hate crypto and never trade it"."""
 _BULL = re.compile(r"\b(?:up|rise|rally|outperform|beat|higher|moon|rip|double|recover|bounce)\w*",
                    re.I)
@@ -180,9 +199,12 @@ def extract(question: str, now: datetime | None = None,
     """The facts a question states about the trader. ``price_of(symbol)`` stamps a thesis with
     the price at the time it was stated; it may be None (no price, no gap measured later)."""
     from argus.lui.research import research_symbols
+    from argus.lui.research.sizing import spelled_out
 
     day = (now or datetime.now(UTC)).date().isoformat()
-    text = question.strip()[:600]
+    # European figures and spelled percentages first: "My account is 25.000 USD" was not kept
+    # (a hostile review, round 20, row 696)
+    text = spelled_out(question.strip()[:600])
     facts: list[Fact] = []
     # Questions state nothing about the trader, but the sentence after one can: "What is my risk
     # tolerance? I think I can handle it but my max loss should probably be around 10%" kept
@@ -250,9 +272,9 @@ def extract(question: str, now: datetime | None = None,
                                                   or "").lower()), m.group(0))
     if (m := _CAPITAL.search(text)) is not None:
         amount = float((m.group(1) or m.group(3) or m.group(5) or m.group(7) or m.group(9)
-                        or "0").replace(",", ""))
+                        or m.group(11) or "0").replace(",", ""))
         unit = (m.group(2) or m.group(4) or m.group(6) or m.group(8) or m.group(10)
-                or "").lower()
+                or m.group(12) or "").lower()
         amount *= 1_000 if unit == "k" else 1_000_000 if unit == "m" else 1
         if amount >= 100:
             add("capital", "", f"{amount:.0f}", m.group(0))
@@ -289,12 +311,30 @@ def extract(question: str, now: datetime | None = None,
                     price = float(price_of(named[0]))
                 except Exception:
                     price = None
+            # The reason is part of the thesis: "I'm bullish on NVDA because hyperscaler capex
+            # keeps growing" was kept as "I'm bullish on NVDA" (a judge, round 20, row 713)
+            said = re.split(r"(?<=[.;!?])\s", text[m.start():], maxsplit=1)[0][:220]
             add("thesis", named[0], "bull" if m.group("side").lower() == "bullish" else "bear",
-                m.group(0), price)
+                said.rstrip(" .;!?") or m.group(0), price)
+            if (until := _UNTIL_REPORT.search(text)) is not None and price_of is not None:
+                # "I plan to hold until earnings" is a horizon, and it was not kept (row 713)
+                try:
+                    from argus.lui.journal import next_report_date
+
+                    report = next_report_date(named[0])
+                except Exception:
+                    report = None
+                if report is not None:
+                    days = (report - (now or datetime.now(UTC)).date()).days + 1
+                    if days > 0:
+                        add("horizon", "", str(days * 24),
+                            f"{until.group(0)} ({report:%d %b %Y})")
     for m in _AVOID_CLASS.finditer(text):
-        what = m.group("what").lower()
-        what = "crypto" if what.startswith(("crypto", "coin", "alt", "meme")) else what
-        add("avoid", "", what, m.group(0))
+        for w in _AVOID_WORDS.finditer(m.group("what")):
+            word = re.sub(r"\s+", " ", w.group("w").lower())
+            what = _AVOID_SAME.get(word, word)
+            if not any(f.kind == "avoid" and f.value == what for f in facts):
+                add("avoid", what, what, m.group(0))
     for m in _HOLDS.finditer(text):
         from argus.lui.research.parse import holding_pairs
 
@@ -403,9 +443,50 @@ def apply_sales(facts: list[Fact], text: str, now: datetime | None = None) -> li
     if not left or total <= 0:
         rest = [f for f in facts if f is not book]
         return rest
-    words = "I hold " + ", ".join(f"{w / total:.0%} {s.removesuffix('USDT')}"
-                                  for s, w in left.items())
+    # what was sold becomes cash; the rest keep their weights: selling the AAPL of 40% NVDA, 60%
+    # AAPL leaves 40% NVDA and 60% cash, not 100% NVDA (a hostile review, round 20, row 696)
+    cash = max(0.0, 1.0 - total)
+    words = "I hold " + ", ".join(f"{w:.0%} {s.removesuffix('USDT')}" for s, w in left.items()) \
+        + (f", {cash:.0%} cash" if cash >= 0.005 else "")
     updated = Fact(kind="book", subject="", value=str(len(left)), text=words, at=day,
+                   replaces=f"“{book.text[:120]}” ({book.at})")
+    return [updated, *(f for f in facts if f is not book)]
+
+
+_CORRECTED = re.compile(
+    r"\b(?:actually|correction|sorry|i\s+meant|make\s+that|rather)\b[^.?!]{0,40}?"
+    r"\b(?:it'?s|it\s+is|i\s+hold|i\s+have|make\s+it|that'?s)\s+(?P<pct>\d+(?:\.\d+)?)\s*%\s+"
+    r"(?P<name>[A-Za-z][A-Za-z.]{1,11})\b", re.I)
+"""A holding's weight corrected: "Actually it's 30% NVDA, not 40%." was answered with the desk's
+record and the book kept 40% (a hostile review, round 20, row 696)."""
+
+
+def apply_corrections(facts: list[Fact], text: str, now: datetime | None = None) -> list[Fact]:
+    """The remembered book with a corrected weight set; the rest kept, any gap held as cash."""
+    from argus.lui.research import research_symbols
+    from argus.lui.research.parse import holding_pairs
+
+    book = get(facts, "book")
+    m = _CORRECTED.search(text)
+    if book is None or m is None:
+        return facts
+    named = research_symbols(m.group("name"))[0]
+    if not named:
+        return facts
+    held: dict[str, float] = {}
+    for _, symbol, weight in holding_pairs(book.text):
+        held[symbol] = held.get(symbol, 0.0) + weight
+    if named[0] not in held:
+        return facts
+    held[named[0]] = float(m.group("pct")) / 100
+    total = sum(held.values())
+    if total > 1.0001:
+        return facts
+    cash = max(0.0, 1.0 - total)
+    words = "I hold " + ", ".join(f"{w:.0%} {s.removesuffix('USDT')}" for s, w in held.items()) \
+        + (f", {cash:.0%} cash" if cash >= 0.005 else "")
+    day = (now or datetime.now(UTC)).date().isoformat()
+    updated = Fact(kind="book", subject="", value=str(len(held)), text=words, at=day,
                    replaces=f"“{book.text[:120]}” ({book.at})")
     return [updated, *(f for f in facts if f is not book)]
 
@@ -509,20 +590,9 @@ def apply(request: Any, facts: list[Fact], question: str) -> tuple[Any, list[str
         from decimal import Decimal
 
         request = replace(request, notional=Decimal(capital.value))
-        used.append(remembered_line(capital, f"priced on your ${float(capital.value):,.0f}"))
-    loss = get(facts, "loss_usd")
-    limit_usd = None
-    if loss is not None:
-        try:
-            limit_usd = float(loss.value)
-        except ValueError:
-            limit_usd = None
-    if (loss is not None and limit_usd is not None and request.kind is ResearchKind.IMPACT
-            and not request.book):
-        # the $200 a trader said they cannot lose never appeared beside the worst day it is
-        # measured against (round 19, row 635)
-        used.append(remembered_line(loss, f"set it beside the worst day above: your limit is "
-                                          f"${limit_usd:,.0f}"))
+        used.append(remembered_line(capital, f"priced on your ${float(capital.value):,.0f}" + (
+            " as an unlevered position — margin lets you hold more than that, and lose more"
+            if re.search(r"\bmargin\b", capital.text, re.I) else "")))
     if request.kind is ResearchKind.IMPACT:
         request, mandate_used = _apply_mandate(request, facts, question)
         used.extend(mandate_used)
@@ -587,8 +657,8 @@ def after(lines: list[str], request: Any, facts: list[Fact],
                 capital = Fact(kind="capital", subject="", value=str(said), text=held.text,
                                at=held.at)
     sized = next((m for line in lines
-                  for m in [re.match(r"Bottom line: size \S+ so that its worst observed 24 hours "
-                                     r"\((-\d+(?:\.\d+)?)%\)", line)] if m), None)
+                  for m in [re.match(r"Bottom line: (?:size \S+ so that its|\S+'s) worst observed "
+                                     r"24 hours \((-\d+(?:\.\d+)?)%\)", line)] if m), None)
     if limit is not None and capital is not None and sized is not None:
         # "How big should the SOL short leg be given my 4% drawdown limit?" was answered on a
         # $10,000 default that ignored both (a judge, round 14): the stated limit and book, sized.
@@ -634,10 +704,57 @@ def after(lines: list[str], request: Any, facts: list[Fact],
         if worst:
             deepest = max(worst)
             cap = float(limit.value) * 100
+            # "the worst move above, -14.6%" named an assumed QQQ -10% scenario as the worst
+            # move, and told the trader how to size (a first-time user, round 20, row 682)
             extra.append(remembered_line(limit, (
-                f"the worst move above, -{deepest:.1f}%, is past that limit — size this book so "
-                f"that scenario costs {cap:.0f}% or less" if deepest > cap else
-                f"the worst move above, -{deepest:.1f}%, stays inside it")))
+                f"the largest scenario move above, -{deepest:.1f}%, is an assumed shock, not a "
+                f"day that happened, and it is past your {cap:.0f}% limit" if deepest > cap else
+                f"the largest scenario move above, -{deepest:.1f}%, stays inside it")))
+    dollars_limit = get(facts, "loss_usd")
+    if dollars_limit is not None:
+        # "I can only afford to lose $300" was kept and never set beside a -22.5% stress on a
+        # $3,000 book, about $675 (a first-time user, round 20, row 680)
+        try:
+            cap_usd = float(dollars_limit.value)
+        except ValueError:
+            cap_usd = 0.0
+        account = None
+        if capital is not None:
+            try:
+                account = float(capital.value)
+            except ValueError:
+                account = None
+        moves = [abs(float(m.group(1))) for line in lines
+                 for m in re.finditer(r"(?:book|position)\s+(?:moves|falls)\s+(?:about\s+)?"
+                                      r"-?(\d+(?:\.\d+)?)%", line)]
+        priced = next((float(m.group(1).replace(",", "")) for line in lines
+                       for m in [re.search(r"\bof \$(\d[\d,]*)\)", line)] if m), None)
+        base = priced or account
+        if cap_usd > 0 and moves and base:
+            deepest = max(moves)
+            cost = deepest / 100 * base
+            extra.append(remembered_line(dollars_limit, (
+                f"the largest move above, -{deepest:.1f}%, is about ${cost:,.0f} of your "
+                f"${base:,.0f} — " + (f"${cost - cap_usd:,.0f} past your ${cap_usd:,.0f} limit"
+                                      if cost > cap_usd else
+                                      f"inside your ${cap_usd:,.0f} limit"))))
+    for avoided in (f for f in facts if f.kind == "avoid" and not f.subject.endswith("USDT")):
+        kind_of = avoided.value
+        if kind_of == "leverage" and any(re.search(r"\bHedge: (?:short|long)\b|\b\d+x\b", line)
+                                      for line in lines):
+            extra.append(remembered_line(avoided, (
+                "you said you avoid leverage: a hedge or a position like the one above is held "
+                "on a perpetual with margin, so it is shown as information, not as a fit for your "
+                "rule")))
+        if kind_of in ("meme coins", "crypto", "altcoins"):
+            hit = [s for s in getattr(request, "symbols", ())
+                   if (kind_of == "meme coins" and s in MEME_COINS)
+                   or (kind_of in ("crypto", "altcoins") and _is_crypto(s)
+                       and not (kind_of == "altcoins" and s in ("BTCUSDT", "ETHUSDT")))]
+            if hit:
+                extra.append(remembered_line(avoided, (
+                    f"{', '.join(bare_symbol(s) for s in hit)} "
+                    f"{'is' if len(hit) == 1 else 'are'} among the {kind_of} you said you avoid")))
     for symbol in getattr(request, "symbols", ())[:3]:
         thesis = get(facts, "thesis", symbol)
         if thesis is not None:
@@ -654,6 +771,47 @@ def after(lines: list[str], request: Any, facts: list[Fact],
                 avoid, f"{bare_symbol(symbol)} is a name you said you stay out of"))
     extra.extend(checklist_lines(request, facts, tester=tester))
     return extra
+
+
+def against_view(request: Any, facts: list[Fact]) -> str | None:
+    """A trade weighed against the trader's own remembered view of the name: after "I'm now
+    bearish on NVDA", "should I buy NVDA?" was answered as a plain buy, with the bearish thesis
+    eleven lines below (a judge, round 20, row 713). Said under the lead, and not as advice."""
+    from argus.lui.research.kinds import ResearchKind, bare_symbol
+
+    if getattr(request, "kind", None) is not ResearchKind.IMPACT or not request.symbols:
+        return None
+    symbol = request.symbols[0]
+    thesis = get(facts, "thesis", symbol)
+    if thesis is None or thesis.value not in ("bull", "bear"):
+        return None
+    held = (getattr(request, "book", {}) or {}).get(symbol, 0.0)
+    target = getattr(request, "target", None)
+    short = getattr(request, "side", None) == "short"
+    adds = (not short and (target is None or target > held) and target != 0.0)
+    cuts = short or (target is not None and target < held)
+    name = bare_symbol(symbol)
+    if thesis.value == "bear" and adds:
+        return (f"Against your own view: you said “{thesis.text}” on {thesis.at} — buying {name} "
+                f"runs the other way. What follows prices the trade; it does not back it.")
+    if thesis.value == "bull" and cuts:
+        return (f"Against your own view: you said “{thesis.text}” on {thesis.at} — cutting or "
+                f"shorting {name} runs the other way. What follows prices the trade; it does not "
+                f"back it.")
+    return None
+
+
+MEME_COINS = frozenset({"DOGEUSDT", "SHIBUSDT", "PEPEUSDT", "WIFUSDT", "BONKUSDT", "FLOKIUSDT",
+                        "1000PEPEUSDT", "1000BONKUSDT", "1000SHIBUSDT", "TRUMPUSDT", "POPCATUSDT",
+                        "BRETTUSDT", "MOGUSDT", "NEIROUSDT", "PNUTUSDT"})
+"""Coins a trader means by "meme coins", for checking a remembered dislike against an answer."""
+
+
+def _is_crypto(symbol: str) -> bool:
+    from argus.lui.research.parse import is_us_equity
+    from argus.market import universe
+
+    return not is_us_equity(symbol) and universe.NOT_EQUITY.get(symbol, "crypto") == "crypto"
 
 
 def checklist_lines(request: Any, facts: list[Fact], *, tester: Any = None,
@@ -797,8 +955,9 @@ def _recall_match(question: str) -> re.Match[str] | None:
 
 _RECALL_MANY = re.compile(
     r"\bwhat\s+do\s+i\s+(?:hold|own)\b|\bwhat(?:'s|\s+is|\s+are)\s+my\s+(?:account(?:\s+size)?|"
-    r"capital|holdings|book|positions|max(?:imum)?\s+loss(?:\s+per\s+trade)?|loss\s+limit|"
-    r"risk\s+budget|horizon|style|goal)\b", re.I)
+    r"capital|holdings|book|positions?|max(?:imum)?\s+loss(?:\s+per\s+trade)?|loss\s+limit|"
+    r"risk\s+budget|horizon|style|goal)\b|\bhow\s+(?:big|large|much)\s+is\s+my\s+(?:account|"
+    r"book|portfolio|capital)\b", re.I)
 """A question that asks back for the trader's own facts. "What is my account size, what do I
 hold, and what is my max loss per trade?" went to the desk's track record and "What do I hold?"
 to the desk's open positions (a hostile review, round 19, row 648)."""
@@ -811,7 +970,8 @@ _VIEW_ASKED = re.compile(
 def recall_asked(question: str) -> bool:
     return (bool(_RECALL.search(question)) or _recall_match(question) is not None
             or len(_RECALL_MANY.findall(question)) >= 2
-            or bool(re.match(r"^\W*what\s+do\s+i\s+(?:hold|own)\W*$", question, re.I))
+            or bool(re.match(r"^\W*(?:what\s+do\s+i\s+(?:hold|own)|what(?:'s|\s+is|\s+are)\s+my\s+"
+                             r"(?:positions?|holdings|book))\W*$", question, re.I))
             or bool(_VIEW_ASKED.search(question)))
 
 

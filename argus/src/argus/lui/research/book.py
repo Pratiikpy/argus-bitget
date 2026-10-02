@@ -210,6 +210,11 @@ def _book_report(request: ResearchRequest, data: MarketData,
             + f" — each name then carries about {1 / len(weights):.0%} of the risk, "
             + (f"with the {request.cash:.0%} cash kept as cash." if request.cash else
                "fully invested.")
+            # one of two different targets, said as such: the equal-risk mix beside a trim to the
+            # 25% budget read as three answers to one question (a judge, round 20, row 706)
+            + (f" That is equal shares of risk, a different target from keeping each name under "
+               f"a {request.budget:.0%} risk budget, which {len(weights)} names cannot all meet."
+               if 1 / len(weights) > request.budget else "")
         )
     elif has_short:
         top = max(shares, key=lambda s: shares[s])
@@ -532,11 +537,24 @@ def _event_reaction(symbol: str, raw_text: str) -> tuple[list[str], list[Source]
             r = big[0]
             event = r["kind"] if r["kind"] != "earnings" else "its results releases"
             if str(r["verdict"]).startswith("PARTIAL"):
+                # Which tests agree is read from the row, not assumed: the lead once said "the rank
+                # tests do not confirm it" beside a Corrado rank p=0.01 (round 20, row 710).
+                names = {"patell": "Patell", "bmp": "BMP", "corrado_rank": "Corrado rank",
+                         "generalised_sign": "sign"}
+                tests = r.get("tests") or {}
+                agree = [names.get(k, k) for k, v in tests.items()
+                         if v.get("adjusted_p_value", 1.0) < 0.05]
+                differ = [names.get(k, k) for k, v in tests.items()
+                          if v.get("adjusted_p_value", 1.0) >= 0.05]
+                split = (f"the {', '.join(agree)} test{'s' if len(agree) > 1 else ''} support"
+                         f"{'' if len(agree) > 1 else 's'} it and the {', '.join(differ)} "
+                         f"test{'s' if len(differ) > 1 else ''} do{'' if len(differ) > 1 else 'es'}"
+                         f" not" if agree and differ else "only some of the tests support it")
                 lead = (f"Bottom line: expect a bigger move than usual — {ticker} has moved "
                         f"{r['size_ratio']:.1f}x its ordinary 24 hours after {event}; it has "
-                        f"leaned {r['average_car_bps']:+.0f}bps on average, but the rank tests "
-                        f"do not confirm it, so one or two events may be carrying that lean. "
-                        f"Size or hedge for the move before betting on its direction.")
+                        f"leaned {r['average_car_bps']:+.0f}bps on average, but {split}, so the "
+                        f"lean is not established. Size or hedge for the move before betting on "
+                        f"its direction.")
             else:
                 lead = (f"Bottom line: expect a bigger move than usual, not a direction — {ticker} "
                         f"has moved {r['size_ratio']:.1f}x its ordinary 24 hours after {event}, "
@@ -930,12 +948,13 @@ def _impact_lines(report: CopilotReport, request: ResearchRequest,
             stated = float(request.notional) if request.notional else None
             position = stated if stated else 10_000.0
             lines.append(
-                f"Bottom line: size {add} so that its worst observed 24 hours ({worst_day:+.1f}%)"
-                f"{' as a short, the loss on its biggest rally,' if short else ''} "
-                f"is a "
-                f"loss you would accept — on a ${position:,.0f} position that is about "
-                f"${abs(worst_day) / 100 * position:,.0f}; tell me what you hold to see its share "
-                f"of your risk."
+                # a measurement, not an instruction: "size BTC so that…" read as the advice the
+                # console says it does not give (a first-time user, round 20, row 683)
+                f"Bottom line: {add}'s worst observed 24 hours ({worst_day:+.1f}%)"
+                f"{', as a short the loss on its biggest rally,' if short else ''} would cost "
+                f"about ${abs(worst_day) / 100 * position:,.0f} on a ${position:,.0f} position — "
+                f"the usual rule is to hold only as much as you would accept losing on a day "
+                f"like that; tell me what you hold to see its share of your risk."
             )
     else:
         share = impact.risk_share_after
@@ -982,14 +1001,26 @@ def _impact_lines(report: CopilotReport, request: ResearchRequest,
                 + (f", and {add} carried {impact.risk_share_before:.0%} of its risk"
                    if impact.risk_share_before is not None else "")
                 + ". Whether to sell is your call; the lines below are what changes."))
+        elif (request.target is not None and held and final < held and share is not None
+              and impact.risk_share_before is not None):
+            # a trim, said as one: "size it at no more than 28% — the 28% proposed" read as an add
+            # (round 20, row 705)
+            inside = share <= request.budget + 1e-9
+            lines.insert(0, (
+                f"Bottom line: trimming {add} from {held:.0%} to {final:.0%} of the book takes its "
+                f"share of the risk from {impact.risk_share_before:.0%} to {share:.0%} — "
+                + (f"inside the {request.budget:.0%} budget." if inside else
+                   f"still over the {request.budget:.0%} budget.")))
         elif ceiling is not None:
             verdict = ("inside" if (share or 0.0) <= request.budget else "over")
             lines.append(
                 f"Bottom line: to keep {add} under {request.budget:.0%} of book risk"
                 + (" (your budget)" if request.budget_stated else "")
                 + ", size it at no "
-                f"more than {ceiling:.0%} — the {request.size:.0%} proposed is {verdict} that "
-                f"budget."
+                f"more than {ceiling:.0%} — the {request.size:.0%} "
+                + ("proposed" if request.size_stated else "worked here as a default (no size was "
+                   "given)")
+                + f" is {verdict} that budget."
             )
         elif share is not None and held:
             # Already held and already over budget, so no add fits; the useful number is the

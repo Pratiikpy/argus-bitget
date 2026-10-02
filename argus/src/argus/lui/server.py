@@ -1002,7 +1002,7 @@ def handle_ask(
                                 price_of=_price_now)
     facts = mem.merge(facts, new)
     before_sale = mem.get(facts, "book")
-    facts = mem.apply_sales(facts, text, now)
+    facts = mem.apply_corrections(mem.apply_sales(facts, text, now), text, now)
     after_sale = mem.get(facts, "book")
     if after_sale is not None and after_sale is not before_sale:
         # the sale is said back with the rest of what was noted (round 19, row 648)
@@ -1010,12 +1010,32 @@ def handle_ask(
     if mem.recall_asked(text) and not new:
         # "What do you remember about me?" is answered from the memory the browser sent, in the
         # trader's own words; it was declined while seven facts were held (a judge, round 14).
-        return {"lines": (mem.recall_view(text, facts) or mem.recall_one(text, facts)
-                          or [*mem.recall_lines(facts), *mem.recall_missing(text, facts)]),
+        saved = ([f"Your saved book in My book: {book.strip()[:200]} — the one every answer "
+                  f"uses when a question states none."] if book.strip() else [])
+        # "what is my position" with a book saved was answered from the desk's own ledger (a
+        # first-time user, round 20, row 687): the trader's own holdings are the saved book too
+        missing = mem.recall_missing(text, facts)
+        if saved:
+            missing = [m.replace("holdings or ", "").replace(" or holdings", "")
+                       .replace("your holdings — ", "") for m in missing
+                       if m != "Not remembered: your holdings — you have not said it here yet; "
+                               "say it in a sentence (\"my loss limit is $500 a trade\") and it "
+                               "is kept."]
+        recalled = mem.recall_view(text, facts) or mem.recall_one(text, facts)
+        if recalled is None and saved and not facts:
+            from argus.lui.research.parse import priced_book
+
+            worth = getattr(priced_book(book), "value", 0.0) or 0.0
+            recalled = [f"Bottom line: your saved book in My book is {book.strip()[:200]}"
+                        + (f", worth about ${worth:,.0f} at Bitget's last prices" if worth else "")
+                        + " — the holdings every answer uses when a question states none.",
+                        *(m.replace("account size", "account size beyond this book")
+                          .replace("said them", "said it") for m in missing)]
+        return {"lines": (recalled or [*mem.recall_lines(facts), *saved, *missing]),
                 "sources": [],
                 "data": {}, "refused": False,
                 "reason": "", "classified_by": "memory", "memory": mem.dumps(facts),
-                "remembered": []}
+                "remembered": [], "turns": [*prior, text][-12:]}
     from argus.lui.honesty import funds_instruction
 
     moved = funds_instruction(text)
@@ -1246,7 +1266,47 @@ def _answer(
         return engine_payload(*intro.ask_answer(), by="intro")
     if intro.THANKS_Q.search(text):
         return engine_payload(*intro.thanks_answer(), by="intro")
+    if (_OTHERS_HOLDINGS.search(text)
+            and len(_OTHERS_HOLDINGS.sub("", text).strip(" .,;!?")) < 4):
+        # "My brother holds 100% TSLA." alone was measured as the trader's own book (a hostile
+        # review, round 20, row 696): someone else's holdings are not measured or remembered
+        theirs = _OTHERS_HOLDINGS.search(text)
+        assert theirs is not None
+        return engine_payload([
+            f"Bottom line: “{theirs.group(0).strip()}” is someone else's book, so it is not "
+            f"measured as yours and not remembered. Say what you hold to have it measured, or ask "
+            f"about the name itself."], [], {"others": True}, by="others")
+    if prior and _FIT_Q.search(text):
+        # "does that fit what I told you?" was declined (a first-time user, round 20, row 685):
+        # the last answer, re-read, with the lines in it that used what the trader said
+        again = _answer(prior[-1], prior[:-1], now=now, visitor=visitor, book=book)
+        applied = [str(x) for x in again.get("lines") or [] if str(x).startswith("Remembered:")]
+        from argus.lui import memory as _memory
+
+        kept_facts = _memory.recall_lines(list(_MEMORY.get()))
+        if applied:
+            return engine_payload([
+                f"Bottom line: yes — the last answer used {len(applied)} thing"
+                f"{'s' if len(applied) != 1 else ''} you told me, each on its own line:",
+                *applied], [], {"fit": len(applied)}, by="memory")
+        return engine_payload([
+            "Bottom line: the last answer did not use anything you told me — either nothing you "
+            "said applies to that question, or it was not said here.", *kept_facts[1:4]],
+            [], {"fit": 0}, by="memory")
     if prior and intro.THAT_NUMBER_Q.search(text):
+        # The last answer's own terms, explained: "what does that mean" got a list of example
+        # questions (a first-time user, round 20, row 685)
+        again = _answer(prior[-1], prior[:-1], now=now, visitor=visitor, book=book)
+        said = [str(x) for x in again.get("lines") or []]
+        terms_used = _concepts_in(" ".join(said))[:4]
+        if said and terms_used and not again.get("refused"):
+            head = unlead(said[0]).rstrip(".")
+            return engine_payload([
+                f"Bottom line: the last answer said: {head[:260]}. The terms in it, in plain "
+                f"words:",
+                *(f"{c.name}: {c.definition}" for c in terms_used),
+                "Ask about any one of them for an example, or \"explain that simpler\"."],
+                [], {"explained": [c.name for c in terms_used]}, by="intro")
         return engine_payload(*intro.that_number_answer(prior[-1]), by="intro")
     if (_OWN_LOSS_Q.search(text) and not research_symbols(text)[0] and not about_the_record(text)
             and text.strip().rstrip("?").lower() != _BOOK_REPORT_ASK):
@@ -1280,6 +1340,12 @@ def _answer(
             if not record.get("refused") and record.get("lines"):
                 s_lines = [*s_lines, f"And the desk's {metric.group(0).lower()}:",
                            *(str(x) for x in record["lines"])]
+        if intro.TESTS_Q.search(text):
+            # "How many tests … and how many capabilities are OWNED?" answered the second part
+            # only (a hostile review, round 20, row 700)
+            t_lines, _t_sources, _t_data = intro.tests_answer()
+            s_lines = [*s_lines, "And on the tests:",
+                       *(unlead(str(x)) for x in t_lines)]
         return engine_payload(s_lines, s_sources, s_data, by="standing")
     if intro.TESTS_Q.search(text):
         return engine_payload(*intro.tests_answer(), by="intro")
@@ -1953,6 +2019,26 @@ def _answer(
     # A question about what the desk did or holds goes to the record, whatever ticker it names
     # (`research.about_the_desk`); an instruction is still refused as an order below.
     desk_first = about_the_desk(text)
+    if (prior and not book.strip() and not desk_first
+            and not [s for s in research_symbols(text)[0] if s not in _MARKET_SHOCKS]
+            and re.search(r"\b(?:it|its|it's|that\s+(?:name|stock|coin))\b", text, re.I)
+            and re.search(r"\b(?:fell|falls?|drops?|dropped|crash\w*|tank\w*|rall\w*|ris(?:e|es)|"
+                          r"jump\w*)\b[^?]{0,30}\d+(?:\.\d+)?\s*%", text, re.I)):
+        candidates = next((research_symbols(t)[0] for t in reversed(prior)
+                           if research_symbols(t)[0]), ())
+        if len(candidates) == 1:
+            # "What would happen to it if the Nasdaq fell 5%?" after questions on TSLA asked for
+            # holdings (a hostile review, round 20, row 699): "it" is the name being discussed,
+            # held as the whole position
+            name = candidates[0].removesuffix("USDT")
+            again = _answer(f"{text} I hold 100% {name}.", prior, now=now, visitor=visitor,
+                            book=book)
+            if again.get("lines") and not again.get("refused"):
+                again["lines"] = [*again["lines"][:1],
+                                  f"Assumed: read \"it\" as {name}, the name you were asking "
+                                  f"about, held as the whole position.", *again["lines"][1:]]
+                again["turns"] = [*prior, text][-12:]
+                return again
     followed = None if desk_first else follow_up(text, prior, book)
     if followed is not None:
         # A name swap ("and ETH?", "actually i meant ethereum") re-asks the earlier question, so
@@ -2136,6 +2222,9 @@ def _research_payload(
     if facts and mem.get(facts, "book") is not None:
         result.lines[:] = [line.replace("; tell me what you hold to see its share of your risk.",
                                         ".") for line in result.lines]
+    contrary = mem.against_view(request, facts) if facts and not result.refused else None
+    if contrary and result.lines:
+        result.lines.insert(1, contrary)
     if facts:
         extra = [*used, *mem.after(result.lines, request, facts, price_now=_price_now)]
         if extra:
@@ -2383,6 +2472,21 @@ def glossary_line(lines: list[str]) -> str | None:
     if len(used) < 2:
         return None
     return "Terms: " + "; ".join(f"{word} = {gloss}" for word, gloss in used) + "."
+
+def _concepts_in(text: str) -> list[Any]:
+    """The defined terms an answer uses, in the order the console defines them."""
+    from argus.lui.concepts import CONCEPTS
+
+    return [c for c in CONCEPTS
+            if re.search(rf"(?<![A-Za-z])(?:{c.pattern})(?![A-Za-z])", text, re.I)]
+
+_FIT_Q = re.compile(r"\b(?:does|did|is)\s+(?:that|this|it)\s+(?:fit|match|suit|respect|follow|"
+                    r"take\s+into\s+account|use)\s+(?:what\s+i\s+(?:told|said|gave)|my\s+(?:limits?|rules?|"
+                    r"profile|budget|preferences)|what\s+you\s+know\s+about\s+me)", re.I)
+"""Asking whether the last answer took the trader's own facts into account."""
+
+_MARKET_SHOCKS = frozenset({"NDX100USDT", "SP500USDT", "DIASTOCKUSDT", "QQQUSDT", "SPYUSDT"})
+"""Index names a shock is stated on, which are the market moving, not a holding."""
 
 def _number_like(value: Any) -> bool:
     try:

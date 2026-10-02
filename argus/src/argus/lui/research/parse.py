@@ -754,6 +754,21 @@ _WONDERING = re.compile(r"\?|\b(?:should|shall|would|could|do)\s+i\b|"
                         re.I)
 
 
+TRIM_ASKED = re.compile(r"\b(?:trim|trimming|cut\s+back|scale\s+(?:back|down)|reduce|lighten|"
+                        r"take\s+some\s+(?:off|profit)|sell\s+(?:some|part)\s+of)\b", re.I)
+TRIM_TO_BUDGET = -1.0
+"""A target meaning "trim to the risk budget", resolved once the book's history is loaded."""
+
+HOLD_MAX_ASKED = re.compile(
+    r"\bhow\s+(?:much|big|large)\s+(?:of\s+)?(?:a\s+)?(?:position\s+(?:in\s+)?)?"
+    r"(?:\$?[A-Za-z][\w.]{0,11}\s+)?(?:can|could|should|may)\s+i\s+"
+    r"(?:safely\s+)?(?:hold|own|have|carry|keep|run)\b|"
+    r"\b(?:max(?:imum)?|largest|biggest)\s+(?:size|weight|position|allocation)\b", re.I)
+""""How much TSLA can I hold?" — a question about the most the book can carry, not an add of the
+default 20% (a judge, round 20, row 714)."""
+HOLD_TO_LIMIT = -2.0
+"""A target meaning "the most the limits allow", resolved once the book's history is loaded."""
+
 def selling_asked(text: str) -> bool:
     """A sale of a whole holding asked about, not instructed: "should I sell my SOL?" is weighed;
     "Please simply sell all of my MSTR shares" is an order and stays refused."""
@@ -1962,6 +1977,11 @@ _HEDGE_IS = re.compile(
     r"(?:hedges?|protection|safe\s+haven)\b", re.I)
 """'Is gold a good hedge for my tech-heavy portfolio': the instrument asked about is the one to
 measure; the question named it and the answer showed QQQ, ETH and BTC and never gold."""
+_SHORT_TO_HEDGE = re.compile(
+    r"\b(?:short|sell)\s+([A-Za-z$][\w.$]{0,11})\s+(?:as\s+a\s+hedge|to\s+hedge|for\s+(?:a\s+)?"
+    r"hedge|against)\b", re.I)
+""""Should I short NVDA to hedge?" names NVDA as the hedge; the answer measured QQQ and SMH and
+never NVDA (a judge, round 20, row 714)."""
 
 
 def hedge_instruments(raw: str) -> tuple[str, ...]:
@@ -1969,11 +1989,33 @@ def hedge_instruments(raw: str) -> tuple[str, ...]:
     "hedge my Apple position with oil or gold" — which are candidates to measure, not holdings.
     They were ignored and QQQ/SPY/SMH measured instead (2026-09-25 audit, round 2)."""
     named: list[str] = []
-    for match in (*_HEDGE_WITH.finditer(raw), *_HEDGE_IS.finditer(raw)):
+    for match in (*_HEDGE_WITH.finditer(raw), *_HEDGE_IS.finditer(raw),
+                  *_SHORT_TO_HEDGE.finditer(raw)):
         for symbol in research_symbols(match.group(1))[0]:
             if symbol not in named:
                 named.append(symbol)
     return tuple(named)
+
+
+def shorting_a_holding(request: ResearchRequest, raw: str) -> ResearchRequest:
+    """"Should I short NVDA to hedge?" from a book that holds NVDA long: a short in a name already
+    held is not a hedge of the book, it sells part of the holding. The hedge answer took NVDA out
+    of the book and measured it as an outside instrument (a judge, round 20, row 714); it is read
+    as the cut it is, and said."""
+    if request.kind is not ResearchKind.HEDGE or not request.book:
+        return request
+    for match in _SHORT_TO_HEDGE.finditer(raw):
+        for symbol in research_symbols(match.group(1))[0]:
+            if request.book.get(symbol, 0.0) > 0:
+                return replace(
+                    request, kind=ResearchKind.IMPACT, side="short", target=None,
+                    symbols=(symbol, *(s for s in request.book if s != symbol)),
+                    notes=(*request.notes,
+                           f"A short in {_t(symbol)} is not a hedge of this book: you hold it "
+                           f"long, so shorting it sells part of the position you own — the "
+                           f"answer below is that cut. Ask \"what is the best hedge for my "
+                           f"book\" for an outside instrument."))
+    return request
 
 
 def without_hedges(request: ResearchRequest, raw: str) -> ResearchRequest:
@@ -2383,8 +2425,9 @@ def detect(text: str) -> ResearchRequest | None:
     analyses: in "what if the Nasdaq drops 10%? I hold 40% gold" the Nasdaq is the shock, not a
     holding, and a note saying it was read as NDX100USDT would describe a reading never used.
     """
-    request = with_short_side(as_comparison(
-        _with_leverage_exposure(_with_stated_cash(read_request(text), text), text), text), text)
+    request = with_named_shock(with_short_side(as_comparison(
+        _with_leverage_exposure(_with_stated_cash(read_request(text), text), text), text), text),
+        text)
     if request is not None and request.book and request.notional is None:
         # "I have $600 in SOL and $400 in TSLA, am I too risky?" was sized on the first amount,
         # $600, not the $1,000 the book holds (a first-time user, round 12): a book stated in
@@ -2416,7 +2459,69 @@ def with_short_side(request: ResearchRequest | None, text: str) -> ResearchReque
             and _SHORT.search(text)
             and not re.search(r"\bshort\s+(?:interest|ratio|squeeze|term|sellers?)\b", text, re.I)):
         return replace(request, side="short")
+    proposed = _PROPOSED_SHORT.search(text)
+    if (request is not None and proposed is not None and request.kind is ResearchKind.IMPACT
+            and request.target is None):
+        # the size the words give, over any size a planner read elsewhere
+        request = replace(request, size=float(proposed.group("pct")) / 100, size_stated=True,
+                          side="short")
+    if (request is not None and proposed is not None
+            and request.kind in (ResearchKind.BOOK, ResearchKind.STRESS, ResearchKind.HEDGE)):
+        named = research_symbols(proposed.group("name"))[0]
+        if named:
+            # "What does a 30% short NVDA do to my risk?" was answered as a hedge, then as the
+            # book alone (a hostile review, round 20, row 700): a proposed short is a trade
+            return replace(request, kind=ResearchKind.IMPACT,
+                           symbols=(named[0], *(s for s in request.book if s != named[0])),
+                           size=float(proposed.group("pct")) / 100, size_stated=True,
+                           side="short", shock_pct=None, shock_on=None)
+    if request is not None and request.book:
+        # A holding the question calls a short is held short, whichever reader built the book:
+        # "I am short 100% TSLA. What happens if TSLA rallies 20%?" came back +20% with a hedge
+        # that doubled it (a hostile review, round 20, row 692)
+        signed = {s: (-abs(w) if _held_short(text, s) else w) for s, w in request.book.items()}
+        if signed != request.book:
+            return replace(request, book=signed)
     return request
+
+
+_PROPOSED_SHORT = re.compile(
+    r"\b(?:what\s+(?:does|would|will)|if\s+i|should\s+i|how\s+(?:does|would))\b[^?]{0,30}?"
+    r"\b(?:a\s+|add(?:ing)?\s+(?:a\s+)?)?(?P<pct>\d+(?:\.\d+)?)\s*%\s+short\s+(?:in\s+|on\s+)?"
+    r"(?P<name>[A-Za-z][A-Za-z.]{1,11})\b", re.I)
+"""A short proposed as a trade on the book: "what does a 30% short NVDA do to my risk?"."""
+
+def _held_short(text: str, symbol: str) -> bool:
+    """Whether the question states this holding as a short: "I am short 100% TSLA", "short 50%
+    NVDA, long 50% TSLA". A proposed trade ("what does a 30% short NVDA do") is not a holding, and
+    reading it as one flipped a held long (a hostile review, round 20, row 700)."""
+    name = re.escape(symbol.removesuffix("USDT"))
+    return bool(re.search(rf"\bi(?:'?m|\s+am)\s+(?:also\s+)?short\s+(?:\$?\d[\d,.]*\s*(?:%|k)?\s+"
+                          rf"(?:of\s+)?)?{name}\b|(?<!\ba\s)(?<!\d%\s)\bshort\s+\$?\d[\d,.]*\s*(?:%|k)?\s+"
+                          rf"(?:of\s+)?{name}\b|\b{name}\s+short\b(?!\s+(?:do|does|would|position\s+do))",
+                          text, re.I))
+
+
+def with_named_shock(request: ResearchRequest | None, text: str) -> ResearchRequest | None:
+    """The instrument a stated shock names, whichever reader built the request.
+
+    "How much would I lose if NVDA fell 20%?" with NVDA held was stressed as the Nasdaq falling
+    20%, and "What if not NVDA but TSLA falls 10%?" shocked NVDA (a hostile review, round 20, rows
+    694-695): the name before the shock verb is its subject, and a negated name is not."""
+    if (request is None or request.kind is not ResearchKind.STRESS
+            or request.shock_pct is None):
+        return request
+    unnegated = re.sub(r"\bnot\s+[A-Za-z][A-Za-z0-9.&-]{1,14}\s*,?\s*but\b", "", text, flags=re.I)
+    if unnegated == text and request.shock_on is not None:
+        return request
+    if _INDEX_SUBJECT.search(unnegated) or _SP_SUBJECT.search(unnegated):
+        return request
+    subject = shock_subject(unnegated, set(request.book)) if _NAMED_SHOCK.search(unnegated) \
+        else None
+    if subject is None or subject == request.shock_on:
+        return request
+    return replace(request, shock_on=subject, notes=tuple(
+        n for n in request.notes if "the shock is applied to" not in n))
 
 
 def as_comparison(request: ResearchRequest | None, text: str) -> ResearchRequest | None:
@@ -2544,7 +2649,9 @@ _FALL_WORD = re.compile(r"\b(?:drop|fall|fell|crash|crater|tank|dump|plung|slump
 
 _BOOK_REF = re.compile(
     r"\bmy\s+(?:\w+\s+){0,2}(?:book|portfolio|positions?|holdings|account|equity|longs?|shorts?|"
-    r"pnl|p&l|drawdown|bag)\b|\bhow\s+much\s+of\s+my\b|\bi\s+(?:hold|own)\b", re.I)
+    r"pnl|p&l|drawdown|bag)\b|\bhow\s+much\s+of\s+my\b|\bi\s+(?:hold|own)\b|"
+    # "I am short 100% TSLA. What happens if TSLA rallies 20%?" stated a book (round 20, row 692)
+    r"\bi(?:'m|\s+am)\s+(?:short|long)\s+\d", re.I)
 """The question is about the trader's own book, not about the shocked instrument itself."""
 
 
@@ -2610,6 +2717,15 @@ _HOLDING_SHOCK = re.compile(
     r"(?:by\s+)?(?P<pct>\d+(?:\.\d+)?)\s*%"
     r"|(?<![A-Za-z0-9])(?P<name2>[A-Za-z][A-Za-z0-9.&-]{1,14})\s*(?:to|:|=)?\s*"
     r"(?P<sign>[+-])(?P<pct2>\d+(?:\.\d+)?)\s*%", re.I)
+_JOINT_SHOCK = re.compile(
+    r"(?<![A-Za-z0-9])(?P<names>[A-Za-z][A-Za-z0-9.&-]{1,14}(?:\s*(?:,|and|&)\s*"
+    r"[A-Za-z][A-Za-z0-9.&-]{1,14})+)\s+(?:both|all|each|together)?\s*"
+    r"(?:(?:is|are|were|will|would)\s+)?"
+    r"(?P<verb>drop\w*|fall\w*|fell|crash\w*|tank\w*|dump\w*|plung\w*|los\w+|sink\w*|rall\w*|"
+    r"jump\w*|surg\w*|gain\w*|ris(?:e|es|ing)|rose|climb\w*)\s+(?:by\s+)?"
+    r"(?P<pct>\d+(?:\.\d+)?)\s*%", re.I)
+"""One move stated for several names together: "NVDA and TSLA both fall 10%"."""
+
 _SHOCK_FALLS = re.compile(r"^(?:drop|fall|fell|crash|crater|tank|dump|plung|lose|lost|sink|down)",
                           re.I)
 
@@ -2622,7 +2738,18 @@ def holding_shocks(raw: str) -> dict[str, float]:
     book through beta: a $50,000 book the asker said would lose $9,000 was answered as -3.26%
     (a judge-style audit of the live console, 2026-10-01). Fewer than two named names is empty:
     one stated shock is the ordinary stress question and keeps its engine."""
+    from argus.lui.research.sizing import spelled_out
+
+    raw = spelled_out(raw)
     found: dict[str, float] = {}
+    for match in _JOINT_SHOCK.finditer(raw):
+        # "What if NVDA and TSLA both fall 10%?" applied the fall to one of them (round 20)
+        size = float(match.group("pct"))
+        move = -size if _SHOCK_FALLS.match(match.group("verb")) else size
+        for name in re.split(r"\s*(?:,|\band\b|&)\s*", match.group("names")):
+            symbols, _ = research_symbols(name)
+            if len(symbols) == 1:
+                found[symbols[0]] = move
     for match in _HOLDING_SHOCK.finditer(raw):
         name = match.group("name") or match.group("name2")
         if match.group("name"):
@@ -3447,7 +3574,13 @@ def parse_book(text: str) -> dict[str, float]:
 def _states_holdings(question: str) -> bool:
     """Does the question itself say what the trader holds? A weight given to the name being added
     ("adding 20% TSLA") is the size of the trade, not a holding."""
-    if _HOLDINGS.search(question):
+    held = _HOLDINGS.search(question)
+    if held is not None and not re.match(
+            r"\s*(?:an?\s+)?\$?\s*\d[\d,.]*\s*(?:k|grand|thousand|m)?\s*(?:dollars?\s+|usd\s+)?"
+            r"(?:account|capital|budget|portfolio\s+of)\b|\s*(?:an?\s+)?(?:account|capital)\b",
+            question[held.end():], re.I):
+        # "I have a $40k account. How much would I lose if NVDA fell 20%?" is money, not
+        # holdings, and the saved book was dropped for a one-name book (round 20, row 694)
         return True
     pairs = holding_pairs(question)
     verb = ADD_VERB.search(question)
@@ -3549,6 +3682,16 @@ def with_book(request: ResearchRequest | None, book_text: str,
         # a trade idea's size read as a market shock is the idea, added to this book
         request = _idea_request(question, request)
         if (request.kind is ResearchKind.IMPACT and request.target is None
+                and request.resize_by is None and TRIM_ASKED.search(question)
+                and not re.search(r"\d+(?:\.\d+)?\s*%|\$\s*\d", question)):
+            # "Should I trim it?" with TSLA held was answered "Adding 20% of the book to TSLA"
+            # (a judge, round 20, row 705): a trim with no size is a trim to the risk budget,
+            # worked out where the book's history is loaded (`dispatch._run`)
+            request = replace(request, target=TRIM_TO_BUDGET, size_stated=True)
+        if (request.kind is ResearchKind.IMPACT and request.target is None
+                and request.resize_by is None and HOLD_MAX_ASKED.search(question)):
+            request = replace(request, target=HOLD_TO_LIMIT, size_stated=True)
+        if (request.kind is ResearchKind.IMPACT and request.target is None
                 and selling_asked(question)):
             # either planner reads "should I sell my SOL?" as an add of the default 20% (row 634)
             request = replace(request, target=0.0, size_stated=True)
@@ -3627,7 +3770,11 @@ GIVEN_THAT = re.compile(
 
 COMPARE_FOLLOW_UP = re.compile(
     r"^\s*(?:and\s+|so\s+)?(?:how\s+(?:does|do|did)\s+(?:that|it|this|they)\s+compare|compared?|"
-    r"(?:and\s+)?vs\.?|versus|(?:and\s+)?against|how\s+about\s+against)\s+(?:with|to|against)?",
+    r"(?:and\s+)?vs\.?|versus|(?:and\s+)?against|how\s+about\s+against)\s+(?:with|to|against)?|"
+    # "Would AAPL be a better replacement for it?" was declined (a judge, round 20, row 708)
+    r"\b(?:a\s+)?(?:better|safer|worse|riskier)\s+(?:replacement|substitute|alternative|pick|choice|"
+    r"bet|buy)\s+(?:for|than|to)\s+(?:it|that|this|them)\b|\b(?:instead\s+of|rather\s+than|swap\s+"
+    r"(?:it|that)\s+for|replace\s+(?:it|that)\s+with)\b",
     re.I)
 """A follow-up that sets a new name beside the one already asked about."""
 
@@ -4008,6 +4155,16 @@ def _last_price(symbol: str) -> float | None:
 
 
 def plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, dict[str, Any]]:
+    """The model's plan, then the readings the words themselves settle — the side of a short, a
+    named shock, a comparison — applied on every path. Several of the planner's branches return
+    early, and those skipped them: a proposed 30% short came back at the default 20% (round 20)."""
+    request, audit = _plan_with_model(text, client)
+    if request is not None:
+        request = with_named_shock(with_short_side(as_comparison(request, text), text), text)
+    return request, audit
+
+
+def _plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, dict[str, Any]]:
     """Ask the model to fill in a :class:`ResearchRequest`, and validate every field it returns.
 
     Returns the request (or None) and an audit record of what the model said. The model's output is
@@ -4248,7 +4405,7 @@ def plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, dic
     if request is not None and request.book and _GROUP.search(text):
         request = replace(request, notes=(*request.notes, *_group_note(text)))
     request = as_comparison(request, text)
-    request = with_short_side(request, text)
+    request = with_named_shock(with_short_side(request, text), text)
     audit["applied"] = request is not None
     return request, audit
 

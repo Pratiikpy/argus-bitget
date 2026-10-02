@@ -598,6 +598,13 @@ def _rank_key(event: Event) -> tuple[int, float, float]:
     return (2, -(event.excess or 0.0), 0.0)
 
 
+_MACRO_ASKED = {
+    "CPI": re.compile(r"\bcpi\b|\binflation\s+(?:print|data|report|number)", re.I),
+    "NFP": re.compile(r"\bpayrolls?\b|\bnfp\b|\bjobs\s+(?:report|data|number)", re.I),
+    "PPI": re.compile(r"\bppi\b", re.I),
+}
+"""Macro releases a week-ahead question can name; the Fed has its own check below."""
+
 _EARNINGS_ASKED = re.compile(r"\bearnings\b|\breport(?:s|ing)?\b|\bresults\b|财报", re.I)
 """A week-ahead question that asks about company reports."""
 
@@ -770,6 +777,31 @@ def watchlist(question: str, book_text: str = "", *, now: datetime | None = None
         when = (f"; the next is the {upcoming[0][1]} on {upcoming[0][0]:%a %d %b %Y}, per the "
                 f"Federal Reserve's own calendar" if upcoming else "")
         lines.insert(1, f"No Fed rate decision falls in {span}{when}.")
+    for kind, asked in _MACRO_ASKED.items():
+        if (calendar is None or not asked.search(question) or not book
+                or any(event.kind == kind for event in events)):
+            continue
+        # "What does the CPI print next week mean for my book?" was answered with FOMC minutes
+        # and never said there was no CPI print that week (a judge, round 20, row 712): the
+        # premise is checked, the next release named, and the book's measured reaction to it
+        # given, which is the answer to "what does it mean for my book".
+        coming = sorted(
+            (date.fromisoformat(str(rel["date"])), rel) for rel in calendar.get("releases", [])
+            if rel.get("kind") == kind
+            and date.fromisoformat(str(rel["date"])) >= start.astimezone(NEW_YORK).date())
+        if not coming:
+            continue
+        day, due = coming[0]
+        hour, minute = (int(x) for x in str(due["time_et"]).split(":"))
+        nxt = Event(kind, datetime.combine(day, time(hour, minute), NEW_YORK).astimezone(UTC),
+                    str(due["title"]), str(due["source"]), touched=dict(book))
+        _study(nxt, _reactions(reactions_path))
+        rest = lines[0].removeprefix("Bottom line: ")
+        lines[0] = rest[:1].upper() + rest[1:]
+        lines[0:0] = [f"Bottom line: no {KIND_NAMES[kind]} release falls in {span}; the next is "
+                      f"{due['title']} on {day:%a %d %b %Y} at {due['time_et']} New York "
+                      f"({PUBLISHER[kind]}). How this book's names moved on past ones:",
+                      *(nxt.history or [])]
     lines.extend(book_lines)
     if not stated:
         lines.append(f"Assumed: the next {DEFAULT_DAYS} days ({span}), since no window was stated.")

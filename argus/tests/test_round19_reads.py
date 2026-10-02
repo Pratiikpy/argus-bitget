@@ -98,7 +98,7 @@ class TestMemory:
         facts = memory.extract("I hate crypto and never trade it. I'm bearish on TSLA.")
         kinds = {(f.kind, f.subject, f.value) for f in facts}
         assert ("thesis", "TSLAUSDT", "bear") in kinds
-        assert ("avoid", "", "crypto") in kinds
+        assert ("avoid", "crypto", "crypto") in kinds
 
     def test_a_changed_view_replaces_the_old_and_is_recalled(self) -> None:
         old = memory.extract("I'm bearish on TSLA.")
@@ -110,7 +110,9 @@ class TestMemory:
         facts = memory.extract("I hold 50% NVDA, 50% AAPL.")
         after = memory.apply_sales(facts, "Correction: I sold all my AAPL.")
         book = memory.get(after, "book")
-        assert book is not None and book.text == "I hold 100% NVDA" and "AAPL" in book.replaces
+        # what was sold becomes cash; the rest keep their weights (round 20, row 696)
+        assert book is not None and book.text == "I hold 50% NVDA, 50% cash"
+        assert "AAPL" in book.replaces
 
     def test_several_facts_asked_back_and_the_missing_one_named(self) -> None:
         q = "What is my account size, what do I hold, and what is my max loss per trade?"

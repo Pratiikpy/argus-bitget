@@ -132,7 +132,25 @@ IN_THE_CONSOLE: dict[str, tuple[str, str]] = {
         ("how should I split a $100k order in NVDA", ""),
     "Overnight hedge for an rToken holder vs. Ballast (S2)":
         ("I hold RNVDAUSDT, how do I protect it over the weekend?", ""),
+    # The workbench's breadth is what a full research task cites across its per-stock answers
+    # (options, positioning, fundamentals, ownership, crowd sources); /research runs one.
+    "Research workbench data breadth vs. OpenBB's keyless providers": ("/research", ""),
 }
+
+SCOPE: dict[str, str] = {
+    "Perception layer: what the desk can see": (
+        "Not the same claim as the OWNED workbench row below: this one counts what the trading "
+        "desk's model reads each cycle (6.2 data categories a symbol against OpenBB's 12.4), "
+        "and it is LOST. The workbench a person asks questions of reads more, and is measured "
+        "on its own row."),
+    "Research workbench data breadth vs. OpenBB's keyless providers": (
+        "Not the same claim as the LOST perception row: this one counts what the research "
+        "workbench cites per stock (about 16 categories against OpenBB's keyless 12.4); the "
+        "trading desk's own feed is narrower, and that loss stands on its row."),
+}
+"""Rows that share a rival and a sub-theme but measure different parts of the product. Both
+OpenBB breadth rows showed, one LOST and one OWNED, with nothing saying why (a judge, round 20,
+row 718)."""
 """Capability name -> (question, saved book) whose console answer shows the capability. A value
 starting with "/" is a page of the console rather than a question."""
 
@@ -190,7 +208,8 @@ def _rival(baseline: str, limit: int = 220) -> str:
 def _rerun(module: str) -> str:
     """The comparison module, as the command a reader runs to reproduce the measurement."""
     for part in module.split(","):
-        found = re.fullmatch(r"argus/eval/(\w+_comparison|riskproof|queueproof)\.py", part.strip())
+        found = re.fullmatch(r"argus/eval/(\w+_comparison|riskproof|queueproof|"
+                             r"perception_breadth)\.py", part.strip())
         if found:
             return f"python -m argus.eval.{found.group(1)}"
     return ""
@@ -327,7 +346,9 @@ def _card(win: Win) -> str:
            if win.state != "owned" and win.conditions == 13 else "")
         + "</span></div>"
         f"<h3>{esc(win.name)}</h3>"
-        f"<p><span class='lbl'>Rival</span>{esc(win.rival)}</p>{tested}"
+        f"<p><span class='lbl'>Rival</span>{esc(win.rival)}</p>"
+        + (f"<p><span class='lbl'>Scope</span>{esc(SCOPE[win.name])}</p>"
+           if win.name in SCOPE else "") + f"{tested}"
         f"<div class='links'>{' '.join(links)}</div>{rerun}"
         f"<details><summary>Every condition and its evidence</summary><ul>{proofs}</ul>"
         f"{note}</details></article>"

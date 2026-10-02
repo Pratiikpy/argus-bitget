@@ -107,7 +107,9 @@ _KINDS: tuple[tuple[Kind, re.Pattern[str]], ...] = (
         r"momentum|breakout|break(ing)? out|uptrend|downtrend|trend|higher highs|lower lows|"
         r"strength|has further to run|keeps? (going|rising|falling)", re.I)),
     (Kind.SENTIMENT, re.compile(
-        r"sentiment|fear|greed|panic|euphori|capitulat|hype|everyone|the crowd", re.I)),
+        # "hype" as a word: "hyperscaler capex keeps growing" was tested with crypto fear &
+        # greed (a judge, round 20, row 702)
+        r"sentiment|fear|greed|panic|euphori|capitulat|\bhyped?\b|everyone|the crowd", re.I)),
     (Kind.VALUATION, re.compile(
         r"cheap|undervalued|overvalued|expensive|valuation|\bp/?e\b|price target|fair value",
         re.I)),
@@ -255,7 +257,11 @@ def reasons(text: str) -> tuple[Reason, ...]:
         if not part or _STANCE.match(part) or _ASKED.match(part) or PROFILE_PART.match(part):
             continue
         kind = next((k for k, pattern in _KINDS if pattern.search(part)), None)
-        if kind is Kind.MOMENTUM and dict(_KINDS)[Kind.DRIVER].search(part):
+        if _CONSENSUS_CLAIM.search(part):
+            # a report against the analysts' numbers is settled by the consensus record, whatever
+            # other word the claim carries (round 20, row 702)
+            kind = Kind.EARNINGS
+        elif kind is Kind.MOMENTUM and dict(_KINDS)[Kind.DRIVER].search(part):
             # "AI capex keeps rising" is about the spending, not the price: "keeps rising" took it
             # to the trend reader, which answered "no technical reading" (round 18, row 616).
             kind = Kind.DRIVER
@@ -472,6 +478,12 @@ TAKER = "/api/v2/mix/market/taker-buy-sell"
 CROWDED_LONG = 0.70
 """A share of Bitget accounts long at or above this is a crowd already in the trade."""
 UNCROWDED = 0.50
+
+
+def daily_rows(symbol: str) -> list[tuple[float, float, float, float]]:
+    """The public face of ``_closes`` for other packages (the sizing reader's structural stops),
+    resolved at call time so a test that replaces ``_closes`` replaces this too."""
+    return _closes(symbol)
 
 
 def _closes(symbol: str) -> list[tuple[float, float, float, float]]:
@@ -1190,6 +1202,40 @@ _UNTESTED: Mapping[Kind, str] = {
 }
 
 
+_CONSENSUS_CLAIM = re.compile(
+    r"\b(?:beat|beats|topped|exceeded|crushed|missed|misses|fell\s+short\s+of)\b[^.;]{0,40}"
+    r"\b(?:expectations?|estimates?|consensus|the\s+street|forecasts?)\b", re.I)
+"""A claim about the last report against what analysts expected, which the consensus record
+settles: "data-center revenue beat expectations" was tested on total revenue growth (a judge,
+round 20, row 702)."""
+
+
+def _versus_consensus(reason: Reason, name: str) -> Tested:
+    from argus.lui.research.fundamentals import versus_estimates
+
+    try:
+        found = versus_estimates(name)
+    except Exception:
+        found = None
+    if found is None:
+        return Tested(reason.text, reason.kind, Result.NOT_TESTED,
+                      "Analysts' consensus for the last report did not answer just now, so the "
+                      "claim is not tested.")
+    line, source = found
+    beat = re.search(r"— (above|below|in line with) it", line)
+    claims_miss = bool(re.search(r"\bmiss|fell\s+short", reason.text, re.I))
+    if beat is None or beat.group(1) == "in line with":
+        result = Result.NOT_MEASURABLE
+    else:
+        above = beat.group(1) == "above"
+        result = Result.SUPPORTED if above != claims_miss else Result.CONTRADICTED
+    return Tested(reason.text, reason.kind, result,
+                  (lambda s: s[:1].upper() + s[1:])(line.removeprefix("Against analysts: "))
+                  + " That is the whole company's EPS; a segment the claim names is not read "
+                    "here.", evidence=(Finding(line, "Yahoo Finance earnings history",
+                                               source.ref),))
+
+
 def check(stated: Sequence[Reason], *, name: str, data: Mapping[str, Mapping[str, Any]],
          activity: Mapping[str, Any] | None = None,
          fear_greed: Mapping[str, Any] | None = None,
@@ -1240,6 +1286,8 @@ def check(stated: Sequence[Reason], *, name: str, data: Mapping[str, Mapping[str
             result, line, notes = macro_thesis.test(reason.text, macro, name)
             out.append(Tested(reason.text, reason.kind, Result(result), line, evidence=tuple(
                 Finding(note, "event study and FRED snapshot") for note in notes)))
+        elif reason.kind is Kind.EARNINGS and _CONSENSUS_CLAIM.search(reason.text):
+            out.append(_versus_consensus(reason, name))
         elif reason.kind is Kind.OTHER and _RATIO_EXTREME.search(reason.text):
             out.append(_ratio_extreme(reason))
         else:

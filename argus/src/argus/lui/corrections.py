@@ -375,10 +375,18 @@ def register_losses(standing: dict[str, Any]) -> list[Correction]:
                     chunk = chunk[:417].rstrip() + "..."
                 if chunk not in found:
                     found.append(chunk)
-        if not found:
-            continue
         state = str(cap.get("state", ""))
         name = str(cap.get("name", ""))
+        if not found and state == "lost":
+            # A row the register grades LOST is a loss whatever words its text uses: garak and
+            # LatencySensitiveBench were absent from this page while /proof showed them LOST (a
+            # hostile review, round 20, row 697b)
+            baseline = str(cap.get("baseline") or "a named rival")
+            told = next((t for t in texts if t.strip()), "")
+            told = told if len(told) <= 420 else told[:417].rstrip() + "..."
+            found = [f"Graded LOST against {baseline}." + (f" {told}" if told else "")]
+        if not found:
+            continue
         headline = {
             "tied": f"Lost, then rebuilt to a tie: {name}",
             "owned": f"Lost in part: {name}",

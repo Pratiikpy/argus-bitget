@@ -109,12 +109,19 @@ def _valid(kind: str, value: str, subject: str, quote: str, context: str = ""
     """The fact's (value, subject) as `lui/memory.py` stores them, or None when the quote does not
     carry what the model claimed."""
     from argus.lui.research import research_symbols
+    from argus.lui.research.sizing import spelled_out
 
-    numbers = [float(n.replace(",", "")) for n in re.findall(r"\d[\d,]*(?:\.\d+)?", quote)]
+    # "My account is 25.000 USD" carries 25000, not 25 (a hostile review, round 20, row 696)
+    numbers = [float(n.replace(",", ""))
+               for n in re.findall(r"\d[\d,]*(?:\.\d+)?", spelled_out(quote))]
     if kind in ("budget", "max_loss"):
         try:
             pct = float(value)
         except ValueError:
+            return None
+        if kind == "max_loss" and re.search(r"\bstop\b", quote, re.I) and not re.search(
+                r"\blos[es]|\bloss\b|\bdrawdown\b", quote, re.I):
+            # "stop 3% above entry" is a stop distance, not a loss limit (round 20, row 696)
             return None
         if not 0 < pct <= 100 or not any(abs(n - pct) < 1e-9 for n in numbers):
             return None
@@ -153,6 +160,12 @@ def _valid(kind: str, value: str, subject: str, quote: str, context: str = ""
         # need not appear in it; it must be one of the styles the console acts on.
         if slug not in STYLES:
             return None
+        if slug == "earnings" and not re.search(r"\btrad\w*\b[^.]{0,30}\bearnings\b|"
+                                                r"\bearnings\s+(?:trader|plays?|trades?)\b",
+                                                quote, re.I):
+            # "I plan to hold until earnings" is a holding period, not an earnings-trading style
+            # (a judge, round 20, row 713)
+            return None
         return slug, ""
     if kind in ("avoid", "thesis"):
         named = research_symbols(subject or quote)[0]
@@ -166,6 +179,12 @@ def _valid(kind: str, value: str, subject: str, quote: str, context: str = ""
         if kind == "thesis" and (_AN_ORDER.match(quote) or _A_POSITION.match(quote)):
             # "Long rNVDA over the weekend at 3x" is an order to price, not a view to keep: it
             # replaced the trader's stated NVDA thesis (a judge, round 13, 2026-09-30).
+            return None
+        if kind == "thesis" and re.search(r"\bi\s+(?:want|plan|intend|would\s+like)\s+to\s+"
+                                          r"(?:buy|sell|short|long)\s+\$?\d", quote, re.I) \
+                and not re.search(r"\bbecause\b|\bsince\b|\bthink\b|\bbelieve\b", quote, re.I):
+            # "I want to buy $2 million of COIN" is a trade to price, not a view (a judge, round
+            # 20, row 713)
             return None
         if kind == "thesis" and not _A_CLAIM.search(quote):
             # "SOL short leg", taken from a sizing question, is a noun phrase: it was kept as a

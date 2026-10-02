@@ -44,11 +44,18 @@ def named(text: str) -> Episode | None:
 
 def nasdaq_fall(episode: Episode) -> tuple[float, date, date] | None:
     """The deepest peak-to-trough fall of QQQ inside the window, as a negative percent."""
+    return own_fall(episode, "QQQ", whole=False)
+
+
+def own_fall(episode: Episode, ticker: str, *,
+             whole: bool = True) -> tuple[float, date, date] | None:
+    """The deepest peak-to-trough fall of one name inside the window, as a negative percent, or
+    None when it did not trade through the window (listed after it began, or no history)."""
     try:
-        days = [d for d in equity_history.daily("QQQ") if episode.start <= d.day <= episode.end]
+        days = [d for d in equity_history.daily(ticker) if episode.start <= d.day <= episode.end]
     except Exception:
         return None
-    if len(days) < 5:
+    if len(days) < 5 or (whole and (days[0].day - episode.start).days > 10):
         return None
     peak = days[0]
     worst: tuple[float, date, date] | None = None
@@ -59,3 +66,34 @@ def nasdaq_fall(episode: Episode) -> tuple[float, date, date] | None:
         if worst is None or fall < worst[0]:
             worst = (fall, peak.day, day.day)
     return worst
+
+
+def replay_line(episode: Episode, symbols: tuple[str, ...], ticker_of: object) -> str | None:
+    """What the named episode actually did to the index and to each holding that traded through
+    it — the check a linear beta cannot make. "If the S&P falls 30% like 2008" was answered with
+    a 30-day beta scaled linearly and nothing about 2008 (a judge, round 20, row 707); in a crash
+    betas and correlations rise, so the names' own falls then are the harder test."""
+    index = nasdaq_fall(episode)
+    if index is None:
+        return None
+    spy = own_fall(episode, "SPY")
+    seen: list[str] = []
+    missing: list[str] = []
+    for symbol in symbols:
+        ticker = ticker_of(symbol)  # type: ignore[operator]
+        fall = own_fall(episode, ticker)
+        if fall is None:
+            missing.append(ticker)
+        else:
+            seen.append(f"{ticker} {fall[0]:.0f}%")
+    if not seen and not missing:
+        return None
+    return (f"What {episode.name} actually did ({episode.start:%b %Y} to {episode.end:%b %Y}, "
+            f"Yahoo adjusted closes, deepest peak-to-trough): "
+            + (f"the S&P 500 ETF {spy[0]:.0f}%, " if spy else "")
+            + f"the Nasdaq-100 ETF {index[0]:.0f}%"
+            + (f"; {', '.join(seen)}" if seen else "")
+            + (f"; {', '.join(missing)} did not trade through it, so there is no figure"
+               if missing else "")
+            + ". The lines above scale today's 30-day beta linearly; in a crash betas and "
+              "correlations rise, so the episode's own falls are the harder test.")

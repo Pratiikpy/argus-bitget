@@ -676,8 +676,10 @@ def stress_by_beta(
             move = b * shock.benchmark_move_pct
             total += weight * move
             seen = True
-            if worst is None or move < worst[1]:
-                worst = (symbol, move)
+            # what the holding does to its holder: a short loses on the rise (round 20, row 692)
+            held = move if weight >= 0 else -move
+            if worst is None or held < worst[1]:
+                worst = (symbol, held)
         out.append(
             StressOutcome(shock=shock.name, portfolio_move_pct=total if seen else None,
                           worst_position=worst,

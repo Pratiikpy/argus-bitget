@@ -1117,7 +1117,12 @@ def detect(text: str, *, prior: Sequence[str] = (), book: str = "",
     stated = bool(_STATED_OR_HYPOTHETICAL.search(raw))
     if _OTHERS.search(raw):
         return Detected(OTHERS_POSITIONS, names[0] if names else "")
-    if _PRIVATE.search(raw) and not stated:
+    computable = bool(names) and bool(re.search(r"\b\d+(?:\.\d+)?\s*x\b|\bleverage\b", raw, re.I)) \
+        and bool(re.search(r"\bliquidation\s+(?:price|level)\b", raw, re.I))
+    if _PRIVATE.search(raw) and not stated and not computable:
+        # "Long BTC with 10x leverage — where is my liquidation price?" states the trade, so the
+        # liquidation is arithmetic on it, not a read of the account (a hostile review, round 20,
+        # row 699)
         return Detected(PRIVATE_ACCOUNT)
     past = [s for s in spans if s.end < now - timedelta(days=1)]
     if _DESK.search(raw) and not names[1:]:

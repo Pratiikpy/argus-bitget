@@ -96,7 +96,7 @@ STEPS: tuple[tuple[str, ResearchKind | None, str], ...] = (
      f"similar past hours in up to {ANALOGUE_DAYS} days of Bitget candles"),
     (IMPACT_TITLE, ResearchKind.IMPACT,
      f"your book's risk on {LOOKBACK_DAYS} days of hourly returns"),
-    (EXPOSURE_TITLE, None, "Yahoo sector classification and a four-factor regression"),
+    (EXPOSURE_TITLE, None, "Yahoo sector classification and an eight-factor regression"),
     (EXECUTION_TITLE, ResearchKind.EXECUTION, "Bitget live order book"),
 )
 """The steps in the order they are shown. ``None`` is the exposures engine, which answers a book
@@ -688,8 +688,8 @@ def question_task(asked: str, saved_book: str = "", memory: str = "", *,
 
         try:
             found, _, data = exposures_answer(book)
-            steps.append(Step(title=BOOK_EXPOSURE_TITLE, engine="Yahoo sector classification and a "
-                              "four-factor regression", lines=list(found),
+            steps.append(Step(title=BOOK_EXPOSURE_TITLE, engine="Yahoo sector classification and "
+                              "an eight-factor regression", lines=list(found),
                               seconds=time.perf_counter() - began, data=dict(data)))
         except Exception as exc:  # the answered question stands without it
             steps.append(Step(title=BOOK_EXPOSURE_TITLE, engine="exposures", refused=True,

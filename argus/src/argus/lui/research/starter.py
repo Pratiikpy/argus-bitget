@@ -77,9 +77,13 @@ def answer(text: str, *, today: date, daily: Callable[[str], Any] | None = None
         for d in days:
             peak = max(peak, d.close)
             worst = min(worst, d.close / peak - 1.0)
+        # "at its lowest it was worth $500" when it never went below the start read as odd (a
+        # first-time user, round 20, row 691)
+        floor = (f"it never fell below the ${stake:,.0f} it started at" if lowest >= 0.9995 else
+                 f"at its lowest it was worth ${stake * lowest:,.0f}")
         rows.append(f"In {label}: ${stake:,.0f} would be ${stake * (1 + change):,.0f} a year later "
-                    f"({change:+.0%}); at its lowest it was worth ${stake * lowest:,.0f}, and its "
-                    f"worst fall from a high on the way was {abs(worst):.0%}.")
+                    f"({change:+.0%}); {floor}, and its worst fall from a high on the way was "
+                    f"{abs(worst):.0%}.")
         data[ticker] = {"change": change, "worst": worst, "from": str(days[0].day),
                         "to": str(days[-1].day)}
     lines = [f"Bottom line: this console will not tell you what to buy — it does not know your "
