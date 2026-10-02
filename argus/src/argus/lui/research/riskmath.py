@@ -179,7 +179,9 @@ def _resolve_resize(request: ResearchRequest, before: dict[str, float],
                 f"the console.")
     current = book[add]
     if request.target is not None:
-        target = request.target
+        # Trimming a short keeps it short: "trim TSLA to 10%" with TSLA at -40% was resized to
+        # +10%, a 50-point swing the other way (a hostile review, round 22, on README's own example)
+        target = -abs(request.target) if current < 0 else request.target
     else:
         target = max(0.0, current * (1.0 + (request.resize_by or 0.0)))
     if target >= 1.0:

@@ -189,6 +189,11 @@ def stated_direction(raw: str, at: int | None = None) -> int | None:
     if at is None:
         number = re.search(r"\d+(?:\.\d+)?\s*%", raw)
         at = number.start() if number is not None else len(raw)
+    # A rate move is its own clause: "QQQ drops 6% and the 10-year yield climbs 40 basis points"
+    # took "climbs" as the shock's direction (a hostile review, round 22)
+    for rate in RATE_MOVE.finditer(raw):
+        if not rate.start() <= at < rate.end():
+            raw = raw[:rate.start()] + " " * (rate.end() - rate.start()) + raw[rate.end():]
     cuts = [m.end() for m in _CLAUSE.finditer(raw, 0, at)]
     start = cuts[-1] if cuts else 0
     end_cut = _CLAUSE.search(raw, at)
@@ -688,8 +693,10 @@ def _horizon(text: str) -> tuple[int, bool, str | None]:
     return 24, False, "no horizon was stated, so the next 24 hours are read"
 
 
-_RESIZE_VERB = (r"(?:trim|cut|reduc|lower|bring|tak|siz|resiz|rais|increas|lift|scal|mov|shrink|"
-                r"drop|set|put|adjust|rebalanc|chang)\w*")
+# "drops"/"moves" are a price's verbs, not a trader's: "If NVDA drops by 12%" was read as cutting
+# the position by 12% (a hostile review, round 22)
+_RESIZE_VERB = (r"(?:trim|cut|reduc|lower|bring|tak|siz|resiz|rais|increas|lift|scal|"
+                r"mov(?!es\b|ed\b)|shrink|drop(?!s\b|ped\b)|set|put|adjust|rebalanc|chang)\w*")
 
 
 _RESIZE_FROM_TO = re.compile(
@@ -1341,6 +1348,105 @@ def _number(text: str) -> float:
         return 0.0
 
 
+def money_number(text: str) -> tuple[float, str]:
+    """A money figure as written in English or European style, and how it was read when that
+    was not plain: "40.000,50" is 40,000.50, "2.000" is 2,000 (a dot before three digits is a
+    thousands separator in a money amount), "10 000" is 10,000, "1,234.56" is 1,234.56."""
+    raw = re.sub(r"[\s\u00a0\u202f]", "", text)
+    note = ""
+    if "," in raw and "." in raw:
+        decimal = "," if raw.rfind(",") > raw.rfind(".") else "."
+        thousands = "." if decimal == "," else ","
+        value = float(raw.replace(thousands, "").replace(decimal, "."))
+        if decimal == ",":
+            note = f"{text.strip()} read as {value:,.2f} (comma as the decimal mark)"
+    elif re.fullmatch(r"\d{1,3}(?:\.\d{3})+", raw):
+        value = float(raw.replace(".", ""))
+        note = (f"{text.strip()} read as {value:,.0f} (a dot before three digits read as a "
+                f"thousands separator)")
+    elif re.fullmatch(r"\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?", raw):
+        value = float(raw.replace(",", ""))
+    elif re.fullmatch(r"\d+,\d{1,2}", raw):
+        value = float(raw.replace(",", "."))
+        note = f"{text.strip()} read as {value:,.2f} (comma as the decimal mark)"
+    else:
+        value = _number(raw)
+    return value, note
+
+
+_MONEY_NUM = r"\d{1,3}(?:[.,\s\u00a0\u202f]\d{3})+(?:[.,]\d{1,2})?|\d+(?:[.,]\d{1,2})?"
+_FOREIGN_MONEY = re.compile(
+    rf"(?P<pre>[\u20ac\u00a3\u00a5$])\s?(?P<a>{_MONEY_NUM})\s*(?P<ua>k|m)?\b|"
+    rf"(?P<b>{_MONEY_NUM})\s*(?P<ub>k|m)?\s*(?P<code>\u20ac|\u00a3|\u00a5|eur(?:os?)?|gbp|"
+    rf"pounds?(?:\s+sterling)?|jpy|yen|usd|us\s+dollars?|dollars?)(?![\w])", re.I)
+_FX_PAIRS = {"\u20ac": ("EURUSDUSDT", False, "\u20ac"), "eur": ("EURUSDUSDT", False, "\u20ac"),
+             "\u00a3": ("GBPUSDUSDT", False, "\u00a3"), "gbp": ("GBPUSDUSDT", False, "\u00a3"),
+             "pound": ("GBPUSDUSDT", False, "\u00a3"),
+             "\u00a5": ("USDJPYUSDT", True, "\u00a5"), "jpy": ("USDJPYUSDT", True, "\u00a5"),
+             "yen": ("USDJPYUSDT", True, "\u00a5")}
+"""Currency to Bitget's own FX perpetual: (pair, whether the pair is quoted as foreign per
+dollar, the sign to say it with)."""
+
+
+_IN_CURRENCY = re.compile(
+    r"\bin\s+(?P<c>pounds?|gbp|sterling|euros?|eur|yen|jpy|\u00a3|\u20ac|\u00a5)\b|"
+    r"\b(?:my\s+)?account\s+is\s+in\s+(?P<c2>gbp|pounds?|eur|euros?|jpy|yen)\b", re.I)
+
+
+def asked_currency_amount(text: str, usd: float) -> str | None:
+    """``usd`` restated in the currency the question asks the answer in ("what's the loss in
+    pounds?" got a percentage only, a hostile review, round 22), or None."""
+    found = _IN_CURRENCY.search(text)
+    if found is None:
+        return None
+    said = (found.group("c") or found.group("c2") or "").lower()
+    key = next((k for k in _FX_PAIRS
+                if said.startswith(k) or (k == "pound" and said == "sterling")), None)
+    if key is None:
+        return None
+    pair, inverted, symbol = _FX_PAIRS[key]
+    rate = _last_price(pair)
+    if not rate:
+        return None
+    local = usd * rate if inverted else usd / rate
+    return f"{symbol}{local:,.0f}"
+
+
+def in_us_dollars(text: str) -> tuple[str, list[str]]:
+    """``text`` with every euro, pound and yen amount restated in US dollars at Bitget's own FX
+    perpetuals, and European-style numbers read as written, with a line for each conversion.
+
+    "J'ai 10 000 \u20ac en NVDA", "\u00a55,000,000 of NVDA", "\u00a340.000,50 long AAPL" and
+    "1,234.56 EUR in ETH and 2.000 USD in BTC" were each filed as a note, read in the wrong
+    currency, or read as $2 (a hostile review, round 22)."""
+    said: list[str] = []
+
+    def restate(m: re.Match[str]) -> str:
+        sign = (m.group("pre") or m.group("code") or "").lower()
+        key = next((k for k in _FX_PAIRS if sign.startswith(k)), None)
+        figure = m.group("a") or m.group("b") or ""
+        if key is None and "." not in figure and "," not in figure and " " not in figure:
+            return m.group(0)
+        value, how = money_number(figure)
+        unit = (m.group("ua") or m.group("ub") or "").lower()
+        value *= {"k": 1e3, "m": 1e6}.get(unit, 1.0)
+        if key is None:
+            if how:
+                said.append(how)
+            return f"${value:.2f} "
+        pair, inverted, symbol = _FX_PAIRS[key]
+        rate = _last_price(pair)
+        if not rate:
+            said.append(f"{symbol}{value:,.0f} taken as dollars: no {pair} price answered")
+            return f"${value:.2f} "
+        usd = value / rate if inverted else value * rate
+        said.append(f"{symbol}{value:,.2f} = about ${usd:,.0f} at Bitget's "
+                    f"{pair.removesuffix('USDT')} {rate:,.4f}" + (f"; {how}" if how else ""))
+        return f"${usd:.2f} "
+
+    return _FOREIGN_MONEY.sub(restate, text), said
+
+
 def _resolve_any(name: str) -> str | None:
     """A holding named in a sentence, in any script or case ("aapl", "苹果", "bitcoin")."""
     from argus.market.universe import CJK_ALIASES
@@ -1623,7 +1729,7 @@ _BOOK_CASH_USD = re.compile(
 
 _BOOK_USD = re.compile(
     r"(?<![\w.%])(?:\$\s?(\d[\d,]*(?:\.\d+)?)\s*(k|m)?|(\d[\d,]*(?:\.\d+)?)\s*(k|m)\b)\s*"
-    r"(?:(?:in|of|worth\s+of|into)\s+(?:an?\s+|my\s+|the\s+)?)?"
+    r"(?:(?:in|of|worth\s+of|into|en|dans|em|de)\s+(?:an?\s+|my\s+|the\s+)?|(?:long|short)\s+)?"
     r"([A-Za-z][A-Za-z0-9.]{1,15})\b", re.I)
 """"$20k NVDA", "20k in TSLA", "$5,000 of BTC", "$5k in an S&P fund": a holding stated as its
 dollar value."""
@@ -1646,7 +1752,18 @@ _BOOK_COUNT_AFTER = re.compile(
 that makes the number a count (a bare "NVDA 40" stays unread rather than guessed)."""
 
 
+_CONTRACT_SHARES = re.compile(
+    r"(?P<n>\d[\d,]*)\s+(?P<name>[A-Za-z][\w.]{0,11})\s+(?:option\s+)?contracts?\s+(?:at|of|with|x)\s+"
+    r"(?P<m>\d[\d,]*)\s+shares?(?:\s+each)?", re.I)
+_FUTURES_COUNT = re.compile(
+    r"(?P<n>\d+)\s+(?:e-?mini\s+|micro\s+)?(?P<code>MES|ES)\s+(?:futures?\s+)?contracts?\b", re.I)
+_INDEX_FUTURES = {"ES": ("SP500USDT", 50), "MES": ("SP500USDT", 5)}
+"""S&P 500 futures by their dollar multiplier: an E-mini is $50 times the index, a micro $5."""
 _BOOK_SHORT = re.compile(r"(?:\bshort(?:ing)?\s+|-\s*)$", re.I)
+_AMOUNT_HELD = re.compile(
+    r"\b(?:long|short|hold|own|holding|i\s+have)\s+(?:\$\s?\d|\d[\d,.]*\s*(?:k|m)?\s+"
+    r"(?:shares?\s+(?:of\s+)?|contracts?\s+(?:of\s+)?|units?\s+(?:of\s+)?)?[A-Za-z])", re.I)
+"""A holding stated as an amount inside the question: "Long 100 AAPL, short $20k QQQ"."""
 
 
 PRICED_BOOK_TTL = 60.0
@@ -1703,6 +1820,32 @@ def _price_book(text: str) -> PricedBook | None:
     # The index as it is written in a sentence: "$5k in an S&P fund" (a first-user audit,
     # 2026-09-30).
     text = re.sub(r"\bS\s*&\s*P(?:\s*500)?(?![\w&])", "SP500", text, flags=re.I)
+    converted: list[str] = []
+
+    def per_contract(m: re.Match[str]) -> str:
+        # "30 TSLA contracts at 100 shares each" was read as 30 shares, a loss understated a
+        # hundredfold (a hostile review, round 22)
+        shares = _number(m.group("n")) * _number(m.group("m"))
+        converted.append(f"{m.group('n')} {m.group('name').upper()} contracts x {m.group('m')} "
+                         f"shares = {shares:g} shares")
+        return f"{shares:g} shares of {m.group('name')}"
+
+    def index_future(m: re.Match[str]) -> str:
+        # "2 ES contracts" was shocked through a beta and never priced (round 22): an E-mini is
+        # $50 (a micro $5) times the S&P 500, read at Bitget's SP500 index perpetual
+        symbol, multiplier = _INDEX_FUTURES[m.group("code").upper()]
+        level = _last_price(symbol)
+        if level is None:
+            return m.group(0)
+        value = _number(m.group("n")) * multiplier * level
+        converted.append(f"{m.group('n')} {m.group('code').upper()} = {m.group('n')} x "
+                         f"${multiplier} x S&P 500 at {level:,.2f} = ${value:,.0f}")
+        return f"${value:.0f} SP500 "
+
+    text = _CONTRACT_SHARES.sub(per_contract, text)
+    text = _FUTURES_COUNT.sub(index_future, text)
+    text, said = in_us_dollars(text)
+    converted.extend(said)
     taken: list[tuple[int, int]] = []
 
     def free(span: tuple[int, int]) -> bool:
@@ -1716,7 +1859,9 @@ def _price_book(text: str) -> PricedBook | None:
         return -1.0 if _BOOK_SHORT.search(text[max(0, start - 14): start]) else 1.0
 
     def holding(name: str) -> str | None:
-        if name.upper() in _NOT_A_HOLDING:
+        # A stated amount of QQQ is a holding even though a bare "QQQ" is usually the shock's
+        # subject: "short $30,000 QQQ" was dropped from a saved book (a hostile review, round 22)
+        if name.upper() in _NOT_A_HOLDING - {"QQQ", "NASDAQ"}:
             return None
         return _resolve_any(name)
 
@@ -1731,7 +1876,9 @@ def _price_book(text: str) -> PricedBook | None:
             continue
         value = scaled(match.group(1) or match.group(3), match.group(2) or match.group(4))
         if value > 0:
-            usd[symbol] = usd.get(symbol, 0.0) + sign(match.start()) * value
+            # "$40,000 short AAPL" names the side between the amount and the name
+            side = -1.0 if re.search(r"\bshort\s+\S+\s*$", match.group(0), re.I) else 1.0
+            usd[symbol] = usd.get(symbol, 0.0) + sign(match.start()) * side * value
             taken.append(match.span())
     units: dict[str, float] = {}
     for match in _BOOK_COUNT_AFTER.finditer(text):
@@ -1775,6 +1922,7 @@ def _price_book(text: str) -> PricedBook | None:
     account = gross + cash_usd
     if cash_usd:
         lines.append(f"${cash_usd:,.0f} cash")
+    lines.extend(converted)
     if account <= 0:
         return PricedBook(weights={}, cash=0.0, lines=tuple(lines))
     weights = {s: v / gross for s, v in usd.items() if v} if gross > 0 else {}
@@ -1821,6 +1969,16 @@ RULE_PCT = re.compile(
 when the question said the Nasdaq drops 20% (a judge, round 21)."""
 
 
+RATE_MOVE = re.compile(
+    r"\b(?:interest\s+rates?|rates?|bond\s+yields?|yields?|treasur(?:y|ies)|fed\s+funds|"
+    r"(?:2|5|10|30)[\s-]?(?:year|yr|y)\b(?:\s+(?:treasury|yield|note|bond))?)"
+    r"(?:(?!\band\b|\bwhile\b|,)[^.%;?!])*?(?P<n>[-+]?\d+(?:\.\d+)?)\s*"
+    r"(?:%|percent\b|pct\b|bps\b|bp\b|basis\s+points?\b)", re.I)
+"""A move in rates or yields: "rates rise 50bps", "the 10-year yield climbs 0.4%". It is not a
+price shock: "SPY falls 4% and rates rise 50bps" was stressed at +4% because the rate figure was
+read as the shock and the fall's direction was lost (a hostile review, round 22)."""
+
+
 def shock_numbers(raw: str, weights: Sequence[int] = (), *, near: int = 2) -> list[re.Match[str]]:
     """The percentages in ``raw`` that can be a shock size: not a holding weight (a pair starting
     within ``near`` characters), not cash ("70% cash"), not a VaR confidence level ("99%
@@ -1828,7 +1986,8 @@ def shock_numbers(raw: str, weights: Sequence[int] = (), *, near: int = 2) -> li
     "expected shortfall at 99% confidence" with a +99% one (a ten-agent answer audit,
     2026-09-25)."""
     skip: set[int] = set()
-    for found in (*_CASH_PCT.finditer(raw), *_LEVEL.finditer(raw), *RULE_PCT.finditer(raw)):
+    for found in (*_CASH_PCT.finditer(raw), *_LEVEL.finditer(raw), *RULE_PCT.finditer(raw),
+                  *RATE_MOVE.finditer(raw)):
         skip.update(range(found.start(), found.end()))
     return [m for m in _SHOCK_NUMBER.finditer(raw)
             if m.start() not in skip and not any(abs(pos - m.start()) < near for pos in weights)]
@@ -1888,6 +2047,27 @@ def _with_stated_cash(request: ResearchRequest | None, text: str) -> ResearchReq
     notes = tuple(n for n in request.notes if not n.startswith("your holdings add up to"))
     return replace(request, book=book, cash=cash,
                    notes=(*notes, f"the rest of the book, {cash:.0%}, read as cash"))
+
+
+_RETURN_MULTIPLE = re.compile(
+    r"\b(?:made|make|making|got|gets?|did|doubled|returned|turned\s+\w+\s+into|up)\s+"
+    r"(?:a\s+|like\s+)?(\d+(?:\.\d+)?)\s*x\b|\b(\d+(?:\.\d+)?)\s*x\s+(?:returns?|gains?|profits?|"
+    r"my\s+money|his\s+money|her\s+money|their\s+money|in\s+a\b)", re.I)
+_ANY_MULTIPLE = re.compile(r"\b(\d+(?:\.\d+)?)\s*x\b(?!\s*(?:the\s+)?atr)", re.I)
+
+
+def stated_multiple(raw: str) -> re.Match[str] | None:
+    """The leverage multiple a question states, with a return multiple left out.
+
+    "my friend made 3x on 20x lev on sol" was assessed at 3x, the friend's return, and the risky
+    20x was never looked at (a first-time user, round 22). A multiple followed by a leverage word,
+    or after "at/on/with", is preferred; one that is a gain ("made 3x", "3x returns") never is."""
+    skip = {m.start(g) for m in _RETURN_MULTIPLE.finditer(raw) for g in (1, 2) if m.group(g)}
+    found = [m for m in _ANY_MULTIPLE.finditer(raw) if m.start(1) not in skip]
+    preferred = next((m for m in found if re.match(
+        r"\s*(?:lev\w*|leverage\w*|long|short|margin|perp)", raw[m.end():], re.I)
+        or re.search(r"\b(?:at|on|with|using|use)\s*$", raw[:m.start()], re.I)), None)
+    return preferred or (found[0] if found else None)
 
 
 _ADD_MULTIPLE = re.compile(r"\b(\d+(?:\.\d+)?)\s*x\b(?!\s*(?:vol|volatility))", re.I)
@@ -2571,6 +2751,13 @@ _PROPOSED_SHORT = re.compile(
     r"(?P<name>[A-Za-z][A-Za-z.]{1,11})\b", re.I)
 """A short proposed as a trade on the book: "what does a 30% short NVDA do to my risk?"."""
 
+SHORT_OF_IT = re.compile(
+    r"\bi(?:'?m|\u2019m|\s+am)\s+(?:actually\s+|really\s+)?short\s+(?:it|that|this|that\s+one|"
+    r"the\s+(?:position|name|stock|coin))\b(?!\s+(?:do|does|would))|\bactually\s+(?:i(?:'?m|\u2019m|"
+    r"\s+am)\s+)?short\b|\bshort,?\s+not\s+long\b", re.I)
+"""A correction to short of the name already being discussed: "Actually I'm short it, not long"."""
+
+
 def _held_short(text: str, symbol: str) -> bool:
     """Whether the question states this holding as a short: "I am short 100% TSLA", "short 50%
     NVDA, long 50% TSLA". A proposed trade ("what does a 30% short NVDA do") is not a holding, and
@@ -2856,7 +3043,8 @@ def _named_shock_request(raw: str) -> ResearchRequest | None:
     # "what if gold drops 10%?" is asked of a book as surely as "my book" is (2026-09-25 audit).
     if not (_BOOK_REF.search(raw) or re.search(r"我的|我这个|账户|组合|仓位|持仓", raw)
             or ((len(stated) >= 2
-                 or re.match(r"\s*what\s+(?:if|happens\s+if)\b", raw, re.I))
+                 or re.match(r"\s*what\s+(?:if|happens\s+if)\b|\s*if\b[^?]*\bwhat\s+happens\b",
+                             raw, re.I))
                 and _FALL_WORD.search(raw))):
         return None
     if about_the_record(raw) or ADD_VERB.search(raw) or _HEDGE.search(raw):
@@ -3188,7 +3376,7 @@ def read_request(text: str) -> ResearchRequest | None:
         # names only, and answered that SP500 was not one once the index resolved (2026-09-30).
         return ResearchRequest(kind=ResearchKind.EVENT, symbols=symbols[:1])
     spot_ticker = _spot_rtoken(raw)
-    multiple = re.search(r"\b(\d+(?:\.\d+)?)\s*x\b", raw, re.I)
+    multiple = stated_multiple(raw)
     if (multiple and _CLOSED_HOURS.search(raw) and not _HEDGE.search(raw)
             and not about_the_record(raw) and (spot_ticker or symbols)):
         # "Long rNVDA over the weekend at 3x with 5,000 USDT" is the risk of a leveraged hold
@@ -3426,7 +3614,7 @@ def read_request(text: str) -> ResearchRequest | None:
                                                              "not a prediction",))
     lever = _LEVERAGE.search(raw)
     if lever and symbols and not pairs:
-        amount = re.search(r"\b(\d+(?:\.\d+)?)\s*x\b", raw, re.I)
+        amount = stated_multiple(raw)
         return ResearchRequest(
             kind=ResearchKind.LEVERAGE, symbols=symbols[:1],
             leverage=float(amount.group(1)) if amount else None,
@@ -3571,7 +3759,9 @@ def read_request(text: str) -> ResearchRequest | None:
             symbols=tuple(book) or symbols,
             book=book or {s: 1.0 / len(symbols) for s in symbols},
             shock_pct=shock,
-            notes=tuple(notes if book else [
+            # "Long 100 AAPL, short $20k QQQ" states a book in amounts, priced downstream; the
+            # equal-weight note contradicted the dollar figures beside it (round 22)
+            notes=tuple(notes if book or _AMOUNT_HELD.search(raw) else [
                 *notes,
                 "no book was stated, so " + (
                     f"{symbols[0]} is stressed on its own" if len(symbols) == 1
@@ -3841,7 +4031,9 @@ def with_book(request: ResearchRequest | None, book_text: str,
         others = [s for s in book if s != candidate]
         return replace(request, book=book, symbols=(candidate, *others), notes=(*kept, note))
     if request.kind in (ResearchKind.STRESS, ResearchKind.BOOK):
-        return replace(request, book=book, symbols=tuple(book), notes=(*kept, note))
+        valued = priced_book(book_text)
+        return replace(request, book=book, symbols=tuple(book), notes=(*kept, note),
+                       book_value=valued.value if valued is not None and valued.value else None)
     if request.kind is ResearchKind.MACRO and not request.symbols:
         return replace(request, book=book, symbols=tuple(book), notes=(*kept, note))
     if (request.kind is ResearchKind.HEDGE and len(request.symbols) == 1

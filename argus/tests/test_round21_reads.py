@@ -191,3 +191,17 @@ class TestNumbersAndScenarios:
         old = {"generated_at": "2026-10-02T11:02:22Z"}
         assert "hours old" in _staleness(old, datetime(2026, 10, 2, 17, tzinfo=UTC))
         assert _staleness(old, datetime(2026, 10, 2, 12, tzinfo=UTC)) == ""
+
+
+def test_which_fits_my_thesis_names_the_thesis_name() -> None:
+    from argus.lui import server
+
+    facts = memory.extract("I'm bullish on NVDA because AI capex keeps rising.")
+    token = server._MEMORY.set(tuple(facts))
+    try:
+        said = server._fits_thesis(
+            "Compare NVDA and AMD on valuation — which fits my thesis?",
+            ["Bottom line: AMD is the more expensive on 2 of 3 measures"]) or ""
+    finally:
+        server._MEMORY.reset(token)
+    assert said.startswith("Your thesis is on NVDA") and "NVDA is the cheaper" in said

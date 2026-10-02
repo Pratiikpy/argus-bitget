@@ -47,12 +47,15 @@ _SPLIT = re.compile(
 
 
 _HOLDINGS_ONLY = re.compile(
-    r"^\s*(?:i\s+(?:hold|own|have)|i'?m\s+(?:long|short)|my\s+(?:book|portfolio|holdings)\s+"
+    # "I am short $50,000 of NVDA." split off and the move lost its dollars (round 22)
+    r"^\s*(?:i\s+(?:hold|own|have)|i(?:'?m|\u2019m|\s+am)\s+(?:long|short)|my\s+(?:book|portfolio|"
+    r"holdings)\s+"
     r"(?:is|are)|"
     # "I want to short TSLA." states the trade the next part asks about; split off, its side was
     # lost and a short got a long's liquidation price (a hostile review, round 19, row 646)
     r"i\s+(?:want|plan|intend|am\s+going|'?m\s+going|'?d\s+like|would\s+like)\s+to\s+"
-    r"(?:go\s+)?(?:short|long|buy|sell))\b(?!.*\b(?:what|how|should|which|when|where|why|is\s+it|can)\b)",
+    r"(?:go\s+)?(?:short|long|buy|sell))\b"
+    r"(?!.*\b(?:what|how|should|which|when|where|why|is\s+it|can)\b)",
     re.I)
 
 _WORST_CASE = re.compile(r"^\s*(?:and\s+)?(?:what(?:'s|\s+is|\s+are)\s+(?:my|the)\s+worst[\s-]case|"

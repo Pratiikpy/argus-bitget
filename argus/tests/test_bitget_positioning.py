@@ -53,7 +53,7 @@ def test_positioning_compares_the_crowd_with_the_largest_traders(
     assert "$1,154m long and $710m short in ETH" in lines[1]
     # today's row is still filling; the last full day is yesterday's
     assert f"liquidations on {today - timedelta(days=1)}" in lines[2]
-    assert "the longs took the larger flush" in lines[2]
+    assert "the longs lost more to forced closes" in lines[2]
 
 
 def test_an_ex_dividend_date_is_shown_only_when_it_is_near(

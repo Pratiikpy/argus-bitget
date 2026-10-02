@@ -155,7 +155,9 @@ class LocalPlanner:
         shock = next(iter(research.shock_numbers(text, sorted(weights), near=16)), None)
         if label == "stress" and shock is not None:
             value = abs(float(shock.group(1)))
-            down = research.parse.DOWN_WORDS.search(text) or shock.group(1).startswith("-")
+            said = research.parse.stated_direction(text, shock.start())
+            down = (shock.group(1).startswith("-") or said == -1
+                    or (said is None and research.parse.DOWN_WORDS.search(text)))
             plan["shock_percent"] = -value if down else value
         return plan
 

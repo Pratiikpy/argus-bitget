@@ -1118,7 +1118,8 @@ def handle_ask(
 
         prefix = order_prefix(text)
         if (prefix and payload.get("lines") and not payload.get("refused")
-                and not str(payload["lines"][0]).startswith(prefix)):
+                and not str(payload["lines"][0]).startswith(prefix)
+                and payload.get("classified_by") != "newcomer"):
             # An order instruction answered with analysis says first that nothing was sent: the
             # console places, changes and cancels no orders (infeasibility bench, order rows).
             payload["lines"] = [prefix, *payload["lines"]]
@@ -1450,8 +1451,526 @@ _REFUSALS_RIGHT = re.compile(
     r"record)\b", re.I)
 _SOLD_SHORT_LOSS = re.compile(
     r"\b(?:sold|went|am|i'?m)\s+short\s+(?P<n>\d[\d,]*)\s+(?:shares?\s+(?:of\s+)?)?(?P<name>[A-Za-z]"
-    r"{1,6})\b[^?]{0,60}?\b(?:rall\w*|ris\w*|jump\w*|goes\s+up|climb\w*)\s+(?:by\s+)?"
+    r"{1,6})\b(?:\s+contracts?\s+(?:at|of|with|x)\s+(?P<per>\d[\d,]*)\s+shares?(?:\s+each)?)?"
+    r"[^?]{0,60}?\b(?:rall\w*|ris\w*|jump\w*|goes\s+up|climb\w*)\s+(?:by\s+)?"
     r"(?P<pct>\d+(?:\.\d+)?)\s*%", re.I)
+
+
+_FITS_THESIS = re.compile(r"\b(?:fits?|suits?|matches|goes\s+with|backs?)\s+my\s+(?:thesis|view|"
+                          r"idea|case)\b|\bwhich\s+(?:one\s+)?(?:fits|suits)\b", re.I)
+
+
+def _fits_thesis(text: str, lines: list[str]) -> str | None:
+    """Which compared name a remembered thesis is about, beside the comparison's own lead: "which
+    fits my thesis" was never answered (a judge, round 21, row 749). Read from the thesis the
+    trader stated, never inferred."""
+    if not _FITS_THESIS.search(text):
+        return None
+    from argus.lui.research import research_symbols
+
+    named = research_symbols(text)[0]
+    theses = [f for f in _MEMORY.get() if f.kind == "thesis"]
+    if not theses:
+        return ("Your thesis: none is remembered in this conversation, so there is nothing to fit "
+                "against — state it (\"I'm bullish on NVDA because AI capex keeps rising\") and "
+                "ask again.")
+    on = [f for f in theses if f.subject in named]
+    if not on:
+        held = ", ".join(f"{f.subject.removesuffix('USDT')} (\u201c{f.text}\u201d)" for f in theses)
+        return (f"Your thesis is about {held}, none of the names compared here, so neither fits "
+                f"it by name; the figures below are the comparison alone.")
+    fact = on[0]
+    name = fact.subject.removesuffix("USDT")
+    lead = lines[0] if lines else ""
+    richer = re.search(r"Bottom line: (\w+) is the more expensive", lead)
+    said = ""
+    if richer is not None:
+        said = (f"; on these measures {name} is the "
+                + ("more expensive" if richer.group(1) == name else "cheaper") + " of the two")
+    return (f"Your thesis is on {name} (\u201c{fact.text}\u201d, {fact.at}), so {name} is the name "
+            f"it fits{said}. Whether the reason still holds is a test of its own: ask \"test my "
+            f"thesis\".")
+
+
+def _per_trade_line(request: ResearchRequest) -> str | None:
+    """An add sized to the trader's own per-trade risk: "I never risk more than 1% per trade" was
+    remembered and the AMD-add answer never used it (a judge, round 22). The stop is put at the
+    name's worst 24 hours of the last 30 days, the move a stop must survive; a closer stop allows
+    a larger position, and that is said."""
+    if request.kind is not ResearchKind.IMPACT or not request.symbols:
+        return None
+    rule = next((f for f in _MEMORY.get() if f.kind == "trade_risk" and _number_like(f.value)),
+                None)
+    if rule is None:
+        return None
+    worst = _worst_day(request.symbols[0])
+    if not worst or worst >= 0:
+        return None
+    risk = float(rule.value)
+    stop = abs(worst) + 0.0012
+    cap = risk / stop
+    name = request.symbols[0].removesuffix("USDT")
+    return (f"Your per-trade rule (“{rule.text}”): with the stop at {name}'s worst 24 "
+            f"hours of the last 30 days ({worst:.1%}) plus the 0.12% round trip, the position "
+            f"should be at most {cap:.0%} of the account ({risk:.0%} ÷ {stop:.1%}); a closer "
+            f"stop allows more, a wider one less.")
+
+
+def _stop_level(text: str, lines: list[str], symbols: tuple[str, ...]) -> str | None:
+    """Where the stop goes as a price, when the question asks where and the answer gives only the
+    noise distance in basis points: "where should my stop go on TSLA" was answered "never more
+    than 354bps against it", and "explain that simpler" still gave no price (a first-time user,
+    round 22)."""
+    from argus.lui.research import sizing
+    from argus.lui.research.parse import last_price
+
+    if not sizing.STOP_WHERE.search(text) or not symbols:
+        return None
+    noise = next((m for x in lines if (m := re.search(
+        r"Where a stop sits in the noise: in 90% of past (?P<kind>[\w-]+) windows a "
+        r"(?P<side>long|short) was never more than (?P<bps>\d+)bps", x))), None)
+    if noise is None:
+        return None
+    price = last_price(symbols[0])
+    if price is None:
+        return None
+    gap = int(noise.group("bps")) / 10_000
+    short = noise.group("side") == "short"
+    level = price * (1 + gap if short else 1 - gap)
+    name = symbols[0].removesuffix("USDT")
+    side = noise.group("side")
+    return (f"Bottom line: for a {side} bought at today's {price:,.2f}, put the stop "
+            f"about {gap:.1%} {'above' if short else 'below'} it — near {level:,.2f}. Closer "
+            f"than that, {name}'s ordinary {noise.group('kind')} swings take it out more than one "
+            f"time in ten; if you bought at another price, put it {gap:.1%} "
+            f"{'above' if short else 'below'} that price. A stop limits the loss to roughly that "
+            f"distance times the position, plus fees; a gap through it fills worse.")
+
+
+_MONTHS = ("january", "february", "march", "april", "may", "june", "july", "august",
+           "september", "october", "november", "december")
+_DAY_SAID = re.compile(
+    r"\b(?P<d1>\d{1,2})(?:st|nd|rd|th)?\s+(?P<m1>jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|"
+    r"dec)[a-z]*\.?,?\s+(?P<y1>(?:19|20)\d\d)\b|\b(?P<m2>jan|feb|mar|apr|may|jun|jul|aug|sep|sept|"
+    r"oct|nov|dec)[a-z]*\.?\s+(?P<d2>\d{1,2})(?:st|nd|rd|th)?,?\s+(?P<y2>(?:19|20)\d\d)\b|"
+    r"\b(?P<y3>(?:19|20)\d\d)-(?P<m3>\d\d)-(?P<d3>\d\d)\b", re.I)
+
+
+def _stated_day(text: str) -> Any:
+    """A calendar date written in the question ("15 March 2023", "Jan 1, 2030", "2023-03-15"),
+    or None."""
+    from datetime import date as day_type
+
+    found = _DAY_SAID.search(text)
+    if found is None:
+        return None
+    try:
+        if found.group("y3"):
+            return day_type(int(found.group("y3")), int(found.group("m3")), int(found.group("d3")))
+        month_word = (found.group("m1") or found.group("m2")).lower()[:3]
+        month = next(i for i, m in enumerate(_MONTHS, 1) if m.startswith(month_word))
+        return day_type(int(found.group("y1") or found.group("y2")), month,
+                        int(found.group("d1") or found.group("d2")))
+    except (ValueError, StopIteration):
+        return None
+
+
+def _date_not_applied(text: str, kind: ResearchKind, symbols: tuple[str, ...]) -> str | None:
+    """A stress question that names a date, told the date was not used: "if NVDA fell 5% on 15
+    March 2023" was stressed with today's betas and no word about 2023 (a hostile review, round
+    22). A past date is given the name's actual move that day, from daily closes."""
+    if kind not in (ResearchKind.STRESS, ResearchKind.IMPACT, ResearchKind.BOOK):
+        return None
+    day = _stated_day(text)
+    if day is None:
+        return None
+    today = datetime.now(UTC).date()
+    if day > today:
+        return (f"The date, {day:%d %B %Y}, is not used: nothing here forecasts what a book is "
+                f"worth on a future day, so the move is applied to the book as it stands today.")
+    actual = ""
+    ticker = _yahoo_ticker(symbols[0]) if symbols else None
+    if ticker is not None:
+        from argus.market.equity_history import HistoryError, daily
+
+        try:
+            closes = [(d.day, d.close) for d in daily(ticker)]
+        except (HistoryError, OSError, ValueError):
+            closes = []
+        at = next((i for i, (d, _c) in enumerate(closes) if d >= day), None)
+        if at is not None and at > 0 and closes[at][0] == day:
+            move = closes[at][1] / closes[at - 1][1] - 1
+            actual = (f" On that day {symbols[0].removesuffix('USDT')} actually closed "
+                      f"{move:+.1%} (Yahoo Finance daily closes, split-adjusted).")
+        elif at is not None:
+            actual = f" {day:%d %B %Y} was not a trading day for it."
+    return (f"The date, {day:%d %B %Y}, is not used for the figure above: the stress applies "
+            f"the move with betas from the last 30 days, not the ones in force then.{actual}")
+
+
+def _rate_not_applied(text: str, kind: ResearchKind) -> str | None:
+    """A rate move stated beside a price shock, said not to be applied: the stress moves prices
+    through betas and has no rate channel, so "and rates rise 50bps" must be named as left out
+    rather than silently dropped or, as before round 22, read as the price shock itself."""
+    from argus.lui.research.parse import RATE_MOVE
+
+    if kind not in (ResearchKind.STRESS, ResearchKind.IMPACT, ResearchKind.BOOK):
+        return None
+    found = RATE_MOVE.search(text)
+    if found is None:
+        return None
+    return (f"Not applied: \u201c{found.group(0).strip()}\u201d \u2014 this stress moves prices "
+            f"by the shock stated for them; a change in rates is not turned into a price move "
+            f"here, so its effect on the book is not in the figure above.")
+
+
+_CREDENTIALS = re.compile(
+    r"\b(?:give|share|send|tell|hand|dm|paste)\s+(?:u|you|ya|it|this)?\s*(?:my|the)\s+"
+    r"(?:login|log\s*in|password|passcode|pass|api[\s_-]*keys?|secret[\s_-]*key|seed(?:\s+phrase)?|"
+    r"recovery\s+phrase|private[\s_-]*key|2fa|otp|account\s+details|credentials)\b", re.I)
+"""An offer to hand over a login or key: "can you place the order for me if i give u my login"
+was declined without a word about never sharing it (a first-time user, round 22)."""
+_CREDENTIALS_ANSWER = [
+    "Bottom line: no \u2014 and do not give your login, password, API keys or recovery phrase "
+    "to this console, or to anyone who asks for them. This console never needs them and never "
+    "places an order; anyone who offers to trade for you with your login can empty the account.",
+    "Every trade is yours to place, on Bitget itself. If you ever use an app with an API key, "
+    "create one with trading only (never withdrawal), and delete it when you stop using the app.",
+    "What this console can do before you trade: what the trade would cost and how far it could "
+    "go against you \u2014 \"what does $500 of BTC cost me and what could I lose in a week?\".",
+]
+
+_CRYPTO_WIDE = re.compile(
+    r"\b(?:the\s+)?(?:crypto(?:\s+market)?|coins|all\s+(?:my\s+)?(?:crypto|coins))\s+"
+    r"(?P<verb>drops?|falls?|crash(?:es)?|dumps?|tanks?|rises?|rall(?:y|ies)|jumps?|pumps?)\s+"
+    r"(?:by\s+)?(?P<pct>\d+(?:\.\d+)?)\s*%", re.I)
+_FOREIGN_SAID = re.compile(r"[€£¥]|\d\s*(?:eur(?:os?)?|gbp|pounds?|jpy|yen)\b|"
+                           r"\d{1,3}(?:\.\d{3})+,\d{1,2}\b", re.I)
+_EUROPEAN_WORDS = (
+    (re.compile(r"\b(?:baisse(?:rait)?|chute(?:rait)?|recule(?:rait)?|tombe(?:rait)?|perd(?:ait)?)"
+                r"(?:\s+de)?\b|\b(?:cae|caer[ií]a|baja(?:r[ií]a)?)(?:\s+(?:un|el))?\b|"
+                r"\b(?:f[äa]llt|sinkt|verliert)(?:\s+um)?\b|\b(?:cai|caísse|desce)(?:\s+de)?\b",
+                re.I), "drops"),
+    (re.compile(r"\b(?:monte(?:rait)?|grimpe(?:rait)?|augmente(?:rait)?)(?:\s+de)?\b|"
+                r"\bhausse\s+de\b|\b(?:sube|subir[ií]a)(?:\s+(?:un|el))?\b|"
+                r"\b(?:steigt|klettert)(?:\s+um)?\b|\bsobe(?:\s+de)?\b", re.I), "rises"),
+    (re.compile(r"\bsi\b|\bwenn\b|\bse\b(?=\s+[A-Z])", re.I), "if"),
+    (re.compile(r"\bj'ai\b|\bj\u2019ai\b|\btengo\b|\bich\s+habe\b|\btenho\b", re.I), "I have"),
+    (re.compile(r"\bcombien\s+(?:je\s+perds|vais-je\s+perdre|est-ce\s+que\s+je\s+perds)\b|"
+                r"\bcu[aá]nto\s+pierdo\b|\bwie\s+viel\s+verliere\s+ich\b|\bquanto\s+perco\b",
+                re.I), "how much do I lose"),
+)
+_EUROPEAN_CUE = re.compile(r"\b(?:j'ai|j\u2019ai|combien|baisse|hausse|chute|tengo|cu[aá]nto|"
+                           r"pierdo|wenn|f[äa]llt|steigt|verliere|tenho|quanto)\b", re.I)
+
+
+def _from_european(text: str) -> str:
+    """A French, Spanish, German or Portuguese scenario question with its move words in English,
+    when it states a percentage; unchanged otherwise. The model translates these when it is on;
+    this keeps the direction right when it is paused."""
+    if not _EUROPEAN_CUE.search(text) or not re.search(r"\d\s*%", text):
+        return text
+    out = text
+    for pattern, english in _EUROPEAN_WORDS:
+        out = pattern.sub(english, out)
+    out = re.sub(r"(\d)\s+%", r"\1%", out)
+    return out
+
+
+_STEP_MOVE = re.compile(
+    r"\b(?P<verb>falls?|fell|drops?|dropped|declines?|sinks?|sank|slides?|rises?|rose|"
+    r"rall(?:y|ies|ied)|rebounds?|bounces?|jumps?|climbs?|gains?|recovers?)\s+(?:back\s+)?"
+    r"(?:by\s+)?(?P<pct>\d+(?:\.\d+)?)\s*%", re.I)
+_STEP_DOWN = re.compile(r"fall|fell|drop|declin|sink|sank|slid", re.I)
+_SELF_CORRECTION = re.compile(
+    r"(?:\.{2,}|\u2026|[,;:!.\u2014-])\s*(?:no\s+wait|wait\s*,?\s*no|sorry|i\s+mean|scratch\s+that|"
+    r"correction|actually\s+no)\b[,:.!\s]*", re.I)
+_STOP_MINE = re.compile(
+    r"\bwhere\s+(?:do|should|would|can)\s+i\s+(?:put|place|set)\s+(?:mine|it|one|that|the\s+"
+    r"stop)\b", re.I)
+_HINGLISH_FEAR = re.compile(
+    r"\b(?:darr?|dar)\s+(?:lag|lg)\w*|\bghabra\w*|\bpaisa\s+(?:doob|dub|duub|dooba)\w*|"
+    r"\b(?:sab|saara|sara|pura)\s+paisa\s+(?:doob|dub|ja|chala)\w*", re.I)
+_HINGLISH_AMOUNT = re.compile(
+    r"(?:\$\s*(?P<a>\d[\d,]*)|(?P<b>\d[\d,]*)\s*(?:dollars?|usd|\$|bucks))\s*(?:hai|he|h|hain)\b"
+    r"(?=.*\b(?:kya\s+(?:kharid\w*|lu|loon|lena|karu|karoon)|stock\s+ya\s+crypto|crypto\s+ya\s+"
+    r"stock))", re.I)
+_ALL_IN = re.compile(
+    r"\b(?:put|throw|dump|go|invest)\s+(?:it\s+|my\s+money\s+|everything\s+)?all\s+(?:of\s+it\s+)?"
+    r"(?:in|into|on)\s+(?P<name>[A-Za-z$][\w.$]{1,11})\b|\ball[\s-]in\s+(?:on\s+)?"
+    r"(?P<name2>[A-Za-z$][\w.$]{1,11})\b", re.I)
+
+
+def _restated(text: str, prior: list[str], book: str = "") -> tuple[str, str | None] | None:
+    """A question read into the English the engines answer, with a lead to put first, or None.
+
+    Each case is a first-time user's or a hostile reviewer's question from round 22 that was
+    declined or answered as something else; the reading is always said in a "Read as" line."""
+    from argus.lui.research import research_symbols
+
+    sector = _CRYPTO_WIDE.search(text)
+    if sector is not None:
+        from argus.lui.research.parse import is_us_equity
+        from argus.market import universe
+
+        coins = [s for s in dict.fromkeys([*research_symbols(text)[0], *research_symbols(book)[0]])
+                 if not is_us_equity(s) and universe.NOT_EQUITY.get(s, "crypto") == "crypto"]
+        if coins:
+            # "1,234.56 EUR in ETH and 2.000 USD in BTC. If crypto drops 15%" moved BTC through a
+            # beta to ETH (a hostile review, round 22): a fall of "crypto" is a fall of each coin
+            names = [c.removesuffix("USDT") for c in coins]
+            said = (names[0] if len(names) == 1 else
+                    ", ".join(names[:-1]) + f" and {names[-1]} each")
+            verb = sector.group("verb")
+            if len(names) > 1:
+                verb = (verb[:-3] + "y" if verb.lower().endswith("ies") else
+                        verb[:-2] if re.search(r"(?:sh|ch)es$", verb, re.I) else
+                        verb[:-1] if verb.lower().endswith("s") else verb)
+            return (text[:sector.start()] + f"{said} {verb} {sector.group('pct')}%"
+                    + text[sector.end():]), None
+    steps = list(_STEP_MOVE.finditer(text))
+    if len(steps) >= 2 and re.search(r"\bthen\b", text, re.I):
+        # "If NVDA falls 5%, then rebounds 3%, then falls 2%" was stressed at the last move alone,
+        # -2%, half the compounded loss (a hostile review, round 22)
+        growth = 1.0
+        for step in steps:
+            size = float(step.group("pct")) / 100
+            growth *= (1 - size) if _STEP_DOWN.match(step.group("verb")) else (1 + size)
+        total = (growth - 1) * 100
+        factors = [(1 - float(s.group("pct")) / 100) if _STEP_DOWN.match(s.group("verb"))
+                   else (1 + float(s.group("pct")) / 100) for s in steps]
+        chain = " \u00d7 ".join(f"{f:.2f}" for f in factors)
+        english = (text[:steps[0].start()] + f"moves {total:+.2f}%" + text[steps[-1].end():])
+        return english, (f"Bottom line: those {len(steps)} moves compound to {total:+.2f}% "
+                         f"({chain} = {growth:.4f}), not the sum of them, so the book is "
+                         f"stressed at that one move:")
+    corrected = list(_SELF_CORRECTION.finditer(text))
+    if corrected and len(text[corrected[-1].end():].strip()) >= 12:
+        # "I'm short NVDA via 5 SQQQ... no wait, I'm long 500 SQQQ" asked for holdings again
+        return text[corrected[-1].end():].strip(), None
+    if _STOP_MINE.search(text) and any(re.search(r"\bstop", p, re.I) for p in prior[-3:]):
+        # "ok where do i put mine on tesla" after "what is a stop loss", which the console itself
+        # had suggested asking, was declined
+        named = research_symbols(text)[0] or next(
+            (research_symbols(p)[0] for p in reversed(prior) if research_symbols(p)[0]), ())
+        if named:
+            return f"where should my stop go on {named[0].removesuffix('USDT')}", None
+    if _HINGLISH_FEAR.search(text):
+        # "mujhe darr lag raha hai, sab paisa doob jayega kya?" was declined
+        return "I'm scared of losing all my money", None
+    amount = _HINGLISH_AMOUNT.search(text)
+    if amount is not None:
+        # "bhai 500 dollar hai, kya kharidu? stock ya crypto" got a rates-and-dollar dump
+        sum_said = (amount.group("a") or amount.group("b") or "").replace(",", "")
+        return f"I have ${int(sum_said):,}, should I start with stocks or crypto?", None
+    resized_trade = _sizing_follow_up(text, prior)
+    if resized_trade is not None:
+        return resized_trade, None
+    horizon_fact = next((f for f in _MEMORY.get() if f.kind == "horizon"
+                         and f.value.isdigit()), None)
+    if horizon_fact is not None and _ENTRY_FOR_ME.search(text):
+        entry_named = research_symbols(text)[0] or next(
+            (research_symbols(p)[0] for p in reversed(prior) if research_symbols(p)[0]), ())
+        if entry_named:
+            # "is it a good entry for me then?" after "I hold positions about 3 months" got a
+            # sentiment dump with nothing about the hold (a judge, round 22)
+            hours = int(horizon_fact.value)
+            span = (f"{hours // 720} months" if hours >= 1440 else "a month" if hours >= 720
+                    else f"{hours // 168} weeks" if hours >= 336 else f"{max(1, hours // 24)} days")
+            entry_name = entry_named[0].removesuffix("USDT")
+            span_adj = re.sub(r"^a-", "one-", re.sub(r"\s+(\w+?)s?$", r"-\1", span))
+            return (f"will {entry_name} be higher in {span}?",
+                    f"Bottom line: whether it is a good entry is your call, and nobody can know "
+                    f"where {entry_name} will be. For your {span_adj} hold (“"
+                    f"{horizon_fact.text}”), here is how past {span_adj} stretches from "
+                    f"moments like today ended:")
+    level_hit = _LEVEL_HIT.search(text)
+    if level_hit is not None and (book.strip() or re.search(r"\bmy\b", text, re.I)):
+        from argus.lui.research.parse import last_price
+
+        hit_named = research_symbols(level_hit.group("name"))[0]
+        now_px = last_price(hit_named[0]) if hit_named else None
+        if now_px:
+            # "What happens to my book on 1 January 2030 if BTC hits $1,000,000?" was answered
+            # with a hedge ratio (a hostile review, round 22): a price level is a move from today
+            level = float(level_hit.group("level").replace(",", "")) * {"k": 1e3, "m": 1e6}.get(
+                (level_hit.group("unit") or "").lower(), 1.0)
+            move = (level / now_px - 1) * 100
+            return (text[:level_hit.start()] + f"if {level_hit.group('name')} moves {move:+.1f}%"
+                    + text[level_hit.end():]), None
+    target = _TARGET_PREMISE.search(text)
+    if target is not None:
+        premise = _target_premise(target)
+        if premise is not None:
+            # "eth is going to 10k next month right? should i buy more" led with "it rose 64% of
+            # the time", which a newcomer reads as yes (a first-time user, round 22)
+            name, lead = premise
+            return f"is it a good time to buy {name}?", lead
+    all_in = _ALL_IN.search(text)
+    if all_in is not None:
+        named = research_symbols(all_in.group("name") or all_in.group("name2") or "")[0]
+        if named:
+            # "so should i just put it all in btc?" got beta, kurtosis and Euler decomposition
+            name = named[0].removesuffix("USDT")
+            return (f"how much could I lose on {name} in a bad week?",
+                    f"Bottom line: putting it all in {name} means {name}'s bad week is your "
+                    f"whole account's bad week \u2014 nothing else you hold softens it. Whether "
+                    f"to do it is your call; here is what {name}'s bad weeks have looked like, "
+                    f"in the money you would put in:")
+    return None
+
+
+_STOP_SAID = re.compile(
+    r"(?:\bwith\s+)?(?:\ba\s+)?(?:\bthe\s+)?\bstop(?:[\s-]?loss)?\s+(?:at|of|to)\s+\$?\d[\d,]*(?:\.\d+)?"
+    r"(?:\s*%(?:\s+(?:below|under|above)\s+(?:entry|the\s+entry))?)?|"
+    r"(?:\bwith\s+)?(?:\ba\s+)?\b\d+(?:\.\d+)?\s*%\s+stop(?:[\s-]?loss)?"
+    r"(?:\s+(?:below|under|above)\s+(?:entry|the\s+entry))?", re.I)
+_TRADE_FOLLOW_UP = re.compile(
+    r"^\W*(?:and|but|so|ok(?:ay)?)?\W*(?:what\s+about|how\s+about|and\s+if|what\s+if|if|same\s+"
+    r"(?:trade|thing|question)|instead)\b|\binstead\b|\bsame\s+(?:trade|thing|setup)\b", re.I)
+
+
+def _sizing_follow_up(text: str, prior: list[str]) -> str | None:
+    """A sizing question asked again with one thing changed: "and if I put the stop at 228
+    instead?" was declined and "what about the same trade in TSLA with a 5% stop?" dropped the 1%
+    rule and the stop (a judge, round 22). The earlier sizing question is restated with the new
+    stop and the new name, and everything else it said is kept."""
+    from argus.lui.research import research_symbols, sizing
+
+    if not _TRADE_FOLLOW_UP.search(text) or sizing.asks_for_size(text):
+        return None
+    earlier = next((p for p in reversed(prior[-4:]) if sizing.asks_for_size(p)), None)
+    if earlier is None:
+        return None
+    new_stop = _STOP_SAID.search(text)
+    new_names = research_symbols(text)[0]
+    if new_stop is None and not new_names:
+        return None
+    restated = earlier
+    if new_names:
+        old_names = research_symbols(earlier)[0]
+        if old_names:
+            old = old_names[0].removesuffix("USDT")
+            new = new_names[0].removesuffix("USDT")
+            # the article goes with the ticker as it is said, letter by letter ("an NVDA",
+            # "a TSLA"): a vowel sound for A, E, F, H, I, L, M, N, O, R, S and X
+            article = "an" if new[:1].upper() in "AEFHILMNORSX" else "a"
+            restated = re.sub(rf"\b(?:an?\s+)?{re.escape(old)}\b",
+                              lambda m: (f"{article} {new}" if re.match(r"an?\s", m.group(0), re.I)
+                                         else new), restated, flags=re.I)
+    if new_stop is not None:
+        stop_words = re.sub(r"^(?:with\s+)?(?:a\s+|the\s+)?", "", new_stop.group(0).strip(),
+                            flags=re.I)
+        if _STOP_SAID.search(restated):
+            restated = _STOP_SAID.sub(f" with a {stop_words}", restated, count=1)
+        else:
+            restated = restated.rstrip(" ?.") + f" with a {stop_words}?"
+    elif new_names and (old_stop := _STOP_SAID.search(restated)) is not None \
+            and "%" not in old_stop.group(0):
+        # a price stop belongs to the old name; the new one has no stop until one is said
+        return None
+    restated = re.sub(r"\s{2,}", " ", restated).replace(" with a with a ", " with a ")
+    return restated if restated != earlier else None
+
+
+_ENTRY_FOR_ME = re.compile(
+    r"\b(?:good|bad|right|decent|smart)\s+(?:entry|time\s+to\s+(?:buy|get\s+in)|moment\s+to\s+"
+    r"(?:buy|get\s+in)|price\s+to\s+(?:buy|get\s+in))\b[^?]{0,20}\bfor\s+me\b|"
+    r"\bshould\s+i\s+(?:get|go)\s+in\b[^?]{0,20}\bfor\s+my\s+(?:horizon|hold)", re.I)
+_LEVEL_HIT = re.compile(
+    r"\bif\s+(?P<name>[A-Za-z$][\w.$]{1,11})\s+(?:hits|reaches|goes\s+to|gets\s+to|trades\s+at|"
+    r"is\s+at|falls\s+to|drops\s+to|rises\s+to|climbs\s+to)\s+\$?(?P<level>\d[\d,]*(?:\.\d+)?)"
+    r"\s*(?P<unit>k|m)?\b", re.I)
+"""A held name's price level, stated as the scenario: "if BTC hits $1,000,000"."""
+_TARGET_PREMISE = re.compile(
+    r"\b(?P<name>[A-Za-z$][\w.$]{1,11})\s+(?:is\s+|will\s+|'?s\s+)?(?:going|gonna|headed|heading|"
+    r"go(?:ing)?|hit(?:ting)?|reach(?:ing)?)\s+(?:to\s+)?\$?(?P<level>\d[\d,]*(?:\.\d+)?)\s*"
+    r"(?P<unit>k|m)?\b(?:\s+(?P<when>next\s+(?:week|month|year)|this\s+(?:week|month|year)|"
+    r"by\s+\w+))?", re.I)
+"""A price level stated as coming: "eth is going to 10k next month right?"."""
+
+
+def _target_premise(found: re.Match[str]) -> tuple[str, str] | None:
+    """The size of the move a stated price target needs, beside the largest move of that length
+    in the name's own history; None when the name or its price cannot be read."""
+    from argus.lui.research import research_symbols
+    from argus.lui.research.parse import last_price
+    from argus.market.equity_history import HistoryError, daily
+
+    named = research_symbols(found.group("name"))[0]
+    if not named:
+        return None
+    price = last_price(named[0])
+    if not price:
+        return None
+    level = float(found.group("level").replace(",", "")) * {"k": 1e3, "m": 1e6}.get(
+        (found.group("unit") or "").lower(), 1.0)
+    if level <= 0 or abs(level / price - 1) < 0.02:
+        return None
+    when = (found.group("when") or "").lower()
+    span = 7 if "week" in when else 365 if "year" in when else 30
+    name = named[0].removesuffix("USDT")
+    need = level / price - 1
+    best = ""
+    ticker = _yahoo_ticker(named[0])
+    if ticker is not None:
+        try:
+            closes = [d.close for d in daily(ticker)]
+        except (HistoryError, OSError, ValueError):
+            closes = []
+        if len(closes) > span * 2:
+            moves = [closes[i + span] / closes[i] - 1 for i in range(len(closes) - span)]
+            top = max(moves) if need > 0 else min(moves)
+            beat = sum(1 for m in moves if (m >= need if need > 0 else m <= need))
+            extreme = "biggest rise" if need > 0 else "deepest fall"
+            best = (f" In {len(closes):,} days of its history the {extreme} "
+                    f"over {span} days was {top:+.0%}, and a move of {need:+.0%} or more happened "
+                    f"in {beat / len(moves):.1%} of {span}-day stretches.")
+    lead = (f"Bottom line: nobody can know that, and this console does not forecast prices. "
+            f"{name} is {price:,.2f} now, so {level:,.0f} needs a {need:+.0%} move"
+            f"{' ' + when if when else ' (no date was given, so 30 days is the yardstick)'}."
+            f"{best} Whatever you decide, size it for the move "
+            f"not happening. What has followed moments like today, for what it is worth:")
+    return name, lead
+
+
+_IS_THAT_GOOD = re.compile(
+    r"^\W*(?:so\s+|and\s+|ok(?:ay)?\s+|hmm+\s+)?(?:is|was|are)\s+(?:that|this|it|those)\s+"
+    r"(?:good|bad|a\s+lot|normal|high|low|ok|okay|scary|safe|risky|terrible|fine)\b[^?]{0,30}"
+    r"[?.!\s]*$", re.I)
+"""A beginner's "is that good?" about the last answer's figure (a first-time user, round 22: the
+answer to "is that good?" after a -20.6% bad week was twenty lines of positioning data)."""
+
+
+def _judge_last(prior: list[str], *, now: datetime | None, visitor: str,
+                book: str) -> list[str] | None:
+    """The last answer's lead figure, judged in plain words: a loss is a loss, sized against what
+    was put in; a gain is said to be past, not promised."""
+    again = _answer(prior[-1], prior[:-1], now=now, visitor=visitor, book=book)
+    said = [str(x) for x in again.get("lines") or []]
+    if again.get("refused") or not said:
+        return None
+    lead = unlead(said[0])
+    figure = re.search(r"([-+\u2212]?\d+(?:\.\d+)?)\s*%", lead)
+    if figure is None:
+        return None
+    value = float(figure.group(1).replace("\u2212", "-"))
+    loss_word = re.search(r"\b(?:los[se]|lost|fall|fell|drop|down|worst|wipes?)\b", lead, re.I)
+    if value < 0 or (loss_word and not figure.group(1).startswith("+")):
+        size = abs(value)
+        share = ("about a fifth" if 17 <= size < 23 else "about a quarter" if 23 <= size < 30
+                 else "about a third" if 30 <= size < 40 else "about half" if 40 <= size < 60
+                 else f"{size:.0f} in every 100")
+        judged = (f"Bottom line: no \u2014 that is a loss, and a big one: {size:.1f}% means "
+                  f"{share} of what you put in gone in that stretch. It is what has happened "
+                  f"before, not a forecast, but it can happen again. If losing that much would "
+                  f"hurt you, put in less, or hold it alongside something that does not move "
+                  f"with it.")
+    else:
+        judged = (f"Bottom line: {value:+.1f}% is a gain, and it is in the past \u2014 it says "
+                  f"what happened, not what will. Gains this size come with swings that size the "
+                  f"other way; ask \"how much could I lose on it in a bad week\" for that side.")
+    return [judged, f"The figure: {lead[:240]}"]
 
 
 def _from_hinglish(text: str) -> str:
@@ -1474,7 +1993,12 @@ def _answer(
     """
     import time
 
-    in_pct = _BPS_MOVE.sub(lambda m: f"{m.group(1)} {float(m.group(2)) / 100:g}%", text)
+    from argus.lui.research.parse import RATE_MOVE
+
+    rate_spans = [(r.start(), r.end()) for r in RATE_MOVE.finditer(text)]
+    in_pct = _BPS_MOVE.sub(
+        lambda m: m.group(0) if any(lo <= m.start() < hi for lo, hi in rate_spans)
+        else f"{m.group(1)} {float(m.group(2)) / 100:g}%", text)
     if in_pct != text:
         # "What if NVDA drops 150bps?" never computed the -1.5% shock (a hostile review, round
         # 21): a move stated in basis points is the same move in percent
@@ -1499,6 +2023,42 @@ def _answer(
                 "itself, in case it does:", *(unlead(x) for x in body)]
             shown["turns"] = [*prior, text][-12:]
             return shown
+    european = _from_european(text)
+    if european != text:
+        # "J'ai 10 000 € en NVDA. Si NVDA baisse de 12 %" was stressed at +12% on the Nasdaq when
+        # the model was paused (a hostile review, round 22): the scenario words are read in English
+        read = _answer(european, prior, now=now, visitor=visitor, book=book)
+        body = [str(x) for x in read.get("lines") or []]
+        if body:
+            read["lines"] = [*body[:1], f"Read as: “{european}”.", *body[1:]]
+        read["turns"] = [*prior, text][-12:]
+        return read
+    from argus.lui.research.parse import in_us_dollars
+
+    if _FOREIGN_SAID.search(text) and re.search(r"\d\s*%", text):
+        dollars, conversions = in_us_dollars(text)
+        if conversions and dollars != text:
+            # "I hold ¥5,000,000 of NVDA (yen)" asked for holdings again, and a euro holding was
+            # filed as a memory note (a hostile review, round 22): read in dollars, and said
+            read = _answer(re.sub(r"\s{2,}", " ", dollars).strip(), prior, now=now,
+                           visitor=visitor, book=book)
+            body = [str(x) for x in read.get("lines") or []]
+            if body:
+                read["lines"] = [*body[:1], "Read in US dollars: " + "; ".join(conversions) + ".",
+                                 *body[1:]]
+            read["turns"] = [*prior, text][-12:]
+            return read
+    rewritten = _restated(text, prior, book)
+    if rewritten is not None:
+        english, lead = rewritten
+        read = _answer(english, prior, now=now, visitor=visitor, book=book)
+        body = [str(x) for x in read.get("lines") or []]
+        if body:
+            read["lines"] = ([lead, f"Read as: \u201c{english}\u201d.", *(unlead(x) for x in body)]
+                             if lead else
+                             [*body[:1], f"Read as: \u201c{english}\u201d.", *body[1:]])
+        read["turns"] = [*prior, text][-12:]
+        return read
     plain = _from_hinglish(text)
     if plain != text:
         # "bhai solana lena chahiye kya abhi?" got the generic refusal (a first-time user, round
@@ -1546,6 +2106,8 @@ def _answer(
                      turns=[*prior, text][-12:])
         return built
 
+    if _CREDENTIALS.search(text):
+        return engine_payload(_CREDENTIALS_ANSWER, [], {}, by="newcomer")
     from argus.lui import intro
 
     if intro.ASK_Q.search(text):
@@ -1593,7 +2155,12 @@ def _answer(
                 *(f"{c.name}: {c.definition}" for c in terms_used),
                 "Ask about any one of them for an example, or \"explain that simpler\"."],
                 [], {"explained": [c.name for c in terms_used]}, by="intro")
-        return engine_payload(*intro.that_number_answer(prior[-1]), by="intro")
+        return engine_payload(*intro.that_number_answer(
+            prior[-1], answered=not again.get("refused") and bool(said)), by="intro")
+    if prior and _IS_THAT_GOOD.search(text):
+        judged = _judge_last(prior, now=now, visitor=visitor, book=book)
+        if judged is not None:
+            return engine_payload(judged, [], {}, by="intro")
     if _REFUSALS_RIGHT.search(text):
         # "How often were the desk's refusals right?" got one decision's evidence list when the
         # model was paused (a hostile review, round 21): the graded record answers it
@@ -1609,7 +2176,10 @@ def _answer(
     if short_loss is not None and not book.strip() and "what is my P&L" not in text:
         # "I sold short 100 TSLA yesterday. If TSLA rallies 10% how much do I lose?" was declined
         # without the model (a hostile review, round 21): read as the short it states
-        restated = (f"I'm short {short_loss.group('n')} shares of {short_loss.group('name')}. "
+        # "30 TSLA contracts at 100 shares each" is 3,000 shares (a hostile review, round 22)
+        count = int(short_loss.group("n").replace(",", "")) * int(
+            (short_loss.group("per") or "1").replace(",", ""))
+        restated = (f"I'm short {count} shares of {short_loss.group('name')}. "
                     f"If {short_loss.group('name')} rallies {short_loss.group('pct')}%, what is "
                     f"my P&L?")
         lost = _answer(restated, prior, now=now, visitor=visitor, book=book)
@@ -1647,6 +2217,23 @@ def _answer(
         if changed.get("lines") and not changed.get("refused"):
             changed["turns"] = [*prior, text][-12:]
             return changed
+    held_text = book.strip() or next((f.text for f in _MEMORY.get() if f.kind == "book"), "")
+    if held_text and _RISKIEST_HELD.search(text) and not about_the_record(text):
+        # "which one of my holdings is riskiest?" with the book remembered was answered with the
+        # paper desk's own positions (a judge, round 22)
+        riskiest = _answer(_BOOK_REPORT_ASK, prior, now=now, visitor=visitor, book=book)
+        said = [str(x) for x in riskiest.get("lines") or []]
+        lead = _riskiest_lead(said)
+        if said and not riskiest.get("refused"):
+            riskiest["lines"] = [lead, *(unlead(x) for x in said)] if lead else said
+            riskiest["turns"] = [*prior, text][-12:]
+            return riskiest
+    if held_text and _SELL_TO_CAP.search(text) and not about_the_record(text):
+        to_cap = _sell_to_cap(held_text)
+        if to_cap is not None:
+            # "how much of it should I sell to get under my cap?" after two answers named the
+            # breach was declined as "'that' has nothing to refer to" (a judge, round 22)
+            return engine_payload(to_cap, [], {}, by="research")
     if (_OWN_LOSS_Q.search(text) and not research_symbols(text)[0] and not about_the_record(text)
             and text.strip().rstrip("?").lower() != _BOOK_REPORT_ASK):
         own = _own_loss(text, prior, now=now, visitor=visitor, book=book)
@@ -2653,6 +3240,26 @@ def _research_payload(
         if ruled is not None:
             body = [str(x) for x in payload.get("lines") or []]
             payload["lines"] = [*body[:1], ruled, *body[1:]]
+        per_trade = _per_trade_line(request)
+        if per_trade is not None:
+            body = [str(x) for x in payload.get("lines") or []]
+            payload["lines"] = [*body[:1], per_trade, *body[1:]]
+        stop_at = _stop_level(text, [str(x) for x in payload.get("lines") or []], request.symbols)
+        if stop_at is not None:
+            payload["lines"] = [stop_at, *(unlead(str(x)) for x in payload.get("lines") or [])]
+        dated = _date_not_applied(text, request.kind, (request.shock_on and (request.shock_on,))
+                                  or request.symbols)
+        if dated is not None:
+            body = [str(x) for x in payload.get("lines") or []]
+            payload["lines"] = [*body[:1], dated, *body[1:]]
+        rated = _rate_not_applied(text, request.kind)
+        if rated is not None:
+            body = [str(x) for x in payload.get("lines") or []]
+            payload["lines"] = [*body[:1], rated, *body[1:]]
+        fits = _fits_thesis(text, [str(line) for line in payload.get("lines") or []])
+        if fits is not None:
+            body = [str(x) for x in payload.get("lines") or []]
+            payload["lines"] = [*body[:1], fits, *body[1:]]
         moved = _move_premise(text, [str(line) for line in payload.get("lines") or []])
         if moved is not None:
             body = [str(x) for x in payload.get("lines") or []]
@@ -2725,7 +3332,13 @@ _OWN_LOSS_Q = re.compile(
     r"very\s+|kinda\s+|a\s+bit\s+|lowkey\s+)?(?:scared|afraid|worried|nervous|anxious)\b|"
     # "how am i doing with my stuff" read as the desk's own record (a first-time user, round 21)
     r"\bhow\s+(?:am\s+i|are\s+my\s+(?:stocks|coins|holdings|investments|positions))\s+doing\b|"
-    r"\bhow\s+(?:is|'s)\s+my\s+(?:stuff|portfolio|book|bag|stack)\s+doing\b|"
+    r"\bhow\s*(?:is|'s|\u2019s|s)\s+my\s+(?:stuff|portfolio|book|bag|stack|holdings|investments?|"
+    r"coins|stocks|money)\s+doing\b|"
+    # "am i gonna lose money" and "am i up or down on my stuff?" read the desk's record (round 22)
+    r"\bam\s+i\s+(?:gonna|going\s+to|about\s+to|likely\s+to)\s+lose\b|"
+    r"\bam\s+i\s+(?:up|down|in\s+(?:profit|the\s+green|the\s+red|loss)|making\s+(?:money|a\s+"
+    r"profit)|losing\s+(?:money)?)\b|\bhow\s+much\s+(?:am\s+i|have\s+i)\s+(?:up|down|made|lost|"
+    r"making|losing)\b|"
     r"\bwhat(?:'s|\s+is)\s+the\s+most\s+i\s+"
     r"(?:can|could)\s+lose\b|\b(?:worst|bad)\s+(?:single\s+)?(?:day|week|month)\s+for\s+(?:my|this|"
     r"the)\s+(?:portfolio|book|holdings)\b|\b(?:my|this|the)\s+(?:portfolio|book|holdings)'?s?\s+"
@@ -2737,6 +3350,71 @@ with a desk decision (a judge, row 662)."""
 
 
 _BOOK_REPORT_ASK = "how risky is my book"
+
+_RISKIEST_HELD = re.compile(
+    r"\b(?:which|what)\s+(?:one\s+|name\s+|position\s+)?(?:of\s+)?(?:my|these|those)\s+"
+    r"(?:holdings|positions|stocks|coins|names|bags)\b[^?]{0,30}\b(?:riskiest|most\s+risky|"
+    r"risk(?:i|ie)st|most\s+volatile|biggest\s+risk|most\s+dangerous|safest|least\s+risky)\b|"
+    r"\b(?:which|what)\s+(?:of\s+my\s+\w+\s+)?is\s+(?:my\s+)?(?:riskiest|most\s+risky)\s+"
+    r"(?:holding|position|name)\b", re.I)
+_SELL_TO_CAP = re.compile(
+    r"\bhow\s+much\s+(?:of\s+(?:it|that|this|them|\w+)\s+)?(?:should|do|would|must|to)\s+(?:i\s+)?"
+    r"(?:sell|trim|cut|reduce)\b[^?]{0,60}\b(?:cap|limit|max(?:imum)?|rule)\b|"
+    r"\b(?:get|bring|be)\s+(?:back\s+)?(?:under|within|inside|below)\s+my\s+(?:cap|limit|"
+    r"max(?:imum)?|rule)\b", re.I)
+
+
+def _riskiest_lead(lines: list[str]) -> str | None:
+    """The riskiest holding, by its share of the book's risk and per dollar, from the book
+    report's own "Where the risk sits" line."""
+    sits = next((x for x in lines if "Where the risk sits:" in x), "")
+    rows = [(m.group(1), float(m.group(2)), float(m.group(3))) for m in re.finditer(
+        r"([A-Z][A-Z0-9.]{0,11}) (\d+)% of the money, (-?\d+)% of the risk", sits)]
+    if not rows:
+        return None
+    most = max(rows, key=lambda r: r[2])
+    per_dollar = max((r for r in rows if r[1] > 0), key=lambda r: r[2] / r[1])
+    lead = (f"Bottom line: {most[0]} carries the most of your book's risk, {most[2]:.0f}% from "
+            f"{most[1]:.0f}% of the money")
+    if per_dollar[0] != most[0]:
+        lead += (f"; per dollar {per_dollar[0]} is the riskiest, {per_dollar[2]:.0f}% of the risk "
+                 f"from {per_dollar[1]:.0f}% of the money")
+    return lead + "."
+
+
+def _sell_to_cap(held_text: str) -> list[str] | None:
+    """How much of each holding over the trader's own position cap to sell, from the book they
+    stated; None without a cap or a readable book."""
+    from argus.lui.research.parse import holding_pairs, priced_book
+
+    cap_fact = next((f for f in _MEMORY.get() if f.kind == "cap" and _number_like(f.value)), None)
+    if cap_fact is None:
+        return None
+    cap = float(cap_fact.value)
+    weights: dict[str, float] = {}
+    for _pos, symbol, weight in holding_pairs(held_text):
+        weights[symbol] = weights.get(symbol, 0.0) + weight
+    if not weights:
+        priced = priced_book(held_text)
+        weights = dict(priced.weights) if priced is not None else {}
+    total = sum(abs(w) for w in weights.values())
+    if not weights or total <= 0:
+        return None
+    over = {s: abs(w) / total for s, w in weights.items() if abs(w) / total > cap + 1e-9}
+    if not over:
+        return [f"Bottom line: nothing — every holding is inside your {cap:.0%} cap "
+                f"(“{cap_fact.text}”): "
+                + ", ".join(f"{s.removesuffix('USDT')} {abs(w) / total:.0%}"
+                            for s, w in weights.items()) + "."]
+    parts = [f"{s.removesuffix('USDT')} from {w:.0%} to {cap:.0%} of the book — sell "
+             f"{(w - cap) / w:.0%} of the position ({w - cap:.0%} of the book)"
+             for s, w in sorted(over.items(), key=lambda kv: -kv[1])]
+    return [f"Bottom line: to get under your {cap:.0%} cap, take " + "; ".join(parts) + ".",
+            f"Your cap, as you said it: “{cap_fact.text}” ({cap_fact.at}). The money "
+            f"freed stays as cash unless you put it elsewhere; if it goes into the other holdings, "
+            f"check they stay under {cap:.0%} too.",
+            "Before fees: a sale on Bitget pays the taker fee, about 0.06% of what is sold. "
+            "Whether to sell is your call."]
 
 
 def _yahoo_ticker(symbol: str) -> str | None:
@@ -2829,12 +3507,20 @@ def _own_loss(text: str, prior: list[str], *, now: datetime | None, visitor: str
         basics["classified_by"] = "own-risk"
         basics["turns"] = [*prior, text][-12:]
         return basics
-    if re.search(r"\bdoing\b", text, re.I):
+    so_far = _own_pnl(book)
+    if re.search(r"\b(?:doing|up|down|profit|green|red|making|made|losing\s+money)\b", text,
+                 re.I) and not re.search(r"\b(?:gonna|going\s+to|about\s+to|likely\s+to)\b",
+                                         text, re.I):
         # "how am i doing with my stuff" asks how the holdings have done, before how risky they
-        # are (a first-time user, round 21)
+        # are (a first-time user, round 21); with buy prices stated, against those prices first
+        # (round 22: "hows my stuff doing" read the desk's -$6.22 as the trader's own result)
         done = _answer("what return has my book had?", prior, now=now,
                        visitor=visitor, book=book)
         if done.get("lines") and not done.get("refused"):
+            if so_far:
+                done["lines"] = [*so_far, "How this mix of holdings has done over the last "
+                                 "year, whatever you paid:",
+                                 *(unlead(str(x)) for x in done["lines"])]
             done["classified_by"] = "own-risk"
             done["turns"] = [*prior, text][-12:]
             return done
@@ -2842,6 +3528,8 @@ def _own_loss(text: str, prior: list[str], *, now: datetime | None, visitor: str
     lines = [str(x) for x in again.get("lines") or []]
     if again.get("refused") or not lines:
         return None
+    if so_far:
+        lines = [*so_far, *(unlead(x) for x in lines)]
     worst = next((m for x in lines if (m := re.search(
         r"worst 24-bar window in the observed history \((\d+) hourly bars[^)]*\) would have "
         r"moved this book (-?\d+(?:\.\d+)?)%", x))), None)
@@ -2873,6 +3561,53 @@ def _own_loss(text: str, prior: list[str], *, now: datetime | None, visitor: str
     again["classified_by"] = "own-risk"
     again["turns"] = [*prior, text][-12:]
     return again
+
+_BOUGHT_AT = re.compile(
+    r"(?P<q>\d[\d,]*(?:\.\d+)?)\s+(?:shares?\s+(?:of\s+)?|units?\s+(?:of\s+)?)?"
+    r"(?P<n>[A-Za-z][\w.]{0,11})\s*(?:at|@)\s*\$?\s*(?P<p>\d[\d,]*(?:\.\d+)?)", re.I)
+"""A holding with its buy price: "bought 3 nvda at 180", "2 shares apple @ 210"."""
+
+
+def _own_pnl(book: str) -> list[str]:
+    """The trader's gain or loss against the buy prices the book states, at Bitget's last price.
+
+    "hows my stuff doing" with "bought 3 nvda at 180" saved was answered with the desk's own
+    -$6.22 (a first-time user, round 22). Only holdings with a stated buy price are worked; the
+    others are named as having none."""
+    from argus.lui.research import research_symbols
+    from argus.lui.research.parse import last_price
+
+    rows: list[tuple[str, float, float, float]] = []
+    for m in _BOUGHT_AT.finditer(book):
+        named = research_symbols(m.group("n"))[0]
+        if not named:
+            continue
+        now_px = last_price(named[0])
+        if now_px is None:
+            continue
+        rows.append((named[0], float(m.group("q").replace(",", "")),
+                     float(m.group("p").replace(",", "")), now_px))
+    if not rows:
+        return []
+    priced = {s for s, _q, _p, _n in rows}
+    cost = sum(q * p for _s, q, p, _n in rows)
+    worth = sum(q * n for _s, q, _p, n in rows)
+    change = worth - cost
+    lines = [f"Bottom line: on what you said you paid, you are {'up' if change >= 0 else 'down'} "
+             f"about ${abs(change):,.2f} ({change / cost:+.1%}) — ${cost:,.2f} paid, worth "
+             f"about ${worth:,.2f} at Bitget's last price."]
+    for symbol, qty, paid, now_px in rows:
+        lines.append(f"{symbol.removesuffix('USDT')}: {qty:g} bought at {paid:,.2f}, now "
+                     f"{now_px:,.2f} — {'up' if now_px >= paid else 'down'} "
+                     f"${abs(now_px - paid) * qty:,.2f} ({now_px / paid - 1:+.1%}).")
+    others = [s.removesuffix("USDT") for s in research_symbols(book)[0] if s not in priced]
+    if others:
+        lines.append(f"No buy price was given for {', '.join(others)}, so its gain or loss is not "
+                     f"in that figure — add “at <price>” to it in My book.")
+    lines.append("Before fees, and on paper until you sell: a gain or loss is only locked in when "
+                 "the position is closed.")
+    return lines
+
 
 _OTHERS = (r"(?:friend|wife|husband|partner|brother|sister|dad|father|mum|mom|mother|son|"
            r"daughter|boss|colleague|co-?worker|advisor|adviser|broker|uncle|aunt|cousin|"
@@ -3022,6 +3757,33 @@ def offer_translation(payload: dict[str, Any], text: str) -> None:
     if not body or sum(len(line) for line in body) > translate.MAX_CHARS:
         return
     payload["translate"] = {"lang": lang, "skip": skip, "token": translate.sign(lang, body)}
+    if skip:
+        # "the research engine's output is currently English only" read as the 8-language claim
+        # failing (a judge, round 22, over the API): the translation follows, and the note says so
+        payload["lines"] = [_TRANSLATION_FOLLOWS.get(lang, _TRANSLATION_FOLLOWS["en"]), *body]
+
+
+_TRANSLATION_FOLLOWS = {
+    "zh": ("\u4ee5\u4e0b\u5148\u7ed9\u51fa\u82f1\u6587\u56de\u7b54\uff0c\u8bd1\u6587"
+           "\u968f\u540e\u663e\u793a\uff08API \u8c03\u7528\u65b9\u53ef\u7528\u672c"
+           "\u56de\u7b54\u4e2d\u7684 translate \u4ee4\u724c\u5411 /translate \u53d6\u56de"
+           "\u8bd1\u6587\uff09\uff1b\u6240\u6709\u6570\u5b57\u5747\u7531\u5f15\u64ce"
+           "\u6839\u636e\u5b9e\u65f6\u6570\u636e\u8ba1\u7b97\uff0c\u7ffb\u8bd1\u4e0d"
+           "\u6539\u52a8\u4efb\u4f55\u6570\u5b57\u3002"),
+    "zh-Hant": ("\u4ee5\u4e0b\u5148\u7d66\u51fa\u82f1\u6587\u56de\u7b54\uff0c\u8b6f"
+                "\u6587\u96a8\u5f8c\u986f\u793a\uff08API \u547c\u53eb\u65b9\u53ef\u7528"
+                "\u672c\u56de\u7b54\u4e2d\u7684 translate \u6b0a\u6756\u5411 /translate "
+                "\u53d6\u56de\u8b6f\u6587\uff09\uff1b\u6240\u6709\u6578\u5b57\u5747"
+                "\u7531\u5f15\u64ce\u6839\u64da\u5373\u6642\u8cc7\u6599\u8a08\u7b97"
+                "\uff0c\u7ffb\u8b6f\u4e0d\u6539\u52d5\u4efb\u4f55\u6578\u5b57\u3002"),
+    "en": "Answered in English first; the translation follows on the page (an API caller fetches "
+          "it from /translate with this answer's translate token), and no figure is changed by "
+          "it.",
+}
+"""Said in place of the English-only note when a translation is offered: the Chinese lines read,
+in order, "the English answer first, the translation follows (an API caller fetches it from
+/translate with the translate token in this answer); every figure is computed from live data and
+translation changes none of them"."""
 
 
 

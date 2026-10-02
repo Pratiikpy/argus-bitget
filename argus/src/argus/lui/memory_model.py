@@ -119,6 +119,12 @@ def _valid(kind: str, value: str, subject: str, quote: str, context: str = ""
             pct = float(value)
         except ValueError:
             return None
+        if kind == "max_loss" and re.search(r"\b(?:per|each|a|any\s+one|one)\s+(?:single\s+)?"
+                                            r"(?:trade|bet|position)\b", quote, re.I):
+            # "I never risk more than 1% of my account per trade" is a per-trade risk, kept as
+            # trade_risk; stored as a max loss too, every book stress was held against 1% (a
+            # judge, round 22)
+            return None
         if kind == "max_loss" and re.search(r"\bstop\b", quote, re.I) and not re.search(
                 r"\blos[es]|\bloss\b|\bdrawdown\b", quote, re.I):
             # "stop 3% above entry" is a stop distance, not a loss limit (round 20, row 696)

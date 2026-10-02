@@ -95,9 +95,20 @@ def thanks_answer() -> tuple[list[str], list[Source], dict[str, Any]]:
              "a price, a risk, a cost, or a view you want tested."], [], {"thanks": True})
 
 
-def that_number_answer(previous: str) -> tuple[list[str], list[Source], dict[str, Any]]:
+def that_number_answer(previous: str, *, answered: bool = True,
+                       ) -> tuple[list[str], list[Source], dict[str, Any]]:
     from argus.lui.research import research_symbols
 
+    if not answered:
+        # "what does that mean" after a refusal was told "the last answer, on TSLA, gives each
+        # figure..." when that answer had no figures (a first-time user, round 22)
+        return ([
+            f"Bottom line: the last question, “{previous[:120]}”, was not answered "
+            f"— it was not read as a question this console can work out, so there are no "
+            f"figures in it to explain.",
+            "Try it in different words, or one of these: \"where should my stop go on TSLA\", "
+            "\"what is liquidation\", \"how much could I lose on BTC in a bad week\".",
+        ], [], {"that_number": None})
     named = research_symbols(previous)[0]
     subject = named[0].removesuffix("USDT") if named else "it"
     return ([
@@ -138,9 +149,9 @@ def answer() -> tuple[list[str], list[Source], dict[str, Any]]:
         "Bottom line: ARGUS is a research console for Bitget markets — tokenized US stocks, "
         "crypto, indices and commodities. Ask in plain words and it works the answer out from "
         "live data, showing where every number came from.",
-        "Who it is for: a trader holding Bitget's tokenized US stocks who wants a second desk "
-        "that shows its work. It is not a signal service and not financial advice, and it never "
-        "places an order for you.",
+        "Who it is for: anyone holding or weighing Bitget's tokenized US stocks or crypto, new "
+        "to trading or not, who wants answers that show their work. It is not a signal service "
+        "and not financial advice, and it never places an order for you.",
         "What to ask, for example: \"what is NVDA doing today\", \"how much would I lose if the "
         "Nasdaq fell 10% and I hold $5k of TSLA\", \"size a trade: $10k account, 1% risk, stop "
         "4% below entry\", \"compare gold and bitcoin this year\", \"when does TSLA report and "

@@ -108,7 +108,7 @@ class Positioning:
             out.append(f"{self.base} liquidations on {self.liquidation_day}: "
                        f"${self.liquidated_long_usd / 1e6:,.1f}m of longs and "
                        f"${self.liquidated_short_usd / 1e6:,.1f}m of shorts forced out — the "
-                       f"{heavier} took the larger flush (Binance, via {SOURCE}).")
+                       f"{heavier} lost more to forced closes (Binance, via {SOURCE}).")
         return out
 
 

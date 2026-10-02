@@ -125,6 +125,7 @@ from argus.lui.research.parse import (
     TRIM_TO_BUDGET,
     _idea_request,
     _mandate_lines,
+    asked_currency_amount,
     daily_technicals_asked,
     holding_shocks,
     is_us_equity,
@@ -147,6 +148,7 @@ from argus.lui.research.quote import (
     _session_line,
     _sized_round_trip,
     _technicals_computed,
+    open_while_open_line,
 )
 from argus.lui.research.riskmath import (
     _BETA_ASKED,
@@ -200,6 +202,12 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
             and not request.book and _TWO_WINDOWS.search(raw_text)):
         # "7 days vs 90 days for TSLA" is the move over each window, however the planner read it.
         request = replace(request, kind=ResearchKind.QUOTE)
+    if (request.kind is ResearchKind.COMPARE and len(request.symbols) >= 2
+            and _VALUATION.search(raw_text)
+            and all(is_us_equity(s) for s in request.symbols[:2])):
+        # "which one is cheaper on valuation?" after a comparison came back with volatility and
+        # beta, no P/E (a judge, round 22): valuation is the fundamentals engine's comparison
+        request = replace(request, kind=ResearchKind.FUNDAMENTALS, symbols=request.symbols[:2])
     with coverage.recording() as reached:
         answer = _run(raw_text, request, ledger=ledger)
         symbol = request.symbols[0] if request.symbols else ""
@@ -448,6 +456,10 @@ def _compounded(hourly: Sequence[Any]) -> float | None:
     return growth - 1.0
 
 
+_INDEX_LIKE = frozenset({"NDX100USDT", "SP500USDT", "DIASTOCKUSDT", "QQQUSDT", "SPYUSDT"})
+"""The broad-market names a question uses as "the market" beside a holding's own move."""
+
+
 def _own_move_lines(raw_text: str, request: ResearchRequest,
                     moves: Mapping[str, float]) -> list[str]:
     """The book's move when each named holding moves by the amount stated for it.
@@ -492,6 +504,15 @@ def _own_move_lines(raw_text: str, request: ResearchRequest,
         notes.append(f"{cash:.0%} in cash unchanged")
     if notes:
         lines.append("Assumed: " + "; ".join(notes) + ".")
+    indices = [s for s in absent if s in _INDEX_LIKE]
+    if indices:
+        # "NVDA drops 10% and the Nasdaq drops 3%": the index move was dropped with only "not in
+        # your book" (a hostile review, round 22); a holding's own stated move already includes
+        # whatever the market did, so the index move is not added on top, and that is said
+        lines.append(f"The {', '.join(_t(s) for s in indices)} move is not added on top: each "
+                     f"holding's own stated move already includes whatever the market did. Ask "
+                     f"\"if the Nasdaq falls 10%\" alone for the beta-propagated version.")
+    absent = [s for s in absent if s not in _INDEX_LIKE]
     if absent:
         lines.append(f"Not in your book, so no effect: {', '.join(_t(s) for s in absent)}.")
     lines.append("Each holding moves by exactly the figure you gave for it — no beta or "
@@ -831,7 +852,9 @@ def _agent_hub_lines(symbol: str, request: ResearchRequest, plan: Any,
             symbol, side,
             first, ticker.last,
             contract.size_step if contract else None, contract.min_qty if contract else None,
-            limit_price=(Decimal(str(touch)) if plan.slices[0].style == "near-touch limit"
+            # any limit slice previews as a limit at the touch: a "limit (quoted at taker)" first
+            # slice was previewed as a market order (a judge, round 22)
+            limit_price=(Decimal(str(touch)) if "limit" in plan.slices[0].style
                          and touch else None))
         return agenthub.lines_for(child)
     except Exception:
@@ -1292,15 +1315,28 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
         own = len(holding_shocks(raw_text)) >= 2
         # "I am short 100% TSLA. What happens if TSLA rallies 20%?" reached here with no book
         # from the hosted planner and was rebuilt long, +20% (round 20, row 692, live re-ask)
-        from argus.lui.research.parse import _held_short
+        from argus.lui.research import research_symbols as named_in
+        from argus.lui.research.parse import SHORT_OF_IT, _held_short
 
-        held = -1.0 if _held_short(raw_text, request.shock_on) else 1.0
+        # "Actually I'm short it, not long" after "I'm long 100 NVDA" was still stressed long
+        # (a hostile review, round 22): a short stated of "it" is a short of the one name shocked
+        held = -1.0 if (_held_short(raw_text, request.shock_on) or (
+            SHORT_OF_IT.search(raw_text) and len(named_in(raw_text)[0]) <= 1)) else 1.0
         request = replace(request, book={request.shock_on: held}, symbols=(request.shock_on,),
                           notes=request.notes if own else (
                               *request.notes, f"no other holdings were stated, so the book is "
                                               f"read as a position in {_t(request.shock_on)} "
                                               f"itself — say what you hold for your whole "
                                               f"book's figure"))
+    if (request.kind is ResearchKind.STRESS and request.shock_pct is not None
+            and request.shock_pct <= -100):
+        # a -500% shock returned a -556% loss on a long book (a hostile review, round 22)
+        return Answer(
+            question=question, refused=True,
+            reason="a price cannot fall by more than all of it",
+            lines=[f"A {request.shock_pct:g}% move is not possible: a price can fall at most 100%, "
+                   "to zero, and a long position then loses all of it and no more. Ask for a fall "
+                   "under 100% (\"what if the Nasdaq falls 50%\")."])
     if not request.symbols:
         return Answer(
             question=question, refused=True,
@@ -1856,7 +1892,7 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             from argus.lui.research.sizing import stated_capital
 
             stated_value = (getattr(priced_book(raw_text), "value", 0.0) or stated_capital(raw_text)
-                            or 0.0)
+                            or request.book_value or 0.0)
             for outcome in outcomes:
                 if outcome.portfolio_move_pct is None:
                     lines.append(f"{outcome.shock}: unavailable — {outcome.reason}")
@@ -1865,8 +1901,11 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                 lead_here = stated_leads and outcome is outcomes[0]
                 # said as a loss or a gain: "(about $5,627 of $46,894)" read the same either way
                 in_money = (f" (a {'loss' if outcome.portfolio_move_pct < 0 else 'gain'} of about "
-                            f"${abs(outcome.portfolio_move_pct) / 100 * stated_value:,.0f} on "
-                            f"${stated_value:,.0f})" if stated_value else "")
+                            f"${abs(outcome.portfolio_move_pct) / 100 * stated_value:,.0f}"
+                            + (f", {local}" if (local := asked_currency_amount(
+                                raw_text, abs(outcome.portfolio_move_pct) / 100 * stated_value))
+                               else "")
+                            + f" on ${stated_value:,.0f})" if stated_value else "")
                 lines.append(
                     ("Bottom line: " if lead_here else "")
                     + f"If {shocked_name} moves {outcome.shock.removeprefix('benchmark ')}: your "
@@ -2022,8 +2061,10 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                 vol_text = ("n/a" if row["realised_vol"] is None
                             else f"{row['realised_vol']:.0%}")
                 lines.append(
+                    # "beta 1.17 open / 0.80 shut" left a newcomer guessing (round 22)
                     f"{row['symbol'].removesuffix('USDT')}: realised vol {vol_text} a year; beta "
-                    f"{row['beta_open'] or 0:.2f} open / {row['beta_shut'] or 0:.2f} shut; QQQ "
+                    f"{row['beta_open'] or 0:.2f} while the US market is open and "
+                    f"{row['beta_shut'] or 0:.2f} while it is shut; QQQ "
                     f"-10% implies {(row['qqq_minus_10'] or 0):+.1f}%; worst 24-hour window "
                     f"{(row['worst_24h'] or 0):+.1f}%."
                 )
@@ -2065,10 +2106,29 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                 # answered with betas and one name's raw return (a judge, round 21)
                 from argus.lui.research.parse import _period_days
 
-                adjusted = risk_adjusted_lines(tuple(request.symbols),
-                                               _period_days(raw_text) or 90)
+                # "this year" was answered on the last 90 days with no word of the swap (a
+                # judge, round 22): the year to date, or the default said as one
+                this_year = re.search(r"\bthis\s+year\b|\bytd\b|\byear[\s-]to[\s-]date\b",
+                                      raw_text, re.I)
+                stated_days = _period_days(raw_text)
+                span_days = (stated_days or ((datetime.now(UTC).date()
+                                              - datetime.now(UTC).date().replace(month=1, day=1))
+                                             .days if this_year else 90))
+                adjusted = risk_adjusted_lines(tuple(request.symbols), span_days)
+                if adjusted and this_year and not stated_days:
+                    adjusted[0] = adjusted[0].replace(
+                        f"over the last {span_days} days",
+                        f"so far this year ({span_days} days since 1 January)")
                 if adjusted:
-                    lines = [adjusted[0], *(unlead(str(x)) for x in lines), *adjusted[1:]]
+                    said_span = ("" if stated_days else
+                                 f" The period is the year to date, {span_days} days."
+                                 if this_year else
+                                 " No period was stated, so the last 90 days are used.")
+                    lines = [adjusted[0], *(unlead(str(x)) for x in lines),
+                             adjusted[1] + said_span
+                             + " Its volatility is from daily closes over that period; the "
+                               "realised vol in the lines above is from the last 30 days of "
+                               "hourly bars, so the two figures differ.", *adjusted[2:]]
             if re.search(r"\bbeg+i?n+er|\bnewbie|\bnew\s+to\b|\bfirst\s+(?:time|position|buy)\b",
                          raw_text, re.I) and len(rows) >= 2:
                 # "eth vs sol which better for begginer" was ranked by beta and never said what it
@@ -2194,6 +2254,12 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                 if implied is not None and IMPLIED_OPEN_QUESTION.search(raw_text):
                     # "where will NVDA open?" opened on the round-trip cost (live, 2026-09-25).
                     lines = _lead_with(lines, "Implied open:")
+                elif (implied is None and anchor_open and len(quoted) == 1
+                      and re.search(r"\bopen(?:ing)?\b", raw_text, re.I)
+                      and IMPLIED_OPEN_QUESTION.search(raw_text)):
+                    open_now = open_while_open_line(symbol)
+                    if open_now is not None:
+                        lines = [open_now, *(unlead(str(x)) for x in lines)]
                 extra_lines, extra_sources, asked = _quote_extras(raw_text, quoted, float(fee))
                 lines.extend(extra_lines)
                 sources.extend(extra_sources)
@@ -2220,8 +2286,10 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             sources.extend(extra)
             if levels:
                 payload["technicals"] = levels
-            if daily_technicals_asked(raw_text):
-                daily, daily_sources = _daily_technicals(request.symbols[0], raw_text)
+            if daily_technicals_asked(raw_text) or (request.horizon_hours or 0) >= 336:
+                daily, daily_sources = _daily_technicals(
+                    request.symbols[0], raw_text if daily_technicals_asked(raw_text)
+                    else f"{raw_text} (50-day and 200-day moving averages)")
                 if daily:
                     # the daily figures asked for lead; the 4-hour Skill reading follows as the
                     # shorter-term context, its own lead demoted

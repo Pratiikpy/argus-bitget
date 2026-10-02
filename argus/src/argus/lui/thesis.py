@@ -123,7 +123,12 @@ _KINDS: tuple[tuple[Kind, re.Pattern[str]], ...] = (
         # "deliveries are falling" is a demand claim the revenue filings test, as a proxy said so
         # (a judge, round 19, row 669: it was left "not tested")
         r"\bdeliver(?:y|ies)\b|\bunits?\s+sold\b|\bshipments?\b|\bsales\s+volumes?\b|"
-        r"\bsubscribers?\b|\bbookings?\b", re.I)),
+        r"\bsubscribers?\b|\bbookings?\b|"
+        # "margins are shrinking" is a claim about reported quarters, tested on gross margin from
+        # the filings (a judge, round 22: it was refused as a claim about future earnings)
+        r"\bmargins?\s+(?:are\s+|is\s+|keep\s+)?(?:shrink|fall|declin|compress|squeez|expand|"
+        r"grow|ris|improv|widen|narrow)\w*|\b(?:shrinking|falling|declining|expanding|rising|"
+        r"improving)\s+(?:gross\s+)?margins?\b|\bgross\s+margins?\b", re.I)),
     (Kind.EARNINGS, re.compile(r"earnings|revenue|guidance|profit|margins?|\beps\b|beat", re.I)),
     (Kind.MACRO, re.compile(
         r"\bfed\b|rates?\b|rate cuts?|\bcpi\b|inflation|dollar|\bdxy\b|macro|liquidity|yields?",

@@ -613,7 +613,10 @@ def _passive_rate(
     quote is the taker rate.
     """
     if book is None:
-        return model.taker_bps, "limit (quoted at taker: no book supplied to price the fill)"
+        # "no book supplied" sat two lines under a live 50-level book (a judge, round 22): what is
+        # missing is the trading at the touch a fill rate needs, not the book
+        return model.taker_bps, ("limit (quoted at taker: no trades at the touch were observed, "
+                                 "so a passive fill is not assumed)")
     fill = PassiveExecution(cost=model, chase=True).execute(
         max(fraction * notional, Decimal("1")), book
     )

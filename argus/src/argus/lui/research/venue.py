@@ -189,6 +189,27 @@ def _leverage(symbol: str, multiple: float, side: str, *, closure: str | None = 
 
     mmr = maintenance_margin_rate(symbol, notional or 1000.0)
     distance = 1.0 / multiple - (mmr or 0.0)
+    from argus.market.bitget import max_leverage
+
+    allowed = max_leverage(symbol, notional or 1000.0)
+    if distance <= 0 or (allowed is not None and multiple > allowed):
+        # "I'm 500x long ETH" was given a liquidation price above its own entry and never told
+        # the position cannot be opened (a hostile review, round 22)
+        why = (f"its {1 / multiple:.2%} margin is at or below Bitget's {mmr:.2%} maintenance "
+               f"margin, so it would be liquidated the moment it opened"
+               if distance <= 0 and mmr is not None else
+               f"Bitget allows at most {allowed:g}x on {_t(symbol)} at this size")
+        cap = (f" The most Bitget allows here is {allowed:g}x, where a "
+               f"{1 / allowed - (mmr or 0.0):.2%} move against it wipes the margin."
+               if allowed is not None else "")
+        return ([f"Bottom line: a {multiple:g}x {side} on {_t(symbol)} cannot be opened — "
+                 f"{why}.{cap} So yes: at {multiple:g}x, any move against it is a "
+                 f"liquidation.",
+                 "Data: Bitget's public position tier table (query-position-lever) for "
+                 f"{_t(symbol)}. This is analysis, not advice — you make the call."],
+                [Source(kind="venue", ref="bitget /api/v2/mix/market/query-position-lever",
+                        detail=f"{_t(symbol)} tiers")],
+                {"leverage": multiple, "max_leverage": allowed, "maintenance_margin_rate": mmr})
     worst = 0.0
     hits = 0
     windows = 0
@@ -214,8 +235,9 @@ def _leverage(symbol: str, multiple: float, side: str, *, closure: str | None = 
     ticker = _t(symbol)
     lines = [
         f"Bottom line: at {multiple:g}x {side} a {distance:.1%} {verb} in {ticker} wipes the margin"
-        f" — and {ticker} moved that far against a {side} within 24 hours from {hits / windows:.0%}"
-        f" of the hourly entry points in the last {days:.0f} days. Its worst 24 hours against a "
+        # "from 0% of the hourly entry points" was unreadable to a newcomer (round 22)
+        f" — of {side}s opened at each hour of the last {days:.0f} days, {hits / windows:.0%} "
+        f"would have been wiped out within 24 hours. Its worst 24 hours against a "
         # from hourly highs and lows, which is wider than the close-to-close worst day other
         # answers quote; a first-time user saw 5.4% here and -4.2% there with no reason given
         f"{side} was {worst:.1%}, measured from hourly highs and lows (wider than a close-to-close "

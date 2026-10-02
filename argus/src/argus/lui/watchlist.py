@@ -358,6 +358,15 @@ def window(text: str, now: datetime, days: int | None = None) -> tuple[datetime,
         return now, now + timedelta(days=max(1, min(n, MAX_DAYS))), True
     if re.search(r"\b(?:next|coming)\s+(?:two|2)\s+weeks\b", text, re.I):
         return now, now + timedelta(days=14), True
+    if re.search(r"\bthis\s+week\s+or\s+(?:the\s+)?next(?:\s+week)?\b|\bthis\s+(?:week\s+)?and\s+"
+                 r"next\s+week\b|\b(?:next|coming)\s+(?:couple|few)\s+(?:of\s+)?weeks\b|"
+                 r"\bfortnight\b|本周或下周|这周和下周", text, re.I):
+        # "this week or next" was read as the default seven days and cut CPI on the 14th (a
+        # judge, round 22): it runs to the end of next week, New York time
+        asked_on = now.astimezone(NEW_YORK)
+        next_monday = datetime.combine(
+            asked_on.date() + timedelta(days=7 - asked_on.weekday()), time(0), NEW_YORK)
+        return now, (next_monday + timedelta(days=7)).astimezone(UTC), True
     if re.search(r"\bnext\s+month\b|下个月", text, re.I):
         # "if CPI comes in hot next month" covered this month's print, 2 Oct to 2 Nov (a judge,
         # round 21): next month is the calendar month after this one, New York time
@@ -746,6 +755,30 @@ def watchlist(question: str, book_text: str = "", *, now: datetime | None = None
         if book and top.kind != "EARNINGS":
             lead += f"; it touches the whole book ({_who(top.touched)})"
         lines.insert(0, lead + ". Size for the move, not a direction.")
+        if top.excess is None and book and calendar is not None:
+            # "this week or next" left CPI on the 14th just outside its window with no word,
+            # though CPI is the one release ARGUS has measured moving NVDA (a judge, round 22):
+            # the next measured release after the window is named
+            measured_after: list[Event] = []
+            for row in calendar.get("releases", []):
+                hour, minute = (int(x) for x in str(row["time_et"]).split(":"))
+                at = datetime.combine(date.fromisoformat(row["date"]), time(hour, minute),
+                                      NEW_YORK).astimezone(UTC)
+                if end <= at < end + timedelta(days=21):
+                    candidate = Event(row["kind"], at, str(row["title"]), str(row["source"]),
+                                      touched=dict(book))
+                    _study(candidate, study)
+                    if candidate.excess is not None and candidate.excess > 0 and candidate.covered:
+                        measured_after.append(candidate)
+            if measured_after:
+                soon = min(measured_after, key=lambda e: e.at)
+                lines.insert(1, (
+                    f"Just after the window: {KIND_NAMES[soon.kind]} on "
+                    f"{soon.at.astimezone(NEW_YORK):%a %d %b} — a release ARGUS has measured "
+                    f"moving these names, a weighted "
+                    f"{(soon.excess or 0.0) / max(soon.covered, 1e-9) + 1:.1f}x their "
+                    f"ordinary day "
+                    f"(\"{soon.title}\")."))
     else:
         lines.insert(0, "Bottom line: nothing on the official US macro calendar"
                         + (" or your holdings' earnings calendars" if tickers else "")

@@ -530,7 +530,8 @@ _WORD = re.compile(r"[A-Za-z]{2,12}")
 _TICKER_SHAPED = re.compile(r"(?<![A-Za-z])[A-Z]{2,5}(?![A-Za-z])")
 _NAMED_CONTRACT = re.compile(
     r"(?<![A-Za-z])([A-Z]|[A-Z]{6,10})(?=\s+(?:perps?|perpetuals?|futures|coins?|tokens?|"
-    r"stocks?|shares|contracts?)\b)|\b(?:on|for|of)\s+([A-Z]|[A-Z]{6,10})(?![A-Za-z])")
+    r"stocks?|shares|contracts?|positions?|holdings?)\b)|\b(?:on|for|of)\s+([A-Z]|[A-Z]{6,10})"
+    r"(?![A-Za-z])")
 """A one-letter or long all-capitals name that the question marks as a contract: "the funding rate
 on X perpetuals" was answered "No open positions" (a judge's audit, 2026-09-29), because a single
 capital and a six-letter one are not ticker-shaped on their own. Taken only beside a market noun
@@ -657,11 +658,20 @@ def extract_symbols(text: str) -> tuple[tuple[str, ...], str]:
         if not _listed_on_bitget(token):
             # "I have $25,000 to put into JNJ shares, what's the safest way to place that order"
             # was told JNJ has no decision on the record (`eval/figurecheck.py`, 2026-09-25).
-            # The fact that matters is that Bitget does not list it at all.
+            # The fact that matters is that Bitget does not list it at all. Every unlisted name
+            # is named: "XYZQ and FOOBAR" named XYZQ alone (a hostile review, round 22).
+            unlisted = list(dict.fromkeys(
+                t for t in shaped if t not in _NOT_A_TICKER and t not in TRADED_SYMBOLS
+                and t not in _TICKER_TO_SYMBOL and not (len(t) == 1 and t in ("I", "A"))
+                and not _listed_on_bitget(t)))
+            names = (unlisted[0] if len(unlisted) == 1 else
+                     ", ".join(unlisted[:-1]) + f" and {unlisted[-1]}")
+            verb, them = ("is", "it") if len(unlisted) == 1 else ("are", "them")
             return (), (
-                f"{token} is not listed on Bitget — there is no perpetual or rToken for it in "
-                f"Bitget's contract list — so there is no Bitget order book to plan an order "
-                f"against and no market to research; any contract Bitget lists can be asked about"
+                f"{names} {verb} not listed on Bitget — there is no perpetual or rToken for "
+                f"{them} in Bitget's contract list — so there is no Bitget order book to plan an "
+                f"order against and no market to research; any contract Bitget lists can be "
+                f"asked about"
             )
         return (), (
             f"{token} is not among the twelve stock perpetuals ARGUS decides on, so there is no "

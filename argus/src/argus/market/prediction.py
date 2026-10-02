@@ -116,7 +116,10 @@ def relevant(events: list[dict[str, Any]], terms: tuple[str, ...], *,
     found: list[Market] = []
     for event in events:
         for market in event.get("markets") or []:
-            question = str(market.get("question") or "")
+            # A duplicated market carries a slug suffix in its title: "…by December 31, 2026?-bV81"
+            # was printed as is (a judge, round 22)
+            question = re.sub(r"\?\s*-[A-Za-z0-9]{2,8}\s*$", "?",
+                              str(market.get("question") or ""))
             if not market.get("active") or market.get("closed") or question in seen:
                 continue
             if not any(p.search(question) for p in patterns):

@@ -146,6 +146,25 @@ def maintenance_margin_rate(symbol: str, notional: float) -> float | None:
     return None
 
 
+def max_leverage(symbol: str, notional: float) -> float | None:
+    """The highest leverage Bitget allows a position of ``notional`` USDT in ``symbol``, from the
+    same public tier table as :func:`maintenance_margin_rate` (``leverage`` per tier: ETHUSDT 150x
+    to $200,000 on 2026-10-03). None when the table does not answer."""
+    try:
+        rows = public_get("/api/v2/mix/market/query-position-lever",
+                          {"symbol": symbol, "productType": "USDT-FUTURES"}, timeout=10.0)
+    except BitgetError:
+        return None
+    for row in rows or []:
+        try:
+            low, high = float(row["startUnit"]), float(row["endUnit"])
+            if low <= notional < high:
+                return float(row["leverage"])
+        except (KeyError, TypeError, ValueError):
+            continue
+    return None
+
+
 def _dec(value: Any, default: str = "0") -> Decimal:
     """Bitget returns numbers as strings, and occasionally as empty strings.
 

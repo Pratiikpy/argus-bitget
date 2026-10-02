@@ -102,8 +102,10 @@ _MAX_LOSS = re.compile(
 _HORIZON = re.compile(
     r"\bi(?:'?m|\s+am)\s+an?\s+(?:[\w-]+\s+){0,3}?(day|swing|position|long[\s-]term)\s+"
     r"(?:trader|investor)|"
-    r"\bi(?:'?ll|\s+will|'?d)?\s+(?:usually\s+|normally\s+|typically\s+|only\s+|plan\s+to\s+)?"
-    r"hold\s+(?:it\s+|this\s+(?:one\s+)?|positions?\s+)?"
+    # "I'm a swing trader and hold positions about 3 months" kept the style's 7 days (a judge,
+    # round 22): the hold said after "and" is the horizon
+    r"\b(?:i(?:'?ll|\s+will|'?d)?|and)\s+(?:usually\s+|normally\s+|typically\s+|only\s+|"
+    r"plan\s+to\s+)?hold\s+(?:it\s+|this\s+(?:one\s+)?|positions?\s+|trades?\s+)?"
     r"(?:for\s+)?(?:about\s+|around\s+|roughly\s+|up\s+to\s+)?"
     r"(?P<n1>a\s+few|several|a\s+couple(?:\s+of)?|\d{1,3}|one|two|three|four|six|an?)?\s*"
     r"(?P<u1>hours?|days?|weeks?|months?|years?)\b|"
@@ -289,7 +291,7 @@ def extract(question: str, now: datetime | None = None,
             168 if word.startswith("week") else 720 if word.startswith("month") else 24 * 365)
         if word not in ("day", "swing", "position") and not word.startswith("long"):
             hours *= max(1, times)
-        add("horizon", "", str(hours), m.group(0))
+        add("horizon", "", str(hours), re.sub(r"^and\s+", "I ", m.group(0)))
         facts[-1] = replace(facts[-1], replaces=earlier(_HORIZON))
     if (m := _STYLE.search(text)) is not None:
         add("style", "", re.sub(r"[\s-]+", "-", (m.group(1) or m.group(2) or m.group(3)
@@ -630,7 +632,18 @@ def apply(request: Any, facts: list[Fact], question: str) -> tuple[Any, list[str
         request = replace(request, budget=float(budget.value), budget_stated=True)
         used.append(remembered_line(budget, f"your {float(budget.value):.0%} risk budget is "
                                             f"applied"))
+    position_cap = get(facts, "cap")
+    if position_cap is not None and request.kind in (ResearchKind.BOOK, ResearchKind.IMPACT,
+                                                     ResearchKind.CONSTRUCT):
+        request = replace(request, position_cap=float(position_cap.value))
     horizon = get(facts, "horizon")
+    if (horizon is not None and horizon.value.isdigit() and int(horizon.value) >= 336
+            and request.kind is ResearchKind.TECHNICALS and request.horizon_hours is None):
+        # "I hold positions about 3 months. Is NVDA overbought?" was read on the 4-hour RSI
+        # alone (a judge, round 22): a holder for weeks or months is read on the daily chart
+        request = replace(request, horizon_hours=int(horizon.value))
+        used.append(remembered_line(horizon, "read on the daily chart, which fits that holding "
+                                             "period, with the 4-hour reading after it"))
     defaulted = any("no horizon was stated" in note for note in request.notes)
     if (horizon is not None and request.kind is ResearchKind.ANALOGUE and defaulted
             and request.horizon_hours is not None):
@@ -1066,7 +1079,15 @@ _RECALL_KINDS = {"loss": ("loss_usd", "max_loss"), "drawdown": ("max_loss", "los
                                                                                    "max_loss")}
 
 
+_SCENARIO_STATED = re.compile(r"\b(?:if|when|should)\b[^?]*?\d+(?:\.\d+)?\s*(?:%|percent\b|"
+                              r"bps\b|basis\s+points?\b)", re.I)
+"""A move stated in the question: "if SPY falls 4%..., what's my loss?" asks for a computed loss,
+not the remembered loss limit (a hostile review, round 22)."""
+
+
 def _recall_match(question: str) -> re.Match[str] | None:
+    if _SCENARIO_STATED.search(question):
+        return None
     return next((m for p in _RECALL_ONE_FORMS if (m := p.search(question))), None)
 
 

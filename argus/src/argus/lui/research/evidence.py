@@ -217,7 +217,8 @@ def _beta_track_record() -> str | None:
         return None
     text = (f"How far to trust that beta: on {books:,} test books, it missed the next four "
             f"weeks' realised beta by {err['argus_open']:.2f} on average, against "
-            f"{err['rival_spy']:.2f} for the best other tool measured on the same books "
+            f"{err['rival_spy']:.2f} for the best other tool measured on the same books (a "
+            f"Season 2 entry, named on /proof) "
             f"(p = {shipped['wilcoxon_p']:.2f}; {err['rival_qqq']:.2f} on the same benchmark, "
             f"p = {same['wilcoxon_p']:.2f}, not significant) and {err['naive_one']:.2f} for "
             f"simply assuming a beta of 1.0 — the comparison is on /proof")

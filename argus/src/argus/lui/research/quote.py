@@ -747,6 +747,44 @@ def _overnight_record(symbol: str) -> dict[str, Any] | None:
         return None
 
 
+def open_while_open_line(symbol: str, now: datetime | None = None) -> str | None:
+    """"Where will NVDA open?" asked while its market is open: when the next open is, and the
+    record of the reading this answer gives after the close. It led with the round-trip cost
+    instead (a judge, round 22)."""
+    from argus.lui.research.session import anchor_is_open
+
+    is_open = anchor_is_open()
+    instant = now or datetime.now(UTC)
+    if not is_open(instant):
+        return None
+    step = timedelta(minutes=5)
+    # on the five-minute grid, so the bell is read at 16:00 and 09:30, not five minutes past
+    moment = instant.replace(second=0, microsecond=0) - timedelta(minutes=instant.minute % 5)
+    for _ in range(12 * 24 * 5):
+        moment += step
+        if not is_open(moment):
+            break
+    closes_at = moment
+    for _ in range(12 * 24 * 5):
+        moment += step
+        if is_open(moment):
+            break
+    from zoneinfo import ZoneInfo
+
+    new_york = ZoneInfo("America/New_York")
+    text = (f"Bottom line: {_t(symbol)}'s US market is open now, so there is no open to estimate "
+            f"— it closes {closes_at.astimezone(new_york):%a %H:%M} New York and next opens "
+            f"{moment.astimezone(new_york):%a %d %b %H:%M} New York. After the close this answer "
+            f"gives the open its perpetual implies")
+    record = _overnight_record(symbol)
+    if record:
+        text += (f"; read that way on {record['scope']} it missed the real open by "
+                 f"{record['argus']:.0f}bps on average, against {record['rival']:.0f}bps for "
+                 f"gloaming, an S2 overnight desk, and {record['zero']:.0f}bps for assuming no "
+                 f"gap")
+    return text + "."
+
+
 def _implied_open_line(symbol: str, perp_last: Decimal,
                        now: datetime | None = None) -> tuple[str, Source] | None:
     """While the US market is shut: where the stock should open, read from its own perpetual's

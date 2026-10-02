@@ -160,7 +160,9 @@ _PLACING = (
 )
 _FOR_ME = re.compile(
     r"\b(?:can|could|will|would)\s+(?:u|you|ya|it)\s+(?:just\s+|please\s+)?(?:trade|invest|buy|"
-    r"sell|do\s+(?:it|the\s+trading|everything))\s+(?:for|on\s+behalf\s+of)\s+me\b|"
+    r"sell|do\s+(?:it|the\s+trading|everything))\s+"
+    # "can u just buy it for me" was declined as "'that' has nothing to refer to" (round 22)
+    r"(?:(?:it|that|this|them|some|one|the\s+\w+)\s+)?(?:for|on\s+behalf\s+of)\s+me\b|"
     r"\bmanage\s+my\s+(?:money|account|portfolio|funds)\b|\bauto[\s-]?trade\s+for\s+me\b", re.I)
 """Handing the trading over: "can u just trade for me" got the generic refusal (round 21)."""
 _TRADING_FOR_YOU = (

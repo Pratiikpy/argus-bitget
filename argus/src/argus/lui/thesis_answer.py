@@ -466,6 +466,34 @@ def falsify(text: str, prior: list[str], *, book: str = "", memory: str = ""
         breaks = _BREAKS.get(r.kind.name, _BREAKS["OTHER"])
         if r.kind.name == "OTHER" and thesis._RATIO_EXTREME.search(r.text):
             breaks = "the ratio breaks through that extreme and keeps going instead of turning"
+        if r.kind.name == "DRIVER":
+            # "wrong if the driver's next report comes in against the claim" named no threshold
+            # (a judge, round 22): the figures measured today set it
+            seen = " ".join(evidence.get(r.text, []))
+            capex = re.search(r"on capex in the quarter to about (\w+ \d{4}), ([+-]\d+%) on the "
+                              r"year", seen)
+            revenue = re.search(r"(\b[A-Z]{1,6}) revenue, quarter to ([^:]+): \$[\d.,]+bn, "
+                                r"([+-]\d+%) on the year", seen)
+            lines_up: list[str] = []
+            if capex:
+                lines_up.append(f"the cloud builders' combined capex growth turns negative on the "
+                                f"year (it was {capex.group(2)} in the quarter to "
+                                f"{capex.group(1)})")
+            if revenue:
+                lines_up.append(f"{revenue.group(1)}'s revenue growth turns negative on the year "
+                                f"(it was {revenue.group(3)} in the quarter to "
+                                f"{revenue.group(2)})")
+            if lines_up and re.search(r"accelerat|speed\w*\s+up|faster", r.text, re.I):
+                # a claim of acceleration breaks when the growth slows, well before it turns
+                lines_up = [x.replace("turns negative on the year", "slows for two quarters "
+                                                                    "running")
+                            for x in lines_up]
+            if lines_up and case == "bull":
+                breaks = " or ".join(lines_up) + " — each quarterly filing is the check"
+            elif lines_up:
+                breaks = (" or ".join(x.replace("turns negative", "speeds up again")
+                                      for x in lines_up) + " — each quarterly filing is the "
+                                                           "check")
         out.append(f"\"{r.text}\": wrong if {breaks}.{today}")
     stop = ""
     try:

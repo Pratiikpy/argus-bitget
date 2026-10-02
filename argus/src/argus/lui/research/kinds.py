@@ -205,6 +205,16 @@ class ResearchRequest:
     mandate_capital: Decimal | None = None
     """The account size the trader stated earlier, which the mandate sizes against."""
 
+    position_cap: float | None = None
+    """The trader's own cap on any one position, as a fraction ("no single position above 35%"),
+    which a proposed rebalance must respect (a judge, round 22: the equal-risk mix put NVDA at 40%
+    beside a 35% cap stated in the same message)."""
+
+    book_value: float | None = None
+    """The saved book's value in dollars when it is written in amounts ("long 1 BTC"), so a
+    stress of the saved book is said in money too (a hostile review, round 22: "if BTC hits
+    $1,000,000" on a saved 1 BTC gave percentages only)."""
+
     def as_dict(self) -> dict[str, Any]:
         return {
             "kind": str(self.kind),

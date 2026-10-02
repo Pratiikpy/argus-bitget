@@ -49,6 +49,14 @@ BUILDERS: tuple[tuple[str, str], ...] = (("MSFT", "Microsoft"), ("GOOGL", "Alpha
 REVENUE_TAGS = ("RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues",
                 "SalesRevenueNet")
 CAPEX_TAGS = ("PaymentsToAcquirePropertyPlantAndEquipment", "PaymentsToAcquireProductiveAssets")
+GROSS_PROFIT_TAGS = ("GrossProfit",)
+MARGIN_CLAIM = re.compile(r"\bmargins?\b", re.I)
+"""A claim about margins: "margins are shrinking" is a claim about reported quarters, which gross
+profit over revenue in the filings settles (a judge, round 22: it was refused as a claim about
+future earnings)."""
+UNIT_CLAIM = re.compile(r"\bdeliver(?:y|ies)\b|\bunits?\s+sold\b|\bshipments?\b|"
+                        r"\bsales\s+volumes?\b|\bsubscribers?\b|\bbookings?\b", re.I)
+"""A claim about a count (cars delivered, units shipped) that no XBRL tag carries."""
 QUARTER_DAYS = (80, 100)
 YEAR_APART_DAYS = (350, 380)
 ALIGN_DAYS = 45
@@ -181,6 +189,10 @@ def facts(ticker: str, reason: str, *, cik_for: Callable[[str], int | None] | No
         got = dict(pool.map(one, names))
     out: dict[str, Any] = {"ticker": ticker, "cik": ciks[ticker], "revenue": got[ticker][0],
                            "revenue_tag": got[ticker][1], "fund": fund}
+    own_cik = ciks.get(ticker)
+    if MARGIN_CLAIM.search(reason) and own_cik is not None:
+        gross, gross_tag = _series(own_cik, GROSS_PROFIT_TAGS, get)
+        out["gross_profit"], out["gross_profit_tag"] = gross, gross_tag
     if len(names) > 1:
         out["builders"] = {name: got[name][0] for name, _ in BUILDERS}
         out["builder_tags"] = {name: got[name][1] for name, _ in BUILDERS}
@@ -225,6 +237,8 @@ def test(reason: str, found: Mapping[str, Any]) -> tuple[str, str, list[tuple[st
     ticker = str(found["ticker"])
     if found.get("fund"):
         return _spending_only(reason, ticker, found)
+    if MARGIN_CLAIM.search(reason):
+        return _margin_test(reason, found)
     revenue: list[Quarter] = list(found.get("revenue") or [])
     rev_growth = growth(revenue)
     if not rev_growth:
@@ -239,6 +253,14 @@ def test(reason: str, found: Mapping[str, Any]) -> tuple[str, str, list[tuple[st
                      f"{_bn(revenue[-1].value)}, {_pct(last_g)} on the year; the last "
                      f"{len(trend)} quarters' growth " + ", ".join(_pct(g) for g in trend)
                      + f" ({slope}).", "SEC XBRL, company filings", rev_url))
+    if UNIT_CLAIM.search(reason) and found.get("builders") is None:
+        # "deliveries are falling" was marked contradicted on total revenue (a judge, round 22):
+        # a count of cars or units is not in the filings this reads, and revenue is not it
+        return ("not tested", f"Deliveries and unit counts are figures {ticker} reports in its own "
+                              f"releases, which this console does not read, and no SEC XBRL tag "
+                              f"carries them; revenue is shown below for context only \u2014 it "
+                              f"is not the same measure (prices, services and other segments move "
+                              f"it too), so it is not used as the verdict.", evidence)
     builders = found.get("builders")
     line = ""
     if builders is not None:
@@ -313,6 +335,55 @@ def test(reason: str, found: Mapping[str, Any]) -> tuple[str, str, list[tuple[st
                  " What the filings cannot test is the part still ahead: it breaks the quarter "
                  "revenue growth turns negative")
         line += " — each report is the next check."
+    return result, line, evidence
+
+
+def _margin_test(reason: str, found: Mapping[str, Any]
+                 ) -> tuple[str, str, list[tuple[str, str, str]]]:
+    """A margin claim against reported gross margin: gross profit over revenue for each quarter
+    both were filed, the latest against the same quarter a year before and the last four in a
+    row. A claim of shrinking margins holds when the latest is below a year ago and the trend is
+    down; one of expanding margins, the other way."""
+    from argus.market.statement_facts import CONCEPT_URL
+
+    ticker = str(found["ticker"])
+    revenue: list[Quarter] = list(found.get("revenue") or [])
+    gross: list[Quarter] = list(found.get("gross_profit") or [])
+    margins: list[tuple[date, float]] = []
+    for q in gross:
+        match = next((r for r in revenue if abs((r.end - q.end).days) <= 5 and r.value > 0), None)
+        if match is not None:
+            margins.append((q.end, q.value / match.value))
+    if len(margins) < 5:
+        return ("not tested", f"{ticker}'s gross profit and revenue could not be lined up for "
+                              f"enough quarters in its XBRL filings, so the margin claim is not "
+                              f"measured.", [])
+    last_end, last_m = margins[-1]
+    year_ago = next((m for e, m in margins
+                     if YEAR_APART_DAYS[0] <= (last_end - e).days <= YEAR_APART_DAYS[1]), None)
+    recent = [m for _, m in margins[-4:]]
+    falling = recent[-1] < recent[0] - 0.005
+    rising = recent[-1] > recent[0] + 0.005
+    evidence = [(f"{ticker} gross margin, last {len(recent)} quarters to {last_end:%d %b %Y}: "
+                 + ", ".join(f"{m:.1%}" for m in recent)
+                 + (f"; the same quarter a year before {year_ago:.1%}" if year_ago is not None
+                    else "") + ".", "SEC XBRL, gross profit over revenue",
+                 CONCEPT_URL.format(cik=int(found["cik"]),
+                                    tag=found.get("gross_profit_tag") or "GrossProfit"))]
+    down = bool(BEARISH.search(reason))
+    below_year = year_ago is not None and last_m < year_ago - 0.002
+    above_year = year_ago is not None and last_m > year_ago + 0.002
+    if down:
+        result = ("supported" if falling and (below_year or year_ago is None) else
+                  "contradicted" if rising and not below_year else "not measurable")
+    else:
+        result = ("supported" if rising and (above_year or year_ago is None) else
+                  "contradicted" if falling and not above_year else "not measurable")
+    line = (f"Gross margin was {last_m:.1%} in the quarter to {last_end:%b %Y}"
+            + (f", against {year_ago:.1%} a year before" if year_ago is not None else "")
+            + f", and {'fell' if falling else 'rose' if rising else 'held about level'} over the "
+              f"last {len(recent)} quarters \u2014 gross margin only; operating margin, which "
+              f"spending on research and sales also moves, is not read here.")
     return result, line, evidence
 
 

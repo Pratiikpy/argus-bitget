@@ -429,8 +429,16 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
             if subject is None and str(shocked).lower() not in ("nasdaq", "qqq", "market"):
                 subject = _symbol(str(shocked))
         shock = args.get("shock_percent")
+        try:
+            shock_value = float(shock) if shock is not None else None
+        except (TypeError, ValueError) as exc:
+            raise ToolError("shock_percent must be a number, e.g. -10") from exc
+        if shock_value is not None and shock_value <= -100:
+            # -500 was stressed as a -556% loss on a long book (a hostile review, round 22)
+            raise ToolError("shock_percent must be above -100: a price cannot fall by more than "
+                            "all of it")
         request = ResearchRequest(kind=ResearchKind.STRESS, symbols=tuple(book), book=book,
-                                  shock_pct=float(shock) if shock is not None else None,
+                                  shock_pct=shock_value,
                                   shock_on=subject)
         result = _run(request, "stress my book")
         return _answer_text(result), result["refused"]

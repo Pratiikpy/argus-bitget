@@ -967,6 +967,7 @@ class TestLeverageArithmetic:
         from argus.market import bitget
         monkeypatch.setattr(bitget, "fetch_tickers", lambda: {"DOGEUSDT": _ticker("DOGEUSDT")})
         monkeypatch.setattr(bitget, "maintenance_margin_rate", lambda symbol, notional: None)
+        monkeypatch.setattr(bitget, "max_leverage", lambda symbol, notional: None)
         lines, _, payload = research.venue._leverage("DOGEUSDT", 20.0, "short")
         assert payload["liquidation_distance"] == pytest.approx(0.05)
         assert payload["worst_adverse_24h"] == pytest.approx(0.10)

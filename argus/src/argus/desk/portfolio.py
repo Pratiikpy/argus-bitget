@@ -1052,18 +1052,22 @@ def resize(before: Mapping[str, float], name: str, target: float) -> dict[str, f
     20%" — both name the weight the holding ends at. Before 2026-09-25 those questions were read as
     adds of 20% (the default), because nothing expressed a target. ``target`` may be zero (sell it
     all); the name then stays in the book at zero so the before/after comparison can name it.
+
+    A short is resized as a short: ``target`` is negative for it, and a book with shorts sums to
+    one in gross (absolute) weight, as the stress and risk readings normalise it. "Trim TSLA to
+    10%" with TSLA at -40% was set to +10% until round 22 (a hostile review).
     """
-    if not 0.0 <= target < 1.0:
-        raise PortfolioError(f"target weight must be in [0, 1), got {target}")
+    if not -1.0 < target < 1.0:
+        raise PortfolioError(f"target weight must be in (-1, 1), got {target}")
     held = before.get(name, 0.0)
-    rest = sum(w for s, w in before.items() if s != name)
+    rest = sum(abs(w) for s, w in before.items() if s != name)
     if rest <= 0:
-        if 0.0 < held < 0.999:
+        if 0.0 < abs(held) < 0.999:
             # One risky name beside cash ("50% BTC, 50% cash"): the resized weight moves to or
             # from the cash, which is not a column here and so is not rescaled.
             return {name: target}
         raise PortfolioError(f"a book of {name} alone cannot be resized against itself")
-    scale = (1.0 - target) / rest
+    scale = (1.0 - abs(target)) / rest
     after = {s: w * scale for s, w in before.items() if s != name}
     after[name] = target
     del held

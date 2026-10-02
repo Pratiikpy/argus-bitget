@@ -815,6 +815,15 @@ def exposures_answer(
 
     # the lead
     top_b = next(iter(sec_b.items()), ("nothing", 0.0))
+    book_is = f"{_pct(top_b[1])} {top_b[0]}"
+    if any(w < 0 for w in before.values()):
+        long_side = sector_weights({s: w for s, w in before.items() if w > 0}, rows)
+        short_side = sector_weights({s: -w for s, w in before.items() if w < 0}, rows)
+        gross_top = max(set(long_side) | set(short_side),
+                        key=lambda b: long_side.get(b, 0.0) + short_side.get(b, 0.0))
+        book_is = (f"net {_pct(sec_b.get(gross_top, 0.0))} {gross_top} "
+                   f"({_pct(long_side.get(gross_top, 0.0))} long, "
+                   f"{_pct(short_side.get(gross_top, 0.0))} short)")
     if not fitted_any:
         if after is not None and changes:
             bucket = changes[0][0]
@@ -823,7 +832,7 @@ def exposures_answer(
                     f"book — the biggest sector change; the factor loadings are not stated this "
                     f"time because {no_factors}.")
         else:
-            lead = (f"Bottom line: your book is {_pct(top_b[1])} {top_b[0]}"
+            lead = (f"Bottom line: your book is {book_is}"
                     + (f" across {eff_sec_b:.1f} effective sectors" if len(sec_b) > 1 else "")
                     + f"; its factor loadings are not stated this time because {no_factors}.")
     elif after is not None and changes:
@@ -843,7 +852,7 @@ def exposures_answer(
                      f"that is more than you mean to hold in one sector.")
     else:
         tilt = max((f for f in FACTORS if f != "market"), key=lambda f: abs(load_b[f]))
-        lead = (f"Bottom line: your book is {_pct(top_b[1])} {top_b[0]}"
+        lead = (f"Bottom line: your book is {book_is}"
                 + (f" across {eff_sec_b:.1f} effective sectors" if len(sec_b) > 1 else "")
                 + f"; its market beta is {load_b['market']:.2f} to the S&P 500 (daily closes, "
                   f"about a year — not the hourly beta to the Nasdaq-100 the console's risk "
@@ -856,6 +865,16 @@ def exposures_answer(
 
     # sectors
     shown = ", ".join(f"{b} {_pct(w)}" for b, w in sec_b.items() if abs(w) >= 0.005)
+    if any(w < 0 for w in before.values()):
+        # "long 50% NVDA, short 50% AAPL" printed an empty sector line and "0% Information
+        # Technology" (a hostile review, round 22): a long/short book is said gross, each side
+        longs = sector_weights({s: w for s, w in before.items() if w > 0}, rows)
+        shorts = sector_weights({s: -w for s, w in before.items() if w < 0}, rows)
+        sides = sorted(set(longs) | set(shorts),
+                       key=lambda b: -(longs.get(b, 0.0) + shorts.get(b, 0.0)))
+        shown = ", ".join(f"{b} {_pct(longs.get(b, 0.0))} long and {_pct(shorts.get(b, 0.0))} "
+                          f"short (net {_pct(sec_b.get(b, 0.0))})" for b in sides
+                          if longs.get(b, 0.0) + shorts.get(b, 0.0) >= 0.005)
     lines.append(f"Sector weights of the book now (Yahoo's classification, GICS names): {shown}.")
     if after is not None:
         moved = ", ".join(f"{b} {_pct(sec_b.get(b, 0.0))} → {_pct(sec_a.get(b, 0.0))}"

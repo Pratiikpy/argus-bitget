@@ -194,10 +194,13 @@ def _technicals(symbol: str, *, found: dict[str, Any] | None = None,
             # BTC's key support level" was told none was within range, and when it did answer the
             # level was 0.1% away (a judge's audit, 2026-09-30). The swing points on Bitget's own
             # 4h candles over 30 days fill an empty side and are given as the structural levels.
-            if not below and own[0] is not None:
-                below = [own[0]]
-            if not above and own[1] is not None:
-                above = [own[1]]
+            # Both sources stand as candidates for the nearest level, not only when the Skill
+            # gave none: "nearest support 354.63" sat beside a swing support at 368.48, closer,
+            # and the verdict used the farther one (a judge, round 22)
+            if own[0] is not None and own[0] < price:
+                below = [*below, own[0]]
+            if own[1] is not None and own[1] > price:
+                above = [*above, own[1]]
             swing = [f"support {own[0]:g} ({(1 - own[0] / price) * 100:.1f}% below)"
                      if own[0] is not None else "",
                      f"resistance {own[1]:g} ({(own[1] / price - 1) * 100:.1f}% above)"

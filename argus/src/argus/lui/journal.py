@@ -1454,6 +1454,20 @@ def summary_lines(checks: Sequence[Check], patterns: Sequence[Pattern]) -> list[
 
 
 @traced(declaration=every("computed"))
+def _loss_size_check(trades: Sequence[Trade]) -> dict[str, Any] | None:
+    """The size of the losers, kept as a reminder when no habit was found: what a new entry's
+    size has to survive, from the trader's own results. None with no losing trade."""
+    losers = [t.return_pct for t in trades if t.return_pct < 0]
+    if not losers:
+        return None
+    average = sum(losers) / len(losers)
+    return {"key": "loss_size", "count": len(losers), "of": len(trades),
+            "check": (f"Your losing trades here averaged {average:+.1f}% (the worst "
+                      f"{min(losers):+.1f}%): size a new entry so a move that size costs no "
+                      f"more than you will accept."),
+            "members": []}
+
+
 def checklist_lines(patterns: Sequence[Pattern]) -> list[str]:
     """The reusable checklist: one check per habit found, in the order of what it cost."""
     if not patterns:
@@ -1725,6 +1739,13 @@ def review_trades(text: str, *, now: datetime | None = None, explicit: bool = Fa
                      f"anecdote worth checking, not a measured habit.")
     lines.extend(summary[1:])
     lines.extend(checklist_lines(patterns))
+    kept_loss = None if patterns else _loss_size_check(trades)
+    if kept_loss is not None:
+        # with no habit found the review kept nothing, so README's "kept and run again" could not
+        # be seen working (a judge, round 22): the losers' size is kept as a reminder instead
+        lines.extend(["Checklist, from your own trades (kept in this browser, and shown again "
+                      "when you next ask about adding a name or executing an order):",
+                      f"1. {kept_loss['check']}"])
     lines.extend(trade_lines(checks))
     gate, gate_report = gate_lines(trades)
     lines.extend(gate)
@@ -1802,8 +1823,8 @@ def review_trades(text: str, *, now: datetime | None = None, explicit: bool = Fa
     data = {"journal": {
         "parsed_from": journal.parsed_from,
         "trades": [c.as_dict() for c in checks],
-        "patterns": [p.as_dict() for p in patterns],
-        "checklist": [p.check for p in patterns],
+        "patterns": [p.as_dict() for p in patterns] + ([kept_loss] if kept_loss else []),
+        "checklist": [p.check for p in patterns] + ([kept_loss["check"]] if kept_loss else []),
         "anecdotal": len(trades) < MIN_STATISTICAL_TRADES,
         "open": still_open, "dropped": dropped, "fetch_failed": failed,
         "gate": None if gate_report is None else {

@@ -158,8 +158,29 @@ def the_specific_reading_stands(text: str, book: str, planned: ResearchRequest |
     return planned, audit
 
 
+def a_price_shock_is_a_stress(text: str, book: str, planned: ResearchRequest | None,
+                              patterned: ResearchRequest | None,
+                              audit: dict[str, Any]) -> tuple[ResearchRequest | None,
+                                                              dict[str, Any]]:
+    """A stated price shock beside a rate move is a stress, not a macro question.
+
+    "If NVDA falls 6% and the 10-year yield rises 30bps, what happens?" against a long/short book
+    was answered with the rates backdrop and no figure for the book (a hostile review, round 22):
+    when the patterns read a stress with a shock and the planner read macro, the stress stands and
+    the rate move is named as not applied."""
+    from argus.lui.research.parse import RATE_MOVE
+
+    if planned is None or planned.kind is not ResearchKind.MACRO or not RATE_MOVE.search(text):
+        return planned, audit
+    priced = detect_research(RATE_MOVE.sub(" ", text))
+    if priced is not None and priced.kind is ResearchKind.STRESS and priced.shock_pct is not None:
+        return (with_book(priced, book, text),
+                {**audit, "detail": "a stated price shock read as a stress over macro"})
+    return planned, audit
+
+
 RULES: tuple[Rule, ...] = (leverage_needs_leverage, the_add_is_not_a_holding,
-                           the_specific_reading_stands)
+                           the_specific_reading_stands, a_price_shock_is_a_stress)
 """Applied in this order to the planner's reading; each may replace it with the patterns'."""
 
 

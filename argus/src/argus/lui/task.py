@@ -456,7 +456,9 @@ def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
                     if thesis.Kind.ACTIVITY in kinds else None)
         mood = pool.submit(thesis.fear_greed_now) if thesis.Kind.SENTIMENT in kinds else None
         # A demand driver is tested against the filings (`lui/drivers.py`), read beside the engines.
-        driven = next((r.text for r in stated if r.kind is thesis.Kind.DRIVER), None)
+        # every driver reason's words, so "deliveries are falling and margins are shrinking"
+        # fetches the gross profit the margin reason needs (a judge, round 22)
+        driven = "; ".join(r.text for r in stated if r.kind is thesis.Kind.DRIVER) or None
         driver = (pool.submit(drivers.facts, symbol.removesuffix("USDT"), driven)
                   if driven is not None else None)
         against = next((r.text for r in stated if r.kind is thesis.Kind.RELATIVE), None)

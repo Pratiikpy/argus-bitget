@@ -510,6 +510,13 @@ def concept_asked(text: str, named_symbols: tuple[str, ...] = ()) -> Concept | N
     text = re.sub(r"\b(what\s+(?:does|do|is)\s+.+?\s+)(?:men|meen|mena|mea|maen)\b", r"\1mean",
                   text, flags=re.I)
     text = re.sub(r"\bdiff\b", "difference", text, flags=re.I)
+    # "wait so what's liquidation exactly" was declined while "what is liquidation" was answered,
+    # and the console itself had suggested asking it (a first-time user, round 22): the filler
+    # around a definition question is not part of it
+    text = re.sub(r"^\s*(?:(?:wait|ok|okay|so|um+|hmm+|and|but|lol|bro|hey|sorry|ah|oh)\b"
+                  r"[\s,.!]*)+", "", text, flags=re.I)
+    text = re.sub(r"\s+(?:exactly|again|tho|though|then|lol|pls|please|actually)(?=\s*[?.!]*\s*$)",
+                  "", text, flags=re.I)
     # Hinglish, as typed: "bitcoin kya hai" / "stop loss kya hota hai" is "what is ..." (a
     # first-time user, round 11, got BTC's trading cost).
     hinglish = re.fullmatch(r"\s*(.+?)\s+kya\s+(?:hai|hota\s+hai|hoti\s+hai|h)\s*[?.!]*\s*", text,

@@ -1,12 +1,12 @@
 {
-  "as_of": "2026-10-02T18:16:33.204544+00:00",
-  "refusals": 988,
-  "refusals_with_a_gradeable_claim": 462,
+  "as_of": "2026-10-02T20:15:02.835422+00:00",
+  "refusals": 998,
+  "refusals_with_a_gradeable_claim": 466,
   "hours_tolerance": 1.5,
   "round_trip_bps": 12.0,
   "base_clearance_about_2h": {
-    "cleared": 399,
-    "marks": 556
+    "cleared": 407,
+    "marks": 566
   },
   "by_claim": {
     "session_closed": {
@@ -25,7 +25,7 @@
       "ungradeable": 0
     },
     "no_hedge": {
-      "consistent": 211,
+      "consistent": 212,
       "contradicted": 0,
       "ungradeable": 52
     },
@@ -35,9 +35,9 @@
       "ungradeable": 0
     },
     "moves_enough": {
-      "consistent": 80,
-      "contradicted": 30,
-      "ungradeable": 41
+      "consistent": 82,
+      "contradicted": 31,
+      "ungradeable": 42
     },
     "move_too_small": {
       "consistent": 0,
@@ -49,14 +49,14 @@
     "move_too_small": {
       "borne_out": 0,
       "graded": 2,
-      "base_rate": 0.2824,
+      "base_rate": 0.2809,
       "p_one_sided": 1.0
     },
     "moves_enough": {
-      "borne_out": 80,
-      "graded": 110,
-      "base_rate": 0.7176,
-      "p_one_sided": 0.4588
+      "borne_out": 82,
+      "graded": 113,
+      "base_rate": 0.7191,
+      "p_one_sided": 0.4858
     }
   },
   "forward_claims": [
@@ -319,8 +319,16 @@
       "stated": "\u2026vs 4 up current quarter, 16 down vs 3 up next quarter). The remaining upside from here is unlikely to clear the 16.27bps total hurdle with sufficient probability given\u2026",
       "recorded": "next move -12.1bps over 1.99h against a 12bps round trip (refusal_marks.jsonl)",
       "verdict": "contradicted"
+    },
+    {
+      "seq": 990,
+      "symbol": "AMZNUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026arket moved 109bps median \u2014 the binding constraint has been direction, not size, and today's direction is already partially spent.",
+      "recorded": "next move -9.5bps over 2.00h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
     }
   ],
-  "verdict": "988 refusal(s) on record; 462 carried at least one reason the record can check. Of 914 decision-time reason(s) graded, 914 agreed with the record and 0 contradicted it. `move_too_small` claims were borne out by the next ~2h move 0 of 2 time(s) (0%), against 28% for every ~2h refusal mark (one-sided exact binomial p = 1.00); no evidence the stated reason says more than the base rate does. `moves_enough` claims were borne out by the next ~2h move 80 of 110 time(s) (73%), against 72% for every ~2h refusal mark (one-sided exact binomial p = 0.46); no evidence the stated reason says more than the base rate does.",
+  "verdict": "998 refusal(s) on record; 466 carried at least one reason the record can check. Of 915 decision-time reason(s) graded, 915 agreed with the record and 0 contradicted it. `move_too_small` claims were borne out by the next ~2h move 0 of 2 time(s) (0%), against 28% for every ~2h refusal mark (one-sided exact binomial p = 1.00); no evidence the stated reason says more than the base rate does. `moves_enough` claims were borne out by the next ~2h move 82 of 113 time(s) (73%), against 72% for every ~2h refusal mark (one-sided exact binomial p = 0.49); no evidence the stated reason says more than the base rate does.",
   "method": "Each checkable reason in a no_trade thesis is matched by a fixed pattern and set beside the record: session_phase and hours_to_discovery from the ledger, the desk's own hedge-menu note, the risk ruling, and the next ~2h mark for claims about the size of the coming move. Question and binary verdict from VisualWebArena's llm_ua_match (evaluation_harness/helper_functions.py:610-642, MIT); graded here by the record, not by a model."
 }

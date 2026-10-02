@@ -63,6 +63,15 @@ _BOOK_HISTORY_Q = re.compile(r"\b(?:sharpe|sortino|drawdown|returns?|performance
 _WORTH_Q = re.compile(r"\bworth\b|\bvalue\s+of\s+my\b|\bhow\s+much\s+is\s+my\b", re.I)
 
 
+def _default_budget(request: ResearchRequest) -> str:
+    """Said beside a risk budget the trader never set: "over the 25% budget" read to a newcomer
+    as a rule they were breaking, with nothing saying where it came from (round 22)."""
+    if request.budget_stated:
+        return ""
+    return (" \u2014 a default yardstick for how much of the risk one name should carry, not a "
+            "limit you set; say \"my risk budget is 40%\" to use your own")
+
+
 def _book_history_lines(book: Mapping[str, float], cash: float,
                         question: str) -> tuple[list[str], Source] | None:
     """The saved book's own history, held at its weights and rebalanced daily: annual return and
@@ -163,6 +172,24 @@ def risk_premise_line(text: str, lines: list[str]) -> str | None:
                if heavier else "") + ".")
 
 
+def _under_cap(weights: Mapping[str, float], cap: float) -> dict[str, float]:
+    """``weights`` (summing to one) with none above ``cap``: each name over it is held at the cap
+    and the excess spread over the others in proportion to their weights, repeated until none is
+    over. A cap that cannot be met by every name (cap x names < 1) leaves the rest uncapped."""
+    out = dict(weights)
+    if cap * len(out) < 1.0:
+        return out
+    for _ in range(len(out)):
+        fixed = {s for s, w in out.items() if w >= cap - 1e-12}
+        excess = sum(out[s] - cap for s in fixed)
+        free = {s: w for s, w in out.items() if s not in fixed}
+        if excess <= 1e-12 or not free:
+            break
+        room = sum(free.values())
+        out = {s: (cap if s in fixed else w + excess * w / room) for s, w in out.items()}
+    return out
+
+
 def _book_report(request: ResearchRequest, data: MarketData,
                  is_open: Any) -> tuple[list[str], list[Source], dict[str, Any]]:
     """The whole book as held: risk by holding against weight, volatility, beta and how much of the
@@ -197,6 +224,20 @@ def _book_report(request: ResearchRequest, data: MarketData,
     balanced = (_equal_risk_weights(tuple(weights), columns)
                 if len(weights) >= 2 and not request.budget_stated and not has_short
                 and len(weights) * budget <= 1.0 else None)
+    capped_note = ""
+    if balanced is not None and request.position_cap and max(balanced.values()) > (
+            request.position_cap / max(1.0 - request.cash, 1e-9) + 1e-9):
+        # the trader's own position cap binds the proposal (a judge, round 22)
+        balanced = _under_cap(balanced, request.position_cap / max(1.0 - request.cash, 1e-9))
+        held_risk = decompose(balanced, columns)
+        if held_risk is not None:
+            capped_shares = {c.symbol: c.contribution / held_risk.volatility
+                             for c in held_risk.contributions}
+            capped_note = (f" Held under your {request.position_cap:.0%} position cap, so the "
+                           f"shares of risk are not quite equal: "
+                           + ", ".join(f"{_t(s)} {capped_shares[s]:.0%}"
+                                       for s in sorted(capped_shares,
+                                                       key=lambda s: -capped_shares[s])) + ".")
     if balanced is not None:
         top = max(shares, key=lambda s: shares[s])
         # The cash stays cash: with "30% cash" stated the rebalance said "fully invested" and
@@ -207,15 +248,24 @@ def _book_report(request: ResearchRequest, data: MarketData,
             f"{shares[top]:.0%} of the risk). An equal-risk rebalance holds "
             + ", ".join(f"{_t(s)} {balanced[s] * invested:.0%}"
                         for s in sorted(balanced, key=lambda s: -balanced[s]))
-            + f" — each name then carries about {1 / len(weights):.0%} of the risk, "
+            + (f" — each name then carries about {1 / len(weights):.0%} of the risk, "
+               if not capped_note else " — ")
             + (f"with the {request.cash:.0%} cash kept as cash." if request.cash else
-               "fully invested.")
+               "fully invested.") + capped_note
             # one of two different targets, said as such: the equal-risk mix beside a trim to the
             # 25% budget read as three answers to one question (a judge, round 20, row 706)
             + (f" That is equal shares of risk, a different target from keeping each name under "
                f"a {request.budget:.0%} risk budget, which {len(weights)} names cannot all meet."
                if 1 / len(weights) > request.budget else "")
         )
+    elif has_short and all(w < 0 for w in weights.values()):
+        # "I am short $50,000 of NVDA" was told its short "does not move with the longs enough to
+        # hedge them" when there are no longs (a hostile review, round 22)
+        names = " and ".join(_t(s) for s in weights)
+        lines.append(
+            f"Bottom line: the book is short {names} and holds nothing long, so the short is the "
+            f"whole risk: it loses when {names} rises, and a rise has no ceiling. Its size and a "
+            f"stop above the price are the levers.")
     elif has_short:
         top = max(shares, key=lambda s: shares[s])
         offsets = [s for s in shares if weights[s] < 0]
@@ -1005,21 +1055,24 @@ def _impact_lines(report: CopilotReport, request: ResearchRequest,
                 + (f", and {add} carried {impact.risk_share_before:.0%} of its risk"
                    if impact.risk_share_before is not None else "")
                 + ". Whether to sell is your call; the lines below are what changes."))
-        elif (request.target is not None and held and final < held and share is not None
-              and impact.risk_share_before is not None):
+        elif (request.target is not None and held and abs(final) < abs(held)
+              and share is not None and impact.risk_share_before is not None):
             # a trim, said as one: "size it at no more than 28% — the 28% proposed" read as an add
             # (round 20, row 705)
             inside = share <= request.budget + 1e-9
             lines.insert(0, (
-                f"Bottom line: trimming {add} from {held:.0%} to {final:.0%} of the book takes its "
-                f"share of the risk from {impact.risk_share_before:.0%} to {share:.0%} — "
-                + (f"inside the {request.budget:.0%} budget." if inside else
-                   f"still over the {request.budget:.0%} budget.")))
+                f"Bottom line: trimming {add}{' short' if held < 0 else ''} from "
+                f"{abs(held):.0%} to {abs(final):.0%} of the book takes its "
+                f"share of the risk from {impact.risk_share_before:.0%} to {share:.0%}"
+                + (" (below zero: it now offsets the rest of the book's risk)" if share < 0
+                   else "") + " — "
+                + (f"inside the {request.budget:.0%} budget{_default_budget(request)}." if inside
+                   else f"still over the {request.budget:.0%} budget{_default_budget(request)}.")))
         elif ceiling is not None:
             verdict = ("inside" if (share or 0.0) <= request.budget else "over")
             lines.append(
                 f"Bottom line: to keep {add} under {request.budget:.0%} of book risk"
-                + (" (your budget)" if request.budget_stated else "")
+                + (" (your budget)" if request.budget_stated else _default_budget(request))
                 + ", size it at no "
                 f"more than {ceiling:.0%} — the {request.size:.0%} "
                 + ("proposed" if request.size_stated else "worked here as a default (no size was "
@@ -1038,7 +1091,8 @@ def _impact_lines(report: CopilotReport, request: ResearchRequest,
                 # risk ("carries more than of this book's risk" was printed, 2026-09-25 audit).
                 + (f"{before_share:.0%} of this book's risk" if before_share is not None
                    else "all of this book's risk")
-                + f" at {held:.0%}, over the {request.budget:.0%} budget, so "
+                + f" at {held:.0%}, over the {request.budget:.0%} budget"
+                f"{_default_budget(request)}, so "
                 f"any add takes it further over"
                 + (f"; trimming it to {trim_to:.0%} brings it inside." if trim_to is not None
                    else ".")

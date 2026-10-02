@@ -1,14 +1,15 @@
 # ARGUS
 
 [![CI](https://github.com/Pratiikpy/argus-bitget/actions/workflows/ci.yml/badge.svg)](https://github.com/Pratiikpy/argus-bitget/actions/workflows/ci.yml)
-![tests](https://img.shields.io/badge/tests-11%2C135%20collected-2ea44f)
+![tests](https://img.shields.io/badge/tests-11%2C168%20collected-2ea44f)
 ![mypy](https://img.shields.io/badge/mypy-strict%20clean-2ea44f)
 ![register](https://img.shields.io/badge/register-6%20owned%20%C2%B7%2033%20tied%20%C2%B7%207%20lost-555)
 ![languages](https://img.shields.io/badge/answers%20in-8%20languages-555)
 ![MCP](https://img.shields.io/badge/MCP-10%20tools-555)
 
-**A research desk for Bitget's tokenized US stocks. Ask in plain language; every number is
-computed from live data and names its source.**
+**A research desk for Bitget's tokenized US stocks, and its crypto, indices and commodities too.
+Ask in plain language, new to trading or not; every number is computed from live data and names
+its source.**
 
 **Live console: https://deploy-topaz-seven-64.vercel.app** · [one research task, run
 live](https://deploy-topaz-seven-64.vercel.app/research) · [what we beat](https://deploy-topaz-seven-64.vercel.app/proof)
@@ -45,7 +46,7 @@ kept; the full table, rival by rival, is on [`/proof`](https://deploy-topaz-seve
 |---|---|---|
 | gloaming (S2) | estimates the open while the US market is shut | missed by 81bps over 113 nights and 8 stocks against 30bps for ARGUS (93% of directions right) and 90bps for no gap; ahead on all 8 stocks, narrowest on QQQ (12.5 against 14.3bps). The stock's own pre-market price at 09:00, the general tool, missed by 36bps; ARGUS is ahead of it on all 8 stocks |
 | Rook (S2) | ends each thesis with an invalidation price | its stops, 0.1-1.7% away, were reached on 62% of held-out days against 11% for ARGUS's fitted stop: ahead on that measure, six names, one run |
-| baserate (S2) | prices a leveraged weekend hold | ARGUS rebuilt to read 1,443 NVDA weekends since 1999 and Bitget's live margin tier; its regime match scored worse than ARGUS's volatility-scaled band over 17,044 weekends, but baserate's own forecasts are not yet scored on the same weekends: a tie |
+| baserate (S2) | prices a leveraged weekend hold | ARGUS rebuilt to read every NVDA weekend since 1999 (1,444 as of October 2026) and Bitget's live margin tier; its regime match scored worse than ARGUS's volatility-scaled band over 17,044 weekends, but baserate's own forecasts are not yet scored on the same weekends: a tie |
 | MirrorLine (S2) | checks a trader's claims about the tape | first run 18 of 38 verdicts to its 38; fixed the same morning, re-run tied at 30 of 30 gradable claims |
 | optic-bitget (S2) | debates a thesis with a model judge | abstained on two of three theses for want of earnings and positioning data ARGUS answered; still gives one synthesised call ARGUS does not: a tie |
 | Ballast (S2) | hedges an rToken holder's nights | beat ARGUS's index hedge on 2026-09-24; now a tie |
@@ -76,7 +77,7 @@ Open the console and ask any of these. Each one exercises something different.
 
 | Ask | What it shows |
 |---|---|
-| *I hold 40% NVDA, 30% MSFT, 30% AAPL — should I add 15% TSLA?* | Your book's risk before and after, sized to a risk budget, a hedge, stress cases, and how far to trust the beta — scored against weekend-copilot, an S2 rival answering the same question. |
+| *I hold 40% NVDA, 30% MSFT, 30% AAPL — should I add 15% TSLA?* | Your book's risk before and after, sized to a risk budget, a hedge, stress cases, and how far to trust the beta — scored against weekend-copilot, an S2 rival answering the same question (the answer calls it the best other tool measured; [/proof](https://deploy-topaz-seven-64.vercel.app/proof) names it). |
 | *I'm bullish on NVDA because AI capex keeps accelerating. Test my thesis.* | Each reason tested on its own measurement — hyperscaler capex and NVDA's revenue from SEC filings; ask *what would prove it wrong?* next. |
 | *How should I split a $50k order in NVDA?* | An execution schedule priced on the live order book, measured against Bitget's own TWAP on a full-depth replay, and the first child written as the Agent Hub `bgc --dry-run` command that previews it without sending. |
 | *Long rNVDA over the weekend at 3x* | The stock's weekends since 1999, a band for Monday's open scaled to its volatility now, which covered 79% of 17,044 weekends out of sample against an 80% target, and the perpetual's own path to the liquidation line. |
@@ -108,6 +109,24 @@ Open the console and ask any of these. Each one exercises something different.
 desk that shows its work, and a newcomer who wants to see what a sum of money would have been
 through before risking it. **Who it is not for:** anyone wanting signals or trades placed for them —
 it places no orders, holds no money and says so.
+
+### New to trading? Start here
+
+The console's home page has a **New to trading** row. These four questions work as written, in
+plain words, typos and all:
+
+- *I have $1,000, where should I start?* — what that sum has actually been through in the last
+  year in the Nasdaq-100, bitcoin and gold, the worst fall on the way included. No pick.
+- *How much could I lose on BTC in a bad week?* — then *is that good?*, which says plainly that it
+  is a loss and what share of the money it is.
+- *What is liquidation?* / *Is 10x leverage ok for a small account?* — the word, and what it means
+  for you.
+- *Where should my stop go on TSLA?* — a price to put it at, and why closer gets stopped out by
+  ordinary moves.
+
+Put what you hold in **My book** (`bought 3 NVDA at 180, 0.01 BTC`) and *how's my stuff doing?*
+answers against what you paid. Never give anyone your login or API keys; this console never asks
+for them and cannot trade.
 
 ---
 
@@ -246,11 +265,11 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 11,135 tests collected
+pytest -q                       # 11,168 tests collected
 ```
 
-Nothing above needs a credential. On 2026-10-02, with every outbound connection refused, 10,822
-passed, 75 skipped and 0 failed of the 11,135 tests collected; the other 238 read a live
+Nothing above needs a credential. On 2026-10-03, with every outbound connection refused, 10,855
+passed, 75 skipped and 0 failed of the 11,168 tests collected; the other 238 read a live
 venue, feed or model and run apart
 (`pytest -m network`). Tests that need a rival's source cloned beside the repository skip
 and say which. `ARGUS_BLOCK_NETWORK=1` refuses every outbound connection, so
@@ -270,7 +289,7 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **11,135 tests collected** — `pytest -q` |
+| Tests | **11,168 tests collected** — `pytest -q` |
 | Types | **`mypy --strict` clean on 578 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
@@ -306,8 +325,8 @@ a test that reaches the network shows itself.
   refused. Every other decision on its ledger is a refusal. Two settled trades are not a
   sample, so its Sharpe and drawdown are undefined and printed as such, and its win rate of 0%
   says nothing yet. Each refusal carried a direction, hashed before the
-  outcome existed: at about two hours, **305 of 553 directional calls were right**, which clears a
-  coin flip and does not beat calling "up" every time. The median refusal **forgave -8.77bps of
+  outcome existed: at about two hours, **311 of 563 directional calls were right**, which clears a
+  coin flip and does not beat calling "up" every time. The median refusal **forgave -8.72bps of
   net edge** after the 12bps round trip — the trades it passed
   on were mostly unprofitable. This workbench does not trade; trading is the separate Track 2
   project's job.
