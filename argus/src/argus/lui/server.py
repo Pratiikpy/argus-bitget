@@ -2227,6 +2227,10 @@ def _research_payload(
         result.lines.insert(1, contrary)
     if facts:
         extra = [*used, *mem.after(result.lines, request, facts, price_now=_price_now)]
+        if contrary and contrary.startswith("Against your own rule"):
+            # said once, under the lead, not again among the Remembered lines
+            extra = [x for x in extra if "you said you avoid" not in x
+                     and "a name you said you stay out of" not in x]
         if extra:
             at = next((i for i, line in enumerate(result.lines) if line.startswith("Data:")),
                       len(result.lines))

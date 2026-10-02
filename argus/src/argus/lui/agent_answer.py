@@ -170,6 +170,15 @@ def answer(fetch: Callable[[str], Any] = fetch_json
         f"{counts.get('orders_sent', 0)} orders sent, {counts.get('fills', 0)} filled, "
         f"{counts.get('protective_rulings', 0)} protective rulings by its risk kernel.",
     ]
+    try:
+        from argus.lui.agent_record import rejections
+
+        refused, why = rejections(fetch("orders.json"))
+    except Exception:
+        refused, why = 0, ""
+    if refused:
+        # "93 orders sent, 19 filled" left 74 unexplained (a judge, round 20, row 717)
+        lines.append(why)
     if envelope.get("sharpe_ann"):
         lines.append(f"A no-edge book over the same window lands at Sharpe "
                      f"{envelope['sharpe_ann']} and {envelope.get('closed_trades', '?')} closed "

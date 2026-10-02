@@ -1201,7 +1201,12 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
         # A move stated for each of two or more holdings is answered from those holdings alone
         # (`_own_move_lines`), so the one-name note would contradict the line above it (row 612).
         own = len(holding_shocks(raw_text)) >= 2
-        request = replace(request, book={request.shock_on: 1.0}, symbols=(request.shock_on,),
+        # "I am short 100% TSLA. What happens if TSLA rallies 20%?" reached here with no book
+        # from the hosted planner and was rebuilt long, +20% (round 20, row 692, live re-ask)
+        from argus.lui.research.parse import _held_short
+
+        held = -1.0 if _held_short(raw_text, request.shock_on) else 1.0
+        request = replace(request, book={request.shock_on: held}, symbols=(request.shock_on,),
                           notes=request.notes if own else (
                               *request.notes, f"no other holdings were stated, so the book is "
                                               f"read as a position in {_t(request.shock_on)} "

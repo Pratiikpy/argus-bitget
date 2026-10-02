@@ -201,11 +201,11 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 11,111 tests collected
+pytest -q                       # 11,113 tests collected
 ```
 
-Nothing above needs a credential. On 2026-10-02, with every outbound connection refused, 10,798
-passed, 75 skipped and 0 failed of the 11,111 tests collected; the other 238 read a live
+Nothing above needs a credential. On 2026-10-02, with every outbound connection refused, 10,800
+passed, 75 skipped and 0 failed of the 11,113 tests collected; the other 238 read a live
 venue, feed or model and run apart
 (`pytest -m network`). Tests that need a rival's source cloned beside the repository skip
 and say which. `ARGUS_BLOCK_NETWORK=1` refuses every outbound connection, so
@@ -225,7 +225,7 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **11,111 tests collected** — `pytest -q` |
+| Tests | **11,113 tests collected** — `pytest -q` |
 | Types | **`mypy --strict` clean on 578 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |

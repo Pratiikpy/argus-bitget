@@ -782,6 +782,20 @@ def against_view(request: Any, facts: list[Fact]) -> str | None:
     if getattr(request, "kind", None) is not ResearchKind.IMPACT or not request.symbols:
         return None
     symbol = request.symbols[0]
+    buying = (getattr(request, "side", None) != "short"
+              and getattr(request, "target", None) != 0.0)
+    for avoided in (f for f in facts if f.kind == "avoid"):
+        # "I avoid meme coins. Should I buy DOGE?" said so eight lines down (round 20 re-ask)
+        hit = (avoided.subject == symbol
+               or (avoided.value == "meme coins" and symbol in MEME_COINS)
+               or (avoided.value in ("crypto", "altcoins") and _is_crypto(symbol)
+                   and not (avoided.value == "altcoins" and symbol in ("BTCUSDT", "ETHUSDT"))))
+        if hit and buying:
+            what = (f"among the {avoided.value} you said you avoid"
+                    if avoided.subject != symbol else "a name you said you stay out of")
+            return (f"Against your own rule: you said “{avoided.text}” on {avoided.at}, and "
+                    f"{bare_symbol(symbol)} is {what}. What follows prices the trade; it does "
+                    f"not back it.")
     thesis = get(facts, "thesis", symbol)
     if thesis is None or thesis.value not in ("bull", "bear"):
         return None

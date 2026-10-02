@@ -10,7 +10,7 @@ that produced them.
 |---|---|
 | Source | **581 source files**, 20 packages (measured 2026-09-27) |
 | Registered and importable at runtime | **152/152** (`python -m argus.status`) |
-| Tests | **11,111 tests collected**; CI runs every one that needs no network with each outbound connection refused, and the 238 that read a live venue, feed or model in a separate advisory job |
+| Tests | **11,113 tests collected**; CI runs every one that needs no network with each outbound connection refused, and the 238 that read a live venue, feed or model in a separate advisory job |
 | Static analysis | `ruff` clean; `mypy --strict` clean on the 578 files it checks (the three vendored files are excluded) |
 | Artefacts | **1,870** files under `argus/data/`; each one a document cites is written by a named command, and a test fails if a cited artefact has no writer |
 | External systems torn down at code level | **57 code-level teardowns** under `research/architecture/`, each citing `file:line` |

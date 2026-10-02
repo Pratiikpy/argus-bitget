@@ -194,3 +194,24 @@ class TestTheFirstChild:
         # an hour may take 10% of an hour's volume, $100,000; half of it as market, over sixty
         # one-minute children: about $833, 4.16 COIN — not half the whole order (row 715)
         assert lines and "--qty 4.16 " in lines[0]
+
+
+class TestLiveReAsk:
+    def test_an_avoided_class_is_said_under_the_lead(self) -> None:
+        facts = memory.extract("I avoid meme coins.")
+        line = memory.against_view(detect("Should I buy DOGE?"), facts)
+        assert line is not None and line.startswith("Against your own rule")
+        assert "meme coins" in line
+
+    def test_the_track2_answer_counts_refused_orders(self) -> None:
+        from argus.lui import agent_answer
+
+        files = {"summary.json": {"metrics": {"n_hours": 2, "n_closed_trades": 0},
+                                  "counts": {"orders_sent": 2, "fills": 0}},
+                 "orders.json": {"counts": {"sent": 2}, "orders": [
+                     {"symbol": "METAUSDT", "purpose": "protective_exit", "state": "rejected",
+                      "submitted_at": "2026-09-28T09:16:00Z",
+                      "rejection": {"message": "HTTP 400 from Bitget: Parameter X does not "
+                                               "exist"}}] * 2}}
+        lines, _s, _d = agent_answer.answer(files.get)
+        assert any(line.startswith("The venue refused 2 of the 2 orders sent") for line in lines)

@@ -26,6 +26,7 @@ from argus.lui.agent_record import (  # noqa: F401 — re-exported for the page'
     RUN_1_RECORD,
     Fetch,
     fetch_json,
+    rejections,
 )
 
 
@@ -109,46 +110,6 @@ def _funnel(counts: Mapping[str, Any]) -> str:
 _DRAWDOWN_SAID = re.compile(
     r"drawdown\s+(?:beyond|above|over|past|exceed\w*)\s+(\d+(?:\.\d+)?)\s*%", re.I)
 _DRAWDOWN_HELD = re.compile(r"book\.drawdown_pct\s*=\s*(-?\d+(?:\.\d+)?)")
-
-
-def rejections(orders: Mapping[str, Any] | None) -> tuple[int, str]:
-    """The orders the venue refused, counted and explained from the record's own order log.
-
-    Run 2 sent 93 orders and 74 were refused, and the page showed "93 orders sent, 19 fills" with
-    nothing between them (a judge, round 20, row 717). Grouped by what was refused and why, with
-    the time span, so a reader sees a cluster of retries rather than 74 separate failures."""
-    rows = [o for o in (orders or {}).get("orders") or [] if o.get("state") == "rejected"]
-    if not rows:
-        return 0, ""
-    groups: dict[tuple[str, str, str], list[Mapping[str, Any]]] = {}
-    for o in rows:
-        message = str((o.get("rejection") or {}).get("message") or "no message")
-        message = re.sub(r"^HTTP \d+ from Bitget:\s*", "", message)[:90]
-        key = (str(o.get("symbol")), str(o.get("purpose") or "order").replace("_", " "), message)
-        groups.setdefault(key, []).append(o)
-    parts = []
-    for (symbol, purpose, message), group in sorted(groups.items(), key=lambda kv: -len(kv[1])):
-        stamps = sorted(str(o.get("submitted_at") or "")[:16] for o in group)
-        span = (f"{stamps[0]}Z" if stamps[0] == stamps[-1] else
-                f"{stamps[0]}Z to {stamps[-1][11:]}Z") if stamps and stamps[0] else ""
-        parts.append(f"{len(group)} {purpose}{'s' if len(group) > 1 else ''} on {symbol}"
-                     + (f", {span}" if span else "") + f" — “{message}”")
-    every = (orders or {}).get("orders") or []
-    later = all(any(o.get("state") == "filled" and o.get("symbol") == symbol
-                    and str(o.get("submitted_at") or "") > max(str(g.get("submitted_at") or "")
-                                                               for g in group)
-                    for o in every)
-                for (symbol, _, _), group in groups.items())
-    retried = max(len(g) for g in groups.values())
-    sent = (orders or {}).get("counts", {}).get("sent")
-    return len(rows), (
-        f"The venue refused {len(rows)}" + (f" of the {sent} orders sent" if sent else " orders")
-        + ": " + "; ".join(parts) + "."
-        + (" Each name had a later order filled, so the refusals were the venue's "
-           "state at the time rather than an order it could never take." if later else "")
-        + (f" The agent has no back-off on a refused exit: it sent the same one {retried} times. "
-           f"Recorded as a known defect and not changed mid-run, so the scored record stays the "
-           f"one that ran." if retried > 3 else ""))
 
 
 def narration_check(row: Mapping[str, Any]) -> str | None:
