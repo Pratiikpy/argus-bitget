@@ -914,6 +914,21 @@ def _price_premise(text: str) -> str | None:
             f"read at the real price.")
 
 
+_DESK_RECORD = frozenset({"performance", "decision_why", "decision_list", "abstention_why",
+                          "evidence", "calibration", "integrity", "position"})
+"""Readers of the desk's own record: never the answer to a trader telling it about themselves."""
+
+
+def _statement_only(text: str) -> bool:
+    """A sentence that tells rather than asks: "My max drawdown is 10% and my horizon is 3
+    months." matched the performance reader on "drawdown" and returned the desk's track record
+    instead of saying what was kept (a judge and a first-time user, round 18, row 616)."""
+    return "?" not in text and not re.match(
+        r"^\W*(?:what|how|why|when|which|who|whose|is|are|am|can|could|should|would|do|does|"
+        r"did|will|has|have|show|tell|give|explain|compare|list|run|stress|size|check|find|get)\b",
+        text, re.I)
+
+
 _PRICEABLE_ORDER = re.compile(
     r"^\W*(?:(?:ok(?:ay)?|yes|please|pls|just|now)[\s,]+)*(?:buy|sell|short|long)\s+\$\d", re.I)
 """A plain buy, sell, long or short order with a dollar size, which is priced rather than declined.
@@ -1093,7 +1108,8 @@ def handle_ask(
         checks = mem.checks_from(payload.get("data"), now)
         if checks:
             facts = mem.merge_checks(facts, checks)
-    if new and (payload.get("refused") or by.startswith("declined") or by == "ngram"):
+    if new and (payload.get("refused") or by.startswith("declined") or by == "ngram"
+                or (_statement_only(text) and str(payload.get("intent")) in _DESK_RECORD)):
         noted = {f.key() for f in new}
         payload.update(lines=mem.acknowledgement([f for f in facts if f.key() in noted]),
                        refused=False, reason="",

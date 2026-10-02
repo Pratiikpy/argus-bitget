@@ -1026,11 +1026,15 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
         # "whats my drawdown if btc drops 20%" names the holding the shock is on and no book; it
         # asked for holdings twice in a row (answer audit, round 3). Read as a position in that
         # name, and said.
+        # A move stated for each of two or more holdings is answered from those holdings alone
+        # (`_own_move_lines`), so the one-name note would contradict the line above it (row 612).
+        own = len(holding_shocks(raw_text)) >= 2
         request = replace(request, book={request.shock_on: 1.0}, symbols=(request.shock_on,),
-                          notes=(*request.notes, f"no other holdings were stated, so the book is "
-                                                 f"read as a position in {_t(request.shock_on)} "
-                                                 f"itself — say what you hold for your whole "
-                                                 f"book's figure"))
+                          notes=request.notes if own else (
+                              *request.notes, f"no other holdings were stated, so the book is "
+                                              f"read as a position in {_t(request.shock_on)} "
+                                              f"itself — say what you hold for your whole "
+                                              f"book's figure"))
     if not request.symbols:
         return Answer(
             question=question, refused=True,
@@ -1228,6 +1232,19 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                          raw_text, re.I):
                 lines = _lead_with(lines, "Liquidation price:")
             payload["leverage"] = lever_payload
+            stake = next((m for note in request.notes if (m := re.match(
+                r"your holdings add up to (\d+(?:\.\d+)?)%, so they were scaled", note))), None)
+            if stake is not None and lines:
+                # "put 50% of my book in TSLA with leverage" had its 50% scaled to 100% (round 18,
+                # row 626): the share is the stake, and what it does to the book is the answer.
+                pct = float(stake.group(1))
+                lev = request.leverage or 10.0
+                request = replace(request, notes=tuple(n for n in request.notes
+                                                       if not n.startswith("your holdings add up")))
+                lines.insert(1, f"Your book: {pct:g}% of it as margin at {lev:g}x is a position "
+                                f"{pct * lev / 100:g} times the whole book; a liquidation loses "
+                                f"that {pct:g}% of the book, and every 1% the price moves against "
+                                f"you short of it costs {pct * lev / 100:g}% of the book.")
             closure_read = lever_payload.get("closure") or {}
             if closure_read:
                 data = replace(data, provenance=", ".join(part for part, used in (
@@ -1259,7 +1276,20 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                 # "what is the S&P 500 doing" led with "nothing in 48h names SP500" and gave the
                 # move itself second (2026-09-30): the move is what was asked, the news is why.
                 head = str(lines[0]).removeprefix("Bottom line: ")
-                lines = [f"Bottom line: {lines[moved]} On the news: {head[:1].lower() + head[1:]}",
+                top = str(lines[moved])
+                from argus.lui.research.parse import _period_days
+
+                asked_days = _period_days(raw_text)
+                if asked_days and asked_days > 1:
+                    # "How is Bitcoin doing this week?" was answered with the 24-hour move (a
+                    # hostile review, round 18, row 621): the period asked leads, 24h follows.
+                    from argus.lui.research.quote import period_move
+
+                    last = (news_payload or {}).get("last")
+                    span = period_move(request.symbols[0], asked_days, last) if last else None
+                    if span is not None:
+                        top = f"{span.split('; its range')[0]}. {top}"
+                lines = [f"Bottom line: {top} On the news: {head[:1].lower() + head[1:]}",
                          *(line for i, line in enumerate(lines) if i not in (0, moved))]
 
         elif request.kind is ResearchKind.BOOK:
@@ -1621,7 +1651,11 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                         lines[0] = lines[0].replace("Bottom line: ", "", 1)
                         lines.insert(0, sized_line[0])
                         sources.append(sized_line[1])
-                if (len(quoted) == 1 and (_PRICE_ASKED.search(raw_text)
+                # "what is BTC doing" also asks for the price and the move, not the fee (a
+                # first-time user, round 18, row 632)
+                doing = re.search(r"\bdoing\b|\bup\s+to\b|\bhow(?:'s|\s+is|\s+are)\b", raw_text,
+                                  re.I)
+                if (len(quoted) == 1 and (_PRICE_ASKED.search(raw_text) or doing
                                           or PRICE_AT.match(raw_text))
                         and not re.search(r"\bcost|\bspread|\bfees?\b|round[\s-]?trip|"
                                           r"\bbreak[\s-]?even", raw_text, re.I)):

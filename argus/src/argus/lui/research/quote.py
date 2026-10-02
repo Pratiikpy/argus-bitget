@@ -193,6 +193,35 @@ def _sized_round_trip(symbol: str, notional: Decimal,
                         detail=f"{symbol} both sides walked for ${float(notional):,.0f}")
 
 
+def period_move(symbol: str, days: int, last: Any) -> str | None:
+    """The move over the last ``days`` from Bitget's candles to ``last``, with its range; None
+    when the candles do not answer."""
+    from argus.market.history import fetch_window
+
+    base = symbol.removesuffix("USDT")
+    # Hourly bars up to 30 days so the start sits within an hour of the cutoff; daily beyond.
+    step = timedelta(hours=1) if days <= 30 else timedelta(days=1)
+    try:
+        bars = fetch_window(symbol, start=datetime.now(UTC) - timedelta(days=days + 2),
+                            interval="1H" if days <= 30 else "1D", pause=0.05)
+    except Exception:
+        bars = []
+    cutoff = datetime.now(UTC) - timedelta(days=days)
+    # A bar closes at its open time plus its length; the start is the last close at or before
+    # the cutoff, and the range covers the bars that followed it.
+    before = [b for b in bars if b.ts + step <= cutoff]
+    if not before:
+        return None
+    start = float(before[-1].close)
+    window = [b for b in bars if b.ts > before[-1].ts]
+    high = max(float(b.high) for b in window)
+    low = min(float(b.low) for b in window)
+    move = (float(last) / start - 1) * 100
+    closed = before[-1].ts + step
+    return (f"Over the last {days} day(s) {base} moved {move:+.2f}%, from {start:g} at the "
+            f"{closed:%d %b %H:%M} UTC close to {last} now; its range in that time was {low:g} "
+            f"to {high:g}.")
+
 def _ratio_over_time(a_sym: str, b_sym: str, days: int) -> str | None:
     """The ratio of two contracts over a window, from their own hourly (or daily) closes: where it
     started, where it is, and the lowest and highest close it reached. "What has the ETH/BTC
@@ -338,34 +367,12 @@ def _quote_extras(raw_text: str, quoted: list[tuple[str, Any]],
     ratio_asked = len(quoted) >= 2 and bool(_RATIO_Q.search(raw_text))
     period_lines: list[str] = []
     for span in ([] if ratio_asked else _windows(raw_text, days)):
-        from argus.market.history import fetch_window
-
         days = span
-
-        # Hourly bars up to 30 days so the start sits within an hour of the cutoff; daily beyond.
-        step = timedelta(hours=1) if days <= 30 else timedelta(days=1)
-        try:
-            bars = fetch_window(symbol, start=datetime.now(UTC) - timedelta(days=days + 2),
-                                interval="1H" if days <= 30 else "1D", pause=0.05)
-        except Exception:
-            bars = []
-        cutoff = datetime.now(UTC) - timedelta(days=days)
-        # A bar closes at its open time plus its length; the start is the last close at or before
-        # the cutoff, and the range covers the bars that followed it.
-        before = [b for b in bars if b.ts + step <= cutoff]
-        if before:
-            start = float(before[-1].close)
-            window = [b for b in bars if b.ts > before[-1].ts]
-            high = max(float(b.high) for b in window)
-            low = min(float(b.low) for b in window)
-            move = (float(ticker.last) / start - 1) * 100
-            closed = before[-1].ts + step
-            text = (f"Over the last {days} day(s) {base} moved {move:+.2f}%, from {start:g} at the "
-                    f"{closed:%d %b %H:%M} UTC close to {ticker.last} now; its range in that "
-                    f"time was {low:g} to {high:g}.")
-            lines.append(text)
-            period_lines.append(text)
-            lead = lead or text
+        moved = period_move(symbol, days, ticker.last)
+        if moved is not None:
+            lines.append(moved)
+            period_lines.append(moved)
+            lead = lead or moved
             sources.append(Source(kind="venue", ref="bitget /api/v3/market/candles",
                                   detail=f"{symbol} hourly, last {days + 2} days"))
     if len(period_lines) > 1:

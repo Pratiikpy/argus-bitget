@@ -44,6 +44,13 @@ _NOT_NAMES = frozenset({
 _MARKETS: tuple[tuple[str, str, str], ...] = (
     (r"\b(?:crypto|coins|altcoins|the\s+crypto\s+market)\b", "BTCUSDT",
      "no single name was given, so the crypto market is read as bitcoin (BTCUSDT)"),
+    # "semis will outperform because AI capex keeps rising" was told to name a stock, then the next
+    # turn called it a bull case (round 18, row 616): a sector has a listed fund that stands for it.
+    (r"\b(?:semis|semiconductors?|chip\s*(?:stocks|makers|sector)|chips)\b", "SMHUSDT",
+     "no single name was given, so semiconductors are read as the VanEck semiconductor fund's "
+     "contract (SMHUSDT)"),
+    (r"\b(?:tech\s+stocks|tech|the\s+nasdaq|nasdaq)\b", "QQQUSDT",
+     "no single name was given, so tech is read as the Nasdaq-100 fund's contract (QQQUSDT)"),
     (r"\b(?:stocks|equities|the\s+(?:stock\s+)?market|us\s+stocks|wall\s+street)\b", "SP500USDT",
      "no single name was given, so the stock market is read as Bitget's S&P 500 contract "
      "(SP500USDT)"),
@@ -495,6 +502,9 @@ def research_names(text: str) -> str:
     from argus.lui.research import research_symbols
 
     named = research_symbols(text)[0]
+    if not named:
+        # the market a sector or market thesis was tested on, not "it" (round 18, row 616)
+        named = tuple(sym for pattern, sym, _label in _MARKETS if re.search(pattern, text, re.I))
     return named[0].removesuffix("USDT") if named else "it"
 
 trace_module(globals())

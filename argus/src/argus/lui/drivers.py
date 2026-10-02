@@ -163,7 +163,8 @@ def facts(ticker: str, reason: str, *, cik_for: Callable[[str], int | None] | No
         ciks = {name: cik_for(name) for name in names}
     except Exception as exc:  # the SEC's ticker map did not answer
         return {"error": f"the SEC's ticker map did not answer ({type(exc).__name__})"}
-    if ciks.get(ticker) is None:
+    fund = ciks.get(ticker) is None and len(names) > 1
+    if ciks.get(ticker) is None and not fund:
         return {"error": f"{ticker} files no XBRL with the SEC under that ticker"}
     get = rows
 
@@ -171,13 +172,15 @@ def facts(ticker: str, reason: str, *, cik_for: Callable[[str], int | None] | No
         cik = ciks[name]
         if cik is None:
             return name, ([], "")
+        # A fund (SMH) files no statements of its own; "AI capex keeps rising" is still a claim
+        # about the builders' spending, which their own filings settle (round 18, row 616).
         tags = REVENUE_TAGS if name == ticker else CAPEX_TAGS
         return name, _series(cik, tags, get)
 
     with ThreadPoolExecutor(max_workers=len(names)) as pool:
         got = dict(pool.map(one, names))
     out: dict[str, Any] = {"ticker": ticker, "cik": ciks[ticker], "revenue": got[ticker][0],
-                           "revenue_tag": got[ticker][1]}
+                           "revenue_tag": got[ticker][1], "fund": fund}
     if len(names) > 1:
         out["builders"] = {name: got[name][0] for name, _ in BUILDERS}
         out["builder_tags"] = {name: got[name][1] for name, _ in BUILDERS}
@@ -220,6 +223,8 @@ def test(reason: str, found: Mapping[str, Any]) -> tuple[str, str, list[tuple[st
     if found.get("error"):
         return "not tested", f"The filings could not be read just now: {found['error']}.", []
     ticker = str(found["ticker"])
+    if found.get("fund"):
+        return _spending_only(reason, ticker, found)
     revenue: list[Quarter] = list(found.get("revenue") or [])
     rev_growth = growth(revenue)
     if not rev_growth:
@@ -308,6 +313,48 @@ def test(reason: str, found: Mapping[str, Any]) -> tuple[str, str, list[tuple[st
                  " What the filings cannot test is the part still ahead: it breaks the quarter "
                  "revenue growth turns negative")
         line += " — each report is the next check."
+    return result, line, evidence
+
+
+def _spending_only(reason: str, ticker: str,
+                   found: Mapping[str, Any]) -> tuple[str, str, list[tuple[str, str, str]]]:
+    """The driver claim on a name with no filings of its own, read from the spending alone."""
+    from argus.market.statement_facts import CONCEPT_URL
+
+    builders = found.get("builders") or {}
+    if not all(builders.get(t) for t, _ in BUILDERS):
+        missing = [n for t, n in BUILDERS if not builders.get(t)]
+        return ("not tested", f"The capex of {', '.join(missing)} could not be read from their "
+                              f"filings just now, so the spending named as the driver is not "
+                              f"measured.", [])
+    combined = _combined(builders)
+    capex_growth = growth(combined)
+    if not capex_growth:
+        return ("not tested", "The cloud builders' quarters could not be lined up a year apart, "
+                              "so their capex growth is not measured.", [])
+    cap_end, cap_g = capex_growth[-1]
+    cap_trend = [g for _, g in capex_growth[-4:]]
+    cap_slope = _slope(cap_trend)
+    per = [f"{name} {_pct(g[-1][1])}" for t, name in BUILDERS if (g := growth(builders[t]))]
+    evidence = [(f"Microsoft, Alphabet, Amazon and Meta together spent {_bn(combined[-1].value)} "
+                 f"on capex in the quarter to about {cap_end:%b %Y}, {_pct(cap_g)} on the year ("
+                 + ", ".join(per) + ").", "SEC XBRL, company filings",
+                 CONCEPT_URL.format(cik=int(found["builder_ciks"]["MSFT"]),
+                                    tag=found["builder_tags"]["MSFT"]))]
+    if BEARISH.search(reason):
+        result = ("supported" if cap_g < 0 or cap_slope == "slowing" else
+                  "contradicted" if cap_slope == "accelerating" else "not measurable")
+    else:
+        result = ("supported" if cap_g > 0 else "contradicted" if cap_g < 0
+                  else "not measurable")
+    line = (f"{ticker} is a fund and files no statements of its own, so the spending is read "
+            f"directly: the cloud builders' capex growth over the last {len(cap_trend)} quarters "
+            f"ran " + ", ".join(_pct(g) for g in cap_trend) + f" ({cap_slope}). Whether it "
+            f"reaches {ticker}'s holdings' revenue is not read here — ask it of one of them "
+            f"(NVDA, AMD, AVGO) to test that link too.")
+    if FORWARD.search(reason):
+        line += (" What the filings cannot test is the part still ahead: it breaks the quarter "
+                 "the builders' capex growth turns negative — each report is the next check.")
     return result, line, evidence
 
 

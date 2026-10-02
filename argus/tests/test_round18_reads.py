@@ -5,6 +5,8 @@ Each test pins one finding (tracker rows 612 onward). Live sources are never rea
 
 from __future__ import annotations
 
+import pytest
+
 from argus.lui.research.dispatch import _own_move_lines
 from argus.lui.research.kinds import ResearchKind
 from argus.lui.research.parse import holding_shocks
@@ -223,3 +225,81 @@ class TestRound19Scenarios:
         hike = _rate_scenario("what if the Fed hikes 50bp, what happens to tech", "QQQ", sens)
         assert hike is not None and "+50bp" in hike and "-5.0%" in hike
         assert _rate_scenario("what is the 10-year yield doing", "QQQ", sens) is None
+
+
+class TestRound19LiveFindings:
+    def test_a_sentence_ending_full_stop_is_not_a_decimal_point(self) -> None:
+        from argus.lui.research.sizing import _CAPITAL, account_of
+
+        m = _CAPITAL.search("I have $10,000. How much NVDA should I buy")
+        assert m is not None and m.group("a") == "10,000"
+        assert account_of("account of 10,000. risk 1%") == 10_000.0
+
+    def test_no_stop_on_a_named_name_uses_two_atrs_and_says_so(self) -> None:
+        from argus.lui.research import sizing
+
+        lines, _sources, _data = sizing.answer(
+            "I have $10,000. How much NVDA should I buy if I can't lose more than $500?",
+            "NVDAUSDT", price=lambda _s: 200.0, worst_day=lambda _s: -0.03,
+            atr=lambda _s: 0.01)
+        text = " ".join(lines)
+        assert "2x ATR stop" in text and "$10,000 account" in text and "$10 account" not in text
+
+    def test_a_stated_limit_is_acknowledged_not_answered_with_the_desk_record(self) -> None:
+        from argus.lui.server import _statement_only
+
+        assert _statement_only("My max drawdown is 10% and my horizon is 3 months.")
+        assert not _statement_only("what is the max drawdown")
+        assert not _statement_only("show me the drawdown")
+
+    def test_a_sector_thesis_is_read_as_its_fund_and_outperform_gets_a_benchmark(self) -> None:
+        from argus.lui import thesis
+        from argus.lui.thesis_answer import research_names
+
+        said = "I think semis will outperform because AI capex keeps rising"
+        assert research_names(said) == "SMH"
+        kinds = {r.text: r.kind for r in
+                 thesis.reasons("I think semis will outperform because AI capex keeps rising")}
+        assert kinds["semis will outperform"] is thesis.Kind.RELATIVE
+        assert kinds["AI capex keeps rising"] is thesis.Kind.DRIVER
+        assert thesis.implied_benchmark("SMHUSDT") == "SP500USDT"
+        assert thesis.implied_benchmark("SOLUSDT") == "BTCUSDT"
+        assert thesis.implied_benchmark("SP500USDT") is None
+
+    def test_a_fund_reads_the_builders_spending(self) -> None:
+        from datetime import date
+
+        from argus.lui import drivers
+
+        def q(values: list[float]) -> list[drivers.Quarter]:
+            return [drivers.Quarter(end=date(2025 + i // 4, 3 * (i % 4) + 1, 28), value=v)
+                    for i, v in enumerate(values)]
+
+        builders = {t: q([10, 11, 12, 13, 15, 17, 19, 22]) for t, _ in drivers.BUILDERS}
+        found = {"ticker": "SMH", "fund": True, "builders": builders,
+                 "builder_tags": {t: "PaymentsToAcquirePropertyPlantAndEquipment"
+                                  for t, _ in drivers.BUILDERS},
+                 "builder_ciks": {t: 1 for t, _ in drivers.BUILDERS}}
+        result, line, _evidence = drivers.test("AI capex keeps rising", found)
+        assert result == "supported" and "files no statements of its own" in line
+
+    def test_a_week_question_on_the_news_reader_leads_with_the_week(self) -> None:
+        from argus.lui.research.parse import _period_days
+
+        assert _period_days("How is Bitcoin doing this week?") == 7
+
+    def test_period_move_reads_the_window_from_candles(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from datetime import UTC, datetime, timedelta
+        from decimal import Decimal
+        from types import SimpleNamespace
+
+        import argus.market.history as history
+        from argus.lui.research.quote import period_move
+
+        now = datetime.now(UTC).replace(minute=0, second=0, microsecond=0)
+        bars = [SimpleNamespace(ts=now - timedelta(hours=h), close=Decimal(100 + (200 - h) * 0.1),
+                                high=Decimal(130), low=Decimal(90)) for h in range(200, 0, -1)]
+        monkeypatch.setattr(history, "fetch_window", lambda *_a, **_k: bars)
+        line = period_move("BTCUSDT", 7, Decimal("110"))
+        assert line is not None and line.startswith("Over the last 7 day(s) BTC moved")

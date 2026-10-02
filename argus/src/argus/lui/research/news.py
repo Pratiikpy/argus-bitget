@@ -248,7 +248,8 @@ def _news(symbol: str, is_open: Any,
     for f in filings[:2]:
         lines.append(f"SEC filing: {f.form} filed {f.filed:%Y-%m-%d} — "
                      f"{f.item_summary if f.is_event else f.description or f.form}.")
-    payload = {"change_24h_pct": change, "headlines": [
+    payload = {"change_24h_pct": change, "last": None if move is None else str(move.last),
+               "headlines": [
         {"title": h.title, "feed": h.feed, "link": h.link, "published": h.published.isoformat()}
         for h in kept[:10]], "filings": [f.form for f in filings],
         "tone": toned[1] if toned is not None else None}

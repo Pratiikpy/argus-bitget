@@ -4105,6 +4105,11 @@ def plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, dic
                 f"turned into a share of it: {lead} is assessed at {DEFAULT_SIZE:.0%} — say the "
                 f"book's value, or the share, to size it exactly"
                 if amount is not None and not valued else
+                # "should I put $500 in Bitcoin" said "no size was given" under a $500 answer
+                # (a first-time user, round 18, row 629)
+                f"the ${amount:,.0f} is read as the whole position in {_t(lead)}, with "
+                f"nothing else held — say what else you hold to see its share of a book"
+                if amount is not None and set(valued) == {lead} else
                 f"no size was given, so {lead} is assessed at {DEFAULT_SIZE:.0%}")
         request = ResearchRequest(
             kind=ResearchKind.IMPACT,

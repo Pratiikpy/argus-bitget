@@ -225,8 +225,16 @@ def reasons(text: str) -> tuple[Reason, ...]:
         if not part or _STANCE.match(part) or _ASKED.match(part):
             continue
         kind = next((k for k, pattern in _KINDS if pattern.search(part)), None)
+        if kind is Kind.MOMENTUM and dict(_KINDS)[Kind.DRIVER].search(part):
+            # "AI capex keeps rising" is about the spending, not the price: "keeps rising" took it
+            # to the trend reader, which answered "no technical reading" (round 18, row 616).
+            kind = Kind.DRIVER
         if _RELATIVE.search(part) and len(_two_names(part)) == 2:
             # "SOL will outrun ETH" named two contracts and was left "not tested" (round 11).
+            kind = Kind.RELATIVE
+        elif _RELATIVE.search(part) and kind in (None, Kind.DIRECTION, Kind.OTHER):
+            # "semis will outperform" names no second contract: it is measured against the
+            # market it would beat (`relative_facts`), not left to the trader (round 18, row 616).
             kind = Kind.RELATIVE
         if kind is Kind.REVERSION and _RATIO.search(part):
             # "ETH/BTC should mean-revert" is about a ratio; the price test reads one name's own
@@ -258,13 +266,26 @@ def _two_names(text: str) -> tuple[str, ...]:
     return research_symbols(text)[0][:2]
 
 
-def relative_facts(reason: str) -> dict[str, Any] | None:
+def implied_benchmark(symbol: str) -> str | None:
+    """What a one-name "will outperform" is measured against: bitcoin for a coin, the S&P 500
+    contract for anything else, and nothing for the benchmark itself."""
+    bench = "BTCUSDT" if _is_coin(symbol) else "SP500USDT"
+    return None if symbol == bench else bench
+
+
+def relative_facts(reason: str, subject: str | None = None) -> dict[str, Any] | None:
     """Both names' returns over 7, 30 and ~90 days from Bitget's daily candles, in the order
-    named."""
+    named. A reason naming one name or none is the thesis subject against its implied benchmark,
+    marked ``implied`` so the answer says which market it was measured against."""
     names = _two_names(reason)
+    implied = None
+    if len(names) < 2 and subject is not None:
+        first = names[0] if names else subject
+        implied = implied_benchmark(first)
+        names = (first, implied) if implied is not None else names
     if len(names) != 2:
         return None
-    out: dict[str, Any] = {"names": list(names)}
+    out: dict[str, Any] = {"names": list(names), "implied": implied}
     for symbol in names:
         rows = _closes(symbol)
         if len(rows) < 31:
@@ -305,6 +326,8 @@ def _relative(reason: Reason, found: Mapping[str, Any] | None) -> Tested:
                       "tested.")
     first, second = found["names"]
     a, b = found[first], found[second]
+    against = (f" Measured against {second.removesuffix('USDT')}, the market the claim names no "
+               f"rival for." if found.get("implied") else "")
     spans = sorted(set(a) & set(b))
     parts = [f"over {n} days {first.removesuffix('USDT')} {a[n]:+.1%} against "
              f"{second.removesuffix('USDT')} {b[n]:+.1%}" for n in spans]
@@ -326,7 +349,7 @@ def _relative(reason: Reason, found: Mapping[str, Any] | None) -> Tested:
                       f"Over {window} days {first.removesuffix('USDT')} returned "
                       f"{a[window]:+.1%} against {second.removesuffix('USDT')}'s {b[window]:+.1%} "
                       f"— {'true' if result is Result.SUPPORTED else 'not so'}, on Bitget's "
-                      f"daily closes.",
+                      f"daily closes." + against,
                       evidence=tuple(Finding(f"{s.removesuffix('USDT')} daily closes, Bitget",
                                              "Bitget market candles", _candles_url(s))
                                      for s in (first, second)))
@@ -336,7 +359,7 @@ def _relative(reason: Reason, found: Mapping[str, Any] | None) -> Tested:
     return Tested(reason.text, reason.kind, Result.NOT_MEASURABLE,
                   "A forecast, so the record is context and not a test — so far: "
                   + "; ".join(parts) + ". Whether it keeps up is what comes next, and no data "
-                  "tests that.",
+                  "tests that." + against,
                   evidence=tuple(Finding(f"{s.removesuffix('USDT')} daily closes, Bitget",
                                          "Bitget market candles", _candles_url(s))
                                  for s in (first, second)))

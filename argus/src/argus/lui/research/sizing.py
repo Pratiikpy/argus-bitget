@@ -44,7 +44,7 @@ _ACCOUNT = (
     re.compile(r"\b(?:account|capital|portfolio|balance|bankroll|my\s+book|book\s+(?:size|value))\s+"
                r"(?:of|is|=|:|size\s+(?:of|is))?\s*(?:about\s+|around\s+|roughly\s+|~)?"
                # not a percentage: "10k account 1% risk" read the account as $1 (round 11)
-               r"\$?\s*(?P<n>\d[\d,]*(?:\.\d+)?)(?![\d.,]|\s*%)\s*(?P<k>k|m|thousand|million)?",
+               r"\$?\s*(?P<n>\d[\d,]*(?:\.\d+)?)(?!\d|[.,]\d|\s*%)\s*(?P<k>k|m|thousand|million)?",
                re.I),
     re.compile(r"\b(?P<n>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k|m|thousand|million)?\s+(?:dollars?\s+|usd\s+|"
                r"usdt\s+)?(?:account|capital|portfolio|balance|bankroll|book)\b", re.I),
@@ -109,8 +109,8 @@ def account_of(text: str) -> float | None:
 
 _CAPITAL = re.compile(
     r"\b(?:i\s+(?:only\s+)?(?:have|got|own)|with|using|of)\s+(?:about\s+|around\s+|only\s+)?"
-    r"(?:\$\s*(?P<a>\d[\d,]*(?:\.\d+)?)(?![\d.])(?:\s*(?P<ak>k|thousand|grand)\b)?"
-    r"|(?P<b>\d[\d,]*(?:\.\d+)?)(?![\d.])\s*"
+    r"(?:\$\s*(?P<a>\d[\d,]*(?:\.\d+)?)(?!\d|[.,]\d)(?:\s*(?P<ak>k|thousand|grand)\b)?"
+    r"|(?P<b>\d[\d,]*(?:\.\d+)?)(?!\d|[.,]\d)\s*"
     r"(?:(?P<bk>k|thousand|grand)\b|(?:dollars?|usd|usdt|bucks)\b))(?!\s*%)"
     r"(?!\s+(?:stock|share|coin|token)s?\b)", re.I)
 """The money a trader says they have: "if i have 3k", "with $5,000", "i got 2 grand"."""
@@ -289,6 +289,19 @@ def answer(text: str, symbol: str | None = None, *,
     elif _STOP_PRICE.search(text) is not None:
         return _refusal("a stop price needs an entry price to become a distance — say \"entry "
                         "150, stop 144\", or give the stop as a percentage (\"a 4% stop\").")
+    if stop_frac is None and symbol and atr is not None:
+        # A named name has an honest default distance — its own volatility — so the trader gets a
+        # size and the stop it assumes rather than a request for one (a judge, round 18, row 614).
+        try:
+            one = atr(symbol)
+        except Exception:  # an unreadable ATR falls through to asking for the stop
+            one = None
+        if one:
+            stop_frac = 2 * one
+            notes.append(f"no stop was given, so a 2x ATR stop is used: "
+                         f"{symbol.removesuffix('USDT')}'s 14-period ATR on Bitget's 4-hour "
+                         f"candles is {one:.2%} of price, so the stop sits {stop_frac:.2%} away "
+                         f"(say \"a 4% stop\" to use your own distance)")
     if stop_frac is None:
         return _refusal(f"a size follows from the risk (${risk_usd:,.0f} here) and how far away "
                         f"the stop is, and no stop was given — add one, as in \"a 4% stop\" or "

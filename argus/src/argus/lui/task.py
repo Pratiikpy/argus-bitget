@@ -453,7 +453,8 @@ def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
         driver = (pool.submit(drivers.facts, symbol.removesuffix("USDT"), driven)
                   if driven is not None else None)
         against = next((r.text for r in stated if r.kind is thesis.Kind.RELATIVE), None)
-        relative = (pool.submit(thesis.relative_facts, against) if against is not None else None)
+        relative = (pool.submit(thesis.relative_facts, against, symbol)
+                    if against is not None else None)
         macro = (pool.submit(macro_thesis.facts, symbol) if thesis.Kind.MACRO in kinds else None)
         around = pool.submit(thesis.context, symbol) if stated else None
         futures = [pool.submit(one, step) for step in STEPS]
