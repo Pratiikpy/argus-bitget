@@ -196,7 +196,8 @@ def asks_for_size(text: str) -> bool:
     stress and execution engines, one of which planned a $250,000 order for an empty account. A
     budget with a size asked for and no stop is answered by asking for the stop."""
     text = spelled_out(text)
-    budget = bool(_RISK_PCT.search(text) or stated_risk_usd(text) is not None)
+    budget = bool(_RISK_PCT.search(text) or stated_risk_usd(text) is not None
+                  or (_LOSS_PCT.search(text) and (stated_capital(text) or account_of(text))))
     stop = bool(_STOP_PCT.search(text) or _STOP_ATR.search(text) or _STOP_PRICE.search(text))
     # A stop with a request for a size is a sizing question even with no budget stated in it: the
     # answer is then the budget it needs (said earlier, or asked for), never a leverage reading of
@@ -226,6 +227,11 @@ def answer(text: str, symbol: str | None = None, *,
     # ticker was named (a hostile review, 2026-09-30).
     account = stated_capital(text)
     risk_usd = stated_risk_usd(text)
+    limit = _LOSS_PCT.search(text)
+    if risk_usd is None and limit is not None and account:
+        # "a $20,000 account and I cannot lose more than 5% of it" is the dollars at risk; it was
+        # read as a 20% position in the account's size (a judge, round 19, row 667)
+        risk_usd = account * float(limit.group("p") or limit.group("p2") or limit.group("p3")) / 100
     if risk_usd is None and (m := _RISK_PCT.search(text)) is not None:
         fraction = float(_group(m, "p", "p2") or 0) / 100
         if account is None:
@@ -389,7 +395,10 @@ _POSITION_PCT = re.compile(
 _LOSS_PCT = re.compile(
     r"\b(?:can'?t|cannot|won'?t|don'?t\s+want\s+to)\s+(?:afford\s+to\s+)?lose\s+(?:more\s+than\s+)?"
     r"(?P<p>\d+(?:\.\d+)?)\s*%|\b(?:max(?:imum)?\s+loss|loss\s+limit|risk(?:ing)?)\s+(?:of\s+|is\s+)?"
-    r"(?P<p2>\d+(?:\.\d+)?)\s*%", re.I)
+    r"(?P<p2>\d+(?:\.\d+)?)\s*%|"
+    # "with a 3% max loss" names the figure first (a judge, round 19)
+    r"\b(?P<p3>\d+(?:\.\d+)?)\s*%\s+(?:max(?:imum)?\s+loss|loss\s+limit|stop[\s-]?out\s+limit)\b",
+    re.I)
 
 
 def stop_for(text: str, symbol: str | None, *,
@@ -421,7 +430,7 @@ def stop_for(text: str, symbol: str | None, *,
     loss = stated_risk_usd(text)
     limit = _LOSS_PCT.search(text)
     if loss is None and account and limit is not None:
-        loss = account * float(limit.group("p") or limit.group("p2")) / 100
+        loss = account * float(limit.group("p") or limit.group("p2") or limit.group("p3")) / 100
     if position is None or loss is None or position <= 0:
         return None
     distance = loss / position - ROUND_TRIP

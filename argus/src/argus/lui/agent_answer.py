@@ -35,6 +35,81 @@ def asks_about_the_agent(text: str) -> bool:
     return bool(AGENT_Q.search(text) and _ABOUT_ITS_RECORD.search(text))
 
 
+_BREAKER_Q = re.compile(r"\b(?:circuit\s+breaker|breaker|reduce[\s-]?only|halt(?:ed)?|kernel)\b",
+                        re.I)
+_ITS = re.compile(r"\b(?:its|it|it's|the\s+agent'?s?|that\s+agent)\b", re.I)
+
+
+def asks_follow_up(text: str, prior: list[str]) -> bool:
+    """"Why is its circuit breaker on…?" straight after a question about the Track 2 agent: the
+    pronoun is the agent, and it went to this console's own desk record (a judge, round 19, row
+    663)."""
+    return bool(prior and AGENT_Q.search(prior[-1]) and _ITS.search(text)
+                and (_BREAKER_Q.search(text) or _ABOUT_ITS_RECORD.search(text)))
+
+
+def asks_about_the_breaker(text: str) -> bool:
+    return bool(_BREAKER_Q.search(text))
+
+
+_HELD = re.compile(r"book\.(drawdown_pct|consecutive_losses)\s*=\s*(-?\d+(?:\.\d+)?)")
+_LIMIT = re.compile(r"kernel\.(breaker_reduce_only_drawdown_pct|breaker_losing_streak)\s*=\s*"
+                    r"(-?\d+(?:\.\d+)?)")
+
+
+def breaker_answer(fetch: Callable[[str], Any] = fetch_json
+                   ) -> tuple[list[str], list[Source], dict[str, Any]]:
+    """Why the agent's breaker is on, from the latest decision whose record names it: each trip
+    rule against the figure the book held, so the reason is the record's and not the narration's."""
+    try:
+        loaded = fetch("decisions.json") or []
+    except Exception:
+        loaded = []
+    rows = loaded if isinstance(loaded, list) else loaded.get("decisions") or []
+    latest = next((r for r in sorted(rows, key=lambda r: str(r.get("decided_at", "")),
+                                     reverse=True)
+                   if _HELD.search(str(r.get("mandate_response") or ""))
+                   and _BREAKER_Q.search(str(r.get("mandate_response") or ""))), None)
+    if latest is None:
+        return ([f"Bottom line: no decision in the Track 2 agent's published record "
+                 f"({RECORD}/decisions.json) names its breaker's inputs, so the reason is not "
+                 f"stated rather than guessed."], [], {})
+    response = str(latest.get("mandate_response") or "")
+    held = {k: float(v) for k, v in _HELD.findall(response)}
+    # The rule's thresholds are the policy's, the same on every decision of the run; a decision
+    # that quotes only the figure that tripped borrows them from the nearest one that names them.
+    limits: dict[str, float] = {}
+    for row in sorted(rows, key=lambda r: str(r.get("decided_at", "")), reverse=True):
+        for key, value in _LIMIT.findall(str(row.get("mandate_response") or "")):
+            limits.setdefault(key, float(value))
+        if len(limits) == 2:
+            break
+    trips = []
+    streak, streak_limit = held.get("consecutive_losses"), limits.get("breaker_losing_streak")
+    if streak is not None and streak_limit is not None:
+        trips.append((streak >= streak_limit,
+                      f"{streak:g} consecutive losing closes against a {streak_limit:g}-loss rule"))
+    draw, draw_limit = held.get("drawdown_pct"), limits.get("breaker_reduce_only_drawdown_pct")
+    if draw is not None and draw_limit is not None:
+        trips.append((abs(draw) >= draw_limit,
+                      f"a {abs(draw):.3g}% drawdown against its {draw_limit:g}% line"))
+    fired = [what for hit, what in trips if hit]
+    clear = [what for hit, what in trips if not hit]
+    lead = ("Bottom line: the Track 2 agent's breaker is on because of "
+            + (" and ".join(fired) if fired else "no rule its record shows tripped")
+            + (f"; not because of {' or '.join(clear)}" if clear else "")
+            + " — it makes the book reduce-only: positions can be closed, none opened.")
+    lines = [lead,
+             f"Read from decision seq {latest.get('seq')} "
+             f"({str(latest.get('decided_at', ''))[:16]} UTC) in the agent's published record."]
+    if "drawdown beyond" in str(latest.get("summary") or "") and clear:
+        lines.append("That decision's own summary says the drawdown is beyond the line; its "
+                     "record does not support that, and /agent says so beside it.")
+    lines.append("This is the separate Track 2 project, not this console's research desk.")
+    return lines, [Source("venue", f"{RECORD}/decisions.json",
+                          "the agent's decisions and the facts each was given")], {}
+
+
 def answer(fetch: Callable[[str], Any] = fetch_json
            ) -> tuple[list[str], list[Source], dict[str, Any]]:
     """The agent's scored metrics, its activity counts, and the envelope a no-edge book lands in."""

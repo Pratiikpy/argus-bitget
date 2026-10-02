@@ -167,6 +167,11 @@ def answer(text: str, *, book: str = "", memory: str = ""
     emit(lines[1:-1], "computed")
     if market_note:
         lines.append(f"Assumed: {market_note}.")
+    profile = thesis.profile_parts(text)
+    if profile:
+        lines.insert(1, "Kept as your profile, not tested as reasons: "
+                     + "; ".join(f"“{p}”" for p in profile)
+                     + " — they shape the sizing and mandate answers that follow.")
     return lines, sources, {"thesis": {"name": name,
                                        "tested": [t.as_dict() for t in task.tested]}}
 

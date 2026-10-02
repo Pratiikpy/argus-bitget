@@ -1368,7 +1368,10 @@ def unread_holdings(text: str) -> list[tuple[str, float]]:
 
 
 _JOINED_CAPS = re.compile(
-    r"(?=\b([A-Z]{2,5})\b\s*(?:,|and|vs\.?|versus|or|against|with)\s+\b([A-Z]{2,5})\b)")
+    # Longer junk and the joiners of the languages the console is asked in: "¿Debería comprar
+    # FOOBARXYZ y AAPL?" dropped the unknown name without a word (a hostile review, round 19).
+    r"(?=\b([A-Z][A-Z0-9]{1,9})\b\s*(?:,|and|y|o|e|et|und|oder|ou|vs\.?|versus|or|against|"
+    r"with|con)\s+\b([A-Z][A-Z0-9]{1,9})\b)")
 """Two capitalised names joined as a trader joins the things compared: "NVDA and ZZZQX"."""
 
 _FINANCE_ACRONYMS = frozenset({
@@ -2380,7 +2383,8 @@ def detect(text: str) -> ResearchRequest | None:
     analyses: in "what if the Nasdaq drops 10%? I hold 40% gold" the Nasdaq is the shock, not a
     holding, and a note saying it was read as NDX100USDT would describe a reading never used.
     """
-    request = _with_leverage_exposure(_with_stated_cash(read_request(text), text), text)
+    request = with_short_side(as_comparison(
+        _with_leverage_exposure(_with_stated_cash(read_request(text), text), text), text), text)
     if request is not None and request.book and request.notional is None:
         # "I have $600 in SOL and $400 in TSLA, am I too risky?" was sized on the first amount,
         # $600, not the $1,000 the book holds (a first-time user, round 12): a book stated in
@@ -2395,6 +2399,44 @@ def detect(text: str) -> ResearchRequest | None:
     read_as = [n for s, n in _read(text).items() if n and s in request.symbols
                and n not in request.notes]
     return replace(request, notes=(*request.notes, *read_as)) if read_as else request
+
+
+_ASKS_COMPARISON = re.compile(r"\b(?:compar\w*|versus|vs\.?|which\s+(?:has|is|one)\s+(?:the\s+)?"
+                              r"(?:better|stronger|weaker|more|less|higher|lower))\b", re.I)
+
+
+def with_short_side(request: ResearchRequest | None, text: str) -> ResearchRequest | None:
+    """A trade the question calls a short, read on the short side by either reader.
+
+    "should I short TSLA?" was answered on the long side — the worst day as a fall, an add to a
+    long holding — by the model's plan and by the patterns alike (a hostile review and a judge,
+    round 19, rows 653, 666, 668)."""
+    if (request is not None and request.side == "long"
+            and request.kind in (ResearchKind.IMPACT, ResearchKind.LEVERAGE)
+            and _SHORT.search(text)
+            and not re.search(r"\bshort\s+(?:interest|ratio|squeeze|term|sellers?)\b", text, re.I)):
+        return replace(request, side="short")
+    return request
+
+
+def as_comparison(request: ResearchRequest | None, text: str) -> ResearchRequest | None:
+    """A one-name reading of a question that compares two names, widened to the comparison.
+
+    "Compare NVDA and AMD — which has better momentum?" was read as one name's technicals, by the
+    patterns (NVDA) and by the live planner (AMD), so the other name was never answered (a judge,
+    round 19, row 673). The comparison engine leads with momentum when momentum is asked."""
+    if request is None or len(request.symbols) >= 2 or request.book:
+        return request
+    if request.kind not in (ResearchKind.TECHNICALS, ResearchKind.QUOTE, ResearchKind.IMPACT,
+                            ResearchKind.ANALOGUE, ResearchKind.NEWS):
+        return request
+    if not _ASKS_COMPARISON.search(text):
+        return request
+    names = research_symbols(text)[0]
+    if len(names) < 2:
+        return request
+    return ResearchRequest(kind=ResearchKind.COMPARE, symbols=tuple(names[:COMPARE_MAX]),
+                           parsed_by=request.parsed_by, notes=request.notes)
 
 
 _SHOCK_SUBJECTS = frozenset({"NDX100USDT", "SP500USDT", "DIASTOCKUSDT"})
@@ -3541,6 +3583,12 @@ def with_book(request: ResearchRequest | None, book_text: str,
         return request
     shown = [f"{w:.0%} {_t(s)}" for s, w in book.items()] + ([f"{cash:.0%} cash"] if cash else [])
     note = f"used your saved book ({', '.join(shown)}{book_pricing_note(book_text)})"
+    stated_total = sum(w for _, _, w in holding_pairs(book_text))
+    if stated_total > 1.02 and not unread_holdings(book_text):
+        # "60% AAPL, 30% NVDA, 30% MSFT" in My book was scaled to 50/25/25 with no word that its
+        # weights add up to 120% (a hostile review, round 19, row 654)
+        note += (f"; its weights add up to {stated_total:.0%}, so they were scaled to 100% — "
+                 f"correct them in My book if one is wrong")
     missing = unread_holdings(book_text)
     if missing:
         # "20% DOGSHIT, 80% BTC" was scaled to all BTC with no word about DOGSHIT (answer audit,
@@ -3683,7 +3731,10 @@ def follow_up(text: str, prior: list[str], book_text: str = "") -> ResearchReque
                 *base.notes, f"read as the previous question — \"{earlier[:60]}\" — "
                              f"with the shock on {_t(new)}"))
         if base.kind is ResearchKind.IMPACT and base.book:
-            others = tuple(s for s in base.symbols[1:] if s != new)
+            # every holding stays in the names loaded: "What about NVDA?" after "Should I short
+            # TSLA?" loaded NVDA alone, and the book's TSLA, with no series, carried no risk
+            # (round 19)
+            others = tuple(dict.fromkeys(s for s in (*base.symbols[1:], *base.book) if s != new))
             symbols: tuple[str, ...] = (new, *others)
         elif base.kind in (ResearchKind.STRESS, ResearchKind.BOOK):
             return None  # a book question does not take a single name
@@ -4196,13 +4247,8 @@ def plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, dic
     request = _with_leverage_exposure(_with_stated_cash(request, text), text)
     if request is not None and request.book and _GROUP.search(text):
         request = replace(request, notes=(*request.notes, *_group_note(text)))
-    if (request is not None and request.side == "long"
-            and request.kind in (ResearchKind.IMPACT, ResearchKind.LEVERAGE)
-            and _SHORT.search(text)
-            and not re.search(r"\bshort\s+(?:interest|ratio|squeeze|term|sellers?)\b", text, re.I)):
-        # "should I short TSLA?" was answered on the long side — the worst day as a fall — when
-        # the model's plan carried no side (a hostile review and a judge, round 19, rows 653, 666)
-        request = replace(request, side="short")
+    request = as_comparison(request, text)
+    request = with_short_side(request, text)
     audit["applied"] = request is not None
     return request, audit
 

@@ -401,6 +401,16 @@ def task_fill_cost() -> tuple[Number, ...]:
     return h["sliced_bps"], h["single_order_bps"]
 
 
+def standing_findings() -> int:
+    """Conditions the capability register says are claimed but not evidenced.
+
+    Quoted in the README's verified table since 2026-10-02, after a hostile review found the
+    register's own `clean: false` said only on one page (round 19, row 658); a count that moves
+    with every register write is watched here rather than typed."""
+    rows = json.loads((DATA / "standing.json").read_text(encoding="utf-8")).get("findings") or []
+    return len(rows)
+
+
 def register_claims() -> int:
     """Claims committed to the public register.
 
@@ -819,6 +829,9 @@ CLAIMS: tuple[Claim, ...] = (
           task_fill_cost, ("submission",)),
     # `falsifiable claims about` was added after README:163 was found quoting 36 against a live 156
     # — the sentence had drifted by 120 claims and matched no pattern, so the gate never saw it.
+    Claim("standing_findings",
+          r"lists (?P<q>\d+) conditions claimed but not evidenced",
+          standing_findings, ("public-readme",)),
     Claim("register_claims",
           r"(?P<q>[\d,]+) (?:falsifiable )?claims? "
           r"(?:across|about|committed|pre-registered|on the register)",

@@ -228,7 +228,12 @@ def _odds_lines(request: ResearchRequest,
                              if side == "long" else
                              ("lower", 1 - odds.higher_share, 1 - odds.higher_high,
                               1 - odds.higher_low))
+    edge = min(abs(odds.higher_low - 0.5), abs(odds.higher_high - 0.5)) < 0.01
+    # "45% (95% interval 40% to 50%) — a real lean down" called an interval that reaches 50% as
+    # printed a real lean (a judge, round 19, row 678): at the edge it is said as the edge
     lean = ("indistinguishable from a coin flip" if odds.coin_flip else
+            f"a lean {'up' if odds.higher_low > 0.5 else 'down'} only at the edge of chance — the "
+            f"interval reaches 50% as rounded" if edge else
             f"a real lean {'up' if odds.higher_low > 0.5 else 'down'}, though a lean is not a call")
     thin = (f" — thin: only {odds.independent:g} independent windows" if odds.thin else "")
     lines = [

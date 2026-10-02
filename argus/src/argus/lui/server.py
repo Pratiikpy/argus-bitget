@@ -1001,7 +1001,12 @@ def handle_ask(
     new = memory_model.combined(text, _model_for(visitor, count=False), now,
                                 price_of=_price_now)
     facts = mem.merge(facts, new)
+    before_sale = mem.get(facts, "book")
     facts = mem.apply_sales(facts, text, now)
+    after_sale = mem.get(facts, "book")
+    if after_sale is not None and after_sale is not before_sale:
+        # the sale is said back with the rest of what was noted (round 19, row 648)
+        new = [*new, after_sale]
     if mem.recall_asked(text) and not new:
         # "What do you remember about me?" is answered from the memory the browser sent, in the
         # trader's own words; it was declined while seven facts were held (a judge, round 14).
@@ -1064,6 +1069,11 @@ def handle_ask(
             payload["lines"] = [*payload["lines"], f"Assumed: {date_note}."]
         if others_note and payload.get("lines"):
             payload["lines"] = [payload["lines"][0], others_note, *payload["lines"][1:]]
+        terms = glossary_line([str(x) for x in payload.get("lines") or []])
+        if terms and not payload.get("refused"):
+            at = next((i for i, line in enumerate(payload["lines"])
+                       if str(line).startswith("Data:")), len(payload["lines"]))
+            payload["lines"] = [*payload["lines"][:at], terms, *payload["lines"][at:]]
         from argus.lui.honesty import order_prefix
 
         prefix = order_prefix(text)
@@ -1378,7 +1388,10 @@ def _answer(
         return engine_payload(*onchain.gas(text), by="eth-gas")
     from argus.lui import agent_answer
 
-    if agent_answer.asks_about_the_agent(text):
+    if ((agent_answer.asks_about_the_agent(text) or agent_answer.asks_follow_up(text, prior))
+            and agent_answer.asks_about_the_breaker(text)):
+        return engine_payload(*agent_answer.breaker_answer(), by="track2-agent")
+    if agent_answer.asks_about_the_agent(text) or agent_answer.asks_follow_up(text, prior):
         # The Track 2 agent's Sharpe and win rate were answered from this console's own desk
         # ledger, a different system (a judge's audit, 2026-09-30).
         return engine_payload(*agent_answer.answer(), by="track2-agent")
@@ -2199,9 +2212,9 @@ _OWN_LOSS_Q = re.compile(
     r"(?:risky|safe|dangerous)\b|\bhow\s+(?:risky|safe|dangerous)\s+(?:is|are)\s+my\s+(?:portfolio|"
     r"book|holdings|positions|bag|stack|coins)\b|\bi(?:'m|\u2019m|\s+am)\s+(?:so\s+|really\s+|"
     r"very\s+)?(?:scared|afraid|worried|nervous|anxious)\b|\bwhat(?:'s|\s+is)\s+the\s+most\s+i\s+"
-    r"(?:can|could)\s+lose\b|\b(?:worst|bad)\s+(?:day|week|month)\s+for\s+my\s+(?:portfolio|book|"
-    r"holdings)\b|\bmy\s+(?:portfolio|book|holdings)'?s?\s+worst\s+(?:single\s+)?(?:day|week)\b|"
-    r"\bworst\s+single\s+day\s+for\s+my\b", re.I)
+    r"(?:can|could)\s+lose\b|\b(?:worst|bad)\s+(?:single\s+)?(?:day|week|month)\s+for\s+(?:my|this|"
+    r"the)\s+(?:portfolio|book|holdings)\b|\b(?:my|this|the)\s+(?:portfolio|book|holdings)'?s?\s+"
+    r"worst\s+(?:single\s+)?(?:day|week)\b", re.I)
 """The trader's own risk or loss, with no instrument named: "is my portfolio risky", "how much
 could I lose in a bad week", "I'm scared of losing money". Four of them were answered with the
 desk's own track record (a first-time user, round 19, row 633), and "worst single day for my book"
@@ -2209,6 +2222,60 @@ with a desk decision (a judge, row 662)."""
 
 
 _BOOK_REPORT_ASK = "how risky is my book"
+
+
+def _yahoo_ticker(symbol: str) -> str | None:
+    from argus.lui.research.parse import is_us_equity
+    from argus.market import universe
+
+    base = symbol.removesuffix("USDT")
+    if is_us_equity(symbol):
+        return base
+    if universe.NOT_EQUITY.get(symbol, "crypto") == "crypto":
+        return f"{base}-USD"
+    return None
+
+
+def _book_worst_day_year(book: str) -> str | None:
+    """The book's worst close-to-close day over the last year, weights held fixed, from daily
+    closes; None when any holding's year cannot be read (a partial book would understate it)."""
+    import itertools
+
+    from argus.lui.research.parse import holding_pairs, priced_book
+    from argus.market.equity_history import HistoryError, daily
+
+    priced = priced_book(book)
+    weights: dict[str, float] = dict(priced.weights) if priced is not None else {}
+    if not weights:
+        for _, symbol, weight in holding_pairs(book):
+            weights[symbol] = weights.get(symbol, 0.0) + weight
+    total = sum(abs(w) for w in weights.values())
+    if not weights or total <= 0:
+        return None
+    since = datetime.now(UTC).date().replace(year=datetime.now(UTC).year - 1)
+    closes: dict[str, dict[Any, float]] = {}
+    for symbol in weights:
+        ticker = _yahoo_ticker(symbol)
+        if ticker is None:
+            return None
+        try:
+            closes[symbol] = {d.day: d.close for d in daily(ticker) if d.day >= since}
+        except (HistoryError, OSError, ValueError):
+            return None
+    common = sorted(set.intersection(*(set(c) for c in closes.values())))
+    if len(common) < 120:
+        return None
+    worst_move, worst_day = 0.0, common[0]
+    for prev, day in itertools.pairwise(common):
+        move = sum(weights[s] / total * (closes[s][day] / closes[s][prev] - 1.0) for s in weights)
+        if move < worst_move:
+            worst_move, worst_day = move, day
+    value = priced.value if priced is not None and priced.value else None
+    money = f", about ${abs(worst_move) * value:,.0f} of ${value:,.0f}" if value else ""
+    return (f"Bottom line: this book's worst single day in the last year was {worst_move:+.2%}"
+            f"{money}, on {worst_day:%d %b %Y} — today's weights applied to each holding's daily "
+            f"closes over {len(common)} common trading days (Yahoo Finance, split-adjusted), so "
+            f"it is what this mix would have done, not what any account did.")
 """The book report's own question, asked inward; it is answered by the book engine directly."""
 
 
@@ -2242,6 +2309,14 @@ def _own_loss(text: str, prior: list[str], *, now: datetime | None, visitor: str
         value = next((float(f.value) for f in _MEMORY.get()
                       if f.kind == "capital" and _number_like(f.value)), None)
     week = re.search(r"\bweek", text, re.I)
+    if re.search(r"\b(?:last|past)\s+(?:year|12\s+months|twelve\s+months)\b|\bthis\s+year\b", text,
+                 re.I):
+        yearly = _book_worst_day_year(book)
+        if yearly is not None:
+            # "worst single day for this book in the last year" went to the desk's record, then
+            # had only a 30-day window (a judge, round 19, row 662): a year of daily closes
+            lines = [yearly, *(unlead(x) for x in lines)]
+            worst = None
     if worst is not None:
         pct = float(worst.group(2))
         money = f" — about ${abs(pct) / 100 * value:,.0f} of your ${value:,.0f}" if value else ""
@@ -2283,6 +2358,31 @@ def _without_others_holdings(text: str) -> tuple[str, str]:
     said = "; ".join(f"“{f}”" for f in found)
     return rest, (f"Not read as yours: {said} — someone else's holdings are left out of every "
                   f"figure here; say what you hold to have it measured.")
+
+_TERMS = (
+    (re.compile(r"\d\s*bps\b"), "bps", "hundredths of a percent (25bps = 0.25%)"),
+    (re.compile(r"\bbeta\b", re.I), "beta",
+     "how far it moves for each 1% the Nasdaq-100 moves (1.2 = 1.2%)"),
+    (re.compile(r"\bkurtosis\b", re.I), "kurtosis", "how often it makes outsized moves"),
+    (re.compile(r"\bskew\b", re.I), "skew", "whether its big moves lean up or down"),
+    (re.compile(r"R²|\bR2\b"), "R²", "the share of its moves the benchmark explains"),
+    (re.compile(r"\bfunding\s+[+-]?\d", re.I), "funding",
+     "what longs and shorts pay each other every few hours on a perpetual"),
+    (re.compile(r"\brealised\s+vol", re.I), "realised vol",
+     "how far it has typically swung in a year"),
+)
+"""Words an answer uses that a newcomer stops on: "skew +1.04", "excess kurtosis 9.4", "R² 71%",
+"beta 1.19 open / 0.81 shut", "14.27bps hurdle" were printed with no gloss (a first-time user,
+round 19, row 643)."""
+
+
+def glossary_line(lines: list[str]) -> str | None:
+    """One line glossing the terms an answer uses, when it uses two or more; None otherwise."""
+    text = " ".join(lines)
+    used = [(word, gloss) for pattern, word, gloss in _TERMS if pattern.search(text)]
+    if len(used) < 2:
+        return None
+    return "Terms: " + "; ".join(f"{word} = {gloss}" for word, gloss in used) + "."
 
 def _number_like(value: Any) -> bool:
     try:

@@ -125,6 +125,16 @@ def parts(question: str, book: str = "") -> list[Part] | None:
             if request is not None:
                 named = research_symbols(" ".join(earlier))[0]
                 inherited = named[-1] if named else ""
+        if (request is None and earlier and not research_symbols(piece)[0]
+                and re.search(r"\bwhich\b|\bbetter\b|\bstronger\b", piece, re.I)):
+            # "…which is cheaper on valuation and which has better momentum?" asks both parts of
+            # both names; the second ran as one name's technicals (a judge, round 19, row 673)
+            named = research_symbols(" ".join(earlier))[0]
+            if len(named) >= 2:
+                both = " or ".join(n.removesuffix("USDT") for n in named[:2])
+                request = with_book(detect(f"{piece}, {both}"), book, piece)
+                inherited = (" and ".join(n.removesuffix("USDT") for n in named[:2])
+                             if request is not None else "")
         if request is None and earlier and not research_symbols(piece)[0]:
             named = research_symbols(" ".join(earlier))[0]
             if named:

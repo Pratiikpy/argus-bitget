@@ -8,7 +8,7 @@ import json
 import re
 import time
 from collections.abc import Mapping
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from typing import Any
 
 from argus.desk.portfolio import (
@@ -390,6 +390,51 @@ def _fit_caveat(rho: float) -> str:
             f"moves, so most of any real move would come from something else.")
 
 
+_NEXT_RELEASE_Q = re.compile(r"\b(?:when|what\s+day|which\s+day|what\s+date)\b|\bnext\b", re.I)
+_RELEASE_KINDS = (
+    (re.compile(r"\bfomc\b|\bfed\s+(?:meeting|decision)|\brate\s+decision\b", re.I), "FOMC",
+     "FOMC rate decision"),
+    (re.compile(r"\bcpi\b|\binflation\s+(?:print|report|data)\b", re.I), "CPI", "CPI"),
+    (re.compile(r"\bppi\b", re.I), "PPI", "PPI"),
+    (re.compile(r"\bnfp\b|\bpayrolls?\b|\bjobs\s+report\b", re.I), "NFP", "jobs report"),
+    (re.compile(r"\bpce\b", re.I), "PCE", "PCE"),
+    (re.compile(r"\bgdp\b", re.I), "GDP", "GDP"),
+)
+
+
+def _next_releases(raw_text: str, today: date) -> str | None:
+    """The next date of each release the question names, from the frozen official calendars.
+
+    "When is the next FOMC/CPI?" led with last month's CPI print and gave no date (a judge,
+    round 19, row 679). The dates are the Fed's, BLS's and BEA's own published schedules
+    (`data/macro_calendar_2026.json`, refreshed by `lui/watchlist.refresh`)."""
+    from argus.lui.watchlist import load_calendar
+
+    if not _NEXT_RELEASE_Q.search(raw_text):
+        return None
+    asked = [(kind, label) for pattern, kind, label in _RELEASE_KINDS if pattern.search(raw_text)]
+    if not asked:
+        return None
+    calendar = load_calendar()
+    if calendar is None:
+        return None
+    rows = [r for r in calendar.get("releases") or [] if isinstance(r, dict)]
+    found = []
+    for kind, label in asked:
+        upcoming = sorted((r for r in rows if r.get("kind") == kind
+                           and str(r.get("date", "")) >= today.isoformat()),
+                          key=lambda r: str(r.get("date")))
+        if upcoming:
+            first = upcoming[0]
+            at = f" at {first['time_et']} New York time" if first.get("time_et") else ""
+            found.append(f"next {label} {first['date']}{at}")
+        else:
+            found.append(f"no {label} date after {today.isoformat()} is in the frozen calendar")
+    retrieved = str(calendar.get("retrieved_at", ""))[:10]
+    return ("Bottom line: " + "; ".join(found) + f" — from the official published schedules "
+            f"(Federal Reserve, BLS, BEA), frozen {retrieved}.")
+
+
 def _macro(symbol: str | None, book: Mapping[str, float] | None = None,
            raw_text: str = "",
            also: tuple[str, ...] = ()) -> tuple[list[str], list[Source], dict[str, Any]]:
@@ -565,6 +610,16 @@ def _macro(symbol: str | None, book: Mapping[str, float] | None = None,
             lines = [cpi[0], *(unlead(x)
                                for x in lines), *cpi[1:]]
             macro_sources.extend(cpi_sources)
+    upcoming = _next_releases(raw_text, datetime.now(UTC).date())
+    if upcoming is not None:
+        lines = [upcoming, *(unlead(x) for x in lines)]
+    scenario_at = next((i for i, x in enumerate(lines) if x.startswith("Scenario: ")), None)
+    if scenario_at is not None and lines:
+        # "what if the Fed cuts 50bp" asked for the scenario and led with the 10-year's level (a
+        # judge, round 19, row 679): the scenario leads, the backdrop follows
+        body = lines[scenario_at].removeprefix("Scenario: ")
+        lines = [f"Bottom line: {body[:1].lower() + body[1:]}",
+                 *(unlead(x) for i, x in enumerate(lines) if i != scenario_at)]
     return lines, macro_sources, readings
 
 

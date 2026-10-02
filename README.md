@@ -72,8 +72,11 @@ your thesis beside every answer about that name with the move since you stated i
 with memory off, none reaching another trader (`python -m argus.eval.memory_eval`). Every answer ends by naming the
 sources it reached and any that did not answer. If the desk cannot source a figure, it refuses and
 says why. Ask in Chinese, Japanese, Korean, Spanish, Portuguese, French or German and the answer
-comes back in that language: the engines write English, Qwen translates, and every number in each
-translated line is checked against the English — a line whose figures do not match stays English.
+comes back in that language on the console page: the engines write English, which shows at once,
+and Qwen's translation replaces it a few seconds later (the page's second call, `/translate`); every
+number in each translated line is checked against the English, and a line whose figures do not
+match stays English. A direct `POST /ask` returns the English with a one-line note in the asker's
+language, and the signed token that `/translate` accepts.
 
 The same desk answers in Telegram at [@argusbitgetbot](https://t.me/argusbitgetbot): `/book` saves
 your holdings for the chat, and orders are refused there as everywhere.
@@ -154,7 +157,7 @@ The full table, rival by rival, is on [`/proof`](https://deploy-topaz-seven-64.v
 
 | Surface | Where ARGUS uses it | Measured |
 |---|---|---|
-| Public market API (v3) | Candles, tickers, 50-level books, funding — every price and cost in the console | Answering, checked live on `/status` |
+| Public market API (v2 market data, v3 for the account and order preview) | Candles, tickers, 50-level books, funding — every price and cost in the console | Answering, checked live on `/status` |
 | Order-book websocket (`books5`, trades) | Execution replay and the order-splitting comparison | Recorded locally, RFC 6455 client |
 | `bitget-mcp-server` | US fundamentals, 13F holders, analyst estimates, earnings calendar, the stock behind each rToken | 37 of 67 catalog entries answer in the latest sweep (`data/data_coverage.json`, dated inside and on `/status`); on 26 Sep every entry refused while its upstream answered 503 |
 | `bitget-signal` Skills | The console asks the Skill first for technicals (MACD corrected against Bitget's own candles), crypto sentiment and the rates curve, and checks BTC against `crypto_derivatives` | 2 of bitget-signal's 19 tools answered all three attempts on 2026-09-26 (crypto_derivatives, technical_analysis), from 1 of its 5 Skills (technical-analysis) plus 1 tool no SKILL.md names; when a Skill is silent the answer names the public source it read instead |
@@ -198,11 +201,11 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 11,076 tests collected
+pytest -q                       # 11,089 tests collected
 ```
 
-Nothing above needs a credential. On 2026-10-02, with every outbound connection refused, 10,763
-passed, 75 skipped and 0 failed of the 11,076 tests collected; the other 238 read a live
+Nothing above needs a credential. On 2026-10-02, with every outbound connection refused, 10,776
+passed, 75 skipped and 0 failed of the 11,089 tests collected; the other 238 read a live
 venue, feed or model and run apart
 (`pytest -m network`). Tests that need a rival's source cloned beside the repository skip
 and say which. `ARGUS_BLOCK_NETWORK=1` refuses every outbound connection, so
@@ -222,11 +225,12 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **11,076 tests collected** — `pytest -q` |
+| Tests | **11,089 tests collected** — `pytest -q` |
 | Types | **`mypy --strict` clean on 578 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
 | Sub-themes | **18/18 sub-themes** each resolve to an importable module and a test file (`python -m argus.status`). That is coverage, not a claim to lead them: 6 of 46 capabilities are OWNED against a named rival, and `/proof` says which |
+| Register self-check | **Not clean, and said so**: `data/standing.json` lists 52 conditions claimed but not evidenced, every one on a TIED (41) or LOST (11) row; none on the 6 OWNED rows, which is what OWNED requires (`python -m argus.eval.standing`) |
 | Understanding | **81.7%** of 240 questions in 12 languages, written blind by an agent that never saw this repository and scored once, were read correctly by the console with no language model (52.1% before the 2026-09-25 fixes); with Qwen reading first, as on the live site, 85.0% — `data/lui_final_heldout_report.json`. Which engine each question reaches is re-scored on every change by `eval/kind_routing.py` |
 | Quoted figures | Every figure these documents quote is re-checked against its artefact by `python -m argus.eval.docclaims --tests`, which fails if one has drifted |
 
@@ -272,7 +276,7 @@ a test that reaches the network shows itself.
 ## 中文简介
 
 ARGUS 是面向 Bitget 美股代币（rToken）的研究工作台（Track 3 · AI Trading Desk）。用自然语言提问，
-七个引擎基于 Bitget 行情、SEC 文件、FRED 与新闻实时计算，每个数字都注明来源；语言模型只理解问题，
+八个引擎基于 Bitget 行情、SEC 文件、FRED 与新闻实时计算，每个数字都注明来源；语言模型只理解问题，
 从不编写数字。全部 46 项能力均已与各子赛道领先的专业系统在相同输入上对比：6 项领先（OWNED）、33 项
 持平、0 项已实现、7 项落后（LOST：人群情绪分类在 TweetEval 上不及 RoB-RT；跨时段执行在回放订单簿上不及 Bitget 自带的 TWAP；思考时间定价在 23,003 个真实决策时点上不及滚动实现波动估计；协整筛选的错误发现率未达自身目标；数据覆盖面不及 OpenBB 的免密钥数据源；走势形态匹配的预测区间不及个股自身的无条件区间；对未针对性编写的注入攻击，拦截率不及训练好的分类器），所有落败记录公开在 `/wrong`。本团队的 Track 2 参赛作品是另一个独立项目
 （t2-sentiment-agent，独立的代码库、交易日志与演示），不属于本仓库。

@@ -43,6 +43,7 @@ def frozen_data(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(universe, "_CACHE", None)
     # SEC filings are a live source too; tests that need an earnings surprise supply one.
     monkeypatch.setattr(research.fundamentals, "_earnings_surprise", lambda ticker: None)
+    monkeypatch.setattr(research.fundamentals, "_versus_estimates", lambda ticker: None)
     # Three more live sources the answers reach, found by running this file with the network
     # blocked (2026-09-27). The exposures engine runs beside every add question on its own thread,
     # so a Yahoo read from one test was still in flight during the next one.

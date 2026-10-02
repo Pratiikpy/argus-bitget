@@ -690,7 +690,9 @@ def plan_execution(
         )
         rationale = (
             "the stock's own market is shut, so this book is thin and resting orders tend to fill "
-            "only when the price moves against them — passive orders get less of the size, not more"
+            "only when the price moves against them — so nothing rests: the near-touch limit "
+            "crosses at the touch and pays the taker fee like the market slice, where an "
+            "open-market plan can rest part of the size"
         )
     else:
         rate, label = _passive_rate(model, book, fraction=Decimal("0.34"), notional=notional)

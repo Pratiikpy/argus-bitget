@@ -82,5 +82,5 @@ def test_the_page_says_plainly_it_is_a_separate_project_before_the_reader_can_co
     assert "same team" in html
     assert "Bitget's Demo (paper) environment" in html
     assert "no real money" in html
-    assert "ARGUS" in html and "never places an order" in html
+    assert "ARGUS" in html and "places no order on any venue" in html
     assert html.index("The agent that trades.") < html.index("separate project")

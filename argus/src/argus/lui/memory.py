@@ -118,7 +118,11 @@ _CAPITAL = re.compile(
     r"(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\b|\bi\s+have\s+(?:about\s+|around\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)"
     r"\s*(k|m)?\s+(?:to\s+(?:trade|invest)|in\s+my\s+account)|"
     r"\b(?:an?|my)\s+\$\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\s+(?:account|book|portfolio)\b|"
-    r"\b(?:trading|investing)\s+(?:with\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\b", re.I)
+    r"\b(?:trading|investing)\s+(?:with\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\b|"
+    # "I only have about $1,000 total" was not kept (a first-time user, round 19, row 635)
+    r"\bi\s+(?:only\s+)?have\s+(?:about\s+|around\s+|roughly\s+|only\s+|just\s+)?\$\s*"
+    r"(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\s+(?:total|in\s+total|altogether|overall|saved|to\s+my\s+name)\b",
+    re.I)
 _THESIS = re.compile(
     r"\bi\s+(?:think|believe|expect|reckon|bet)\s+(?:that\s+)?(.{2,40}?)\s+(?:will|is\s+going\s+to|"
     r"gonna|should|can|to)\s+(.{3,120}?)(?=\s*(?:[,.;!?]|\b(?:and|but|while)\s+i\s|$))", re.I)
@@ -245,9 +249,10 @@ def extract(question: str, now: datetime | None = None,
         add("style", "", re.sub(r"[\s-]+", "-", (m.group(1) or m.group(2) or m.group(3)
                                                   or "").lower()), m.group(0))
     if (m := _CAPITAL.search(text)) is not None:
-        amount = float((m.group(1) or m.group(3) or m.group(5) or m.group(7)
+        amount = float((m.group(1) or m.group(3) or m.group(5) or m.group(7) or m.group(9)
                         or "0").replace(",", ""))
-        unit = (m.group(2) or m.group(4) or m.group(6) or m.group(8) or "").lower()
+        unit = (m.group(2) or m.group(4) or m.group(6) or m.group(8) or m.group(10)
+                or "").lower()
         amount *= 1_000 if unit == "k" else 1_000_000 if unit == "m" else 1
         if amount >= 100:
             add("capital", "", f"{amount:.0f}", m.group(0))
@@ -496,6 +501,28 @@ def apply(request: Any, facts: list[Fact], question: str) -> tuple[Any, list[str
 
         request = replace(request, notional=Decimal(capital.value))
         used.append(remembered_line(capital, f"sized on your ${float(capital.value):,.0f}"))
+    if (capital is not None and request.notional is None and request.kind is ResearchKind.IMPACT
+            and not request.book and not re.search(r"\$|\d+\s*k\b", question, re.I)):
+        # "is bitcoin a good investment" after "I only have about $1,000" priced "a $10,000
+        # position" (a first-time user, round 19, row 635): the money the trader said they have
+        # is the position a one-name answer is priced on
+        from decimal import Decimal
+
+        request = replace(request, notional=Decimal(capital.value))
+        used.append(remembered_line(capital, f"priced on your ${float(capital.value):,.0f}"))
+    loss = get(facts, "loss_usd")
+    limit_usd = None
+    if loss is not None:
+        try:
+            limit_usd = float(loss.value)
+        except ValueError:
+            limit_usd = None
+    if (loss is not None and limit_usd is not None and request.kind is ResearchKind.IMPACT
+            and not request.book):
+        # the $200 a trader said they cannot lose never appeared beside the worst day it is
+        # measured against (round 19, row 635)
+        used.append(remembered_line(loss, f"set it beside the worst day above: your limit is "
+                                          f"${limit_usd:,.0f}"))
     if request.kind is ResearchKind.IMPACT:
         request, mandate_used = _apply_mandate(request, facts, question)
         used.extend(mandate_used)

@@ -132,7 +132,8 @@ def _lead_with_what_was_asked(lines: list[str], question: str) -> list[str]:
              else r"^Institutions:|Institutional holders" if (
                  OWNERSHIP_Q.search(question)
                  or re.search(r"\b13f|institution|holders?", question, re.I))
-             else r"Earnings surprise" if re.search(r"\bsurprise|beat|miss", question, re.I)
+             else r"Against analysts|Earnings against its own past" if re.search(
+                 r"\bsurprise|beat|miss|estimates?|consensus|expect", question, re.I)
              else None)
     if focus is None:
         return lines
@@ -203,18 +204,53 @@ def _earnings_surprise(ticker: str) -> tuple[str, Source] | None:
     newest = max(f.end for f in facts)
     window = [next(f for f in facts if f.end == newest)]
     size = ("a large" if abs(sue.sue) >= 2 else "a moderate" if abs(sue.sue) >= 1 else "a small")
-    direction = "beat" if sue.sue > 0 else "shortfall" if sue.sue < 0 else "in-line print"
+    direction = "rise" if sue.sue > 0 else "fall" if sue.sue < 0 else "flat print"
+    # Against its own past, not against analysts: "large beat" was printed for a year-over-year
+    # change and read as a beat against consensus (a judge, round 19, row 670). The consensus
+    # comparison is its own line (`_versus_estimates`).
     return (
-        f"Earnings surprise: the quarter ending {window[0].end.isoformat()} was {size} {direction} "
-        f"— SUE {sue.sue:+.2f}, i.e. diluted EPS changed {sue.eps_change:+.2f} year over year "
-        f"against a usual swing of {sue.eps_std:.2f} (SEC filing, filed "
-        f"{window[0].filed.isoformat()})."
+        f"Earnings against its own past: the quarter ending {window[0].end.isoformat()} showed "
+        f"{size} {direction} in diluted EPS — {window[0].value:.2f}, {sue.eps_change:+.2f} on the "
+        f"same quarter a year earlier against a usual swing of {sue.eps_std:.2f} (SUE "
+        f"{sue.sue:+.2f}; SEC filing, filed {window[0].filed.isoformat()})."
         + (" Not the latest quarter: a fiscal fourth quarter is reported only inside the annual "
            "10-K, which carries no separate quarterly figure, so this is the one before it."
            if (datetime.now(UTC).date() - window[0].end).days > STALE_QUARTER_DAYS else ""),
         Source(kind="computation", ref="argus.market.sue via SEC XBRL",
                detail=f"{ticker} eps_diluted, {sue.quarters_used} quarters"),
     )
+
+
+def _versus_estimates(ticker: str) -> tuple[str, Source] | None:
+    """The last reported quarter's EPS against the analysts' consensus for it, from Yahoo
+    Finance's earnings history — the comparison "last quarter versus estimates" asks for."""
+    from argus.market.estimates import EstimatesError, EstimatesSource
+
+    try:
+        rows = (EstimatesSource().summary(ticker, "earningsHistory").get("earningsHistory")
+                or {}).get("history") or []
+    except EstimatesError:
+        return None
+
+    def raw(node: Any) -> Any:
+        return node.get("raw") if isinstance(node, dict) else node
+
+    dated = [r for r in rows if raw(r.get("epsActual")) is not None
+             and raw(r.get("epsEstimate")) is not None and raw(r.get("quarter"))]
+    if not dated:
+        return None
+    last = max(dated, key=lambda r: raw(r["quarter"]))
+    actual, estimate = float(raw(last["epsActual"])), float(raw(last["epsEstimate"]))
+    when = datetime.fromtimestamp(int(raw(last["quarter"])), UTC).date()
+    gap = (actual / estimate - 1.0) if estimate else None
+    verdict = ("in line with" if gap is not None and abs(gap) < 0.01 else
+               "above" if actual > estimate else "below")
+    return (f"Against analysts: the quarter ending {when.isoformat()} reported EPS {actual:.2f} "
+            f"against a consensus of {estimate:.2f} — {verdict} it"
+            + (f", by {gap:+.1%}" if gap is not None and verdict != "in line with" else "")
+            + " (Yahoo Finance's earnings history).",
+            Source(kind="venue", ref="https://query2.finance.yahoo.com/v10/finance/quoteSummary",
+                   detail=f"{ticker} earningsHistory"))
 
 
 _VALUATION = re.compile(
@@ -728,6 +764,7 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
                    ("next_earnings", "consensus", "institutional_holdings", "quote",
                     "price_targets")}
         pending["surprise"] = pool.submit(_earnings_surprise, ticker)
+        pending["versus_estimates"] = pool.submit(_versus_estimates, ticker)
         # Three more of the server's equity entries, unused until an audit of the toolkit counted
         # 5 of 22 in use (2026-09-24): valuation ratios, the institutional position summary and
         # insider (Form 4) filings. Each is read only where its fields mean one thing.
@@ -890,6 +927,10 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
                 lines.append(line)
         sources.extend(backup_sources)
 
+    versus = safe("versus_estimates")
+    if versus is not None:
+        lines.append(versus[0])
+        sources.append(versus[1])
     surprise = safe("surprise")
     if surprise is not None:
         lines.append(surprise[0])

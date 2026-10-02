@@ -13,6 +13,7 @@ reads cannot. When the record cannot be fetched the page says so and shows nothi
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping
 from html import escape
 from typing import Any
@@ -85,6 +86,30 @@ def _funnel(counts: Mapping[str, Any]) -> str:
                    f"<span>{escape(label)}</span></div>" for key, label in order)
 
 
+_DRAWDOWN_SAID = re.compile(
+    r"drawdown\s+(?:beyond|above|over|past|exceed\w*)\s+(\d+(?:\.\d+)?)\s*%", re.I)
+_DRAWDOWN_HELD = re.compile(r"book\.drawdown_pct\s*=\s*(-?\d+(?:\.\d+)?)")
+
+
+def narration_check(row: Mapping[str, Any]) -> str | None:
+    """A drawdown the agent's summary claims, checked against the drawdown its own record holds.
+
+    Seq 2638 says "Circuit breaker active (4 consecutive losses, drawdown beyond 2.5%)" while the
+    same row's facts read `book.drawdown_pct = -0.0479769`: the breaker tripped on the losing
+    streak alone, and the narration overstated the drawdown fifty-fold (a judge, round 19, row
+    664). The agent's run is not edited mid-window; the page says what the record shows."""
+    said = _DRAWDOWN_SAID.search(str(row.get("summary") or ""))
+    held = _DRAWDOWN_HELD.search(str(row.get("mandate_response") or ""))
+    if said is None or held is None:
+        return None
+    claimed, actual = float(said.group(1)), abs(float(held.group(1)))
+    if actual >= claimed:
+        return None
+    return (f"Narration check: the summary says the drawdown is beyond {claimed:g}%, but the "
+            f"book's own record for this decision holds {actual:.3g}% — under that line. The "
+            f"breaker's other trip, the losing streak, is what the record supports.")
+
+
 def _decision(row: Mapping[str, Any]) -> str:
     targets = row.get("targets") or []
     legs = "; ".join(
@@ -110,6 +135,7 @@ def _decision(row: Mapping[str, Any]) -> str:
             f"<span class='pill proof'>{stance}</span>{pill}"
             f"<span class='mono dim'>seq {seq}</span></div>"
             f"<p>{escape(str(row.get('summary') or ''))}</p>"
+            + (f"<p class='dim'>{escape(note)}</p>" if (note := narration_check(row)) else "")
             + detail + "</li>")
 
 
@@ -179,7 +205,8 @@ def render(fetch: Fetch = fetch_json) -> str:
 <h1>The agent that trades.</h1>
 <div class="notice"><b>This is a separate project, by the same team</b> — not ARGUS. It trades on
 Bitget's Demo (paper) environment, with no real money. ARGUS, the console you are reading right
-now, never places an order.</div>
+now, places no order on any venue: its own paper desk fills its decisions in its own ledger, at the
+recorded price, and nowhere else.</div>
 <p class="sub">ARGUS researches; its sibling project trades. Qwen decides, a risk kernel that can
 only reduce stands between it and the venue, and Bitget's Agent Hub places every order on Bitget
 Demo. Everything below is read live from the agent's own record, recomputed hourly from its

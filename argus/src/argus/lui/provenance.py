@@ -153,7 +153,8 @@ _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
         r"^(?:Actionable|Bottom line):(?!\s+(?:Open interest:|Crypto fear))|^Your premise\b|"
         r"^Implied open:|"
         r"^Versus the stock:|\bexplains [+-]\d|"
-        r"^A \$[\d,]+ order is\b|^Order book \(|^Earnings surprise:", re.I)),
+        r"^A \$[\d,]+ order is\b|^Order book \(|^Earnings surprise:|"
+        r"^Earnings against its own past:", re.I)),
     ("desk", re.compile(
         r"^seq\s+\d+|^Stated confidence|^Thesis:|^Invalidation:|^Not yet settled|^Entry hash|"
         r"^How the desk reached|^Evidence screen:|^Panel:|^Agreement,|^Memory:|^Debate:|"

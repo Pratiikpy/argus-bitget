@@ -117,7 +117,11 @@ _KINDS: tuple[tuple[Kind, re.Pattern[str]], ...] = (
         r"\bcapex\b|capital\s+spend|data[\s-]*cent(?:er|re)|hyperscal|\bai\s+(?:spend|demand|"
         r"build|boom|infrastructure|investment|chips?|servers?)|cloud\s+spend|\bdemand\b|"
         r"runs?\s+on\b|driven\s+by|(?:revenue|sales)\s+(?:growth|keeps?\s+growing|(?:is|are)\s+"
-        r"(?:growing|accelerating))", re.I)),
+        r"(?:growing|accelerating))|"
+        # "deliveries are falling" is a demand claim the revenue filings test, as a proxy said so
+        # (a judge, round 19, row 669: it was left "not tested")
+        r"\bdeliver(?:y|ies)\b|\bunits?\s+sold\b|\bshipments?\b|\bsales\s+volumes?\b|"
+        r"\bsubscribers?\b|\bbookings?\b", re.I)),
     (Kind.EARNINGS, re.compile(r"earnings|revenue|guidance|profit|margins?|\beps\b|beat", re.I)),
     (Kind.MACRO, re.compile(
         r"\bfed\b|rates?\b|rate cuts?|\bcpi\b|inflation|dollar|\bdxy\b|macro|liquidity|yields?",
@@ -128,14 +132,36 @@ _SPLIT = re.compile(
     # a comma, but not the one inside "$200,000" (a hostile review, round 12: the number was split
     # into two "reasons"), and a sentence's end
     r"\s*(?:,(?!\d{3}(?!\d))|[;?]|(?<=[a-z%)])\.\s+(?=[A-Za-z])|\bbecause\b|\bsince\b|\bas\b|"
-    r"\band\b|\bgiven\b|\bplus\b)\s*", re.I)
+    # a dash between clauses: "AI capex is still accelerating — I want to go long NVDA for the
+    # next 3 months" was one "reason" (a judge, round 19)
+    r"\s[\u2014\u2013-]\s|\band\b|\bgiven\b|\bplus\b)\s*", re.I)
 _OPENER = re.compile(r"^i\s+(?:think|believe|reckon|expect|feel)\s+(?:that\s+)?", re.I)
 _PRICE_STATEMENT = re.compile(r"(?:[$€£]\s*\d|\d\s*(?:k|usd|dollars?|euros?)\b)", re.I)
 """A fragment that only states a price ("Bitcoin is at $200,000 right now"): the premise check
 reads it (:func:`price_premise`), and it is not a reason of its own."""
 _STANCE = re.compile(r"^(?:i(?:'m| am)?\s+)?(?:going\s+|thinking of going\s+|considering\s+"
-                     r"(?:going\s+)?)?(?:long|short|buy(?:ing)?|sell(?:ing)?|bullish|bearish)"
-                     r"(?:\s+on)?\s+\S+$", re.I)
+                     r"(?:going\s+)?|want\s+to\s+(?:go\s+)?|plan\s+to\s+(?:go\s+)?|would\s+like\s+to\s+"
+                     r"(?:go\s+)?)?(?:long|short|buy(?:ing)?|sell(?:ing)?|bullish|bearish)"
+                     r"(?:\s+on)?\s+\S+(?:\s+(?:for|over)\s+(?:the\s+)?(?:next\s+)?(?:\d+|a|one|"
+                     r"two|three|few|couple(?:\s+of)?)?\s*(?:days?|weeks?|months?|years?|quarters?))?$",
+                     re.I)
+
+PROFILE_PART = re.compile(
+    r"^\s*(?:i(?:'?m|\s+am)\s+(?:a\s+|an\s+)?(?:swing|day|position|long[\s-]term|short[\s-]term|"
+    r"momentum|value|conservative|aggressive|cautious|risk[\s-]averse)\b|i\s+(?:can'?t|cannot|"
+    r"won'?t|don'?t\s+want\s+to)\s+(?:afford\s+to\s+)?lose\b|my\s+(?:horizon|loss\s+limit|"
+    r"risk\s+budget|max(?:imum)?\s+(?:loss|drawdown)|account)\b|i\s+(?:usually\s+|normally\s+)?"
+    r"hold\s+(?:for|positions?\s+for)\b|i\s+have\s+\$)", re.I)
+"""Who the trader is, said inside a thesis: "I'm a swing trader, I can't lose more than 10%, and I
+think TSLA is overvalued…" graded the first two as reasons "no engine reads" (a judge, round 19,
+row 669). They are the trader's profile, kept by memory and said back as such."""
+
+
+def profile_parts(text: str) -> list[str]:
+    """The profile statements a thesis message carries, in the trader's words."""
+    return [part.strip(" .") for part in _SPLIT.split(text.rstrip(".?!"))
+            if part and PROFILE_PART.match(part)]
+
 
 _ASK_WORDS = re.compile(
     r"^\s*(?:i\s+(?:think|believe|reckon|expect|feel)\s+(?:that\s+)?|my\s+(?:thesis|view|take|"
@@ -153,7 +179,11 @@ _ASK_WORDS = re.compile(
     re.I)
 """The asking around a stated thesis ("I think ...", "... test my thesis"): not a reason."""
 
-_ASKED = re.compile(r"^(?:should|would|could|can|do|does|is|are)\s+(?:i|we|it|you)\b", re.I)
+_ASKED = re.compile(r"^(?:should|would|could|can|do|does|is|are)\s+(?:i|we|it|you)\b|"
+                    # "Is that a good thesis?" was tested as a reason of its own (a judge, round 19)
+                    r"^(?:is|was)\s+(?:that|this|my|the)\s+(?:a\s+|my\s+)?(?:good|sound|valid|"
+                    r"right|bad|reasonable|solid|strong|weak)?\s*(?:thesis|view|idea|take|call|"
+                    r"reasoning|argument)\b", re.I)
 """The question itself ("should I buy NVDA") is not a reason."""
 
 CHAINS: Mapping[str, str] = {
@@ -222,7 +252,7 @@ def reasons(text: str) -> tuple[Reason, ...]:
         # "because of institutional adoption" leaves "of ..." after the split (round 11)
         part = re.sub(r"^(?:of|to|on|that|the\s+fact\s+that)\s+", "", part.strip(" ."), flags=re.I)
         part = _OPENER.sub("", part)
-        if not part or _STANCE.match(part) or _ASKED.match(part):
+        if not part or _STANCE.match(part) or _ASKED.match(part) or PROFILE_PART.match(part):
             continue
         kind = next((k for k, pattern in _KINDS if pattern.search(part)), None)
         if kind is Kind.MOMENTUM and dict(_KINDS)[Kind.DRIVER].search(part):

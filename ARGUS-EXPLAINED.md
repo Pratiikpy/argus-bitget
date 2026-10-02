@@ -711,7 +711,7 @@ python -m argus.market.skills --symbol NVDAUSDT
 And to check the whole thing is what this document says it is:
 
 ```bash
-pytest                    # 11,076 tests
+pytest                    # 11,089 tests
 python -m argus.status    # 152/152 modules importable, 18/18 sub-themes, artefacts on disk
 ```
 
@@ -1371,8 +1371,8 @@ route to it — is now what the layer sees.
 
 ## Part 13 — What we cannot do on Track 2, said plainly
 
-- **One settled trade.** Seq 797 closed on 2026-09-29 at a 1.78 USDT loss; the scored half of the
-  track needs many more before a Sharpe, a drawdown or a win rate means anything.
+- **Two settled trades, both losses.** Seq 797 closed on 2026-09-29 at a 1.78 USDT loss and seq 884
+  on 2026-10-01 at 4.45 USDT; the scored half of the track needs many more before a Sharpe, a drawdown or a win rate means anything.
 - **Zero certified factors.** The lab found none worth trading and says so.
 - **Analysts run one after another**, and the record labels their agreement as possible contagion.
 - **No checkpoint and resume** of an interrupted cycle.
@@ -1767,7 +1767,7 @@ takes, and every artefact the system writes.
 |---|---|
 | Source modules | **581** files across **20 packages** (2026-09-27) |
 | Registered and importable | **152/152** (`python -m argus.status` checks this at runtime) |
-| Test files / tests | **447 files**, **11,076 tests collected** |
+| Test files / tests | **447 files**, **11,089 tests collected** |
 | Type and lint | `ruff` clean, `mypy --strict` clean on **578 source files** |
 | Artefacts written | **870** files under `argus/data/` |
 | Code-level teardowns of other people's systems | **56** under `research/architecture/` |
@@ -2416,7 +2416,7 @@ source is a build failure, not a typo.
 | Source modules | 581 files, 20 packages; `mypy --strict` clean on 578 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 152/152 modules importable |
-| Tests | 11,076 tests collected, `ruff` clean |
+| Tests | 11,089 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
 | Artefacts on disk | 870 files under `argus/data/`, every one produced by running something |
 | Code-level teardowns of other systems | 62, each citing file and line |
@@ -2705,7 +2705,7 @@ could attack today.
     graded on, so its measured accuracy cannot yet be compared against the 55% bar.
 37. **Two settled outcomes.** Calibration on the desk's own judgement cannot be computed yet; the
     49,140 figure is the policy layer, labelled as such, and the two must never be added together.
-38. **39 of 45 capabilities are not OWNED.** 7 are LOST, 33 are TIED against the named rival and 0 are
+38. **40 of 46 capabilities are not OWNED.** 7 are LOST, 33 are TIED against the named rival and 0 are
     IMPLEMENTED; each says what it is missing.
 39. **Four of five official Bitget Skills carry no data.** Measured to be their backend rather than
     our integration — but a judge sees a thin panel either way.
@@ -3339,6 +3339,6 @@ UNREACHED stays a fact about this proposal rather than about the code.
    at a 5% false-discovery rate. The single result that survived the softer gate is the one the
    overfitting test condemns hardest, at 0.77. The pre-registered explanation for having no trades
    was refuted by our own replay harness, and the measurement that replaced it says the binding
-   constraint is the desk's confidence, not its costs. Zero trades have settled. Every one of those
+   constraint is the desk's confidence, not its costs. Two trades have settled, both losses. Every one of those
    is in a file on disk, next to the machinery that found it — and that is the reason to believe
    the rest.

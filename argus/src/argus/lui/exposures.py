@@ -144,8 +144,10 @@ FACTOR_WORDS = {
     "quality": "Quality beta (QUAL minus SPY; above 0 leans to profitable, low-debt companies)",
     "low_vol": "Low-volatility beta (USMV minus SPY; above 0 leans defensive, below 0 to the "
                "names that swing most)",
-    "rates": "Rates beta (IEF, 7-10 year Treasuries; below 0 the name falls when bond prices "
-             "fall, that is when yields rise)",
+    # The sign was backwards (a judge, round 19, row 671): a loading on the bond ETF's price,
+    # so above 0 moves with bond prices and below 0 against them.
+    "rates": "Rates beta (IEF, 7-10 year Treasuries; above 0 the name falls when bond prices "
+             "fall, that is when yields rise; below 0 it rises then)",
     "crypto": "Crypto beta (Bitget BTCUSDT)",
 }
 
