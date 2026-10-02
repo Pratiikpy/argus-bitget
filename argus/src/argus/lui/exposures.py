@@ -629,11 +629,12 @@ def after_trade(book: Mapping[str, float], proposed: Mapping[str, float]) -> dic
     w0 and moved to w scales every other holding by (1 - w) / (1 - w0)."""
     out = {s: float(w) for s, w in book.items()}
     for symbol, target in proposed.items():
-        held = out.get(symbol, 0.0)
-        rest = 1.0 - held
-        scale = (1.0 - target) / rest if rest > 1e-12 else 0.0
+        # gross weights, so a short add (a negative target) scales the rest to 1 - |target| as a
+        # long add does (a hostile review, round 23: "TSLA -15%" was read as a long)
+        rest = sum(abs(w) for s, w in out.items() if s != symbol)
+        scale = (1.0 - abs(target)) / rest if rest > 1e-12 else 0.0
         out = {s: w * scale for s, w in out.items() if s != symbol}
-        if target > 0:
+        if abs(target) > 0:
             out[symbol] = target
         if not out:
             return {}
@@ -790,7 +791,9 @@ def exposures_answer(
         parts = []
         for symbol, target in proposed.items():
             held = before.get(symbol, 0.0)
-            if target <= 0:
+            if target < 0:
+                parts.append(f"shorting {_pct(-target)} {_t(symbol)}")
+            elif target == 0:
                 parts.append(f"selling all {_t(symbol)}")
             elif held <= 0:
                 parts.append(f"adding {_pct(target)} {_t(symbol)}")
@@ -1038,6 +1041,10 @@ def asks_exposures(text: str) -> bool:
     return EXPOSURES_QUESTION.search(text) is not None and not _SHARE_UNITS.search(text)
 
 
+_SHORT_ADD = re.compile(r"\b(?:if\s+i\s+|to\s+|and\s+|i\s+(?:want|plan)\s+to\s+)short\b",
+                        re.I)
+"""Shorting a name as the proposed trade: "exposures if I short 15% TSLA" read the short as the
+whole book (a hostile review, round 23)."""
 DEFAULT_ADD = 0.20
 """The target weight of a name the question adds without a size, as `research.DEFAULT_SIZE`."""
 
@@ -1052,8 +1059,10 @@ def parse(text: str, book_text: str = "") -> tuple[dict[str, float], dict[str, f
     from argus.lui import research
 
     notes: list[str] = []
-    verb = research.parse.ADD_VERB.search(text)
+    verb = research.parse.ADD_VERB.search(text) or _SHORT_ADD.search(text)
     cut = verb.start() if verb is not None else len(text)
+    shorting = verb is not None and bool(re.search(r"\bshort", text[verb.start():], re.I) or
+                                         re.search(r"-\s?\d+(?:\.\d+)?\s*%", text[verb.start():]))
     pairs = research.parse.holding_pairs(text)
     book: dict[str, float] = {}
     proposed: dict[str, float] = {}
@@ -1061,7 +1070,7 @@ def parse(text: str, book_text: str = "") -> tuple[dict[str, float], dict[str, f
         if position < cut:
             book[symbol] = book.get(symbol, 0.0) + weight
         else:
-            proposed[symbol] = abs(weight)
+            proposed[symbol] = -abs(weight) if shorting else abs(weight)
     if verb is not None and not proposed:
         named, _ = research.research_symbols(text[verb.end():])
         for symbol in named[:1]:

@@ -94,10 +94,12 @@ class TestNewcomers:
                       "am i up or down on my stuff?"):
             assert server._OWN_LOSS_Q.search(asked), asked
         monkeypatch.setattr(parse, "last_price", {"NVDAUSDT": 240.0}.get)
+        monkeypatch.setattr(parse, "_last_prices", lambda: {"NVDAUSDT": 240.0})
+        parse._PRICED.clear()
         lines = server._own_pnl("bought 3 nvda at 180 and 0.01 btc")
         assert lines[0].startswith("Bottom line: on what you said you paid, you are up about "
                                    "$180.00 (+33.3%)")
-        assert any("No buy price was given for BTC" in x for x in lines)
+        assert any("No live price could be read for BTC" in x for x in lines)
 
     def test_follow_ups_the_console_suggested_are_read(self) -> None:
         from argus.lui import concepts, newcomer, server
@@ -259,3 +261,11 @@ class TestEngines:
         found = prediction.relevant(events, ("MicroStrategy",),
                                     now=datetime(2026, 10, 2, tzinfo=UTC))
         assert found and found[0].question.endswith("2026?")
+
+
+def test_a_side_correction_keeps_the_amount_said_before() -> None:
+    from argus.lui.server import _restated
+
+    said = _restated("Actually I'm short it, not long. If NVDA rises 10%, what's my P&L?",
+                     ["I'm long 100 NVDA. What's my risk?"])
+    assert said == ("I'm short 100 NVDA. If NVDA rises 10%, what's my P&L?", None)

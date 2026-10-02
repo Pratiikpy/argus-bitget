@@ -510,6 +510,9 @@ def concept_asked(text: str, named_symbols: tuple[str, ...] = ()) -> Concept | N
     text = re.sub(r"\b(what\s+(?:does|do|is)\s+.+?\s+)(?:men|meen|mena|mea|maen)\b", r"\1mean",
                   text, flags=re.I)
     text = re.sub(r"\bdiff\b", "difference", text, flags=re.I)
+    if not re.search(r"\bleverag", text, re.I):
+        # "is 50x safe if i only put $20" was declined: a bare multiple is leverage (round 23)
+        text = re.sub(r"\b(\d+(?:\.\d+)?)\s*x\b", r"\1x leverage", text, count=1, flags=re.I)
     # "wait so what's liquidation exactly" was declined while "what is liquidation" was answered,
     # and the console itself had suggested asking it (a first-time user, round 22): the filler
     # around a definition question is not part of it

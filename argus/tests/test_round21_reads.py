@@ -148,7 +148,7 @@ class TestNumbersAndScenarios:
 
         lines = _stated_funding("If funding on MSTR is 50bps per 8h, what does it cost me to "
                                 "short $10,000 for a day?") or []
-        assert lines and "earns about $150 a day" in lines[0]
+        assert lines and "receives about $150.00 a day" in lines[0]
 
     def test_options_beside_a_stock_are_priced_at_expiry(self,
                                                          monkeypatch: pytest.MonkeyPatch) -> None:

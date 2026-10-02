@@ -23,9 +23,13 @@ from argus.lui.answer import Source
 from argus.lui.trace import trace_module
 
 STARTER_Q = re.compile(
-    r"\bi\s+(?:have|got|own|saved|can\s+(?:put|invest|spare))\s+(?:about\s+|around\s+|roughly\s+|"
-    r"only\s+|like\s+|maybe\s+|just\s+)?\$?\s*(?P<amount>\d[\d,]*(?:\.\d+)?)\s*(?P<unit>k|thousand|grand|dollars?|usd|usdt|"
-    r"bucks)?\b.{0,300}?(?:what\s+(?:should|do|can|would)\s+i\s+do|where\s+(?:should|do|can)\s+"
+    # "i got like 700 bucks lying around, wat shud i buy" and "I'm new and have $2,000 - what's
+    # a sensible way to begin?" were filed as notes and never answered (round 23)
+    r"\b(?:i|and)\s+(?:have|got|own|saved|can\s+(?:put|invest|spare))\s+(?:about\s+|around\s+|"
+    r"roughly\s+|only\s+|like\s+|maybe\s+|just\s+)?\$?\s*(?P<amount>\d[\d,]*(?:\.\d+)?)\s*"
+    r"(?P<unit>k|thousand|grand|dollars?|usd|usdt|bucks)?\b.{0,300}?(?:wh?at\s+(?:should|shud|"
+    r"shld|do|can|would)\s+i\s+(?:do|buy|get)|(?:sensible|good|best|smart|right)\s+(?:way|place)\s+"
+    r"to\s+(?:begin|start)|(?:way|how)\s+to\s+(?:begin|start)|where\s+(?:should|do|can)\s+"
     r"i\s+(?:put|invest|start)|how\s+(?:should|do|can)\s+i\s+(?:invest|start|begin)|what\s+(?:should|"
     r"do)\s+i\s+(?:buy|invest\s+in)|to\s+invest|invest\s+it|where\s+to\s+start|what\s+to\s+buy|"
     r"any\s+(?:advice|ideas|suggestions)|(?:don'?t|do\s+not)\s+know\s+where\s+to\s+start|"

@@ -21,9 +21,12 @@ _SUBJECT = (r"(?:argus|this(?:\s+(?:site|website|page|tool|app|console|product|t
 INTRO_Q = re.compile(
     # "hi, I'm new here. what is this and what can you do?" was declined (a first-time user,
     # round 19, row 636): a greeting and "I'm new" are a preamble, not the question
-    rf"^\s*(?:(?:hi|hello|hey)(?:\s+there)?\W+)?(?:i'?m\s+new(?:\s+(?:here|to\s+(?:this|trading|"
+    # "hi" alone, and "hlo, total noob here. what even is this", were declined (round 23)
+    rf"^\s*(?:hi+|hello|hey|hlo|hii+|yo|namaste|gm)\W*$|"
+    rf"^\s*(?:(?:hi+|hello|hey|hlo|yo)(?:\s+there)?\W+)?(?:(?:total\s+|complete\s+)?(?:noob|newbie|"
+    rf"beginner)\s+here\W+)?(?:i'?m\s+new(?:\s+(?:here|to\s+(?:this|trading|"
     rf"crypto|investing)))?\W+|first\s+time\s+here\W+)?"
-    rf"(?:so\s+)?(?:what\s+(?:is|'s)\s+{_SUBJECT}|what\s+does\s+"
+    rf"(?:so\s+)?(?:what\s+(?:even\s+)?(?:is|'s)\s+{_SUBJECT}(?:\s+even)?|what\s+does\s+"
     rf"{_SUBJECT}\s+do|who\s+(?:is|'s)\s+(?:{_SUBJECT}|it)\s+for|who\s+(?:made|built)\s+{_SUBJECT}|"
     rf"what\s+can\s+(?:you|argus|this(?:\s+\w+)?)\s+do(?:\s+for\s+me)?|what\s+(?:can|should)\s+i\s+"
     rf"ask(?:\s+(?:you|it|argus|here))?|how\s+do\s+i\s+use\s+{_SUBJECT}|what\s+am\s+i\s+looking\s+at|"
@@ -67,7 +70,17 @@ THAT_NUMBER_Q = re.compile(
     r"^\W*(?:ok(?:ay)?\W+|so\W+|um+\W+)?(?:wh?at|wut|wat)\s+(?:does|do|did)\s+(?:that|this|it|"
     r"all\s+that)\s+(?:even\s+)?mean\W*(?:lol|lmao|tbh|tho|bro|pls|please|for\s+me)?\W*$|"
     r"^\W*(?:explain|say)\s+(?:that|this|it)\s+(?:simpler|more\s+simply|in\s+plain\s+"
-    r"(?:english|words)|like\s+i'?m\s+(?:5|five|new))\W*$",
+    r"(?:english|words)|like\s+i'?m\s+(?:5|five|new))\W*$|"
+    # "explain simpler pls, im 5" got a desk decision, and "yaar thoda simple mein samjhao" was
+    # declined (a first-time user, round 23)
+    r"^\W*(?:can\s+you\s+|pls\s+|please\s+|ok\s+)?explain\s+(?:it\s+|that\s+|this\s+)?(?:a\s+bit\s+)?"
+    r"(?:simpler|more\s+simply|simply|in\s+simple\s+(?:terms|words))\b[^?]{0,30}[?.!]*\s*$|"
+    r"\b(?:thoda\s+)?(?:simple|aasan|asaan)\s+(?:mein|me|main|bhasha\s+mein)\s+samjha\w*|"
+    r"^\W*(?:yaar\s+|bhai\s+)?samjhao\W*$|"
+    # "can you say that again but simpler, I'm a total beginner" (a round-23 re-ask)
+    r"^\W*(?:can\s+you\s+|could\s+you\s+|pls\s+|please\s+)?(?:say|explain|put)\s+(?:that|it|this)"
+    r"\s+(?:again\s+)?(?:but\s+)?(?:simpler|more\s+simply|in\s+simpler\s+(?:words|terms)|"
+    r"in\s+plain\s+(?:english|words))\b[^?]{0,60}[?.!]*\s*$",
     re.I)
 """Asking what the last answer's figures mean, which named nothing to look up (row 637)."""
 
@@ -286,9 +299,9 @@ def how_answer(text: str = "") -> tuple[list[str], list[Source], dict[str, Any]]
         "The language model: Qwen 3.8 Max, through Bitget's hackathon endpoint, reads your "
         "question and picks which engine answers it; it never writes a number. When it is "
         "unavailable, a small classifier trained here and the console's own patterns read the "
-        "question instead. The model reads up to 40 questions an hour from one network address; "
-        "past that the classifier and patterns answer, in English. Each line of an answer is "
-        "marked with where it came from.",
+        "question instead. The model reads up to 40 questions an hour from one network address, "
+        "counted on each server instance; past that the classifier and patterns answer, in "
+        "English. Each line of an answer is marked with where it came from.",
     ]
     if re.search(r"\b(?:model|llm|ai|gpt|chatgpt|bot|robot)\b", text, re.I):
         # Asked which model, the model leads.

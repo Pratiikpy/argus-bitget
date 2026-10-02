@@ -450,6 +450,12 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
             raise ToolError("usd must be a number") from exc
         if usd <= 0:
             raise ToolError("usd must be positive")
+        if usd > Decimal("1e11"):
+            # a $1 quadrillion order got a 24-hour schedule and a 2-billion-bps cost (a hostile
+            # review, round 23); past $100bn no Bitget book is anywhere near the order
+            raise ToolError("usd must be at most 100000000000: an order that size is many times "
+                            "any Bitget contract's daily volume, so no schedule for it means "
+                            "anything")
         request = ResearchRequest(kind=ResearchKind.EXECUTION, symbols=(symbol,), notional=usd)
         result = _run(request, f"how should I split a ${usd} order in {symbol}")
         return _answer_text(result), result["refused"]
@@ -479,7 +485,18 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
         if not holdings:
             raise ToolError("book is required, e.g. '50% NVDA, 50% AAPL'")
         add = str(args.get("add") or "").strip()
-        asked = "what are my sector and factor exposures" + (f" if I add {add}" if add else "")
+        signed = re.match(r"^\s*(?:short\s+)?(?P<name>[A-Za-z][\w.]{0,11})\s*"
+                          r"(?P<pct>-\s?\d+(?:\.\d+)?)\s*%\s*$|^\s*"
+                          r"(?P<pct2>-\s?\d+(?:\.\d+)?)\s*%\s*(?P<name2>[A-Za-z][\w.]{0,11})"
+                          r"\s*$", add)
+        if signed is not None:
+            # "TSLA -15%" is a 15% short (a hostile review, round 23: it was added long)
+            size = (signed.group("pct") or signed.group("pct2") or "").replace(" ", "").lstrip("-")
+            add_words = f"short {size}% {signed.group('name') or signed.group('name2')}"
+        else:
+            add_words = f"add {add}" if add else ""
+        asked = "what are my sector and factor exposures" + (
+            f" if I {add_words}" if add_words else "")
         found = exposures(asked, holdings[:300])
         if found is None:  # pragma: no cover - the question above always asks for exposures
             raise ToolError("the exposures engine did not recognise the request")

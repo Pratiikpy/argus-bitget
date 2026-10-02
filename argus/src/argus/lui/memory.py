@@ -98,7 +98,14 @@ _MAX_LOSS = re.compile(
     r"(\d{1,2}(?:\.\d+)?)\s*%|"
     # "my max loss should probably be around 10%" (the mem0 comparison, round 12)
     r"\bmax(?:imum)?\s+loss\s+(?:should\s+(?:probably\s+)?be|would\s+be|of)\s+(?:around\s+|about\s+|"
-    r"roughly\s+|~)?(\d{1,2}(?:\.\d+)?)\s*%", re.I)
+    r"roughly\s+|~)?(\d{1,2}(?:\.\d+)?)\s*%|"
+    # "I can't stand a drawdown worse than 15%" was kept only by the model (a judge, round 23)
+    r"\b(?:can'?t|cannot|won'?t|don'?t|do\s+not)\s+(?:stand|take|handle|stomach|tolerate|accept|"
+    r"bear|afford)\s+(?:a\s+|any\s+)?(?:drawdown|loss|fall|drop)\s+(?:worse|bigger|larger|more|"
+    r"deeper|over|above)\s+(?:than\s+)?(\d{1,2}(?:\.\d+)?)\s*%|"
+    # "I have a 15% drawdown limit" (a round-23 re-ask)
+    r"\b(\d{1,2}(?:\.\d+)?)\s*%\s+(?:max(?:imum)?\s+)?(?:drawdown|loss)\s+(?:limit|tolerance|"
+    r"cap)\b|\b(\d{1,2}(?:\.\d+)?)\s*%\s+max(?:imum)?\s+(?:drawdown|loss)\b", re.I)
 _HORIZON = re.compile(
     r"\bi(?:'?m|\s+am)\s+an?\s+(?:[\w-]+\s+){0,3}?(day|swing|position|long[\s-]term)\s+"
     r"(?:trader|investor)|"
@@ -112,7 +119,10 @@ _HORIZON = re.compile(
     r"\b(?P<explicit>(?:my\s+)?(?:time\s+|trading\s+|holding\s+|investment\s+)?horizon\s+"
     r"(?:is\s+|of\s+|=\s*|:\s*)?(?:about\s+|around\s+|roughly\s+)?)"
     r"(?P<n2>a\s+few|several|a\s+couple(?:\s+of)?|\d{1,3}|one|two|three|four|six|an?)?\s*"
-    r"(?P<unit>hours?|days?|weeks?|months?|years?)\b", re.I)
+    r"(?P<unit>hours?|days?|weeks?|months?|years?)\b|"
+    # "a 2-year horizon" (a round-23 re-ask)
+    r"\b(?P<n3>\d{1,3}|one|two|three|four|six)[\s-]+(?P<u3>hours?|days?|weeks?|months?|years?)"
+    r"[\s-]+(?:time\s+|investment\s+|holding\s+|trading\s+)?horizon\b", re.I)
 _HOLDS = re.compile(
     r"\b(?:i\s+(?:currently\s+|now\s+)?(?:hold|own|have)|i(?:'?m|\s+am)\s+(?:holding|long|in)|"
     r"my\s+(?:current\s+)?(?:book|portfolio|holdings?|allocation)\s+(?:is|are|reads|looks\s+like|:)"
@@ -154,6 +164,11 @@ _THESIS = re.compile(
 """One view per match, ending at the clause's end, so "I think NVDA will rise and I think BTC will
 crash" is two theses. Until 2026-09-28 the claim ran to the end of the message and only the first
 view was kept (research/harvest/04-mem0.md, the multi-topic case mem0 is built for)."""
+_VIEW_STATED = re.compile(
+    r"\bmy\s+(?:view|take|call|thesis)\s*:\s*(?P<name>[A-Za-z$][\w.$]{1,11})\s+(?:is|looks)\s+"
+    r"(?:too\s+|very\s+)?(?P<claim>cheap|expensive|overvalued|undervalued)\b|"
+    r"^\W*(?:i'?m\s+)?(?P<side>bullish|bearish)\s+(?:on\s+)?(?P<name2>[A-Za-z$][\w.$]{1,11})\s*"
+    r"[:\-—]", re.I)
 _IDEA = re.compile(
     r"\bi\s+(?:want|plan|intend|would\s+like)\s+to\s+(short|long|buy|sell)\s+(?:some\s+)?"
     r"(.{2,30}?)\s+(?:because|since|as)\s+(.{3,120}?)(?=\s*(?:[,.;!?]|$))", re.I)
@@ -263,7 +278,8 @@ def extract(question: str, now: datetime | None = None,
     if (m := last(_CAP)) is not None:
         add("cap", "", str(float(m.group("a") or m.group("b") or m.group("c")) / 100), m.group(0))
     if (m := last(_MAX_LOSS)) is not None:
-        add("max_loss", "", str(float(m.group(1) or m.group(2) or m.group(3) or m.group(4))
+        add("max_loss", "", str(float(m.group(1) or m.group(2) or m.group(3) or m.group(4)
+                                      or m.group(5) or m.group(6) or m.group(7))
                                 / 100), m.group(0))
         facts[-1] = replace(facts[-1], replaces=earlier(_MAX_LOSS))
     from argus.lui.research.sizing import LOSS_USD
@@ -277,12 +293,13 @@ def extract(question: str, now: datetime | None = None,
         if len(dollars) > 1:
             facts[-1] = replace(facts[-1], replaces=f"“{dollars[0].group(0).strip()}” (earlier in "
                                                     f"the same message)")
-    stated = [h for h in _HORIZON.finditer(text) if h.group("explicit") is not None]
+    stated = [h for h in _HORIZON.finditer(text)
+              if h.group("explicit") is not None or h.group("n3") is not None]
     if (m := stated[-1] if stated else last(_HORIZON)) is not None:
         # A horizon said in words beats the one a trading style implies: "I'm a swing trader, my
         # horizon is a few weeks" is three weeks, whichever order the two come in.
-        word = (m.group(1) or m.group("u1") or m.group("unit") or "").lower()
-        count = (m.group("n1") or m.group("n2") or "").lower()
+        word = (m.group(1) or m.group("u1") or m.group("unit") or m.group("u3") or "").lower()
+        count = (m.group("n1") or m.group("n2") or m.group("n3") or "").lower()
         count = re.sub(r"\s+", " ", count)
         times = int(count) if count.isdigit() else _HOW_MANY.get(count, 1)
         hours = {"day": 24, "swing": 24 * 7, "position": 24 * 30}.get(word) or (
@@ -292,7 +309,11 @@ def extract(question: str, now: datetime | None = None,
         if word not in ("day", "swing", "position") and not word.startswith("long"):
             hours *= max(1, times)
         add("horizon", "", str(hours), re.sub(r"^and\s+", "I ", m.group(0)))
-        facts[-1] = replace(facts[-1], replaces=earlier(_HORIZON))
+        # "replacing 'I'm a long-term investor'" read as dropping it, while it is kept as the style
+        # (a judge, round 23): only the horizon it implied is replaced, and that is what is said
+        before = earlier(_HORIZON)
+        facts[-1] = replace(facts[-1], replaces=f"the horizon implied by {before}" if before
+                            else "")
     if (m := _STYLE.search(text)) is not None:
         add("style", "", re.sub(r"[\s-]+", "-", (m.group(1) or m.group(2) or m.group(3)
                                                   or "").lower()), m.group(0))
@@ -317,6 +338,15 @@ def extract(question: str, now: datetime | None = None,
                 except Exception:
                     price = None
             add("thesis", named[0], lean, m.group(0), price)
+    for m in _VIEW_STATED.finditer(text):
+        # "My view: META is cheap because ..." and "Bearish AAPL: ..." were tested and not kept
+        # (a judge, round 23)
+        named = research_symbols(m.group("name") or m.group("name2") or "")[0]
+        if named and not any(f.kind == "thesis" and f.subject == named[0] for f in facts):
+            word = (m.group("claim") or m.group("side") or "").lower()
+            lean = "bull" if word in ("cheap", "undervalued", "bullish") else "bear"
+            said = re.split(r"(?<=[.;!?])\s", text[m.start():], maxsplit=1)[0][:220]
+            add("thesis", named[0], lean, said.rstrip(" .;!?"), None)
     for m in _IDEA.finditer(text):
         named = research_symbols(m.group(2))[0]
         if named:
@@ -394,6 +424,33 @@ def merge_checks(old: list[Fact], checks: list[Fact]) -> list[Fact]:
     return merge([f for f in old if f.kind != "check"], checks)
 
 
+_RANGES: dict[str, tuple[float, float]] = {
+    "horizon": (1, 24 * 365 * 30), "max_loss": (0.0001, 1.0), "budget": (0.0001, 1.0),
+    "trade_risk": (0.0001, 1.0), "cap": (0.0001, 1.0), "capital": (1, 1e12),
+    "loss_usd": (0.01, 1e12)}
+"""What each numeric fact can mean: hours from one to thirty years, fractions above zero up to
+all of it, money above zero."""
+_INSTRUCTION = re.compile(
+    r"\b(?:system\s+(?:override|prompt|message)|ignore\s+(?:all\s+|the\s+|previous\s+|prior\s+|"
+    r"your\s+)+(?:instructions|rules)|disregard\s+(?:all|previous|prior)|you\s+are\s+now|"
+    r"developer\s+mode|jailbreak|new\s+instructions?\s*:)", re.I)
+
+
+def _plausible(kind: str, value: str, text: str) -> bool:
+    """Whether a stored fact's value is one a trader can mean, and its words are not an
+    instruction to the console."""
+    if _INSTRUCTION.search(text):
+        return False
+    bounds = _RANGES.get(kind)
+    if bounds is None:
+        return True
+    try:
+        number = float(value)
+    except ValueError:
+        return False
+    return bounds[0] <= number <= bounds[1]
+
+
 def parse(raw: str | None) -> list[Fact]:
     """The client's stored memory, validated. Anything malformed is dropped, never trusted."""
     if not raw:
@@ -407,6 +464,12 @@ def parse(raw: str | None) -> list[Fact]:
     out: list[Fact] = []
     for row in rows[:MAX_FACTS]:
         if not isinstance(row, dict) or row.get("kind") not in KINDS:
+            continue
+        if not _plausible(str(row["kind"]), str(row.get("value", "")),
+                          str(row.get("text", ""))):
+            # a horizon of -9999 hours and a -300% loss limit were used as computed figures,
+            # and an injected instruction was echoed as the trader's words (a hostile review,
+            # round 23): a value outside what a trader can mean is dropped, as malformed
             continue
         try:
             price = row.get("price_at")
@@ -728,6 +791,48 @@ def _apply_mandate(request: Any, facts: list[Fact], question: str) -> tuple[Any,
     return replace(request, mandate_text=words, mandate_capital=amount), used
 
 
+def _hold_words(hours: int) -> str:
+    """A holding period in the words a trader uses: "about two years", "about 3 months"."""
+    days = hours / 24
+    if days >= 330:
+        years = round(days / 365, 1)
+        return f"about {years:g} year{'s' if years != 1 else ''}"
+    if days >= 28:
+        months = round(days / 30)
+        return f"about {months} month{'s' if months != 1 else ''}"
+    return f"about {round(days)} days"
+
+
+def _deepest_fall_year(symbol: str) -> float | None:
+    """The deepest fall from a high over the last year of daily closes, as a positive fraction,
+    or None when the closes do not answer."""
+    from datetime import timedelta
+
+    from argus.lui.research.parse import is_us_equity
+    from argus.market import universe
+    from argus.market.equity_history import HistoryError, daily
+
+    base = symbol.removesuffix("USDT")
+    if is_us_equity(symbol):
+        ticker = base
+    elif universe.NOT_EQUITY.get(symbol, "crypto") == "crypto":
+        ticker = f"{base}-USD"
+    else:
+        return None
+    since = datetime.now(UTC).date() - timedelta(days=365)
+    try:
+        closes = [d.close for d in daily(ticker) if d.day >= since]
+    except (HistoryError, OSError, ValueError):
+        return None
+    if len(closes) < 100:
+        return None
+    peak, deepest = closes[0], 0.0
+    for close in closes:
+        peak = max(peak, close)
+        deepest = max(deepest, 1 - close / peak)
+    return deepest or None
+
+
 def after(lines: list[str], request: Any, facts: list[Fact],
           price_now: Any = None, *, tester: Any = None) -> list[str]:
     """Lines an answer gains from memory once it is computed: a stated loss limit set against the
@@ -747,9 +852,58 @@ def after(lines: list[str], request: Any, facts: list[Fact],
             if said:
                 capital = Fact(kind="capital", subject="", value=str(said), text=held.text,
                                at=held.at)
+    if limit is not None and capital is None and getattr(request, "notional", None):
+        # "how much of a $25k portfolio could I put in it given my limit?" names the account in
+        # the question itself (a judge, round 23)
+        capital = Fact(kind="capital", subject="", value=str(float(request.notional)),
+                       text=f"${float(request.notional):,.0f} in the question", at="")
     sized = next((m for line in lines
-                  for m in [re.match(r"Bottom line: (?:size \S+ so that its|\S+'s) worst observed "
-                                     r"24 hours \((-\d+(?:\.\d+)?)%\)", line)] if m), None)
+                  for m in [re.match(r"Bottom line: (?:size \S+ so that its|\S+'s) worst "
+                                     r"(?:observed 24 hours|24 hours in the last 30 days)"
+                                     r" \((-\d+(?:\.\d+)?)%\)",
+                                     line)] if m), None)
+    horizon_held = get(facts, "horizon")
+    long_hold = (horizon_held is not None and horizon_held.value.isdigit()
+                 and int(horizon_held.value) >= 720)
+    deepest_year = (_deepest_fall_year(request.symbols[0])
+                    if long_hold and limit is not None and (sized is not None or capital is None)
+                    and bool(getattr(request, "symbols", ())) else None)
+    if (limit is not None and capital is not None and sized is not None and deepest_year
+            and horizon_held is not None):
+        # a 15% drawdown limit for a two-year holder was held against a 24-hour move (a judge,
+        # round 23): over a hold that long, the deepest fall from a high is the move that tests it
+        money = float(capital.value)
+        allowed = money * float(limit.value)
+        leg = min(money, allowed / deepest_year)
+        extra.append(remembered_line(limit, (
+            f"you hold for {_hold_words(int(horizon_held.value))}, so the test is the deepest "
+            f"fall from "
+            f"a high in the last year, {-deepest_year:.1%}: {float(limit.value):.0%} of your "
+            f"${money:,.0f} is ${allowed:,.0f}, which a fall that deep reaches on a ${leg:,.0f} "
+            f"position ({leg / money:.0%} of the account)"
+            + (" \u2014 the whole account fits inside it" if leg >= money else
+               " \u2014 any larger position breaks the limit on a repeat")
+            + ", before what your other holdings do beside it")))
+        sized = None
+        limit_said = True
+    elif (limit is not None and capital is None and deepest_year and horizon_held is not None
+          and not getattr(request, "book", None)):
+        # "I have a 15% drawdown limit and a 2-year horizon. Can I hold NVDA?" names no account,
+        # and was checked against an assumed scenario (a round-23 re-ask): the deepest fall from a
+        # high in the last year is the test, as the share of the account it allows
+        share = min(1.0, float(limit.value) / deepest_year)
+        name = request.symbols[0].removesuffix("USDT")
+        extra.append(remembered_line(limit, (
+            f"you hold for {_hold_words(int(horizon_held.value))}, so the test is the deepest "
+            f"fall from a high in the last year, {-deepest_year:.1%}: "
+            + (f"a fall that deep stays inside your {float(limit.value):.0%} limit even with the "
+               f"whole account in {name}" if share >= 1 else
+               f"a repeat breaks your {float(limit.value):.0%} limit once {name} is more than "
+               f"about {share:.0%} of the account")
+            + " — say the account size for the dollars, before what other holdings do beside it")))
+        limit_said = True
+    else:
+        limit_said = False
     if limit is not None and capital is not None and sized is not None:
         # "How big should the SOL short leg be given my 4% drawdown limit?" was answered on a
         # $10,000 default that ignored both (a judge, round 14): the stated limit and book, sized.
@@ -788,7 +942,7 @@ def after(lines: list[str], request: Any, facts: list[Fact],
             f"the {shock.group(1)} {float(shock.group(2)):+g}% shock moves the book -{move:.2f}%"
             f"{dollars}, which uses {move / cap:.0%} of your {cap:g}% limit"
             + (f" — {move - cap:.2f} points past it" if move > cap else " — inside it"))))
-    if limit is not None and not (capital is not None and sized is not None):
+    if limit is not None and not limit_said and not (capital is not None and sized is not None):
         worst = [abs(float(m.group(1))) for line in lines
                  for m in re.finditer(r"(?:book|position)\s+moves\s+(?:about\s+)?(-\d+(?:\.\d+)?)%",
                                       line)]
@@ -1080,7 +1234,11 @@ _RECALL_KINDS = {"loss": ("loss_usd", "max_loss"), "drawdown": ("max_loss", "los
 
 
 _SCENARIO_STATED = re.compile(r"\b(?:if|when|should)\b[^?]*?\d+(?:\.\d+)?\s*(?:%|percent\b|"
-                              r"bps\b|basis\s+points?\b)", re.I)
+                              r"bps\b|basis\s+points?\b)|"
+                              # "The S&P drops 80 points. What's my loss?" (a round-23 re-ask)
+                              r"\b(?:drops?|falls?|rises?|gains?|moves?|slides?|sinks?|tanks?|"
+                              r"rall(?:y|ies)|jumps?|climbs?|crash(?:es)?)\s+(?:by\s+)?"
+                              r"\d[\d,]*(?:\.\d+)?\s*(?:%|percent\b|points?\b|pts\b|bps\b)", re.I)
 """A move stated in the question: "if SPY falls 4%..., what's my loss?" asks for a computed loss,
 not the remembered loss limit (a hostile review, round 22)."""
 

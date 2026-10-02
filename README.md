@@ -81,7 +81,7 @@ Open the console and ask any of these. Each one exercises something different.
 | *I'm bullish on NVDA because AI capex keeps accelerating. Test my thesis.* | Each reason tested on its own measurement — hyperscaler capex and NVDA's revenue from SEC filings; ask *what would prove it wrong?* next. |
 | *How should I split a $50k order in NVDA?* | An execution schedule priced on the live order book, measured against Bitget's own TWAP on a full-depth replay, and the first child written as the Agent Hub `bgc --dry-run` command that previews it without sending. |
 | *Long rNVDA over the weekend at 3x* | The stock's weekends since 1999, a band for Monday's open scaled to its volatility now, which covered 79% of 17,044 weekends out of sample against an 80% target, and the perpetual's own path to the liquidation line. |
-| *Where will NVDA open?* | While the US market is shut: the price the stock's own perpetual implies for the next open, with that reading's measured miss beside two S2 rivals'. |
+| *Where will NVDA open?* | While the US market is shut: the price the stock's own perpetual implies for the next open, with that reading's measured miss beside gloaming's (an S2 rival) and a no-gap baseline; while the market is open it says when the next open is. |
 | *I have $1,000 and I'm new — where should I start?* | No pick: what that sum went through in a year in three broad markets, and how to place a first trade on Bitget. |
 
 <details>
@@ -112,17 +112,17 @@ it places no orders, holds no money and says so.
 
 ### New to trading? Start here
 
-The console's home page has a **New to trading** row. These four questions work as written, in
-plain words, typos and all:
+The console's home page has a **New to trading** row of five questions: *I have $1,000, where
+should I start?*, *what is a stop loss and do I need one*, *is 10x leverage ok for a small
+account*, *how much could I lose on BTC in a bad week?* and *what is this site and who is it for*.
+Each works as written, in plain words, typos and all, and so do the follow-ups a newcomer reaches
+for:
 
-- *I have $1,000, where should I start?* — what that sum has actually been through in the last
-  year in the Nasdaq-100, bitcoin and gold, the worst fall on the way included. No pick.
-- *How much could I lose on BTC in a bad week?* — then *is that good?*, which says plainly that it
-  is a loss and what share of the money it is.
-- *What is liquidation?* / *Is 10x leverage ok for a small account?* — the word, and what it means
-  for you.
-- *Where should my stop go on TSLA?* — a price to put it at, and why closer gets stopped out by
-  ordinary moves.
+- *is that good?* after a loss figure says plainly that it is a loss and what share of the money
+  it is; *explain simpler* restates the last answer's terms in plain words.
+- *where should my stop go on TSLA?* gives a price to put it at, and why closer gets stopped out
+  by ordinary moves.
+- *so what should I do?* gets no pick, but three checks that make the choice yours.
 
 Put what you hold in **My book** (`bought 3 NVDA at 180, 0.01 BTC`) and *how's my stuff doing?*
 answers against what you paid. Never give anyone your login or API keys; this console never asks
@@ -265,11 +265,11 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 11,168 tests collected
+pytest -q                       # 11,199 tests collected
 ```
 
-Nothing above needs a credential. On 2026-10-03, with every outbound connection refused, 10,855
-passed, 75 skipped and 0 failed of the 11,168 tests collected; the other 238 read a live
+Nothing above needs a credential. On 2026-10-03, with every outbound connection refused, 10,886
+passed, 75 skipped and 0 failed of the 11,199 tests collected; the other 238 read a live
 venue, feed or model and run apart
 (`pytest -m network`). Tests that need a rival's source cloned beside the repository skip
 and say which. `ARGUS_BLOCK_NETWORK=1` refuses every outbound connection, so
@@ -289,7 +289,7 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **11,168 tests collected** — `pytest -q` |
+| Tests | **11,199 tests collected** — `pytest -q` |
 | Types | **`mypy --strict` clean on 578 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |

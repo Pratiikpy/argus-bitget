@@ -51,6 +51,8 @@ def frozen_data(monkeypatch: pytest.MonkeyPatch) -> None:
 
     monkeypatch.setattr(exposures, "_yahoo_daily", _fail)
     monkeypatch.setattr(exposures, "_bitget_daily", _fail)
+    # The year's worst day under a standalone position is read from Yahoo's daily closes.
+    monkeypatch.setattr(research.book, "_year_worst_day", lambda *args, **kwargs: None)
     # Yahoo's consensus and key statistics, read beside the MCP facts in fundamentals answers.
     monkeypatch.setattr(research.fundamentals, "yahoo_summary", _fail)
     # bitget-mcp-server: no session is opened; TestFundamentals installs its own fake service.
@@ -761,7 +763,7 @@ class TestASingleNamesProfile:
 
     def test_a_standalone_question_leads_with_a_sizing_rule_and_shows_the_shape(self) -> None:
         answer = run("q", ResearchRequest(kind=ResearchKind.IMPACT, symbols=("MSTRUSDT",)))
-        assert answer.lines[0].startswith("Bottom line: MSTR's worst observed 24 hours")
+        assert answer.lines[0].startswith("Bottom line: MSTR's worst 24 hours in the last 30 days")
         assert any(line.startswith("Return shape") and "kurtosis" in line and "R²" in line
                    for line in answer.lines)
 

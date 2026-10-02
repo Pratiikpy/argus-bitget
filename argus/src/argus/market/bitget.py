@@ -146,6 +146,26 @@ def maintenance_margin_rate(symbol: str, notional: float) -> float | None:
     return None
 
 
+SPOT_TAKER_FEE_VIP0 = 0.001
+"""Bitget's spot taker fee at VIP 0, from its fee schedule (https://www.bitget.com/fee, read
+2026-10-03: 0.1% maker / 0.1% taker, 0.08% when paid in BGB)."""
+
+
+def spot_taker_fee(symbol: str) -> float | None:
+    """The spot taker fee a VIP 0 account pays on ``symbol`` (e.g. BTCUSDT), as a fraction, when
+    the pair is listed on spot; None when the symbol list does not carry it.
+
+    The symbol list's own ``takerFeeRate`` (``/api/v2/spot/public/symbols``: 0.002 for BTCUSDT on
+    2026-10-03) is not the rate charged: it was quoted as the fee and doubled it against the
+    published schedule (a round-23 re-ask), so the list is read only for the listing."""
+    try:
+        rows = public_get("/api/v2/spot/public/symbols", {"symbol": symbol}, timeout=10.0)
+    except BitgetError:
+        return None
+    listed = any(isinstance(row, dict) and row.get("symbol") == symbol for row in rows or [])
+    return SPOT_TAKER_FEE_VIP0 if listed else None
+
+
 def max_leverage(symbol: str, notional: float) -> float | None:
     """The highest leverage Bitget allows a position of ``notional`` USDT in ``symbol``, from the
     same public tier table as :func:`maintenance_margin_rate` (``leverage`` per tier: ETHUSDT 150x

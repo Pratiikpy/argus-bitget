@@ -44,7 +44,10 @@ _HOW_TO_BUY = re.compile(
     r"start\s+(?:buying|trading|investing))\s*(?:(?:some\s+)?(?:crypto|bitcoin|btc|ethereum|eth|"
     r"stocks?|shares?|coins?|tokens?|this|it|that|them)\b|[?.!]*\s*$)|\bhow\s+(?:do\s+i|to|can\s+i)\s+(?:start|begin)\s+(?:trading|investing)\b|\bwhere\s+(?:do|"
     r"can)\s+i\s+buy\b|\b(?:i['\u2019]?m|i\s+am)\s+(?:brand\s+)?new\b[^?]*\b(?:where|how)\b[^?]*"
-    r"\b(?:start|begin)\b|\bwhere\s+(?:do|should)\s+i\s+(?:start|begin)\b[?.!]*\s*$", re.I)
+    r"\b(?:start|begin)\b|\bwhere\s+(?:do|should)\s+i\s+(?:start|begin)\b[?.!]*\s*$|"
+    # "how do i actually buy on bitget step by step" got the rToken-versus-perpetual answer
+    r"\bhow\s+(?:do\s+i|to|can\s+i)\s+(?:actually\s+)?buy\s+(?:on|from|at)\s+bitget\b|"
+    r"\bbuy\b[^?]{0,30}\bstep\s+by\s+step\b", re.I)
 _LOSE_MORE = re.compile(
     r"\b(?:can|could|will|do)\s+i\s+lose\s+(?:more\s+(?:money\s+)?than|everything|all\s+(?:of\s+)?"
     r"my\s+money)|\blose\s+more\s+than\s+(?:i|you)\s+(?:put|invest)|\bowe\s+(?:money|the\s+exchange)"
@@ -74,7 +77,11 @@ _FREE = re.compile(
     r"(?:free|paid|free\s+to\s+use)\b|\bdo\s+i\s+(?:have\s+to|need\s+to)\s+(?:pay|sign\s*up|"
     r"register|log\s*in|create\s+an?\s+account)\b|\bhow\s+much\s+(?:does|is)\s+(?:argus|this\s+"
     r"(?:console|tool|app|site|service))\s+(?:cost|to\s+use)\b|\bany\s+(?:fees?|charges?|"
-    r"subscription)\s+(?:to\s+use|for\s+using)\b", re.I)
+    r"subscription)\s+(?:to\s+use|for\s+using)\b|"
+    # "whats the catch with this site, do u take a cut" (a first-time user, round 23)
+    r"\bwhat'?s\s+the\s+catch\b|\b(?:do|does)\s+(?:u|you|it|argus)\s+take\s+a\s+cut\b|"
+    r"\bhow\s+do\s+(?:you|u|they)\s+make\s+money\b|\b(?:do|does)\s+(?:u|you|it)\s+charge\b",
+    re.I)
 """Whether using the console costs anything: "is this free?" was declined (round 17)."""
 _GO_WRONG = re.compile(
     r"\bwhat\s+(?:could|can|might|would)\s+go\s+wrong\b|\bwhat\s+are\s+the\s+(?:main\s+|biggest\s+)?"
@@ -175,11 +182,12 @@ _TRADING_FOR_YOU = (
     "read how each one has done, and what it can lose, before you follow it.",
 )
 _FREE_TO_USE = (
-    "Bottom line: yes — using this console costs nothing: there is no account, no login, no card "
-    "and no subscription.",
+    "Bottom line: using this console costs nothing and takes no cut: there is no account, no "
+    "login, no card and no subscription.",
     "One limit: the language model that reads oddly phrased questions answers up to 40 questions "
-    "an hour from one network address. Past that, the console's own readers answer, in English, "
-    "and every figure is still computed from live data.",
+    "an hour from one network address, counted on each server instance. Past that, the "
+    "console's own readers answer, in English, and every figure is still computed from live "
+    "data.",
     "Trading is separate: Bitget charges its own fees when you trade there, and this console "
     "never places an order. Ask \"what does it cost to buy $500 of BTC\" for the fee on a real "
     "order book.",
@@ -318,6 +326,41 @@ explains(*_LOOKAHEAD_A, *_OVERFIT_A, *_SURVIVOR_A, *_COSTS_A, *_NOT_ADVICE, *_BU
          *_LOSS_HAPPENS_A, *_BEGINNER_SAFE_A,
          *_GOING_WRONG, *_NO_GUARANTEE, *_SAFE, *_WITHDRAWING, *_PLACING, *_FREE_TO_USE)
 
+_LOAN = re.compile(
+    r"\b(?:take|get|taking|getting)\s+(?:out\s+)?a\s+loan\b|\bborrow\w*\s+(?:money\s+)?to\s+"
+    r"(?:buy|invest|trade)\b|\bloan\s+to\s+(?:buy|invest|trade)\b", re.I)
+_LOAN_A = (
+    "Bottom line: no \u2014 do not borrow to buy. A loan has to be repaid whatever the price "
+    "does, so a fall loses money you do not have, and the interest is a cost every month you "
+    "wait.",
+    "\"It always comes back\" is not something any price has promised: ETH closed more than half "
+    "below its 2021 high on 65% of the days of 2022 and on every day of 2023 (Yahoo Finance daily "
+    "closes), and a borrower who needed the money back in that time sold at the bottom. Some "
+    "coins and stocks never came back at all.",
+    "If you buy, buy with money you could leave alone through a bad year, and ask \"how much could "
+    "I lose on ETH in a bad week\" first to see what that means in dollars.",
+)
+_WHAT_NOW = re.compile(
+    r"^\W*(?:(?:so|ok(?:ay)?|then|alright|hmm+)\W+){0,2}(?:what\s+(?:should|do)\s+i\s+do"
+    r"(?:\s+now)?|"
+    # "ok so which one do i go for" (a round-23 re-ask)
+    r"which\s+(?:one\s+)?(?:should|do|would)\s+i\s+(?:pick|choose|buy|go\s+(?:with|for)|get)|"
+    r"what\s+now|now\s+what|"
+    r"what\s+would\s+you\s+pick|just\s+tell\s+me\s+what\s+to\s+(?:buy|do))\W*$", re.I)
+"""A follow-up asking for the pick the last answer did not give: "so what should i do" and "so
+which one should i pick" were declined (a first-time user, round 23)."""
+_WHAT_NOW_A = (
+    "Bottom line: this console will not pick for you \u2014 it cannot see your situation, and a "
+    "pick from a website is not one you can hold it to. What it can do is make the choice yours "
+    "with three checks:",
+    "1. How much could you lose in a bad week without it hurting? Ask \"how much could I lose on "
+    "BTC in a bad week\" (or QQQ, or gold) and compare the dollars with that.",
+    "2. How long can you leave it alone? Money you need within a year is safest out of the market.",
+    "3. Start with one broad thing rather than many small bets, without leverage, so the most you "
+    "can lose is what you put in.",
+)
+
+
 def reply(text: str, *, named: bool = False) -> Reply | None:
     """The newcomer answer to ``text``, or None when it is not one of these questions.
 
@@ -327,6 +370,10 @@ def reply(text: str, *, named: bool = False) -> Reply | None:
     2026-09-30: all five nameless forms were declined)."""
     from argus.lui.research.sizing import stated_capital
 
+    if _LOAN.search(text):
+        return Reply(lines=_LOAN_A)
+    if _WHAT_NOW.search(text):
+        return Reply(lines=_WHAT_NOW_A)
     if _LOOKAHEAD.search(text):
         return Reply(lines=_LOOKAHEAD_A)
     if _OVERFIT.search(text):

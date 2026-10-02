@@ -286,7 +286,8 @@ def _answer(text: str, symbol: str | None = None, *,
     if risk_usd is None and limit is not None and account:
         # "a $20,000 account and I cannot lose more than 5% of it" is the dollars at risk; it was
         # read as a 20% position in the account's size (a judge, round 19, row 667)
-        risk_usd = account * float(limit.group("p") or limit.group("p2") or limit.group("p3")) / 100
+        risk_usd = account * float(limit.group("p") or limit.group("p2") or limit.group("p3")
+                               or limit.group("p4")) / 100
     if risk_usd is None and (m := _RISK_PCT.search(text)) is not None:
         fraction = float(_group(m, "p", "p2") or 0) / 100
         if account is None:
@@ -433,6 +434,20 @@ def _answer(text: str, symbol: str | None = None, *,
             + (f" — it needs {ratio:.2f}x leverage, and leverage is what turns a gap through the "
                f"stop into more than the budget." if ratio > 1 else
                ", so no leverage is needed."))
+        if ratio > 1 and symbol and worst_day is not None:
+            # "8% of a $40k account" read only as a leveraged size: unlevered, the budget may
+            # already hold the whole account through the worst day (a judge, round 23)
+            whole = worst_day(symbol)
+            if whole is not None and whole < 0:
+                lost_whole = account * abs(whole)
+                lines.append(
+                    f"Without leverage: the whole ${account:,.0f} in it would lose about "
+                    f"${lost_whole:,.0f} on a repeat of its worst 24 hours ({whole:.1%}), "
+                    + (f"inside the ${risk_usd:,.0f} budget, so any unlevered size up to the "
+                       f"account fits it; the larger figure above is what a tight stop allows."
+                       if lost_whole <= risk_usd else
+                       f"past the ${risk_usd:,.0f} budget, so even unlevered the position should "
+                       f"be at most ${risk_usd / abs(whole):,.0f}."))
     if symbol and worst_day is not None:
         worst = worst_day(symbol)
         if worst is not None:
@@ -482,7 +497,10 @@ _LOSS_PCT = re.compile(
     r"(?P<p>\d+(?:\.\d+)?)\s*%|\b(?:max(?:imum)?\s+loss|loss\s+limit|risk(?:ing)?)\s+(?:of\s+|is\s+)?"
     r"(?P<p2>\d+(?:\.\d+)?)\s*%|"
     # "with a 3% max loss" names the figure first (a judge, round 19)
-    r"\b(?P<p3>\d+(?:\.\d+)?)\s*%\s+(?:max(?:imum)?\s+loss|loss\s+limit|stop[\s-]?out\s+limit)\b",
+    r"\b(?P<p3>\d+(?:\.\d+)?)\s*%\s+(?:max(?:imum)?\s+loss|loss\s+limit|stop[\s-]?out\s+limit)\b|"
+    # "the most I can stomach losing on this is 8% of a $40k account" (a judge, round 23)
+    r"\bmost\s+i\s+(?:can|could|would|will)\s+(?:stomach|afford|accept|bear|take|stand|handle)\s+"
+    r"(?:to\s+)?los(?:e|ing)\b[^?%]{0,30}?\b(?:is|=)\s+(?P<p4>\d+(?:\.\d+)?)\s*%",
     re.I)
 
 
@@ -520,7 +538,8 @@ def stop_for(text: str, symbol: str | None, *,
         position = None  # the loss limit's own dollars are not a position
     limit = _LOSS_PCT.search(text)
     if loss is None and account and limit is not None:
-        loss = account * float(limit.group("p") or limit.group("p2") or limit.group("p3")) / 100
+        loss = account * float(limit.group("p") or limit.group("p2") or limit.group("p3")
+                               or limit.group("p4")) / 100
     if position is None and loss is not None and loss > 0:
         return _stop_from_structure(text, symbol, loss, account, price)
     if position is None or loss is None or position <= 0:

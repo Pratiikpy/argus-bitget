@@ -124,6 +124,12 @@ _KINDS: tuple[tuple[Kind, re.Pattern[str]], ...] = (
         # (a judge, round 19, row 669: it was left "not tested")
         r"\bdeliver(?:y|ies)\b|\bunits?\s+sold\b|\bshipments?\b|\bsales\s+volumes?\b|"
         r"\bsubscribers?\b|\bbookings?\b|"
+        # "ad revenue is growing faster than its costs" and "Azure growth is speeding up" (a
+        # judge, round 23): a revenue-against-costs claim the filings test, and a segment claim
+        # they cannot, said as such
+        r"\b(?:revenue|sales)\b[^.;]{0,40}\bfaster\s+than\b[^.;]{0,20}\b(?:costs?|expenses?|"
+        r"spending)\b|\b(?:azure|aws|google\s+cloud|iphone|ipad|mac|data\s+cent(?:er|re)|gaming|"
+        r"segment|cloud\s+(?:growth|revenue))\b|"
         # "margins are shrinking" is a claim about reported quarters, tested on gross margin from
         # the filings (a judge, round 22: it was refused as a claim about future earnings)
         r"\bmargins?\s+(?:are\s+|is\s+|keep\s+)?(?:shrink|fall|declin|compress|squeez|expand|"
@@ -131,8 +137,10 @@ _KINDS: tuple[tuple[Kind, re.Pattern[str]], ...] = (
         r"improving)\s+(?:gross\s+)?margins?\b|\bgross\s+margins?\b", re.I)),
     (Kind.EARNINGS, re.compile(r"earnings|revenue|guidance|profit|margins?|\beps\b|beat", re.I)),
     (Kind.MACRO, re.compile(
-        r"\bfed\b|rates?\b|rate cuts?|\bcpi\b|inflation|dollar|\bdxy\b|macro|liquidity|yields?",
-        re.I)),
+        # "staking yields are falling" is not the Treasury curve: it was tested against the
+        # 10-year yield (a round-23 re-ask), so a staking or dividend yield is not macro
+        r"\bfed\b|(?<!staking )(?<!dividend )rates?\b|rate cuts?|\bcpi\b|inflation|dollar|\bdxy\b|"
+        r"macro|liquidity|(?<!staking )(?<!dividend )(?<!earnings )yields?", re.I)),
 )
 
 _SPLIT = re.compile(
@@ -183,7 +191,15 @@ _ASK_WORDS = re.compile(
     r"^\s*(?:i\s+(?:think|believe|reckon|expect|feel)\s+(?:that\s+)?|my\s+(?:thesis|view|take|"
     r"idea|argument|claim)(?:\s+is)?(?:\s+that)?\s*:?\s*|here'?s\s+my\s+(?:thesis|view|take|idea):?\s*|"
     # "My bull case for BTC: ..." (a judge, round 12)
-    r"(?:my|the)\s+(?:bull|bear)(?:ish)?\s+case(?:\s+(?:for|on)\s+[\w$.&/-]+)?\s*[:,-]?\s*)|"
+    r"(?:my|the)\s+(?:bull|bear)(?:ish)?\s+case(?:\s+(?:for|on)\s+[\w$.&/-]+)?\s*[:,-]?\s*|"
+    # "Bearish AAPL: ..." (a judge, round 23)
+    r"(?:i'?m\s+)?(?:bullish|bearish)\s+(?:on\s+)?\$?[A-Za-z]{1,6}\s*[:\-—]\s*)|"
+    # "... Check that for me." and "... Is that right?" closing a thesis (round 23)
+    r"\s*[.?!]?\s*(?:please\s+)?check\s+(?:that|this|it)(?:\s+(?:for\s+me|out))?[\s?.!]*$|"
+    r"\s*[.?!]?\s*(?:is|isn'?t)\s+(?:that|this|it)\s+(?:right|correct|true|fair)[\s?.!]*$|"
+    # "... What would prove me wrong?" closing a thesis was read as a second reason (round 23)
+    r"\s*[.?!]?\s*what\s+(?:would|could|might)\s+(?:prove|show|make)\s+(?:me|it|this|that)\s+"
+    r"(?:wrong|be\s+wrong)[\s?.!]*$|"
     r"\s*[-\u2013\u2014:,.]?\s*(?:please\s+|can\s+you\s+)?(?:test|check|challenge|"
     r"stress[\s-]*test|pressure[\s-]*test|poke\s+holes\s+in|kill|critique|evaluate|assess|validate)\s+"
     r"(?:(?:my|this|the|that)\s+(?:thesis|idea|view|take|theory|call|argument)|it|this|that)\b"

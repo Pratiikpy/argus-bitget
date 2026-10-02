@@ -463,6 +463,13 @@ def pattern_reading_wins(request: ResearchRequest | None, text: str) -> bool:
     if (request.kind is ResearchKind.IMPACT and _SHOULD_I_TRADE.search(text)
             and not _HOW_TO_EXECUTE.search(text)):
         return True
+    if request.kind is ResearchKind.IMPACT and request.book and re.search(
+            r"\b(?:keep|leave|hold)\s+(?:my\s+|the\s+)?(?:book'?s?\s+)?(?:volatility|vol|risk)\s+"
+            r"(?:where\s+it\s+is|the\s+same|unchanged|flat)\b|\b(?:volatility|vol|risk)[\s-]+"
+            r"neutral\b", text, re.I):
+        # "What weight of AMD would keep my volatility where it is?" is an add with one answer,
+        # the volatility-neutral weight; the kind model read it as the book's risk (round 23)
+        return True
     if request.kind is ResearchKind.IMPACT and (request.target is not None
                                                 or request.resize_by is not None):
         # A resize names a final weight; the model's plan has no field for one and read "trim

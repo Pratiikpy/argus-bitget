@@ -190,6 +190,30 @@ def _under_cap(weights: Mapping[str, float], cap: float) -> dict[str, float]:
     return out
 
 
+def _year_worst_day(symbol: str, *, short: bool = False) -> float | None:
+    """The worst close-to-close day of the last year for ``symbol``, in percent (the biggest
+    rise when ``short``), from Yahoo Finance daily closes; None when they do not answer."""
+    from argus.market import universe
+    from argus.market.equity_history import HistoryError, daily
+
+    base = symbol.removesuffix("USDT")
+    if is_us_equity(symbol):
+        ticker = base
+    elif universe.NOT_EQUITY.get(symbol, "crypto") == "crypto":
+        ticker = f"{base}-USD"
+    else:
+        return None
+    since = datetime.now(UTC).date() - timedelta(days=365)
+    try:
+        closes = [d.close for d in daily(ticker) if d.day >= since]
+    except (HistoryError, OSError, ValueError):
+        return None
+    moves = [(b / a - 1) * 100 for a, b in itertools.pairwise(closes) if a > 0]
+    if len(moves) < 100:
+        return None
+    return -max(moves) if short else min(moves)
+
+
 def _book_report(request: ResearchRequest, data: MarketData,
                  is_open: Any) -> tuple[list[str], list[Source], dict[str, Any]]:
     """The whole book as held: risk by holding against weight, volatility, beta and how much of the
@@ -318,6 +342,7 @@ def _book_report(request: ResearchRequest, data: MarketData,
     lines.append(
         f"Book volatility about {annual:.0%} a year on "
         + ("every hour, as crypto trades" if round_clock else "open-session hours")
+        + " (hourly bars, last 30 days)"
         + (f"; risk is spread across {spread:.1f} effective position(s) of {len(weights)}"
            if spread is not None else "")
         + (f"; {request.cash:.0%} cash dilutes all of it" if request.cash else "") + "."
@@ -1001,12 +1026,21 @@ def _impact_lines(report: CopilotReport, request: ResearchRequest,
             # priced; $10,000 stands in only when none was given (round 18, 2026-10-01)
             stated = float(request.notional) if request.notional else None
             position = stated if stated else 10_000.0
+            # "worst observed" read as the worst ever, from a 30-day window, by someone who had
+            # just put their savings in; the $10,000 read as their own sum (a first-time user,
+            # round 23): the window and the worked example are said, with the year's worst day
+            sized = (f"on your ${position:,.0f}" if stated else
+                     f"on a worked-example ${position:,.0f} (no amount was given)")
+            year = _year_worst_day(request.symbols[0], short=short)
+            yearly = (f"; over the last year its worst single day was {year:+.1f}%, about "
+                      f"${abs(year) / 100 * position:,.0f}" if year is not None
+                      and abs(year) > abs(worst_day) else "")
             lines.append(
                 # a measurement, not an instruction: "size BTC so that…" read as the advice the
                 # console says it does not give (a first-time user, round 20, row 683)
-                f"Bottom line: {add}'s worst observed 24 hours ({worst_day:+.1f}%)"
+                f"Bottom line: {add}'s worst 24 hours in the last 30 days ({worst_day:+.2f}%)"
                 f"{', as a short the loss on its biggest rally,' if short else ''} would cost "
-                f"about ${abs(worst_day) / 100 * position:,.0f} on a ${position:,.0f} position — "
+                f"about ${abs(worst_day) / 100 * position:,.0f} {sized}{yearly} — "
                 f"the usual rule is to hold only as much as you would accept losing on a day "
                 f"like that; tell me what you hold to see its share of your risk."
             )

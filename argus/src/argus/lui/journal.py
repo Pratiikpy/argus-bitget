@@ -832,6 +832,12 @@ def pair(legs: Sequence[Leg]) -> tuple[list[Trade], list[str], list[str]]:
                                          x.flags))
                         remaining = 0.0
                 lots = keep
+                if remaining > 1e-9:
+                    # "sold 25 NVDA" after buying 10 reviewed the 10 and said nothing of the 15
+                    # (a hostile review, round 23)
+                    dropped.append(f"{leg.text[:60]!r} {'sells' if side == 'long' else 'buys'} "
+                                   f"{remaining:g} more than was held; that part would open a "
+                                   f"{'short' if side == 'long' else 'long'} and is not reviewed")
             sized = all(x.qty is not None for x in taken)
             weights = [x.qty or 0.0 for x in taken] if sized else [1.0] * len(taken)
             total = sum(weights) or 1.0
@@ -1514,7 +1520,11 @@ POSITION_Q = re.compile(
     r"\bhow\s+am\s+i\s+doing\b|\bam\s+i\s+(?:up|down|in\s+(?:profit|the\s+(?:green|red)))\b|"
     r"\b(?:position|holdings?|p\s*&\s*l|pnl|profit|realized|realised|unrealized|unrealised|"
     r"cost\s+basis|average\s+(?:cost|price)|break[\s-]?even|up\s+or\s+down|how\s+much\s+"
-    r"(?:did\s+i|have\s+i)\s+(?:make|made|lose|lost))\b|持仓|盈亏|成本价|赚了多少|亏了多少", re.I)
+    r"(?:did\s+i|have\s+i)\s+(?:make|made|lose|lost))\b|"
+    # "I hold 20 AAPL bought at 190. What's my gain?" (a round-23 re-ask)
+    r"\bwhat(?:'s|\s+is)\s+my\s+(?:gain|loss|return|profit)\b(?!\s+(?:limit|if|when))|"
+    r"\bhow\s+much\s+(?:am\s+i|have\s+i\s+got)\s+(?:up|down)\b|"
+    r"持仓|盈亏|成本价|赚了多少|亏了多少", re.I)
 """A question about where the trader's own fills leave them: the position and its profit."""
 
 
@@ -1534,10 +1544,13 @@ def _money(value: float) -> str:
 _HOLDING = re.compile(
     rf"(?<![\w.]){_NUM}\s*(?:shares?\s+(?:of\s+)?|units?\s+(?:of\s+)?|contracts?\s+(?:of\s+)?)?"
     rf"\$?([A-Za-z]{{2,6}})\s*(?:(?:perpetual|perp|futures?|spot)\s+)?(?:contracts?\s+|shares?\s+)?"
-    rf"(?:(?:that\s+i\s+|which\s+i\s+)?(?:bought|purchased|acquired|entered|paid)\s+)?(?:@|at\s+)"
+    rf"(?:(?:that\s+i\s+|which\s+i\s+)?(?:bought|purchased|acquired|entered|paid)\s+)?"
+    # "short 50 shares of AAPL from 230" (a round-23 re-ask); "from 230 to 245" is a price path
+    rf"(?:@|at\s+|from\s+(?!\$?\d[\d,.]*\s*k?\s*(?:to|-|\u2013)\s*\$?\d))"
     # "at an average entry price of 205.00" (a hostile review, 2026-09-30)
     rf"(?:an?\s+)?(?:average\s+|avg\.?\s+)?(?:entry\s+|cost\s+)?(?:price\s+)?(?:of\s+)?"
-    rf"\s*\$?{_NUM}", re.I)
+    # "1 BTC perp at 10x" is a leverage, not a price of $10 (a hostile review, round 23)
+    rf"\s*\$?{_NUM}(?![\d.,]*\s*x\b)", re.I)
 """A holding written with its entry price: "100 COIN@$180", "50 MSTR at 320", "100 shares of
 NVDA bought at $200"."""
 
@@ -1548,10 +1561,59 @@ _PNL_ASKED = re.compile(
 """A question about the profit on a position, which one fill is enough to answer."""
 
 _STATED_MARK = re.compile(
-    rf"\b(?:if\s+(?:it'?s|it\s+is|the\s+price\s+is)|it'?s|price\s+is|trading|now)\s+(?:at\s+|"
-    rf"around\s+)?\$?\s*{_NUM}\s*(?:now|today|currently)?\s*[?.!]*\s*$", re.I)
+    rf"\b(?:if\s+(?:it'?s|it\s+is|the\s+price\s+is)|it'?s(?:\s+now)?|it\s+is(?:\s+now)?|price\s+is|"
+    rf"trading|now|"
+    # "It's now 234. What's my P&L?" and "BTC goes to 66,000" gave the trader's price and the
+    # live one was used (a hostile review, round 23)
+    rf"is\s+now|(?:goes|went|rises|rose|falls|fell|drops|dropped|moves|moved|gets|got|climbs|"
+    rf"climbed|rallies|rallied)\s+(?:up\s+|down\s+)?to)\s+(?:at\s+|around\s+)?\$?\s*{_NUM}"
+    rf"\s*(?:now|today|currently)?(?=\s*(?:[?.!,;\u2014\u2013]|-\s|$)|\s+(?:what|how|and|so)\b)",
+    re.I)
 """A price the trader gives for today: "... what's my P&L if it's at 175 now". The live price is
 used only when none is given (a judge's audit, 2026-09-29)."""
+
+
+def _short_pnl(text: str, shorts: list[tuple[str, float, float]],
+               price: Callable[[str], float] | None,
+               ) -> tuple[list[str], list[Source], dict[str, Any]]:
+    """Each short's open profit: the entry less the mark, times the size; the mark is the
+    trader's own price when one is given for a single name, else Bitget's live last price."""
+    stated = _STATED_MARK.search(text)
+    given = stated is not None and len({s for s, _q, _p in shorts}) == 1
+    leads: list[str] = []
+    lines: list[str] = []
+    data: dict[str, Any] = {}
+    total, marked = 0.0, 0
+    for symbol, qty, entry in shorts:
+        name = symbol.removesuffix("USDT")
+        mark: float | None = _number(stated.group(1)) if given and stated is not None else None
+        if mark is None and price is not None:
+            try:
+                mark = price(symbol)
+            except Exception:
+                mark = None
+        lines.append(f"{name} read: short {qty:g} from {entry:g}.")
+        if mark is None:
+            leads.append(f"you are short {qty:g} {name} from ${entry:,.2f}; no price to mark it "
+                         f"against answered")
+            continue
+        open_pnl = (entry - mark) * qty
+        total += open_pnl
+        marked += 1
+        where = f"the {mark:,.2f} you gave" if given else f"Bitget's live {mark:,.2f}"
+        leads.append(f"you are short {qty:g} {name} from ${entry:,.2f}; at {where} that is "
+                     f"{_money(open_pnl)} unrealised")
+        lines.append(f"{name}: a short gains as the price falls \u2014 ({entry:g} - {mark:g}) x "
+                     f"{qty:g} = {_money(open_pnl)}.")
+        data[symbol] = {"held": -qty, "average_cost": entry, "mark": mark}
+    if marked > 1:
+        leads.append(f"{_money(total)} unrealised in all")
+    lines.insert(0, "Bottom line: " + "; ".join(leads) + ".")
+    lines.append("Fees and funding are not in these figures unless you typed them; this reads the "
+                 "position you wrote, not your Bitget account.")
+    return (lines, [Source("computation", "argus.lui.journal:_short_pnl",
+                           "entry less mark, times the size, for each short")],
+            {"position": data})
 
 
 def position_and_pnl(text: str, *, now: datetime | None = None,
@@ -1569,6 +1631,10 @@ def position_and_pnl(text: str, *, now: datetime | None = None,
     text = repair_typos(text)
     if not POSITION_Q.search(text):
         return None
+    if re.search(r"\b\d+\s+[A-Za-z]{1,6}\s+(?:\d+(?:\.\d+)?\s+)?(?:puts?|calls?)\b", text, re.I):
+        # "I bought 10 NVDA 250 calls for $5 each" is an option position, priced at expiry
+        # elsewhere; read here it was 10 shares bought at $5 (a hostile review, round 23)
+        return None
     clock = now or datetime.now(UTC)
     legs, _notes = parse_text(text, now=clock.date())
     fills = [leg for leg in legs if leg.symbol and leg.price and leg.action in ("buy", "sell")
@@ -1576,9 +1642,21 @@ def position_and_pnl(text: str, *, now: datetime | None = None,
     if not fills:
         # Holdings written as "100 COIN@$180, 50 MSTR@$320": each is a buy at that price. The
         # P&L asked of them was never computed (a judge's audit, 2026-09-29).
-        fills = [Leg("buy", symbol, _number(m.group(3)), qty=_number(m.group(1)), text=m.group(0))
-                 for m in _HOLDING.finditer(text)
-                 if (symbol := _resolve_word(m.group(2))) is not None]
+        fills, shorts = [], []
+        for m in _HOLDING.finditer(text):
+            symbol = _resolve_word(m.group(2))
+            if symbol is None:
+                continue
+            if re.search(r"\bshort(?:ed)?\s+(?:sold\s+)?$|\bsold\s+short\s+$",
+                         text[max(0, m.start() - 24):m.start()], re.I):
+                # "I'm short 100 NVDA at 250" was read as a buy and its P&L given the wrong sign
+                # (a hostile review, round 23)
+                shorts.append((symbol, _number(m.group(1)), _number(m.group(3))))
+            else:
+                fills.append(Leg("buy", symbol, _number(m.group(3)), qty=_number(m.group(1)),
+                                 text=m.group(0)))
+        if shorts:
+            return _short_pnl(text, shorts, price)
         if not fills:
             return None
     elif len(fills) < 2 and not _PNL_ASKED.search(text):

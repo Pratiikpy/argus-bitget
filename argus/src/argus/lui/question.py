@@ -286,9 +286,17 @@ was refused as an order while the same sentence with "I think" in front was test
 The console still places nothing; it tests the reason."""
 
 
+_HELD_THEN_ASKED = re.compile(
+    r"^\s*(?:long|short)\s+\$?\d[\d,.]*\s*(?:k|m)?\s+(?:shares?\s+(?:of\s+)?|lots?\s+(?:of\s+)?)?"
+    r"[A-Za-z][\w.]{0,11}\b[^?]*[.,;]\s*[^?]*(?:\?|\b(?:p&l|pnl|profit|loss|lose|make|net|"
+    r"worth)\b)", re.I)
+"""A position stated, then a question about it: "Long 100 NVDA. NVDA moves -10%. P&L in dollars?"
+was refused as an order to buy (a hostile review, round 23)."""
+
+
 def is_order_instruction(raw: str) -> bool:
     """An instruction to trade, in any of the forms the console refuses."""
-    if PLAN_REQUEST.match(raw) or POSITION_THESIS.match(raw):
+    if PLAN_REQUEST.match(raw) or POSITION_THESIS.match(raw) or _HELD_THEN_ASKED.match(raw):
         return False
     return bool((ORDER_VERB.match(raw) and not INTERROGATIVE.match(raw))
                 or ORDER_CJK.search(raw) or _ORDER_REQUEST.search(raw)

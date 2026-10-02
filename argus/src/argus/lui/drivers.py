@@ -50,6 +50,13 @@ REVENUE_TAGS = ("RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues
                 "SalesRevenueNet")
 CAPEX_TAGS = ("PaymentsToAcquirePropertyPlantAndEquipment", "PaymentsToAcquireProductiveAssets")
 GROSS_PROFIT_TAGS = ("GrossProfit",)
+COSTS_TAGS = ("CostsAndExpenses", "OperatingCostsAndExpenses", "OperatingExpenses")
+COSTS_CLAIM = re.compile(r"\b(?:revenue|sales)\b[^.;]{0,40}\bfaster\s+than\b[^.;]{0,20}\b"
+                         r"(?:costs?|expenses?|spending)\b", re.I)
+"""Revenue growing faster than costs: settled by the two series' growth in the filings."""
+SEGMENT_CLAIM = re.compile(r"\b(?:azure|aws|google\s+cloud|iphone|ipad|mac|data\s+cent(?:er|re)|"
+                           r"gaming|segment|cloud)\b", re.I)
+"""A claim about one segment or product line, which company-level XBRL does not carry."""
 MARGIN_CLAIM = re.compile(r"\bmargins?\b", re.I)
 """A claim about margins: "margins are shrinking" is a claim about reported quarters, which gross
 profit over revenue in the filings settles (a judge, round 22: it was refused as a claim about
@@ -190,6 +197,9 @@ def facts(ticker: str, reason: str, *, cik_for: Callable[[str], int | None] | No
     out: dict[str, Any] = {"ticker": ticker, "cik": ciks[ticker], "revenue": got[ticker][0],
                            "revenue_tag": got[ticker][1], "fund": fund}
     own_cik = ciks.get(ticker)
+    if COSTS_CLAIM.search(reason) and own_cik is not None:
+        costs, costs_tag = _series(own_cik, COSTS_TAGS, get)
+        out["costs"], out["costs_tag"] = costs, costs_tag
     if MARGIN_CLAIM.search(reason) and own_cik is not None:
         gross, gross_tag = _series(own_cik, GROSS_PROFIT_TAGS, get)
         out["gross_profit"], out["gross_profit_tag"] = gross, gross_tag
@@ -239,6 +249,8 @@ def test(reason: str, found: Mapping[str, Any]) -> tuple[str, str, list[tuple[st
         return _spending_only(reason, ticker, found)
     if MARGIN_CLAIM.search(reason):
         return _margin_test(reason, found)
+    if COSTS_CLAIM.search(reason):
+        return _costs_test(reason, found)
     revenue: list[Quarter] = list(found.get("revenue") or [])
     rev_growth = growth(revenue)
     if not rev_growth:
@@ -253,6 +265,13 @@ def test(reason: str, found: Mapping[str, Any]) -> tuple[str, str, list[tuple[st
                      f"{_bn(revenue[-1].value)}, {_pct(last_g)} on the year; the last "
                      f"{len(trend)} quarters' growth " + ", ".join(_pct(g) for g in trend)
                      + f" ({slope}).", "SEC XBRL, company filings", rev_url))
+    if SEGMENT_CLAIM.search(reason) and not AI_CAPEX.search(reason):
+        # "Azure growth is speeding up" was "no engine reads this kind of claim" (round 23)
+        return ("not tested", f"The claim is about one segment or product line, and its figures "
+                              f"sit in the segment note of {ticker}'s 10-Q, which the "
+                              f"company-level XBRL facts read here do not carry; the company's "
+                              f"total revenue is shown below for context only, not as the "
+                              f"verdict.", evidence)
     if UNIT_CLAIM.search(reason) and found.get("builders") is None:
         # "deliveries are falling" was marked contradicted on total revenue (a judge, round 22):
         # a count of cars or units is not in the filings this reads, and revenue is not it
@@ -335,6 +354,38 @@ def test(reason: str, found: Mapping[str, Any]) -> tuple[str, str, list[tuple[st
                  " What the filings cannot test is the part still ahead: it breaks the quarter "
                  "revenue growth turns negative")
         line += " — each report is the next check."
+    return result, line, evidence
+
+
+def _costs_test(reason: str, found: Mapping[str, Any]
+               ) -> tuple[str, str, list[tuple[str, str, str]]]:
+    """Revenue against costs: each one's growth on the same quarter a year earlier, from the
+    filings; the claim holds when revenue grew faster in the latest quarter."""
+    from argus.market.statement_facts import CONCEPT_URL
+
+    ticker = str(found["ticker"])
+    rev = growth(list(found.get("revenue") or []))
+    costs = growth(list(found.get("costs") or []))
+    if not rev or not costs:
+        return ("not tested", f"{ticker}'s revenue and total costs could not both be read a year "
+                              f"apart from its XBRL filings, so the claim is not measured.", [])
+    rev_end, rev_g = rev[-1]
+    cost_end, cost_g = next(((e, g) for e, g in reversed(costs)
+                             if abs((e - rev_end).days) <= ALIGN_DAYS), costs[-1])
+    result = ("supported" if rev_g > cost_g + 0.005 else
+              "contradicted" if rev_g < cost_g - 0.005 else "not measurable")
+    line = (f"In the quarter to {rev_end:%b %Y} revenue grew {_pct(rev_g)} on the year and total "
+            f"costs and expenses {_pct(cost_g)} \u2014 revenue "
+            + ("faster, as the claim says" if result == "supported" else
+               "slower, against the claim" if result == "contradicted" else
+               "about as fast, so the claim is neither borne out nor broken")
+            + "; the filings do not split advertising revenue out at company level, so this is "
+              "all of it.")
+    evidence = [(f"{ticker} revenue {_pct(rev_g)} and costs and expenses {_pct(cost_g)} on the "
+                 f"year, quarter to {rev_end:%d %b %Y}.", "SEC XBRL, company filings",
+                 CONCEPT_URL.format(cik=int(found["cik"]), tag=found.get("costs_tag")
+                                    or "CostsAndExpenses"))]
+    del cost_end
     return result, line, evidence
 
 

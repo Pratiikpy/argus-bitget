@@ -35,7 +35,17 @@ THESIS_ASK = re.compile(
     # "My bull case for BTC: ... Which of these is strongest?" (a judge, round 12)
     r"\b(?:my|the)\s+(?:bull|bear)(?:ish)?\s+case\b|\bwhich\s+of\s+(?:these|my\s+reasons)\s+"
     r"(?:is|are)\s+(?:the\s+)?(?:strongest|weakest|best)\b|\bmy\s+thesis\b[^?]{0,200}"
-    r"\btrue\s+or\s+false\b", re.I)
+    r"\btrue\s+or\s+false\b|"
+    # "My view: META is cheap because ... Check that for me." and "Bearish AAPL: iPhone sales are
+    # slowing and the stock is too expensive. Is that right?" were never tested (a judge, round 23)
+    # ...and the same with no "My view:" before it, "META is cheap because ad revenue grows faster
+    # than costs. Check that" (a round-23 re-ask)
+    r"\bbecause\b[^?]{0,200}\b(?:check|test|verify|validate)\s+(?:that|this|it)\b|"
+    r"\bmy\s+(?:view|take|call|read)\s*:|\bcheck\s+(?:that|this|it)\s+(?:for\s+me|out)\b[^?]{0,0}|"
+    r"^\W*(?:i'?m\s+)?(?:bullish|bearish)\s+(?:on\s+)?\$?[A-Za-z]{1,6}\s*[:\-\u2014]|"
+    r"(?=[^?]*\b(?:because|bullish|bearish|cheap|expensive|overvalued|undervalued|slowing|"
+    r"growing|accelerating)\b)[^?]*\bis\s+(?:that|this|it)\s+(?:right|correct|true|fair)\b",
+    re.I)
 """A trader stating a view and asking for it to be tested."""
 
 _NOT_NAMES = frozenset({
@@ -483,7 +493,15 @@ def falsify(text: str, prior: list[str], *, book: str = "", memory: str = ""
                 lines_up.append(f"{revenue.group(1)}'s revenue growth turns negative on the year "
                                 f"(it was {revenue.group(3)} in the quarter to "
                                 f"{revenue.group(2)})")
-            if lines_up and re.search(r"accelerat|speed\w*\s+up|faster", r.text, re.I):
+            costs = re.search(r"revenue (?P<rev>[+-]\d+%) "
+                              r"and costs and expenses (?P<cost>[+-]\d+%) on "
+                              r"the year, quarter to (?P<end>[^.]+)", seen)
+            if costs is not None:
+                # revenue against costs: the threshold is the two growth rates crossing
+                lines_up = [f"total costs grow faster than revenue in the next report (to "
+                            f"{costs.group('end')} costs were {costs.group('cost')} on the year "
+                            f"against revenue {costs.group('rev')})"]
+            elif lines_up and re.search(r"accelerat|speed\w*\s+up|faster", r.text, re.I):
                 # a claim of acceleration breaks when the growth slows, well before it turns
                 lines_up = [x.replace("turns negative on the year", "slows for two quarters "
                                                                     "running")

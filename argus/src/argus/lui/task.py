@@ -181,6 +181,12 @@ def read_question(text: str, saved_book: str = "") -> Reading | str:
     if not text:
         return ("Type a question, for example: I hold 40% NVDA, 30% MSFT, 30% AAPL — should I "
                 "add 15% TSLA?")
+    if re.search(r"\b(?:add|buy)\s+-\s?\d|\bshort(?:ing)?\s+\d+(?:\.\d+)?\s*%|\bi\s+short\b|"
+                 r"\bshould\s+i\s+short\b", text, re.I):
+        # "should I add -15% TSLA?" was read as "add 1% TSLA" and recommended (a hostile review,
+        # round 23): this task weighs a long add, and a short is answered in the console
+        return ("This research task weighs adding a long position; a short is not one it runs. "
+                "Ask the console instead, e.g. \"what does shorting 15% TSLA do to my book\"")
     request = with_book(detect(text), saved_book, text)
     if (request is not None and request.kind in _NOT_A_TASK
             # "Should I go long ETH into next week's FOMC decision?" is about ETH, with the Fed as

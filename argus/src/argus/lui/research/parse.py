@@ -164,7 +164,7 @@ _SHOCK_NUMBER = re.compile(r"(-?\d+(?:\.\d+)?)\s*(?:%|percent\b|pct\b)", re.I)
 
 DOWN_WORDS = re.compile(
     r"\b(?:drop\w*|fall\w*|fell|crash\w*|dump\w*|tank\w*|sell[\s-]?off|sells?\s+off|"
-    r"selling\s+off|down|declin\w*)\b", re.I
+    r"selling\s+off|down|declin\w*|shed\w*|slid\w*|slip\w*|los(?:e|es|t))\b", re.I
 )
 
 
@@ -173,7 +173,8 @@ _UP_MOVE = re.compile(
     r"pump\w*|rebound\w*|up)\b", re.I)
 _DOWN_MOVE = re.compile(
     r"\b(?:drop\w*|fall\w*|fell|crash\w*|dump\w*|tank\w*|sell[\s-]?off|sells?\s+off|"
-    r"selling\s+off|down|declin\w*|crater\w*|plung\w*|sink\w*|sank|slump\w*|lose|loses|lost)\b",
+    r"selling\s+off|down|declin\w*|crater\w*|plung\w*|sink\w*|sank|slump\w*|lose|loses|lost|"
+    r"shed\w*|slid\w*|slip\w*)\b",
     re.I)
 _NEGATED = re.compile(r"\b(?:not|no|never|doesn'?t|don'?t|won'?t|isn'?t|didn'?t|without)\s+"
                       r"(?:\w+\s+){0,1}$", re.I)
@@ -1376,8 +1377,8 @@ def money_number(text: str) -> tuple[float, str]:
 
 _MONEY_NUM = r"\d{1,3}(?:[.,\s\u00a0\u202f]\d{3})+(?:[.,]\d{1,2})?|\d+(?:[.,]\d{1,2})?"
 _FOREIGN_MONEY = re.compile(
-    rf"(?P<pre>[\u20ac\u00a3\u00a5$])\s?(?P<a>{_MONEY_NUM})\s*(?P<ua>k|m)?\b|"
-    rf"(?P<b>{_MONEY_NUM})\s*(?P<ub>k|m)?\s*(?P<code>\u20ac|\u00a3|\u00a5|eur(?:os?)?|gbp|"
+    rf"(?P<pre>[\u20ac\u00a3\u00a5$])\s?(?P<a>{_MONEY_NUM})\s*(?P<ua>k|m|mio\.?|million|mn)?\b|"
+    rf"(?P<b>{_MONEY_NUM})\s*(?P<ub>k|m|mio\.?|million|mn)?\s*(?P<code>\u20ac|\u00a3|\u00a5|eur(?:os?)?|gbp|"
     rf"pounds?(?:\s+sterling)?|jpy|yen|usd|us\s+dollars?|dollars?)(?![\w])", re.I)
 _FX_PAIRS = {"\u20ac": ("EURUSDUSDT", False, "\u20ac"), "eur": ("EURUSDUSDT", False, "\u20ac"),
              "\u00a3": ("GBPUSDUSDT", False, "\u00a3"), "gbp": ("GBPUSDUSDT", False, "\u00a3"),
@@ -1429,7 +1430,8 @@ def in_us_dollars(text: str) -> tuple[str, list[str]]:
             return m.group(0)
         value, how = money_number(figure)
         unit = (m.group("ua") or m.group("ub") or "").lower()
-        value *= {"k": 1e3, "m": 1e6}.get(unit, 1.0)
+        # "1,5 Mio. \u20ac" is 1.5 million (a hostile review, round 23)
+        value *= 1e3 if unit == "k" else 1e6 if unit[:1] == "m" else 1.0
         if key is None:
             if how:
                 said.append(how)
@@ -1549,6 +1551,9 @@ def split_notation(text: str) -> str:
 def holding_pairs(text: str) -> list[tuple[int, str, float]]:
     """Every (position, symbol, weight) the text states, weights as fractions of one."""
     text = split_notation(text)
+    # A line break ends a holding, as a comma does: "NVDA 50%\nAAPL 50%" read "50%\nAAPL" as one
+    # pair and dropped NVDA (a hostile review, round 23). Same length, so positions still hold.
+    text = text.replace("\r\n", ", ").replace("\n", ",")
     found: list[tuple[int, str, float]] = []
     taken: set[tuple[int, int]] = set()
 
@@ -1756,12 +1761,20 @@ _CONTRACT_SHARES = re.compile(
     r"(?P<n>\d[\d,]*)\s+(?P<name>[A-Za-z][\w.]{0,11})\s+(?:option\s+)?contracts?\s+(?:at|of|with|x)\s+"
     r"(?P<m>\d[\d,]*)\s+shares?(?:\s+each)?", re.I)
 _FUTURES_COUNT = re.compile(
-    r"(?P<n>\d+)\s+(?:e-?mini\s+|micro\s+)?(?P<code>MES|ES)\s+(?:futures?\s+)?contracts?\b", re.I)
+    # "short 3 MES micro futures" and "1 E-mini S&P future" are positions too (round 23)
+    r"(?P<n>\d+)\s+(?:(?:e-?mini|micro)\s+)?(?:(?P<code>MES|ES)|(?P<sp>(?:e-?mini\s+)?S&?P(?:\s*500)?|"
+    r"SP500))\s+(?:(?:e-?mini|micro)\s+)?(?:futures?|contracts?)(?:\s+contracts?)?\b", re.I)
+_FUTURES_BARE = re.compile(r"(?P<n>\d+)\s+(?P<code>MES|ES)\b(?!\s*(?:futures?|contracts?))")
+"""A future by its code alone, in capitals: "short 3 MES" (a round-23 re-ask)."""
+_NAME_THEN_AMOUNT = re.compile(
+    r"\b(?P<side>long|short)\s+(?P<name>[A-Za-z]{1,6})\s+(?P<amount>\$\s?\d[\d,.]*\s*"
+    r"(?:k|m|mm|bn|million)?)(?![\w%])", re.I)
+""""long QQQ $1m": the amount after the name, put before it as the readers expect it."""
 _INDEX_FUTURES = {"ES": ("SP500USDT", 50), "MES": ("SP500USDT", 5)}
 """S&P 500 futures by their dollar multiplier: an E-mini is $50 times the index, a micro $5."""
 _BOOK_SHORT = re.compile(r"(?:\bshort(?:ing)?\s+|-\s*)$", re.I)
 _AMOUNT_HELD = re.compile(
-    r"\b(?:long|short|hold|own|holding|i\s+have)\s+(?:\$\s?\d|\d[\d,.]*\s*(?:k|m)?\s+"
+    r"\b(?:long|short|hold|own|holding|i\s+have)\s+(?:\$\s?\d|[A-Za-z]{1,6}\s+\$\s?\d|\d[\d,.]*\s*(?:k|m)?\s+"
     r"(?:shares?\s+(?:of\s+)?|contracts?\s+(?:of\s+)?|units?\s+(?:of\s+)?)?[A-Za-z])", re.I)
 """A holding stated as an amount inside the question: "Long 100 AAPL, short $20k QQQ"."""
 
@@ -1833,17 +1846,20 @@ def _price_book(text: str) -> PricedBook | None:
     def index_future(m: re.Match[str]) -> str:
         # "2 ES contracts" was shocked through a beta and never priced (round 22): an E-mini is
         # $50 (a micro $5) times the S&P 500, read at Bitget's SP500 index perpetual
-        symbol, multiplier = _INDEX_FUTURES[m.group("code").upper()]
+        code = (m.group("code") or ("MES" if re.search(r"micro", m.group(0), re.I) else "ES"))
+        symbol, multiplier = _INDEX_FUTURES[code.upper()]
         level = _last_price(symbol)
         if level is None:
             return m.group(0)
         value = _number(m.group("n")) * multiplier * level
-        converted.append(f"{m.group('n')} {m.group('code').upper()} = {m.group('n')} x "
+        converted.append(f"{m.group('n')} {code.upper()} = {m.group('n')} x "
                          f"${multiplier} x S&P 500 at {level:,.2f} = ${value:,.0f}")
         return f"${value:.0f} SP500 "
 
+    text = _NAME_THEN_AMOUNT.sub(lambda m: f"{m['side']} {m['amount']} {m['name']}", text)
     text = _CONTRACT_SHARES.sub(per_contract, text)
     text = _FUTURES_COUNT.sub(index_future, text)
+    text = _FUTURES_BARE.sub(index_future, text)
     text, said = in_us_dollars(text)
     converted.extend(said)
     taken: list[tuple[int, int]] = []
@@ -2678,6 +2694,12 @@ def with_estimates(request: ResearchRequest | None, text: str) -> ResearchReques
         n for n in request.notes if "forecast" not in n))
 
 
+_WEIGHT_OF_ADD = re.compile(
+    r"\b(?:what|which|how\s+much)\s+(?:weight|size|amount|percentage|allocation)\s+(?:of|in)\s+"
+    r"(?P<name>\$?[A-Za-z]{1,6})\s+(?:would|could|should|can|will)\s+(?=(?:keep|leave|hold)\b)",
+    re.I)
+
+
 def detect(text: str) -> ResearchRequest | None:
     """A research request, or None when the question is not one — see :func:`read_request`.
 
@@ -2685,9 +2707,12 @@ def detect(text: str) -> ResearchRequest | None:
     analyses: in "what if the Nasdaq drops 10%? I hold 40% gold" the Nasdaq is the shock, not a
     holding, and a note saying it was read as NDX100USDT would describe a reading never used.
     """
-    request = with_estimates(with_named_shock(with_short_side(as_comparison(
+    # "What weight of AMD would keep my volatility where it is?" asks for an add, and was read as
+    # a comparison of five names (a round-23 re-ask)
+    text = _WEIGHT_OF_ADD.sub(r"should I add \g<name> and ", text)
+    request = with_stated_amounts(with_estimates(with_named_shock(with_short_side(as_comparison(
         _with_leverage_exposure(_with_stated_cash(read_request(text), text), text), text), text),
-        text), text)
+        text), text), text)
     if request is not None and request.book and request.notional is None:
         # "I have $600 in SOL and $400 in TSLA, am I too risky?" was sized on the first amount,
         # $600, not the $1,000 the book holds (a first-time user, round 12): a book stated in
@@ -2702,6 +2727,49 @@ def detect(text: str) -> ResearchRequest | None:
     read_as = [n for s, n in _read(text).items() if n and s in request.symbols
                and n not in request.notes]
     return replace(request, notes=(*request.notes, *read_as)) if read_as else request
+
+
+def with_stated_amounts(request: ResearchRequest | None, text: str) -> ResearchRequest | None:
+    """A shock asked of holdings the question states in amounts, read as a stress of exactly
+    those holdings, each with its side.
+
+    "I'm long $1m QQQ and short $1m TQQQ. Nasdaq falls 5%. Net?" was read as a $2m long QQQ, the
+    opposite sign (a hostile review, round 23): no reader took the amounts as the book unless the
+    question said "my book". Only when no saved-book reading is in play (the caller's ``with_book``
+    runs later and keeps a stated book), a single shock is stated, and the amounts price."""
+    if request is not None and request.kind not in (ResearchKind.STRESS, ResearchKind.ANALOGUE):
+        return request
+    if request is not None and request.kind is ResearchKind.ANALOGUE and not re.search(
+            r"\b(?:could|might|may|if|would)\b[^?.]{0,30}\b(?:drop|fall|lose|rise|gain|rall)\w*\s+"
+            r"(?:by\s+)?\d", text, re.I):
+        # an odds question ("will it be higher in 48 hours") stays one; "TSLA could drop 10%"
+        # beside a stated holding is a stress of it (round 23)
+        return request
+    if not _AMOUNT_HELD.search(text) or len(holding_shocks(text)) >= 2:
+        return request
+    shocks = shock_numbers(text)
+    if not shocks or not (_FALL_WORD.search(text) or _UP_MOVE.search(text)
+                          or re.search(r"\bmov(?:es|ed|e)\s+[+-]?\d", text, re.I)):
+        return request
+    priced = priced_book(text)
+    if priced is None or not priced.weights or not priced.value:
+        return request
+    if request is not None and request.book and set(request.book) == set(priced.weights) and all(
+            (request.book[s] < 0) == (priced.weights[s] < 0) for s in priced.weights):
+        return request
+    match = shocks[-1]
+    said = stated_direction(text, match.start())
+    size = abs(float(match.group(1)))
+    down = match.group(1).startswith("-") or said == -1 or (said is None
+                                                             and DOWN_WORDS.search(text))
+    subject = shock_subject(text, set(priced.weights))
+    notes = tuple(n for n in (request.notes if request is not None else ())
+                  if "no book was stated" not in n and "equal weight" not in n)
+    return ResearchRequest(kind=ResearchKind.STRESS, symbols=tuple(priced.weights),
+                           book=dict(priced.weights), shock_pct=-size if down else size,
+                           shock_on=subject, notional=Decimal(str(round(priced.value, 2))),
+                           notes=(*notes, "the holdings are the amounts stated in the question, "
+                                          "each on its own side: " + ", ".join(priced.lines)))
 
 
 _ASKS_COMPARISON = re.compile(r"\b(?:compar\w*|versus|vs\.?|which\s+(?:has|is|one)\s+(?:the\s+)?"
@@ -2903,7 +2971,9 @@ def _cjk_request(raw: str, symbols: tuple[str, ...]) -> ResearchRequest | None:
 
 
 _NAMED_SHOCK = re.compile(
+    # "AAPL loses 10%", "QQQ slides 3%", "sheds 20%" were not shocks (a hostile review, round 23)
     r"(?<![a-z])(?:drop\w*|fall\w*|fell|crash\w*|crater\w*|tank\w*|dump\w*|plung\w*|spik\w*|jump\w*|"
+    r"los(?:e|es|t|ing)|shed\w*|slid\w*|slip\w*|sink\w*|sank|"
     r"surg\w*|rall\w*|ris(?:e|es|ing)|rose|gain\w*|climb\w*|soar\w*|gap\w*\s+(?:down|up)|"
     r"sell[\s-]?off|sells?\s+off|stress|shock|down|up|move)"
     r"[^?.]{0,20}?-?\d+(?:\.\d+)?\s*%|-?\d+(?:\.\d+)?\s*%\s*(?:\w+\s+){0,3}(?:drop|fall|crash|"
@@ -2912,6 +2982,7 @@ _NAMED_SHOCK = re.compile(
 
 
 _FALL_WORD = re.compile(r"\b(?:drop|fall|fell|crash|crater|tank|dump|plung|slump|decline|"
+                        r"shed|slid|slip|lose|loses|lost|"
                         r"sell[\s-]?off|sells?\s+off|spike|surge|rall(?:y|ies))\w*", re.I)
 """A move word that makes a stated book a shock question; "sizing up COIN 8%" is an add."""
 
@@ -2946,7 +3017,9 @@ def shock_subject(raw: str, weighted: set[str]) -> str | None:
     tech book); a named holding is the subject when it is the only name ("MSTR craters 30%, how
     much of my book"). Index words mean QQQ, the S&P means SPY."""
     if _SP_SUBJECT.search(raw):
-        return "SPYUSDT"
+        # an S&P holding (an index future read as SP500) takes the S&P move itself, not through
+        # its beta to SPY: "short 3 MES ... S&P rallies 2%" was stressed at -1.67% (round 23)
+        return "SP500USDT" if "SP500USDT" in weighted else "SPYUSDT"
     if _INDEX_SUBJECT.search(raw):
         # "what if the nasdaq drops 10%, I hold gold": the index is shocked and gold is held.
         # Checked before the named instruments, which here are holdings.
@@ -2991,6 +3064,7 @@ _JOINT_SHOCK = re.compile(
     r"[A-Za-z][A-Za-z0-9.&-]{1,14})+)\s+(?:both|all|each|together)?\s*"
     r"(?:(?:is|are|were|will|would)\s+)?"
     r"(?P<verb>drop\w*|fall\w*|fell|crash\w*|tank\w*|dump\w*|plung\w*|los\w+|sink\w*|rall\w*|"
+    r"shed\w*|slid\w*|slip\w*|"
     r"jump\w*|surg\w*|gain\w*|ris(?:e|es|ing)|rose|climb\w*)\s+(?:by\s+)?"
     r"(?P<pct>\d+(?:\.\d+)?)\s*%", re.I)
 """One move stated for several names together: "NVDA and TSLA both fall 10%"."""
@@ -3014,7 +3088,8 @@ def holding_shocks(raw: str) -> dict[str, float]:
     for match in _JOINT_SHOCK.finditer(raw):
         # "What if NVDA and TSLA both fall 10%?" applied the fall to one of them (round 20)
         size = float(match.group("pct"))
-        move = -size if _SHOCK_FALLS.match(match.group("verb")) else size
+        move = -size if (_SHOCK_FALLS.match(match.group("verb"))
+                         or re.match(r"(?:shed|slid|slip)", match.group("verb"), re.I)) else size
         for name in re.split(r"\s*(?:,|\band\b|&)\s*", match.group("names")):
             symbols, _ = research_symbols(name)
             if len(symbols) == 1:
@@ -3736,7 +3811,9 @@ def read_request(text: str) -> ResearchRequest | None:
         if held:
             book = {s: 1.0 / len(held) for s in held}
             notes.append(
-                "no weights were given for your holdings, so they were read as equal weight"
+                "no weight was given, so the one holding is read as the whole book"
+                 if len(held) == 1 else
+                 "no weights were given for your holdings, so they were read as equal weight"
             )
 
     if candidate and candidate in book and size is None:
@@ -4664,7 +4741,10 @@ def _plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, di
             held = [s for s in symbols if s not in _SHOCK_SUBJECTS and s != subject]
             if held:
                 book = {s: 1.0 / len(held) for s in held}
-                notes.append("no weights were given for your holdings, so they were read as "
+                # one holding is the whole book, not "equal weight" (a hostile review, round 23)
+                notes.append("no weight was given, so the one holding is read as the whole book"
+                             if len(held) == 1 else
+                             "no weights were given for your holdings, so they were read as "
                              "equal weight")
         request = ResearchRequest(kind=kind, symbols=tuple(book), book=book, shock_pct=shock,
                                   shock_on=subject, parsed_by="model", notes=tuple(notes))

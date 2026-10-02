@@ -179,8 +179,26 @@ def a_price_shock_is_a_stress(text: str, book: str, planned: ResearchRequest | N
     return planned, audit
 
 
+def the_stated_amounts_are_the_book(text: str, book: str, planned: ResearchRequest | None,
+                                    patterned: ResearchRequest | None,
+                                    audit: dict[str, Any]) -> tuple[ResearchRequest | None,
+                                                                    dict[str, Any]]:
+    """A stress of holdings the question states in amounts uses exactly those holdings, each on
+    its side, whichever reader planned it: "long $1m QQQ and short $1m TQQQ" was stressed as $2m
+    long QQQ on the live console (a hostile review, round 23)."""
+    from argus.lui.research.parse import with_stated_amounts
+
+    if planned is None or planned.kind is not ResearchKind.STRESS:
+        return planned, audit
+    fixed = with_stated_amounts(planned, text)
+    if fixed is planned or fixed is None:
+        return planned, audit
+    return fixed, {**audit, "detail": "the holdings stated in amounts kept as the book"}
+
+
 RULES: tuple[Rule, ...] = (leverage_needs_leverage, the_add_is_not_a_holding,
-                           the_specific_reading_stands, a_price_shock_is_a_stress)
+                           the_specific_reading_stands, a_price_shock_is_a_stress,
+                           the_stated_amounts_are_the_book)
 """Applied in this order to the planner's reading; each may replace it with the patterns'."""
 
 
