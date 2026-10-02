@@ -146,7 +146,8 @@ def _decision(row: Mapping[str, Any]) -> str:
     # the largest change is said in the pill.
     cut = max((abs(float(t.get("proposed_weight") or 0) - float(t.get("approved_weight") or 0))
                for t in targets), default=0.0)
-    pill = (f"<span class='pill red'>kernel changed it by up to {cut * 100:.2f} pt</span>"
+    size = (f"{cut * 100:.2f} pt" if cut >= 0.001 else f"{cut * 10_000:.1f} bp")
+    pill = (f"<span class='pill red'>kernel changed it by up to {size} of weight</span>"
             if kernel and cut else
             "<span class='pill red'>kernel changed it</span>" if kernel
             else "<span class='pill'>kernel passed it</span>" if kernel is not None else "")

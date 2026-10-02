@@ -40,7 +40,7 @@ def test_renders_the_record_metrics_envelope_and_decisions() -> None:
     assert "undefined" not in html
     assert "n/a" in html  # a null Sharpe is printed as n/a with its reason, never as zero
     assert "median -2.3, p05 -20.2, p95 +16.8" in html
-    assert "kernel changed it by up to 10.00 pt" in html and "bound by gross_cap" in html
+    assert "kernel changed it by up to 10.00 pt of weight" in html and "bound by gross_cap" in html
     assert "proposed 30.00%, approved 20.00%" in html
     # The logged reasons are kept, behind a control (first-user audit, 2026-09-29).
     assert "<details><summary>The logged reasons" in html and "no edge after costs" in html
