@@ -202,16 +202,24 @@ class TestRound19Scenarios:
     def test_rate_cut_is_modelled_not_only_described(self) -> None:
         from argus.lui.research.macro import _rate_scenario
 
-        sens = {"pct_per_10bp": -1.4, "days": 61}
+        sens = {"pct_per_10bp": -1.4, "corr_10y": -0.6, "days": 61}
         line = _rate_scenario("What would a Fed rate cut do to my NVDA holding?", "NVDA", sens)
         assert line is not None
         assert "-25bp" in line and "+3.5%" in line and "quarter point" in line
         assert "not a forecast" in line
+        assert "rates explain about" not in line
+
+    def test_a_loose_fit_says_how_little_rates_explain(self) -> None:
+        from argus.lui.research.macro import _rate_scenario
+
+        sens = {"pct_per_10bp": -1.33, "corr_10y": -0.24, "days": 62}
+        line = _rate_scenario("What would a Fed rate cut do to my NVDA holding?", "NVDA", sens)
+        assert line is not None and "rates explain about 6% of its daily moves" in line
 
     def test_hike_size_is_read_and_a_plain_yield_question_is_not_a_scenario(self) -> None:
         from argus.lui.research.macro import _rate_scenario
 
-        sens = {"pct_per_10bp": -1.0, "days": 61}
+        sens = {"pct_per_10bp": -1.0, "corr_10y": -0.7, "days": 61}
         hike = _rate_scenario("what if the Fed hikes 50bp, what happens to tech", "QQQ", sens)
         assert hike is not None and "+50bp" in hike and "-5.0%" in hike
         assert _rate_scenario("what is the 10-year yield doing", "QQQ", sens) is None

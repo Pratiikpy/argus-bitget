@@ -378,7 +378,16 @@ def _rate_scenario(raw_text: str, target: str, sensitivity: Mapping[str, Any]) -
             + f", {name} would move about {effect:+.1f}% on that sensitivity. A Fed move and the "
               f"10-year are different series — the long yield often moves before the Fed does, "
               f"or against it — so this is an association from {sensitivity['days']} days, not "
-              f"a forecast.")
+              f"a forecast." + _fit_caveat(float(sensitivity["corr_10y"])))
+
+
+def _fit_caveat(rho: float) -> str:
+    """A loose fit said beside the figure it loosens: a "barely" link printed a +3.3% scenario
+    with no word on how little of the move rates explain."""
+    if abs(rho) >= 0.5:
+        return ""
+    return (f" At a correlation of {rho:+.2f}, rates explain about {rho * rho:.0%} of its daily "
+            f"moves, so most of any real move would come from something else.")
 
 
 def _macro(symbol: str | None, book: Mapping[str, float] | None = None,
