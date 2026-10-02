@@ -40,9 +40,9 @@ _ADVICE = re.compile(
     r"(?:trust|follow|listen\s+to)\s+(?:you|this|argus)|are\s+you\s+(?:giving\s+(?:me\s+)?)?"
     r"(?:financial|investment)\s+advice)\b", re.I)
 _HOW_TO_BUY = re.compile(
-    r"\bhow\s+(?:do\s+i|to|can\s+i|would\s+i)\s+(?:buy|get|purchase|start\s+(?:buying|trading|"
-    r"investing))\s*(?:(?:some\s+)?(?:crypto|bitcoin|btc|ethereum|eth|stocks?|shares?|coins?|"
-    r"tokens?)\b|[?.!]*\s*$)|\bhow\s+(?:do\s+i|to|can\s+i)\s+(?:start|begin)\s+(?:trading|investing)\b|\bwhere\s+(?:do|"
+    r"\bhow\s+(?:do\s+i|to|can\s+i|would\s+i)\s+(?:actually\s+|just\s+|even\s+)?(?:buy|get|purchase|"
+    r"start\s+(?:buying|trading|investing))\s*(?:(?:some\s+)?(?:crypto|bitcoin|btc|ethereum|eth|"
+    r"stocks?|shares?|coins?|tokens?|this|it|that|them)\b|[?.!]*\s*$)|\bhow\s+(?:do\s+i|to|can\s+i)\s+(?:start|begin)\s+(?:trading|investing)\b|\bwhere\s+(?:do|"
     r"can)\s+i\s+buy\b|\b(?:i['\u2019]?m|i\s+am)\s+(?:brand\s+)?new\b[^?]*\b(?:where|how)\b[^?]*"
     r"\b(?:start|begin)\b|\bwhere\s+(?:do|should)\s+i\s+(?:start|begin)\b[?.!]*\s*$", re.I)
 _LOSE_MORE = re.compile(

@@ -19,7 +19,11 @@ _SUBJECT = (r"(?:argus|this(?:\s+(?:site|website|page|tool|app|console|product|t
             r"service|project))?)")
 
 INTRO_Q = re.compile(
-    rf"^\s*(?:(?:hi|hello|hey)\W+)?(?:so\s+)?(?:what\s+(?:is|'s)\s+{_SUBJECT}|what\s+does\s+"
+    # "hi, I'm new here. what is this and what can you do?" was declined (a first-time user,
+    # round 19, row 636): a greeting and "I'm new" are a preamble, not the question
+    rf"^\s*(?:(?:hi|hello|hey)(?:\s+there)?\W+)?(?:i'?m\s+new(?:\s+(?:here|to\s+(?:this|trading|"
+    rf"crypto|investing)))?\W+|first\s+time\s+here\W+)?"
+    rf"(?:so\s+)?(?:what\s+(?:is|'s)\s+{_SUBJECT}|what\s+does\s+"
     rf"{_SUBJECT}\s+do|who\s+(?:is|'s)\s+(?:{_SUBJECT}|it)\s+for|who\s+(?:made|built)\s+{_SUBJECT}|"
     rf"what\s+can\s+(?:you|argus|this(?:\s+\w+)?)\s+do(?:\s+for\s+me)?|what\s+(?:can|should)\s+i\s+"
     rf"ask(?:\s+(?:you|it|argus|here))?|how\s+do\s+i\s+use\s+{_SUBJECT}|what\s+am\s+i\s+looking\s+at|"
@@ -37,6 +41,65 @@ ASK_Q = re.compile(
 """The question a visitor asks right after the introduction: "what can I ask" returned the same
 paragraph as "what is this" (a first-time user, round 18, row 632)."""
 
+
+NO_NAME_BUY_Q = re.compile(
+    r"^\W*(?:(?:ok(?:ay)?|so|well|hmm|right|alright)\W+)*(?:what\s+should\s+i\s+(?:buy|invest\s+in|"
+    r"get|trade|put\s+(?:my\s+)?money\s+in)|what\s+(?:do\s+you\s+recommend|would\s+you\s+buy)|"
+    r"what'?s\s+a\s+good\s+(?:buy|investment|trade)|should\s+i(?:\s+(?:buy|invest|do\s+it|go\s+for\s+"
+    r"it|buy\s+(?:it|now|something)))?)\s*(?:now|then|today)?\s*[?.!]*\s*$", re.I)
+"""A buy question with nothing named: "what should I buy", "ok so should I?" (a first-time user,
+round 19, row 636 — both were declined with the record reader's list)."""
+
+THANKS_Q = re.compile(
+    r"^\W*(?:ok(?:ay)?\W+)?(?:thanks?|thank\s+you|thx|ty|cheers|great|perfect|cool|nice|awesome|"
+    r"got\s+it)\b[^?]*$", re.I)
+"""Thanks or an acknowledgement with no question in it."""
+
+THAT_NUMBER_Q = re.compile(
+    r"^\W*(?:and\s+|so\s+)?what\s+(?:does|do)\s+(?:that|this|those|these)\s+(?:number|figure|"
+    r"numbers|figures|percentage|stat)s?\s+mean\b|^\W*(?:i\s+)?(?:don'?t|do\s+not)\s+understand"
+    r"(?:\s+(?:that|this|the\s+numbers?))?\W*$|^\W*what\s+does\s+(?:that|this|it)\s+mean\W*$",
+    re.I)
+"""Asking what the last answer's figures mean, which named nothing to look up (row 637)."""
+
+
+def no_name_buy_answer(capital: float | None, earlier: str | None = None
+                       ) -> tuple[list[str], list[Source], dict[str, Any]]:
+    name = earlier.removesuffix("USDT") if earlier else "BTC"
+    held = (f" With the ${capital:,.0f} you mentioned: \"how much could I lose with "
+            f"${capital:,.0f} in {name} this week\"." if capital else "")
+    about = (f" On {name}, the name you were just asking about: \"how much could I lose on "
+             f"{name} this week\" or \"what would make {name} a bad buy now\"."
+             if earlier else "")
+    return ([
+        "Bottom line: this console makes no buy call — it does not know your situation — but it "
+        "will measure any choice you are weighing before you make it." + about + held,
+        "Name what you are considering and ask what it would mean: \"how much could I lose on BTC "
+        "this week\", \"is TSLA riskier than NVDA\", \"what does it cost to buy $500 of ETH\".",
+        "If you have nothing in mind yet, say how much you have — \"I have $1,000, what should I "
+        "do\" — and it shows what that sum went through in a year in three broad markets.",
+    ], [], {"no_name_buy": True})
+
+
+def thanks_answer() -> tuple[list[str], list[Source], dict[str, Any]]:
+    return (["Bottom line: glad it helped. Ask anything else about a market Bitget lists — "
+             "a price, a risk, a cost, or a view you want tested."], [], {"thanks": True})
+
+
+def that_number_answer(previous: str) -> tuple[list[str], list[Source], dict[str, Any]]:
+    from argus.lui.research import research_symbols
+
+    named = research_symbols(previous)[0]
+    subject = named[0].removesuffix("USDT") if named else "it"
+    return ([
+        f"Bottom line: the last answer, on {subject}, gives each figure with what it was "
+        f"computed from; ask for the one you mean by its word and it is explained in plain "
+        f"language.",
+        "For example: \"what does 24h range mean\", \"what is funding\", \"what is the "
+        "spread\", \"what is beta\", \"what is volatility\", \"what is a drawdown\".",
+        f"Or ask it simpler: \"explain that simpler\" restates the last answer about {subject} "
+        f"in plain words.",
+    ], [], {"that_number": subject})
 
 def ask_answer() -> tuple[list[str], list[Source], dict[str, Any]]:
     lines = [

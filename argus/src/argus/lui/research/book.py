@@ -751,6 +751,20 @@ def _hedge_plan(book: Mapping[str, float], value: Decimal,
         {"legs": rows, "pick": best["leg"], "live": data.live}
 
 
+def book_r_squared(weights: Mapping[str, float], columns: Mapping[str, Sequence[float]],
+                   bench: Sequence[float]) -> float | None:
+    """How much of the book's open-session moves QQQ explains (R²), or None without the data.
+
+    Every hedge line reads it: the book report said a QQQ short "would remove little" of a crypto
+    book's risk while the stress and impact answers sized the same short as neutralising it (a
+    first-time user and a hostile review, round 19, rows 639 and 652)."""
+    if not bench or not all(s in columns for s in weights):
+        return None
+    series = [sum(weights[s] * columns[s][i] for s in weights) for i in range(len(bench))]
+    rho = correlation(series, bench)
+    return None if rho is None else rho * rho
+
+
 def _hedge_line(book_beta: float | None, r_squared: float | None = None) -> str | None:
     """The hedge the Open Theme asks for, as a number: a QQQ short sized to the book's open-session
     beta neutralises the market-driven part of the risk. Stated with its limit — beta hedges the
@@ -956,6 +970,18 @@ def _impact_lines(report: CopilotReport, request: ResearchRequest,
                                   if b0 is not None and b1 is not None else "")
                 + (f" — the book's market risk scales by about {final / held:.0%} of today's."
                    if held else ".")))
+        elif request.target == 0.0 and held:
+            # "should I sell my SOL?" was answered with a budget ceiling for a 0% "proposal"
+            # (round 19, row 634): a sale is read as what the book becomes without it.
+            b0, b1 = impact.beta_before, impact.beta_after
+            lines.insert(0, (
+                f"Bottom line: selling all of {add} ({held:.0%} of the book) leaves the rest "
+                f"scaled up to fill it"
+                + (f"; the book's beta goes from {b0:.2f} to {b1:.2f}" if b0 is not None
+                   and b1 is not None else "")
+                + (f", and {add} carried {impact.risk_share_before:.0%} of its risk"
+                   if impact.risk_share_before is not None else "")
+                + ". Whether to sell is your call; the lines below are what changes."))
         elif ceiling is not None:
             verdict = ("inside" if (share or 0.0) <= request.budget else "over")
             lines.append(
@@ -989,8 +1015,10 @@ def _impact_lines(report: CopilotReport, request: ResearchRequest,
             )
         # The engine's own render repeats the risk-share sentence written just above; keep the
         # rest (beta shift, diversification, closest existing holding).
-        lines.extend(line for line in impact.render() if "of total portfolio risk" not in line)
-        hedge = _hedge_line(impact.beta_after)
+        lines.extend(line for line in impact.render() if "of total portfolio risk" not in line
+                     and not (request.target == 0.0 and "adding it" in line))
+        hedge = _hedge_line(impact.beta_after, book_r_squared(
+            report.weights_after, columns, columns.get(BENCHMARK, [])))
         if hedge:
             lines.append(hedge)
     if report.risk_after is not None and not standalone:

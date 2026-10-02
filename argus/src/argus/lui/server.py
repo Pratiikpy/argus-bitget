@@ -1001,10 +1001,13 @@ def handle_ask(
     new = memory_model.combined(text, _model_for(visitor, count=False), now,
                                 price_of=_price_now)
     facts = mem.merge(facts, new)
+    facts = mem.apply_sales(facts, text, now)
     if mem.recall_asked(text) and not new:
         # "What do you remember about me?" is answered from the memory the browser sent, in the
         # trader's own words; it was declined while seven facts were held (a judge, round 14).
-        return {"lines": mem.recall_one(text, facts) or mem.recall_lines(facts), "sources": [],
+        return {"lines": (mem.recall_view(text, facts) or mem.recall_one(text, facts)
+                          or [*mem.recall_lines(facts), *mem.recall_missing(text, facts)]),
+                "sources": [],
                 "data": {}, "refused": False,
                 "reason": "", "classified_by": "memory", "memory": mem.dumps(facts),
                 "remembered": []}
@@ -1036,6 +1039,7 @@ def handle_ask(
         # "13/02/2024" and "02/13/2024" read as the date they are before anything else reads the
         # question (a hostile review, 2026-09-30); an order that had to be assumed is said.
         text, date_note = iso_dates(text)
+        text, others_note = _without_others_holdings(text)
         # Holdings said in chat stand in for My book when that field is empty: "I hold 40% NVDA,
         # 30% MSFT, 30% AAPL" was forgotten by the next question, which read a book of XOM alone
         # (a judge, round 13, 2026-09-30). The field, when filled, is the trader's saved word and
@@ -1058,6 +1062,8 @@ def handle_ask(
                 for line in payload["lines"]]
         if date_note and payload.get("lines"):
             payload["lines"] = [*payload["lines"], f"Assumed: {date_note}."]
+        if others_note and payload.get("lines"):
+            payload["lines"] = [payload["lines"][0], others_note, *payload["lines"][1:]]
         from argus.lui.honesty import order_prefix
 
         prefix = order_prefix(text)
@@ -1109,7 +1115,11 @@ def handle_ask(
         if checks:
             facts = mem.merge_checks(facts, checks)
     if new and (payload.get("refused") or by.startswith("declined") or by == "ngram"
-                or (_statement_only(text) and str(payload.get("intent")) in _DESK_RECORD)):
+                or (_statement_only(text) and str(payload.get("intent")) in _DESK_RECORD
+                    # only an answer the record reader gave: an engine's payload carries the
+                    # ledger classifier's intent too, and a tested thesis was replaced by "noted"
+                    # (a judge, round 19, row 659)
+                    and (by in ("patterns", "ngram") or by.startswith(("router", "ngram"))))):
         noted = {f.key() for f in new}
         payload.update(lines=mem.acknowledgement([f for f in facts if f.key() in noted]),
                        refused=False, reason="",
@@ -1224,6 +1234,21 @@ def _answer(
 
     if intro.ASK_Q.search(text):
         return engine_payload(*intro.ask_answer(), by="intro")
+    if intro.THANKS_Q.search(text):
+        return engine_payload(*intro.thanks_answer(), by="intro")
+    if prior and intro.THAT_NUMBER_Q.search(text):
+        return engine_payload(*intro.that_number_answer(prior[-1]), by="intro")
+    if (_OWN_LOSS_Q.search(text) and not research_symbols(text)[0] and not about_the_record(text)
+            and text.strip().rstrip("?").lower() != _BOOK_REPORT_ASK):
+        own = _own_loss(text, prior, now=now, visitor=visitor, book=book)
+        if own is not None:
+            return own
+    if intro.NO_NAME_BUY_Q.search(text) and not research_symbols(text)[0]:
+        capital = next((float(f.value) for f in _MEMORY.get() if f.kind == "capital"
+                        and _number_like(f.value)), None)
+        named_before = next((research_symbols(t)[0][0] for t in reversed(prior)
+                             if research_symbols(t)[0]), None)
+        return engine_payload(*intro.no_name_buy_answer(capital, named_before), by="intro")
     if intro.INTRO_Q.search(text):
         # "What is this site and who is it for" was told "that" had nothing to refer to (a
         # first-time user, 2026-09-30).
@@ -1401,6 +1426,12 @@ def _answer(
     from argus.lui.research import sizing
 
     held_risk = mem.risk_budget_usd(list(_MEMORY.get()))
+    if sizing.STOP_WHERE.search(text) and not about_the_record(text):
+        named_for_stop = research_symbols(text)[0]
+        placed = sizing.stop_for(text, named_for_stop[0] if named_for_stop else None,
+                                 price=_price_now, atr=_atr_fraction)
+        if placed is not None:
+            return engine_payload(*placed, by="sizing")
     if sizing.asks_for_size(text) and not about_the_record(text):
         # "$50,000 account, risk at most 2% per trade with a 4% stop — what position size" was
         # answered with the desk's abstention count (a judge's audit, 2026-09-29).
@@ -1433,6 +1464,11 @@ def _answer(
         if first_steps.lines:
             return engine_payload(list(first_steps.lines), [], {}, by="newcomer")
         named_first = research_symbols(text)[0]
+        if not named_first and prior and re.search(r"\b(?:it|this|that|them|now)\b", text, re.I):
+            # "is it a good time to buy?" right after a DOGE price was worked on BTC (a first-time
+            # user, round 19, row 642): "it" is the name the conversation is on
+            named_first = next((research_symbols(t)[0] for t in reversed(prior)
+                                if research_symbols(t)[0]), ())
         subject = named_first[0].removesuffix("USDT") if named_first else "BTC"
         answered = _answer(first_steps.reask.format(name=subject), prior, now=now,
                            visitor=visitor, book=book)
@@ -1716,6 +1752,14 @@ def _answer(
         # an answer from three questions earlier (the round-7 judge and first-user audits,
         # 2026-09-30): the reasons are the previous answer's own evidence and sources.
         again = _answer(prior[-1], prior[:-1], now=now, visitor=visitor, book=book)
+        if again.get("classified_by") == "intro":
+            # the last reply was about using the console, which has no evidence to show; it was
+            # quoted back as "the last answer said the last answer…" (round 19, row 637)
+            return engine_payload([
+                "Bottom line: \"why\" shows what an answer about a market rests on — its "
+                "figures and their sources. The last reply was about how to use this console, so "
+                "there is nothing behind it to show; ask about a market and then ask why."],
+                [], {"why_after_intro": True}, by="intro")
         before = [str(line) for line in again.get("lines") or []]
         engine_said = str(again.get("classified_by") or "") not in (
             "patterns", "ngram", "router", "declined", "declined-off-topic", "")
@@ -1789,6 +1833,11 @@ def _answer(
             again["turns"] = [*prior, text][-12:]
             return again
     cold = _COLD_ABOUT.match(text)
+    if cold is not None and prior and follow_up(text, prior, book) is not None:
+        # "and ETH?" after a question about bitcoin's week is that question asked of ETH, which
+        # the follow-up reader below answers; read cold it became a risk profile and "no earlier
+        # question" (a first-time user, round 19, row 634)
+        cold = None
     if cold is not None:
         # "what about COIN?" or "COIN" with nothing before it was answered with the session clock
         # or declined (a first-time-user audit, round 17): a name alone is a request to look at it.
@@ -2144,6 +2193,104 @@ _LATIN_OTHER = re.compile(r"\b(?:quoi|pourquoi|est-ce|wie|warum|welche|ist|wenn|
                           re.I)
 
 
+_OWN_LOSS_Q = re.compile(
+    r"\bhow\s+much\s+(?:money\s+)?(?:can|could|would|might|will|do|did)\s+i\s+lose\b|"
+    r"\b(?:is|are)\s+my\s+(?:portfolio|book|holdings|positions|bag|stack|coins)\s+(?:too\s+)?"
+    r"(?:risky|safe|dangerous)\b|\bhow\s+(?:risky|safe|dangerous)\s+(?:is|are)\s+my\s+(?:portfolio|"
+    r"book|holdings|positions|bag|stack|coins)\b|\bi(?:'m|\u2019m|\s+am)\s+(?:so\s+|really\s+|"
+    r"very\s+)?(?:scared|afraid|worried|nervous|anxious)\b|\bwhat(?:'s|\s+is)\s+the\s+most\s+i\s+"
+    r"(?:can|could)\s+lose\b|\b(?:worst|bad)\s+(?:day|week|month)\s+for\s+my\s+(?:portfolio|book|"
+    r"holdings)\b|\bmy\s+(?:portfolio|book|holdings)'?s?\s+worst\s+(?:single\s+)?(?:day|week)\b|"
+    r"\bworst\s+single\s+day\s+for\s+my\b", re.I)
+"""The trader's own risk or loss, with no instrument named: "is my portfolio risky", "how much
+could I lose in a bad week", "I'm scared of losing money". Four of them were answered with the
+desk's own track record (a first-time user, round 19, row 633), and "worst single day for my book"
+with a desk decision (a judge, row 662)."""
+
+
+_BOOK_REPORT_ASK = "how risky is my book"
+"""The book report's own question, asked inward; it is answered by the book engine directly."""
+
+
+def _own_loss(text: str, prior: list[str], *, now: datetime | None, visitor: str,
+              book: str) -> dict[str, Any] | None:
+    """The saved or stated book's measured risk, led by the loss in the trader's own money."""
+    from argus.lui.research.parse import priced_book
+
+    if not book.strip():
+        basics = _answer("what happens if I lose money", prior, now=now, visitor=visitor, book="")
+        said = [str(x) for x in basics.get("lines") or []]
+        if basics.get("refused") or not said:
+            return None
+        basics["lines"] = [
+            "Bottom line: that depends on what you hold and how much — tell me, in My book or in "
+            "the question (\"$600 BTC, $300 ETH\"), and it measures the worst day that book has "
+            "actually had, in dollars.", *(unlead(x) for x in said)]
+        basics["classified_by"] = "own-risk"
+        basics["turns"] = [*prior, text][-12:]
+        return basics
+    again = _answer(_BOOK_REPORT_ASK, prior, now=now, visitor=visitor, book=book)
+    lines = [str(x) for x in again.get("lines") or []]
+    if again.get("refused") or not lines:
+        return None
+    worst = next((m for x in lines if (m := re.search(
+        r"worst 24-bar window in the observed history \((\d+) hourly bars[^)]*\) would have "
+        r"moved this book (-?\d+(?:\.\d+)?)%", x))), None)
+    priced = priced_book(book)
+    value = priced.value if priced is not None and priced.value else None
+    if value is None:
+        value = next((float(f.value) for f in _MEMORY.get()
+                      if f.kind == "capital" and _number_like(f.value)), None)
+    week = re.search(r"\bweek", text, re.I)
+    if worst is not None:
+        pct = float(worst.group(2))
+        money = f" — about ${abs(pct) / 100 * value:,.0f} of your ${value:,.0f}" if value else ""
+        lead = (f"Bottom line: the worst 24 hours this book actually had in the last 30 days cost "
+                f"{pct:+.2f}%{money}."
+                + (" A week can lose more than its worst day; this record measures 24-hour "
+                   "windows, and the figures below say where the risk sits."
+                   if week else " That is what happened, not a limit on what can; the figures "
+                   "below say where the risk sits."))
+        lines = [lead, *(unlead(x) for x in lines)]
+    again["lines"] = lines
+    again["classified_by"] = "own-risk"
+    again["turns"] = [*prior, text][-12:]
+    return again
+
+_OTHERS = (r"(?:friend|wife|husband|partner|brother|sister|dad|father|mum|mom|mother|son|"
+           r"daughter|boss|colleague|co-?worker|advisor|adviser|broker|uncle|aunt|cousin|"
+           r"neighbou?r|roommate|flatmate|girlfriend|boyfriend)")
+_OTHERS_HOLDINGS = re.compile(
+    rf"\b(?:my|his|her|their|a)\s+{_OTHERS}(?:'s|\u2019s)?\s+(?:holds?|owns?|has|is\s+(?:long|short|"
+    rf"holding|all[\s-]+in|in)|bought|portfolio\s+is|book\s+is)\b[^.;!?]*?"
+    rf"(?=\s*(?:,\s*)?\band\b\s+(?:my|i|what|should|how)\b|\s*,\s*(?:what|how|should|is|are|"
+    rf"can|could|would|if|i)\b|[.;!?]|$)", re.I)
+"""Another person's holdings, said beside the trader's own question: "My friend holds 100% COIN
+and my advisor says buy MSTR" built the trader's book from the friend's COIN (a hostile review,
+round 19, row 650). The memory reader already keeps such sentences out; the research reader now
+does too."""
+
+
+def _without_others_holdings(text: str) -> tuple[str, str]:
+    """The question with another person's holdings taken out, and the note saying so."""
+    found = [m.group(0).strip() for m in _OTHERS_HOLDINGS.finditer(text)]
+    if not found:
+        return text, ""
+    rest = _OTHERS_HOLDINGS.sub("", text)
+    rest = re.sub(r"^\W*(?:and\s+)?", "", rest).strip()
+    if len(rest) < 4:
+        return text, ""
+    said = "; ".join(f"“{f}”" for f in found)
+    return rest, (f"Not read as yours: {said} — someone else's holdings are left out of every "
+                  f"figure here; say what you hold to have it measured.")
+
+def _number_like(value: Any) -> bool:
+    try:
+        float(value)
+    except (TypeError, ValueError):
+        return False
+    return True
+
 def saved_book_first(lines: list[str]) -> list[str]:
     """The saved book, said under the lead rather than near the foot.
 
@@ -2154,7 +2301,9 @@ def saved_book_first(lines: list[str]) -> list[str]:
                   if line.startswith("Assumed: used your saved book")), None)
     if saved is None or saved <= 1:
         return lines
-    held = lines[saved].removeprefix("Assumed: used your saved book").strip(" .()")
+    held = lines[saved].removeprefix("Assumed: used your saved book").strip().removesuffix(".")
+    # only the one wrapping pair: "(... 50 TSLA = $17,820 (356.40))" kept its inner bracket open
+    held = held[1:-1] if held.startswith("(") and held.endswith(")") else held
     return [lines[0], f"Assumed: read against your saved book in My book — {held}; clear it to ask "
                       f"without it.", *lines[1:saved], *lines[saved + 1:]]
 

@@ -168,6 +168,12 @@ _NUMBER_WORDS = {"half": "0.5", "one": "1", "two": "2", "three": "3", "four": "4
 def spelled_out(text: str) -> str:
     """Percentages as a trader types them, rewritten as figures: "3 percent", "one percent",
     "two pct" were missed by every pattern here (a hostile review, 2026-09-30)."""
+    # European figures: "account 25.000" sized a $25 account and "risk 0,5%" read as no loss
+    # limit (a hostile review, round 19, row 647). A dot before exactly three digits that ends the
+    # figure is a thousands mark; a comma before one or two digits and a % is a decimal point.
+    text = re.sub(r"(?<![\d.,])(\d{1,3}(?:\.\d{3})+)(?![\d.,]\d)",
+                  lambda m: m.group(1).replace(".", ""), text)
+    text = re.sub(r"(?<![\d.,])(\d+),(\d{1,2})(?=\s*%)", r"\1.\2", text)
     text = re.sub(r"\b(" + "|".join(_NUMBER_WORDS) + r")\s+(?:percent|per\s+cent|pct)\b",
                   lambda m: _NUMBER_WORDS[m.group(1).lower()] + "%", text, flags=re.I)
     return re.sub(r"(\d+(?:\.\d+)?)\s*(?:percent|per\s+cent|pct)\b", r"\1%", text, flags=re.I)
@@ -369,6 +375,93 @@ LOSS_COMPARE = re.compile(
 """A percentage fall set against a dollar loss: "If BTC drops 50 percent, is that worse than losing
 10000 dollars?" shocked QQQ and never made the comparison (a hostile review, round 12)."""
 
+
+STOP_WHERE = re.compile(
+    r"\bwhere\s+(?:should|would|do|does|to)\s+(?:i\s+)?(?:put|place|set)\s+(?:my\s+|a\s+|the\s+)?"
+    r"stop\b|\bwhere\s+(?:should|would|do|does)\s+(?:my|the|a)\s+stop\s+(?:go|be|sit)\b|"
+    r"\bwhere\s+(?:is|should\s+be)\s+(?:my|the)\s+stop\b|\bhow\s+(?:far|wide|tight)\s+"
+    r"(?:should|can|must)\s+(?:my|the|a)\s+stop\b", re.I)
+"""Where a stop goes, asked of a position whose size and loss limit the question states."""
+
+_POSITION_PCT = re.compile(
+    r"\b(?P<p>\d+(?:\.\d+)?)\s*%\s+(?:of\s+(?:my\s+|the\s+)?(?:account|capital|book|portfolio)\s+"
+    r"(?:in|on|into)\s+)?(?P<name>[A-Za-z]{2,10})\b", re.I)
+_LOSS_PCT = re.compile(
+    r"\b(?:can'?t|cannot|won'?t|don'?t\s+want\s+to)\s+(?:afford\s+to\s+)?lose\s+(?:more\s+than\s+)?"
+    r"(?P<p>\d+(?:\.\d+)?)\s*%|\b(?:max(?:imum)?\s+loss|loss\s+limit|risk(?:ing)?)\s+(?:of\s+|is\s+)?"
+    r"(?P<p2>\d+(?:\.\d+)?)\s*%", re.I)
+
+
+def stop_for(text: str, symbol: str | None, *,
+             price: Callable[[str], float] | None = None,
+             atr: Callable[[str], float | None] | None = None,
+             ) -> tuple[list[str], list[Source], dict[str, Any]] | None:
+    """Where the stop goes for a stated position and loss limit, or None if the question does not
+    state both.
+
+    "$50k account, short 10% COIN, can't lose more than 3% of the account — where should my stop
+    go?" went to the desk's own record, then to a long's stop levels (a judge, round 19, row 666).
+    The arithmetic is the sizing rule run backwards: the stop sits where a stop-out costs the loss
+    limit, the 0.12% taker round trip included. Whether that distance is inside the name's
+    ordinary noise is said beside it, from its own 4-hour ATR."""
+    text = spelled_out(text)
+    if symbol is None or not STOP_WHERE.search(text):
+        return None
+    account = stated_capital(text) or account_of(text)
+    position: float | None = None
+    for m in _POSITION_PCT.finditer(text):
+        if account and symbol.removesuffix("USDT").lower() == m.group("name").lower():
+            position = account * float(m.group("p")) / 100
+    if position is None:
+        from argus.lui.research.parse import parse_notional
+
+        without_account = re.sub(r"\$\s*\d[\d,.]*\s*(?:k|m)?\s+account", "", text, flags=re.I)
+        stated = parse_notional(without_account)
+        position = float(stated) if stated else None
+    loss = stated_risk_usd(text)
+    limit = _LOSS_PCT.search(text)
+    if loss is None and account and limit is not None:
+        loss = account * float(limit.group("p") or limit.group("p2")) / 100
+    if position is None or loss is None or position <= 0:
+        return None
+    distance = loss / position - ROUND_TRIP
+    name = symbol.removesuffix("USDT")
+    short = bool(re.search(r"\bshort", text, re.I))
+    if distance <= 0:
+        return _refusal(f"a ${loss:,.0f} loss limit on a ${position:,.0f} position is used up by "
+                        f"the {ROUND_TRIP:.2%} round trip alone, so no stop fits — trade smaller.")
+    entry: float | None = None
+    try:
+        entry = price(symbol) if price is not None else None
+    except Exception:  # the stop is still a distance without a quote
+        entry = None
+    level = (f", about {entry * (1 + distance if short else 1 - distance):,.2f} against an entry "
+             f"at Bitget's last {entry:,.2f}" if entry else "")
+    lines = [f"Bottom line: put the stop {distance:.1%} {'above' if short else 'below'} your entry"
+             f"{level} — a stop-out then loses ${loss:,.0f} on the ${position:,.0f} "
+             f"{'short' if short else 'position'}, the {ROUND_TRIP:.2%} taker round trip included."]
+    one = None
+    try:
+        one = atr(symbol) if atr is not None else None
+    except Exception:
+        one = None
+    if one:
+        multiple = distance / one
+        lines.append(
+            f"That is {multiple:.1f}x {name}'s 14-period ATR on Bitget's 4-hour candles "
+            f"({one:.2%} of price) — " + (
+                "inside its ordinary swing, so it would likely be hit by noise; a smaller "
+                "position allows a wider stop for the same loss." if multiple < 1.5 else
+                "outside its ordinary 4-hour swing, so noise alone is unlikely to hit it."))
+    if account:
+        lines.append(f"Assumed: the position is ${position:,.0f} and the loss limit ${loss:,.0f}, "
+                     f"both read from the ${account:,.0f} account you stated.")
+    lines.append("A stop is an order, not a guarantee: a gap through it fills worse. This is "
+                 "analysis, not advice — you make the call.")
+    return lines, [Source(kind="computation", ref="argus.lui.research.sizing.stop_for",
+                          detail="loss limit / position, less the taker round trip")], {
+        "stop": {"distance": distance, "position": position, "loss": loss, "side":
+                 "short" if short else "long"}}
 
 def loss_compare(text: str, symbol: str | None
                  ) -> tuple[list[str], list[Any], dict[str, Any]] | None:

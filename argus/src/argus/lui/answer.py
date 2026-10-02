@@ -311,6 +311,16 @@ def answer_performance(ledger: PaperLedger, question: Question) -> Answer:
             lines.append(t("perf.few_trades", lang, trades=perf.trades,
                            abstentions=perf.abstentions, days=perf.window_days,
                            net=_dollars(perf.net_pnl), win=win))
+            from argus.paper.corrections import VOIDED_SEQS
+
+            if VOIDED_SEQS and lang != "zh":
+                # The two void rows carry `verdict: trade` in the ledger and are counted with
+                # the abstentions, because the risk layer refused them; said, so the count
+                # reconciles with a raw read of the ledger (a hostile review, round 19, row 656).
+                seqs = " and ".join(str(s) for s in sorted(VOIDED_SEQS))
+                lines.append(f"The abstentions include seq {seqs}: the ledger stores them as "
+                             f"trades, but the risk layer had refused them and no position was "
+                             f"taken, so they are void as trades (`paper/corrections.py`).")
             lines.extend(undefined)
         else:
             lines.extend(undefined)
@@ -384,6 +394,16 @@ def answer_decision_why(ledger: PaperLedger, question: Question) -> Answer:
         )
 
     entry = rows[-1]
+    if re.search(r"\b(?:buy|bought|sell|sold|short(?:ed)?|long|trade[ds]?|position|enter(?:ed)?|"
+                 r"open(?:ed)?)\b", question.raw, re.I):
+        from argus.paper.corrections import is_voided
+
+        taken = [r for r in rows if r.verdict == "trade" and not is_voided(r.seq)]
+        if taken:
+            # "Why did the desk buy NVDA on 2026-09-28" answered with that day's last stand-aside
+            # (seq 827) instead of the buy itself (seq 797): a question about a trade is about
+            # the row that took it (a hostile review, round 19, row 651).
+            entry = taken[-1]
     lang = question.language
     lines = [
         t("why.header", lang, seq=entry.seq, symbol=entry.symbol, verdict=entry.verdict,

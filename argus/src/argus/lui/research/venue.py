@@ -216,10 +216,16 @@ def _leverage(symbol: str, multiple: float, side: str, *, closure: str | None = 
         f"Bottom line: at {multiple:g}x {side} a {distance:.1%} {verb} in {ticker} wipes the margin"
         f" — and {ticker} moved that far against a {side} within 24 hours from {hits / windows:.0%}"
         f" of the hourly entry points in the last {days:.0f} days. Its worst 24 hours against a "
-        f"{side} was {worst:.1%}"
+        # from hourly highs and lows, which is wider than the close-to-close worst day other
+        # answers quote; a first-time user saw 5.4% here and -4.2% there with no reason given
+        f"{side} was {worst:.1%}, measured from hourly highs and lows (wider than a close-to-close "
+        f"figure)"
         + ("." if not survive else
-           f", so {multiple:g}x would have survived every day in the window (anything up to "
-           f"{survive}x did)." if multiple <= survive else
+           # "10x would have survived every day (anything up to 17x did)" read as a green light to
+           # a newcomer (round 19, row 640): it is what one month allowed, and it says so
+           f": {multiple:g}x stayed clear of liquidation in this one month — up to {survive}x "
+           f"would have — which says nothing about the next month's worst day." if multiple <=
+           survive else
            f", which only {survive}x or less would have survived.")
     ]
     try:

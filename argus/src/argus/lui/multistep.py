@@ -48,7 +48,18 @@ _SPLIT = re.compile(
 
 _HOLDINGS_ONLY = re.compile(
     r"^\s*(?:i\s+(?:hold|own|have)|i'?m\s+(?:long|short)|my\s+(?:book|portfolio|holdings)\s+"
-    r"(?:is|are))\b(?!.*\b(?:what|how|should|which|when|where|why|is\s+it|can)\b)", re.I)
+    r"(?:is|are)|"
+    # "I want to short TSLA." states the trade the next part asks about; split off, its side was
+    # lost and a short got a long's liquidation price (a hostile review, round 19, row 646)
+    r"i\s+(?:want|plan|intend|am\s+going|'?m\s+going|'?d\s+like|would\s+like)\s+to\s+"
+    r"(?:go\s+)?(?:short|long|buy|sell))\b(?!.*\b(?:what|how|should|which|when|where|why|is\s+it|can)\b)",
+    re.I)
+
+_WORST_CASE = re.compile(r"^\s*(?:and\s+)?(?:what(?:'s|\s+is|\s+are)\s+(?:my|the)\s+worst[\s-]case|"
+                         r"how\s+much\s+(?:can|could|would)\s+i\s+lose)\b", re.I)
+"""A worst case asked beside a leveraged trade is that trade's worst case, which the leverage
+reader answers (worst 24 hours against the side, liquidation odds); read alone it went to the book
+stress engine and asked for holdings the question never had (row 646)."""
 
 
 _ELABORATES = re.compile(
@@ -93,7 +104,10 @@ def parts(question: str, book: str = "") -> list[Part] | None:
     joined: list[str] = []
     for piece in pieces:
         if joined and (_HOLDINGS_ONLY.match(piece) or _HOLDINGS_ONLY.match(joined[-1])
-                       or _ELABORATES.match(piece)):
+                       or _ELABORATES.match(piece)
+                       or (_WORST_CASE.match(piece)
+                           and re.search(r"\bliquidat|\b\d+(?:\.\d+)?\s*x\b|\bleverage",
+                                         joined[-1], re.I))):
             joined[-1] = f"{joined[-1]} {piece}"
         else:
             joined.append(piece)

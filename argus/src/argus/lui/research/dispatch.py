@@ -53,6 +53,7 @@ from argus.lui.research.book import (
     _hedge_plan,
     _impact_lines,
     _within_limits,
+    book_r_squared,
     impact_sizing,
 )
 from argus.lui.research.claims import (
@@ -528,7 +529,21 @@ def _compare_lead(rows: Sequence[Mapping[str, Any]]) -> str:
     by_beta = sorted(rows, key=lambda r: -abs(r["beta_open"] or 0))
     riskiest, second = by_beta[0], by_beta[1]
     wildest = max(rows, key=lambda r: r["realised_vol"] or 0.0)
-    if abs(riskiest["beta_open"] or 0) - abs(second["beta_open"] or 0) < BETA_TIE:
+    calmest = min(rows, key=lambda r: r["realised_vol"] or 0.0)
+    tied = abs(riskiest["beta_open"] or 0) - abs(second["beta_open"] or 0) < BETA_TIE
+    hi, lo = wildest["realised_vol"] or 0.0, calmest["realised_vol"] or 0.0
+    if tied and wildest is not calmest and lo > 0 and hi / lo >= 1.2:
+        # "is TSLA riskier than NVDA" was told they carry the same risk, above 35% against 27% a
+        # year and -8.0% against -3.3% worst days (a first-time user, round 19, row 641): with
+        # the betas tied, how far each swings is the risk that differs, so it leads.
+        worst = (f", and its worst 24 hours was {wildest['worst_24h']:+.1f}% against "
+                 f"{calmest['worst_24h']:+.1f}%" if wildest.get("worst_24h") is not None
+                 and calmest.get("worst_24h") is not None else "")
+        return (f"Bottom line: {_t(wildest['symbol'])} is the riskier — it swings about "
+                f"{hi:.0%} a year against {_t(calmest['symbol'])}'s {lo:.0%}{worst}; their market "
+                f"risk per dollar is about the same (beta {riskiest['beta_open'] or 0:.2f} and "
+                f"{second['beta_open'] or 0:.2f}), so the difference is each name's own moves")
+    if tied:
         lead = (f"Bottom line: {_t(riskiest['symbol'])} and {_t(second['symbol'])} carry about "
                 f"the same market risk per dollar (beta {riskiest['beta_open'] or 0:.2f} and "
                 f"{second['beta_open'] or 0:.2f})")
@@ -1270,16 +1285,18 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             moved = next((i for i, line in enumerate(lines)
                           if re.search(r" is [+-][\d.]+% over 24 hours on Bitget", str(line))),
                          None)
+            from argus.lui.research.parse import _period_days as _asked_period
+
             if (moved is not None and lines
-                    and re.search(r"\b(?:what|how)\s+(?:is|are|'s)\b[^?]{1,40}\bdoing\b",
-                                  raw_text, re.I)):
+                    and (re.search(r"\b(?:what|how)\s+(?:is|are|'s)\b[^?]{1,40}\bdoing\b",
+                                   raw_text, re.I)
+                         # "what's happening with Bitcoin this week" asks for the week too
+                         or (_asked_period(raw_text) or 0) > 1)):
                 # "what is the S&P 500 doing" led with "nothing in 48h names SP500" and gave the
                 # move itself second (2026-09-30): the move is what was asked, the news is why.
                 head = str(lines[0]).removeprefix("Bottom line: ")
                 top = str(lines[moved])
-                from argus.lui.research.parse import _period_days
-
-                asked_days = _period_days(raw_text)
+                asked_days = _asked_period(raw_text)
                 if asked_days and asked_days > 1:
                     # "How is Bitcoin doing this week?" was answered with the 24-hour move (a
                     # hostile review, round 18, row 621): the period asked leads, 24h follows.
@@ -1422,18 +1439,26 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             shocked_name = "QQQ" if shocked == BENCHMARK else _t(shocked)
             outcomes = stress_by_beta(weights=request.book, columns=columns,
                                       benchmark=columns[shocked], shocks=shocks)
+            # A book stated in amounts has a value, and the move is said in it too: "what does a
+            # 15% crypto crash do to me in dollars?" got percentages only (a hostile review,
+            # round 19, row 655).
+            stated_value = getattr(priced_book(raw_text), "value", 0.0) or 0.0
             for outcome in outcomes:
                 if outcome.portfolio_move_pct is None:
                     lines.append(f"{outcome.shock}: unavailable — {outcome.reason}")
                     continue
                 worst = outcome.worst_position
                 lead_here = stated_leads and outcome is outcomes[0]
+                in_money = (f" (about ${abs(outcome.portfolio_move_pct) / 100 * stated_value:,.0f}"
+                            f" of ${stated_value:,.0f})" if stated_value else "")
                 lines.append(
                     ("Bottom line: " if lead_here else "")
                     + f"If {shocked_name} moves {outcome.shock.removeprefix('benchmark ')}: your "
                     f"book moves "
-                    f"about {outcome.portfolio_move_pct:+.2f}%"
-                    + (f", {'hardest hit' if worst[1] < 0 else 'biggest move'} "
+                    f"about {outcome.portfolio_move_pct:+.2f}%{in_money}"
+                    # the stress engine keeps the lowest move: under a rally that is the
+                    # smallest gain, and "biggest move" named it (a hostile review, row 645)
+                    + (f", {'hardest hit' if worst[1] < 0 else 'smallest gain'} "
                        f"{worst[0].removesuffix('USDT')} {worst[1]:+.2f}%"
                        if worst else "") + " (market-driven part only, through each beta)."
                 )
@@ -1473,7 +1498,15 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                                 f"beta to {shocked_name} is {book_beta:+.2f}, so the shock reaches "
                                 f"it only faintly and no hedge against it is needed.")
             if shocked == BENCHMARK:
-                hedge = _hedge_line(book_beta)
+                r2 = book_r_squared(request.book, columns, columns.get(BENCHMARK, []))
+                hedge = _hedge_line(book_beta, r2)
+                if r2 is not None and r2 < 0.3:
+                    lines = [line.replace(f"the {shocked_name} hedge below is the other lever",
+                                          f"a {shocked_name} hedge would do little here, as "
+                                          f"below").replace(
+                                 f"the {shocked_name} hedge below is the lever",
+                                 f"a {shocked_name} hedge would do little here, as below")
+                             for line in lines]
             elif abs(book_beta) >= 0.2:
                 side = "short" if book_beta > 0 else "long"
                 hedge = (f"Hedge: {side} {shocked_name} worth about {abs(book_beta):.0%} of the "

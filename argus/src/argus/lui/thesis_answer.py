@@ -205,7 +205,15 @@ def _words(text: str) -> set[str]:
 def _thesis_turn(prior: list[str]) -> int | None:
     """The last turn that stated a thesis to test, looking back past earlier revisions of it."""
     return next((i for i in range(len(prior) - 1, -1, -1) if asks(prior[i])
-                 and not REVISE.search(prior[i])), None)
+                 and not REVISE.search(prior[i]) and not _follow_up_only(prior[i])), None)
+
+
+def _follow_up_only(text: str) -> bool:
+    """"Challenge my thesis: what is the strongest case against it?" asks about the thesis before
+    it and names nothing new; read as the thesis itself, it became one (round 19, row 661)."""
+    return bool((AGAINST.search(text) or FALSIFY.search(text) or STRONGEST.search(text))
+                and not research_symbols_in(text)
+                and not re.search(r"\b(?:because|since|due\s+to|as)\b", text, re.I))
 
 
 def _apply(revision: str, reasons: list[Any]) -> tuple[list[Any], list[Any]] | None:
@@ -303,9 +311,20 @@ _A_VIEW = re.compile(r"\bi\s+(?:think|believe|feel|expect|reckon|bet)\b|\bmy\s+(
 
 FALSIFY = re.compile(
     r"\bwhat\s+(?:would|could|will)(?:\s+it)?\s+(?:prove|show|make|mean|tell)"
-    r"\b[^?.]{0,40}\b(?:wrong|invalid\w*)|\bwhat\s+would\s+change\s+my\s+mind\b|"
+    r"\b[^?.]{0,40}\b(?:wrong|invalid\w*)|\bwhat\s+would\s+change\s+(?:my|your)\s+mind\b|"
+    r"\bwhat\s+(?:would|could)\s+make\s+(?:me|you)\s+change\s+(?:my|your)\s+mind\b|"
     r"\bhow\s+(?:would|will|do)\s+i\s+know\s+(?:if\s+)?(?:i(?:'m|\s+am))?\s*wrong\b", re.I)
 """A follow-up asking what would show the trader's thesis is wrong."""
+
+AGAINST = re.compile(
+    r"\bcase\s+against\b|\bbear(?:ish)?\s+case\s+(?:against|on)\b|\bargue\s+against\b|"
+    r"\bargument\s+against\b|\bdevil'?s\s+advocate\b|\bpoke\s+holes\b|\bchallenge\s+(?:my|this|"
+    r"the|that|it)\b|\bwhat\s+(?:could|would|might)\s+(?:go\s+wrong|break\s+it|kill\s+it)\b|"
+    r"\bweak(?:est)?\s+(?:points?|spots?|links?)\b|\brisks?\s+to\s+(?:my|this|the)\s+thesis\b",
+    re.I)
+"""Asking for the other side of a thesis already stated. "What is the strongest case against my
+NVDA thesis?" was ranked as the strongest reason FOR it, and "Challenge my thesis: what is the
+strongest case against it?" was asked to name a stock (a judge, round 19, rows 660-661)."""
 
 _BREAKS = {
     "REVERSION": "the price keeps going the way it has — a fresh extreme, not a return",
@@ -330,7 +349,12 @@ def falsify(text: str, prior: list[str], *, book: str = "", memory: str = ""
     reason still standing, what would break it, what today's data already says of it, and a stop
     level from the last 20 daily bars (a judge, round 15: it was told "that" had nothing to refer
     to, and the reasons were not turned into things that can be watched)."""
-    if not FALSIFY.search(text) or asks(text):
+    against = bool(AGAINST.search(text))
+    if not (FALSIFY.search(text) or against):
+        return None
+    if asks(text) and not _follow_up_only(text) and (research_symbols_in(text)
+                                                     or thesis_reasons_in(text)):
+        # a new thesis stated in the same breath is tested as one, not read as a follow-up
         return None
     current = _standing(list(prior))
     if current is None:
@@ -355,14 +379,28 @@ def falsify(text: str, prior: list[str], *, book: str = "", memory: str = ""
     name = research_names(earlier)
     case = _case(earlier)
     now_said: dict[str, str] = {}
+    evidence: dict[str, list[str]] = {}
     try:
         _lines, _sources, data = answer(earlier, book=book, memory=memory)
         for row in (data.get("thesis") or {}).get("tested", []):
             now_said[str(row.get("reason"))] = str(row.get("result"))
+            evidence[str(row.get("reason"))] = [str(e.get("text", "")) for e in
+                                                row.get("evidence") or [] if isinstance(e, dict)]
     except Exception:
         pass
-    out = [f"Bottom line: your {case} case for {name} is wrong if any of these happens; each is "
-           f"set beside what today's data already says of that reason."]
+    if against:
+        contra = [r for r in kept if now_said.get(r.text) == "contradicted"]
+        untested = [r for r in kept if now_said.get(r.text) in ("not_measurable", "not_tested",
+                                                                 "not measurable", "not tested")]
+        out = [f"Bottom line: the case against your {case} case for {name} — "
+               + (f"today's data already contradicts {len(contra)} of its {len(kept)} reasons; "
+                  if contra else "today's data contradicts none of its reasons, so the case "
+                  "against is what could still break them; ")
+               + (f"{len(untested)} cannot be tested on today's data; " if untested else "")
+               + "each reason below with the event that would break it."]
+    else:
+        out = [f"Bottom line: your {case} case for {name} is wrong if any of these happens; each "
+               f"is set beside what today's data already says of that reason."]
     for r in kept:
         state = now_said.get(r.text)
         today = {"contradicted": " Today's data already contradicts it.",
@@ -391,7 +429,43 @@ def falsify(text: str, prior: list[str], *, book: str = "", memory: str = ""
     if dropped:
         out.append("Assumed: " + " and ".join(f"\"{r.text}\"" for r in dropped)
                    + " stays set aside, as you said.")
-    return out, [], {"thesis": {"name": name, "case": case}, "falsifiers": [r.text for r in kept]}
+    if against:
+        for r in kept:
+            for row in _forward_risk(r.text, now_said.get(r.text), evidence.get(r.text, [])):
+                out.append(row)
+    return out, [], {"thesis": {"name": name, "case": case}, "falsifiers": [r.text for r in kept],
+                     "against": against}
+
+
+def _forward_risk(reason: str, state: str | None, evidence: list[str]) -> list[str]:
+    """What cuts against a reason the data backs: the part no filing has settled yet, and how
+    much the name depends on the driver it names."""
+    from argus.lui import drivers
+
+    out: list[str] = []
+    share = next((m for e in evidence if (m := re.search(
+        r"^(\w+)'s quarterly revenue came to (\d+%) of their capex", e))), None)
+    if share is not None:
+        out.append(f"Dependence: {share.group(1)}'s quarterly revenue is {share.group(2)} the size "
+                   f"of the four cloud builders' capex — a business that large beside one group's "
+                   f"spending would feel a pause there quickly. The filings give the two sizes, "
+                   f"not how much of one flows into the other.")
+    if state == "supported" and drivers.FORWARD.search(reason):
+        out.append(f"\"{reason}\" holds today, but it is a claim about the quarters still ahead: "
+                   f"every filing so far backs it, and none of them can show the next one.")
+    return out
+
+
+def research_symbols_in(text: str) -> tuple[str, ...]:
+    from argus.lui.research import research_symbols
+
+    return tuple(research_symbols(text)[0])
+
+
+def thesis_reasons_in(text: str) -> bool:
+    from argus.lui import thesis
+
+    return bool(thesis.reasons(text))
 
 
 def strongest(text: str, prior: list[str], *, book: str = "", memory: str = ""
@@ -399,7 +473,7 @@ def strongest(text: str, prior: list[str], *, book: str = "", memory: str = ""
     """"Which of those two remaining reasons is the strongest?" after a thesis and its
     revisions: the reasons still standing, ranked (a judge, round 14: it was told "that" had
     nothing to refer to, because the turn just before was a revision, not the thesis)."""
-    if not STRONGEST.search(text) or asks(text):
+    if not STRONGEST.search(text) or asks(text) or AGAINST.search(text):
         return None
     current = _standing(list(prior))
     if current is None:

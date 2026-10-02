@@ -113,7 +113,8 @@ _STYLE = re.compile(
 """Style, including the one said in passing: "I am a tech-stock event-driven swing trader" was not
 remembered at all on the hosted console (readiness audit, finding 40)."""
 _CAPITAL = re.compile(
-    r"\bmy\s+(?:account|book|portfolio|capital)\s+is\s+(?:about\s+|around\s+)?\$?\s*"
+    r"\bmy\s+(?:account|book|portfolio|capital)\s+is\s+(?:actually\s+|now\s+|really\s+)?"
+    r"(?:about\s+|around\s+)?\$?\s*"
     r"(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\b|\bi\s+have\s+(?:about\s+|around\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)"
     r"\s*(k|m)?\s+(?:to\s+(?:trade|invest)|in\s+my\s+account)|"
     r"\b(?:an?|my)\s+\$\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\s+(?:account|book|portfolio)\b|"
@@ -152,6 +153,18 @@ _ASKING = re.compile(r"^\s*(?:what|how|should|is|are|does|do|can|could|why|when|
 I trade earnings" wrote false memories on the first extraction run (`eval/memory_eval.py`)."""
 _AVOID = re.compile(r"\bi\s+(?:don'?t|never|won'?t)\s+(?:trade|touch|buy|hold|want)\s+(?:any\s+)?"
                     r"(.{2,30}?)(?:[,.;!?]|$)", re.I)
+_STANCE = re.compile(
+    r"\bi(?:'?m|\u2019m|\s+am)\s+(?:now\s+|still\s+|really\s+|very\s+|quite\s+|pretty\s+|"
+    r"turning\s+|getting\s+)?(?P<side>bullish|bearish)\s+(?:on\s+|about\s+)?"
+    r"(?P<name>[A-Za-z][A-Za-z.]{1,11})\b", re.I)
+"""A view said as a stance: "I'm bearish on TSLA", "Actually I'm now bullish on TSLA". Neither was
+kept, and "What's my view on TSLA?" was told nothing was remembered (a hostile review, round 19,
+row 649)."""
+_AVOID_CLASS = re.compile(
+    r"\bi\s+(?:really\s+)?(?:hate|avoid|don'?t\s+(?:like|trust|do)|can'?t\s+stand|never\s+(?:trade|"
+    r"touch|buy|use))\s+(?P<what>crypto(?:currenc(?:y|ies))?|coins|stocks|equities|leverage|"
+    r"options|meme\s*coins|altcoins|futures|perps?|perpetuals)\b", re.I)
+"""A whole class of instrument the trader stays away from: "I hate crypto and never trade it"."""
 _BULL = re.compile(r"\b(?:up|rise|rally|outperform|beat|higher|moon|rip|double|recover|bounce)\w*",
                    re.I)
 _BEAR = re.compile(r"\b(?:down|fall|drop|crash|underperform|miss|lower|dump|tank|decline|lose)\w*",
@@ -262,6 +275,21 @@ def extract(question: str, now: datetime | None = None,
                     price = None
             add("thesis", named[0], "bear" if m.group(1).lower() in ("short", "sell") else "bull",
                 m.group(0), price)
+    for m in _STANCE.finditer(text):
+        named = research_symbols(m.group("name"))[0]
+        if named:
+            price = None
+            if price_of is not None:
+                try:
+                    price = float(price_of(named[0]))
+                except Exception:
+                    price = None
+            add("thesis", named[0], "bull" if m.group("side").lower() == "bullish" else "bear",
+                m.group(0), price)
+    for m in _AVOID_CLASS.finditer(text):
+        what = m.group("what").lower()
+        what = "crypto" if what.startswith(("crypto", "coin", "alt", "meme")) else what
+        add("avoid", "", what, m.group(0))
     for m in _HOLDS.finditer(text):
         from argus.lui.research.parse import holding_pairs
 
@@ -338,6 +366,43 @@ def merge(old: list[Fact], new: list[Fact]) -> list[Fact]:
     replaced = {f.key() for f in stamped}
     kept = [*stamped, *(f for f in old if f.key() not in replaced)]
     return kept[:MAX_FACTS]
+
+
+_SOLD = re.compile(
+    r"\bi\s+(?:just\s+|already\s+|have\s+|'ve\s+)?(?:sold|closed|exited|dumped|got\s+out\s+of)\s+"
+    r"(?:all\s+(?:of\s+)?)?(?:my\s+)?(?P<name>[A-Za-z][A-Za-z.]{1,11})\b", re.I)
+"""A holding the trader says is gone: "I sold all my AAPL" left the remembered book at 50% AAPL
+(a hostile review, round 19, row 648)."""
+
+
+def apply_sales(facts: list[Fact], text: str, now: datetime | None = None) -> list[Fact]:
+    """The remembered book with each name the message says was sold taken out, the rest scaled to
+    the whole; the old book kept as what was replaced."""
+    from argus.lui.research import research_symbols
+    from argus.lui.research.parse import holding_pairs
+
+    book = get(facts, "book")
+    if book is None:
+        return facts
+    sold = {s for m in _SOLD.finditer(text) for s in research_symbols(m.group("name"))[0]}
+    if not sold:
+        return facts
+    held: dict[str, float] = {}
+    for _, symbol, weight in holding_pairs(book.text):
+        held[symbol] = held.get(symbol, 0.0) + weight
+    if not sold & set(held):
+        return facts
+    left = {s: w for s, w in held.items() if s not in sold}
+    total = sum(left.values())
+    day = (now or datetime.now(UTC)).date().isoformat()
+    if not left or total <= 0:
+        rest = [f for f in facts if f is not book]
+        return rest
+    words = "I hold " + ", ".join(f"{w / total:.0%} {s.removesuffix('USDT')}"
+                                  for s, w in left.items())
+    updated = Fact(kind="book", subject="", value=str(len(left)), text=words, at=day,
+                   replaces=f"“{book.text[:120]}” ({book.at})")
+    return [updated, *(f for f in facts if f is not book)]
 
 
 def dumps(facts: list[Fact]) -> str:
@@ -703,8 +768,71 @@ def _recall_match(question: str) -> re.Match[str] | None:
     return next((m for p in _RECALL_ONE_FORMS if (m := p.search(question))), None)
 
 
+_RECALL_MANY = re.compile(
+    r"\bwhat\s+do\s+i\s+(?:hold|own)\b|\bwhat(?:'s|\s+is|\s+are)\s+my\s+(?:account(?:\s+size)?|"
+    r"capital|holdings|book|positions|max(?:imum)?\s+loss(?:\s+per\s+trade)?|loss\s+limit|"
+    r"risk\s+budget|horizon|style|goal)\b", re.I)
+"""A question that asks back for the trader's own facts. "What is my account size, what do I
+hold, and what is my max loss per trade?" went to the desk's track record and "What do I hold?"
+to the desk's open positions (a hostile review, round 19, row 648)."""
+_VIEW_ASKED = re.compile(
+    r"\bwhat(?:'s|\s+is|\s+was)\s+my\s+(?:view|thesis|take|stance|position|call)\s+on\s+"
+    r"(?P<name>[A-Za-z][A-Za-z.]{1,11})\b|\bam\s+i\s+(?:bullish|bearish)\s+on\s+"
+    r"(?P<name2>[A-Za-z][A-Za-z.]{1,11})\b", re.I)
+
+
 def recall_asked(question: str) -> bool:
-    return bool(_RECALL.search(question)) or _recall_match(question) is not None
+    return (bool(_RECALL.search(question)) or _recall_match(question) is not None
+            or len(_RECALL_MANY.findall(question)) >= 2
+            or bool(re.match(r"^\W*what\s+do\s+i\s+(?:hold|own)\W*$", question, re.I))
+            or bool(_VIEW_ASKED.search(question)))
+
+
+_ASKED_KIND = (
+    (re.compile(r"\baccount(?:\s+size)?\b|\bcapital\b", re.I), ("capital",), "account size"),
+    (re.compile(r"\bwhat\s+do\s+i\s+(?:hold|own)\b|\bholdings\b|\bmy\s+(?:book|positions)\b", re.I),
+     ("book",), "holdings"),
+    (re.compile(r"\bmax(?:imum)?\s+loss|\bloss\s+limit", re.I), ("max_loss", "loss_usd"),
+     "loss limit"),
+    (re.compile(r"\brisk\s+budget", re.I), ("budget",), "risk budget"),
+    (re.compile(r"\bhorizon\b", re.I), ("horizon",), "horizon"),
+    (re.compile(r"\bstyle\b", re.I), ("style",), "style"),
+)
+
+
+def recall_missing(question: str, facts: list[Fact]) -> list[str]:
+    """What the question asked back that was never said: a list of facts that silently skipped
+    the loss limit read as if it had answered it (round 19, row 648)."""
+    have = {f.kind for f in facts}
+    missing = [label for pattern, kinds, label in _ASKED_KIND
+               if pattern.search(question) and not have & set(kinds)]
+    if not missing:
+        return []
+    return [f"Not remembered: your {' or '.join(missing)} — you have not said "
+            f"{'it' if len(missing) == 1 else 'them'} here yet; say it in a sentence "
+            f"(\"my loss limit is $500 a trade\") and it is kept."]
+
+
+def recall_view(question: str, facts: list[Fact]) -> list[str] | None:
+    """The trader's own remembered view on the name asked about, or None if not asked."""
+    from argus.lui.research import research_symbols
+
+    m = _VIEW_ASKED.search(question)
+    if m is None:
+        return None
+    named = research_symbols(m.group("name") or m.group("name2") or "")[0]
+    if not named:
+        return None
+    views = [f for f in facts if f.kind == "thesis" and f.subject == named[0]]
+    name = named[0].removesuffix("USDT")
+    if not views:
+        return [f"Bottom line: no view on {name} is remembered for you in this browser — say it "
+                f"(\"I'm bearish on {name} because …\") and it is kept."]
+    view = views[-1]
+    side = {"bull": "bullish", "bear": "bearish"}.get(view.value, "a view")
+    earlier = f", replacing {view.replaces}" if view.replaces else ""
+    return [f"Bottom line: you are {side} on {name} — you said “{view.text}” on {view.at}"
+            f"{earlier}."]
 
 
 def recall_one(question: str, facts: list[Fact]) -> list[str] | None:

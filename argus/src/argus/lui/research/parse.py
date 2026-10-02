@@ -168,6 +168,37 @@ DOWN_WORDS = re.compile(
 )
 
 
+_UP_MOVE = re.compile(
+    r"\b(?:rall\w*|ris(?:e|es|ing)|rose|jump\w*|surg\w*|spik\w*|gain\w*|climb\w*|soar\w*|"
+    r"pump\w*|rebound\w*|up)\b", re.I)
+_DOWN_MOVE = re.compile(
+    r"\b(?:drop\w*|fall\w*|fell|crash\w*|dump\w*|tank\w*|sell[\s-]?off|sells?\s+off|"
+    r"selling\s+off|down|declin\w*|crater\w*|plung\w*|sink\w*|sank|slump\w*|lose|loses|lost)\b",
+    re.I)
+_NEGATED = re.compile(r"\b(?:not|no|never|doesn'?t|don'?t|won'?t|isn'?t|didn'?t|without)\s+"
+                      r"(?:\w+\s+){0,1}$", re.I)
+_CLAUSE = re.compile(r"[,;.!?]|\bbut\b|\binstead\b|\band\s+then\b", re.I)
+
+
+def stated_direction(raw: str, at: int | None = None) -> int | None:
+    """+1 or -1 for the move the clause holding a stated shock names, None when it names none.
+
+    The direction was read from any down word anywhere in the question, so "What if the Nasdaq
+    does NOT drop, but rallies 8%?" was stressed at -8% (a hostile review, round 19, row 644). A
+    negated move word ("does not drop") states nothing; the last move word in the clause wins."""
+    if at is None:
+        number = re.search(r"\d+(?:\.\d+)?\s*%", raw)
+        at = number.start() if number is not None else len(raw)
+    cuts = [m.end() for m in _CLAUSE.finditer(raw, 0, at)]
+    start = cuts[-1] if cuts else 0
+    end_cut = _CLAUSE.search(raw, at)
+    clause = raw[start:end_cut.start() if end_cut is not None else len(raw)]
+    moves = sorted([(m.start(), +1, m) for m in _UP_MOVE.finditer(clause)]
+                   + [(m.start(), -1, m) for m in _DOWN_MOVE.finditer(clause)],
+                   key=lambda x: x[0])
+    live = [sign for pos, sign, _m in moves if not _NEGATED.search(clause[:pos])]
+    return live[-1] if live else None
+
 _COMPARE = re.compile(
     r"\b(?:compar\w*|versus|vs\.?|or|against|relative\s+to|side\s+by\s+side|more\s+risky|"
     r"riskier|"
@@ -705,7 +736,29 @@ def _resize(raw: str) -> tuple[float | None, float | None, float | None] | None:
             r"\b(?:close|sell|exit|cerrar|vender|reducir|trim|cut|reduc|reduzier|verringer|"
             r"senk|abbau|k[uü]rz|verkauf)", by.group(0), re.I)
         return None, None, amount if raising else -amount
+    if selling_asked(raw):
+        # "should I sell my SOL?" was answered as adding 20% to it (a first-time user, round 19,
+        # row 634): selling a held name sets its weight to nothing.
+        return 0.0, None, None
     return None
+
+
+_SELL_ALL = re.compile(
+    r"\b(?:sell(?:ing)?|sold|close|closing|exit(?:ing)?|dump(?:ing)?|get\s+out\s+of|cash\s+out\s+of|"
+    r"get\s+rid\s+of|drop(?:ping)?)\s+(?:all\s+(?:of\s+)?)?(?:my|the|our)\s+[A-Za-z]{2,10}\b|"
+    r"\b(?:sell(?:ing)?|sold)\s+(?:all\s+(?:of\s+)?)?(?:my\s+)?[A-Za-z]{2,10}\s+(?:position|holding|"
+    r"stake|bag)s?\b", re.I)
+"""Selling a whole held name, said as a question or a what-if."""
+_WONDERING = re.compile(r"\?|\b(?:should|shall|would|could|do)\s+i\b|"
+                        r"\bwhat\s+(?:if|happens|would)\b|\bif\s+i\b|\bwhat\s+does\s+selling\b",
+                        re.I)
+
+
+def selling_asked(text: str) -> bool:
+    """A sale of a whole holding asked about, not instructed: "should I sell my SOL?" is weighed;
+    "Please simply sell all of my MSTR shares" is an order and stays refused."""
+    return (bool(_SELL_ALL.search(text)) and bool(_WONDERING.search(text))
+            and not re.search(r"\bhalf\b|\d+(?:\.\d+)?\s*%", text))
 
 
 _OUTLOOK = re.compile(r"\b(?:outlook|next\s+(?:week|month|quarter))\b", re.I)
@@ -2435,7 +2488,8 @@ def _cjk_request(raw: str, symbols: tuple[str, ...]) -> ResearchRequest | None:
 
 _NAMED_SHOCK = re.compile(
     r"(?<![a-z])(?:drop\w*|fall\w*|fell|crash\w*|crater\w*|tank\w*|dump\w*|plung\w*|spik\w*|jump\w*|"
-    r"surg\w*|rall\w*|gap\w*\s+(?:down|up)|sell[\s-]?off|sells?\s+off|stress|shock|down|up|move)"
+    r"surg\w*|rall\w*|ris(?:e|es|ing)|rose|gain\w*|climb\w*|soar\w*|gap\w*\s+(?:down|up)|"
+    r"sell[\s-]?off|sells?\s+off|stress|shock|down|up|move)"
     r"[^?.]{0,20}?-?\d+(?:\.\d+)?\s*%|-?\d+(?:\.\d+)?\s*%\s*(?:\w+\s+){0,3}(?:drop|fall|crash|"
     r"shock|move|gap|stress|sell[\s-]?off|decline|spike|rally)|\s-\d+(?:\.\d+)?\s*%", re.I)
 """A shock of a stated size: "drops 25%", "-20% shock", "craters 30%", "a 3% gap down"."""
@@ -2463,7 +2517,8 @@ _SP_SUBJECT = re.compile(r"\b(?:s&p|s\s*&\s*p|spx|sp500|spy)\b|标普", re.I)
 SHOCK_WEIGHT = re.compile(
     r"-\s?\d+(?:\.\d+)?\s*%|\d+(?:\.\d+)?\s*%\s*(?:\w+\s+){0,2}(?:shock|drop|fall|crash|gap|"
     r"move|stress|sell[\s-]?off|decline|spike|rally)|(?:drops?|falls?|crash\w*|crater\w*|"
-    r"tank\w*|dump\w*|spikes?|jumps?|surg\w*|rall\w*)\s+(?:by\s+)?\d", re.I)
+    r"tank\w*|dump\w*|spikes?|jumps?|surg\w*|rall\w*|rises?|rose|gains?|climbs?|soars?)\s+"
+    r"(?:by\s+)?\d", re.I)
 
 
 def shock_subject(raw: str, weighted: set[str]) -> str | None:
@@ -2568,8 +2623,10 @@ def _named_shock_request(raw: str) -> ResearchRequest | None:
     shock: float | None = None
     for match in shock_numbers(raw, [pos for pos, _, _ in pairs]):
         value = abs(float(match.group(1)))
-        down = (DOWN_WORDS.search(raw) or match.group(1).startswith("-")
-                or re.search(r"crater|跌|崩|跳水", raw))
+        said = stated_direction(raw, match.start())
+        down = (match.group(1).startswith("-") or said == -1
+                or (said is None and (DOWN_WORDS.search(raw)
+                                      or re.search(r"crater|跌|崩|跳水", raw))))
         shock = -value if down else value
     if subject is not None and len(holding_shocks(raw)) < 2:
         notes.append(f"the shock is applied to {_t(subject)}; each holding moves through its "
@@ -3254,7 +3311,10 @@ def read_request(text: str) -> ResearchRequest | None:
         for match in shock_numbers(raw, [pos for pos, _, _ in pairs]):
             # A holding weight, a cash share or a VaR level is not the shock size.
             value = abs(float(match.group(1)))
-            shock = -value if DOWN_WORDS.search(raw) or match.group(1).startswith("-") else value
+            said = stated_direction(raw, match.start())
+            down = (match.group(1).startswith("-") or said == -1
+                    or (said is None and DOWN_WORDS.search(raw)))
+            shock = -value if down else value
         return ResearchRequest(
             kind=ResearchKind.STRESS,
             symbols=tuple(book) or symbols,
@@ -3446,6 +3506,10 @@ def with_book(request: ResearchRequest | None, book_text: str,
     if question:
         # a trade idea's size read as a market shock is the idea, added to this book
         request = _idea_request(question, request)
+        if (request.kind is ResearchKind.IMPACT and request.target is None
+                and selling_asked(question)):
+            # either planner reads "should I sell my SOL?" as an add of the default 20% (row 634)
+            request = replace(request, target=0.0, size_stated=True)
     if not book_text.strip():
         return request
     if question:
@@ -3973,6 +4037,9 @@ def plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, dic
             shock = float(raw["shock_percent"])
     except (TypeError, ValueError):
         shock = None
+    if shock is not None and (said := stated_direction(text)) is not None:
+        # the words decide the sign, not the model's reading of them (row 644)
+        shock = said * abs(shock)
     read_as = _read(text)
     named: list[str] = []
     listed_names = raw.get("names")
@@ -4129,6 +4196,13 @@ def plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, dic
     request = _with_leverage_exposure(_with_stated_cash(request, text), text)
     if request is not None and request.book and _GROUP.search(text):
         request = replace(request, notes=(*request.notes, *_group_note(text)))
+    if (request is not None and request.side == "long"
+            and request.kind in (ResearchKind.IMPACT, ResearchKind.LEVERAGE)
+            and _SHORT.search(text)
+            and not re.search(r"\bshort\s+(?:interest|ratio|squeeze|term|sellers?)\b", text, re.I)):
+        # "should I short TSLA?" was answered on the long side — the worst day as a fall — when
+        # the model's plan carried no side (a hostile review and a judge, round 19, rows 653, 666)
+        request = replace(request, side="short")
     audit["applied"] = request is not None
     return request, audit
 

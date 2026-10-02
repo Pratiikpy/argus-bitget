@@ -795,7 +795,13 @@ _OWN_TOLERANCE = re.compile(
     r"\bi\s*(?:can'?t|cannot|couldn'?t|won'?t|don'?t\s+want\s+to|do\s+not\s+want\s+to|"
     r"wouldn'?t\s+want\s+to)\s+(?:\w+\s+)?(?:lose|stomach|take|afford|handle|see)\b|"
     r"\b(?:if|when)\s+i\s+(?:lose|lost)\b|\b(?:what|which)\s+\w+(?:\s+\w+)?\s+i\s+"
-    r"(?:said|told|set|mentioned)\b", re.I)
+    r"(?:said|told|set|mentioned)\b|"
+    # "how much can I lose", "how much could I lose in a bad week", "I'm scared of losing money"
+    # (a first-time user, round 19, row 633): the trader's own loss, never the desk's record
+    r"\b(?:can|could|would|will|might|do|did)\s+i\s+lose\b|\bi\s+(?:might|could|may)\s+lose\b|"
+    r"(?:^|[,;:]\s*|\band\s+)(?:can'?t|cannot|won'?t)\s+(?:afford\s+to\s+)?lose\b|"
+    r"\bi(?:'m|\u2019m|\s+am)\s+(?:so\s+|really\s+|very\s+)?(?:scared|afraid|worried|nervous|"
+    r"anxious)\b|\blos(?:e|ing)\s+my\s+(?:money|savings|shirt)\b", re.I)
 """The trader's own tolerance or an earlier statement of it — "I can't lose more than 10%", "what
 happens if I lose money", "remind me what drawdown I said" — which carries the performance words
 (lose, drawdown) and was answered with the desk's own track record (a first-user audit, r18)."""
