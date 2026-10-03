@@ -2795,6 +2795,39 @@ _KELLY_PAYOFF = re.compile(
     re.I)
 
 
+def _hourly_fit(symbols: list[str], to: str, days: int = 30) -> dict[str, tuple[float, float]]:
+    """Each symbol's correlation with ``to`` and its slope on it, from hourly simple returns over
+    the last ``days`` days, on the hours both have a close."""
+    from itertools import pairwise
+
+    from argus.market import history
+
+    def returns(symbol: str) -> dict[datetime, float]:
+        try:
+            candles = history.fetch_range(symbol, days=days, interval="1H")
+        except Exception:
+            return {}
+        closes = [(c.ts, float(c.close)) for c in candles]
+        return {t1: c1 / c0 - 1 for (_t0, c0), (t1, c1) in pairwise(closes) if c0 > 0}
+
+    base = returns(to)
+    out: dict[str, tuple[float, float]] = {}
+    for symbol in symbols:
+        own = returns(symbol)
+        shared = sorted(set(own) & set(base))
+        if len(shared) < 48:
+            continue
+        xs, ys = [own[t] for t in shared], [base[t] for t in shared]
+        mx, my = sum(xs) / len(xs), sum(ys) / len(ys)
+        sxy = sum((x - mx) * (y - my) for x, y in zip(xs, ys, strict=True))
+        sxx = sum((x - mx) ** 2 for x in xs)
+        syy = sum((y - my) ** 2 for y in ys)
+        if sxx <= 0 or syy <= 0:
+            continue
+        out[symbol] = (sxy / (sxx * syy) ** 0.5, sxy / syy)
+    return out
+
+
 def _growth_compare_lines(text: str, *, now: datetime | None,
                           visitor: str) -> list[str] | None:
     """Revenue growth for two or more names, side by side, with the verdict asked for: "which
@@ -4475,17 +4508,13 @@ def _answer(
             # judge, round 24): each holding's hourly correlation and slope to it, tied_rows
             to = anchor_sym[0].removesuffix("USDT")
             tied_rows = []
-            for symbol in held_syms[:6]:
-                if symbol == anchor_sym[0]:
-                    continue
-                name = symbol.removesuffix("USDT")
-                got = _answer(f"what is the beta of {name} to {to}", [], now=now,
-                              visitor=visitor)
-                head = " ".join(str(x) for x in (got.get("lines") or [])[:1])
-                fit = re.search(r"moves about (?P<b>[-\d.]+)x .*?correlation (?P<r>[+-]\d+\.\d+)",
-                                head)
-                if fit is not None:
-                    tied_rows.append((name, float(fit.group("r")), float(fit.group("b"))))
+            # computed here from hourly closes, not through the router: on the live console the
+            # model read one holding's inner question another way and MSTR, the most tied, was
+            # dropped without a word (round 24 live re-ask)
+            fits = _hourly_fit([s for s in held_syms[:6] if s != anchor_sym[0]], anchor_sym[0])
+            unmeasured = [s.removesuffix("USDT") for s in held_syms[:6]
+                          if s != anchor_sym[0] and s not in fits]
+            tied_rows = [(s.removesuffix("USDT"), r, beta) for s, (r, beta) in fits.items()]
             if tied_rows:
                 tied_rows.sort(key=lambda r: -r[1])
                 return engine_payload_like(
@@ -4493,7 +4522,9 @@ def _answer(
                      + ", ".join(f"{n} correlation {r:+.2f} (moves {b:.2f}x {to})"
                                  for n, r, b in tied_rows) + ".",
                      f"From hourly returns over the last 30 days, in the hours both trade; a "
-                     f"correlation near 1 means the holding is largely a {to} bet."],
+                     f"correlation near 1 means the holding is largely a {to} bet."
+                     + (f" Not measured, for want of shared hourly history: "
+                        f"{', '.join(unmeasured)}." if unmeasured else "")],
                     prior, text, by="research")
     grown = _growth_compare_lines(text, now=now, visitor=visitor)
     if grown is not None:

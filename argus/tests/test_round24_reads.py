@@ -192,3 +192,25 @@ class TestRound24Remainder:
             "should I DCA into BTC with $1,000?"
         stop = server._STOP_SAID.search("what if the stop is 6% instead?")
         assert stop is not None
+
+    def test_holdings_are_ranked_by_their_own_hourly_fit(self, monkeypatch: pytest.MonkeyPatch
+                                                         ) -> None:
+        from datetime import UTC, datetime, timedelta
+        from types import SimpleNamespace
+
+        from argus.lui import server
+        from argus.market import history
+
+        start = datetime(2026, 9, 1, tzinfo=UTC)
+        base = [100.0 * (1.01 if i % 2 else 0.99) ** (i % 7) for i in range(200)]
+        paths = {"BTCUSDT": base, "MSTRUSDT": [2 * x for x in base],
+                 "AAPLUSDT": [100.0 + (i % 3) for i in range(200)]}
+
+        def fake(symbol: str, *, days: int = 30, interval: str = "1H") -> list[object]:
+            return [SimpleNamespace(ts=start + timedelta(hours=i), close=c)
+                    for i, c in enumerate(paths[symbol])]
+
+        monkeypatch.setattr(history, "fetch_range", fake)
+        fits = server._hourly_fit(["MSTRUSDT", "AAPLUSDT"], "BTCUSDT")
+        assert fits["MSTRUSDT"][0] > 0.99 and abs(fits["MSTRUSDT"][1] - 1.0) < 1e-9
+        assert fits["AAPLUSDT"][0] < fits["MSTRUSDT"][0]
