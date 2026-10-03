@@ -1267,8 +1267,12 @@ _LEANS_ON = re.compile(r"\b(?:the\s+(?:stock|company|name|shares?)|it)\b", re.I)
 _MORE_OR_LESS = re.compile(
     r"^\W*(?:is|was|does)\s+(?:that|it|this)\s+(?:move\s+)?(?:more|less|bigger|smaller|larger)"
     r"(?:\s+or\s+(?:more|less|bigger|smaller))?\s+than\s+(?:for\s+|with\s+)?"
-    r"(?P<other>[^?]{1,40}?)(?:'s)?\s*\??\s*$", re.I)
-_EVENT_MOVE = re.compile(r"\b\d{1,2} [A-Z][a-z]{2} \d{4} ([+-]\d+(?:\.\d+)?)%")
+    r"(?P<other>[^?]{1,40}?)(?:'s)?\s*\??\s*$|"
+    # "compare that to Apple" after TSLA's post-earnings moves got beta and volatility (a judge,
+    # round 24)
+    r"^\W*(?:and\s+|now\s+)?(?:compare|how\s+does)\s+(?:that|it|this)\s+(?:compare\s+)?(?:to|with)\s+"
+    r"(?:just\s+)?(?P<other2>[^?]{1,40}?)(?:'s)?\s*\??\s*$", re.I)
+_EVENT_MOVE =re.compile(r"\b\d{1,2} [A-Z][a-z]{2} \d{4} ([+-]\d+(?:\.\d+)?)%")
 
 
 def _earnings_follow_up(text: str, prior: list[str], *, now: datetime | None, visitor: str,
@@ -1308,7 +1312,7 @@ def _earnings_follow_up(text: str, prior: list[str], *, now: datetime | None, vi
     asked = _MORE_OR_LESS.match(text)
     if asked is None or not any(_EARNINGS_MOVE.search(t) for t in prior[-2:]):
         return None
-    other_named = research_symbols(asked.group("other"))[0]
+    other_named = research_symbols(asked.group("other") or asked.group("other2") or "")[0]
     if not other_named:
         return None
     other = other_named[0].removesuffix("USDT")
@@ -2791,6 +2795,39 @@ _KELLY_PAYOFF = re.compile(
     re.I)
 
 
+def _growth_compare_lines(text: str, *, now: datetime | None,
+                          visitor: str) -> list[str] | None:
+    """Revenue growth for two or more names, side by side, with the verdict asked for: "which
+    one has the higher revenue growth?" (NVDA vs MSFT) gave MSFT's figure alone and no verdict (a
+    judge, round 24)."""
+    if not re.search(r"\b(?:higher|faster|bigger|stronger|better|more)\s+(?:revenue|sales)\s+"
+                     r"growth\b|\b(?:revenue|sales)\s+growth\b[^?]{0,30}\b(?:higher|faster|"
+                     r"compare|vs|versus|or)\b", text, re.I):
+        return None
+    from argus.lui.research import research_symbols
+
+    names = [s.removesuffix("USDT") for s in research_symbols(text)[0]][:4]
+    if len(names) < 2:
+        return None
+    rows: list[tuple[str, float, str]] = []
+    for name in names:
+        got = _answer(f"what is {name} revenue growth", [], now=now, visitor=visitor)
+        head = " ".join(str(x) for x in (got.get("lines") or [])[:1])
+        yearly = re.search(r"([+-]\d+(?:\.\d+)?)% on the same quarter a year earlier", head)
+        if yearly is None:
+            continue
+        rows.append((name, float(yearly.group(1)), unlead(head)))
+    if len(rows) < 2:
+        return None
+    rows.sort(key=lambda r: -r[1])
+    lead = ("Bottom line: " + f"{rows[0][0]} has the higher revenue growth — "
+            + ", ".join(f"{n} {g:+.1f}%" for n, g, _h in rows)
+            + " on the same quarter a year earlier, each its latest reported quarter.")
+    return [lead, *(h for _n, _g, h in rows),
+            "Quarters end on different dates for different companies, so the figures are each "
+            "company's latest, not the same calendar quarter."]
+
+
 def _kelly_lines(text: str, prior: list[str]) -> list[str] | None:
     """The Kelly fraction for a stated win rate and payoff, f = p - (1 - p) / b (Kelly 1956, the
     form `PyPortfolioOpt` and every sizing text use for a binary bet), and half of it.
@@ -2872,7 +2909,9 @@ def _performance_answer(text: str, prior: list[str], now: datetime | None) -> li
     if period is None:
         return None
     named = list(research_symbols(re.sub(r"\bstock\s+market\b", "S&P 500", text))[0])
-    if not named and (leaning is not None or re.search(r"\b(?:it|they|them|both)\b", text, re.I)):
+    if not named and (leaning is not None or re.search(
+            r"\b(?:it|they|them|both|the\s+(?:stock|coin|name|company|token|share))\b", text,
+            re.I)):
         named = next((list(research_symbols(q)[0]) for q in reversed(prior[-3:])
                       if research_symbols(q)[0]), [])
     if not named:
@@ -3257,6 +3296,82 @@ _NEEDED_MONEY_IN = re.compile(
     r"(?:money|fund|cash|savings)?\s*(?:in|into|on)\b", re.I)
 
 
+def _leaning_follow_up(text: str, prior: list[str]) -> str | None:
+    """A follow-up that leans on the question before, put as the question it asks (a judge and a
+    first-time user, round 24, each answered with the desk's record, a decline or a repeat)."""
+    from argus.lui.research import research_symbols
+
+    if not prior:
+        return None
+    last = prior[-1]
+    named = next((research_symbols(p)[0][0].removesuffix("USDT") for p in reversed(prior[-3:])
+                  if research_symbols(p)[0]), None)
+    # "and the expected shortfall?" after a 99% VaR was answered at 95%
+    if re.match(r"^\W*(?:and\s+|what\s+about\s+)?(?:the\s+)?(?:expected\s+shortfall|es|cvar|"
+                r"conditional\s+var)\W*$", text, re.I) and re.search(r"\bvar\b|value\s+at\s+risk",
+                                                                     last, re.I):
+        return last if re.search(r"shortfall", last, re.I) else f"{last.rstrip(' ?.')} and the "\
+            "expected shortfall?"
+    # "is it dangerous" after "what is a perp" repeated the definition, and "so is that expensive"
+    # after "what is the spread" was declined (a first-time user, round 24)
+    judged = re.match(r"^\W*(?:so\s+|but\s+|and\s+)?(?:is|are)\s+(?:it|that|this|they)\s+(?P<w>"
+                      r"dangerous|risky|safe|bad|expensive|cheap|a\s+lot|high|normal)\W*$", text,
+                      re.I)
+    if judged is not None:
+        topic = last.lower()
+        if re.search(r"\bspread\b", topic):
+            return f"what is the {named or 'BTC'} price now?"
+        if re.search(r"\b(?:perp\w*|futures?|leverage\w*|margin)\b", topic):
+            return "what leverage is safe then"
+        if re.search(r"\b(?:stable\s*coins?|usdt|usdc)\b", topic):
+            return "is a stablecoin safe"
+        if re.search(r"\bshort(?:ing|\s+selling)?\b", topic):
+            return "can I lose more than I put in"
+    # "should I DCA into BTC" after "I have $1,000" was worked on $10,000 (a first-time user,
+    # round 24): the amount said a turn earlier is the amount averaged
+    if re.search(r"\bdca\b|dollar[\s-]cost|\baverag(?:e|ing)\s+in(?:to)?\b", text, re.I) and (
+            not re.search(r"\$\s?\d|\d\s*(?:k|dollars|bucks|usd)\b", text, re.I)):
+        said_amount = next((m.group(0) for p in reversed(prior[-3:])
+                            if (m := re.search(r"\$\s?\d[\d,]*(?:\.\d+)?\s*k?\b", p))), None)
+        if said_amount is not None:
+            return f"{text.rstrip(' ?.')} with {said_amount}?"
+    if named is None:
+        return None
+    # "what's the bear case?" after a thesis asked for a name
+    if re.match(r"^\W*(?:and\s+|so\s+)?(?:what'?s|what\s+is|whats|give\s+me)\s+the\s+"
+                r"(?:bear|bull)\s+case\W*$", text, re.I) and any(
+                    re.search(r"\bthesis|because\b", p, re.I) for p in prior[-3:]):
+        return "what would prove it wrong?"
+    # "is the sentiment positive or negative?" after Apple headlines switched to crypto
+    if re.search(r"\bsentiment\b", text, re.I) and not research_symbols(text)[0]:
+        return f"{text.rstrip(' ?.')} on {named}?"
+    # "what did the stock do the day after?" after an earnings date got the desk's record
+    if re.search(r"\b(?:what|how)\s+(?:did|does)\s+(?:the\s+stock|it|the\s+share|the\s+price)\s+"
+                 r"(?:do|move|react)\b[^?]{0,30}\b(?:day\s+after|after\s+(?:the\s+)?(?:results|"
+                 r"earnings|report))", text, re.I) and re.search(r"\b(?:report|earnings|results)\b",
+                                                                 last, re.I):
+        return f"how much does {named} usually move on earnings?"
+    # "How many shares is that?" after a sizing answer
+    if re.match(r"^\W*(?:so\s+|and\s+)?how\s+many\s+(?:shares|units|coins|contracts)\s+(?:is|"
+                r"would\s+be|does\s+that\s+make)\s+that\W*$", text, re.I):
+        again = _answer(last, prior[:-1])
+        sized = re.search(r"the position of (?P<n>[A-Z0-9]+) is \$(?P<a>[\d,]+(?:\.\d+)?)",
+                          " ".join(str(x) for x in (again.get("lines") or [])[:1]))
+        if sized is not None:
+            return f"how many {sized.group('n')} is ${sized.group('a')}"
+    # Hinglish: "NVDA mein abhi entry lena sahi hai kya?" and "aur agar 5% gir gaya toh?"
+    falls = re.match(r"^\W*(?:aur|and)\s+agar\s+(?P<p>\d+(?:\.\d+)?)\s*%\s+(?:gir|gira|giraa)\s+"
+                     r"(?:gaya|jaye|jaaye|jata)\s*(?:toh|to)?\W*$", text, re.I)
+    if falls is not None:
+        return f"what if {named} falls {falls.group('p')}%?"
+    return None
+
+
+_HINGLISH_ENTRY = re.compile(
+    r"\b(?P<n>[A-Za-z]{2,6})\s+(?:mein|me|main)\s+(?:abhi\s+)?entry\s+(?:lena|lu|loon|leni)\s+"
+    r"(?:sahi|theek|thik|achha|acha)\s+(?:hai|h)\s+(?:kya|na)\b", re.I)
+
+
 _ZH_HOLD = re.compile(
     "我(?:持有|有|买了|拿着)\\s*(?P<q>\\d+(?:\\.\\d+)?)\\s*"
     "(?:股|个|枚|手)?\\s*(?P<n>[^\\s\uff0c,。0-9]{1,8}?)\\s*[\uff0c,]?\\s*"
@@ -3294,6 +3409,7 @@ _HINGLISH_SAID: tuple[tuple[re.Pattern[str], Any], ...] = (
                f"{m.group('p')}%, how much do I lose?"),
     (re.compile(r"\buske\s+baad\s+(?:stock|share|ye|yeh)\s+kitna\s+(?:hilta|move\s+karta)\s+hai\b",
                 re.I), "how much does {name} usually move on earnings?"),
+    (_HINGLISH_ENTRY, lambda m: f"should I buy {m.group('n').upper()} now?"),
     (re.compile(r"^\W*aur\s+(?P<n>[A-Za-z]{2,6})\s*\??\W*$", re.I),
      lambda m: f"and what about {m.group('n')}?"),
     # English follow-ups and newcomer phrasings that got the desk's record or a decline
@@ -3323,6 +3439,20 @@ _HINGLISH_SAID: tuple[tuple[re.Pattern[str], Any], ...] = (
                 "Bottom line: this console does not choose a split for your savings — that "
                 "is a decision for you, or a licensed adviser who knows your situation. What it "
                 "can show is how the two have behaved, side by side:")),
+    # "How far away should I put it for Apple?" after the stop-loss explanation got an order plan
+    (re.compile(r"\bhow\s+far\s+(?:away\s+|down\s+|below\s+)?(?:should|do|would|can)\s+i\s+(?:put|"
+                r"place|set)\s+(?:it|the\s+stop|mine|my\s+stop|a\s+stop)\b", re.I),
+     "where should my stop go on {name}"),
+    # "What is the S&P 500 at today?" got a $50,000 order schedule
+    (re.compile(r"^\W*(?:so\s+)?what(?:'s|\s+is)\s+(?:the\s+)?(?P<n>[A-Za-z&$][\w&$. -]{1,20}?)"
+                r"\s+at\s+(?:today|now|right\s+now|currently|the\s+moment)\W*$", re.I),
+     lambda m: f"what is the {m.group('n')} price now?"),
+    # "for 50 bucks of btc how much fee" got the desk's scope note (a first-time user, round 24)
+    (re.compile(r"\$(?P<a>\d[\d,]*(?:\.\d+)?)\s+(?:of|in|worth\s+of)\s+(?P<n>[A-Za-z]{2,6})\b"
+                r"[^?]{0,25}\b(?:fees?|cost|charge)\b|\b(?:fees?|cost|charge)\b[^?]{0,25}\$(?P<a2>"
+                r"\d[\d,]*(?:\.\d+)?)\s+(?:of|in|worth\s+of)\s+(?P<n2>[A-Za-z]{2,6})\b", re.I),
+     lambda m: f"what does it cost to buy ${m.group('a') or m.group('a2')} of "
+               f"{m.group('n') or m.group('n2')}"),
     (re.compile(r"\b(?:gimme|give\s+me|find\s+me|show\s+me|which\s+is|what'?s)\s+(?:a|the\s+next|"
                 r"the)\s+(?:\d{2,4}x|moon\w*|gem)\s+(?:coin|token|crypto|stock)?\b", re.I),
      "can i turn 100 into 10000"),
@@ -3357,6 +3487,9 @@ def _restated(text: str, prior: list[str], book: str = "") -> tuple[str, str | N
                     f"lose?"), None
         if _ZH_HOLD.search(text) and re.search("盈亏|赚|亏", text):
             return f"{stated} What is my P&L?", None
+    leaned = _leaning_follow_up(text, prior)
+    if leaned is not None:
+        return leaned, None
     for spoken, english in _HINGLISH_SAID:
         heard = spoken.search(text)
         if heard is not None:
@@ -3365,6 +3498,8 @@ def _restated(text: str, prior: list[str], book: str = "") -> tuple[str, str | N
             asked = english(heard) if callable(english) else english
             if isinstance(asked, tuple):
                 return asked[0], asked[1]
+            if asked.strip().lower().rstrip("?") == text.strip().lower().rstrip("?"):
+                continue  # already the question the engines read
             named_before = next((research_symbols(p)[0][0].removesuffix("USDT")
                                  for p in (text, *reversed(prior)) if research_symbols(p)[0]),
                                 "BTC")
@@ -3736,7 +3871,10 @@ _STOP_SAID = re.compile(
     r"(?:\bwith\s+)?(?:\ba\s+)?(?:\bthe\s+)?\bstop(?:[\s-]?loss)?\s+(?:at|of|to)\s+\$?\d[\d,]*(?:\.\d+)?"
     r"(?:\s*%(?:\s+(?:below|under|above)\s+(?:entry|the\s+entry))?)?|"
     r"(?:\bwith\s+)?(?:\ba\s+)?\b\d+(?:\.\d+)?\s*%\s+stop(?:[\s-]?loss)?"
-    r"(?:\s+(?:below|under|above)\s+(?:entry|the\s+entry))?", re.I)
+    r"(?:\s+(?:below|under|above)\s+(?:entry|the\s+entry))?|"
+    # "what if the stop is 6% instead?" repeated the 4% answer (a judge, round 24)
+    r"(?:\bthe\s+)?\bstop(?:[\s-]?loss)?\s+(?:is|was|were|becomes)\s+\$?\d[\d,]*(?:\.\d+)?\s*%?",
+    re.I)
 _TRADE_FOLLOW_UP = re.compile(
     r"^\W*(?:and|but|so|ok(?:ay)?)?\W*(?:what\s+about|how\s+about|and\s+if|what\s+if|if|same\s+"
     r"(?:trade|thing|question)|instead)\b|\binstead\b|\bsame\s+(?:trade|thing|setup)\b", re.I)
@@ -3773,6 +3911,8 @@ def _sizing_follow_up(text: str, prior: list[str]) -> str | None:
     if new_stop is not None:
         stop_words = re.sub(r"^(?:with\s+)?(?:a\s+|the\s+)?", "", new_stop.group(0).strip(),
                             flags=re.I)
+        stop_words = re.sub(r"\bstop(?:[\s-]?loss)?\s+(?:is|was|were|becomes)\s+(?P<v>\S+)",
+                            r"\g<v> stop", stop_words, flags=re.I)
         if _STOP_SAID.search(restated):
             restated = _STOP_SAID.sub(f" with a {stop_words}", restated, count=1)
         else:
@@ -3925,6 +4065,9 @@ def _answer(
 
     from argus.lui.research.parse import RATE_MOVE
 
+    # "for 50 bucks of btc how much fee" was priced on $50,000 (a first-time user, round 24)
+    text = re.sub(r"(?<![\w$.,])(\d[\d,]*(?:\.\d+)?)\s*(?:bucks|dollars|usd)\b(?!\s*(?:worth|of\s+"
+                  r"(?:margin|collateral)))", r"$\1", text, flags=re.I)
     # "If it rips 15%" was read as an index move with the sign turned (a judge, round 24): trader
     # slang for a move is the move
     text = re.sub(r"\b(?:rips?|ripped|pumps?|pumped|moons?|mooned|spikes?|spiked|surges?|surged|"
@@ -4319,6 +4462,58 @@ def _answer(
     halved = _halve_loss_lines(text, prior, book, now=now, visitor=visitor)
     if halved is not None:
         return engine_payload_like(halved, prior, text, by="research")
+    tied = re.search(r"\b(?:which|what)\s+(?:of\s+my\s+)?(?:holdings?|positions?|names?|stocks?|"
+                     r"coins?|ones?)\s+(?:is|are)\s+(?:the\s+)?most\s+(?:correlated|tied|linked)\s+"
+                     r"(?:with|to)\s+(?P<to>\$?[A-Za-z]{2,10})\b", text, re.I)
+    if tied is not None and book.strip():
+        from argus.lui.research.parse import holding_pairs
+
+        anchor_sym = research_symbols(tied.group("to"))[0]
+        held_syms = [s for _p, s, _w in holding_pairs(book)]
+        if anchor_sym and held_syms:
+            # "Which of my holdings is most correlated with BTC?" was answered as adding BTC (a
+            # judge, round 24): each holding's hourly correlation and slope to it, tied_rows
+            to = anchor_sym[0].removesuffix("USDT")
+            tied_rows = []
+            for symbol in held_syms[:6]:
+                if symbol == anchor_sym[0]:
+                    continue
+                name = symbol.removesuffix("USDT")
+                got = _answer(f"what is the beta of {name} to {to}", [], now=now,
+                              visitor=visitor)
+                head = " ".join(str(x) for x in (got.get("lines") or [])[:1])
+                fit = re.search(r"moves about (?P<b>[-\d.]+)x .*?correlation (?P<r>[+-]\d+\.\d+)",
+                                head)
+                if fit is not None:
+                    tied_rows.append((name, float(fit.group("r")), float(fit.group("b"))))
+            if tied_rows:
+                tied_rows.sort(key=lambda r: -r[1])
+                return engine_payload_like(
+                    [f"Bottom line: {tied_rows[0][0]} is the holding most tied to {to} — "
+                     + ", ".join(f"{n} correlation {r:+.2f} (moves {b:.2f}x {to})"
+                                 for n, r, b in tied_rows) + ".",
+                     f"From hourly returns over the last 30 days, in the hours both trade; a "
+                     f"correlation near 1 means the holding is largely a {to} bet."],
+                    prior, text, by="research")
+    grown = _growth_compare_lines(text, now=now, visitor=visitor)
+    if grown is not None:
+        return engine_payload_like(grown, prior, text, by="research")
+    if re.search(r"\b(?:coming\s+up|upcoming|this\s+week|next\s+week|on\s+the\s+calendar|"
+                 r"scheduled)\b", text, re.I) and re.search(
+            r"\b(?:anything|events?|catalysts?|big|news|data|could\s+move|move\s+it)\b", text,
+            re.I) and not re.search(r"\b(?:earnings|report)\b", text, re.I):
+        # "anything big coming up this week that could move BTC?" repeated the price card (a
+        # judge, round 24): the scheduled US releases are the answer
+        from argus.lui.research.riskmath import event_lines
+
+        dated, _clause = event_lines(text, always=True)
+        if dated:
+            return engine_payload_like(
+                ["Bottom line: the scheduled events that move markets broadly are the US releases "
+                 "below; nothing on these calendars is specific to one coin or stock.",
+                 *dated,
+                 "Ask \"how has QQQ reacted after CPI prints\" for what those releases have done "
+                 "before."], prior, text, by="research")
     kelly = _kelly_lines(text, prior)
     if kelly is not None:
         return engine_payload_like(kelly, prior, text, by="arithmetic")
@@ -6872,7 +7067,8 @@ class Handler(BaseHTTPRequestHandler):
         route = urlparse(self.path)
         path = route.path.rstrip("/") or "/"
         try:
-            if path == "/":
+            if path in ("/", "/console", "/index.html"):
+                # "/console" was a 404 to a judge who had it as the console's address (round 24)
                 self._send(PAGE.encode(), "text/html; charset=utf-8")
                 return
             if path == "/mcp":

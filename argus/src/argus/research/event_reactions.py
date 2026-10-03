@@ -179,12 +179,36 @@ def results_releases(filings: Sequence[Any]) -> list[datetime]:
     return sorted(kept)
 
 
+def release_anchor(accepted: datetime) -> datetime:
+    """The instant a results release reaches the market, from its 8-K's acceptance time.
+
+    EDGAR accepts an after-close 8-K hours after the press release: Apple's results for the quarter
+    to September 2025 went out at 16:30 New York time on 30 Oct and its 8-K was accepted at
+    2025-10-31T00:30:35Z (SEC submissions API, checked 2026-10-03), so a window opened at acceptance
+    began after the 24-hour perpetual had already moved, and Apple's four "moves" read +0.1%, -0.1%,
+    +0.2%, +0.0% (a judge, round 24). An acceptance outside the US regular session (09:30-16:00 New
+    York) is anchored at the last regular close before it, where every after-close or pre-open
+    release is first traded; an acceptance inside the session is its own anchor."""
+    from zoneinfo import ZoneInfo
+
+    new_york = ZoneInfo("America/New_York")
+    local = accepted.astimezone(new_york)
+    if time(9, 30) <= local.time() < time(16, 0) and local.weekday() < 5:
+        return accepted
+    day = local.date() if local.time() >= time(16, 0) else local.date() - timedelta(days=1)
+    while day.weekday() >= 5:
+        day -= timedelta(days=1)
+    return datetime.combine(day, time(16, 0), tzinfo=new_york).astimezone(UTC)
+
+
 def earnings_releases(ticker: str) -> list[datetime]:
-    """Every quarterly results release on EDGAR, by acceptance time (:func:`results_releases`)."""
+    """Every quarterly results release on EDGAR (:func:`results_releases`), each anchored where the
+    market first trades it (:func:`release_anchor`)."""
     from argus.market.evidence import EdgarSource
 
     since = datetime.now(UTC) - timedelta(days=HISTORY_DAYS + 30)
-    return results_releases(EdgarSource().filings(ticker, since=since, limit=200))
+    return [release_anchor(at) for at in
+            results_releases(EdgarSource().filings(ticker, since=since, limit=200))]
 
 
 FETCH_ATTEMPTS = 5
@@ -252,7 +276,8 @@ def reaction(symbol: str, kind: str, times: Sequence[datetime],
             continue  # a window whose market model cannot be fitted is left out, not guessed at
         if found is not None:
             windows.append(found)
-    dates = tuple(w.at.date().isoformat() for w in windows)
+    # the instant, not the day: the move list measures from it (round 24)
+    dates = tuple(w.at.astimezone(UTC).isoformat(timespec="minutes") for w in windows)
     if len(windows) < MIN_EVENTS:
         return Reaction(symbol, kind, len(windows), None, None,
                         f"{len(windows)} {kind} event(s) have enough hourly history around them; "

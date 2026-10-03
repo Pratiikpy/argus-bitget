@@ -13,52 +13,52 @@
       "doc": "readme",
       "line": 55,
       "quoted": [
-        "11,209"
+        "11,211"
       ],
       "live": [
-        11209
+        11211
       ],
       "status": "OK",
-      "excerpt": "11,209 tests collected"
+      "excerpt": "11,211 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 268,
       "quoted": [
-        "11,209"
+        "11,211"
       ],
       "live": [
-        11209
+        11211
       ],
       "status": "OK",
-      "excerpt": "11,209 tests collected"
+      "excerpt": "11,211 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 272,
       "quoted": [
-        "11,209"
+        "11,211"
       ],
       "live": [
-        11209
+        11211
       ],
       "status": "OK",
-      "excerpt": "11,209 tests collected"
+      "excerpt": "11,211 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 292,
       "quoted": [
-        "11,209"
+        "11,211"
       ],
       "live": [
-        11209
+        11211
       ],
       "status": "OK",
-      "excerpt": "11,209 tests collected"
+      "excerpt": "11,211 tests collected"
     },
     {
       "claim": "tests_passing",
@@ -66,7 +66,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        11209
+        11211
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -76,52 +76,52 @@
       "doc": "explained",
       "line": 714,
       "quoted": [
-        "11,209"
+        "11,211"
       ],
       "live": [
-        11209
+        11211
       ],
       "status": "OK",
-      "excerpt": "11,209 tests"
+      "excerpt": "11,211 tests"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 1770,
       "quoted": [
-        "11,209"
+        "11,211"
       ],
       "live": [
-        11209
+        11211
       ],
       "status": "OK",
-      "excerpt": "11,209 tests collected"
+      "excerpt": "11,211 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 2419,
       "quoted": [
-        "11,209"
+        "11,211"
       ],
       "live": [
-        11209
+        11211
       ],
       "status": "OK",
-      "excerpt": "11,209 tests collected"
+      "excerpt": "11,211 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "architecture",
       "line": 13,
       "quoted": [
-        "11,209"
+        "11,211"
       ],
       "live": [
-        11209
+        11211
       ],
       "status": "OK",
-      "excerpt": "11,209 tests collected"
+      "excerpt": "11,211 tests collected"
     },
     {
       "claim": "source_files",

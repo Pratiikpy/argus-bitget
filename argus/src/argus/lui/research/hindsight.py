@@ -217,15 +217,18 @@ def dca(text: str, symbol: str, *, today: date, daily: Callable[[str], Any] | No
         if key not in seen:
             seen.add(key)
             buys.append(d)
-    part = STAKE / len(buys)
-    units_lump = STAKE / window[0].close
+    # "I have $1,000 ... should I DCA into BTC" was worked on $10,000 (a first-time user,
+    # round 24): the amount said is the amount averaged
+    stake = stated_amount(text) or STAKE
+    part = stake / len(buys)
+    units_lump = stake / window[0].close
     units_dca, spent, worst_dca, peak_dca, worst_lump, peak_lump = 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
     buy_days = {d.day for d in buys}
     for d in window:
         if d.day in buy_days:
             units_dca += part / d.close
             spent += part
-        value_dca = units_dca * d.close + (STAKE - spent)
+        value_dca = units_dca * d.close + (stake - spent)
         value_lump = units_lump * d.close
         peak_dca, peak_lump = max(peak_dca, value_dca), max(peak_lump, value_lump)
         worst_dca = min(worst_dca, value_dca / peak_dca - 1.0)
@@ -234,13 +237,15 @@ def dca(text: str, symbol: str, *, today: date, daily: Callable[[str], Any] | No
     end_dca, end_lump = units_dca * last.close, units_lump * last.close
     ahead = "averaging" if end_dca > end_lump else "buying at once"
     lines = [
-        f"Bottom line: over {window[0].day:%b %Y} to {last.day:%b %Y}, ${STAKE:,.0f} put into "
+        f"Bottom line: over {window[0].day:%b %Y} to {last.day:%b %Y}, ${stake:,.0f} put into "
         f"{name} in {len(buys)} equal monthly buys would now be ${end_dca:,.0f}, against "
         f"${end_lump:,.0f} bought all at once on {window[0].day:%d %b %Y} — {ahead} came out "
         f"ahead.",
         f"The ride: the averaged account's worst fall from its peak was {abs(worst_dca):.1%}, the "
         f"lump sum's {abs(worst_lump):.1%} — averaging's case is the smaller fall while it builds, "
         f"not a higher end value.",
+        f"The buys were ${part:,.0f} a month; the same ${stake:,.0f} spread weekly over a year is "
+        f"about ${stake / 52:,.0f} a week.",
         "The choice is yours and depends on what you would do in a fall; this is what one window "
         "of real closes did, not a forecast. Name another start (\"since 2022\") to see a "
         "different window.",

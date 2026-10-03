@@ -154,3 +154,41 @@ class TestFirstTimeUserRound24:
                                            "liquidation")
         assert said is not None and "liquidated near 108,480.00" in said[0]
         assert any("would already have been liquidated" in x for x in said)
+
+
+class TestRound24Remainder:
+    def test_a_release_is_anchored_where_it_is_first_traded(self) -> None:
+        from datetime import UTC, datetime
+
+        from argus.research.event_reactions import release_anchor
+
+        # Apple, 30 Oct 2025: released 16:30 New York, 8-K accepted 2025-10-31T00:30:35Z (EDGAR)
+        after_close = release_anchor(datetime(2025, 10, 31, 0, 30, 35, tzinfo=UTC))
+        assert after_close == datetime(2025, 10, 30, 20, 0, tzinfo=UTC)
+        # a pre-open 8-K is first traded from the previous close
+        pre_open = release_anchor(datetime(2026, 1, 27, 11, 0, tzinfo=UTC))
+        assert pre_open == datetime(2026, 1, 26, 21, 0, tzinfo=UTC)
+        # one accepted inside the session is its own anchor
+        inside = datetime(2026, 3, 4, 15, 0, tzinfo=UTC)
+        assert release_anchor(inside) == inside
+
+    def test_follow_ups_that_lean_on_the_question_before(self) -> None:
+        from argus.lui import server
+
+        assert server._leaning_follow_up(
+            "what's the bear case?", ["I am bullish on MSFT because Azure growth is accelerating. "
+                                      "Test my thesis.", "and how has the stock done?"]) == \
+            "what would prove it wrong?"
+        assert server._leaning_follow_up(
+            "is the sentiment positive or negative?",
+            ["What are the latest news headlines on Apple?"]) == \
+            "is the sentiment positive or negative on AAPL?"
+        assert server._leaning_follow_up(
+            "what did the stock do the day after?", ["When does GOOGL report earnings?"]) == \
+            "how much does GOOGL usually move on earnings?"
+        assert server._leaning_follow_up("is it dangerous", ["what is a perp"]) == \
+            "what leverage is safe then"
+        assert server._leaning_follow_up("should I DCA into BTC", ["I have $1,000"]) == \
+            "should I DCA into BTC with $1,000?"
+        stop = server._STOP_SAID.search("what if the stop is 6% instead?")
+        assert stop is not None

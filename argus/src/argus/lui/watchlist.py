@@ -563,7 +563,7 @@ def _study(event: Event, report: Mapping[str, Any] | None) -> None:
                 "no reliable direction")
         lines.append(f"{ticker} on {label}: moved {ratio:.1f}x its ordinary 24 hours over the day "
                      f"after each of {row.get('events')} since {str(dates[0])[:4] if dates else ''}"
-                     f"{'-' + str(dates[0])[5:] if dates else ''}; average "
+                     f"{'-' + str(dates[0])[5:10] if dates else ''}; average "
                      f"{float(car):+.0f}bps, {lean}." if car is not None else
                      f"{ticker} on {label}: moved {ratio:.1f}x its ordinary 24 hours; {lean}.")
         excess += weight * (ratio - 1.0)

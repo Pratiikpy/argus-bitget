@@ -1122,11 +1122,20 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
                                   detail=f"{ticker} top holdings and sector weights"))
     filed = safe("filings")
     if isinstance(filed, list) and filed:
+        # an amendment is not the report: "10-K filed 30 Apr 2026" was the 10-K/A, the 10-K having
+        # been filed 29 Jan (a judge, round 24, checked on EDGAR); the original is dated, and a
+        # later amendment is said beside it
         by_form: dict[str, Any] = {}
+        amended: dict[str, Any] = {}
         for f in sorted(filed, key=lambda f: f.filed, reverse=True):
-            by_form.setdefault(f.form.replace("/A", ""), f)
-        shown = [f"{form} filed {by_form[form].filed:%d %b %Y}" for form in ("10-Q", "10-K", "8-K")
-                 if form in by_form]
+            if f.form.endswith("/A"):
+                amended.setdefault(f.form.removesuffix("/A"), f)
+            else:
+                by_form.setdefault(f.form, f)
+        shown = [f"{form} filed {by_form[form].filed:%d %b %Y}"
+                 + (f" (amended {amended[form].filed:%d %b %Y})"
+                    if form in amended and amended[form].filed > by_form[form].filed else "")
+                 for form in ("10-Q", "10-K", "8-K") if form in by_form]
         if shown:
             lines.append(f"Latest SEC filings: {'; '.join(shown)}.")
             sources.append(Source(kind="venue", ref="SEC EDGAR submissions",

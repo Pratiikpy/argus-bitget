@@ -480,6 +480,14 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
         "Neither is the share itself: it tracks the price; there is no vote, and the rToken's "
         "terms (dividends, redemption) are Bitget's to set.",
         "Ask \"what does it cost to buy $100 of NVDA\" for the fee on a real order.")),
+    (re.compile(r"^\W*(?:so\s+)?what(?:'s|\s+is)\s+(?:the\s+|a\s+)?(?:bid[\s-]+ask\s+)?spread\W*$",
+                re.I), (
+        "Bottom line: the spread is the gap between the best price a buyer offers (the bid) and "
+        "the best price a seller asks (the ask); buying at the ask and selling at the bid costs "
+        "you that gap once, on top of fees.",
+        "On busy markets such as BTC on Bitget it is a fraction of a basis point; on thin markets, "
+        "or when a stock's own exchange is shut, it widens.",
+        "Ask \"what is the BTC price now\" to see the live bid, ask and spread.")),
     (re.compile(r"\bvoting\s+rights?\b|\bdo\s+i\s+get\s+(?:to\s+)?vote\b|\bcan\s+i\s+vote\b",
                 re.I), (
         "Bottom line: no — neither a stock's rToken nor its perpetual on Bitget makes you a "

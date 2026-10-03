@@ -396,3 +396,7 @@ def _event_lines(raw_text: str, *, always: bool = False) -> tuple[list[str], str
 
 # Every engine here is a traced step from import on (lui/trace.py, trace_module).
 trace_module(globals())
+
+
+event_lines = _event_lines
+"""The next CPI and FOMC lines, public for the answer to "anything big coming up" (round 24)."""

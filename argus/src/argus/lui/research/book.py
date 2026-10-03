@@ -131,7 +131,7 @@ def _book_history_lines(book: Mapping[str, float], cash: float,
             "and it describes this window only — a different window gives a different figure."
             + (" It is positive while the yearly return is negative because it uses the average "
                "daily return, which volatility drag puts above the compounded one."
-               if sharpe is not None and sharpe > 0 > growth else ""))
+               if sharpe is not None and round(sharpe, 2) > 0 > growth else ""))
     return [text, note], Source(kind="computation",
                                 ref="argus.lui.research.book._book_history_lines",
                                 detail=f"Bitget daily candles, {len(days)} shared days")
@@ -498,9 +498,18 @@ def _moves_one_by_one(symbol: str, days: Sequence[str]) -> str | None:
     over the 30 days before the latest release."""
     from argus.market.history import HistoryError, fetch_window
 
+    def anchor(day: str) -> datetime:
+        # a full instant from the study (round 24: the release's anchor, the last US close before
+        # it reached the market); an older bare date keeps the 20:00 UTC reading
+        said = datetime.fromisoformat(day)
+        if "T" in day:
+            at = said if said.tzinfo else said.replace(tzinfo=UTC)
+            return at.astimezone(UTC).replace(minute=0, second=0, microsecond=0)
+        return said.replace(hour=20, tzinfo=UTC)
+
     moves: list[str] = []
     for day in days:
-        start = datetime.fromisoformat(day).replace(hour=20, tzinfo=UTC)
+        start = anchor(day)
         try:
             candles = fetch_window(symbol, start=start - timedelta(hours=1),
                                    end=start + timedelta(hours=26), interval="1H", pause=0.05)
@@ -514,7 +523,7 @@ def _moves_one_by_one(symbol: str, days: Sequence[str]) -> str | None:
     if not moves:
         return None
     try:
-        latest = datetime.fromisoformat(days[-1]).replace(hour=20, tzinfo=UTC)
+        latest = anchor(days[-1])
         month = fetch_window(symbol, start=latest - timedelta(days=31), end=latest,
                              interval="1H", pause=0.05)
     except (HistoryError, OSError, ValueError):

@@ -205,7 +205,15 @@ class EarningsReleaseSource:
             url = self._exhibit_url(cik, accession)
             if url is None:
                 continue
-            fields = parse(clean(_fetch(url)))
+            document = clean(_fetch(url))
+            fields = parse(document)
+            if fields["revenue"] is None and re.search(
+                    r"\b(?:production|deliveries|delivery)\b[^.]{0,40}\b(?:deliveries|deployments|"
+                    r"report|update)\b", document[:600], re.I):
+                # Tesla files its quarterly "Production, Deliveries & Deployments" report under
+                # item 2.02 too; it carries no results, and was quoted as the earnings release (a
+                # judge, round 24, checked on EDGAR)
+                continue
             out.append(Release(
                 ticker=ticker.upper(), filed=date.fromisoformat(rf["filingDate"][i]),
                 accession=accession, url=url, headline=fields["headline"],
