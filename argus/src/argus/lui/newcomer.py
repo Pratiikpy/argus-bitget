@@ -346,8 +346,10 @@ explains(*_TRUST_A)
 # hidden costs and beginner mistakes were declined or answered with the perpetual-versus-rToken
 # explainer.
 _SPECULATION = re.compile(
-    r"\bis\s+(?:it|this|that|crypto|trading|all\s+this)\s+(?:just\s+|basically\s+|really\s+)?"
-    r"(?:gambling|a\s+casino|a\s+scam|a\s+ponzi)\b|\bno\s+(?:real\s+)?(?:use|utility|purpose)\b|"
+    r"\b(?:is|are)\s+(?:it|this|that|crypto|trading|all\s+this|meme\s*coins?|memecoins?|alt\s*"
+    r"coins?|shit\s*coins?|these\s+coins|those\s+coins|altcoins?)\s+(?:just\s+|basically\s+|"
+    r"really\s+|kinda\s+|like\s+|all\s+)?(?:gambling|a\s+casino|casinos|a\s+scam|scams|a\s+ponzi|"
+    r"lottery|a\s+lottery\s+ticket)\b|\bno\s+(?:real\s+)?(?:use|utility|purpose)\b|"
     r"\bwhy\s+(?:would|do|does|did)\s+(?:a\s+|these\s+|those\s+)?(?:coins?|tokens?|memes?|"
     r"memecoins?)\b[^?]{0,40}\b(?:go|went)\s+up\b|\b(?:dog|meme|joke|shit|frog)\s*coins?\b[^?]{0,40}"
     r"\b(?:still\s+a\s+thing|worth\s+it|legit|real|a\s+thing)\b|\bmade\s+bank\b", re.I)
@@ -378,8 +380,9 @@ _OTHER_EXCHANGE_A = (
 )
 _KYC = re.compile(
     r"\b(?:verify|verified|verification|kyc)\b[^?]{0,40}\b(?:id|identity|bitget|account|start|"
-    r"trade|use)\b|\b(?:id|identity|passport)\b[^?]{0,30}\b(?:to\s+(?:use|trade|start|sign\s+up|"
-    r"buy)|for\s+bitget)\b|\bkyc\b", re.I)
+    r"trade|use)\b|\b(?:id|identity|passport|selfie|driver'?s\s+licen[cs]e)\b[^?]{0,30}\b(?:to\s+"
+    r"(?:use|trade|start|sign\s+up|buy)|for\s+bitget|on\s+bitget)\b|\bupload\s+(?:a\s+|my\s+)?"
+    r"(?:passport|id|selfie|documents?)\b|\bkyc\b", re.I)
 _KYC_A = (
     "Bottom line: Bitget asks for identity verification (KYC) — which features need it, and "
     "when, is set by Bitget's rules for your country, on its help centre and on the sign-up "
@@ -403,8 +406,8 @@ _HIDDEN_FEES_A = (
 )
 _MISTAKES = re.compile(
     r"\b(?:biggest|common|worst|typical|main|top|usual)\s+(?:beginner\s+|newbie\s+|rookie\s+)?"
-    r"(?:mistakes?|errors?|traps?)\b|\bmistakes?\s+(?:that\s+)?(?:beginners?|newbies?|new\s+"
-    r"traders?|people)\b|\bwhat\s+should\s+i\s+(?:avoid|watch\s+out\s+for|not\s+do)\b", re.I)
+    r"(?:mistakes?|errors?|traps?)\b|\bmistakes?\b[^?]{0,20}\b(?:beginners?|newbies?|noobs?|new\s+"
+    r"traders?|people\s+new)\b|\bwhat\s+should\s+i\s+(?:avoid|watch\s+out\s+for|not\s+do)\b", re.I)
 _MISTAKES_A = (
     "Bottom line: the costliest beginner mistakes are sizes and habits, not picks — too much "
     "leverage, trading too often, putting in money you cannot lose, and buying after a big run "

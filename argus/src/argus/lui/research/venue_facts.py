@@ -52,7 +52,7 @@ GOLD_LINEUP_Q: Final = re.compile(
     r"\b(?:redemption|redeem|compare)\b[^?]{0,80}\b(?:paxg|tether\s+gold|xaut)\b", re.I)
 LEVELS_Q: Final = re.compile(
     r"\b(?:give\s+me|what(?:'s|\s+is|\s+are)|show\s+me|quote|tell\s+me)\b[^?]{0,120}\b(?:levels?|"
-    r"prices?|quotes?)\b", re.I)
+    r"prices?|quotes?)\b|\bquote\s+me\b|\b(?:prices?|levels?|quotes?)\s+(?:of|for)\b", re.I)
 _DXY: Final = re.compile(r"\bdxy\b|\bdollar\s+index\b|\bus\s+dollar\s+index\b", re.I)
 RTOKEN_REDEEM_Q: Final = re.compile(
     r"\brtokens?\b[^?]{0,120}\b(?:redeem\w*|redemption|backed|backing|custod\w*|wrapped|wbtc)\b|"

@@ -533,6 +533,10 @@ def concept_asked(text: str, named_symbols: tuple[str, ...] = ()) -> Concept | N
              # round 21): whether a term is safe for someone is what the term carries
              or re.match(r"^\s*(?:is|are)\s+(?:using\s+)?(.+?)\s+(?:ok|okay|safe|fine|good|"
                          r"a\s+good\s+idea|smart|wise)\b[^?]{0,40}[?.!\s]*$", text, re.I))
+    if risky is not None and re.search(r"\d+(?:\.\d+)?\s*%|\$\s?\d", risky.group(1)):
+        # "how risky is 30% NVDA 70% BTC over a 5-year horizon" got Bitcoin defined (round 28,
+        # live re-ask): weights or sums make it a book to measure, not a term to explain
+        return None
     if risky is not None:
         text = f"explain {risky.group(1)}"
     if not _ASK.search(text) or (_OWNED.search(text) and not _MEANS.search(text)):
