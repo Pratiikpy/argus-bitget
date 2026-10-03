@@ -422,6 +422,9 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
         book = _book(args.get("book"))
         if not book:
             raise ToolError("book is required")
+        # weights that add past 100% are leverage and under 100% leave cash: {NVDA: 200, AAPL:
+        # 100} was stressed as 67/33 with no word (a hostile review, round 25)
+        stated_gross = sum(abs(float(v)) for v in (args.get("book") or {}).values()) / 100.0
         shocked = args.get("shocked")
         subject = None
         if shocked:
@@ -437,9 +440,19 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
             # -500 was stressed as a -556% loss on a long book (a hostile review, round 22)
             raise ToolError("shock_percent must be above -100: a price cannot fall by more than "
                             "all of it")
+        note: tuple[str, ...] = ()
+        leverage, cash = None, 0.0
+        if stated_gross > 1.0 + 1e-9:
+            leverage = round(stated_gross, 4)
+            note = (f"the weights add to {stated_gross:.0%}, read as {stated_gross:.2f}x "
+                    f"leverage on the account",)
+        elif stated_gross < 1.0 - 1e-9:
+            cash = round(1.0 - stated_gross, 6)
+            note = (f"the weights add to {stated_gross:.0%}, so the other {cash:.0%} is read as "
+                    f"cash",)
         request = ResearchRequest(kind=ResearchKind.STRESS, symbols=tuple(book), book=book,
-                                  shock_pct=shock_value,
-                                  shock_on=subject)
+                                  shock_pct=shock_value, shock_on=subject, leverage=leverage,
+                                  cash=cash, notes=note)
         result = _run(request, "stress my book")
         return _answer_text(result), result["refused"]
     if name == "argus_execution_plan":

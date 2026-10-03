@@ -482,6 +482,18 @@ def _find_date(text: str, now: date, notes: set[str]) -> tuple[date | None, str]
                     found = _date_from(None, int(m.group(1)), int(m.group(2)), now, notes)
                     if found is not None:
                         notes.add("a date written 8/20 was read month first (US order)")
+                said_day = re.search(r"\b(mon|tue|wed|thu|fri|sat|sun)[a-z]*\.?,?\s*$",
+                                     text[:m.start()], re.I)
+                if found is not None and said_day is not None:
+                    # "Sat 6 Sep" when 6 Sep 2026 is a Sunday went unremarked (a hostile
+                    # review, round 25): the date is used and the mismatch said
+                    days = ("monday", "tuesday", "wednesday", "thursday", "friday", "saturday",
+                            "sunday")
+                    written = said_day.group(1).lower()
+                    if days[found.weekday()][:3] != written:
+                        named = next(d for d in days if d.startswith(written)).title()
+                        notes.add(f"{found:%d %b %Y} is a {found:%A}, not a {named} as written; "
+                                  f"the date was used")
         text = pattern.sub(" ", text)
     return found, text
 

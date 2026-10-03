@@ -55,3 +55,24 @@ def test_the_agent_page_states_the_next_trades_effect() -> None:
 
     html = agent_page._metrics({"n_closed_trades": 7, "win_rate": 2 / 7}, {})
     assert "the next win takes the win rate to 37.5% and the next loss to 25.0%" in html
+
+
+def test_a_weekday_that_does_not_match_its_date_is_said() -> None:
+    from argus.lui.journal import _find_date
+
+    notes: set[str] = set()
+    _find_date("bought 10 NVDA on Sat 6 Sep at 180", date(2026, 10, 3), notes)
+    assert "06 Sep 2026 is a Sunday, not a Saturday as written; the date was used" in notes
+
+
+def test_mcp_stress_reads_weights_past_100_as_leverage(monkeypatch: pytest.MonkeyPatch) -> None:
+    from argus.lui import mcp_server
+
+    seen: list[object] = []
+    monkeypatch.setattr(mcp_server, "_run", lambda request, text: seen.append(request) or {
+        "lines": ["Bottom line: ok"], "refused": False, "sources": []})
+    mcp_server.call_tool("argus_stress", {"book": {"NVDA": 200, "AAPL": 100},
+                                          "shock_percent": -10})
+    request = seen[0]
+    assert request.leverage == 3.0
+    assert any("3.00x leverage" in n for n in request.notes)
