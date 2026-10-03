@@ -1,5 +1,5 @@
 {
- "at": "2026-10-03T13:46:45+00:00",
+ "at": "2026-10-03T15:41:28+00:00",
  "digest": "68ceeadb52fc4ce0721006d8016744de7bc4d135ae75eb0aaca20e68f6460712",
  "source": "risk_policy.json",
  "thresholds": {
@@ -179,22 +179,6 @@
    ]
   },
   "TQQQUSDT": {
-   "can_fire": [
-    "max_gross_exposure_notional",
-    "max_position_notional",
-    "max_signed_exposure_notional",
-    "max_unhedged_notional",
-    "min_confidence_to_trade"
-   ],
-   "cannot_fire": [
-    "factor_exposure_limits",
-    "max_liquidation_cost_bps",
-    "max_margin_usage_ratio",
-    "max_scenario_loss_pct",
-    "min_symbol_realized_pnl"
-   ]
-  },
-  "SQQQUSDT": {
    "can_fire": [
     "max_gross_exposure_notional",
     "max_position_notional",

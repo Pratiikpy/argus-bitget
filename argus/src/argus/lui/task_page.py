@@ -255,7 +255,11 @@ def _conclusion(task: Task) -> str:
         parts.append("<h3>Your reasons, tested</h3><ul class='reasons'>" + "".join(
             _reason_item(t) for t in task.tested) + "</ul>")
     if call is not None:
-        lead = (f"<h3>How much</h3><p class='call2'>{esc(call.call)}</p>" if weighed is not None
+        # "No measured edge" followed by a bare "How much: Add, at 15%" read to a newcomer as an
+        # instruction to add (a first-time user, round 27): the sizing is conditional, and its
+        # heading says so
+        lead = (f"<h3>If you do add it: the size your risk budget allows</h3>"
+                f"<p class='call2'>{esc(call.call)}</p>" if weighed is not None
                 else f"<p class='call'>{esc(call.call)}</p>")
         parts.append(lead + "".join(f"<p>{esc(line)}</p>" for line in call.lines))
     if weighed is not None:

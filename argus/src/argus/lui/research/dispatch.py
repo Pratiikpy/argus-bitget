@@ -400,7 +400,8 @@ def _standalone_lead(lines: list[str], add: str, raw: Mapping[str, Mapping[Any, 
                     from argus.market.bitget import fetch_tickers
 
                     last = float(fetch_tickers()[add].last)
-                    price_first = f"{name} last {last:,.2f} USDT on Bitget; "
+                    shown = f"{last:,.2f}" if last >= 1 else f"{last:.4g}"
+                    price_first = f"{name} last {shown} USDT on Bitget; "
                 except Exception:
                     price_first = ""
             word = beta_line.split(" ", 1)[0]
@@ -627,7 +628,7 @@ def risk_adjusted_lines(symbols: tuple[str, ...], days: int) -> list[str] | None
         try:
             with _FETCH_SLOTS:
                 bars = fetch_window(symbol, start=datetime.now(UTC) - timedelta(days=days + 2),
-                                    interval="1D", candle_type=CandleType.MARKET, pause=0.05)
+                                    interval="1Dutc", candle_type=CandleType.MARKET, pause=0.05)
         except Exception:
             continue
         closes = [float(b.close) for b in bars if float(b.close) > 0][-(days + 1):]
@@ -1158,13 +1159,17 @@ def _loss_cap(symbol: str, text: str) -> tuple[float, str] | None:
 
 def span_moves(symbol: str, days: int) -> tuple[list[float], int, date] | None:
     """Every overlapping ``days``-calendar-day move of ``symbol`` over about three years of
-    Bitget daily closes, with the count of closes and the first date; None when too short."""
+    Bitget daily closes, with the count of closes and the first date; None when too short.
+
+    Days run from 00:00 UTC (``1Dutc``): Bitget's plain ``1D`` starts at 00:00 UTC+8, which put
+    BTC's worst day at -9.0% where the year's UTC closes in the same answer said -14.0% (a
+    first-time user, round 27)."""
     from argus.market.history import CandleType, fetch_window
 
     try:
         with _FETCH_SLOTS:
             bars = fetch_window(symbol, start=datetime.now(UTC) - timedelta(days=1100),
-                                interval="1D", candle_type=CandleType.MARKET, pause=0.05)
+                                interval="1Dutc", candle_type=CandleType.MARKET, pause=0.05)
     except Exception:
         return None
     dated = [(b.ts.date(), float(b.close)) for b in bars if float(b.close) > 0]
@@ -1180,6 +1185,12 @@ def span_moves(symbol: str, days: int) -> tuple[list[float], int, date] | None:
         return None
     return moves, len(dated), dated[0][0]
 
+
+MARGIN_WITH = re.compile(
+    r"\bwith\s+(?:only\s+|just\s+|like\s+)?\$?\s?(?P<m>\d[\d,]*(?:\.\d+)?)"
+    r"(?![\d.,]*\s*(?:%|x\b|times|percent))\s*(?:usdt|usd|dollars|bucks|\$)?"
+    r"(?:\s+(?:of\s+)?margin)?\b", re.I)
+"""The margin put up on a leveraged trade: "20x leverage on btc with 100 usdt"."""
 
 BAD_SPAN_Q = re.compile(
     r"\bhow\s+much\s+(?:money\s+)?(?:could|can|would|might|will|do)\s+i\s+lose\s+(?:on|in|with|"
@@ -1728,6 +1739,18 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                          r"\bprice\b[^?.]{0,20}\bliquidat|\bget\s+liquidated\s+at\b",
                          raw_text, re.I):
                 lines = _lead_with(lines, "Liquidation price:")
+            margin = MARGIN_WITH.search(raw_text)
+            multiple_used = request.leverage or 10.0
+            if margin is not None and lines and float(margin.group("m").replace(",", "")) > 0:
+                # "20x leverage on btc with 100 usdt" never said that is a $2,000 position whose
+                # liquidation takes the whole $100 (a first-time user, round 27)
+                posted = float(margin.group("m").replace(",", ""))
+                position = posted * multiple_used
+                lines.insert(1, f"With ${posted:,.0f} of margin at {multiple_used:g}x the position "
+                                f"is ${position:,.0f}: each 1% move in {_t(request.symbols[0])} "
+                                f"is ${position / 100:,.2f}, {multiple_used:g}% of your margin, "
+                                f"and liquidation takes the whole ${posted:,.0f} on isolated "
+                                f"margin.")
             payload["leverage"] = lever_payload
             stake = next((m for note in request.notes if (m := re.match(
                 r"your holdings add up to (\d+(?:\.\d+)?)%, so they were scaled", note))), None)

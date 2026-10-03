@@ -322,6 +322,23 @@ _GOING_WRONG = (
 )
 
 
+_TRUST = re.compile(
+    r"\b(?:can|should|do)\s+i\s+trust\s+(?:you|this|it|argus|the\s+console)\b|\bare\s+you\s+"
+    r"(?:reliable|accurate|legit|trustworthy)\b|\bhow\s+(?:accurate|reliable|trustworthy)\s+(?:are\s+"
+    r"you|is\s+(?:this|it|argus))\b|\bwhy\s+should\s+i\s+(?:trust|believe)\s+(?:you|this|it)\b",
+    re.I)
+_TRUST_A = (
+    "Bottom line: trust it only as far as you can check it — every figure names its source, so "
+    "you can verify it yourself, and the console publishes its own mistakes.",
+    "/wrong lists every claim it has withdrawn or corrected, in plain terms; /proof sets each "
+    "capability against other tools on the same inputs, losses included; /status shows how "
+    "accurate its own forecasts have been, including where a simple base rate does better.",
+    "What it never does is tell you what to buy or sell — the decision and the risk stay yours.",
+)
+""""should i trust you" got the not-advice template, whose first word is "no" (a first-time
+user, round 27)."""
+
+explains(*_TRUST_A)
 explains(*_LOOKAHEAD_A, *_OVERFIT_A, *_SURVIVOR_A, *_COSTS_A, *_NOT_ADVICE, *_BUYING, *_LOSING,
          *_LOSS_HAPPENS_A, *_BEGINNER_SAFE_A,
          *_GOING_WRONG, *_NO_GUARANTEE, *_SAFE, *_WITHDRAWING, *_PLACING, *_FREE_TO_USE)
@@ -572,6 +589,8 @@ def reply(text: str, *, named: bool = False) -> Reply | None:
         return Reply(lines=_COSTS_A)
     if _GUARANTEE.search(text):
         return Reply(lines=_NO_GUARANTEE)
+    if _TRUST.search(text):
+        return Reply(lines=_TRUST_A)
     if _ADVICE.search(text):
         return Reply(lines=_NOT_ADVICE)
     if _MONEY_SAFE.search(text):

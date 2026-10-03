@@ -130,7 +130,12 @@ def lines(*, now: datetime | None = None, top: int = 8) -> list[str] | None:
         return None
     if not scored:
         return None
-    best = scored[:top]
+    # a ticker in another script reads as a bug to an English reader (round 27); it is counted
+    shown = [s for s in scored if _latin(s.symbol)]
+    unshown = len(scored) - len(shown)
+    best = shown[:top]
+    if not best:
+        return None
 
     def row(s: Scored) -> str:
         p = s.parts
@@ -150,11 +155,74 @@ def lines(*, now: datetime | None = None, top: int = 8) -> list[str] | None:
             "Score out of 100: unusual volume 35 (24h traded value against the 20 days before, 3x "
             "or more is full), 5-day move 25 (10% either way is full), funding 20 (0.05% a "
             "settlement is full), CoinGecko trending 20. Volume and attention can be "
-            "manufactured; a high score is a reason to look, nothing more.",
+            "manufactured; a high score is a reason to look, nothing more."
+            + (f" {unshown} contract{'s' if unshown != 1 else ''} named in another script "
+               f"{'are' if unshown != 1 else 'is'} left off this list." if unshown else ""),
             f"Computed {when:%d %b %H:%M} UTC from Bitget's public tickers and daily candles and "
             "CoinGecko's trending list. Ask about any name on it for its full picture."]
 
 
-__all__ = ["ASKED", "WEIGHTS", "Scored", "lines", "scan"]
+TODAY_ASKED: Final = re.compile(
+    r"\bwhat\s+should\s+i\s+(?:look\s+at|watch|keep\s+an\s+eye\s+on)\s+(?:today|now|this\s+week)\b",
+    re.I)
+"""The newcomer's "what should I look at today?", which wants the day before it wants a scan."""
+
+
+def _latin(symbol: str) -> bool:
+    return symbol.isascii()
+
+
+def today_lines(*, now: datetime | None = None) -> list[str] | None:
+    """"what should i look at today?" led a newcomer with an unexplained Chinese-character ticker
+    and two pump-shaped small caps (a first-time user, round 27): the day first — BTC and ETH
+    over 24 hours and the next scheduled US release — then the three Latin-named contracts
+    scoring highest on the scan, said as a list to read."""
+    from argus.lui.research.desk_answers import _tickers
+
+    when = now or datetime.now(UTC)
+    try:
+        tickers = _tickers()
+    except Exception:
+        return None
+    majors = []
+    for symbol in ("BTCUSDT", "ETHUSDT"):
+        ticker = tickers.get(symbol)
+        change = getattr(ticker, "change_24h", None) if ticker is not None else None
+        if change is not None:
+            majors.append(f"{symbol.removesuffix('USDT')} {float(change):+.1%}")
+    if not majors:
+        return None
+    event = None
+    try:
+        from argus.lui.watchlist import watchlist
+
+        week = watchlist("what is on the calendar this week", now=when)
+        event = next((str(x).removeprefix("Scheduled: ") for x in week[0]
+                      if str(x).startswith("Scheduled:")), None)
+    except Exception:
+        event = None
+    try:
+        scored = [s for s in scan() if _latin(s.symbol)]
+    except Exception:
+        scored = []
+    out = [f"Bottom line: today, {' and '.join(majors)} over 24 hours"
+           + (f"; the next scheduled US release this week is {event.rstrip('.')}" if event else
+              "; nothing major is on the US calendar this week")
+           + ". Those, and anything you already hold, are the place to start."]
+    if scored:
+        out.append("Moving unusually beyond the big names — a list to read, not to buy, since "
+                   "volume like this is often a pump that fades:")
+        for s in scored[:3]:
+            move = f"{s.move_5d:+.1%}" if s.move_5d is not None else "n/a"
+            ratio = f"{s.volume_ratio:.1f}x" if s.volume_ratio is not None else "n/a"
+            out.append(f"{s.symbol.removesuffix('USDT')}: {move} over 5 days, trading {ratio} its "
+                       f"usual daily value.")
+    out.append(f"Computed {when:%d %b %H:%M} UTC from Bitget's public tickers and the BLS and Fed "
+               "calendars. Ask \"early signals\" for the full scored scan, or about any name for "
+               "its picture.")
+    return out
+
+
+__all__ = ["ASKED", "TODAY_ASKED", "WEIGHTS", "Scored", "lines", "scan", "today_lines"]
 
 trace_module(globals())

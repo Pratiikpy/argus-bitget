@@ -15,7 +15,7 @@ from __future__ import annotations
 import re
 from collections.abc import Sequence
 from datetime import UTC, datetime, timedelta
-from typing import Any
+from typing import Any, Final
 
 from argus.lui.trace import trace_module
 
@@ -41,7 +41,10 @@ def _tickers() -> dict[str, Any]:
 def fees_lines(text: str) -> list[str] | None:
     """"What are Bitget's spot trading fees for a normal user?", "and futures maker/taker?" were
     answered with when to use a perpetual (a judge, round 26)."""
-    if not re.search(r"\b(?:trading\s+)?fees?\b|\bmaker\b|\btaker\b|\bcommission", text, re.I):
+    # "how much does bitget charge per trade" led with when to use a perpetual (a first-time user,
+    # round 27)
+    if not re.search(r"\b(?:trading\s+)?fees?\b|\bmaker\b|\btaker\b|\bcommission|\bcharges?\b",
+                     text, re.I):
         return None
     if re.search(r"\$\s?\d|\d+\s*(?:btc|eth|sol|shares?)\b", text, re.I):
         return None  # a fee on a stated order is the order-cost engine's
@@ -56,6 +59,53 @@ def fees_lines(text: str) -> list[str] | None:
             f"fees in BGB lower these rates; your own rate is on Bitget's fee page.",
             "Source: Bitget's published VIP 0 spot rate and the maker/taker rates its USDT-futures "
             "contract list returns (makerFeeRate 0.0002, takerFeeRate 0.0006)."]
+
+
+_TRADES_PER: Final = re.compile(
+    r"\b(?P<n>\d+)\s*(?:x|times?|trades?|round[\s-]*trips?|orders?)\s+(?:a|per|each|every)\s+"
+    r"(?P<u>day|week|month)\b|\b(?P<n2>\d+)\s+(?:trades?|times?)\s+(?:daily|weekly)\b", re.I)
+_STAKE: Final = re.compile(
+    r"\$\s?(?P<a>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k)?\b|(?P<b>\d[\d,]*(?:\.\d+)?)\s*(?P<k2>k)?\s*"
+    r"(?:usdt|usd|dollars|bucks)\b", re.I)
+
+
+def fee_burn_lines(text: str) -> list[str] | None:
+    """"if i trade 10 times a day with $500 how much do fees eat" got the fee schedule and no sum
+    (a first-time user, round 27): the schedule, worked through the stated count and stake — per
+    trade, per day, per month and as a share of the stake — on spot and on the perpetual."""
+    if not re.search(r"\bfees?\b|\bcommissions?\b|\bcosts?\b", text, re.I):
+        return None
+    freq = _TRADES_PER.search(text)
+    stake = _STAKE.search(text)
+    if freq is None or stake is None:
+        return None
+    count = int(freq.group("n") or freq.group("n2"))
+    unit = (freq.group("u") or ("week" if re.search(r"\bweekly\b", text, re.I) else "day")).lower()
+    amount = float((stake.group("a") or stake.group("b")).replace(",", "")) * (
+        1000 if (stake.group("k") or stake.group("k2")) else 1)
+    if count <= 0 or amount <= 0 or count > 10_000:
+        return None
+    per_month = count * {"day": 30, "week": 30 / 7, "month": 1}[unit]
+    spot_trip, perp_trip = 2 * SPOT_TAKER_VIP0, 2 * PERP_TAKER
+
+    def money(x: float) -> str:
+        return f"${x:,.2f}" if x < 100 else f"${x:,.0f}"
+
+    perp_month = amount * perp_trip * per_month
+    spot_month = amount * spot_trip * per_month
+    share = perp_month / amount
+    return [f"Bottom line: about {money(perp_month)} a month on perpetuals, {share:.0%} "
+            f"of the {money(amount)} — each trade in and out costs {money(amount * perp_trip)} "
+            f"({perp_trip:.2%} taker round trip), {count} a {unit} is "
+            f"{money(amount * perp_trip * count)} a {unit}; on spot it is {money(spot_month)} a "
+            f"month ({spot_trip:.2%} a round trip).",
+            f"So every trade has to make {perp_trip:.2%} ({spot_trip:.2%} on spot) just to stand "
+            f"still; crypto trades every day, so a month here is 30 days. Leverage makes it worse: "
+            f"fees are charged on the position, so at 5x the same {money(amount)} pays five "
+            f"times as much.",
+            "Each trade read as a full round trip (a buy and a sell) at Bitget's standard (VIP 0) "
+            "taker rates; maker orders pay less (0.02% a side on perpetuals) but only fill when "
+            "the price comes to them, and perpetuals also pay or receive funding."]
 
 
 def new_listings_lines(text: str, now: datetime | None = None) -> list[str] | None:

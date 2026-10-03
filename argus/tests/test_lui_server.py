@@ -155,7 +155,7 @@ class TestTheDemoStarts:
                 hours_to_discovery=30.0, decided_at=start + timedelta(hours=n))
         monkeypatch.setattr(server, "_ledger_path", lambda: path)
 
-        payload = json.loads(_get(base_url + "/status")[1])
+        payload = json.loads(_get(base_url + "/status?format=json")[1])
         assert payload["entries"] == 3
         assert payload["chain_intact"] is True
         assert payload["newest_decision_at"] == (start + timedelta(hours=2)).isoformat()
@@ -164,7 +164,7 @@ class TestTheDemoStarts:
         rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
         rows[0]["thesis"] = "a thesis written after the fact"
         path.write_text("\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8")
-        tampered = json.loads(_get(base_url + "/status")[1])
+        tampered = json.loads(_get(base_url + "/status?format=json")[1])
         assert tampered["entries"] == 3
         assert tampered["chain_intact"] is False
 

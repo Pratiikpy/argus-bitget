@@ -143,7 +143,7 @@ class TestTheHostedStatusReadsTheBundledRecord:
                 if row.get("kind", "decision") == "decision" and row.get("decided_at"):
                     newest = row["decided_at"]
         assert newest is not None, "the bundled ledger holds no decision"
-        status, _, body = _call(hosted + "/status")
+        status, _, body = _call(hosted + "/status?format=json")
         payload = json.loads(body)
         assert status == 200 and payload["chain_intact"] is True
         assert (datetime.fromisoformat(payload["newest_decision_at"])

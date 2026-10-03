@@ -1,26 +1,26 @@
 {
   "symbol": "MSTRUSDT",
   "phase": "weekend",
-  "started_at": "2026-10-03T13:30:12.437191+00:00",
+  "started_at": "2026-10-03T15:30:43.823416+00:00",
   "window_seconds": 90,
-  "samples": 56,
-  "prints_seen": 0,
-  "rpi_share": 0.0,
+  "samples": 52,
+  "prints_seen": 74,
+  "rpi_share": 0.0676,
   "maker_bps": 2.0,
   "markouts": [
     {
       "horizon_seconds": 5,
-      "prints": 0,
-      "median_bps": 0.0,
-      "mean_bps": 0.0,
-      "worst_bps": 0.0
+      "prints": 67,
+      "median_bps": 0.6162,
+      "mean_bps": 0.368,
+      "worst_bps": -1.5407
     },
     {
       "horizon_seconds": 15,
-      "prints": 0,
-      "median_bps": 0.0,
-      "mean_bps": 0.0,
-      "worst_bps": 0.0
+      "prints": 48,
+      "median_bps": 1.5407,
+      "mean_bps": 0.3852,
+      "worst_bps": -4.3142
     },
     {
       "horizon_seconds": 30,
@@ -37,5 +37,5 @@
       "worst_bps": 0.0
     }
   ],
-  "verdict": "0 joined print(s) at the 5s horizon over 90s of MSTRUSDT (weekend) \u2014 below the 20 this module will draw a conclusion from. The sample says the book was quiet, not that resting here is safe"
+  "verdict": "Over 15s the passive side of 48 print(s) gained a median +1.54bps on MSTRUSDT (weekend). No measurable adverse selection in this window \u2014 which is a statement about 90 seconds, not about the instrument"
 }

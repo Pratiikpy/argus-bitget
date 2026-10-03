@@ -160,7 +160,10 @@ _CAPITAL = re.compile(
     # "I have $5,000 of margin in my account" was kept by the model as a bare "$5,000" and read
     # as a position (a judge, round 20, row 713); the words are kept with it
     r"\bi\s+have\s+(?:about\s+|around\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\s+(?:of\s+)?"
-    r"(?:margin|collateral|buying\s+power)\b",
+    r"(?:margin|collateral|buying\s+power)\b|"
+    # "i want to grow my $300 slowly" kept "slowly" and lost the $300 (a first-time user, round 27)
+    r"\b(?:grow|build\s+up|invest|start\s+with|got|have)\s+(?:only\s+|just\s+|like\s+|about\s+)?"
+    r"(?:my\s+|this\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\b(?!\s*(?:of|in|on|worth)\b)",
     re.I)
 _THESIS = re.compile(
     r"\bi\s+(?:think|believe|expect|reckon|bet)\s+(?:that\s+)?(.{2,40}?)\s+(?:will|is\s+going\s+to|"
@@ -324,9 +327,9 @@ def extract(question: str, now: datetime | None = None,
                                                   or "").lower()), m.group(0))
     if (m := _CAPITAL.search(text)) is not None:
         amount = float((m.group(1) or m.group(3) or m.group(5) or m.group(7) or m.group(9)
-                        or m.group(11) or "0").replace(",", ""))
+                        or m.group(11) or m.group(13) or "0").replace(",", ""))
         unit = (m.group(2) or m.group(4) or m.group(6) or m.group(8) or m.group(10)
-                or m.group(12) or "").lower()
+                or m.group(12) or m.group(14) or "").lower()
         amount *= 1_000 if unit == "k" else 1_000_000 if unit == "m" else 1
         if amount >= 100:
             add("capital", "", f"{amount:.0f}", m.group(0))
@@ -423,7 +426,8 @@ def extract(question: str, now: datetime | None = None,
                 price = None
         plan = tripwire.read(text, price, now=now)
         if plan is not None:
-            add("tripwire", plan.symbol, tripwire.value_of(plan), plan.words, price)
+            add("tripwire", tripwire.subject_of(plan), tripwire.value_of(plan), plan.words,
+                price)
     return facts
 
 
@@ -1232,7 +1236,9 @@ def earlier_lines(question: str, prior: list[str], facts: list[Fact]) -> list[st
 
 
 _WHAT_KEPT = (r"(?P<what>(?:max(?:imum)?\s+)?loss(?:\s+limit)?|drawdown(?:\s+limit)?|"
-              r"risk\s+budget|horizon|(?:trading\s+)?style|account(?:\s+size)?|capital|goal)")
+              # "remind me what i said my budget was" (a first-time user, round 27)
+              r"risk\s+budget|budget|money|horizon|(?:trading\s+)?style|account(?:\s+size)?|"
+              r"capital|goal)")
 _RECALL_ONE_FORMS = tuple(re.compile(p, re.I) for p in (
     r"\bwhat(?:\s+(?:was|is|were|are)|'?s)\s+my\s+" + _WHAT_KEPT
     + r"\b(?:\s+(?:i|we)\s+(?:told|gave|said|set|mentioned)\b[^?]*)?\s*\??\s*$",
@@ -1240,6 +1246,8 @@ _RECALL_ONE_FORMS = tuple(re.compile(p, re.I) for p in (
     # computed figure, not a remembered one.
     r"\bwhat(?:\s+(?:was|is|were|are)|'?s)\s+the\s+" + _WHAT_KEPT
     + r"\s+(?:i|we)\s+(?:told|gave|said|set|mentioned)\b[^?]*\??\s*$",
+    r"\b(?:remind|tell)\s+me\s+(?:again\s+)?what\s+(?:i|we)\s+(?:said|told\s+you|gave|set)\s+"
+    r"(?:my\s+|the\s+)?" + _WHAT_KEPT + r"\b(?:\s+(?:was|is))?\s*\??\s*$",
     r"\b(?:remind|tell)\s+me\s+(?:again\s+)?what\s+(?:my\s+)?" + _WHAT_KEPT
     + r"\b(?:\s+(?:was|is))?(?:\s+(?:i|we)\s+(?:told|gave|said|set|mentioned)\b[^?]*)?\s*\??\s*$",
     r"\bwhat\s+" + _WHAT_KEPT + r"\s+did\s+(?:i|we)\s+(?:tell|give|say|set|mention)\b[^?]*\??\s*$",
@@ -1249,8 +1257,9 @@ and returned a stale decision (a first-user audit, round 17, 2026-10-01)."""
 _RECALL_KINDS = {"loss": ("loss_usd", "max_loss"), "drawdown": ("max_loss", "loss_usd"),
                  "risk": ("budget",), "horizon": ("horizon",), "style": ("style",),
                  "trading": ("style",), "account": ("capital", "book"), "capital": ("capital",),
-                 "goal": ("goal",), "max": ("loss_usd", "max_loss"), "maximum": ("loss_usd",
-                                                                                   "max_loss")}
+                 "goal": ("goal",), "budget": ("capital", "loss_usd"),
+                 "money": ("capital", "loss_usd"), "max": ("loss_usd", "max_loss"),
+                 "maximum": ("loss_usd", "max_loss")}
 
 
 _SCENARIO_STATED = re.compile(r"\b(?:if|when|should)\b[^?]*?\d+(?:\.\d+)?\s*(?:%|percent\b|"

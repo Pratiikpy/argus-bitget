@@ -89,11 +89,14 @@ def test_triggers_come_from_the_levels_the_quartile_and_the_report() -> None:
     w = weigh(engines(support=360.0, p25=-120.0), name="TSLA")
     assert w is not None
     assert any(t.startswith("Below 360 (3.0% under the price)") for t in w.triggers)
-    assert any("fall of more than 120 bps" in t for t in w.triggers)
+    assert any("fall of more than 1.20% within 24 hours" in t for t in w.triggers)
     assert any("The report on 2026-10-21 (23 days)" in t for t in w.triggers)
     # a quartile that rounds to nothing is not a trigger
     flat = weigh(engines(p25=-0.19), name="TSLA")
-    assert flat is not None and not any("bps within 24 hours" in t for t in flat.triggers)
+    assert flat is not None and not any("within 24 hours is worse" in t for t in flat.triggers)
+    # nor is one under a quarter of a percent, which read as a units bug (round 27)
+    noise = weigh(engines(p25=-5.0), name="TSLA")
+    assert noise is not None and not any("within 24 hours is worse" in t for t in noise.triggers)
 
 
 def test_the_questions_are_the_inputs_the_task_did_not_have() -> None:

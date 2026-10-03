@@ -34,8 +34,12 @@ TRIPWIRE: Final = re.compile(
     r"rises?|climbs?|tops?|hits?|reaches?|crosses?|crosses|pushes|rallies)?\s*"
     r"(?P<dir>below|under|beneath|above|over|past|through|to|back\s+to)?\s*"
     r"\$?(?P<lvl>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k\b)?"
-    r"[^.?!]{0,12}?,?\s*(?:then\s+)?i(?:'ll|\s+will|\s+would|\s+am\s+going\s+to|\s+plan\s+to|"
-    r"\u2019ll)\s+(?P<act>[^.?!]{3,90})",
+    r"[^.?!]{0,12}?,?\s*(?:then\s+)?i(?:(?:'ll|\s+will|\s+would|\s+am\s+going\s+to|\s+plan\s+to|"
+    r"\u2019ll)\s+(?P<act>[^.?!]{3,90})|"
+    # "if ETH goes under 2500 i sell all", "if eth hits 3000 i take profit": the plain present
+    # tense, accepted only when an action verb follows (a first-time user, round 27)
+    r"\s+(?P<act2>(?:sell|buy|take|cut|trim|exit|close|add|hedge|short|reduce|dump|get\s+out|"
+    r"go\s+long|go\s+short|lighten|flatten|load)\b[^.?!]{0,80}))",
     re.I,
 )
 """"If BTC drops below 80k I'll sell half", "when NVDA breaks 200, I will add 10%", "once ETH
@@ -97,7 +101,7 @@ def read(text: str, price_now: float | None = None, *,
         side = "below" if level < price_now else "above"
     else:
         return None
-    act = m.group("act")
+    act = m.group("act") or m.group("act2") or ""
     action = ("hedge" if _HEDGE.search(act) else "reduce" if _REDUCE.search(act)
               else "add" if _ADD.search(act) else "other")
     return Plan(symbol=symbols[0], side=side, level=level, action=action,
@@ -199,6 +203,13 @@ def status_line(status: Status) -> str:
     plan = status.plan
     name = _name(plan.symbol)
     head = f"Tripwire ({_plan_words(plan)}):"
+    past = ((plan.side == "below" and status.price_now <= plan.level)
+            or (plan.side == "above" and status.price_now >= plan.level))
+    if status.fired_at is None and past:
+        # "change it to 85k" with BTC at 84.7k: the level is already behind the price, so the
+        # plan is live now — the moment the trader set it for (a first-time user, round 27)
+        return (f"{head} live now — {name} is {status.price_now:,.6g}, already "
+                f"{plan.side} {plan.level:,.10g}; the condition you set is met.")
     if status.fired_at is None:
         gap = plan.level / status.price_now - 1
         return (f"{head} not reached — {name} is {status.price_now:,.6g}, "
@@ -220,6 +231,16 @@ def status_line(status: Status) -> str:
             f"slippage).{already}")
 
 
+def subject_of(plan: Plan) -> str:
+    """A tripwire's memory subject: the symbol and its side, so a stop and a take-profit on the
+    same name are two facts, not one replacing the other."""
+    return f"{plan.symbol}|{plan.side}"
+
+
+def symbol_of(subject: str) -> str:
+    return subject.split("|", 1)[0]
+
+
 def lines_for(facts: list[Any], symbols: tuple[str, ...] | None = None, *,
               now: datetime | None = None) -> list[str]:
     """Status lines for the trader's tripwires — every one, or only those on ``symbols``."""
@@ -227,9 +248,9 @@ def lines_for(facts: list[Any], symbols: tuple[str, ...] | None = None, *,
     for fact in facts:
         if getattr(fact, "kind", "") != "tripwire":
             continue
-        if symbols is not None and fact.subject not in symbols:
+        if symbols is not None and symbol_of(fact.subject) not in symbols:
             continue
-        plan = from_value(fact.subject, fact.value, fact.text)
+        plan = from_value(symbol_of(fact.subject), fact.value, fact.text)
         if plan is None:
             continue
         status = check(plan, fact.at, fact.price_at, now=now)
@@ -238,18 +259,59 @@ def lines_for(facts: list[Any], symbols: tuple[str, ...] | None = None, *,
     return out
 
 
+FOLLOW_UP: Final = re.compile(
+    r"\bhow\s+far\s+(?:are\s+we|is\s+it|am\s+i|away)\b|\bhow\s+close\s+(?:are\s+we|is\s+it)\b|"
+    r"\bdid\s+it\s+(?:fire|trigger|hit|go\s+off)\b|\bhas\s+it\s+(?:fired|triggered|hit)\b",
+    re.I,
+)
+"""A question about the tripwire just set or checked, by pronoun ("how far are we from it",
+"ok did it fire now"): both were declined after 26 seconds (a first-time user, round 27)."""
+
+CHANGE: Final = re.compile(
+    r"\b(?:change|move|set|make|update|raise|lower)\s+(?:it|that|the\s+(?:level|tripwire|trigger))"
+    r"\s+to\s+\$?(?P<lvl>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k\b)?",
+    re.I,
+)
+DELETE: Final = re.compile(
+    r"\b(?:delete|remove|cancel|drop|clear|forget)\s+(?:the\s+|my\s+|that\s+)?(?:(?P<sym>[A-Za-z]"
+    r"{2,10})\s+)?(?:one|tripwires?|plan|trigger)\b|\b(?:delete|remove|cancel|clear)\s+(?:all\s+)?"
+    r"my\s+tripwires\b",
+    re.I,
+)
+
+
+def about_tripwires(prior: list[str]) -> bool:
+    """Whether the last two turns were about a tripwire."""
+    return any(TRIPWIRE.search(q) or ASKED.search(q) or FOLLOW_UP.search(q) or CHANGE.search(q)
+               for q in prior[-2:])
+
+
+def latest(facts: list[Any]) -> Any | None:
+    """The tripwire set most recently (memory keeps the newest first)."""
+    return next((f for f in facts if getattr(f, "kind", "") == "tripwire"), None)
+
+
 __all__ = [
     "ASKED",
+    "CHANGE",
+    "DELETE",
+    "FOLLOW_UP",
     "TRIPWIRE",
     "Plan",
     "Status",
+    "about_tripwires",
     "acknowledgement",
     "check",
     "from_value",
+    "latest",
     "lines_for",
     "read",
     "status_line",
+    "subject_of",
+    "symbol_of",
     "value_of",
 ]
+
+
 
 trace_module(globals())

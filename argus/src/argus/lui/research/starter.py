@@ -25,7 +25,8 @@ from argus.lui.trace import trace_module
 STARTER_Q = re.compile(
     # "i got like 700 bucks lying around, wat shud i buy" and "I'm new and have $2,000 - what's
     # a sensible way to begin?" were filed as notes and never answered (round 23)
-    r"\b(?:i|and)\s+(?:have|got|own|saved|can\s+(?:put|invest|spare))\s+(?:about\s+|around\s+|"
+    r"\b(?:i|and)\s+(?:only\s+|just\s+)?(?:have|got|own|saved|can\s+(?:put|invest|spare))\s+"
+    r"(?:about\s+|around\s+|"
     r"roughly\s+|only\s+|like\s+|maybe\s+|just\s+)?\$?\s*(?P<amount>\d[\d,]*(?:\.\d+)?)\s*"
     r"(?P<unit>k|thousand|grand|dollars?|usd|usdt|bucks)?\b.{0,300}?(?:wh?at\s+(?:should|shud|"
     r"shld|do|can|would)\s+i\s+(?:do|buy|get)|(?:sensible|good|best|smart|right)\s+(?:way|place)\s+"
@@ -37,16 +38,35 @@ STARTER_Q = re.compile(
     # "I have $800 saved, can you help me start investing" was declined (a first-time user,
     # 2026-09-30).
     r"help\s+me\s+(?:start|begin|get\s+started)|start(?:ing)?\s+(?:to\s+)?invest\w*|"
-    r"get(?:ting)?\s+started)", re.I | re.S)
+    r"get(?:ting)?\s+started|"
+    # "i only got like 200 bucks where do i even start" and "...make me a plan" were filed as
+    # notes and never answered (a first-time user, round 27)
+    r"where\s+(?:do|should|can)\s+i\s+even\s+(?:start|begin)|(?:make|give|build)\s+me\s+a\s+"
+    r"plan|plan\s+for\s+me)", re.I | re.S)
+STARTER_LOSS_Q = re.compile(
+    # "im 22, student, can lose maybe $300 total, want to grow it slowly. make me a plan": the sum
+    # a newcomer can afford to lose is the first sum (a first-time user, round 27)
+    r"\bcan\s+(?:afford\s+to\s+)?(?:lose|risk)\s+(?:about\s+|around\s+|maybe\s+|up\s+to\s+|"
+    r"like\s+)?\$\s*(?P<amount>\d[\d,]*(?:\.\d+)?)\s*(?P<unit>k|thousand|grand)?\b.{0,200}?"
+    r"(?:(?:make|give|build)\s+me\s+a\s+plan|plan\s+for\s+me|where\s+(?:do|should|can)\s+i\s+"
+    r"(?:even\s+)?(?:start|begin)|what\s+should\s+i\s+(?:do|buy)|grow\s+it)", re.I | re.S)
 """A first-money question: an amount, and a request for what to do with it."""
 
 _MARKETS: tuple[tuple[str, str], ...] = (("QQQ", "the Nasdaq-100 (QQQ)"), ("BTC-USD", "bitcoin"),
                                          ("GLD", "gold (GLD)"))
 
 
+STARTER_GROW_Q = re.compile(
+    # "i want to grow my $300 slowly, i'm 22" was declined (a first-time user, round 27)
+    r"\b(?:want|wanna|trying|looking|hope|hoping|need|plan(?:ning)?)\s+to\s+(?:grow|build(?:\s+up)?|"
+    r"invest|start\s+with|turn)\s+(?:my\s+|this\s+|the\s+|about\s+|like\s+)?\$\s*"
+    r"(?P<amount>\d[\d,]*(?:\.\d+)?)\s*(?P<unit>k|thousand|grand)?\b", re.I)
+"""A first sum and what the newcomer wants it to do."""
+
+
 def amount_of(text: str) -> float | None:
     """The sum a first-money question names, in dollars."""
-    m = STARTER_Q.search(text)
+    m = STARTER_Q.search(text) or STARTER_LOSS_Q.search(text) or STARTER_GROW_Q.search(text)
     if m is None:
         return None
     value = float(m.group("amount").replace(",", ""))

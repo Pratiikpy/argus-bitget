@@ -306,6 +306,9 @@ _WINDOW = re.compile(
     r"\b(?:this|next|coming)\s+month\b|"
     r"本周|这周|这个星期|这星期|下周|下个星期|下个?月|未来\s*\d+\s*天|未来一周|接下来", re.I)
 _CUE = re.compile(
+    # "anything big this week" got next month's CPI with this week's FOMC minutes left out (a
+    # first-time user, round 27)
+    r"\banything\s+(?:big|major|important|happening)\b|\bbig\s+(?:events?|news|days?)\b|"
     r"\bwatch(?:list|ing)?\b(?!\s+out)|\bkeep\s+(?:an\s+)?eyes?\s+on\b|\bcalendar\b|\bcatalysts?\b|"
     r"\bevents?\b|\bkey\s+dates\b|\b(?:data|macro|economic)\s+(?:releases?|prints?|data)\b|"
     r"\bearnings\b|\breport(?:s|ing)?\b|\bmacro\b|\bfomc\b|\bcpi\b|\bpayrolls?\b|\bnfp\b|"

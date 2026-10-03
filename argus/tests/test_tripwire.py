@@ -66,7 +66,9 @@ class TestReading:
         facts = mem.extract("If BTC drops below 80k I'll sell half", SET,
                             price_of=lambda _s: 84000.0)
         (fact,) = [f for f in facts if f.kind == "tripwire"]
-        assert (fact.subject, fact.price_at) == ("BTCUSDT", 84000.0)
+        # one tripwire per side of a name: a stop below and a take-profit above both stay
+        assert (fact.subject, fact.price_at) == ("BTCUSDT|below", 84000.0)
+        assert tripwire.symbol_of(fact.subject) == "BTCUSDT"
         assert mem.parse(mem.dumps(facts))[0].kind == "tripwire"  # survives the browser store
 
 
@@ -104,6 +106,33 @@ class TestReplay:
         status = tripwire.check(plan, "2026-10-03", 2940.0, now=SET + timedelta(hours=3))
         assert status is not None
         assert "adding then caught a 5.0% rise" in tripwire.status_line(status)
+
+    @pytest.mark.parametrize(("said", "side", "action"), [
+        # bare present-tense verbs a first-time user typed (round 27)
+        ("if btc drops under 80k i sell all", "below", "reduce"),
+        ("if eth goes above 3000 i take profit", "above", "reduce"),
+    ])
+    def test_bare_verbs_are_plans(self, said: str, side: str, action: str) -> None:
+        plan = tripwire.read(said, now=SET)
+        assert plan is not None and (plan.side, plan.action) == (side, action)
+
+    def test_a_stop_and_a_take_profit_on_one_name_are_two_facts(self) -> None:
+        below = mem.extract("if ETH drops below 2400 I sell all", SET)
+        above = mem.extract("if ETH climbs above 3000 I take profit", SET)
+        kept = mem.merge(below, above)
+        trips = [f for f in kept if f.kind == "tripwire"]
+        assert {f.subject for f in trips} == {"ETHUSDT|below", "ETHUSDT|above"}
+        assert tripwire.latest(kept) is not None
+
+    def test_change_delete_and_follow_up_asks(self) -> None:
+        changed = tripwire.CHANGE.search("change it to 85k")
+        assert changed is not None and changed.group("lvl") == "85" and changed.group("k")
+        gone = tripwire.DELETE.search("delete the eth one")
+        assert gone is not None and gone.group("sym") == "eth"
+        assert tripwire.DELETE.search("remove all my tripwires")
+        assert tripwire.FOLLOW_UP.search("how far are we from it")
+        assert tripwire.about_tripwires(["if BTC drops below 80k I'll sell half"])
+        assert not tripwire.about_tripwires(["what is BTC trading at"])
 
     def test_the_ask_reads_check_my_tripwires(self) -> None:
         assert tripwire.ASKED.search("check my tripwires")

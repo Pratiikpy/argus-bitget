@@ -45,6 +45,13 @@ PREMISE = re.compile(
     r"\b(?:is|are|has\s+been|have\s+been|has|have|keeps?)\s+(?:cutting|cut|lowering|lowered|easing|"
     r"eased|hiking|hiked|raising|raised|tightening|tightened)\b", re.I)
 """A claim that the Fed is already moving, which the fed funds rate can check."""
+REAL_PREMISE = re.compile(
+    r"\breal\s+(?:interest\s+)?(?:yields?|rates?)\s+(?:are|is|have\s+been|has\s+been|keep|will\s+keep)?"
+    r"\s*(?P<d>fall\w*|drop\w*|declin\w*|going\s+down|coming\s+down|down|lower\w*|ris\w*|"
+    r"climb\w*|going\s+up|up|higher)\b", re.I)
+"""A claim about where real yields are going, which the 10-year less breakeven inflation checks:
+"gold beats bitcoin because real yields are falling" was tested against the nominal yield's
+correlation while the real yield had risen 69bp (a first-time user, round 27)."""
 
 
 def _daily_closes(symbol: str) -> dict[date, float]:
@@ -65,6 +72,15 @@ def facts(symbol: str) -> dict[str, Any]:
         funds = [(date.fromisoformat(d), float(v)) for d, v in snapshot["series"]["DFF"]]
     except (OSError, ValueError, KeyError):
         tens, funds = {}, []
+        breakevens: dict[date, float] = {}
+    else:
+        breakevens = {date.fromisoformat(d): float(v)
+                      for d, v in snapshot["series"].get("T10YIE", [])}
+    real_days = sorted(d for d in tens if d in breakevens)
+    if len(real_days) >= 10:
+        out["real"] = {"then": tens[real_days[0]] - breakevens[real_days[0]],
+                       "now": tens[real_days[-1]] - breakevens[real_days[-1]],
+                       "from": real_days[0].isoformat(), "to": real_days[-1].isoformat()}
     try:
         closes = _daily_closes(symbol)
     except Exception:
@@ -144,6 +160,23 @@ def test(reason: str, found: Mapping[str, Any] | None, name: str
                     f"The premise does not hold: the fed funds rate went from {funds['then']:.2f}% "
                     f"on {funds['since']} to {funds['now']:.2f}% — "
                     + ("up, not down" if cutting else "down, not up") + ".", evidence)
+    real = found.get("real")
+    claimed = REAL_PREMISE.search(reason)
+    if claimed and real:
+        falling = not re.match(r"ris|climb|going\s+up|up|higher", claimed.group("d"), re.I)
+        moved = (real["now"] - real["then"]) * 100
+        line = (f"The real 10-year yield (the 10-year Treasury less breakeven inflation, FRED) "
+                f"went from {real['then']:.2f}% on {real['from']} to {real['now']:.2f}% on "
+                f"{real['to']}, {moved:+.0f}bp")
+        if abs(moved) < 10:
+            return ("not measurable", line + " — flat, so the premise is neither true nor false "
+                    "yet; where real yields go next is the part no data tests.", evidence)
+        holds = (moved < 0) == falling
+        return ("supported" if holds else "contradicted",
+                line + (" — falling, as the reason says." if holds and falling else
+                        " — rising, as the reason says." if holds else
+                        " — rising, so the reason is false so far." if falling else
+                        " — falling, so the reason is false so far."), evidence)
     rates = found.get("rates")
     if inflation or not rates:
         result = "not measurable"

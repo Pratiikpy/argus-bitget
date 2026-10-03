@@ -4311,7 +4311,10 @@ COMPARE_FOLLOW_UP = re.compile(
 """A follow-up that sets a new name beside the one already asked about."""
 
 _FOLLOW_UP = re.compile(
-    r"^\s*(?:and\s+)?(?:what|how)\s+(?:about|abt|bout)\b|^\s*and\s+(?:for\s+)?\S+\s*\??\s*$|"
+    # a leading "ok", "so", "cool" is filler: "ok and sol" (a first-time user, round 27)
+    r"^\s*(?:(?:ok(?:ay)?|so|cool|now|right|nice|thanks)[,\s]+)?(?:and\s+)?(?:what|how)\s+(?:about|"
+    r"abt|bout)\b|^\s*(?:(?:ok(?:ay)?|so|cool|now|right|nice|thanks)[,\s]+)?and\s+(?:for\s+)?\S+"
+    r"\s*\??\s*$|"
     r"^\s*(?:same|now|ok(?:ay)?|also)\b[^?]{0,40}\b(?:for|with)\b|^\s*(?:do|try)\s+(?:the\s+)?"
     r"same\b|^\s*(?:swap|switch|replace)\b|"
     # "actually i meant ethereum" (answer audit, round 3)

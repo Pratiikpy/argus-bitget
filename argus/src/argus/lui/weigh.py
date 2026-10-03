@@ -38,6 +38,10 @@ MIN_EPISODES = 8
 """The fewest independent episodes a base rate may rest on (`research.analogue.MIN_INDEPENDENT_
 EPISODES`)."""
 
+QUARTILE_FLOOR_BPS = 25
+"""The smallest 24-hour quartile move worth naming as a trigger: below a quarter of a percent it is
+noise, and "a fall of more than 5 bps" read as a units bug (round 27)."""
+
 AT_EDGE_PCT = 0.3
 """A price this close to the day's low or high is at it: a trigger "0.0% under the price" says
 nothing a trader can act on."""
@@ -231,11 +235,14 @@ def weigh(data: Mapping[str, Mapping[str, Any]], *, name: str, side: str = "long
                             f"price): the range breaks up.")
     # The quartile against the position: a long is hurt by the bottom quarter, a short by the top.
     against = (edge or {}).get("p25_bps" if wants_up else "p75_bps")
-    if against is not None and (against <= -1 if wants_up else against >= 1):
-        triggers.append(f"A {'fall' if wants_up else 'rise'} of more than {abs(against):.0f} bps "
-                        f"within 24 hours is worse for a {side} than three in four comparable "
-                        f"past states — the point a base-rate case stops describing what is "
-                        f"happening.")
+    # "a fall of more than 5 bps" read as a units bug (a first-time user, round 27): a quartile
+    # that small is noise, not a trigger, and the move is said in percent
+    if against is not None and (against <= -QUARTILE_FLOOR_BPS if wants_up
+                                else against >= QUARTILE_FLOOR_BPS):
+        triggers.append(f"A {'fall' if wants_up else 'rise'} of more than "
+                        f"{abs(against) / 100:.2f}% within 24 hours is worse for a {side} than "
+                        f"three in four comparable past states — the point a base-rate case "
+                        f"stops describing what is happening.")
     if days is not None and EARNINGS_WAIT_DAYS < int(days) <= 45:
         triggers.append(f"The report on {fund.get('earnings_date')} ({int(days)} days): every "
                         f"figure above is from before it and must be read again after.")

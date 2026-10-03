@@ -22,7 +22,7 @@ import re
 from collections.abc import Sequence
 from datetime import UTC, datetime, timedelta
 from itertools import pairwise
-from typing import Any
+from typing import Any, Final
 
 from argus.lui.trace import trace_module
 
@@ -724,6 +724,50 @@ def unread_lines(text: str, prior: Sequence[str] = ()) -> list[str] | None:
     return None
 
 
+def weekend_lines(text: str, prior: Sequence[str]) -> list[str] | None:
+    """"can i trade it on weekends" after TSLA got the worst day (a first-time user, round 27):
+    whether the contract trades on Saturday and Sunday, and how thin it is then, from its own
+    hourly candles over the last eight days."""
+    from argus.lui.research.parse import is_us_equity
+    from argus.market import history
+
+    if not re.search(r"\bweekends?\b|\bsaturdays?\b|\bsundays?\b|\bsat(?:urday)?\s+(?:and|&|or)\s+"
+                     r"sun", text, re.I) or not re.search(
+            r"\b(?:trade|trading|traded|buy|sell|open|closed?|available|work)\b", text, re.I):
+        return None
+    named = _named_before(text, prior)
+    if not named:
+        return None
+    symbol = named[0]
+    try:
+        candles = history.fetch_range(symbol, days=8, interval="1H")
+    except Exception:
+        return None
+    weekend = [c for c in candles if c.ts.weekday() >= 5]
+    weekday = [c for c in candles if c.ts.weekday() < 5]
+    if not weekend or not weekday:
+        return None
+    hourly_end = sum(float(c.volume) * float(c.close) for c in weekend) / len(weekend)
+    hourly_week = sum(float(c.volume) * float(c.close) for c in weekday) / len(weekday)
+    traded = sum(1 for c in weekend if float(c.volume) > 0)
+    name = symbol.removesuffix("USDT")
+    share = hourly_end / hourly_week if hourly_week > 0 else 0.0
+    lines = [f"Bottom line: yes — the {name} perpetual on Bitget traded in {traded} of the "
+             f"{len(weekend)} weekend hours of the last eight days, but thinly: about "
+             f"{share:.0%} of a weekday hour's traded value."]
+    if is_us_equity(symbol):
+        lines.append(f"The US market is shut then, so {name}'s weekend price is set by Bitget's "
+                     f"traders alone; when Nasdaq opens on Monday the price can jump to where the "
+                     f"stock actually opens, and a stop set over the weekend can fill past its "
+                     f"level. Funding keeps settling on the weekend too.")
+    else:
+        lines.append("Crypto trades around the clock; weekend books are thinner, so the same "
+                     "order moves the price more and spreads can be wider.")
+    lines.append("Read from the contract's hourly candles on Bitget's public market API; weekend "
+                 "hours are Saturday and Sunday in UTC.")
+    return lines
+
+
 def funding_rule_lines(text: str, prior: Sequence[str]) -> list[str] | None:
     """"Thesis: buy BTC whenever funding goes negative. Backtest it over a year." and "what's
     the win rate?" were tested against today's rate and answered from the desk's record (round
@@ -736,6 +780,15 @@ def funding_rule_lines(text: str, prior: Sequence[str]) -> list[str] | None:
     here = re.search(r"\bfunding\b[^?.]{0,40}\b(?:goes|turns|is|gets)\s+(?P<s>negative|positive)\b",
                      text, re.I)
     follow = re.search(r"\bwin\s+rate\b|\bhit\s+rate\b|\bhow\s+often\b", text, re.I)
+    # "does that include fees" and "how many trades was that" after the test got the worst day and
+    # the desk's own record (a first-time user, round 27)
+    fees_asked = re.search(r"\bfees?\b|\bcosts?\b|\bnet\b|\bafter\s+(?:fees|costs)\b", text, re.I)
+    count_asked = re.search(r"\bhow\s+many\s+(?:trades|times|cases|signals|settlements|entries|"
+                            r"buys)\b", text, re.I)
+    luck_asked = re.search(r"\b(?:luck|lucky|chance|fluke|statistically|significant|real\s+or|"
+                           r"coin\s*flip|random)\b", text, re.I)
+    if here is None and follow is None:
+        follow = fees_asked or count_asked or luck_asked
     source = text if here else next((q for q in reversed(prior[-2:]) if re.search(
         r"\bfunding\b[^?.]{0,40}\b(?:goes|turns|is|gets)\s+(?:negative|positive)\b", q, re.I)),
                                      None)
@@ -783,6 +836,55 @@ def funding_rule_lines(text: str, prior: Sequence[str]) -> list[str] | None:
                 f"{sum(on) / len(on):+.2%}; after any settlement it was up {base:.0%}, average "
                 f"{sum(every) / len(every):+.2%}")
 
+    if here is None and fees_asked is not None:
+        on, _every = rows["24 hours"] if "24 hours" in rows else rows["7 days"]
+        window = "24 hours" if "24 hours" in rows else "7 days"
+        gross = sum(on) / len(on)
+        kept = sum(1 for x in on if x > 0.0012)
+        return [f"Bottom line: no — those figures are price moves before costs. A taker round trip "
+                f"on the {name} perpetual is about 0.12%, which takes the {window} average from "
+                f"{gross:+.2%} to {gross - 0.0012:+.2%}, and the cases that still came out ahead "
+                f"to {rate_phrase(kept, len(on))}.",
+                "On spot the round trip is about 0.20% (0.10% a side); a perpetual held across a "
+                "settlement also pays or receives funding — after a negative settlement, a long "
+                "is usually the side that receives it.",
+                "Fees at Bitget's standard (VIP 0) rates; spread and slippage are extra."]
+    if here is None and luck_asked is not None and follow is luck_asked:
+        # "is that statistically real or luck" after the test got ETH's worst day (a first-time
+        # user, round 27): the test's own interval against the rate after any settlement
+        on, every = rows["24 hours"] if "24 hours" in rows else rows["7 days"]
+        window = "24 hours" if "24 hours" in rows else "7 days"
+        from argus.backtest.proportion import wilson
+
+        wins = sum(1 for x in on if x > 0)
+        base = sum(1 for x in every if x > 0) / len(every)
+        interval = wilson(wins, len(on))
+        if interval is None:
+            return None
+        inside = not interval.excludes(base)
+        verdict = "it cannot be told from luck" if inside else "it stands out, but only just"
+        return [f"Bottom line: {verdict} — {name} was up over the next {window} in {wins} of "
+                f"{len(on)} cases, a 95% range of {interval.lo:.0%} to {interval.hi:.0%}, and "
+                f"after any settlement it was up {base:.0%}, "
+                + ("inside that range." if inside else "outside that range."),
+                "The cases overlap and bunch into a handful of separate stretches, so the real "
+                "evidence is thinner than the count; ninety days of funding is all Bitget serves. "
+                "A result like this is a reason to keep watching, not to trade it.",
+                "Range: a 95% Wilson interval on the share of cases that were up."]
+    if here is None and count_asked is not None and follow is count_asked:
+        on, _every = rows["24 hours"] if "24 hours" in rows else rows["7 days"]
+        episodes = 0
+        last_hit = None
+        for t in hits:
+            if last_hit is None or t - last_hit > 86_400_000:
+                episodes += 1
+            last_hit = t
+        return [f"Bottom line: {len(hits)} {side} funding settlements in the {span_days:.0f} days "
+                f"Bitget serves, {len(on)} of them with a price a day later to score — but they "
+                f"bunch together into about {episodes} separate stretches, so it is closer to "
+                f"{episodes} independent tests than {len(on)}.",
+                "Each settlement was scored as one entry; no trade was placed, and nothing was "
+                "netted for fees (ask \"does that include fees\")."]
     lines = [f"Bottom line: tested on the {span_days:.0f} days of funding Bitget serves (not a "
              f"year: that is all its API returns), after each {side} settlement "
              + (said(*rows["24 hours"], "24 hours") if "24 hours" in rows else
@@ -797,6 +899,82 @@ def funding_rule_lines(text: str, prior: Sequence[str]) -> list[str] | None:
     lines.append("Overlapping windows and few independent episodes: a description of the last few "
                  "months, before fees, not evidence the rule works. The range is a 95% Wilson "
                  "interval; Bitget funding history and hourly closes.")
+    return lines
+
+
+_ENOUGH: Final = re.compile(
+    r"\b(?:is|would|will)\s+(?P<amt>\$?\s?\d[\d,]*(?:\.\d+)?\s*(?:k|bucks|dollars|usd|usdt)?|that|"
+    r"it|this)\s+(?:be\s+)?enough\s+(?:money\s+)?(?:to\s+(?:buy|get|start(?:\s+with)?|trade|invest\s+"
+    r"in)|for)\s+(?P<sym>[^?.!,]{2,30})",
+    re.I,
+)
+_AMOUNT: Final = re.compile(
+    r"\$\s?(?P<a>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k)?\b|(?P<b>\d[\d,]*(?:\.\d+)?)\s*(?P<k2>k)?\s*"
+    r"(?:bucks|dollars|usd|usdt)\b",
+    re.I,
+)
+
+
+def _amount_in(text: str) -> float | None:
+    m = _AMOUNT.search(text)
+    if m is None:
+        return None
+    value = float((m.group("a") or m.group("b")).replace(",", ""))
+    return value * (1000 if (m.group("k") or m.group("k2")) else 1)
+
+
+def _usd(value: float) -> str:
+    """Dollars, with cents when the sum is small enough for them to matter ("$0.50", not "$0")."""
+    return f"${value:,.2f}" if value < 10 else f"${value:,.0f}"
+
+
+def enough_to_buy_lines(text: str, prior: Sequence[str]) -> list[str] | None:
+    """"is that enough to buy bitcoin?" after "i only got like 200 bucks" got the desk's own
+    universe (a first-time user, round 27): the smallest order Bitget takes, on spot and on the
+    perpetual, read from its own symbol and contract lists, against the sum said."""
+    from argus.market.bitget import public_get
+
+    asked = _ENOUGH.search(text)
+    if asked is None:
+        return None
+    named = _names(asked.group("sym"))
+    if not named:
+        return None
+    amount = _amount_in(asked.group("amt") or "") or next(
+        (a for q in reversed(prior[-3:]) if (a := _amount_in(q)) is not None), None)
+    symbol = named[0]
+    try:
+        spot = (public_get("/api/v2/spot/public/symbols", {"symbol": symbol}) or [{}])[0]
+        perp = (public_get("/api/v2/mix/market/contracts",
+                           {"productType": "USDT-FUTURES", "symbol": symbol}) or [{}])[0]
+    except Exception:
+        return None
+    spot_min = float(spot.get("minTradeUSDT") or 0) if spot else 0.0
+    perp_min = float(perp.get("minTradeUSDT") or 0) if perp else 0.0
+    name = symbol.removesuffix("USDT")
+    if not spot_min and not perp_min:
+        return None
+    floor = min(x for x in (spot_min, perp_min) if x)
+    lead = (f"Bottom line: yes — {_usd(amount)} is enough to buy {name} on Bitget"
+            if amount is not None and amount >= floor else
+            f"Bottom line: not yet — {_usd(amount)} is below Bitget's smallest {name} order"
+            if amount is not None else
+            f"Bottom line: Bitget's smallest {name} order is {_usd(floor)}")
+    parts = []
+    if spot_min:
+        parts.append(f"spot from ${spot_min:,.2f} (you own the coin; the most you can lose is what "
+                     f"you paid)")
+    if perp_min:
+        parts.append(f"the perpetual from ${perp_min:,.2f} of position, and at least "
+                     f"{perp.get('minTradeNum')} {name} per order (leverage, and losses can reach "
+                     f"the margin)")
+    lines = [lead + ": " + "; ".join(parts) + "."]
+    if amount is not None and amount >= floor:
+        lines.append(f"You can buy a fraction of one {name}: {_usd(amount)} buys "
+                     f"{_usd(amount)} worth, whatever one coin costs. A first buy on spot keeps "
+                     f"the loss limited to what you put in.")
+    lines.append("Bitget's own spot symbol list and USDT-futures contract list (minTradeUSDT), "
+                 "read now; fees are extra (0.10% a side on spot).")
     return lines
 
 

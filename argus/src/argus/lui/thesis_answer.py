@@ -432,6 +432,12 @@ _BREAKS = {
 }
 
 
+_PRICE_CALL = re.compile(
+    r"\b(?:rip\w*|rall\w*|moon\w*|pump\w*|go(?:es|ing)?\s+(?:up|higher)|keep\s+(?:going|rising|"
+    r"climbing)|ris\w*|climb\w*|run\w*|fall\w*|drop\w*|dump\w*|crash\w*|tank\w*)\b", re.I)
+"""A call on the price itself: "is gonna keep ripping", "will dump"."""
+
+
 def falsify(text: str, prior: list[str], *, book: str = "", memory: str = ""
             ) -> tuple[list[str], list[Source], dict[str, Any]] | None:
     """"What would prove my thesis wrong, and how should I size it?" after a thesis: for each
@@ -499,6 +505,11 @@ def falsify(text: str, prior: list[str], *, book: str = "", memory: str = ""
                  "not_measurable": " No data tests it today.",
                  "not_tested": " Not tested today."}.get(state or "", "")
         breaks = _BREAKS.get(r.kind.name, _BREAKS["OTHER"])
+        if r.kind.name == "OTHER" and _PRICE_CALL.search(r.text):
+            # "nvidia is gonna keep ripping" was told it is wrong "if the figure the claim rests
+            # on moves against it" (a first-time user, round 27): a call on the price itself is
+            # broken by the price
+            breaks = _BREAKS["DIRECTION"]
         if r.kind.name == "OTHER" and thesis._RATIO_EXTREME.search(r.text):
             breaks = "the ratio breaks through that extreme and keeps going instead of turning"
         if r.kind.name == "DRIVER":

@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-10-03T13:46:45.215346+00:00",
-  "decisions": 1016,
-  "gate_population": 934,
+  "generated_at": "2026-10-03T15:41:28.105269+00:00",
+  "decisions": 1027,
+  "gate_population": 945,
   "proposed_exposure": 4,
   "session_coverage": {
     "by_phase": {
       "extended": 1,
       "rth": 636,
-      "weekend": 379
+      "weekend": 390
     },
     "with_price_discovery": 636,
     "median_hours_to_discovery": 0.0,
     "min_hours_to_discovery": 0.0,
     "single_phase_only": false,
-    "note": "1016 decision(s) across 3 session phase(s): extended=1, rth=636, weekend=379. 636 were taken while the anchor market had price discovery"
+    "note": "1027 decision(s) across 3 session phase(s): extended=1, rth=636, weekend=390. 636 were taken while the anchor market had price discovery"
   },
   "gates": [
     {
@@ -21,9 +21,9 @@
       "name": "no_exposure",
       "checks": "verdict carries no quantity, or quantity <= 0",
       "status": "FIRED",
-      "reached": 934,
-      "fired": 930,
-      "note": "bound on 930 of 934 decision(s) that reached it"
+      "reached": 945,
+      "fired": 941,
+      "note": "bound on 941 of 945 decision(s) that reached it"
     },
     {
       "order": 2,
@@ -154,12 +154,12 @@
   ],
   "unreached_gates": [],
   "confidence_median": 0.62,
-  "confidence_mean": 0.6569,
+  "confidence_mean": 0.657,
   "confidence_min": 0.38,
   "confidence_would_have_bound": true,
-  "verdict": "4 of 1016 decision(s) proposed exposure, so the risk chain has live inputs and its outcomes below are exercised rather than unreached",
-  "falsifier": "the next session with price discovery is 47.7h away, and the committed cycle schedule (13:30/15:30/17:30/19:30 UTC) sits inside US regular hours. If the desk abstains through a full session of those, the cause is the desk and this conclusion is refuted",
+  "verdict": "4 of 1027 decision(s) proposed exposure, so the risk chain has live inputs and its outcomes below are exercised rather than unreached",
+  "falsifier": "the next session with price discovery is 45.8h away, and the committed cycle schedule (13:30/15:30/17:30/19:30 UTC) sits inside US regular hours. If the desk abstains through a full session of those, the cause is the desk and this conclusion is refuted",
   "triggered_by": [
-    "10 settlements since the last postmortem"
+    "19 settlements since the last postmortem"
   ]
 }
