@@ -5593,6 +5593,7 @@ def _answer(
     if worth_and_move is not None:
         return engine_payload_like(worth_and_move, prior, text, by="research")
     from argus.lui.research import desk_followups as _followups
+    from argus.lui.research import early_signals as _early
 
     # asks a judge found taken by an earlier, broader route (round 26)
     early_rules: tuple[Callable[[], list[str] | None], ...] = (
@@ -5600,6 +5601,7 @@ def _answer(
                        lambda: _followups.hold_choice_lines(text, prior),
                        lambda: _followups.dominance_thesis_lines(text, now),
                        lambda: _followups.book_thesis_lines(text, book),
+                       lambda: (_early.lines(now=now) if _early.ASKED.search(text) else None),
                        lambda: _followups.rotate_conditions_lines(text, prior),
                        lambda: _followups.book_beta_lines(text, prior, book),
                        lambda: _followups.earnings_lines(text, prior),
