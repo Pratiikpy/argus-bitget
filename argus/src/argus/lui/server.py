@@ -3119,7 +3119,8 @@ def _round27_follow_up(text: str, prior: list[str], *, now: datetime | None, vis
     if term_asked is not None:
         # "wait whats a perpetual contract tho i dont get it" names its own term: the term is
         # explained, not the answer before it (a first-time user, round 29)
-        t_lines, _t_sources, _t_data = _concepts.answer(term_asked, None)
+        t_lines, _t_sources, _t_data = _concepts.answer(
+            term_asked, None, _concepts.second_concept(text, term_asked))
         return engine_payload_like(t_lines, prior, text, by="concept")
     if prior and _PLAINER.search(text) and not symbols_in(text)[0]:
         # "wait that didnt make sense, can u explain in like plain english what you just said"
@@ -3788,6 +3789,16 @@ def handle_ask(
             payload["lines"] = [*rest[:1], crossed, *rest[1:]]
         premises = (_premise_lines(text, now, book)
                     if payload.get("lines") and not payload.get("refused") else [])
+        data_said = [str(x) for x in payload.get("lines") or [] if str(x).startswith("Data:")]
+        if len(data_said) > 1:
+            # two engines each closed with their own Data line ("Bitget's position tier table";
+            # "live Bitget hourly candles"), read as a repeated footer (a re-ask, round 30)
+            advice = " This is analysis, not advice — you make the call."
+            merged = "Data: " + " ".join(dict.fromkeys(
+                x.removeprefix("Data: ").replace(advice, "").strip() for x in data_said))
+            merged += advice if any(advice in x for x in data_said) else ""
+            kept = [x for x in payload["lines"] if not str(x).startswith("Data:")]
+            payload["lines"] = [*kept, merged]
         overridden = _book_overridden(text, book) if payload.get("lines") and not payload.get(
             "refused") else None
         if overridden is not None:

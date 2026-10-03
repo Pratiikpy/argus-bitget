@@ -341,3 +341,12 @@ class TestLiveRephrasings:
         said = server._stop_side_lines("I'm short ETH from 2700 with my stop at 2650, is that "
                                        "set up right?")
         assert said is not None and said[1]
+
+
+def test_two_terms_asked_plainly_are_both_explained() -> None:
+    """"explain rsi and macd like im new" reached the plain-words reader, which explained RSI
+    alone (the live re-ask after round 30)."""
+    first = concepts.concept_asked("explain rsi and macd like im new")
+    assert first is not None
+    second = concepts.second_concept("explain rsi and macd like im new", first)
+    assert second is not None and "MACD" in second.name.upper()
