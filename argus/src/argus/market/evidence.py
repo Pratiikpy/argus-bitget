@@ -340,6 +340,18 @@ class EdgarSource:
     def _get(self, url: str) -> Any:
         return http.fetch_json(url, timeout=_TIMEOUT, headers={"User-Agent": self._ua})
 
+    def listing(self, ticker: str) -> tuple[str, tuple[str, ...], tuple[str, ...]] | None:
+        """(the filer's name, its tickers, the exchanges they trade on) from its EDGAR
+        submissions record, or None when the ticker has no CIK. Used to check a stated ticker or
+        exchange: "Coinbase trades on the NYSE" went unchecked (a hostile review, round 30);
+        EDGAR says Nasdaq."""
+        cik = self.cik_for(ticker)
+        if cik is None:
+            return None
+        sub = self._get(self.SUBMISSIONS_URL.format(cik=cik))
+        return (str(sub.get("name") or ""), tuple(str(t) for t in sub.get("tickers") or ()),
+                tuple(str(x) for x in sub.get("exchanges") or ()))
+
     def cik_for(self, ticker: str) -> int | None:
         if self._ciks is None:
             raw = self._get(self.TICKERS_URL)

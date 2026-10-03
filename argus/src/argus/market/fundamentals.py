@@ -65,6 +65,10 @@ CONCEPTS: dict[str, tuple[str, ...]] = {
     "operating_income": ("OperatingIncomeLoss",),
     "eps_diluted": ("EarningsPerShareDiluted", "EarningsPerShareBasicAndDiluted"),
     "gross_profit": ("GrossProfit",),
+    # "Apple's new $5.00 per share quarterly dividend" was met with "no dividend figure", while the
+    # 10-Q the same answer cited carried $0.27 (a hostile review, round 30)
+    "dividend_per_share": ("CommonStockDividendsPerShareDeclared",
+                           "CommonStockDividendsPerShareCashPaid"),
 }
 
 

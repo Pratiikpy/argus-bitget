@@ -3,6 +3,8 @@ of 2026-09-29: sector comparison, analyst counts and yes-or-no dividend question
 
 from __future__ import annotations
 
+import pytest
+
 from argus.lui.research.fundamentals import _fundamentals_focus, _lead_with_what_was_asked
 
 TARGETS = ("NVDA reports in 49 days.",
@@ -29,7 +31,10 @@ def test_a_yes_or_no_dividend_question_says_yes() -> None:
         "Bottom line: yes — KO corporate actions: last cash dividend $0.53 a share.")
 
 
-def test_a_split_alone_is_not_a_dividend() -> None:
+def test_a_split_alone_is_not_a_dividend(monkeypatch: pytest.MonkeyPatch) -> None:
+    from argus.lui.research import fundamentals
+
+    monkeypatch.setattr(fundamentals, "_declared_dividend", lambda ticker: None)  # offline
     lines = ["TSLA reports in 20 days.", "TSLA corporate actions: last split 3-for-1."]
     lead = _fundamentals_focus(lines, "does TSLA pay a dividend", "TSLA")[0]
     assert lead.startswith("Bottom line: no dividend is on record for TSLA")

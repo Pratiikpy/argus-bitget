@@ -76,13 +76,14 @@ def test_the_answer_leads_with_every_part_and_keeps_one_bold_lead() -> None:
     assert lines[-1].startswith("Data:")
 
 
-def test_a_fifth_part_is_named_not_dropped() -> None:
+def test_a_part_past_the_budget_is_named_not_dropped() -> None:
     found = [multistep.Part(text=f"part {i}", request=type("R", (), {
-        "kind": ResearchKind.QUOTE})()) for i in range(6)]
+        "kind": ResearchKind.QUOTE})()) for i in range(multistep.MAX_PARTS + 2)]
 
     def run(text: str, request: Any) -> _Result:
         return _Result(lines=["Bottom line: x"])
 
     lines, _, _ = multistep.answer("q", found, run)
-    assert any(line.startswith("Assumed: only the first 4 parts") and "part 5" in line
-               for line in lines)
+    first = multistep.MAX_PARTS
+    assert any(line.startswith(f"Assumed: only the first {first} parts")
+               and f"part {first}" in line for line in lines)

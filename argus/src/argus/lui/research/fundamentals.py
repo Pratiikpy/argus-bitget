@@ -1065,15 +1065,22 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
     else:
         # With Yahoo unreachable, "when does AAPL report earnings" answered with no date and no
         # word about why (an outage drill, 2026-10-04): what is missing, and from where, is said
+        report_said = any(re.search(r"^Next report|\breports\s+(?:in|next|on)\b|\breport\s+date\b",
+                              unlead(line)) and "not" not in unlead(line)[:60] for line in lines)
         missing = [what for what, needed in (
-            ("the next report date", not any(line.startswith("Next report") for line in lines)),
+            ("the next report date", not report_said),
             ("the analysts' price targets", target_line is None))
             if needed]
         if missing:
-            lines.insert(0, f"Bottom line: for {ticker}, {' and '.join(missing)} could not be "
-                            f"read just now — Bitget's data service has none on file and Yahoo "
-                            f"Finance, the second source, did not answer; ask again in a "
-                            f"minute.")
+            said = (f"for {ticker}, {' and '.join(missing)} could not be read just now — Bitget's "
+                    f"data service has none on file and Yahoo Finance, the second source, did not "
+                    f"answer; ask again in a minute.")
+            # an answer that already leads with what was read keeps its lead; the gap is said
+            # under it (the near-report lead was pushed down by this note, round 30's suite)
+            if lines and LEAD.match(lines[0]):
+                lines.insert(1, "Not read this time: " + said)
+            else:
+                lines.insert(0, f"Bottom line: {said}")
 
     versus = safe("versus_estimates")
     if versus is not None:
@@ -1491,6 +1498,12 @@ def _fundamentals_focus(lines: list[str], question: str, ticker: str) -> list[st
                                             and "bitcoin" in line.lower())
                     for p in starts)
              and (topic != "dividend" or "dividend" in line.lower())), None)
+        if hit is None and topic == "dividend":
+            # the 10-Q a dividend question's own answer cited carried the figure the answer said
+            # was missing (a hostile review, round 30): the declared dividend is read from XBRL
+            filed = _declared_dividend(ticker)
+            if filed is not None:
+                return [f"Bottom line: {filed}", *plain]
         if hit is None:
             if topic == "dividend" and _PAYS_Q.search(question):
                 return [f"Bottom line: no dividend is on record for {ticker} in the sources read "
@@ -1508,6 +1521,28 @@ def _fundamentals_focus(lines: list[str], question: str, ticker: str) -> list[st
         rest = [line for i, line in enumerate(plain) if i != hit and i not in also]
         return [f"Bottom line: {plain[hit]}", *(plain[i] for i in also), *rest]
     return lines
+
+
+def _declared_dividend(ticker: str) -> str | None:
+    """The last dividend per share the company declared, from its own XBRL filings."""
+    from argus.market.fundamentals import FundamentalsSource
+
+    try:
+        facts, _status = FundamentalsSource().facts(ticker, concept="dividend_per_share",
+                                                    as_of=datetime.now(UTC))
+    except Exception:
+        return None
+    if not facts:
+        return None
+    ordered = sorted(facts, key=lambda f: f.end)
+    last = ordered[-1]
+    before = ordered[-2] if len(ordered) > 1 else None
+    change = ("" if before is None or before.value == last.value else
+              f", up from ${before.value:,.2f} the quarter before" if last.value > before.value
+              else f", down from ${before.value:,.2f} the quarter before")
+    return (f"{ticker} declared ${last.value:,.2f} a share for the quarter ending "
+            f"{last.end:%d %b %Y}{change} ({last.form} filed {last.filed:%d %b %Y}, SEC EDGAR "
+            f"XBRL).")
 
 
 # Every engine here is a traced step from import on (lui/trace.py, trace_module).

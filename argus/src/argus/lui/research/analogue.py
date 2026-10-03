@@ -70,8 +70,11 @@ def _analogue(symbol: str, data: MarketData) -> tuple[list[str], list[Source], d
     as_of = closes[-1][0] if closes[-1][0].tzinfo else closes[-1][0].replace(tzinfo=UTC)
     report = find(query=query, corpus=corpus, as_of=as_of, explain=True)
     lines = [
-        f"Now: {_t(symbol)} is {query['trailing_return']:+.0f}bps over the last 24h with hourly "
-        f"volatility of {query['volatility_bps']:.0f}bps."
+        # "+193bps over the last 24h" matched neither Bitget's rolling nor its UTC-day change (a
+        # judge, round 30): it is 24 hourly closes to the last completed hour, and says so
+        f"Now: {_t(symbol)} is {query['trailing_return']:+.0f}bps over the 24 hours to the last "
+        f"completed hourly close ({as_of:%H:00} UTC) — not Bitget's own 24h change, which runs "
+        f"to this minute — with hourly volatility of {query['volatility_bps']:.0f}bps."
     ]
     dist = report.distribution
     if not report.usable or dist is None:

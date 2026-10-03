@@ -106,6 +106,15 @@ CONCEPTS: tuple[Concept, ...] = (
             "of margin holds a $5,000 position.",
             "Gains and losses are both multiplied by the leverage, and so is how quickly a move "
             "against you reaches liquidation."),
+    # "whats the diff between leverage and margin" defined leverage alone (a first-time user,
+    # round 30): margin is the money, leverage the multiple
+    Concept("margin", r"(?:initial\s+|maintenance\s+|isolated\s+|cross\s+)?margin(?!\s+trading)",
+            "Margin is the money you put up to hold a leveraged position — the collateral. "
+            "Leverage is the multiple: position size divided by margin.",
+            "On Bitget, isolated margin risks only what you put behind that one position; cross "
+            "margin lets the whole account's balance back it. If losses use the margin up to the "
+            "maintenance margin (about 0.4% of the position on the largest contracts), the "
+            "position is liquidated."),
     Concept("perpetual contract",
             # "whats a perpetual contract" was not read as its own name (a first-time user, round
             # 29)
@@ -569,8 +578,10 @@ def concept_asked(text: str, named_symbols: tuple[str, ...] = ()) -> Concept | N
 def second_concept(text: str, first: Concept) -> Concept | None:
     """The other term of "what is the difference between calls and puts", when the question
     compares two."""
-    if not re.search(r"\b(?:difference|differ|vs\.?|versus|compared?\s+(?:to|with))\b", text,
-                     re.I):
+    # "whats rsi and macd mean in simple words" defined RSI alone (a first-time user, round 30):
+    # two terms joined by "and" are both asked
+    if not re.search(r"\b(?:difference|differ|diff|vs\.?|versus|compared?\s+(?:to|with)|and|or|"
+                     r"plus)\b|&", text, re.I):
         return None
     for concept in CONCEPTS:
         if concept is not first and concept.definition != first.definition and re.search(

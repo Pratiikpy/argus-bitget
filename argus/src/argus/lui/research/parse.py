@@ -585,6 +585,15 @@ _VENUE = re.compile(
 )
 
 
+_VENUE_CUE = re.compile(
+    r"\brtokens?\b|\bxstocks?\b|\btokeni[sz]ed\b|\bspot\b[^?]{0,40}\b(?:perps?|perpetuals?|"
+    r"futures|contracts?)\b|\b(?:perps?|perpetuals?|futures)\b[^?]{0,40}\bspot\b|\bwhich\s+(?:way|"
+    r"product|version|one)\b[^?]{0,30}\b(?:hold|own|buy|use)\b|\btwo\s+ways\b|\bown\s+(?:the\s+)?"
+    r"(?:actual\s+)?(?:share|stock)s?\b|\binstead\s+of\s+(?:the\s+)?(?:share|stock)s?\b",
+    re.I)
+"""Words that ask about the way Bitget offers a market, which the venue explainer answers."""
+
+
 _CONSTRUCT = re.compile(
     r"\b(?:build|construct|design|create|make|suggest|give\s+me|"
     r"put\s+together)\s+(?:me\s+)?(?:an?\s+)?"
@@ -898,6 +907,8 @@ was answered with the dollar index and Treasury yields (2026-09-25 audit, round 
 
 _SENTIMENT = re.compile(
     r"\b(?:fear\s*(?:&|and)?\s*greed|sentiment|market\s+mood|fomo|euphori\w*|"
+    # "yo whats the vibe on eth rn" got ETH's risk figures (a first-time user, round 30)
+    r"(?:the\s+)?(?:vibes?|mood|feeling)\s+(?:on|around|with|for|of)\b|"
     r"crowded|crowding|positioning|how\s+(?:bullish|bearish|greedy|fearful)\s+is|"
     r"(?:is|are)\s+(?:people|traders|everyone|the\s+market)\s+(?:bullish|bearish)|"
     # "why is the market so bearish today" was answered with a ledger row (2026-09-25 audit)
@@ -4802,6 +4813,13 @@ def _plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, di
         confidence = 0.0
     if confidence < MIN_PLAN_CONFIDENCE:
         audit["detail"] = f"confidence {confidence:.2f} below {MIN_PLAN_CONFIDENCE}"
+        return None, audit
+    if kind is ResearchKind.VENUE and not _VENUE_CUE.search(text):
+        # "What is the current price of NVDA", "what's COIN's beta to BTC" and "the research
+        # case for going long SOLUSDT" were each answered with the rToken-versus-perpetual
+        # explainer, SOL called a US stock (a judge and a hostile review, round 30): the product
+        # explainer runs only when the words ask about the product
+        audit["detail"] = "a venue reading with no word about Bitget's products was not applied"
         return None, audit
 
     notes: list[str] = []

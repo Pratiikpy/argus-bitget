@@ -59,8 +59,10 @@ round 19, row 636 — both were declined with the record reader's list)."""
 
 THANKS_Q = re.compile(
     r"^\W*(?:ok(?:ay)?\W+)?(?:thanks?|thank\s+you|thx|ty|cheers|great|perfect|cool|nice|awesome|"
-    r"got\s+it)\b[^?]*$", re.I)
-"""Thanks or an acknowledgement with no question in it."""
+    r"got\s+it)\b(?![^?]*\b(?:what|how|why|when|where|which|should|can|could|do\s+i|is\s+it|"
+    r"tell\s+me)\b)[^?]*$", re.I)
+"""Thanks or an acknowledgement with no question in it: "ok thank you, what i do first step
+today" carries one, and was answered with the thanks alone (a first-time user, round 30)."""
 
 THAT_NUMBER_Q = re.compile(
     r"^\W*(?:and\s+|so\s+)?what\s+(?:does|do)\s+(?:that|this|those|these)\s+(?:number|figure|"

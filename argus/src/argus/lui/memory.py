@@ -151,20 +151,20 @@ remembered at all on the hosted console (readiness audit, finding 40)."""
 _CAPITAL = re.compile(
     r"\bmy\s+(?:account|book|portfolio|capital)\s+is\s+(?:actually\s+|now\s+|really\s+)?"
     r"(?:about\s+|around\s+)?[$€£]?\s*"
-    r"(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\b|\bi\s+have\s+(?:about\s+|around\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)"
+    r"(\d[\d,]*(?:\.\d+)?)(?![\d,.]*\d)\s*(k|m)?\b|\bi\s+have\s+(?:about\s+|around\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)(?![\d,.]*\d)"
     r"\s*(k|m)?\s+(?:to\s+(?:trade|invest)|in\s+my\s+account)|"
-    r"\b(?:an?|my)\s+\$\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\s+(?:account|book|portfolio)\b|"
-    r"\b(?:trading|investing)\s+(?:with\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\b|"
+    r"\b(?:an?|my)\s+\$\s*(\d[\d,]*(?:\.\d+)?)(?![\d,.]*\d)\s*(k|m)?\s+(?:account|book|portfolio)\b|"
+    r"\b(?:trading|investing)\s+(?:with\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)(?![\d,.]*\d)\s*(k|m)?\b|"
     # "I only have about $1,000 total" was not kept (a first-time user, round 19, row 635)
     r"\bi\s+(?:only\s+)?have\s+(?:about\s+|around\s+|roughly\s+|only\s+|just\s+)?\$\s*"
-    r"(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\s+(?:total|in\s+total|altogether|overall|saved|to\s+my\s+name)\b|"
+    r"(\d[\d,]*(?:\.\d+)?)(?![\d,.]*\d)\s*(k|m)?\s+(?:total|in\s+total|altogether|overall|saved|to\s+my\s+name)\b|"
     # "I have $5,000 of margin in my account" was kept by the model as a bare "$5,000" and read
     # as a position (a judge, round 20, row 713); the words are kept with it
-    r"\bi\s+have\s+(?:about\s+|around\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\s+(?:of\s+)?"
+    r"\bi\s+have\s+(?:about\s+|around\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)(?![\d,.]*\d)\s*(k|m)?\s+(?:of\s+)?"
     r"(?:margin|collateral|buying\s+power)\b|"
     # "i want to grow my $300 slowly" kept "slowly" and lost the $300 (a first-time user, round 27)
     r"\b(?:grow|build\s+up|invest|start\s+with|got|have)\s+(?:only\s+|just\s+|like\s+|about\s+)?"
-    r"(?:my\s+|this\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\b(?!\s*(?:of|in|on|worth)\b)",
+    r"(?:my\s+|this\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)(?![\d,.]*\d)\s*(k|m)?\b(?!\s*(?:of|in|on|worth)\b(?!\s+(?:fresh\s+|new\s+|spare\s+|free\s+)?(?:cash|savings|money|capital)\b))",
     re.I)
 _THESIS = re.compile(
     r"\bi\s+(?:think|believe|expect|reckon|bet)\s+(?:that\s+)?(.{2,40}?)\s+(?:will|is\s+going\s+to|"
@@ -837,6 +837,12 @@ def _hold_words(hours: int) -> str:
     return f"about {round(days)} days"
 
 
+def deepest_fall_year(symbol: str) -> float | None:
+    """The deepest fall from a high over the last year of daily closes, as a positive fraction,
+    or None when the closes do not answer."""
+    return _deepest_fall_year(symbol)
+
+
 def _deepest_fall_year(symbol: str) -> float | None:
     """The deepest fall from a high over the last year of daily closes, as a positive fraction,
     or None when the closes do not answer."""
@@ -1417,6 +1423,7 @@ __all__ = [
     "apply",
     "checklist_lines",
     "checks_from",
+    "deepest_fall_year",
     "dumps",
     "earlier_asked",
     "earlier_lines",

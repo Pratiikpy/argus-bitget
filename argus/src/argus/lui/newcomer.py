@@ -15,6 +15,7 @@ so no figure here is written by hand.
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Final
 
@@ -128,6 +129,22 @@ _MONEY_SAFE = re.compile(
     r"\bis\s+(?:my|it)\s+(?:\w+\s+)?(?:insured|protected)\b", re.I)
 """A newcomer asking whether their money is safe here (a first-time user, round 11: answered with
 how rTokens and perpetuals differ)."""
+
+_BITGET_SAFE = re.compile(
+    # "is bitget safe for keep my money there long time, i am worry" got the desk's track record
+    # (a first-time user, round 30)
+    r"\bis\s+bitget\s+(?:\w+\s+){0,2}(?:safe|legit|trustworthy|secure|a\s+scam|reliable)\b|"
+    r"\b(?:safe|ok|okay)\s+(?:to|for)\s+(?:keep|keeping|leave|leaving|store|storing|hold|holding)\s+"
+    r"(?:my\s+)?(?:money|crypto|funds|coins|savings)\b", re.I)
+_BITGET_SAFE_A = (
+    "Bottom line: that is Bitget's to show and yours to check — this console does not audit "
+    "Bitget, and no exchange is risk-free.",
+    "What Bitget publishes for you to check: its proof-of-reserves reports and its protection "
+    "fund, on its own site. Read the latest before deciding how much to leave there.",
+    "For a long time: money on any exchange carries that exchange's risk. Many people keep only "
+    "what they trade on the exchange and move coins they hold for years to a wallet they control "
+    "— which then makes keeping its recovery phrase safe their own job.",
+    "This console never holds, moves or touches money.")
 
 _WITHDRAW = re.compile(
     # "how do i actually get my money out if i wanna stop" (a first-time user, round 28)
@@ -501,11 +518,15 @@ _LOAN_A = (
     "I lose on ETH in a bad week\" first to see what that means in dollars.",
 )
 _WHAT_NOW = re.compile(
-    r"^\W*(?:(?:so|ok(?:ay)?|then|alright|hmm+)\W+){0,2}(?:what\s+(?:should|do)\s+i\s+do"
+    r"^\W*(?:(?:so|ok(?:ay)?|then|alright|hmm+|thanks?|thank\s+you|thx)\W+){0,3}(?:what\s+(?:should|"
+    r"do)\s+i\s+do"
     r"(?:\s+now)?|"
     # "ok so which one do i go for" (a round-23 re-ask)
     r"which\s+(?:one\s+)?(?:should|do|would)\s+i\s+(?:pick|choose|buy|go\s+(?:with|for)|get)|"
     r"what\s+now|now\s+what|"
+    # "ok thank you, what i do first step today" got the thanks alone (a first-time user, round 30)
+    r"what\s+(?:do\s+|should\s+)?i\s+do\s+(?:as\s+)?(?:a\s+|the\s+|my\s+)?first(?:\s+step)?(?:\s+today)?|"
+    r"(?:what(?:'?s|\s+is)\s+)?(?:the|my)\s+first\s+step(?:\s+today)?|"
     r"what\s+would\s+you\s+pick|just\s+tell\s+me\s+what\s+to\s+(?:buy|do))\W*$", re.I)
 """A follow-up asking for the pick the last answer did not give: "so what should i do" and "so
 which one should i pick" were declined (a first-time user, round 23)."""
@@ -741,6 +762,8 @@ def reply(text: str, *, named: bool = False) -> Reply | None:
             return Reply(lines=answer_now)
     if _ADVICE.search(text):
         return Reply(lines=_NOT_ADVICE)
+    if _BITGET_SAFE.search(text):
+        return Reply(lines=_BITGET_SAFE_A)
     if _MONEY_SAFE.search(text):
         return Reply(lines=_SAFE)
     if _WITHDRAW.search(text):
@@ -788,6 +811,167 @@ def reply(text: str, *, named: bool = False) -> Reply | None:
                      note="\"buy the dip\" was read as: what followed similar past states — a "
                           "base rate, not a forecast")
     return None
+
+
+# --- the same answer in plain words ---------------------------------------------------------------
+
+_PLAIN_WORDS: Final[tuple[tuple[re.Pattern[str], str], ...]] = tuple(
+    (re.compile(pattern, re.I), plain) for pattern, plain in (
+        (r"\b(?:its\s+own\s+)?positioning\s+is\s+not\s+crowded\s+either\s+way\s+on\s+funding\b",
+         "traders are not piling onto one side (the fee buyers and sellers pay each other is "
+         "normal)"),
+        (r"\b(?:its\s+own\s+)?positioning\s+is\s+not\s+crowded\s+either\s+way\b",
+         "traders are not piling onto one side"),
+        (r"\bread\s+both\s+as\s+positioning,\s+not\s+a\s+signal\b",
+         "read both as a picture of how traders are betting, not a tip"),
+        (r"\bcrypto\s+fear\s*(?:&|and)\s*greed\b", "crypto mood gauge (0 scared, 100 greedy)"),
+        (r"^open\s+interest:", "open bets:"),
+        (r"\bpositioning\b", "how traders are betting"),
+        (r"\bcrowded\b", "piled onto one side"),
+        (r"\bthe\s+crypto\s+market\s+backdrop\b", "the mood across crypto"),
+        (r"\bbackdrop\b", "overall mood"),
+        (r"\bfunding\s+rates?\b|\bfunding\b", "the fee that buyers and sellers of the contract pay "
+                                              "each other"),
+        (r"\bopen\s+interest\b", "the number of open bets"),
+        (r"\bfear\s*(?:&|and)\s*greed\b", "the 0-100 mood gauge (0 scared, 100 greedy)"),
+        (r"\b(?:realised|realized|annuali[sz]ed)\s+volatility\b|\bvolatility\b",
+         "how much it swings"),
+        (r"\bdrawdown\b", "fall from its high"),
+        (r"\bliquidat(?:ed|ion)\b", "forced out of the trade"),
+        (r"\bbasis\s+points?\b|\bbps\b", "hundredths of a percent"),
+        (r"\bperpetual(?:\s+contract)?\b", "contract"),
+        (r"\bbeta\b", "how much it moves with the stock market"),
+        (r"\bkurtosis\b", "how often it makes very big moves"),
+        (r"\bthe\s+Nasdaq-100\s+\(QQQ\)|\bthe\s+Nasdaq-100\b", "the big US tech stocks"),
+        (r"\bmiddle\s+range\b", "normal range"),
+        (r"\bper\s+8h\s+settlement\b", "every 8 hours")))
+"""Jargon a newcomer said they did not understand, each with the plain words for it."""
+
+
+def plain_words(line: str) -> str:
+    """``line`` with its jargon said in plain words: "can u explain like im 5" after a sentiment
+    answer got the same "positioning … crowded … backdrop" sentence, only shorter (a first-time
+    user, round 30)."""
+    for jargon, plain in _PLAIN_WORDS:
+        line = jargon.sub(_cased(plain), line)
+    return line[:1].upper() + line[1:]
+
+
+def _cased(plain: str) -> Callable[[re.Match[str]], str]:
+    """The plain words, capitalised where the jargon they replace was."""
+    def put(m: re.Match[str]) -> str:
+        return plain[:1].upper() + plain[1:] if m.group(0)[:1].isupper() else plain
+    return put
+
+
+# --- a loss already taken: "my portfolio is down 30%", then "is that bad" ------------------------
+
+LOSS_STATED: Final = re.compile(
+    r"\b(?:my\s+)?(?:portfolio|account|book|money|holdings?|stack|bag|bags|crypto|investments?|"
+    r"savings|positions?|coins?|stocks?|it|i'?m|im|i\s+am|we'?re|i'?ve|i\s+have)\s+"
+    r"(?:is\s+|are\s+|was\s+|been\s+|got\s+|already\s+)*(?:down|lost|underwater|in\s+the\s+red)\s+"
+    r"(?:by\s+)?(?:about\s+|around\s+|like\s+|almost\s+|nearly\s+|over\s+)?"
+    r"(?P<pct>\d{1,2}(?:\.\d+)?)\s*(?:%|percent|pc)", re.I)
+"""A loss stated as a share: "my portfolio down 30%", "i'm down like 40 percent"."""
+_LOSS_BAD: Final = re.compile(
+    r"^\W*(?:so\s+|and\s+|but\s+|ok(?:ay)?\s+)?(?:is\s+(?:that|this|it)\s+(?:bad|normal|a\s+lot|"
+    r"terrible|ok(?:ay)?)|how\s+bad\s+is\s+(?:that|this|it)|should\s+i\s+(?:be\s+)?(?:worr(?:y|ied)|"
+    r"panic(?:king)?|scared)|am\s+i\s+(?:screwed|cooked|done|ok(?:ay)?)|is\s+(?:that|this)\s+"
+    r"(?:the\s+)?end)\b", re.I)
+_LOSS_SELL: Final = re.compile(
+    r"\bshould\s+i\s+(?:just\s+)?(?:sell|dump|cash\s+out|get\s+out|cut\s+(?:my\s+)?loss(?:es)?|"
+    r"exit|bail)\b|\bsell\s+(?:it\s+)?(?:all|everything)\b|\bget\s+out\s+(?:now|while)\b", re.I)
+_LOSS_MORE: Final = re.compile(
+    r"\bwhat\s+if\s+(?:it|they|this|that|the\s+market|prices?)\s+(?:keeps?|continues?)\s+"
+    r"(?:to\s+)?(?:drop|fall|go(?:ing)?\s+down|crash|sink)\w*|\bwhat\s+if\s+(?:it|they)\s+"
+    r"(?:drops?|falls?|goes\s+down|crash(?:es)?)\s+(?:more|further|again|lower)\b|"
+    r"\bwhat\s+if\s+it\s+goes\s+(?:even\s+)?lower\b|"
+    r"^\W*(?:and\s+|but\s+|so\s+)?(?:what\s+)?if\s+(?:it|they)\s+(?:goes|go|gets|drops?|falls?|"
+    r"keeps?\s+(?:dropping|falling))\s+(?:even\s+|any\s+)?(?:lower|further|more|down)?", re.I)
+_LOSS_BACK: Final = re.compile(
+    r"\bwill\s+(?:it|they|my\s+\w+)\s+(?:ever\s+)?(?:come\s+back|recover|bounce\s+back|go\s+back\s+"
+    r"up)\b|\bhow\s+long\s+(?:to|until|till|before)\s+(?:it\s+)?(?:recover|come\s+back|break\s+"
+    r"even|get\s+back)\w*\b|\bget\s+back\s+to\s+even\b", re.I)
+
+
+def _fall(base: float, more: float) -> tuple[float, float]:
+    """(the total loss after a further fall of ``more``, the rise that total needs to get back)."""
+    left = (1 - base) * (1 - more)
+    return 1 - left, 1 / left - 1
+
+
+def loss_lines(text: str, prior: list[str]) -> list[str] | None:
+    """A trader who has said they are down N% asks "is that bad", "should I sell everything" or
+    "what if it keeps dropping" — the two highest-stakes things a newcomer asks, both answered with
+    "I did not recognise that question" (a first-time user, round 30); the third was read as the
+    desk's own abstention log. Answered with the arithmetic of the loss they stated, the deepest
+    fall BTC and ETH took in the last year as the yardstick, the questions that decide whether to
+    sell, and how to get their own book measured. No call either way."""
+    stated = LOSS_STATED.search(text)
+    source = stated
+    if source is None:
+        source = next((m for t in reversed(prior[-4:]) if (m := LOSS_STATED.search(t))), None)
+    if source is None:
+        return None
+    pct = float(source.group("pct")) / 100
+    if not 0.02 <= pct <= 0.95:
+        return None
+    sell, more, back = _LOSS_SELL.search(text), _LOSS_MORE.search(text), _LOSS_BACK.search(text)
+    bad = _LOSS_BAD.search(text)
+    bare = (stated is not None and len(re.findall(r"[a-z0-9%]+", text, re.I)) <= 9
+            and "?" not in text)
+    if not (sell or more or back or bad or bare):
+        return None
+    from argus.lui.memory import deepest_fall_year
+
+    need = 1 / (1 - pct) - 1
+    falls = [(name, f) for name, sym in (("BTC", "BTCUSDT"), ("ETH", "ETHUSDT"))
+             if (f := deepest_fall_year(sym)) is not None]
+    yardstick = ("For scale: over the last year BTC fell as far as "
+                 + " and ".join(f"{f:.0%} below its high" if n == "BTC" else f"ETH {f:.0%}"
+                                for n, f in falls)
+                 + " at the worst point — so a loss this size is common in crypto, and rarer "
+                   "in a broad stock index." if falls else
+                 "For scale: single coins often fall 30-50% from a high within a year; broad "
+                 "stock indices much less often.")
+    own = ("To measure your own position rather than the averages, say what you hold, e.g. "
+           "\"I hold 60% BTC and 40% SOL — what if crypto drops another 20%?\"")
+    said = f"down {pct:.0%}"
+    if sell:
+        total, back_to = _fall(pct, 0.5)
+        return [f"Bottom line: no sell call from here — this console cannot see your situation. "
+                f"Selling now makes the {said} final; holding keeps it open both ways.",
+                "Four questions decide it: would you buy it today at this price? Do you need this "
+                "money within the next year? Has the reason you bought it changed? Could you sit "
+                "through another fall as large without selling at the bottom?",
+                f"The middle path is selling part: half sold means half of any further fall, and "
+                f"half of any recovery. Selling all of it would avoid, for example, a further 50% "
+                f"fall — which would leave you down {total:.0%} in total, needing +{back_to:.0%} "
+                f"to get back.",
+                yardstick, own, "This is analysis, not advice — you make the call."]
+    if more:
+        rows = "; ".join(f"another {m:.0%} fall makes it {_fall(pct, m)[0]:.0%} in total, "
+                         f"needing +{_fall(pct, m)[1]:.0%} to get back"
+                         for m in (0.10, 0.20, 0.30))
+        return [f"Bottom line: from {said}, {rows}. Each further fall costs more to recover from "
+                f"than the one before.",
+                f"Getting back to where you started already needs +{need:.0%}, not +{pct:.0%}: a "
+                "loss is measured from the higher starting point, a recovery from the lower one.",
+                yardstick,
+                "What limits the damage is decided before the next fall, not during it: a size you "
+                "can hold, a price at which you would sell part, and no leverage on a falling "
+                "position.", own]
+    if back:
+        return [f"Bottom line: no one can say when, or whether — from {said}, getting back to "
+                f"even needs a rise of +{need:.0%}.",
+                yardstick,
+                "Broad indices have recovered from every fall in their history, given years; "
+                "single coins and small stocks sometimes never have.", own]
+    return [f"Bottom line: {said} is a large loss — getting back to where you started needs a "
+            f"rise of +{need:.0%}, because a recovery is measured from the lower point.",
+            yardstick,
+            "Whether it is bad for you depends on two things only you know: whether you need the "
+            "money soon, and whether what you hold is still what you meant to hold.", own]
 
 
 trace_module(globals())

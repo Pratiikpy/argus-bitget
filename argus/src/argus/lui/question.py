@@ -549,7 +549,7 @@ prose is not. Case is read from the raw question deliberately: `GME` is a ticker
 typo, and calling the second an instrument would refuse real questions over a stray shift key."""
 
 _NOT_A_TICKER = frozenset({
-    "I", "A", "AI", "PM", "AM", "ET", "UTC", "US", "USD", "EPS", "PE", "ROI", "NAV", "LLM",
+    "I", "A", "AI", "PM", "AM", "ET", "UTC", "US", "USD", "EPS", "PE", "ROI", "NAV", "LLM", "VIP",
     "OK", "NO", "YES", "WHY", "HOW", "AND", "OR", "THE", "ARGUS", "IT", "WE", "Q", "FY",
     "FOMC", "FED", "CPI", "PPI", "GDP", "PCE", "NFP", "ECB", "BOJ", "PMI", "ETF", "IPO", "CEO",
     "RSI", "MACD", "ATR", "DXY", "VIX", "YTD", "EOD", "ATH",
@@ -694,6 +694,11 @@ def extract_symbols(text: str) -> tuple[tuple[str, ...], str]:
     return (), ""
 
 
+def listed_on_bitget(token: str) -> bool:
+    """Whether Bitget lists ``token`` as a perpetual; True when the list cannot be read."""
+    return _listed_on_bitget(token)
+
+
 def _listed_on_bitget(token: str) -> bool:
     """Whether Bitget's contract list carries ``token`` as a perpetual (``XUSDT`` or
     ``XSTOCKUSDT``). True when the list cannot be read, so an outage never makes the console call a
@@ -704,7 +709,9 @@ def _listed_on_bitget(token: str) -> bool:
         listed = universe.contracts()
     except Exception:
         return True
-    return f"{token}USDT" in listed or f"{token}STOCKUSDT" in listed
+    # "BTCUSDT" itself was looked up as "BTCUSDTUSDT" and called unlisted (a hostile review,
+    # round 30)
+    return token in listed or f"{token}USDT" in listed or f"{token}STOCKUSDT" in listed
 
 
 # --- intent ---------------------------------------------------------------------------------
@@ -1458,6 +1465,7 @@ __all__ = [
     "Window",
     "classify",
     "extract_symbols",
+    "listed_on_bitget",
     "resolve_symbol",
     "resolve_window",
 ]

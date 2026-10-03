@@ -36,8 +36,14 @@ from argus.lui.answer import LEAD
 from argus.lui.research.kinds import bare_symbol
 from argus.truth.coverage import ContextPool
 
-MAX_PARTS = 4
-"""The step budget. A fifth part is named in the answer as not run, never silently dropped."""
+MAX_PARTS = 8
+"""The step budget. A ninth part is named in the answer as not run, never silently dropped. Raised
+from 4 for a numbered checklist of eight questions (a hostile review, round 30); past four parts
+each is shown by its own lead and two lines, the rest one ask away."""
+FULL_PARTS = 4
+"""Up to this many parts, each is shown in full below the leads."""
+_NUMBERED = re.compile(r"(?:^|[\s,;:])(?:and\s+)?\(?\d{1,2}[).]\s+(?=\S)")
+"""An item of a numbered list: "1) ", "(2) ", "3. "."""
 
 _SPLIT = re.compile(
     r"(?<=[?.!;])\s+(?=\S)|\s*;\s*|\s+(?:and\s+)?then\s+(?=(?:what|how|is|are|should|can|tell|"
@@ -71,10 +77,37 @@ _ELABORATES = re.compile(
     r"bullish|bearish|a\s+(?:good|bad)\s+sign)\b|"
     r"^\s*(?:and\s+|so\s+)?(?:how|does|did|will)\s+(?:does\s+|did\s+|will\s+)?(?:that|it|this)\s+"
     r"(?:affect|hit|move|impact|weigh|matter|change)\w*|^\s*(?:is|are)\s+(?:that|it|they)\s+"
-    r"(?:normal|high|low|weighing|a\s+lot|good|bad|much)", re.I)
+    r"(?:normal|high|low|weighing|a\s+lot|good|bad|much)|"
+    # "…get liquidated, and does that price sit above or below my entry?" lost "that price"
+    # from the liquidation it named (a hostile review, round 30)
+    r"^\s*(?:and\s+)?(?:does|is|would|will)\s+(?:that|this|the)\s+(?:price|level|number|"
+    r"line)\b", re.I)
 """A clause that leans on the one before with a pronoun — "is that normal", "is it weighing on
 crypto", "how does that affect the market" — elaborates it: one question, answered whole. Splitting
 them cut 3 of 680 single held-out questions in two on the first run (`eval/multistep_eval.py`)."""
+
+
+_TYPED: tuple[tuple[re.Pattern[str], str], ...] = tuple(
+    (re.compile(pattern, re.I), plain) for pattern, plain in (
+        (r"^\W*(?:hey|hi|yo|ok(?:ay)?|so|um+|uh+|bro|lol)\b[\s,]*", ""),
+        (r"\bwh?ats\b|\bwats?\b", "what is"), (r"\bwat\b", "what"), (r"\bhows\b", "how is"),
+        (r"\brn\b", "right now"), (r"\bur\b", "your"), (r"\bu\b", "you"),
+        (r"\b(?:shud|shld)\b", "should"), (r"\bwanna\b", "want to"), (r"\bgonna\b", "going to")))
+"""Chat spelling, read as written English for a part's reading only: "hey whats btc doing today
+and also should i buy eth rn" lost its first half because "whats btc doing today" read as nothing
+(a first-time user, round 30). The part keeps its own words in the answer."""
+
+
+def _formal(piece: str) -> str:
+    for typed, plain in _TYPED:
+        piece = typed.sub(plain, piece)
+    return piece.strip()
+
+
+_CONSOLE_ONLY = re.compile(r"\b(?:max(?:imum)?|highest|most)\s+(?:allowed\s+)?leverage\b|"
+                           r"\bleverage\s+(?:cap|limit)\b", re.I)
+"""Items a research engine would misread: "what's the max leverage Bitget allows on TSLA" went to
+the liquidation reader at 10x; the console's own tier-list reader answers it."""
 
 
 @dataclass(frozen=True)
@@ -83,6 +116,17 @@ class Part:
     request: Any
     inherited: str = ""
     """The instrument carried from an earlier part, when this part named none."""
+
+
+def _numbered(question: str) -> list[str] | None:
+    """The items of a question laid out as a numbered list, or None when it is not one."""
+    marks = list(_NUMBERED.finditer(question))
+    if len(marks) < 2:
+        return None
+    items = [question[m.end():(marks[i + 1].start() if i + 1 < len(marks) else len(question))]
+             for i, m in enumerate(marks)]
+    items = [re.sub(r"[\s,;]+(?:and)?\s*$", "", item).strip(" ,.;") for item in items]
+    return [item for item in items if item] if len(items) >= 2 else None
 
 
 def parts(question: str, book: str = "") -> list[Part] | None:
@@ -94,7 +138,9 @@ def parts(question: str, book: str = "") -> list[Part] | None:
 
     from argus.lui.research import ResearchKind, detect, follow_up, research_symbols, with_book
 
-    pieces = [p.strip(" ,.;") for p in _SPLIT.split(question.strip()) if p and p.strip(" ,.;")]
+    listed = _numbered(question)
+    pieces = listed or [p.strip(" ,.;") for p in _SPLIT.split(question.strip())
+                        if p and p.strip(" ,.;")]
     if len(pieces) < 2 and not re.search(r"\b(?:compare|vs\.?|versus|between|riskier|safer|"
                                          r"better|worse)\b", question, re.I):
         # "BTC funding rate and ETH open interest": two noun phrases joined by "and", each
@@ -121,7 +167,9 @@ def parts(question: str, book: str = "") -> list[Part] | None:
     seen: set[tuple[Any, ...]] = set()
     earlier: list[str] = []
     for piece in pieces:
-        request = with_book(detect(piece), book, piece)
+        request = with_book(detect(piece) or detect(_formal(piece)), book, piece)
+        if listed and _CONSOLE_ONLY.search(piece):
+            request = None  # a venue fact the console's own reader answers (see _CONSOLE_ONLY)
         inherited = ""
         if request is None and earlier:
             request = follow_up(piece, earlier, book)
@@ -149,16 +197,24 @@ def parts(question: str, book: str = "") -> list[Part] | None:
                     spelled = f"{piece} {name}"
                 request = with_book(detect(spelled), book, piece)
                 inherited = named[-1] if request is not None else ""
-        if request is None and earlier and found and found[-1].request.kind is ResearchKind.MACRO:
+        if (request is None and earlier and found and found[-1].request is not None
+                and found[-1].request.kind is ResearchKind.MACRO):
             # "…; how does that affect BTC": the macro read, for the name this part gives
             named = research_symbols(piece)[0]
             if named:
                 request = replace(found[-1].request, symbols=named[:1])
         earlier.append(piece)
         if request is None:
+            if listed:
+                # an item of a numbered list is a question the asker numbered: it is answered by
+                # the console as a whole (``request`` None), or said to be unanswered, never
+                # dropped (a hostile review, round 30)
+                found.append(Part(text=piece, request=None))
             continue
-        held = next((p.request for p in reversed(found) if p.request.book), None)
-        if (held is not None and found[-1].request.kind is ResearchKind.BOOK
+        held = next((p.request for p in reversed(found) if p.request is not None
+                     and p.request.book), None)
+        if (held is not None and found[-1].request is not None
+                and found[-1].request.kind is ResearchKind.BOOK
                 and re.search(r"\b(?:its|it|the\s+book'?s?)\b", piece, re.I)
                 and re.search(r"\bbeta|\bcorrelat|\bvolatil|\bsharpe|\bdrawdown", piece, re.I)):
             # "…also what is its beta to the S&P?" after a book: the same book, asked again
@@ -246,8 +302,12 @@ def answer(question: str, found: list[Part], run: Any) -> tuple[list[str], list[
                    f" (read with {part.inherited})" if part.inherited else "")
         body.append(f"Part {number} — “{part.text}”{carried}:")
         # one bold lead per answer: a part's own lead is already listed above, so it is plain here
-        body.extend(LEAD.sub("", line, count=1) for line in lines
-                    if not line.startswith("Data:"))
+        shown = [LEAD.sub("", line, count=1) for line in lines if not line.startswith("Data:")]
+        if len(budget) > FULL_PARTS:
+            # past four parts the answer would run to a hundred lines: each part keeps its lead
+            # and the next two lines, and the full answer is one ask away
+            shown = shown[1:3]
+        body.extend(shown)
         sources.extend(result.sources)
     head = (f"Bottom line: your question has {len(budget)} parts, each answered by its own "
             f"engine below" + (f"; {unread} could not be answered and say why" if unread else "")
@@ -267,4 +327,4 @@ def answer(question: str, found: list[Part], run: Any) -> tuple[list[str], list[
     return [head, *leads, *body, *tail], sources, unread
 
 
-__all__ = ["MAX_PARTS", "Part", "answer", "parts"]
+__all__ = ["FULL_PARTS", "MAX_PARTS", "Part", "answer", "parts"]

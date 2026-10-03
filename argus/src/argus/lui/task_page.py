@@ -299,7 +299,8 @@ def _main(task: Task) -> str:
 {called}<section class="concl"><h2>What to do, engine by engine</h2><ol>{conclusion}</ol>
 </section>
 {cards}
-<p class="sub">Ran in {task.seconds:.1f}s. Execution is sized on a ${DEFAULT_BOOK_VALUE:,.0f} book.
+<p class="sub">Ran at {task.ran_at:%H:%M} UTC on {task.ran_at:%d %b}, in {task.seconds:.1f}s.
+Execution is sized on a ${DEFAULT_BOOK_VALUE:,.0f} book.
 This is analysis, not advice — you make the call. <a href="{esc(json_link)}">JSON</a></p>
 """
 

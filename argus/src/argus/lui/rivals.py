@@ -29,6 +29,9 @@ _GENERIC = frozenset({
     "tested", "test", "tests", "capability", "capabilities", "many", "rival", "rivals",
     "named", "measured", "competitors", "competitor", "systems", "beaten",
     "every", "theme", "themes", "other", "others", "ahead", "stronger",
+    # the words of a stress or a scenario, which baselines share without naming a system
+    "stress", "long", "short", "position", "positions", "overnight", "week", "weekend", "crash",
+    "drop", "fall", "survive", "thesis", "happens", "like", "move", "shock", "scenario",
 })
 """Words a question and a baseline share without naming a rival."""
 
@@ -59,7 +62,18 @@ _SELF = re.compile(r"\bargus\b|\byou(?:r|rs)?\b|\b(?:this|the)\s+(?:desk|tool|co
 
 
 def asks_about_a_rival(text: str) -> bool:
-    return bool(_COMPARE.search(text)) and bool(_SELF.search(text)) and bool(rows_naming(text))
+    """A comparison of ARGUS with a system the register names, where the system's name follows the
+    comparing word: "stress test a long SOL position against a 30% overnight crash … does your
+    thesis survive it" matched five rows through "stress", "overnight" and "week" and got the
+    register instead of a stress test (a judge, round 30, the third time this class appeared)."""
+    if not (_COMPARE.search(text) and _SELF.search(text)):
+        return False
+    return any(rows_naming(_after(m.end(), text)) for m in _COMPARE.finditer(text))
+
+
+def _after(at: int, text: str) -> str:
+    """The six words after a comparing word, where a rival's name sits when one is meant."""
+    return " ".join(text[at:].split()[:6])
 
 
 def rows_naming(text: str) -> list[Any]:

@@ -37,6 +37,7 @@ from collections.abc import Callable
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from concurrent.futures import TimeoutError as FuturesTimeout
 from dataclasses import dataclass, field, replace
+from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
 
@@ -336,6 +337,9 @@ class Task:
     tested: tuple[Tested, ...] = ()
     """The reasons the trader's own words gave, each tested (`lui/thesis.py`); empty when the
     question stated none."""
+    ran_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    """When the engines were read: the page says it, since the example task may be served from
+    the CDN for up to a minute."""
 
     @property
     def verdict(self) -> Verdict | None:

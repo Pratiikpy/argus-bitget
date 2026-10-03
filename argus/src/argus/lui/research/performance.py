@@ -75,6 +75,16 @@ class Period:
     """The period as the answer says it: "so far this year (1 Jan to 3 Oct)"."""
 
 
+
+def _px(value: float) -> str:
+    """A price with enough decimals to show it: SHIB's year read "0.00 to 0.00" (a first-time
+    user, round 30), so a price under 1 keeps four significant figures."""
+    if value <= 0 or value >= 1:
+        return f"{value:,.2f}"
+    from math import floor, log10
+
+    return f"{value:.{min(12, 3 - floor(log10(value)))}f}"
+
 def asked_period(text: str, now: datetime | None = None) -> Period | None:
     """The period a question names, or None when it names none."""
     now = now or datetime.now(UTC)
@@ -413,7 +423,7 @@ def performance_lines(symbols: tuple[str, ...], period: Period, *, amount: float
     if len(ranked) == 1:
         r = ranked[0]
         lead = (f"Bottom line: {_name(r.symbol)} is {r.change:+.1%} {said} — from "
-                f"{r.first:,.2f} to {r.last:,.2f} — and its deepest fall from a high on the way "
+                f"{_px(r.first)} to {_px(r.last)} — and its deepest fall from a high on the way "
                 f"was {r.drawdown:.1%} ({r.peak_day:%d %b} to {r.trough_day:%d %b}).")
     else:
         lead = ("Bottom line: " + ", ".join(f"{_name(r.symbol)} {r.change:+.1%}" for r in ranked)
@@ -424,14 +434,14 @@ def performance_lines(symbols: tuple[str, ...], period: Period, *, amount: float
                   f"drawdown.")
     lines = [lead]
     for r in ranked:
-        lines.append(f"{_name(r.symbol)}: {r.first:,.2f} on {r.first_day:%d %b %Y} to "
-                     f"{r.last:,.2f} on {r.last_day:%d %b %Y}; worst day {r.worst_day:+.1%}, "
+        lines.append(f"{_name(r.symbol)}: {_px(r.first)} on {r.first_day:%d %b %Y} to "
+                     f"{_px(r.last)} on {r.last_day:%d %b %Y}; worst day {r.worst_day:+.1%}, "
                      f"best day {r.best_day:+.1%}."
                      + (f" Bitget's daily history starts {r.first_day:%d %b %Y}, so the period is "
                         f"measured from there." if r.short_history else ""))
     first = ranked[0]
     if units is not None and len(found) == 1:
-        lines.insert(1, f"{units:g} {_name(first.symbol)} bought at {first.first:,.2f} cost "
+        lines.insert(1, f"{units:g} {_name(first.symbol)} bought at {_px(first.first)} cost "
                         f"${units * first.first:,.2f} and is worth ${units * first.last:,.2f}: "
                         f"{'a gain' if first.last >= first.first else 'a loss'} of "
                         f"${abs(units * (first.last - first.first)):,.2f}.")

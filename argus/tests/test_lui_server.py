@@ -426,6 +426,14 @@ class TestTheResearchTaskIsReachable:
         assert "should I add 15% TSLA?" in body
         assert "What to do" in body
         assert finished(body).count("<article") == 8
+        # the same example for every visitor, so the CDN may share it for a minute, and it says when
+        assert "s-maxage=60" in headers.get("Cache-Control", "")
+        assert "Ran at " in body and " UTC on " in body
+
+    @pytest.mark.network
+    def test_a_visitors_own_task_is_never_shared(self, base_url: str) -> None:
+        _, _, headers = _get(base_url + "/research?name=gold&size=10")
+        assert "public" not in headers.get("Cache-Control", "")
 
     @pytest.mark.network
     def test_every_step_names_its_engine_and_answers(self, base_url: str) -> None:

@@ -63,6 +63,76 @@ TWO_BOOKS_Q: Final = re.compile(
     re.I)
 
 
+NUMBERED: Final = re.compile(r"(?:^|[\s,;:])(?:1[).]|\(1\))\s*\S[^?]*?[\s,;](?:and\s+)?"
+                             r"(?:2[).]|\(2\))\s*\S", re.I | re.S)
+"""A message laid out as a numbered list: "1) … 2) …"."""
+MAX_LEVERAGE_Q: Final = re.compile(
+    r"\b(?:max(?:imum)?|highest|most|top)\s+(?:allowed\s+)?leverage\b|\bleverage\s+(?:cap|limit|"
+    r"max(?:imum)?)\b|\bhow\s+much\s+leverage\s+(?:can|does|will|is)\b[^?]{0,40}\b(?:allow|offer|"
+    r"give|get|use|bitget)\b|\bleverage\b[^?]{0,30}\b(?:allowed|allow|offer)s?\b", re.I)
+"""The most leverage Bitget allows on a contract."""
+_STATED_LEVERAGE: Final = re.compile(
+    r"\b(?:max(?:imum)?|highest|top)\s+(?:allowed\s+)?leverage\b[^?.]{0,50}?\b(?:is|of|at|=)\s+"
+    r"(?:actually\s+|really\s+|only\s+)?(?P<x>\d{1,4})\s*x\b|\bleverage\s+(?:cap|limit)\b"
+    r"[^?.]{0,50}?\b(?:is|of|at|=)\s+(?:actually\s+)?(?P<y>\d{1,4})\s*x\b", re.I)
+"""A ceiling stated as a fact, "the maximum leverage on BTCUSDT is actually 500x": a position's own
+leverage ("long 3 BTC at 15x") is not a claim about the ceiling."""
+
+
+def max_leverage_lines(text: str) -> list[str] | None:
+    """The leverage ceiling of each contract named, tier by tier, from Bitget's own position-tier
+    list (``/api/v2/mix/market/query-position-lever``), with a stated figure checked against it.
+
+    "Please remember this: Bitget's maximum leverage on BTCUSDT is actually 500x" was answered
+    "BTCUSDT is not listed on Bitget" (a hostile review, round 30); the console had no reader for
+    the ceiling at all, so the claim met the record reader instead."""
+    if not MAX_LEVERAGE_Q.search(text) or NUMBERED.search(text):
+        return None
+    from argus.market.bitget import public_get
+
+    named = list(_names(text))[:3]
+    if not named:
+        return None
+    rows: list[str] = []
+    checks: list[str] = []
+    stated = _STATED_LEVERAGE.search(text)
+    for symbol in named:
+        try:
+            tiers = public_get("/api/v2/mix/market/query-position-lever",
+                               {"productType": "USDT-FUTURES", "symbol": symbol}) or []
+        except Exception:
+            continue
+        if not tiers:
+            continue
+        top = tiers[0]
+        cap = int(float(top["leverage"]))
+        first_limit = float(top["endUnit"])
+        nxt = (f"; above that it falls to {int(float(tiers[1]['leverage']))}x, and to "
+               f"{int(float(tiers[-1]['leverage']))}x for the largest positions"
+               if len(tiers) > 1 else "")
+        name = symbol.removesuffix("USDT")
+        rows.append(f"{name}: up to {cap}x on positions up to {first_limit:,.0f} USDT (maintenance "
+                    f"margin {float(top['keepMarginRate']):.2%}){nxt}.")
+        if stated is not None and int(stated.group("x") or stated.group("y")) != cap:
+            said = int(stated.group("x") or stated.group("y"))
+            beyond = f" — no position can be opened at {said}x" if said > cap else ""
+            checks.append(f"Premise check: you said {said}x for {name}; Bitget's own tier list "
+                          f"says {cap}x at most{beyond}.")
+    if not rows:
+        return None
+    remember = re.search(r"\bremember\b|\bnote\s+(?:this|that)\b|\bkeep\s+in\s+mind\b", text, re.I)
+    lead = ("Bottom line: " + (checks[0].removeprefix("Premise check: ") if checks else
+                               f"the leverage Bitget allows, from its own tier list: "
+                               f"{rows[0].rstrip('.')}."))
+    return [lead,
+            *(rows if checks else rows[1:]),
+            *checks[1:],
+            *(["Noted as what you said, but every figure here uses Bitget's own list, which "
+               "is read fresh each time."] if remember and checks else []),
+            "Source: Bitget's public position-tier list (query-position-lever), read just now; "
+            "the ceiling falls as the position grows, so a large order meets a lower one."]
+
+
 def _names(text: str) -> tuple[str, ...]:
     from argus.lui.research import research_symbols
 
@@ -336,6 +406,13 @@ def gold_lineup_lines(text: str) -> list[str] | None:
 def levels_lines(text: str) -> list[str] | None:
     """Several levels asked for at once, each with the source it came from."""
     if not LEVELS_Q.search(text):
+        return None
+    if NUMBERED.search(text) or re.search(
+            r"\b(?:funding|beta|liquidat\w*|volume|earnings|leverage|open\s+interest|rsi|macd)\b",
+            text, re.I):
+        # an eight-item checklist (price, funding, beta, liquidation, volume, earnings date,
+        # leverage, funding) got eight last prices (a hostile review, round 30): only a list of
+        # levels is a levels question
         return None
     named = list(_names(text))
     dxy = bool(_DXY.search(text))

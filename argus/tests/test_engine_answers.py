@@ -56,7 +56,10 @@ def test_the_hurdle_is_explained_from_the_code_that_sets_it() -> None:
     assert any("default_hurdle_bps" in s.ref for s in sources)
 
 
-def test_the_fundamentals_lead_follows_the_question() -> None:
+def test_the_fundamentals_lead_follows_the_question(monkeypatch: pytest.MonkeyPatch) -> None:
+    # the declared dividend is read from SEC XBRL when the lines carry none (round 30); offline
+    # here, it is said to be missing unless stubbed
+    monkeypatch.setattr(research.fundamentals, "_declared_dividend", lambda ticker: None)
     lines = ["Bottom line: AAPL's next report date is not published yet.",
              "Valuation on 2026-09-24: P/E (trailing 12m) 38.1, dividend yield 0.31%.",
              "Institutions: 6,493 holders own 76.6% of the shares (as of 2026-09-23)."]
@@ -68,6 +71,11 @@ def test_the_fundamentals_lead_follows_the_question() -> None:
     assert research.fundamentals._fundamentals_focus(lines, "AAPL earnings", "AAPL") == lines
     missing: Any = research.fundamentals._fundamentals_focus(lines[:1], "AAPL dividend", "AAPL")
     assert "holds no dividend figure" in missing[0]
+    monkeypatch.setattr(research.fundamentals, "_declared_dividend",
+                        lambda ticker: f"{ticker} declared $0.27 a share for the quarter ending "
+                                       f"27 Jun 2026 (10-Q filed 31 Jul 2026, SEC EDGAR XBRL).")
+    filed: Any = research.fundamentals._fundamentals_focus(lines[:1], "AAPL dividend", "AAPL")
+    assert filed[0].startswith("Bottom line: AAPL declared $0.27 a share")
 
 
 def test_long_short_line_reads_the_split() -> None:

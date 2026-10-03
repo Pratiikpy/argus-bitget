@@ -115,12 +115,21 @@ def _venue(symbol: str, is_open: Any, spot: str | None = None
         spot_count = len(spot_rtokens())
     except Exception:
         spot_count = None
-    lines = [
+    # SOL was described as "a US stock" with an "RSOL" rToken (a judge, round 30): a coin is
+    # offered as spot and as a perpetual, and there is no rToken for it
+    stock = universe.is_equity(symbol) or universe.NOT_EQUITY.get(symbol, "crypto") != "crypto"
+    first = (
         "Bitget offers a US stock two ways. The rToken is a spot token (R" + base + "USDT for "
         + _t(symbol) + ") that you own outright: no leverage and no funding. The stock perpetual ("
         + symbol + ") is a USDT-margined contract: leverage, shorting and a funding payment "
         "every few hours. Both trade around the clock, including when the stock's own market "
-        "is shut. ARGUS's own paper desk decides on the perpetuals and places no real orders; "
+        "is shut." if stock else
+        f"Bitget offers {base} two ways: spot {base} that you own outright (no leverage, no "
+        f"funding), and the {symbol} perpetual, a USDT-margined contract with leverage, shorting "
+        "and a funding payment every few hours. There is no rToken for it: rTokens are for "
+        "stocks and ETFs.")
+    lines = [
+        first + " ARGUS's own paper desk decides on the perpetuals and places no real orders; "
         "this console holds no money and never trades for you.",
         (f"Listed now: {spot_count:,} spot rTokens, and " if spot_count else "Listed now: ")
         + f"{sum(kinds.values())} real-world-asset perpetuals beside {crypto} crypto ones — "
@@ -140,8 +149,8 @@ def _venue(symbol: str, is_open: Any, spot: str | None = None
         hours = (listed.get(symbol) or universe.Contract(symbol, True)).funding_hours or 8
         carry = rate * 24 / hours * 365
         lines.append(f"Holding costs funding: {_t(symbol)} is at {rate:+.4f}% every {hours}h right "
-                     f"now, about {carry:+.1f}% a year for a long if it held — owning the share "
-                     f"costs nothing to hold.")
+                     f"now, about {carry:+.1f}% a year for a long if it held — owning the "
+                     f"{'share' if stock else 'coin on spot'} costs nothing to hold.")
         premium = _premium_line(symbol, ticker.last, is_open(datetime.now(UTC)))
         if premium is not None:
             lines.append(premium[0])
@@ -153,14 +162,18 @@ def _venue(symbol: str, is_open: Any, spot: str | None = None
                      "be redeemed for it is set by Bitget's rToken terms, which this desk has not "
                      "verified — read them on Bitget before relying on any of it. What is measured "
                      "here is the price.")
-    lines.append("Neither is the share: no vote, and outside US hours both are priced on "
-                 "Bitget's own books, not the exchange's. An rToken holder who wants protection "
-                 "while the US market is shut can short the same company's perpetual — ask "
-                 f"\"how do I hedge my r{base} over the weekend\" for the tested ratio.")
+    if stock:
+        lines.append("Neither is the share: no vote, and outside US hours both are priced on "
+                     "Bitget's own books, not the exchange's. An rToken holder who wants "
+                     "protection while the US market is shut can short the same company's "
+                     f"perpetual — ask \"how do I hedge my r{base} over the weekend\" for the "
+                     "tested ratio.")
     lines.insert(0, (
-        "Bottom line: use the perpetual for leverage, shorting, or to hedge a book around the "
-        "clock; the spot rToken to hold exposure without funding; for a long buy-and-hold "
-        "position the share itself costs least to carry"
+        ("Bottom line: use the perpetual for leverage, shorting, or to hedge a book around the "
+         "clock; the spot rToken to hold exposure without funding; for a long buy-and-hold "
+         "position the share itself costs least to carry" if stock else
+         f"Bottom line: use the perpetual for leverage, shorting or a hedge; spot {base} to hold "
+         "it without leverage or funding")
         + (f" — at today's funding a perpetual long pays about {carry:.1f}% a year."
            if carry is not None and carry > 0 else ".")))
     return lines, [Source(kind="venue", ref="bitget contracts + tickers + bitget-mcp-server",

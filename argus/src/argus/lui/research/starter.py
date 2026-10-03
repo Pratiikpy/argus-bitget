@@ -69,11 +69,19 @@ STARTER_GROW_Q = re.compile(
     r"invest|start\s+with|turn)\s+(?:my\s+|this\s+|the\s+|about\s+|like\s+)?\$\s*"
     r"(?P<amount>\d[\d,]*(?:\.\d+)?)\s*(?P<unit>k|thousand|grand)?\b", re.I)
 """A first sum and what the newcomer wants it to do."""
+STARTER_IF_ME_Q = re.compile(
+    # "if you were me with like 500 bucks what would you actually do with it" was told "that" has
+    # nothing to refer to (a first-time user, round 30)
+    r"\b(?:if\s+you\s+were\s+me|if\s+i\s+were\s+you|in\s+(?:my|your)\s+(?:shoes|position|place)|"
+    r"what\s+would\s+you\s+(?:actually\s+|personally\s+)?do)\b.{0,60}?\$?\s*(?P<amount>\d[\d,]*"
+    r"(?:\.\d+)?)\s*(?P<unit>k|thousand|grand|dollars?|usd|usdt|bucks)?\b", re.I | re.S)
+"""A sum, and what the console would do with it in the asker's place."""
 
 
 def amount_of(text: str) -> float | None:
     """The sum a first-money question names, in dollars."""
-    m = STARTER_Q.search(text) or STARTER_LOSS_Q.search(text) or STARTER_GROW_Q.search(text)
+    m = (STARTER_Q.search(text) or STARTER_LOSS_Q.search(text) or STARTER_GROW_Q.search(text)
+         or STARTER_IF_ME_Q.search(text))
     if m is None:
         return None
     value = float(m.group("amount").replace(",", ""))
