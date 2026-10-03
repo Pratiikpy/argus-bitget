@@ -514,6 +514,25 @@ def indicators(symbol: str) -> dict[str, float | str] | None:
         "cross": ("golden cross" if previous <= 0 < histogram else
                   "death cross" if previous >= 0 > histogram else ""),
     }
+    # The shape of the histogram, for "is it a bullish or bearish cross" (a judge, round 29: the
+    # answer said "momentum turning up" over six bars of a shrinking positive histogram). dea[i]
+    # sits over dif[i + 8]: the signal EMA is seeded with the mean of the first nine.
+    series = [dif[i + 8] - dea[i] for i in range(len(dea))]
+    since_cross = next((n for n in range(1, len(series))
+                        if (series[-n] > 0) != (series[-n - 1] > 0)), None)
+    narrowing = 0
+    while (narrowing + 1 < len(series)
+           and abs(series[-1 - narrowing]) < abs(series[-2 - narrowing])
+           and (series[-1 - narrowing] > 0) == (series[-2 - narrowing] > 0)):
+        narrowing += 1
+    widening = 0
+    while (widening + 1 < len(series)
+           and abs(series[-1 - widening]) > abs(series[-2 - widening])
+           and (series[-1 - widening] > 0) == (series[-2 - widening] > 0)):
+        widening += 1
+    out["bars_since_cross"] = float(since_cross) if since_cross is not None else -1.0
+    out["narrowing_bars"] = float(narrowing)
+    out["widening_bars"] = float(widening)
     if value is not None:
         out["rsi"] = value
     return out

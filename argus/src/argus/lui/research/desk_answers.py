@@ -85,7 +85,7 @@ def fees_lines(text: str) -> list[str] | None:
 _TRADES_PER: Final = re.compile(
     r"\b(?P<n>\d+)\s*(?:x|times?|trades?|round[\s-]*trips?|orders?)\s+(?:a|per|each|every)\s+"
     r"(?P<u>day|week|month)\b|\b(?P<n2>\d+)\s+(?:trades?|times?)\s+(?:daily|weekly)\b", re.I)
-_STAKE: Final = re.compile(
+STAKE: Final = re.compile(
     r"\$\s?(?P<a>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k)?\b|(?P<b>\d[\d,]*(?:\.\d+)?)\s*(?P<k2>k)?\s*"
     r"(?:usdt|usd|dollars|bucks)\b", re.I)
 
@@ -97,7 +97,7 @@ def fee_burn_lines(text: str) -> list[str] | None:
     if not re.search(r"\bfees?\b|\bcommissions?\b|\bcosts?\b", text, re.I):
         return None
     freq = _TRADES_PER.search(text)
-    stake = _STAKE.search(text)
+    stake = STAKE.search(text)
     if freq is None or stake is None:
         return None
     count = int(freq.group("n") or freq.group("n2"))
@@ -211,8 +211,9 @@ def perp_vs_spot_lines(text: str, prior: Sequence[str]) -> list[str] | None:
     from argus.lui.research import research_symbols
     from argus.market.bitget import public_get
 
+    # "basis points" is a unit, not the perp-spot basis (a hostile review, round 29)
     asks = re.search(r"\bperp\w*\b[^?]{0,40}\bspot\b|\bspot\b[^?]{0,40}\bperp\w*\b|\bpremium\b|"
-                     r"\bbasis\b", text, re.I)
+                     r"\bbasis\b(?!\s+points?\b)", text, re.I)
     if asks is None:
         return None
     named = research_symbols(text)[0] or next((research_symbols(q)[0] for q in reversed(prior[-2:])

@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from typing import Final
 
 from argus.lui.provenance import explains
 from argus.lui.trace import trace_module
@@ -421,6 +422,61 @@ _MISTAKES_A = (
     "it changing your life — ask \"how much could I lose on BTC in a bad week\" for the figure.",
 )
 explains(*_SPECULATION_A, *_OTHER_EXCHANGE_A, *_KYC_A, *_HIDDEN_FEES_A, *_MISTAKES_A)
+
+OTHER_EXCHANGE: Final = _OTHER_EXCHANGE
+OTHER_EXCHANGE_A: Final = _OTHER_EXCHANGE_A
+EARLY_PLAIN: Final = ((_KYC, _KYC_A), (_MISTAKES, _MISTAKES_A), (_SPECULATION, _SPECULATION_A),
+                      (_HIDDEN_FEES, _HIDDEN_FEES_A))
+"""The plain answers the console's router takes before its research readers see the question:
+"do they make you upload a passport on bitget" was taken by the venue explainer before the
+newcomer answer was reached (round 28)."""
+
+SLANG: dict[str, str] = {
+    "dyor": "\"do your own research\" — check a claim yourself before acting on it",
+    "wagmi": "\"we're all gonna make it\" — cheerleading, not information",
+    "ngmi": "\"not gonna make it\" — said of someone (or a coin) expected to fail",
+    "hodl": "holding through ups and downs instead of selling (a typo of \"hold\" that stuck)",
+    "fomo": "\"fear of missing out\" — buying because a price is rising and others are buying",
+    "fud": "\"fear, uncertainty and doubt\" — negative talk, true or not, that pushes prices down",
+    "ath": "\"all-time high\" — the highest price a coin has ever traded at",
+    "rekt": "\"wrecked\" — a large loss, often a leveraged position closed out",
+    "degen": "someone taking very high-risk bets, often with leverage or tiny coins",
+    "ape": "to buy fast and big without research (\"I aped in\")",
+    "moon": "a very large price rise (\"to the moon\")",
+    "bagholder": "someone still holding a coin that has fallen a long way",
+    "bag holder": "someone still holding a coin that has fallen a long way",
+    "whale": "an account big enough that its trades move the price",
+    "shill": "promoting a coin, often because the promoter owns it",
+    "rug pull": "the people behind a coin take the money and disappear; the price goes to near "
+                "zero",
+    "rug": "short for \"rug pull\": the people behind a coin take the money and disappear",
+    "gm": "\"good morning\" — a greeting, nothing more",
+    "wen": "\"when\", usually asked impatiently (\"wen moon\")",
+    "lfg": "\"let's go\" — excitement, not information",
+    "ct": "\"crypto Twitter\" — the crypto crowd on X",
+    "alpha": "information that is supposed to give an edge; usually a rumour",
+    "pump and dump": "a coin pushed up by coordinated buying so the pushers can sell to latecomers",
+}
+"""What a newcomer reads on crypto social media and asks about: "what does dyor even stand for"
+was answered about Twitter's shares (a first-time user, round 29)."""
+SLANG_Q: Final = re.compile(
+    r"\b(?:what\s+(?:does|do|is|are)|whats|what's|wtf\s+is|meaning\s+of)\s+(?:a\s+|an\s+|the\s+)?"
+    r"(?P<t>" + "|".join(sorted((re.escape(k) for k in SLANG), key=len, reverse=True)) + r")\b",
+    re.I)
+
+
+def slang_lines(text: str) -> list[str] | None:
+    """Every slang term the question asks about, in plain words."""
+    asked = [m.group("t").lower() for m in SLANG_Q.finditer(text)]
+    if not asked:
+        found = [k for k in SLANG if re.search(rf"\b{re.escape(k)}\b", text, re.I)]
+        asked = found if found and re.search(r"\b(?:mean|stand\s+for|means|meaning|no\s+clue|"
+                                             r"don'?t\s+(?:get|know))\b", text, re.I) else []
+    if not asked:
+        return None
+    said = [f"{k.upper() if len(k) <= 5 else k}: {SLANG[k]}." for k in dict.fromkeys(asked)]
+    return ["Bottom line: " + said[0], *said[1:],
+            "Slang like this travels fast on social media; none of it is a reason to buy or sell."]
 explains(*_LOOKAHEAD_A, *_OVERFIT_A, *_SURVIVOR_A, *_COSTS_A, *_NOT_ADVICE, *_BUYING, *_LOSING,
          *_LOSS_HAPPENS_A, *_BEGINNER_SAFE_A,
          *_GOING_WRONG, *_NO_GUARANTEE, *_SAFE, *_WITHDRAWING, *_PLACING, *_FREE_TO_USE)

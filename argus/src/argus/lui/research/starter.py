@@ -27,8 +27,10 @@ STARTER_Q = re.compile(
     # a sensible way to begin?" were filed as notes and never answered (round 23)
     # "ok so i put in like 300 bucks total wut do i do with it" was kept as a note and its
     # question dropped (a first-time user, round 28)
-    r"\b(?:i|and)\s+(?:only\s+|just\s+|already\s+)?(?:have|got|own|saved|put\s+in|deposited|"
-    r"can\s+(?:put|invest|spare))\s+"
+    # "i saved up 150 bucks from my part time job, what should i actually do with it" was
+    # declined as off-topic (a first-time user, round 29)
+    r"\b(?:i|and)\s+(?:only\s+|just\s+|already\s+)?(?:have|got|own|saved(?:\s+up)?|put\s+in|"
+    r"deposited|can\s+(?:put|invest|spare))\s+"
     r"(?:about\s+|around\s+|"
     r"roughly\s+|only\s+|like\s+|maybe\s+|just\s+)?\$?\s*(?P<amount>\d[\d,]*(?:\.\d+)?)\s*"
     r"(?P<unit>k|thousand|grand|dollars?|usd|usdt|bucks)?\b.{0,300}?(?:wh?at\s+(?:should|shud|"

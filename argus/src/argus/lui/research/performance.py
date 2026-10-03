@@ -401,14 +401,23 @@ def performance_lines(symbols: tuple[str, ...], period: Period, *, amount: float
     if not found:
         return None
     ranked = sorted(found, key=lambda r: -r.change)
+    said = period.said
+    if any(r.short_history for r in found):
+        # "TSLA is +10.8% over the last 10 years (05 Oct 2016 to 03 Oct)" was measured from 19 Aug
+        # 2025, where Bitget's history starts (a judge, round 29): the span said is the span used
+        starts = {r.first_day for r in found}
+        said = (f"since {min(starts):%d %b %Y}, as far back as Bitget's daily history goes "
+                f"(shorter than the period asked for)" if len(starts) == 1 else
+                "over each one's own history on Bitget, which is shorter than the period asked "
+                "for (start dates below)")
     if len(ranked) == 1:
         r = ranked[0]
-        lead = (f"Bottom line: {_name(r.symbol)} is {r.change:+.1%} {period.said} — from "
+        lead = (f"Bottom line: {_name(r.symbol)} is {r.change:+.1%} {said} — from "
                 f"{r.first:,.2f} to {r.last:,.2f} — and its deepest fall from a high on the way "
                 f"was {r.drawdown:.1%} ({r.peak_day:%d %b} to {r.trough_day:%d %b}).")
     else:
         lead = ("Bottom line: " + ", ".join(f"{_name(r.symbol)} {r.change:+.1%}" for r in ranked)
-                + f" {period.said}; the deepest falls from a high were "
+                + f" {said}; the deepest falls from a high were "
                 + ", ".join(f"{_name(r.symbol)} {r.drawdown:.1%}" for r in
                             sorted(found, key=lambda r: r.drawdown))
                 + f" — {_name(min(found, key=lambda r: r.drawdown).symbol)} had the bigger "

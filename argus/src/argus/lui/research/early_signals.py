@@ -99,7 +99,7 @@ def scan(*, trending_symbols: frozenset[str] | None = None) -> list[Scored]:
         key=lambda row: -row[1])
     liquid = [row for row in liquid if row[1] >= MIN_TURNOVER][:MAX_SCANNED]
     if trending_symbols is None:
-        trending_symbols = _trending()
+        trending_symbols = _trending() or frozenset()
     with ThreadPoolExecutor(max_workers=8) as pool:
         histories = list(pool.map(lambda row: _history(row[0]), liquid))
     out = []
@@ -112,20 +112,23 @@ def scan(*, trending_symbols: frozenset[str] | None = None) -> list[Scored]:
     return sorted(out, key=lambda s: -s.score)
 
 
-def _trending() -> frozenset[str]:
+def _trending() -> frozenset[str] | None:
+    """CoinGecko's trending coins, or None when the list did not answer — said on the answer,
+    since every coin then scores 0 for attention (an outage drill, 2026-10-04)."""
     from argus.lui.trending import coins_from
     from argus.market.skill_mirror import trending
 
     try:
         return frozenset(c["symbol"] for c in coins_from(trending({})))
     except Exception:
-        return frozenset()
+        return None
 
 
 def lines(*, now: datetime | None = None, top: int = 8) -> list[str] | None:
     when = now or datetime.now(UTC)
+    attention = _trending()
     try:
-        scored = scan()
+        scored = scan(trending_symbols=attention if attention is not None else frozenset())
     except Exception:
         return None
     if not scored:
@@ -159,7 +162,9 @@ def lines(*, now: datetime | None = None, top: int = 8) -> list[str] | None:
             + (f" {unshown} contract{'s' if unshown != 1 else ''} named in another script "
                f"{'are' if unshown != 1 else 'is'} left off this list." if unshown else ""),
             f"Computed {when:%d %b %H:%M} UTC from Bitget's public tickers and daily candles and "
-            "CoinGecko's trending list. Ask about any name on it for its full picture."]
+            "CoinGecko's trending list. Ask about any name on it for its full picture.",
+            *(["CoinGecko's trending list did not answer this time, so attention scores 0 for "
+               "every coin and the scores are out of 80."] if attention is None else [])]
 
 
 TODAY_ASKED: Final = re.compile(

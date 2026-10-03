@@ -114,6 +114,115 @@ def funding_lines(text: str, prior: Sequence[str] = ()) -> list[str] | None:
             "has actually moved."]
 
 
+MARGIN_KIND_Q: Final = re.compile(r"\bcoin[\s-]*(?:margined|m)\b|\binverse\s+(?:perp\w*|"
+                                   r"contracts?|futures?|swaps?)\b|\busdc[\s-]*(?:margined|m|"
+                                   r"perp\w*)\b", re.I)
+
+
+def margin_kind_lines(text: str) -> list[str] | None:
+    """"What's the funding rate right now on Bitget's BTCUSD inverse coin-margined perpetual?" got
+    BTCUSDT's funding beside Coinbase's stock (a hostile review, round 29): which margin kinds
+    Bitget's public API lists for the coin, and their funding — none is invented."""
+    if not MARGIN_KIND_Q.search(text):
+        return None
+    from argus.market.bitget import public_get
+
+    base = (_names(text) or ("BTCUSDT",))[0].removesuffix("USDT")
+    counts: dict[str, int] = {}
+    for product in ("COIN-FUTURES", "USDC-FUTURES"):
+        try:
+            counts[product] = len(public_get("/api/v2/mix/market/contracts",
+                                             {"productType": product}) or [])
+        except Exception:
+            counts[product] = -1
+    rates = []
+    for product, symbol in (("USDT-FUTURES", f"{base}USDT"), ("USDC-FUTURES", f"{base}PERP")):
+        try:
+            got = (public_get("/api/v2/mix/market/current-fund-rate",
+                              {"productType": product, "symbol": symbol}) or [{}])[0]
+        except Exception:
+            continue
+        if got:
+            rates.append(f"{symbol} ({'USDT' if product.startswith('USDT') else 'USDC'}-margined) "
+                         f"{float(got.get('fundingRate') or 0):+.4%} per "
+                         f"{got.get('fundingRateInterval') or '?'}h settlement")
+    coin_m = counts.get("COIN-FUTURES", -1)
+    lead = (f"Bottom line: Bitget's public API lists no coin-margined (inverse) perpetual today — "
+            f"0 contracts under COIN-FUTURES — so there is no {base}USD inverse rate to give."
+            if coin_m == 0 else
+            f"Bottom line: Bitget's public API lists {coin_m} coin-margined contracts; ask about "
+            f"one by its symbol." if coin_m > 0 else
+            "Bottom line: Bitget's coin-margined contract list did not answer just now.")
+    lines = [lead]
+    if rates:
+        lines.append(f"What it does list for {base}: " + "; ".join(rates) + ".")
+    lines.append("Read just now from Bitget's contract lists and current-fund-rate endpoint.")
+    return lines
+
+
+FUNDING_THRESHOLD_Q: Final = re.compile(
+    r"\b(?P<span>a\s+month|monthly|per\s+month|month|a\s+year|per\s+year|annual\w*|yearly|year|"
+    r"a\s+day|daily|per\s+day|a\s+week|weekly)\b[^?]{0,60}?\b(?:higher|more|above|over|below|"
+    r"less|under|exceed\w*|bigger|smaller)\s+(?:than\s+)?(?P<thr>\d+(?:\.\d+)?)\s*%", re.I)
+_STATED_RATE: Final = re.compile(
+    r"(?P<r>\d+(?:\.\d+)?)\s*(?P<u>bps|bp|basis\s+points|%)\s+(?:per|every|each|a)\s+"
+    r"(?P<h>\d+)[\s-]*h(?:our)?", re.I)
+
+
+def funding_threshold_lines(text: str) -> list[str] | None:
+    """"If BTC funding stays at its current rate, is the monthly cost of holding a long higher
+    than 5% a month?" and "running at 87 bps per 8-hour interval … annualized, above or below
+    30%?" were answered around the yes or no (a hostile review, round 29): the rate carried over
+    the stated span and set against the threshold, the stated rate checked against the live one."""
+    if not re.search(r"\bfunding\b", text, re.I):
+        return None
+    asked = FUNDING_THRESHOLD_Q.search(text)
+    if asked is None:
+        return None
+    from argus.market.bitget import public_get
+
+    symbol = (_names(text) or ("BTCUSDT",))[0]
+    try:
+        got = (public_get("/api/v2/mix/market/current-fund-rate",
+                          {"productType": "USDT-FUTURES", "symbol": symbol}) or [{}])[0]
+    except Exception:
+        return None
+    if not got:
+        return None
+    rate = float(got.get("fundingRate") or 0)
+    hours = float(got.get("fundingRateInterval") or 8)
+    span = asked.group("span").lower()
+    days = (30 if "month" in span else 365 if ("year" in span or "annual" in span) else
+            7 if "week" in span else 1)
+    settlements = days * 24 / hours
+    threshold = float(asked.group("thr")) / 100
+    name = symbol.removesuffix("USDT")
+    word = ("a month" if days == 30 else "a year" if days == 365 else "a week" if days == 7
+            else "a day")
+    carried = rate * settlements
+    verdict = "above" if abs(carried) > threshold else "below"
+    lines = [f"Bottom line: {verdict} — at {name}'s current {rate:+.4%} per {hours:g}h settlement, "
+             f"{settlements:g} settlements {word} come to {carried:+.2%}, against the "
+             f"{threshold:.0%} asked about; a long pays it when it is positive."]
+    stated = _STATED_RATE.search(text)
+    if stated is not None:
+        value = float(stated.group("r"))
+        stated_rate = value / 10_000 if stated.group("u").lower() != "%" else value / 100
+        stated_hours = float(stated.group("h"))
+        stated_carried = stated_rate * days * 24 / stated_hours
+        lines.insert(0, f"Premise check: the question's {stated.group(0)} is {stated_rate:.4%} a "
+                        f"settlement; {name}'s live rate is {rate:+.4%}, "
+                        f"{abs(stated_rate / rate):,.0f} times smaller."
+                     if rate and abs(stated_rate) > 3 * abs(rate) else
+                     f"Note: the question's {stated.group(0)} is {stated_rate:.4%} a settlement.")
+        lines.append(f"At the rate the question states, {stated_carried:+.1%} {word} — "
+                     f"{'above' if abs(stated_carried) > threshold else 'below'} the "
+                     f"{threshold:.0%}.")
+    lines.append("Carried forward at today's rate, which changes every settlement — a "
+                 "description of now, not a forecast. Bitget's current-fund-rate endpoint.")
+    return lines
+
+
 FUNDING_HISTORY_Q: Final = re.compile(
     r"\bfunding\b[^?]{0,60}\b(?:averag\w*|history|histor\w*|over\s+the\s+(?:last|past)|been\s+"
     r"(?:running|paying)|trend\w*|compare\w*)\b|\b(?:averag\w*|history\s+of|historical)\b[^?]{0,30}"

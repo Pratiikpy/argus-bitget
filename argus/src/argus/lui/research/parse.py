@@ -2192,7 +2192,12 @@ def stated_multiple(raw: str) -> re.Match[str] | None:
 
     "my friend made 3x on 20x lev on sol" was assessed at 3x, the friend's return, and the risky
     20x was never looked at (a first-time user, round 22). A multiple followed by a leverage word,
-    or after "at/on/with", is preferred; one that is a gain ("made 3x", "3x returns") never is."""
+    or after "at/on/with", is preferred; one that is a gain ("made 3x", "3x returns") never is.
+
+    Thousands separators are read: "a 10,000x leveraged long" was read as "000x", assessed at the
+    default 10x and never said (a hostile review, round 29). The match is on the text with the
+    separators removed, so ``group(1)`` is the whole number."""
+    raw = re.sub(r"(?<=\d),(?=\d{3}(?!\d))", "", raw)
     skip = {m.start(g) for m in _RETURN_MULTIPLE.finditer(raw) for g in (1, 2) if m.group(g)}
     found = [m for m in _ANY_MULTIPLE.finditer(raw) if m.start(1) not in skip]
     preferred = next((m for m in found if re.match(

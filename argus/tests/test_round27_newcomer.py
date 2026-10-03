@@ -303,6 +303,7 @@ class TestBookAndMarkets:
         rows = [early_signals.Scored("龙虾USDT", 3e7, 2.4, -0.55, 0.0005, False),
                 early_signals.Scored("SANDUSDT", 3e7, 9.0, 0.51, -0.005, True)]
         monkeypatch.setattr(early_signals, "scan", lambda **_kw: rows)
+        monkeypatch.setattr(early_signals, "_trending", lambda: frozenset({"SAND"}))
         lines = early_signals.lines(now=datetime(2026, 10, 3, tzinfo=UTC))
         assert lines is not None and "SAND scores highest" in lines[0]
         assert not any("龙虾" in x for x in lines)

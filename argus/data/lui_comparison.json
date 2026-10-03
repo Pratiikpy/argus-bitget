@@ -7,17 +7,17 @@
     "vendored_predictions": "src\\argus\\eval\\baselines\\rasa_diet_sealed_predictions.json"
   },
   "sealed_comparison": {
-    "argus_correct": 234,
-    "argus_answered": 276,
+    "argus_correct": 236,
+    "argus_answered": 278,
     "argus_total": 293,
-    "argus_accuracy": 0.7986,
+    "argus_accuracy": 0.8055,
     "rasa_correct": 240,
     "rasa_answered": 293,
     "rasa_total": 293,
     "rasa_accuracy": 0.8191,
-    "argus_only_correct": 11,
-    "rasa_only_correct": 17,
-    "mcnemar_p": 0.344928,
+    "argus_only_correct": 12,
+    "rasa_only_correct": 16,
+    "mcnemar_p": 0.571588,
     "rasa_ahead": false
   },
   "oos_comparison": {

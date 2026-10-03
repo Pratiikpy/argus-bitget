@@ -587,7 +587,8 @@ def coin_as_ticker(text: str) -> str:
     coin"); anywhere else a lowercase "coin" in a trading question is the ticker."""
     if _COIN_THE_WORD.search(text) or _NAMED_COIN.search(text):
         return text
-    return re.sub(r"(?<![A-Za-z])coin(?![A-Za-z])", "COIN", text)
+    # "coin-margined" and "coin-m" are a kind of contract, not Coinbase (a hostile review, round 29)
+    return re.sub(r"(?<![A-Za-z-])coin(?![A-Za-z-])", "COIN", text)
 
 
 def resolve_symbol(token: str) -> str | None:
@@ -1272,14 +1273,20 @@ _VAGUE_REFERENCE = re.compile(
 )
 
 _NEEDS_REFERENT: frozenset[Intent] = frozenset({
-    Intent.DECISION_WHY, Intent.EVIDENCE, Intent.UNKNOWN,
+    Intent.DECISION_WHY, Intent.EVIDENCE,
 })
 """Intents that cannot be answered without knowing which decision is meant.
 
 Everything else — performance, session, position, integrity, calibration, the decision list — is
 answered across the whole record, so an idiomatic "it" in "how's it going?" is not a dangling
-reference and must not be treated as one. ``UNKNOWN`` is included because an unclassified question
-carrying "that" is exactly the case where asking which one is the right reply."""
+reference and must not be treated as one. ``UNKNOWN`` was in this set until round 29: every
+question the console did not place that carried an "it" or a "that" — "is that normal", "is crypto
+trading really that risky tho", "i dont get it" — was told '"that" has nothing to refer to yet',
+which named a cause that was not the cause. An unplaced question now gets it only when it is
+addressed to the desk itself ("why did you do that?"); any other gets the plain decline."""
+
+_ABOUT_THE_DESK = re.compile(r"\b(?:you|your|argus|the\s+desk|decisions?|trades?|seq)\b", re.I)
+"""An unplaced question about the desk's own actions, where a dangling "that" points at a row."""
 
 
 @dataclass
@@ -1400,7 +1407,8 @@ def classify(
     # answered over the whole record, so a dangling "it" costs them nothing; "why did you do that?"
     # genuinely cannot be answered without knowing which decision.
     if (
-        intent in _NEEDS_REFERENT
+        (intent in _NEEDS_REFERENT
+         or (intent is Intent.UNKNOWN and _ABOUT_THE_DESK.search(raw)))
         and _VAGUE_REFERENCE.search(raw)
         and not symbols
         and seq is None

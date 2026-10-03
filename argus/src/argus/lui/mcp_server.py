@@ -417,7 +417,15 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
             size=float(size) / 100.0 if size is not None else 0.2,
             size_stated=size is not None)
         result = _run(request, f"add {size or 20}% {add}")
-        return _answer_text(result), result["refused"]
+        text = _answer_text(result)
+        stated = sum(abs(float(v)) for v in (args.get("book") or {}).values())
+        if book and abs(stated - 100.0) > 0.5:
+            # {NVDA: 50, AAPL: 70} was rescaled to 100% with no word, where the console says so
+            # (a hostile review, round 29)
+            text = (f"Note: the book's weights add up to {stated:g}%, so each was scaled in "
+                    f"proportion to make 100% — give weights that sum to 100% (cash included) to "
+                    f"have them read as stated.\n{text}")
+        return text, result["refused"]
     if name == "argus_stress":
         book = _book(args.get("book"))
         if not book:

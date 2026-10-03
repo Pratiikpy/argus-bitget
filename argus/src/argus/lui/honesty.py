@@ -981,6 +981,12 @@ def _unlisted_candidate(text: str, registry: Mapping[str, Any]) -> tuple[str, tu
         tickers = COMPANY_TICKERS[key]
         if key in ("strategy", "circle", "visa", "shell") and not match.group(1)[0].isupper():
             continue  # the ordinary words
+        if key == "twitter" and not re.search(
+                r"\btwitter(?:'s)?\s+(?:stock|shares?|share\s+price|ticker|ipo|listing|earnings)\b|"
+                r"\b(?:buy|sell|short|invest\s+in|own|hold)\s+twitter\b", text, re.I):
+            # "everyone on crypto twitter keeps saying dyor" was told Twitter has no listed shares,
+            # twice, through "ok nvm twitter" (a first-time user, round 29): the site, not the stock
+            continue
         if not _listed_tickers(tickers, registry):
             return match.group(1), tickers, COMPANY_STATUS.get(key, "")
     for match in _UNKNOWN_NAME.finditer(text):

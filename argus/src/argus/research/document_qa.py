@@ -882,4 +882,26 @@ def research_answer(question: str, ticker: str, model: ChatModel, *,
               + " — each sentence below is backed by the passage it cites; sentences that were "
                 "not were removed.")
     lines = result.lines if result.refused else [header, *result.lines]
+    if not result.refused:
+        said = " ".join(result.lines).lower()
+        missing = [label for label, pattern in _METRICS
+                   if re.search(pattern, question, re.I) and not re.search(pattern, said, re.I)]
+        if missing:
+            # "what was NVDA's revenue last quarter, and what was its net income as of 1 March
+            # 2026?" got the revenue and nothing about net income (a judge, round 29)
+            lines.append(f"Not answered: {', '.join(missing)} — no passage read for this answer "
+                         f"gave {'it' if len(missing) == 1 else 'them'} with a citation, so "
+                         f"nothing is said rather than a figure guessed.")
     return lines, result.sources, result.as_dict()
+
+
+_METRICS: tuple[tuple[str, str], ...] = (
+    ("revenue", r"\brevenues?\b|\bsales\b"),
+    ("net income", r"\bnet\s+income\b|\bnet\s+(?:profit|earnings)\b"),
+    ("earnings per share", r"\beps\b|\bearnings\s+per\s+share\b"),
+    ("gross margin", r"\bgross\s+margin\b"),
+    ("operating income", r"\boperating\s+income\b"),
+    ("free cash flow", r"\bfree\s+cash\s+flow\b"),
+    ("guidance", r"\bguidance\b|\boutlook\b"),
+)
+"""The figures a filing question names, each checked against the answer that came back."""

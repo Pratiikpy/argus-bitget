@@ -126,6 +126,33 @@ def _answer_the_state_asked(question: str, symbol: str, lines: list[str]) -> lis
     return [*lines[:lead], merged, *lines[lead + 1:]]
 
 
+def _macd_shape(hist: float, mine: dict[str, Any] | None) -> tuple[str, str] | None:
+    """(reading, line): which side of its signal MACD is on, the last cross and its age, and
+    whether the gap is widening or narrowing — from Bitget's 4h candles. "momentum turning up"
+    was said over six bars of a shrinking positive histogram, and "is it a bullish or bearish
+    cross?" went unanswered (a judge, round 29)."""
+    if mine is None or "narrowing_bars" not in mine:
+        return None
+    above = hist > 0
+    since = int(float(mine.get("bars_since_cross", -1)))
+    narrowing = int(float(mine.get("narrowing_bars", 0)))
+    widening = int(float(mine.get("widening_bars", 0)))
+    cross = ("bullish (MACD crossed above its signal)" if above else
+             "bearish (MACD crossed below its signal)")
+    age = (f", {since} bars ({since * 4}h) ago" if since > 0 else "")
+    if narrowing >= 2:
+        trend = (f"and the gap has narrowed for {narrowing} bars, so that momentum is fading "
+                 f"toward the next cross")
+        reading = f"momentum {'up' if above else 'down'} but fading"
+    elif widening >= 2:
+        trend = f"and the gap has widened for {widening} bars, so that momentum is building"
+        reading = f"momentum {'up' if above else 'down'} and building"
+    else:
+        trend = "and the gap is roughly steady"
+        reading = "momentum " + ("up" if above else "down")
+    return reading, f"The last MACD cross was {cross}{age}, {trend}."
+
+
 def _technicals(symbol: str, *, found: dict[str, Any] | None = None,
                 ) -> tuple[list[str], list[Source]]:
     """RSI, MACD, support/resistance and ATR as `bitget-signal` reports them, and what they say
@@ -175,7 +202,12 @@ def _technicals(symbol: str, *, found: dict[str, Any] | None = None,
                              "in each other's fields; recomputed from Bitget's 4h candles, the "
                              "figures above are the right way round and its cross flag is "
                              "replaced.")
-            reading.append("momentum turning up" if hist > 0 else "momentum turning down")
+            shape = _macd_shape(hist, mine)
+            if shape is not None:
+                lines.append(shape[1])
+                reading.append(shape[0])
+            else:
+                reading.append("momentum turning up" if hist > 0 else "momentum turning down")
             sources.append(Source(kind="venue", ref="bitget-signal technical_analysis.macd",
                                   detail=status + ("; signal/histogram swapped by the Skill, "
                                                    "corrected against Bitget 4h candles"

@@ -1577,6 +1577,338 @@ def _quarantined(text: str) -> bool:
         return False
 
 
+_AGO_ASKED = re.compile(
+    r"\b(?:did\s+you\s+(?:give|say|quote|tell|show)|you\s+(?:gave|said|quoted|told))\b[^?]{0,60}"
+    r"\b(?:ago|earlier|before|last\s+time|previously)\b|\b(?:two|2|three|3|few|couple(?:\s+of)?)\s+"
+    r"(?:messages?|questions?|answers?)\s+ago\b", re.I)
+_IN_UNITS = re.compile(
+    r"\b(?:that|it|this|the)(?:\s+same)?(?:\s+[a-z]+){0,3}?\s+in\s+(?:basis\s+points?|bps|bp|"
+    r"percent|percentage|%)\b", re.I)
+_PRICE_STATED = re.compile(r"\bat\s+\$\s?(?P<p>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k)?\b", re.I)
+_PCT_MOVE_FOR = re.compile(
+    r"(?P<pct>\d+(?:\.\d+)?)\s*%\s+(?:drawdown|drop|fall|decline|loss|move|rise|gain)\b[^?]{0,60}?"
+    r"\bfor\s+(?P<n>\d+(?:\.\d+)?)\s+(?P<u>[A-Za-z]{2,10})\b", re.I)
+
+
+def _stated_price_lines(text: str) -> list[str] | None:
+    """"With BTC at $85,000, and also BTC at $95,000, what's a 10% drawdown in dollar terms for 1
+    BTC?" got BTC's day (a hostile review, round 29): the arithmetic at each stated price, the
+    conflict between them said, and the live price beside."""
+    from argus.lui.research import research_symbols as symbols_in
+
+    move = _PCT_MOVE_FOR.search(text)
+    prices = [float(m.group("p").replace(",", "")) * (1000 if m.group("k") else 1)
+              for m in _PRICE_STATED.finditer(text)]
+    named = symbols_in(move.group("u"))[0] if move is not None else ()
+    if move is None or not prices or not named:
+        return None
+    pct, units = float(move.group("pct")) / 100, float(move.group("n"))
+    name = named[0].removesuffix("USDT")
+    each = "; ".join(f"at ${p:,.0f}: {units:g} x ${p:,.0f} x {pct:.0%} = ${units * p * pct:,.0f}"
+                     for p in dict.fromkeys(prices))
+    lines = [f"Bottom line: {each}."]
+    if len(set(prices)) > 1:
+        lines.append(f"The question gives {len(set(prices))} different prices for {name}; each is "
+                     f"worked above rather than one picked.")
+    try:
+        live = float(_price_now(named[0]))
+        lines.append(f"At Bitget's live price, {live:,.2f}: ${units * live * pct:,.0f}.")
+    except Exception:
+        pass
+    return lines
+
+
+_SIZE_SAID = re.compile(r"\$\s?\d[\d,]*(?:\.\d+)?\s*(?:k|m|mm|million|thousand)?\b", re.I)
+
+
+def _carry_size_and_name(text: str, prior: list[str],
+                         payload: dict[str, Any]) -> tuple[str, str] | None:
+    """The question again with the size and the name the conversation already gave, when its
+    answer had to assume them; None when nothing was assumed or nothing was said before."""
+    from argus.lui.research import research_symbols as symbols_in
+
+    said = " ".join(str(x) for x in payload.get("lines") or [])
+    no_size = "no size was stated, so $" in said
+    no_name = "no instrument was named, so" in said
+    if not prior or not (no_size or no_name):
+        return None
+    size = next((m.group(0) for q in reversed(prior[-4:]) if (m := _SIZE_SAID.search(q))),
+                None) if no_size and not _SIZE_SAID.search(text) else None
+    name = next((symbols_in(q)[0][0] for q in reversed(prior[-4:]) if symbols_in(q)[0]),
+                None) if no_name and not symbols_in(text)[0] else None
+    if size is None and name is None:
+        return None
+    added = " ".join(x for x in (f"for {size}" if size else "",
+                                 f"of {name.removesuffix('USDT')}" if name else "") if x)
+    return (f"{text.rstrip(' ?.!')} — {added}",
+            f"Read with what this conversation already said: {added}.")
+
+
+_RTOKEN_HELD = re.compile(
+    r"(?:\b(?P<n>\d[\d,]*(?:\.\d+)?)\s+)?\bR(?P<b>[A-Z]{2,6})(?:USDT)?\b(?![a-z])")
+_RTOKEN_FOLLOW = re.compile(
+    r"\bhedg\w*|\bprotect\w*|\bpairing\b|\bdollar\s+loss\b|\bhow\s+much\s+(?:would|could)\s+i\s+"
+    r"lose\b|\bthe\s+hedge\b|\bweekend\b|\bovernight\b", re.I)
+
+
+def _rtoken_dollars(lines: list[str], qty: str | None, base: str) -> str | None:
+    """The rToken hedge in dollars for the units held: the hedge size, and a typical night's
+    swing unhedged and hedged, from the engine's own figures."""
+    if not qty:
+        return None
+    ratio = next((float(m.group(1)) for x in lines
+                  if (m := re.search(r"short\s+([\d.]+)\s+" + base + r"USDT", x))), None)
+    night = next((m for x in lines if (m := re.search(
+        r"typical\s+night\s+moved\s+(\d+(?:\.\d+)?)\s+bp\s+unhedged\s+and\s+(\d+(?:\.\d+)?)\s+bp"
+        r"\s+hedged", x))), None)
+    if ratio is None:
+        return None
+    units = float(qty.replace(",", ""))
+    try:
+        price = float(_price_now(f"R{base}USDT"))
+    except Exception:
+        try:
+            price = float(_price_now(f"{base}USDT"))
+        except Exception:
+            return None
+    value = units * price
+    said = (f"For your {units:g} R{base} (about ${value:,.0f} at {price:,.2f}): short about "
+            f"{units * ratio:,.2f} {base}USDT")
+    if night is not None:
+        unhedged = value * float(night.group(1)) / 10_000
+        said += (f"; a typical night's swing is about ${unhedged:,.0f} unhedged and "
+                 f"${value * float(night.group(2)) / 10_000:,.0f} hedged")
+    return said + "."
+
+
+_VERIFY_STEPS = re.compile(
+    r"\b(?:step\s+by\s+step|walk\s+me\s+through|how\s+(?:do|would|can)\s+i\s+(?:verify|check|"
+    r"audit|confirm)|verify\s+(?:that|it|this)\s+(?:myself|yourself)|reproduce|independently)\b",
+    re.I)
+_CHAIN_TOPIC = re.compile(r"\b(?:tamper\w*|hash(?:es|ed)?|chain|ledger|log|record)\b", re.I)
+_VERIFY_LINES = (
+    "Bottom line: you can check it without trusting this console — the record is a public file "
+    "and the check is four steps.",
+    "1. Fetch the record: argus/data/paper_ledger.jsonl in the public repository "
+    "(github.com/Pratiikpy/argus-bitget), one JSON row per decision, in file order.",
+    "2. For each row, its prev_hash must equal the content_hash of the row before it; the first "
+    "row's prev_hash is sixteen zeros.",
+    "3. Recompute each content_hash: the first 16 hex characters of SHA-256 over the JSON of "
+    "twelve fields — seq, decided_at, symbol, verdict, side, quantity, entry_price, "
+    "stated_confidence, thesis, market_state_hash, approved_intent_hash, prev_hash — keys sorted, "
+    "no spaces. A row edited after the fact no longer matches, and every row after it breaks.",
+    "4. Or let the code do it from a clone: in argus/, run python -c \"from pathlib import Path; "
+    "from argus.paper.ledger import PaperLedger; print(PaperLedger(path=Path('data/"
+    "paper_ledger.jsonl')).verify())\" — it prints entries and chain_intact. The live figure is "
+    "at /status?format=json.",
+)
+""""Walk me through verifying that yourself, step by step" returned the same two lines as "is the
+log tamper-evident" (a judge, round 29). Steps checked against `paper/ledger.py`'s
+``content_hash`` and run from a clone of the public repository on 2026-10-04."""
+_DOES_THAT_CHANGE = re.compile(
+    r"\bdoes\s+(?:that|this|it|any\s+of\s+that)\s+change\b[^?]{0,80}\b(?:you\s+)?(?:recommended|"
+    r"suggested|gave|said|sized|proposed|worked\s+out)\b", re.I)
+_OPTION_BREAKEVEN = re.compile(r"\bbreak[\s-]?even\b", re.I)
+_OPTION_WORDS = re.compile(r"\b(?:options?|calls?|puts?|straddle|strangle|strike|premium)\b",
+                           re.I)
+_FILING_PIT = re.compile(
+    r"\bfiling\b[^?]{0,200}\b(?:day\s+before|before\s+(?:it|the\s+filing|that)\s+(?:was|became|"
+    r"went)\s+public|point[\s-]in[\s-]time|would\s+(?:that|the|this)\s+answer\s+have\s+been\s+"
+    r"different|as\s+of\s+(?:a|an|the)\s+(?:earlier|past))\b|\bwould\s+(?:that|the|this)\s+answer"
+    r"\s+have\s+been\s+different\b[^?]{0,80}\bfiling\b", re.I)
+
+
+_ACCURACY_ASK = re.compile(
+    r"\b(?:measured\s+)?accura(?:cy|te)\b|\bhow\s+(?:reliable|good|confident|well)\b|"
+    r"\bbenchmark\w*\b|\bbe\s+honest\b|\bhow\s+often\s+(?:is\s+it|are\s+you)\s+(?:right|wrong)\b",
+    re.I)
+_SENTIMENT_TOPIC = re.compile(r"\bsentiment\b|\btone\b|\bcrowd\b|\bclassif\w*|\bmood\b|"
+                              r"\bbullish\s+or\s+bearish\b", re.I)
+
+
+def _measured_accuracy_lines() -> list[str] | None:
+    """"how confident are you in that classification? be honest about its measured accuracy"
+    repeated the sentiment block, and the benchmark question printed eight unrelated register rows
+    (a judge, round 29): the sentiment rows of the register, losses first, as measured."""
+    from argus.truth.paths import DATA_DIR
+
+    try:
+        register = json.loads((DATA_DIR / "standing.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    rows = [r for r in register.get("capabilities", []) if "entiment" in str(r.get("name"))]
+    if not rows:
+        return None
+    order = {"lost": 0, "tied": 1, "implemented": 2, "owned": 3}
+    rows.sort(key=lambda r: order.get(str(r.get("state")), 9))
+    lead = rows[0]
+    first = re.sub(r"^(?:LOST|TIED|OWNED|IMPLEMENTED)\s+", "",
+                   str((lead.get("blockers") or [""])[0]))
+    lines = [f"Bottom line: measured against a published benchmark, the crowd-sentiment reader "
+             f"{str(lead.get('state')).upper()} — {first}" if lead.get("state") == "lost" else
+             f"Bottom line: {lead.get('name')}: {str(lead.get('state')).upper()} — {first}"]
+    for row in rows[1:]:
+        said = str((row.get("blockers") or [row.get("note") or ""])[0])
+        lines.append(f"{row.get('name')}: {str(row.get('state')).upper()} — {said[:300]}")
+    lines.append("From the capability register (/proof), where every comparison was run on the "
+                 "same inputs and losses are kept.")
+    return lines
+
+
+_PLAINER = re.compile(
+    r"\b(?:explain|say|put)\b[^?]{0,40}\b(?:simpler|simply|plain\s+(?:english|words|language)|"
+    r"like\s+i'?m\s+(?:5|five|new|a\s+kid)|eli5|for\s+a\s+(?:beginner|noob|newbie))\b|"
+    r"\b(?:i\s+)?(?:don'?t|dont|didn'?t|didnt)\s+(?:get|understand)\s+(?:any\s+of\s+)?(?:it|that|"
+    r"this|what\s+you\s+(?:just\s+)?said)\s*[?.!]*\s*$|\bthat\s+(?:didn'?t|didnt|doesn'?t)\s+make\s+"
+    r"(?:any\s+)?sense\b|\bwhat\s+you\s+just\s+said\b|\btoo\s+(?:complicated|technical|much\s+"
+    r"jargon)\b", re.I)
+"""Asking for the last answer again, plainer."""
+_GOAL_MONEY = re.compile(
+    r"\b(?:rent|bills?|tuition|emergency\s+fund|down\s*-?\s*payment|house|home|wedding|groceries|"
+    r"car\s+payment|mortgage|school\s+fees|medical|debt)\b", re.I)
+_GOAL_ASK = re.compile(
+    r"\bshould\s+i\s+(?:even\s+)?(?:be\s+)?(?:touch|touching|use|using|trade|trading|invest|"
+    r"investing|put|risk)\w*\b|\bis\s+(?:trading|investing|crypto|it|this)\s+(?:even\s+)?(?:a\s+)?"
+    r"(?:smart|good|bad|safe|wise|dumb)\b|\bcan\s+i\s+(?:use|trade|invest)\b|\bis\s+it\s+ok(?:ay)?\s+"
+    r"to\s+(?:use|trade|invest)\b", re.I)
+_QUICK_MONEY = re.compile(
+    r"\b(?:made|making|earned|doubled|tripled|turned|won)\b[^?]{0,60}\b(?:in\s+a\s+(?:week|day|month)|"
+    r"overnight|in\s+(?:\d+|a\s+few|two|three)\s+(?:days|weeks)|this\s+week)\b", re.I)
+_NORMAL_ASK = re.compile(
+    r"\b(?:normal|realistic|possible|common|legit|real|luck|lucky|typical|doable)\b", re.I)
+_START_WITH = re.compile(
+    r"\bhow\s+much\s+(?:money\s+)?(?:should|do|can|would)\s+(?:i|a\s+beginner|beginners|someone)\s+"
+    r"(?:even\s+|really\s+)?(?:need\s+to\s+)?(?:start|begin)(?:\s+(?:with|trading\s+with|out))?\b|"
+    r"\b(?:minimum|least)\s+(?:amount|money)\s+(?:to\s+)?(?:start|begin|trade)\b", re.I)
+_LEVERAGE_NEW = re.compile(
+    r"\b(?P<x>\d+)\s*x\b[^?]{0,120}\b(?:good\s+idea|safe|ok(?:ay)?|smart|bad\s+idea|worth\s+it|"
+    r"should\s+i)\b", re.I)
+_NEW_TO_IT = re.compile(
+    r"\bnever\s+traded\b|\bfirst[\s-]time\b|\bbeginner\b|\bnewbie\b|\bnoob\b|\bnew\s+to\s+(?:this|"
+    r"trading|crypto)\b|\bi'?m\s+new\b|\bjust\s+started\b", re.I)
+
+
+def _goal_money_lines(text: str, prior: list[str], book: str) -> list[str] | None:
+    """"that 200 usdt is kind of my rent money for next month, should i even be touching it"
+    was answered with an ETH base rate, and "5k saved … for a house downpayment in a couple
+    years, is trading even a smart idea for that" with a note (a first-time user, round 29):
+    money with a date on it, set against what a bad week and the deepest fall have actually
+    been."""
+    from argus.lui.research.desk_answers import STAKE as _STAKE
+    from argus.lui.research.dispatch import span_moves
+
+    stake = _STAKE.search(text) or next((_STAKE.search(q) for q in reversed(prior[-3:])
+                                         if _STAKE.search(q)), None)
+    amount = None
+    if stake is not None:
+        amount = float((stake.group("a") or stake.group("b")).replace(",", "")) * (
+            1000 if (stake.group("k") or stake.group("k2")) else 1)
+    weeks = {}
+    for symbol in ("BTCUSDT", "ETHUSDT"):
+        spans = span_moves(symbol, 7)
+        if spans:
+            weeks[symbol.removesuffix("USDT")] = min(spans[0])
+    if not weeks:
+        return None
+    soon = re.search(r"\bnext\s+(?:week|month)\b|\bthis\s+month\b|\brent\b|\bbills?\b|"
+                     r"\bgroceries\b", text, re.I) is not None
+    worst = min(weeks.values())
+    said_weeks = " and ".join(f"{n} {w:.0%}" for n, w in weeks.items())
+    lost = f" — on ${amount:,.0f} that is ${amount * -worst:,.0f}" if amount else ""
+    what = "rent" if re.search(r"\brent\b", text, re.I) else "that"
+    lead = (f"Bottom line: money you need for {what} soon is better kept out of trading — the "
+            f"worst single week in the last three years was {said_weeks}{lost}, and a week like "
+            f"that can come right before the bill does." if soon else
+            f"Bottom line: money with a date on it, like a house deposit in a couple of years, is "
+            f"a poor fit for trading — the worst single week in the last three years was "
+            f"{said_weeks}{lost}, and a deep fall can take longer than two years to come back.")
+    return [lead,
+            "What people usually do: keep money with a date on it somewhere it cannot fall, and "
+            "trade, if at all, only with what is left over and could be lost in full.",
+            "This console never says to buy or sell; the figures are Bitget's weekly moves on its "
+            "BTC and ETH perpetuals (UTC days)."]
+
+
+_HOW_RISKY = re.compile(
+    r"\bis\s+(?:crypto|trading|crypto\s+trading|day\s+trading|bitcoin|futures|this|it)\s+"
+    r"(?:(?:really|that|so|actually|even|super|very)\s+)*(?:risky|dangerous|safe)\b", re.I)
+
+
+def _how_risky_lines() -> list[str] | None:
+    """"nvm. is crypto trading really that risky tho" was told "that" had nothing to refer to (a
+    first-time user, round 29): how risky, in figures — the worst week and the deepest fall."""
+    from argus.lui.research.dispatch import span_moves
+
+    spans = span_moves("BTCUSDT", 7)
+    if not spans:
+        return None
+    worst_week = min(spans[0])
+    daily = span_moves("BTCUSDT", 1)
+    worst_day = min(daily[0]) if daily else None
+    return [f"Bottom line: yes, by any ordinary measure — over the last three years bitcoin's "
+            f"worst week was {worst_week:.0%}"
+            + (f" and its worst day {worst_day:.0%}" if worst_day is not None else "")
+            + ", and most other coins swing more than bitcoin does.",
+            "Without leverage the most you can lose is what you put in; with leverage the same "
+            "moves are multiplied, and a 10% fall at 10x takes everything in the position.",
+            "Measured on Bitget's BTC perpetual (UTC days); ask \"how much could I lose on ETH in "
+            "a bad week\" for any other coin."]
+
+
+def _quick_money_lines() -> list[str] | None:
+    """"my coworker made like 2000 bucks trading crypto in a week is that normal" was told "that"
+    had nothing to refer to (a first-time user, round 29): what a week has done, both ways."""
+    from argus.lui.research.dispatch import span_moves
+
+    spans = span_moves("BTCUSDT", 7)
+    if not spans:
+        return None
+    moves = sorted(spans[0])
+    best, worst = moves[-1], moves[0]
+    up_big = sum(1 for m in moves if m >= 0.10) / len(moves)
+    down_big = sum(1 for m in moves if m <= -0.10) / len(moves)
+    return [f"Bottom line: it happens, and so does the reverse — over the last three years BTC's "
+            f"best week was {best:+.0%} and its worst {worst:+.0%}; a week up 10% or more came "
+            f"{up_big:.0%} of the time and a week down 10% or more {down_big:.0%}.",
+            "A $2,000 week usually means either a large stake or leverage — and the same leverage "
+            "turns an ordinary bad week into a total loss: at 10x, a 10% fall closes the "
+            "position.",
+            "People share their wins more than their losses, so what you hear is not a fair "
+            "sample. Measured on Bitget's BTC perpetual, every 7-day stretch since late 2023."]
+
+
+def _start_with_lines() -> list[str] | None:
+    """"how much money should i even start with as a beginner" got the desk's own track record
+    (a first-time user, round 29): Bitget's minimums, read live, and the rule people use."""
+    from argus.market.bitget import public_get
+
+    try:
+        spot = (public_get("/api/v2/spot/public/symbols", {"symbol": "BTCUSDT"}) or [{}])[0]
+        perp = (public_get("/api/v2/mix/market/contracts",
+                           {"productType": "USDT-FUTURES", "symbol": "BTCUSDT"}) or [{}])[0]
+    except Exception:
+        return None
+    spot_min = float(spot.get("minTradeUSDT") or 0)
+    perp_min = float(perp.get("minTradeUSDT") or 0)
+    if not spot_min and not perp_min:
+        return None
+    return [f"Bottom line: there is no right amount — Bitget's smallest bitcoin order is about "
+            f"${spot_min:,.2f} on spot" + (f" and ${perp_min:,.2f} on the perpetual"
+                                            if perp_min else "")
+            + ", so the real limit is what you could lose in full without it hurting.",
+            "A small first amount is a way to learn how fees, swings and your own nerves feel "
+            "with real money; ask \"how much could I lose on BTC in a bad week\" to see what a "
+            "sum goes through.",
+            "Minimums read just now from Bitget's spot symbol list and USDT-futures contract list "
+            "(minTradeUSDT)."]
+
+
+_TOLD_YOU = re.compile(
+    r"\b(?:remind\s+me|tell\s+me\s+again|repeat)\s+(?:of\s+)?what\s+(?:i|we)\s+(?:just\s+)?(?:told|said|"
+    r"wrote|typed)(?:\s+(?:u|you|to\s+you))?(?:\s+(?:about|on)\s+(?:my\s+)?(?P<x>[\w$]+))?|"
+    r"\bwhat\s+did\s+i\s+(?:just\s+)?(?:tell|say\s+to)\s+(?:u|you)(?:\s+(?:about|on)\s+(?:my\s+)?"
+    r"(?P<y>[\w$]+))?", re.I)
+"""Asking back for what was said in the conversation, not only what was kept."""
 _CALLED_FOR_ME = re.compile(
     r"\bwhich\s+(?:skills?|tools?|sources?|apis?|mcp\s+tools?)\b[^?]{0,60}\b(?:did\s+you|you)\s+"
     r"(?:call|use|used|called|hit|query)\w*\b[^?]{0,60}\b(?:my|last|previous|those|these)\b", re.I)
@@ -1735,6 +2067,49 @@ def _premise_lines(text: str, now: datetime | None, book: str) -> list[str]:
             said.append(f"Premise check: {named[0].removesuffix('USDT')} moved {actual:+.1%} "
                         f"{span} (Bitget, UTC days), not {'-' if falling else '+'}"
                         f"{claimed:.0%}.")
+    two_sizes = _TWO_SIZES.search(text)
+    if two_sizes is not None and two_sizes.group("a") != two_sizes.group("b"):
+        # "I have 5 BTC long at 10x, which is also 8 BTC long at 10x" was summed to 13 BTC
+        # without a word (a hostile review, round 29)
+        unit = two_sizes.group("u")
+        said.append(f"Your question gives two sizes for what reads as one position "
+                    f"({two_sizes.group('a')} and {two_sizes.group('b')} {unit}); the figures "
+                    f"below read them as two positions — if one corrects the other, ask again "
+                    f"with the one size.")
+    level_said = _LEVEL_CLAIM.search(text)
+    if level_said is not None and named:
+        claimed_level = float((level_said.group("lvl") or level_said.group("lvl2"))
+                              .replace(",", "")) * (
+            1000 if (level_said.group("k") or level_said.group("k2")) else 1)
+        try:
+            price_now = float(_price_now(named[0]))
+        except Exception:
+            price_now = 0.0
+        above = re.search(r"above|over|broke|broken|crossed|passed|hit|reached",
+                          level_said.group(0), re.I) is not None and not re.search(
+            r"below|under|fallen|dropped", level_said.group(0), re.I)
+        if price_now > 0 and ((above and price_now < claimed_level * 0.97)
+                              or (not above and price_now > claimed_level * 1.03)):
+            # "Now that BTC has broken above $150,000 for the first time" got a take-profit study
+            # with no price in it (a hostile review, round 29)
+            said.append(f"Premise check: {named[0].removesuffix('USDT')} is {price_now:,.2f} now "
+                        f"on Bitget, {'below' if above else 'above'} the {claimed_level:,.0f} "
+                        f"the question takes as given.")
+    contracts = _CONTRACTS.search(text)
+    if contracts is not None and named and named[0].endswith("USDT"):
+        # "I opened 10 contracts on BTCUSDT" was read as 10 BTC with only an "Assumed" line
+        step = _size_step(named[0])
+        said.append("On Bitget's USDT perpetuals an order is sized in the coin itself"
+                    + (f" (the smallest step is {step} {named[0].removesuffix('USDT')})"
+                       if step else "")
+                    + f", so \"{contracts.group(0)}\" is read as {contracts.group('n')} "
+                      f"{named[0].removesuffix('USDT')} — give the coin amount if your "
+                      f"contracts were a different size.")
+    deal = _DEAL_CLAIM.search(text)
+    if deal is not None and named:
+        event_line = _deal_check(named[0])
+        if event_line is not None:
+            said.append(event_line)
     none_held = _NONE_HELD.search(text)
     if none_held is not None and book.strip():
         from argus.lui.research.parse import parse_book
@@ -1747,6 +2122,56 @@ def _premise_lines(text: str, now: datetime | None, book: str) -> list[str]:
                         f"said you hold none; this answer uses the saved book — change My book to "
                         f"have it read without {name}.")
     return said
+
+
+_TWO_SIZES = re.compile(
+    r"(?P<a>\d+(?:\.\d+)?)\s+(?P<u>[A-Za-z]{2,10})\b[^.?]{0,60}?\b(?:which\s+is\s+(?:also|really|"
+    r"actually)|i\.?\s*e\.?|aka|or\s+rather|i\s+mean|sorry|correction)\s*,?\s+(?P<b>\d+(?:\.\d+)?)"
+    r"\s+(?P=u)\b", re.I)
+_LEVEL_CLAIM = re.compile(
+    r"\b(?:has|have|just|already|finally|now)\s+(?:broken|broke|crossed|passed|hit|reached|"
+    r"cleared|topped|fallen|dropped|crashed)\s+(?:above\s+|over\s+|below\s+|under\s+|to\s+|"
+    r"through\s+)?\$\s?(?P<lvl>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k)?\b|\b(?:is|now)\s+(?:trading\s+)?"
+    r"(?:above|over|below|under)\s+\$\s?(?P<lvl2>\d[\d,]*(?:\.\d+)?)\s*(?P<k2>k)?\b", re.I)
+_CONTRACTS = re.compile(r"\b(?P<n>\d+(?:\.\d+)?)\s+contracts?\b", re.I)
+_DEAL_CLAIM = re.compile(
+    r"\b(?:acquisition|merger|buyout|takeover|purchase)\s+of\s+[A-Z][\w.&-]+\b[^.?]{0,40}\b"
+    r"(?:closed|completed|went\s+through|is\s+done|was\s+announced|announced|finalized|"
+    r"finalised)\b|\b(?:just\s+|has\s+|officially\s+)(?:acquired|bought|merged\s+with|"
+    r"taken\s+over)\s+[A-Z][\w.&-]+", re.I)
+
+
+def _size_step(symbol: str) -> str | None:
+    from argus.market import universe
+
+    contract = universe.contracts().get(symbol)
+    return getattr(contract, "size_step", None) if contract is not None else None
+
+
+def _deal_check(symbol: str) -> str | None:
+    """Whether the company filed what a closed or agreed deal requires: an 8-K under item 2.01
+    (completion of an acquisition) or 1.01 (a material agreement) in the last 14 days. "Now that
+    Nvidia's acquisition of OpenAI closed this morning" was refuted on /research and passed over
+    on /ask (a hostile review, round 29)."""
+    from argus.lui.research.parse import is_us_equity
+    from argus.lui.watchlist import recent_8k
+
+    if not is_us_equity(symbol):
+        return None
+    ticker = symbol.removesuffix("USDT").removesuffix("STOCK")
+    try:
+        filed = recent_8k([ticker], datetime.now(UTC) - timedelta(days=14)).get(ticker, [])
+    except Exception:
+        return None
+    deal = [f for f in filed if re.search(r"\b(?:2\.01|1\.01)\b", f.items)]
+    if deal:
+        return None
+    return (f"Premise check: {ticker} has filed no 8-K reporting a completed acquisition (item "
+            f"2.01) or a material agreement (item 1.01) in the last 14 days (SEC EDGAR"
+            + (f", {len(filed)} 8-K{'s' if len(filed) != 1 else ''} filed in all" if filed
+               else ", no 8-K at all in that time")
+            + ") — a deal of that kind is filed within four business days, so the event is not "
+              "on the record.")
 
 
 def _fed_funds_now() -> tuple[str, float, str, float] | None:
@@ -1953,8 +2378,11 @@ def _round27_follow_up(text: str, prior: list[str], *, now: datetime | None, vis
         return tuple(symbols_in(text)[0]) or next(
             (tuple(symbols_in(q)[0]) for q in reversed(prior[-3:]) if symbols_in(q)[0]), ())
 
-    def re_asked(asked: str, lead: str | None = None) -> dict[str, Any] | None:
-        again = _answer(asked, prior, now=now, visitor=visitor, book=book)
+    def re_asked(asked: str, lead: str | None = None, *,
+                 fresh: bool = False) -> dict[str, Any] | None:
+        # ``fresh``: the question alone, without the turns or the saved book around it
+        again = _answer(asked, [] if fresh else prior, now=now, visitor=visitor,
+                        book="" if fresh else book)
         body = [str(x) for x in again.get("lines") or []]
         if not body or again.get("refused"):
             return None
@@ -1994,19 +2422,207 @@ def _round27_follow_up(text: str, prior: list[str], *, now: datetime | None, vis
         return refused
     from argus.lui import newcomer as _newcomer
 
-    if _newcomer._OTHER_EXCHANGE.search(text):
+    if _newcomer.OTHER_EXCHANGE.search(text):
         # "Bitget's stock perpetuals against Robinhood's Arbitrum tokenized stocks" was answered
         # about Bitget's HOOD contract alone (a judge, round 28): Robinhood here is the exchange
-        lines = list(_newcomer._OTHER_EXCHANGE_A)
+        lines = list(_newcomer.OTHER_EXCHANGE_A)
         if re.search(r"\btokeni[sz]ed\b|\barbitrum\b|\bon-?chain\b", text, re.I):
             lines.insert(1, "Another venue's tokenized stocks are not read by this console, so "
                             "their fees, hours and backing are left to that venue's own terms; "
                             "Bitget's side is below.")
         return engine_payload_like(lines, prior, text, by="newcomer")
-    for plain_asked, plain_said in ((_newcomer._KYC, _newcomer._KYC_A),
-                                    (_newcomer._MISTAKES, _newcomer._MISTAKES_A),
-                                    (_newcomer._SPECULATION, _newcomer._SPECULATION_A),
-                                    (_newcomer._HIDDEN_FEES, _newcomer._HIDDEN_FEES_A)):
+    if prior and _AGO_ASKED.search(text):
+        # "Just to confirm, what percent figure did you give me two messages ago for BTC funding?"
+        # got BTC's day (a hostile review, round 29): answers are not kept on the server, so the
+        # earlier question is asked again now, and said to be
+        subject = symbols_in(text)[0]
+        words = {w for w in re.findall(r"[a-z]{4,}", text.lower())} - {
+            "just", "confirm", "what", "figure", "give", "gave", "messages", "message", "percent",
+            "number", "said", "earlier", "before", "with", "that", "this", "your", "from"}
+        candidates = [q for q in prior[-4:] if not _AGO_ASKED.search(q) and (
+            not subject or set(subject) & set(symbols_in(q)[0]))]
+        # the earlier question that shares the most words with this one ("funding"), latest first
+        earlier = max(reversed(candidates), key=lambda q: len(words & set(
+            re.findall(r"[a-z]{4,}", q.lower()))), default=None)
+        if earlier is not None:
+            again_now = re_asked(earlier, lead="Answers are not kept on the server, so this is "
+                                                f"“{earlier[:100]}” asked again now — the figure "
+                                                f"can differ from the earlier one if the market "
+                                                f"moved: ")
+            if again_now is not None:
+                return again_now
+    unit_ask = _IN_UNITS.search(text)
+    if prior and unit_ask is not None and not symbols_in(text)[0]:
+        # "And what is that same funding rate in basis points instead of percent?" got the perp
+        # and spot basis (a hostile review, round 29): the earlier answer, its figure converted
+        converted = _answer(prior[-1], prior[:-1], now=now, visitor=visitor, book=book)
+        body = [str(x) for x in converted.get("lines") or []]
+        figure = re.search(r"(?P<v>[+-]?\d+(?:\.\d+)?)%", body[0]) if body else None
+        if figure is not None and not converted.get("refused"):
+            value = float(figure.group("v"))
+            to_bps = re.search(r"basis|bps|bp\b", unit_ask.group(0), re.I) is not None
+            line = (f"In basis points: {figure.group(0)} = {value * 100:+,.2f} bps "
+                    f"(1 bp = 0.01%)." if to_bps else
+                    f"In percent: {figure.group(0)} as given.")
+            converted["lines"] = [line, *body]
+            converted["turns"] = [*prior, text][-12:]
+            return converted
+    held_r = next((m for q in reversed(prior[-3:]) if (m := _RTOKEN_HELD.search(q))), None)
+    if (held_r is not None and _RTOKEN_FOLLOW.search(text) and not _RTOKEN_HELD.search(text)
+            and set(symbols_in(text)[0]) <= {f"{held_r.group('b')}USDT", "QQQUSDT", "SPYUSDT",
+                                             "SMHUSDT"}):
+        # "is QQQUSDT a good hedge or should I use the actual rToken spot pairing?" after "I hold
+        # RNVDAUSDT, how do I protect it over the weekend?" got the generic index-hedge menu, and
+        # the next turn hedged NVDA "as the whole position" (a judge, round 29): the rToken's own
+        # pairing, asked again with the holding
+        base = held_r.group("b")
+        qty = next((m.group("n") for q in [text, *reversed(prior[-3:])]
+                    if (m := re.search(r"\b(?P<n>\d[\d,]*(?:\.\d+)?)\s+(?:units?|tokens?|of\s+"
+                                       r"(?:them|it)|shares?|R" + base + r")\b", q, re.I))),
+                   None) or held_r.group("n")
+        hedged = re_asked(f"I hold {qty + ' ' if qty else ''}R{base}USDT, how do I protect it over "
+                          f"the weekend?", fresh=True)
+        if hedged is not None:
+            dollars = _rtoken_dollars([str(x) for x in hedged["lines"]], qty, base)
+            if dollars is not None:
+                hedged["lines"] = [*hedged["lines"][:1], dollars, *hedged["lines"][1:]]
+            return hedged
+    if _VERIFY_STEPS.search(text) and _CHAIN_TOPIC.search(" ".join([*prior[-2:], text])):
+        return engine_payload_like(list(_VERIFY_LINES), prior, text, by="integrity")
+    if _FILING_PIT.search(text):
+        # "would that answer have been different if I'd asked the day before the filing became
+        # public?" got a desk decision's evidence list (a judge, round 29): what the filing
+        # reader actually reads, from `research/document_qa.py`
+        return engine_payload_like([
+            "Bottom line: yes, it could have been — the filing reader reads the latest 10-K, 10-Q "
+            "and 8-K on SEC EDGAR at the moment it is asked, so the day before a filing was "
+            "public it would have read the one before it.",
+            "Each filing answer names the documents it read at its top (\"From …\") and cites the "
+            "passage behind every sentence; it does not rebuild what was public on a past date, "
+            "so for an as-of question the documents named are the ones to check the date of."],
+            prior, text, by="filings")
+    if _OPTION_BREAKEVEN.search(text) and _OPTION_WORDS.search(" ".join([*prior[-2:], text])) \
+            and not re.search(r"\bstrike\s+(?:of\s+)?\$?\d|\$?\d[\d,.]*\s+strike|\bpremium\s+"
+                              r"(?:of\s+)?\$?\d|\bpaid\s+\$?\d|\b\d[\d,.]*\s*(?:calls?|puts?)\b|"
+                              r"\bfor\s+\$\s?\d", text, re.I):
+        # "what's my breakeven move in percent?" on an option with no strike or premium gave the
+        # earnings move distribution with no word about what was missing (a judge, round 29)
+        return engine_payload_like([
+            "Bottom line: an option's breakeven needs its strike and what was paid for it — "
+            "neither is in the question, so no breakeven is given rather than one guessed.",
+            "Say both and it is worked: \"I bought a 240 call on NVDA for $6.50, what's my "
+            "breakeven\" — a call breaks even at strike plus premium, a put at strike minus "
+            "premium, at expiry.",
+            "Ask \"how much does NVDA usually move after earnings\" to set that breakeven against "
+            "the moves it has actually made."], prior, text, by="arithmetic")
+    if prior and _DOES_THAT_CHANGE.search(text):
+        # "I'm 28, high income, no dependents, 10-year horizon, 401k in a tech-heavy index fund.
+        # Does that change the TSLA add you recommended earlier, and quantify how" got TSLA's
+        # "10-year" return (a judge, round 29): the earlier analysis again, with what it does and
+        # does not take in said plainly
+        earlier_add = next((q for q in reversed(prior[-5:]) if re.search(
+            r"\b(?:add|adding|buy|size|position|book|hold)\b", q, re.I) and symbols_in(q)[0]),
+            None)
+        if earlier_add is not None:
+            redone = re_asked(earlier_add)
+            if redone is not None:
+                overlap = re.search(r"\b401\s*\(?k\)?|index\s+fund|etf\b", text, re.I)
+                redone["lines"] = [*redone["lines"][:2], (
+                    "What you added changes none of the figures above: age, income and horizon "
+                    "are not inputs to this analysis, and the risk shares are measured on the "
+                    "book as given. " + ("The index fund in your 401k is outside that book; its "
+                                         "overlap shows in the beta to the Nasdaq-100 above — "
+                                         "the higher it is, the more this add repeats what the "
+                                         "fund already holds." if overlap else
+                                         "Say your loss limit (\"my loss limit is 10%\") and it "
+                                         "is used.")), *redone["lines"][2:]]
+                return redone
+    deadline = _DEADLINE.search(text)
+    if deadline is not None and prior and not _SIZE_SAID.search(text) and re.search(
+            r"\b(?:fill\w*|done|executed?|complete\w*|schedule|plan)\b", text, re.I):
+        # "I need to be fully filled within 15 minutes because of a margin call deadline. Does
+        # that change the execution schedule you just gave?" got the rivals register (a judge,
+        # round 29): the execution asked before, with the deadline
+        executed = next((q for q in reversed(prior[-4:]) if _SIZE_SAID.search(q) and re.search(
+            r"\b(?:split|execut\w*|fill|order|buy|sell|work)\b", q, re.I)), None)
+        if executed is not None:
+            rushed = re_asked(f"{executed.rstrip(' ?.!')} — it has to be done within "
+                              f"{deadline.group('n')} {deadline.group('unit')}")
+            if rushed is not None:
+                return rushed
+    if re.search(r"\bthanksgiving\b|\bchristmas\b|\bholiday\b|\btrading\s+(?:day|session)\b",
+                 text, re.I):
+        from argus.lui.research.session import holiday_line as _holiday
+
+        on_the_day = _holiday(text, now)
+        if on_the_day is not None:
+            return engine_payload_like([on_the_day], prior, text, by="session")
+    if _ACCURACY_ASK.search(text) and _SENTIMENT_TOPIC.search(" ".join([*prior[-2:], text])):
+        measured = _measured_accuracy_lines()
+        if measured is not None:
+            return engine_payload_like(measured, prior, text, by="rivals")
+    stated_math = _stated_price_lines(text)
+    if stated_math is not None:
+        return engine_payload_like(stated_math, prior, text, by="arithmetic")
+    slang = _newcomer.slang_lines(text)
+    if slang is not None:
+        return engine_payload_like(slang, prior, text, by="newcomer")
+    from argus.lui import concepts as _concepts
+
+    term_asked = (_concepts.concept_asked(re.sub(
+        r"\s*\b(?:i\s+)?(?:don'?t|dont|didn'?t|didnt)\s+(?:get|understand)\s+(?:it|that|this)\W*$",
+        "", text, flags=re.I)) if _PLAINER.search(text) else None)
+    if term_asked is not None:
+        # "wait whats a perpetual contract tho i dont get it" names its own term: the term is
+        # explained, not the answer before it (a first-time user, round 29)
+        t_lines, _t_sources, _t_data = _concepts.answer(term_asked, None)
+        return engine_payload_like(t_lines, prior, text, by="concept")
+    if prior and _PLAINER.search(text) and not symbols_in(text)[0]:
+        # "wait that didnt make sense, can u explain in like plain english what you just said"
+        # was told "that" had nothing to refer to (a first-time user, round 29): the last answer
+        # again, cut to its plain lines
+        plainer = _answer(prior[-1], prior[:-1], now=now, visitor=visitor, book=book)
+        body = [str(x) for x in plainer.get("lines") or []]
+        if body and not plainer.get("refused"):
+            short = _newcomer_cut(body) if len(body) > 3 else body
+            short = [x for x in short if "show the full analysis" not in x]
+            plainer["lines"] = ["Said more simply: " + short[0].removeprefix("Bottom line: "),
+                                *short[1:3],
+                                "Any word still unclear, ask \"what is <word>\" and it is "
+                                "explained on its own."]
+            plainer["turns"] = [*prior, text][-12:]
+            return plainer
+    if _GOAL_MONEY.search(text) and _GOAL_ASK.search(text):
+        goal = _goal_money_lines(text, prior, book)
+        if goal is not None:
+            return engine_payload_like(goal, prior, text, by="newcomer")
+    if _HOW_RISKY.search(text) and not symbols_in(text)[0]:
+        risky = _how_risky_lines()
+        if risky is not None:
+            return engine_payload_like(risky, prior, text, by="newcomer")
+    if _QUICK_MONEY.search(" ".join([*prior[-2:], text])) and _NORMAL_ASK.search(text):
+        quick = _quick_money_lines()
+        if quick is not None:
+            return engine_payload_like(quick, prior, text, by="newcomer")
+    if _START_WITH.search(text):
+        start = _start_with_lines()
+        if start is not None:
+            return engine_payload_like(start, prior, text, by="newcomer")
+    leverage_new = _LEVERAGE_NEW.search(text)
+    if leverage_new is not None and _NEW_TO_IT.search(" ".join([*prior[-3:], text])):
+        # "my friend said just use like 20x leverage … is that a good idea for someone who never
+        # traded before" went to the thesis tester (a first-time user, round 29)
+        lev = re_asked(f"is {leverage_new.group('x')}x leverage ok for a small account")
+        if lev is not None:
+            body = [str(x) for x in lev["lines"]]
+            mine = next((x for x in body if x.startswith("For you:")), None)
+            if mine is not None:
+                # the line about the asker leads; the definition follows it
+                body = ["Bottom line: " + mine.removeprefix("For you: "),
+                        *(x for x in body if x is not mine and not x.startswith("Read as:"))]
+                lev["lines"] = body
+            return lev
+    for plain_asked, plain_said in _newcomer.EARLY_PLAIN:
         if plain_asked.search(text):
             # "do they make you upload a passport on bitget" was taken by the venue explainer
             # before the newcomer answer was reached (round 28, live re-ask)
@@ -2049,7 +2665,9 @@ def _round27_follow_up(text: str, prior: list[str], *, now: datetime | None, vis
     from argus.lui.research import venue_facts
 
     # venue questions a judge found answered with a fixed block about something else (round 28)
-    for venue_rule in (venue_facts.two_books_lines, venue_facts.rtoken_redeem_lines,
+    for venue_rule in (venue_facts.funding_threshold_lines, venue_facts.margin_kind_lines,
+                       venue_facts.two_books_lines,
+                       venue_facts.rtoken_redeem_lines,
                        venue_facts.gold_lineup_lines, venue_facts.funding_history_lines,
                        venue_facts.data_sources_lines, venue_facts.exposure_without_lines,
                        venue_facts.levels_lines):
@@ -2380,6 +2998,31 @@ def handle_ask(
     if after_sale is not None and after_sale is not before_sale:
         # the sale is said back with the rest of what was noted (round 19, row 648)
         new = [*new, after_sale]
+    told = _TOLD_YOU.search(text)
+    if told is not None and prior and not new:
+        # "wait hold on, remind me what i just told u about my sol" was answered with SOL's day,
+        # labelled "Read as: what is SOL doing today" (a first-time user, round 29): what was said
+        # in this conversation is quoted back, and what was kept is said as kept
+        from argus.lui.research import research_symbols as _symbols_told
+
+        about = (told.group("x") or told.group("y") or "").strip()
+        named_told = _symbols_told(about)[0] if about else ()
+        said_before = [q for q in prior if (not about) or about.lower() in q.lower()
+                       or (named_told and set(named_told) & set(_symbols_told(q)[0]))]
+        if said_before:
+            kept = [f for f in facts if not about or about.lower() in f.text.lower()
+                    or (named_told and f.subject in named_told)]
+            lines = [f"Bottom line: in this conversation you said “{said_before[-1][:200]}”"
+                     + (f", and before that “{said_before[-2][:160]}”"
+                        if len(said_before) > 1 else "") + "."]
+            lines.append("Kept across visits in this browser: " + "; ".join(
+                f"“{f.text}”" for f in kept) + "." if kept else
+                "None of it is kept beyond this conversation: a holding is kept when said as one "
+                "(\"I hold 2 SOL\"), a limit or a goal when said as one (\"my loss limit is "
+                "$100\").")
+            return {"lines": lines, "sources": [], "data": {}, "refused": False, "reason": "",
+                    "classified_by": "memory", "memory": mem.dumps(facts), "remembered": [],
+                    "turns": [*prior, text][-12:]}
     if mem.recall_asked(text) and not new:
         # "What do you remember about me?" is answered from the memory the browser sent, in the
         # trader's own words; it was declined while seven facts were held (a judge, round 14).
@@ -2534,6 +3177,16 @@ def handle_ask(
         follow = _as_follow_up(text, prior, payload, now=now, visitor=visitor, book=book)
         if follow is not None:
             payload = follow
+        carried = _carry_size_and_name(text, prior, payload)
+        if carried is not None:
+            # "Why one-minute children and not Bitget's own TWAP default?", three turns into a
+            # $250k NVDA execution, was worked on the $50,000 NVDA default (a judge, round 29):
+            # the size and the name already said in the conversation are used
+            again = _answer(carried[0], prior, now=now, visitor=visitor, book=book)
+            if again.get("lines") and not again.get("refused"):
+                again["lines"] = [*again["lines"][:1], carried[1], *again["lines"][1:]]
+                again["turns"] = [*prior, text][-12:]
+                payload = again
         if said_book is not None and payload.get("lines"):
             payload["lines"] = [
                 str(line).replace("used your saved book",
@@ -2553,6 +3206,20 @@ def handle_ask(
         if (not full_asked and not payload.get("refused") and len(payload.get("lines") or []) > 5
                 and _NEWCOMER_SAID.search(" ".join([*prior[-6:], text]))):
             payload["lines"] = _newcomer_cut([str(x) for x in payload["lines"]])
+        if (payload.get("lines") and not payload.get("refused")
+                and re.search(r"\bshould\s+i\s+(?:sell|hold|cut|take\s+(?:the\s+)?profit|get\s+"
+                              r"out|dump)\b", text, re.I)
+                and not any(re.search(r"\byour\s+call\b|\bis\s+yours\b|\bstays\s+yours\b",
+                                      str(x), re.I) for x in payload["lines"])):
+            # "i bought some sol last week and its already down 15% should i sell" got the price
+            # history and nothing about the question asked (a first-time user, round 29)
+            sold = research_symbols(text)[0]
+            sold_name = sold[0].removesuffix("USDT") if sold else "it"
+            payload["lines"] = [*payload["lines"],
+                                f"Whether to sell is your call; two things that help decide: "
+                                f"\"how much could I lose on {sold_name} in a bad week\", and a "
+                                f"tripwire so the decision is made in advance — \"if "
+                                f"{sold_name} falls below <price> I sell\"."]
         premises = (_premise_lines(text, now, book)
                     if payload.get("lines") and not payload.get("refused") else [])
         if premises:
@@ -2672,6 +3339,21 @@ def handle_ask(
 
         on = _symbols_on(text)[0] or next((_symbols_on(q)[0] for q in reversed(prior[-2:])
                                            if _symbols_on(q)[0]), ())
+        if on and (re.search(r"\d", text) or len(text.split()) > 14):
+            # "With BTC at $85,000, and also BTC at $95,000, what's a 10% drawdown …" and "what
+            # percent figure did you give me two messages ago" got BTC's day in place of an answer
+            # (a hostile review, round 29): a long or numeric question no reader took is said to
+            # be unread, never answered with the coin's picture
+            name = on[0].removesuffix("USDT")
+            payload = {**payload, "refused": True, "reason": "no reader for the question",
+                       "classified_by": "declined-unread", "lines": [
+                           f"Bottom line: this console has no reader for that question about "
+                           f"{name} as it is asked, so it gives no answer rather than one to a "
+                           f"different question.",
+                           f"What it does answer about {name}: its price and day, its risk and "
+                           f"worst day, a stress on a book, a size for a stop, a cost or an "
+                           f"execution plan, its funding — ask for one of those in a sentence."]}
+            on = ()
         if on:
             name = on[0].removesuffix("USDT")
             # a buying question keeps its shape: what holding the name has meant
@@ -4499,7 +5181,10 @@ def _polymarket_lines(text: str, prior: list[str]) -> list[str] | None:
     try:
         markets = prediction.markets_for(named[0])
     except prediction.PredictionError:
-        return None
+        # with Polymarket unreachable the question fell through to the rates dashboard, which
+        # answers something else (an outage drill, 2026-10-04): the outage is said
+        return [f"Bottom line: Polymarket did not answer just now, so there are no crowd odds "
+                f"on {named[0].removesuffix('USDT')} to quote — ask again in a minute."]
     if not markets:
         return [f"Bottom line: Polymarket has no open market on {named[0].removesuffix('USDT')} "
                 f"above its $10,000 volume floor, so there is no crowd price to quote."]
@@ -4550,7 +5235,9 @@ def _fed_odds_lines(text: str, prior: list[str] | None = None) -> list[str] | No
     try:
         markets = prediction.markets_for("FEDUSDT")
     except prediction.PredictionError:
-        return None
+        return ["Bottom line: Polymarket did not answer just now, so there are no Fed-decision "
+                "odds to quote — ask again in a minute; \"when is the next Fed meeting\" is "
+                "answered from the Federal Reserve's own calendar."]
     priced = [m for m in markets if re.search(r"\bfed\b", m.question, re.I)
               and re.search(r"\bmeeting\b", m.question, re.I)]
     if not priced:
