@@ -2135,6 +2135,7 @@ def handle_ask(
         return {"lines": mem.earlier_lines(text, prior, facts), "sources": [], "data": {},
                 "refused": False, "reason": "", "classified_by": "memory",
                 "memory": mem.dumps(facts), "remembered": []}
+    full_asked = False
     token = _MEMORY.set(tuple(facts))
     try:
         from argus.lui.honesty import iso_dates
@@ -2284,7 +2285,8 @@ def handle_ask(
             if (instead.get("lines") and not instead.get("refused")
                     and "twelve stock perpetuals" not in str(instead["lines"][0])):
                 shown = [str(x) for x in instead["lines"]]
-                if len(shown) > 5 and _NEWCOMER_SAID.search(" ".join([*prior[-6:], text])):
+                if (len(shown) > 5 and not full_asked
+                        and _NEWCOMER_SAID.search(" ".join([*prior[-6:], text]))):
                     shown = _newcomer_cut(shown)
                 payload = {**instead, "lines": [*shown, f"Read as: “{retry}”."]}
     trip_names = {f.subject.split("|", 1)[0] for f in facts if f.kind == "tripwire"}

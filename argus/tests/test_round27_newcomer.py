@@ -397,3 +397,21 @@ class TestLiveReAskFindings:
         assert server._routine_lines(None, daily=True)[0].startswith(
             "Bottom line: a daily five-minute check")
         assert server._routine_lines(None)[0].startswith("Bottom line: a weekly routine")
+
+    def test_more_detail_is_not_cut_again(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        wall = "ETH is not one of the twelve stock perpetuals the desk decides on"
+        full = [f"line {i} with kurtosis" if i else "Bottom line: ETH, in full." for i in range(8)]
+
+        def answered(text: str, prior: list[str], **_kw: Any) -> dict[str, Any]:
+            if "newbie" in text:
+                return {"lines": [wall], "sources": [], "data": {}, "refused": True,
+                        "reason": wall, "classified_by": "patterns"}
+            return {"lines": list(full), "sources": [], "data": {}, "refused": False,
+                    "reason": "", "classified_by": "research"}
+
+        monkeypatch.setattr(server, "_answer", answered)
+        short = server.handle_ask("total newbie here, should i get some eth now", [])
+        assert any("short version" in x for x in short["lines"])
+        more = server.handle_ask("more detail", ["total newbie here, should i get some eth now"])
+        assert "line 7 with kurtosis" in more["lines"]
+        assert not any("short version" in x for x in more["lines"])
