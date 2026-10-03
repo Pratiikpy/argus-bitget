@@ -182,7 +182,9 @@ class TestFundingRule:
             _candle(start + timedelta(hours=i), 100 + i) for i in range(24 * 90)])
         lines = desk_followups.funding_rule_lines(
             "Thesis: buy BTC whenever funding goes negative. Backtest it over a year.", [])
-        assert lines is not None and "won 100% of the time over the next 24 hours" in lines[0]
+        assert lines is not None
+        assert "over the next 24 hours BTC was up 100% (" in lines[0]
+        assert "better than a coin flip" in lines[0]
         assert "not a year" in lines[0]
         again = desk_followups.funding_rule_lines(
             "what's the win rate?",

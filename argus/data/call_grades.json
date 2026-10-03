@@ -1,6 +1,6 @@
 {
- "graded_at": "2026-10-02T19:55:06+00:00",
- "calls": 24,
+ "graded_at": "2026-10-03T13:58:20+00:00",
+ "calls": 28,
  "first_call": "2026-09-27T02:28:00+00:00",
  "risk_graded": 0,
  "mean_beta_error": null,
@@ -316,12 +316,36 @@
    "question": "I hold 40% TSLA, 30% META, 30% GOOGL — should I add 15% AMZN?",
    "risk": null,
    "direction": []
+  },
+  {
+   "recorded_at": "2026-10-03T13:56:30+00:00",
+   "question": "I hold 40% NVDA, 30% MSFT, 30% AAPL — should I add 15% TSLA?",
+   "risk": null,
+   "direction": []
+  },
+  {
+   "recorded_at": "2026-10-03T13:56:30+00:00",
+   "question": "I hold 50% NVDA, 50% AAPL — should I add 20% COIN?",
+   "risk": null,
+   "direction": []
+  },
+  {
+   "recorded_at": "2026-10-03T13:56:30+00:00",
+   "question": "I hold 60% QQQ, 40% MSFT — should I add 10% MSTR?",
+   "risk": null,
+   "direction": []
+  },
+  {
+   "recorded_at": "2026-10-03T13:56:30+00:00",
+   "question": "I hold 40% TSLA, 30% META, 30% GOOGL — should I add 15% AMZN?",
+   "risk": null,
+   "direction": []
   }
  ],
  "weekend": {
-  "recorded": 5,
+  "recorded": 10,
   "graded": 5,
-  "pending": 0,
+  "pending": 5,
   "covered": 0.6,
   "mean_pinball_bps": 41.11898361666804,
   "bands": [

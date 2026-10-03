@@ -508,7 +508,30 @@ def walk_forward(tape: Tape, triggers: Sequence[Trigger]) -> dict[str, Any]:
         folds[name] = fold
     combined = {g: score_trades(all_trades[g]) for g in GATES}
     return {"classes": classes, "folds": folds, "out_of_sample_combined": combined,
+            "fold_stability": fold_stability(folds),
             "test_trades": {g: all_trades[g] for g in GATES}}
+
+
+def fold_stability(folds: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    """Per gate, how many test folds made money and the worst one.
+
+    A result is judged on its worst fold, not on the combined figure: a gate that made everything
+    in one fold and bled in the other got lucky once (the walk-forward rule in the backtest-
+    discipline review of 2026-10-03; López de Prado's walk-forward reading). Folds
+    with no test trades are counted as neither positive nor worst."""
+    out: dict[str, dict[str, Any]] = {}
+    for gate in GATES:
+        scored = [(name, fold[gate]["test"]) for name, fold in folds.items()
+                  if fold[gate]["test"]["trades"]]
+        positive = sum(1 for _name, s in scored if s["net_bps_total"] > 0)
+        worst = min(scored, key=lambda pair: pair[1]["net_bps_total"], default=None)
+        out[gate] = {
+            "positive_folds": f"{positive}/{len(scored)}",
+            "worst_fold": worst[0] if worst else None,
+            "worst_fold_net_bps_total": worst[1]["net_bps_total"] if worst else None,
+            "worst_fold_net_bps_mean": worst[1]["net_bps_mean"] if worst else None,
+        }
+    return out
 
 
 # --- slimon's own LLM decisions ----------------------------------------------------------------

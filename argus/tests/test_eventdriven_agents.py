@@ -203,3 +203,20 @@ def test_artefact_matches_a_fresh_count_of_its_own_trades() -> None:
     for gate, row in forward["out_of_sample_combined"].items():
         assert row == ea.score_trades(forward["test_trades"][gate]), gate
     assert report["generated_from"]["snapshot_sha256"] == ea.load_tape().source_sha256
+
+
+def test_fold_stability_judges_on_the_worst_fold() -> None:
+    from argus.eval.eventdriven_agents import GATES, fold_stability
+
+    def fold(total: float, trades: int) -> dict[str, object]:
+        test = {"trades": trades, "net_bps_total": total,
+                "net_bps_mean": total / trades if trades else None}
+        return {g: {"test": test} for g in GATES}
+
+    folds = {"train_first_trade_second": fold(120.0, 4), "train_second_trade_first": fold(-30.0, 2)}
+    out = fold_stability(folds)["argus"]
+    assert out["positive_folds"] == "1/2"
+    assert out["worst_fold"] == "train_second_trade_first"
+    assert out["worst_fold_net_bps_total"] == -30.0
+    empty = fold_stability({"a": fold(0.0, 0), "b": fold(10.0, 1)})["argus"]
+    assert empty["positive_folds"] == "1/1"  # a fold with no trades is not counted

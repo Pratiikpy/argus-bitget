@@ -760,34 +760,43 @@ def funding_rule_lines(text: str, prior: Sequence[str]) -> list[str] | None:
 
     want_negative = sign is not None and sign.group("s").lower() == "negative"
     hits = [t for t, r in settlements if (r < 0) == want_negative and r != 0]
-    rows = {}
+    from argus.backtest.proportion import rate_phrase, stability_phrase
+
+    rows: dict[str, tuple[list[float], list[float]]] = {}
     for label, hours in (("24 hours", 24), ("7 days", 168)):
         on = [x for t in hits if (x := ahead(t, hours)) is not None]
         every = [x for t, _r in settlements if (x := ahead(t, hours)) is not None]
         if on and every:
-            rows[label] = (len(on), sum(1 for x in on if x > 0) / len(on), sum(on) / len(on),
-                           sum(1 for x in every if x > 0) / len(every), sum(every) / len(every))
+            rows[label] = (on, every)
     name = symbol.removesuffix("USDT")
     span_days = (settlements[-1][0] - settlements[0][0]) / 86_400_000 if settlements else 0
+    side = "negative" if want_negative else "positive"
     if not rows:
         return [f"Bottom line: in the {span_days:.0f} days of settlements Bitget serves, {name}'s "
-                f"funding was {'negative' if want_negative else 'positive'} {len(hits)} times — "
-                f"too few with prices after them to test the rule."]
-    day = rows.get("24 hours")
-    week = rows.get("7 days")
-    lead = (f"Bottom line: tested on the {span_days:.0f} days of funding Bitget serves (not a "
-            f"year: that is all its API returns), buying {name} after each "
-            f"{'negative' if want_negative else 'positive'} settlement")
-    if day is not None:
-        lead += (f" won {day[1]:.0%} of the time over the next 24 hours ({day[0]} cases, average "
-                 f"{day[2]:+.2%}), against {day[3]:.0%} and {day[4]:+.2%} after any settlement")
-    lines = [lead + "."]
-    if week is not None:
-        lines.append(f"Over 7 days: {week[1]:.0%} up on average {week[2]:+.2%} ({week[0]} cases), "
-                     f"against {week[3]:.0%} and {week[4]:+.2%} after any settlement.")
+                f"funding was {side} {len(hits)} times — too few with prices after them to test "
+                f"the rule."]
+
+    def said(on: list[float], every: list[float], window: str) -> str:
+        wins = sum(1 for x in on if x > 0)
+        base = sum(1 for x in every if x > 0) / len(every)
+        return (f"over the next {window} {name} was up {rate_phrase(wins, len(on))}, average "
+                f"{sum(on) / len(on):+.2%}; after any settlement it was up {base:.0%}, average "
+                f"{sum(every) / len(every):+.2%}")
+
+    lines = [f"Bottom line: tested on the {span_days:.0f} days of funding Bitget serves (not a "
+             f"year: that is all its API returns), after each {side} settlement "
+             + (said(*rows["24 hours"], "24 hours") if "24 hours" in rows else
+                said(*rows["7 days"], "7 days")) + "."]
+    if "24 hours" in rows and "7 days" in rows:
+        week = said(*rows["7 days"], "7 days")
+        lines.append("Over 7 days: " + week[len("over the next 7 days "):] + ".")
+    first = rows["24 hours"][0] if "24 hours" in rows else rows["7 days"][0]
+    stable = stability_phrase([x > 0 for x in first])
+    if stable is not None:
+        lines.append(f"Stability: {stable}.")
     lines.append("Overlapping windows and few independent episodes: a description of the last few "
-                 "months, before fees, not evidence the rule works. Bitget funding history and "
-                 "hourly closes.")
+                 "months, before fees, not evidence the rule works. The range is a 95% Wilson "
+                 "interval; Bitget funding history and hourly closes.")
     return lines
 
 

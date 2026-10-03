@@ -105,6 +105,22 @@ Open the console and ask any of these. Each one exercises something different.
 
 </details>
 
+### Verify it in 60 seconds
+
+No account, no key, nothing to install but `curl` and `jq`. Each line checks one claim on the live
+deployment.
+
+```bash
+B=https://deploy-topaz-seven-64.vercel.app
+# 1. A live answer from Bitget's own market data, not a cached demo
+curl -sG "$B/ask" --data-urlencode "q=What is BTC trading at right now?" | jq -r '.lines[0]'
+# 2. The research desk's decision record: entries, and whether its hash chain is intact
+curl -s "$B/status?format=json" | jq '{entries, chain_intact, stale}'
+# 3. The MCP server any agent can call, and its ten tools
+curl -s -X POST "$B/mcp" -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | jq -r '.result.tools[].name'
+```
+
 **Who it is for:** a trader holding or weighing Bitget's tokenized US equities who wants a second
 desk that shows its work, and a newcomer who wants to see what a sum of money would have been
 through before risking it. **Who it is not for:** anyone wanting signals or trades placed for them —
@@ -265,11 +281,11 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 11,325 tests collected
+pytest -q                       # 11,330 tests collected
 ```
 
 Nothing above needs a credential. On 2026-10-03, with every outbound connection refused, 11,012
-passed, 75 skipped and 0 failed of the 11,325 tests collected; the other 238 read a live
+passed, 75 skipped and 0 failed of the 11,330 tests collected; the other 238 read a live
 venue, feed or model and run apart
 (`pytest -m network`). Tests that need a rival's source cloned beside the repository skip
 and say which. `ARGUS_BLOCK_NETWORK=1` refuses every outbound connection, so
@@ -289,8 +305,8 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **11,325 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 586 source files** |
+| Tests | **11,330 tests collected** — `pytest -q` |
+| Types | **`mypy --strict` clean on 587 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
 | Sub-themes | **18/18 sub-themes** each resolve to an importable module and a test file (`python -m argus.status`). That is coverage, not a claim to lead them: 6 of 46 capabilities are OWNED against a named rival, and `/proof` says which |
