@@ -5570,6 +5570,7 @@ def _answer(
                        lambda: _followups.dominance_thesis_lines(text, now),
                        lambda: _followups.book_thesis_lines(text, book),
                        lambda: _followups.rotate_conditions_lines(text, prior),
+                       lambda: _followups.book_beta_lines(text, prior, book),
                        lambda: _followups.earnings_lines(text, prior),
                        lambda: _followups.follows_lines(text, prior))
     for early_rule in early_rules:

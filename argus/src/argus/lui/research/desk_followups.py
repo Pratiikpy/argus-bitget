@@ -54,13 +54,15 @@ def earnings_lines(text: str, prior: Sequence[str]) -> list[str] | None:
                      r"\bbeat\s+(?:estimates|expectations|consensus)|\beps\b[^?]{0,30}\b(?:last|"
                      r"latest|came\s+in|reported|actual)", text, re.I)
     ahead = re.search(r"\b(?:consensus|estimates?|expect\w*)\b[^?]{0,30}\bnext\s+(?:quarter|"
-                      r"report)\b|\bnext\s+quarter'?s?\s+(?:consensus|estimates?|eps)\b",
-                      text, re.I)
+                      r"report)\b|\bnext\s+quarter'?s?\s+(?:consensus|estimates?|eps)\b|"
+                      # "what's the street expecting next time?" (a rephrased re-ask, round 26)
+                      r"\b(?:street|analysts?|consensus)\b[^?]{0,20}\bexpect\w*\b[^?]{0,20}"
+                      r"\bnext\b", text, re.I)
     after = re.search(r"\b(?:move|react|do|trade|go)\w*\b[^?]{0,25}\b(?:the\s+)?day\s+after\b|"
                       r"\breact(?:ion|ed)?\s+to\s+(?:it|the\s+(?:report|results|print))\b",
                       text, re.I)
-    earnings_before = any(re.search(r"\bearnings\b|\beps\b|\breport", q, re.I)
-                          for q in prior[-2:])
+    earnings_before = any(re.search(r"\bearnings\b|\beps\b|\breport|\bestimates?\b|\bconsensus\b|"
+                                    r"\bstreet\b|\bresults\b", q, re.I) for q in prior[-2:])
     if ahead is not None or (after is not None and earnings_before):
         named = [s for s in _named_before(text, prior) if is_us_equity(s)]
         if not named:
@@ -69,7 +71,7 @@ def earnings_lines(text: str, prior: Sequence[str]) -> list[str] | None:
         if after is not None and ahead is None:
             from argus.lui.research.earnings_moves import reaction_lines
 
-            return reaction_lines([ticker], 1)
+            return reaction_lines([ticker], 4)
         from argus.lui.research.fundamentals import raw_number, yahoo_summary
 
         try:
@@ -167,8 +169,11 @@ def follows_lines(text: str, prior: Sequence[str]) -> list[str] | None:
         return None
     beta, rho = fit
     na, nb = a[0].removesuffix("USDT"), b[0].removesuffix("USDT")
-    said = re.search(rf"\b{re.escape(nb)}\s+(?:rises|falls|drops|moves|gains|is\s+up|is\s+down)\s+"
-                     r"(?:by\s+)?(?P<n>\d+(?:\.\d+)?)\s*%", text, re.I)
+    # the leader's move as said, under any name for it ("when bitcoin moves 5%")
+    said = next((m for m in re.finditer(
+        r"\b(?P<w>\$?[A-Za-z]{2,12})\s+(?:rises|falls|drops|moves|gains|is\s+up|is\s+down)\s+"
+        r"(?:by\s+)?(?P<n>\d+(?:\.\d+)?)\s*%", text, re.I) if _names(m.group("w"))[:1] == b[:1]),
+                None)
     step = (-1 if said is not None and re.search(r"falls|drops|down", said.group(0), re.I)
             else 1) * (float(said.group("n")) if said is not None else 10.0)
     verdict = "yes, closely" if rho >= 0.7 else "partly" if rho >= 0.4 else "loosely"
@@ -638,7 +643,9 @@ def hold_choice_lines(text: str, prior: Sequence[str]) -> list[str] | None:
     from argus.market.crossasset_feed import fetch_funding
 
     held = re.search(r"\bhold\w*\b[^?]{0,30}?\b(?:for\s+)?(?:(?P<n>\d+(?:\.\d+)?)|an?|one)\s+"
-                     r"(?P<u>days?|weeks?|months?|years?)\b", text, re.I)
+                     r"(?P<u>days?|weeks?|months?|years?)\b", text, re.I) or re.search(
+        # "For a 9 month hold of AAPL, perp or rToken?" (a live re-ask, round 26)
+        r"\b(?P<n>\d+(?:\.\d+)?)[\s-]*(?P<u>days?|weeks?|months?|years?)\s+hold\b", text, re.I)
     if held is None or not re.search(r"\bwhich\b|\bperp\w*\s+or\b|\brtoken\b|\bshould\s+i\s+use",
                                      text, re.I) or not any(
             re.search(r"\brtokens?\b", q, re.I) for q in [*prior[-2:], text]):
@@ -662,9 +669,11 @@ def hold_choice_lines(text: str, prior: Sequence[str]) -> list[str] | None:
     perp_cost = funding + 0.0012
     rtoken_cost = 0.0020
     name = symbol.removesuffix("USDT")
+    unit = held.group("u").lower().rstrip("s")
     span = f"{count:g} {held.group('u').rstrip('s')}{'s' if count != 1 else ''}"
     cheaper = "the rToken" if rtoken_cost < perp_cost else "the perpetual"
-    return [f"Bottom line: for a {span} hold, {cheaper} — at the last {span_days:.0f} days' "
+    return [f"Bottom line: for a {count:g}-{unit} hold, {cheaper} — at the last "
+            f"{span_days:.0f} days' "
             f"average funding ({mean:+.4%} every {hours}h) a {name} perpetual long pays about "
             f"{funding:+.2%} over {span}, {perp_cost:.2%} with its 0.12% taker round trip, "
             f"against about {rtoken_cost:.2%} for the r{name} rToken's spot round trip and no "
