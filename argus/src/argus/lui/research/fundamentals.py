@@ -1062,6 +1062,18 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
             else:
                 lines.append(line)
         sources.extend(backup_sources)
+    else:
+        # With Yahoo unreachable, "when does AAPL report earnings" answered with no date and no
+        # word about why (an outage drill, 2026-10-04): what is missing, and from where, is said
+        missing = [what for what, needed in (
+            ("the next report date", not any(line.startswith("Next report") for line in lines)),
+            ("the analysts' price targets", target_line is None))
+            if needed]
+        if missing:
+            lines.insert(0, f"Bottom line: for {ticker}, {' and '.join(missing)} could not be "
+                            f"read just now — Bitget's data service has none on file and Yahoo "
+                            f"Finance, the second source, did not answer; ask again in a "
+                            f"minute.")
 
     versus = safe("versus_estimates")
     if versus is not None:

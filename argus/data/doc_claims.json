@@ -1285,13 +1285,13 @@
       "doc": "readme",
       "line": 57,
       "quoted": [
-        "1046"
+        "1049"
       ],
       "live": [
-        1046
+        1049
       ],
       "status": "OK",
-      "excerpt": "1046 decisions in the paper ledger"
+      "excerpt": "1049 decisions in the paper ledger"
     },
     {
       "claim": "ledger_decisions",
@@ -1299,7 +1299,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        1046
+        1049
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -1310,7 +1310,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        1046
+        1049
       ],
       "status": "ABSENT",
       "excerpt": ""
@@ -1404,26 +1404,26 @@
       "doc": "readme",
       "line": 57,
       "quoted": [
-        "1046"
+        "1049"
       ],
       "live": [
-        1046
+        1049
       ],
       "status": "OK",
-      "excerpt": "1046 decisions"
+      "excerpt": "1049 decisions"
     },
     {
       "claim": "ledger_entries",
       "doc": "readme",
       "line": 222,
       "quoted": [
-        "1046"
+        "1049"
       ],
       "live": [
-        1046
+        1049
       ],
       "status": "OK",
-      "excerpt": "1046 ledger entries"
+      "excerpt": "1049 ledger entries"
     },
     {
       "claim": "ledger_entries",
@@ -1431,7 +1431,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        1046
+        1049
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -1441,13 +1441,13 @@
       "doc": "explained",
       "line": 1201,
       "quoted": [
-        "1046"
+        "1049"
       ],
       "live": [
-        1046
+        1049
       ],
       "status": "OK",
-      "excerpt": "paper-trading log has 1046 decisions"
+      "excerpt": "paper-trading log has 1049 decisions"
     },
     {
       "claim": "settled_abstentions",
@@ -1491,13 +1491,13 @@
       "doc": "readme",
       "line": 236,
       "quoted": [
-        "876"
+        "879"
       ],
       "live": [
-        876
+        879
       ],
       "status": "OK",
-      "excerpt": "876 decisions carry a lean"
+      "excerpt": "879 decisions carry a lean"
     },
     {
       "claim": "leans_recorded",
@@ -1505,7 +1505,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        876
+        879
       ],
       "status": "ABSENT",
       "excerpt": ""

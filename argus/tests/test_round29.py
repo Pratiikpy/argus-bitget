@@ -289,3 +289,4 @@ class TestLiveReAsk29:
     def test_a_bare_slang_follow_up(self) -> None:
         lines = newcomer.slang_lines("and hodl?")
         assert lines is not None and lines[0].startswith("Bottom line: HODL:")
+
