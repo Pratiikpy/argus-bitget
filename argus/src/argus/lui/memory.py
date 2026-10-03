@@ -89,7 +89,11 @@ _CAP = re.compile(
     r"bigger\s+than|larger\s+than|more\s+than)\s+(?P<a>\d{1,2}(?:\.\d+)?)\s*%(?!\s+of\s+(?:my\s+)?"
     r"(?:the\s+)?risk)|\bmax(?:imum)?\s+(?P<b>\d{1,2}(?:\.\d+)?)\s*%\s+(?:per|in\s+(?:any\s+)?one|"
     r"in\s+a\s+single)\s+(?:position|name|holding|stock)\b|\b(?:position|single[\s-]name)\s+cap\s+"
-    r"(?:is\s+|of\s+)?(?P<c>\d{1,2}(?:\.\d+)?)\s*%", re.I)
+    r"(?:is\s+|of\s+)?(?P<c>\d{1,2}(?:\.\d+)?)\s*%|"
+    # "never more than 20% in one name" (a judge, round 24)
+    r"\b(?:never|not|no)\s+more\s+than\s+(?P<d>\d{1,2}(?:\.\d+)?)\s*%\s+(?:of\s+(?:my\s+|the\s+)?"
+    r"(?:book|portfolio|account)\s+)?(?:in|on)\s+(?:any\s+|a\s+single\s+|a\s+)?(?:one\s+)?(?:name|"
+    r"position|holding|stock|coin|asset)\b", re.I)
 _MAX_LOSS = re.compile(
     r"\b(?:i\s+)?(?:can'?t|cannot|can\s+not|don'?t\s+want\s+to|won'?t|never)\s+(?:afford\s+to\s+)?"
     r"lose\s+"
@@ -276,7 +280,8 @@ def extract(question: str, now: datetime | None = None,
         add("trade_risk", "", str(float(m.group("a") or m.group("b") or m.group("c")) / 100),
             m.group(0))
     if (m := last(_CAP)) is not None:
-        add("cap", "", str(float(m.group("a") or m.group("b") or m.group("c")) / 100), m.group(0))
+        add("cap", "", str(float(m.group("a") or m.group("b") or m.group("c")
+                                       or m.group("d")) / 100), m.group(0))
     if (m := last(_MAX_LOSS)) is not None:
         add("max_loss", "", str(float(m.group(1) or m.group(2) or m.group(3) or m.group(4)
                                       or m.group(5) or m.group(6) or m.group(7))

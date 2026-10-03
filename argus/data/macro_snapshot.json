@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-02T20:54:56.433569+00:00",
+ "generated_at": "2026-10-02T23:51:10.370449+00:00",
  "source": "https://fred.stlouisfed.org (FRED, Federal Reserve Bank of St. Louis)",
  "series": {
   "DGS10": [
@@ -1483,6 +1483,10 @@
    ],
    [
     "2026-10-01",
+    2.36
+   ],
+   [
+    "2026-10-02",
     2.36
    ]
   ],

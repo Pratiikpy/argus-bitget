@@ -542,6 +542,20 @@ def _event_reaction(symbol: str, raw_text: str) -> tuple[list[str], list[Source]
     wanted = [kind for kind, pattern in _EVENT_TYPES if pattern.search(raw_text)] or ["CPI"]
     rows = [r for r in report.get("reactions", [])
             if r.get("symbol") == symbol and r.get("kind") in wanted]
+    proxy_note: list[str] = []
+    if not rows and symbol in ("SP500USDT", "SPYUSDT", "NDX100USDT") and any(
+            k in ("CPI", "FOMC") for k in wanted):
+        # "How has the stock market reacted after CPI prints lately?" was refused for the S&P
+        # 500 though the QQQ study exists (a judge, round 24): the market is read through QQQ,
+        # the closest of the studied names, and said
+        rows = [r for r in report.get("reactions", [])
+                if r.get("symbol") == "QQQUSDT" and r.get("kind") in wanted]
+        if rows:
+            said = {"SP500USDT": "S&P 500", "NDX100USDT": "Nasdaq-100 index"}.get(symbol,
+                                                                                 _t(symbol))
+            proxy_note = [f"The {said} is not one of the studied names; QQQ, the Nasdaq-100 "
+                          f"fund, is the closest one that is, so its reactions are shown."]
+            symbol = "QQQUSDT"
     ticker = _t(symbol)
     if not rows:
         studied = sorted({str(r.get("symbol", "")).removesuffix("USDT")
@@ -648,6 +662,7 @@ def _event_reaction(symbol: str, raw_text: str) -> tuple[list[str], list[Source]
                                   else "; until then, treat it as an event of unknown size."))
     upcoming, _ = _event_lines(raw_text, always=True)
     lines.extend(upcoming)
+    lines[1:1] = proxy_note
     return lines, [Source(kind="computation", ref="argus.research.event_reactions",
                           detail=f"MacKinlay event study, hourly Bitget candles; proxy = the other "
                                  f"traded names; computed {when}")]

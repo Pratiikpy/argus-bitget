@@ -522,7 +522,11 @@ def _own_move_lines(raw_text: str, request: ResearchRequest,
         from argus.lui.research.sizing import stated_capital
 
         # "I have a $40k account … in dollars" gave percentages only (round 20, row 694)
-        weights, cash, value = dict(request.book), request.cash, stated_capital(raw_text) or 0.0
+        # a saved book priced from amounts carries its value too: "whole crypto market sheds
+        # 20%" on 0.5 BTC and 4 ETH gave percentages only (a round-23 re-ask)
+        saved = request.book_value or request.notional
+        weights, cash = dict(request.book), request.cash
+        value = stated_capital(raw_text) or (float(saved) if saved else 0.0)
     held = {s: w for s, w in weights.items() if s in moves}
     flat = [s for s in weights if s not in moves]
     absent = [s for s in moves if s not in weights]
@@ -1976,6 +1980,14 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                        if worst and len(request.book) > 1 else "")
                     + " (market-driven part only, through each beta)."
                 )
+                levered = request.leverage or 0.0
+                if lead_here and levered > 1.0:
+                    # "NVDA 120%, cash -20%" is 1.2x on the trader's own money, and was rescaled to
+                    # 100% and answered as unlevered (a hostile review, round 24)
+                    lines.append(f"At {levered:g}x on your own money, that is "
+                                 f"{outcome.portfolio_move_pct * levered:+.2f}% of your equity "
+                                 f"({outcome.portfolio_move_pct:+.2f}% x {levered:g}), before "
+                                 f"borrowing costs.")
             book_beta = 0.0
             driven: dict[str, float] = {}
             for symbol, weight in request.book.items():
@@ -2171,7 +2183,14 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                                 "and horizon, and it does not give advice. What it can measure "
                                 "is the risk.")
             lines.insert(1, actionable + ". Listed from most to least volatile.")
-            if RISK_ADJUSTED.search(raw_text):
+            from argus.lui.research.parse import _period_days as _said_days
+
+            # "compare the last 3 months of NVDA vs AMD returns" was answered on 30 days (a
+            # round-23 re-ask): a stated period with returns asked is measured over that period
+            plain_return = (not RISK_ADJUSTED.search(raw_text) and _said_days(raw_text)
+                            and re.search(r"\breturns?\b|\bperform\w*|\bgains?\b|\bdone\b",
+                                          raw_text, re.I) is not None)
+            if RISK_ADJUSTED.search(raw_text) or plain_return:
                 # "which has better risk-adjusted returns over the last 90 days, ETH or SOL?" was
                 # answered with betas and one name's raw return (a judge, round 21)
                 from argus.lui.research.parse import _period_days

@@ -77,6 +77,9 @@ THAT_NUMBER_Q = re.compile(
     r"(?:simpler|more\s+simply|simply|in\s+simple\s+(?:terms|words))\b[^?]{0,30}[?.!]*\s*$|"
     r"\b(?:thoda\s+)?(?:simple|aasan|asaan)\s+(?:mein|me|main|bhasha\s+mein)\s+samjha\w*|"
     r"^\W*(?:yaar\s+|bhai\s+)?samjhao\W*$|"
+    # "explain like im 5" with no "that" printed a desk decision (a first-time user, round 24)
+    r"^\W*(?:pls\s+|please\s+|can\s+you\s+)?explain\s+(?:it\s+|that\s+|this\s+)?(?:to\s+me\s+)?like\s+"
+    r"i'?m\s+(?:5|five|a\s+kid|new|a\s+beginner|dumb|stupid)\W*(?:pls|please)?\W*$|\beli5\b|"
     # "can you say that again but simpler, I'm a total beginner" (a round-23 re-ask)
     r"^\W*(?:can\s+you\s+|could\s+you\s+|pls\s+|please\s+)?(?:say|explain|put)\s+(?:that|it|this)"
     r"\s+(?:again\s+)?(?:but\s+)?(?:simpler|more\s+simply|in\s+simpler\s+(?:words|terms)|"

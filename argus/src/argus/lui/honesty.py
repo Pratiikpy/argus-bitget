@@ -75,6 +75,8 @@ HORIZON = "horizon_exceeds_data"
 LONG_HORIZON = "long_horizon"
 """An N-year statistic the history is long enough for: answered as asked."""
 UNLISTED = "unlisted"
+SPOT_ONLY = "spot-only"
+"""A company Bitget lists only as a spot rToken, with no perpetual (round 24)."""
 AMBIGUOUS = "ambiguous"
 
 _T = TypeVar("_T")
@@ -987,6 +989,16 @@ def _unlisted_candidate(text: str, registry: Mapping[str, Any]) -> tuple[str, tu
     return None
 
 
+def said_of(tickers: Sequence[str]) -> str:
+    """The tickers as said in a sentence: "JNJ", or "DB or DBK"."""
+    return " or ".join(tickers)
+
+
+def checked_note(registry: Mapping[str, Any], spot: frozenset[str]) -> str:
+    """What was checked, for the data line."""
+    return f"{len(registry)} USDT-futures contracts and {len(spot)} spot symbols checked"
+
+
 def _spot_symbols() -> frozenset[str]:
     payload = http.fetch_json(BITGET_API + "/api/v2/spot/public/symbols", timeout=8.0)
     return frozenset(str(r.get("symbol")) for r in payload.get("data") or [])
@@ -1001,6 +1013,32 @@ def _unlisted_lines(name: str, tickers: Sequence[str], status: str) -> tuple[str
     origin = universe.origin() if live is not None else "frozen snapshot"
     spot = _with_timeout(_spot_symbols, 10.0) or frozenset()
     hits = _listed_tickers(tickers, registry, spot)
+    spot_only = [h.removesuffix(" (spot)") for h in hits if h.endswith(" (spot)")]
+    if hits and len(spot_only) == len(hits):
+        # "Can I buy Johnson & Johnson here?" was answered about NVIDIA, though Bitget lists
+        # RJNJUSDT on spot (a first-time user, round 24): a spot-only company is said as one
+        symbol = spot_only[0]
+        last = None
+        try:
+            rows = http.fetch_json(BITGET_API + f"/api/v2/spot/market/tickers?symbol={symbol}",
+                                   timeout=8.0).get("data") or []
+            last = float(rows[0].get("lastPr")) if rows else None
+        except Exception:
+            last = None
+        token = symbol.removesuffix("USDT")
+        token = "r" + token[1:] if token.startswith("R") and len(token) > 1 else token
+        price = f", last traded at {last:,.2f} USDT" if last else ""
+        return SPOT_ONLY, [
+            f"Bottom line: yes — {name} trades on Bitget as the spot token {token} "
+            f"({symbol}){price}; Bitget lists no perpetual for it.",
+            f"{token} tracks the {said_of(tickers)} share price; it is not the share itself, so "
+            f"there is no vote, and dividends or redemption are set by Bitget's rToken terms, "
+            f"which this console has not verified.",
+            "This console's research engines are built on Bitget's perpetuals, so for "
+            f"{name} it can give the spot price but not the risk, earnings and sizing answers it "
+            f"gives for listed perpetuals.",
+            f"Data: Bitget spot symbol list and spot ticker (live), "
+            f"{checked_note(registry, spot)}."]
     if hits:
         return None  # it is listed after all; the console's own answer stands
     checked = f"{len(registry)} USDT-futures contracts ({origin})"

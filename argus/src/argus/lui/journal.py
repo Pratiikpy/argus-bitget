@@ -1523,6 +1523,8 @@ POSITION_Q = re.compile(
     r"(?:did\s+i|have\s+i)\s+(?:make|made|lose|lost))\b|"
     # "I hold 20 AAPL bought at 190. What's my gain?" (a round-23 re-ask)
     r"\bwhat(?:'s|\s+is)\s+my\s+(?:gain|loss|return|profit)\b(?!\s+(?:limit|if|when))|"
+    # "What's it worth now and my gain?" (a judge, round 24)
+    r"\b(?:and|plus)\s+my\s+(?:gain|loss|return|profit|p\s*&\s*l|pnl)\b|"
     r"\bhow\s+much\s+(?:am\s+i|have\s+i\s+got)\s+(?:up|down)\b|"
     r"持仓|盈亏|成本价|赚了多少|亏了多少", re.I)
 """A question about where the trader's own fills leave them: the position and its profit."""
@@ -1616,6 +1618,279 @@ def _short_pnl(text: str, shorts: list[tuple[str, float, float]],
             {"position": data})
 
 
+_AMOUNT = r"\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?"
+_LEG = re.compile(
+    rf"\b(?P<side>long|short|bought|buy|shorted|sold\s+short|hold|own|have|sold)?\s*"
+    rf"(?P<neg>-\s*)?(?P<qty>{_AMOUNT})\s+(?:shares?\s+(?:of\s+)?|oz\s+(?:of\s+)?|units?\s+of\s+|"
+    rf"coins?\s+of\s+)?\$?(?P<name>[A-Za-z]{{2,6}})(?P<after>\s+(?:perps?|perpetual|futures?|spot|"
+    rf"shares?|short))*,?\s+(?:(?:bought|sold|entered|shorted|short|opened)\s+)?"
+    rf"(?:at|@|from|average(?:\s+cost)?|avg\.?|entry)\s+(?:an?\s+average\s+(?:of\s+)?)?\$?(?P<entry>{_AMOUNT})\b"
+    rf"(?!\s*x\b|\s*%)", re.I)
+"""A held leg with its entry: "short 100 NVDA sold at 190", "0.5 BTC at 60000"."""
+_LEG_MARK = re.compile(
+    rf"\b(?P<name>[A-Za-z]{{2,6}})(?:'s)?\s+(?:is\s+)?(?:now|currently|last|trading(?:\s+at)?|"
+    rf"is\s+at|sits\s+at|closed\s+at|marks?\s+at)\s+(?:at\s+)?\$?(?P<p>{_AMOUNT})\b(?!\s*%)",
+    re.I)
+"""The trader's own price for one name today: "AMD now 160", "NVDA last 220"."""
+_GENERAL_MARK = re.compile(
+    # "what if BTC hits 150k?" (a judge, round 24)
+    rf"\b(?:hits|reaches|gets\s+to|goes\s+to|went\s+to|touches)\s+\$?(?P<hit>{_AMOUNT})\b(?!\s*%)|"
+    rf"\b(?:mark(?:\s+price)?\s+is|(?:the\s+)?(?:screen|chart|app)\s+(?:shows|says)|price\s+is\s+"
+    rf"now|price\s+now|now\s+at|is\s+at|is\s+now|it'?s\s+(?:now\s+)?(?:at\s+)?|it\s+is\s+(?:now\s+)?"
+    rf"(?:at\s+)?|currently|current(?:\s+price)?|last|now)\s+\$?(?P<p>{_AMOUNT})\b(?!\s*%)",
+    re.I)
+_COVER = re.compile(rf"\bcover(?:ed)?\s+(?P<q>{_AMOUNT})\s+(?:of\s+(?:them|it)\s+)?(?:at|@)\s+"
+                    rf"\$?(?P<p>{_AMOUNT})", re.I)
+_TO_SHORT = re.compile(r"\b(?:i\s+)?meant\s+short\b|\bshort,?\s+not\s+long\b|\bactually\s+"
+                       r"(?:i'?m\s+|i\s+am\s+)?short\b", re.I)
+
+
+def _thousands(text: str) -> str:
+    """ "95k" as 95000: "Short 2 BTC perp from 95k" was read as an entry of $95 (round 24)."""
+    return re.sub(r"(?<![\w.$])(\d+(?:\.\d+)?)\s*k\b",
+                  lambda m: f"{float(m.group(1)) * 1000:g}", text, flags=re.I)
+
+
+_WORTH = re.compile(
+    r"(?P<cur>[$\u20ac\u00a3\u20b9])?\s?(?P<amt>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k)?\s*"
+    r"(?P<unit>rupees?|inr|rs\.?|dollars?|usd|euros?|eur|pounds?|gbp)?\s+(?:worth\s+)?of\s+"
+    r"(?P<name>[A-Za-z]{2,6})\s+(?:at|@|from)\s+\$?(?P<e>\d[\d,]*(?:\.\d+)?)", re.I)
+"""A holding stated as money spent at an entry: "1,25,000 rupees worth of TSLA at 400 dollars"."""
+_CURRENCY_SIGN = {"rupee": "\u20b9", "rupees": "\u20b9", "inr": "\u20b9", "rs": "\u20b9",
+                  "rs.": "\u20b9", "euro": "\u20ac", "euros": "\u20ac", "eur": "\u20ac",
+                  "pound": "\u00a3", "pounds": "\u00a3", "gbp": "\u00a3"}
+
+
+_MOVE_ASKED = re.compile(
+    r"\b(?:if|when|should|what\s+happens\s+if|what\s+if)\b[^.?!]{0,30}?\b(?P<verb>rises?|rallies|"
+    r"jumps?|climbs?|gains?|goes\s+up|falls?|drops?|declines?|sinks?|slides?|goes\s+down|loses|"
+    r"moves?)\s+(?:by\s+)?(?:another\s+)?(?P<sign>[+-])?(?P<pct>\d+(?:\.\d+)?)\s*%", re.I)
+"""A move asked of a stated position: "I'm holding 120 NVDA at 190. If it drops 12% from here, how
+much do I lose?" got today's unrealised profit only (a judge, round 24)."""
+
+
+def _european(text: str) -> str:
+    """Euro amounts and German position words put in the reader's form: "1.000 Aktien SAP zu
+    180,50 ... jetzt 195,25. Gewinn?" and "2.500 shares of ASML at \u20ac650,00" were refused
+    or read as 2.5 shares (a hostile review, round 24)."""
+    if not re.search(r"\u20ac|\bEUR\b|\b(?:Aktien|St[\u00fcu]ck|zu|jetzt|Gewinn|Verlust)\b", text,
+                     re.I):
+        return text
+    out = re.sub(r"\b(?:Aktien|St[\u00fcu]ck)(?:\s+(?:von|der))?\b", "shares of", text, flags=re.I)
+    out = re.sub(r"\bzu\b", "at", out, flags=re.I)
+    out = re.sub(r"\bjetzt\b", "now", out, flags=re.I)
+    out = re.sub(r"\bGewinn\b", "profit", out, flags=re.I)
+    out = re.sub(r"\bVerlust\b", "loss", out, flags=re.I)
+    out = out.replace("\u20ac", "")
+    out = re.sub(r"\b(\d{1,3})\.(\d{3})\b(?![.,]\d)", r"\1,\2", out)
+    return re.sub(r"\b(\d+),(\d{2})\b(?!\d)", r"\1.\2", out)
+
+
+def _unlisted(name: str, text: str) -> str | None:
+    """A ticker Bitget does not list, kept when the trader gives both its prices: "1.000 Aktien
+    SAP zu 180,50 ... jetzt 195,25" is plain arithmetic whether or not SAP trades here."""
+    if not (name.isupper() and 2 <= len(name) <= 5):
+        return None
+    if not re.search(rf"\b{re.escape(name)}\b[^.?!]{{0,40}}\b(?:now|currently|last|at|is)\b|"
+                     rf"\b(?:now|currently)\s+\$?\d", text):
+        return None
+    return f"{name}USDT"
+
+
+def _legs_pnl(text: str, price: Callable[[str], float] | None,
+              ) -> tuple[list[str], list[Source], dict[str, Any]] | None:
+    """Every held leg's open profit, long and short together, each marked at the price the
+    trader gave for it, else at one price given for a one-name book, else at Bitget's last.
+
+    A hostile review (round 24) found the reader dropped one side of a long/short pair, read a
+    short corrected from long as long, ignored "mark is 195" and "AMD now 160", took "95k" as 95,
+    and left a partly covered short out. Each case is an exact sum of the trader's own figures.
+    """
+    text = _thousands(text)
+    euro = "\u20ac" in text or re.search(r"\bEUR\b|\beuros?\b", text, re.I) is not None
+    text = _european(text)
+    correction = _TO_SHORT.search(text)
+    if correction is not None:
+        # "I'm long 100 NVDA at 180. Oops, I meant short, not long."
+        text = re.sub(r"\blong\b", "short", text[:correction.start()], flags=re.I) + \
+            text[correction.start():]
+    legs: list[tuple[str, float, float, int]] = []
+    spans: list[tuple[int, int]] = []
+    for m in _LEG.finditer(text):
+        symbol = _resolve_word(m.group("name")) or _unlisted(m.group("name"), text)
+        if symbol is None:
+            continue
+        before = text[max(0, m.start() - 24):m.start()]
+        side_word = (m.group("side") or "").lower()
+        short = bool(m.group("neg") or side_word in ("short", "shorted") or
+                     side_word.startswith("sold short") or
+                     re.search(r"\bshort", m.group("after") or "", re.I) or
+                     (side_word == "sold" and re.search(r"\bshort\b", text[m.end():m.end() + 12],
+                                                        re.I)) or
+                     (not side_word and re.search(r"\bshort(?:ed)?\s*$", before, re.I)))
+        if side_word == "sold" and not short:
+            return None  # a sale of a long is the fills reader's, with its cost basis
+        legs.append((symbol, _number(m.group("qty")), _number(m.group("entry")), -1 if short
+                     else 1))
+        spans.append((m.start(), m.end()))
+    sign = "$"
+    spent_on: dict[str, float] = {}
+    for m in _WORTH.finditer(text):
+        symbol = _resolve_word(m.group("name"))
+        if symbol is None or any(s == symbol for s, *_x in legs):
+            continue
+        # "Bought 1,25,000 rupees worth of TSLA at 400 dollars, TSLA now 440" (a hostile review,
+        # round 24): the money spent buys amount / entry units, and the result is in its currency
+        spent = float(m.group("amt").replace(",", "")) * (1000 if m.group("k") else 1)
+        entry = float(m.group("e").replace(",", ""))
+        if entry <= 0:
+            continue
+        legs.append((symbol, spent / entry, entry, 1))
+        spent_on[symbol] = spent
+        spans.append((m.start(), m.end()))
+        unit = (m.group("unit") or "").lower()
+        sign = (m.group("cur") if m.group("cur") and m.group("cur") != "$"
+                else _CURRENCY_SIGN.get(unit, sign))
+    if not legs:
+        return None
+    names = {s for s, _q, _e, _d in legs}
+    covers = list(_COVER.finditer(text))
+    marks: dict[str, float] = {}
+    said_marks: dict[str, set[float]] = {}
+    for m in _LEG_MARK.finditer(text):
+        if any(a <= m.start() < z for a, z in spans):
+            continue
+        symbol = _resolve_word(m.group("name")) or _unlisted(m.group("name"), text)
+        if symbol in names:
+            marks[symbol] = _number(m.group("p"))
+            said_marks.setdefault(symbol, set()).add(marks[symbol])
+            # "NVDA is now 210 and also 190": the second price for the same name
+            after = re.match(rf"\s*(?:and|or|but)\s+(?:also\s+)?\$?({_AMOUNT})\b(?!\s*%)",
+                             text[m.end():], re.I)
+            if after is not None:
+                said_marks[symbol].add(_number(after.group(1)))
+    clashing = {s: v for s, v in said_marks.items() if len(v) > 1}
+    if clashing:
+        # two prices for one name are not resolved silently (a hostile review, round 24)
+        symbol, values = next(iter(clashing.items()))
+        return ([f"Bottom line: two current prices were given for {symbol.removesuffix('USDT')} ("
+                 + " and ".join(f"{v:g}" for v in sorted(values))
+                 + "); say which one to mark it at."],
+                [Source("computation", "argus.lui.journal:_legs_pnl", "a contradiction")], {})
+    if len(names) == 1 and not marks:
+        general = [m for m in _GENERAL_MARK.finditer(text)
+                   if not any(a <= m.start() < z for a, z in spans)]
+        if len({m.group("p") or m.group("hit") for m in general}) > 1:
+            # "NVDA is now 210 and also 190": two prices for one name are not resolved silently
+            return (["Bottom line: two current prices were given ("
+                     + " and ".join(m.group("p") or m.group("hit") for m in general)
+                     + ") for one name; say which one to mark it at."],
+                    [Source("computation", "argus.lui.journal:_legs_pnl", "a contradiction")],
+                    {})
+        if general:
+            marks[next(iter(names))] = _number(general[0].group("p") or general[0].group("hit"))
+        elif (said := _STATED_MARK.search(text)) is not None and not any(
+                a <= said.start() < z for a, z in spans):
+            # "BTC goes to 66,000" and the other forms the one-name reader already knew
+            marks[next(iter(names))] = _number(said.group(1))
+    moved = _MOVE_ASKED.search(text)
+    if not (any(d < 0 for *_x, d in legs) or len(legs) > 1 or covers or marks or moved):
+        return None
+    # "100 AAPL at 150 and 50 more at 160": the second fill names no ticker
+    fills_said = sum(1 for _m in _LEG.finditer(text))
+    if all(d > 0 for *_x, d in legs) and (len(names) < len(legs) or fills_said > len(legs)):
+        return None  # several buys of one name: the fills reader averages their cost
+    leads: list[str] = []
+    lines: list[str] = []
+    data: dict[str, Any] = {}
+    total = 0.0
+    realised = 0.0
+    for symbol, qty, entry, direction in legs:
+        name = symbol.removesuffix("USDT")
+        held = qty
+        if direction < 0 and covers:
+            for cover in covers:
+                bought_back = _number(cover.group("q"))
+                closed = (entry - _number(cover.group("p"))) * bought_back
+                realised += closed
+                held -= bought_back
+                lines.append(f"{name}: {bought_back:g} covered at {cover.group('p')}, realised "
+                             f"({entry:g} - {cover.group('p')}) x {bought_back:g} = "
+                             f"{_money(closed)}.")
+            covers = []
+        mark = marks.get(symbol)
+        where = "the price you gave"
+        if mark is None and price is not None:
+            try:
+                mark = price(symbol)
+                where = "Bitget's last price"
+            except Exception:
+                mark = None
+        if mark is None:
+            leads.append(f"{name}: no price to mark it at answered")
+            continue
+        # an index future's points are dollars at its multiplier: "short 5 NQ from 21,000" is
+        # $20 a point a contract (a hostile review, round 24)
+        typed = next((m.group("name").upper() for m in _LEG.finditer(text)
+                      if _resolve_word(m.group("name")) == symbol), "")
+        multiplier = {"ES": 50, "MES": 5, "NQ": 20, "MNQ": 2}.get(typed, 1)
+        open_pnl = (mark - entry) * held * direction * multiplier
+        total += open_pnl
+        if moved is not None and symbol not in marks and len(names) == 1:
+            size = float(moved.group("pct")) / 100
+            falls = (re.match(r"(?:fall|drop|declin|sink|slide|goes\s+down|lose)",
+                              moved.group("verb"), re.I) is not None
+                     or moved.group("sign") == "-")
+            moved_to = mark * (1 - size if falls else 1 + size)
+            change = (moved_to - mark) * held * direction * multiplier
+            leads.append(f"if {name} {'falls' if falls else 'rises'} {size:.0%} from "
+                         f"{mark:,.2f} to {moved_to:,.2f}, the "
+                         f"{'short' if direction < 0 else 'long'} {held:g} "
+                         f"{'gains' if change >= 0 else 'loses'} "
+                         f"${abs(change):,.2f} ({held:g} x {abs(moved_to - mark):,.2f}), leaving "
+                         f"{_money(open_pnl + change)} against your {entry:,.2f} entry")
+        side = "short" if direction < 0 else "long"
+        if multiplier != 1:
+            name = f"{typed} (${multiplier} a point)"
+        if symbol in spent_on:
+            lines.append(f"{name}: ${spent_on[symbol]:,.2f} bought at {entry:,.2f}, marked at "
+                         f"{mark:,.2f} ({where}) \u2014 ({mark:g} / {entry:g} - 1) x "
+                         f"{spent_on[symbol]:,.2f} = {_money(open_pnl)} unrealised.")
+            data[symbol] = {"spent": spent_on[symbol], "entry": entry, "mark": mark}
+            continue
+        if direction > 0 and multiplier == 1:
+            # "What's it worth now and my gain?" asked the value too (a judge, round 24)
+            where = f"{where}; worth ${held * mark:,.2f}"
+        lines.append(f"{name}: {side} {held:g} from {entry:,.2f}, marked at {mark:,.2f} ({where}) "
+                     f"\u2014 ({mark:g} - {entry:g}) x {held:g}"
+                     f"{f' x ${multiplier}' if multiplier != 1 else ''}"
+                     f"{' x -1' if direction < 0 else ''} = {_money(open_pnl)} unrealised.")
+        data[symbol] = {"held": held * direction, "entry": entry, "mark": mark}
+    if moved is not None and leads:
+        leads.insert(0, "Bottom line: " + leads.pop(0))
+    elif len(legs) == 1 and not realised and len(lines) == 1:
+        # one position: its own line is the answer
+        leads.insert(0, "Bottom line: " + lines.pop(0).removesuffix("."))
+    else:
+        leads.insert(0, f"Bottom line: {_money(total + realised)} in all"
+                     + (f" \u2014 {_money(realised)} realised and {_money(total)} open"
+                        if realised else " unrealised")
+                     + f", across {len(legs)} position{'s' if len(legs) != 1 else ''}")
+    lines.insert(0, "; ".join(leads) + ".")
+    if correction is not None:
+        lines.insert(1, "Read as short, as corrected.")
+    lines.append("Fees and funding are not in these figures unless you typed them; this reads the "
+                 "positions you wrote, not your Bitget account.")
+    if euro:
+        # the trader's figures were in euros, so the sums are too (round 24)
+        lines = [line.replace("$", "\u20ac") for line in lines]
+    elif sign != "$":
+        lines = [line.replace("$", sign) for line in lines]
+    return (lines, [Source("computation", "argus.lui.journal:_legs_pnl",
+                           "mark less entry, times the size and side, for each leg")],
+            {"position": data})
+
+
 def position_and_pnl(text: str, *, now: datetime | None = None,
                      price: Callable[[str], float] | None = None,
                      ) -> tuple[list[str], list[Source], dict[str, Any]] | None:
@@ -1628,13 +1903,17 @@ def position_and_pnl(text: str, *, now: datetime | None = None,
     price paid so far) and first in, first out (each sale closes the oldest lots, as tax lots
     usually do). Long positions only; a sale larger than the holding is said, not guessed at.
     """
-    text = repair_typos(text)
-    if not POSITION_Q.search(text):
+    text = _thousands(repair_typos(text))
+    if not POSITION_Q.search(_european(text)) and not (
+            _LEG.search(text) and _MOVE_ASKED.search(text)):
         return None
     if re.search(r"\b\d+\s+[A-Za-z]{1,6}\s+(?:\d+(?:\.\d+)?\s+)?(?:puts?|calls?)\b", text, re.I):
         # "I bought 10 NVDA 250 calls for $5 each" is an option position, priced at expiry
         # elsewhere; read here it was 10 shares bought at $5 (a hostile review, round 23)
         return None
+    every_leg = _legs_pnl(text, price)
+    if every_leg is not None:
+        return every_leg
     clock = now or datetime.now(UTC)
     legs, _notes = parse_text(text, now=clock.date())
     fills = [leg for leg in legs if leg.symbol and leg.price and leg.action in ("buy", "sell")

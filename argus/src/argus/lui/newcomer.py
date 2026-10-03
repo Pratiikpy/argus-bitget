@@ -361,6 +361,134 @@ _WHAT_NOW_A = (
 )
 
 
+_PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
+    # Plain questions a first-time user asked and was told "I did not recognise that question"
+    # while the model was available (a first-time user, round 24). Each answer is the plain fact
+    # and the next question this console can answer with live figures.
+    (re.compile(r"\bwhat\s+(?:even\s+)?(?:is|are)\s+(?:a\s+)?(?:stocks?|shares?)\b|"
+                r"\bwhat\s+(?:does|do)\s+(?:a\s+)?(?:stock|share)\s+mean\b", re.I), (
+        "Bottom line: a stock (a share) is a small piece of ownership in a company. Its price is "
+        "what buyers will pay today for that piece of the company's future profits, so it moves "
+        "every trading day.",
+        "On Bitget you do not hold the share itself: you can hold an rToken that tracks a US "
+        "stock's price (rNVDA for NVIDIA) or trade a perpetual contract on it, which adds "
+        "leverage and a funding payment. Neither makes you a shareholder, so neither gives a "
+        "vote.",
+        "To see one in numbers, ask \"what is NVDA doing today\".")),
+    (re.compile(r"\bwhat\s+(?:is|'s|are)\s+(?:a\s+)?margin\s+calls?\b|\bmargin\s+call\s+(?:mean|"
+                r"meaning)\b", re.I), (
+        "Bottom line: a margin call is a broker asking for more money because the losses on a "
+        "borrowed (leveraged) position have eaten into the margin held against it.",
+        "On a crypto exchange's perpetuals the call is not a phone call: when the margin left "
+        "falls to the maintenance level, the exchange closes the position itself (liquidation) "
+        "and the margin is gone. The line to watch is the liquidation price.",
+        "Ask \"where is my liquidation price on a 5x BTC long\" to see where that line sits.")),
+    (re.compile(r"\bisolated\b[^?]{0,30}\bcross\b|\bcross\b[^?]{0,30}\bisolated\b", re.I), (
+        "Bottom line: isolated margin gives each position its own margin, so a liquidation loses "
+        "that margin and nothing else; cross margin lets the whole account balance back every "
+        "position, so a losing one can draw on all of it before it is closed.",
+        "Cross sits further from liquidation, but more of your money is at stake in one bad "
+        "move; isolated caps the loss per position at the margin you put up.",
+        "Ask \"where is my liquidation price on a 5x ETH long\" for the isolated line on a real "
+        "market.")),
+    (re.compile(r"\b(?:what(?:'s|\s+is)|whats)\s+the\s+(?:safest|least\s+risky)\s+(?:thing|coin|"
+                r"stock|option|bet|one|investment)\b", re.I), (
+        "Bottom line: nothing on an exchange is safe in the sense of not losing value; what "
+        "differs is how far it swings. A stablecoin such as USDT aims to stay at $1, and broad "
+        "indices swing less than single coins.",
+        "Measure it rather than take a label: ask \"how much could I lose on QQQ in a bad week\" "
+        "and the same for BTC, and compare the dollars with what you could afford to lose.",
+        "Without leverage, the most you can lose is what you put in.")),
+    (re.compile(r"\brevenge[\s-]?trad\w*|\bwin\s+(?:it\s+|my\s+money\s+|my\s+losses\s+)?back\b",
+                re.I), (
+        "Bottom line: no — trading to win back a loss is how small losses become large "
+        "ones: the size goes up while the judgement goes down.",
+        "Stop for the day, write down what went wrong (size, exit, leverage), and come back with "
+        "the size you would have chosen before the loss.",
+        "Ask \"how much could I lose on BTC in a bad week\" with the amount you can spare before "
+        "the next trade.")),
+    (re.compile(r"\b(?:i'?m|i\s+am)\s+\d{2}\b[^?]{0,40}\b(?:retired|retiree|pension\w*)\b|"
+                r"\bsuitable\s+for\s+(?:someone|a\s+person|people)\s+like\s+me\b|"
+                r"\b(?:retired|retiree)\b[^?]{0,40}\b(?:suitable|safe|right|okay|ok)\b", re.I), (
+        "Bottom line: whether it suits you is a question for a licensed adviser who knows your "
+        "circumstances; this console is a research tool and cannot judge that.",
+        "What it can show plainly: single coins and leverage can fall by half or more in a year, "
+        "and money you will need to live on should not be exposed to that.",
+        "To see what a sum has actually been through in three broad markets over the last year, "
+        "ask \"I have $10,000, what should I do\" — it shows the falls, not a pick.")),
+    (re.compile(r"\bhow\s+do\s+(?:people|traders|you)\s+(?:actually\s+)?make\s+money\s+"
+                r"(?:from\s+|by\s+|in\s+)?trading\b", re.I), (
+        "Bottom line: by being right more often than fees and mistakes cost, at a size where one "
+        "wrong trade does not end the account — and many short-term traders do not manage "
+        "it once fees are counted.",
+        "The parts that decide it: a reason to enter that has worked before, an exit set before "
+        "entering, a size where the exit costs 1-2% of the account, and no more trades than the "
+        "fees allow (a Bitget perpetual round trip at taker is about 0.12%).",
+        "Ask \"has BTC been here before\" to see what followed a market's current state in the "
+        "past.")),
+    (re.compile(r"\b(?:turn|make|grow)\s+\$?(?P<a>\d[\d,]*)\s*(?:dollars?|bucks|usd)?\s+into\s+\$?"
+                r"(?P<b>\d[\d,]*)", re.I), (
+        "Bottom line: turning a sum into ten times as much needs either leverage or a coin that "
+        "could also go to zero — the same move that multiplies it can wipe it out.",
+        "At 10x leverage, a 10% move in your favour doubles the stake and a 10% move against "
+        "it (a bit less, after the maintenance margin) loses all of it; ordinary coins move 10% "
+        "in a week often.",
+        "Ask \"how much could I lose on BTC in a bad week\" with your amount to see the downside "
+        "first.")),
+    (re.compile(r"\b(?:i\s+)?keep\s+losing\b|\bwhat\s+am\s+i\s+doing\s+wrong\b", re.I), (
+        "Bottom line: the usual causes are size, exits and leverage: positions too big for one "
+        "loss to be small, no exit decided before entering, and leverage that turns an ordinary "
+        "move into a liquidation.",
+        "Fees matter too: every round trip on a Bitget perpetual at taker costs about 0.12%, so "
+        "frequent trading needs a bigger edge just to stand still.",
+        "Ask \"where should my stop go on BTC\" for an exit outside ordinary noise, and size so "
+        "that exit costs 1-2% of your account.")),
+    (re.compile(r"\bliquidat\w*\b[^?]{0,80}\b(?:not\s+let|avoid|prevent|stop|never)\b|"
+                r"\b(?:how\s+do\s+i|how\s+to)\s+(?:not\s+get|avoid\s+getting|stop\s+getting)\s+"
+                r"liquidat\w*", re.I), (
+        "Bottom line: a liquidation happens when the loss reaches the margin, and the distance "
+        "to it is about 1 / leverage: at 20x a move of about 5% against you (less the "
+        "maintenance margin) closes the position.",
+        "Three levers: lower leverage (5x is about 20% away, 2x about 50%), a stop that closes "
+        "the trade before the liquidation line, and a size where that stop costs 1-2% of the "
+        "account.",
+        "Ask \"where is my liquidation price on a 20x BTC long\" and \"where should my stop go on "
+        "BTC\" to see both lines on a real market.")),
+    (re.compile(r"^\W*(?:so\s+|then\s+|ok\s+)?(?:what|which)\s+leverage\s+is\s+(?:safe|okay|ok|"
+                r"fine)\b|\bsafe(?:r|st)?\s+(?:amount\s+of\s+)?leverage\b|\bwhats\s+a\s+safer\s+"
+                r"number\b", re.I), (
+        "Bottom line: no leverage is safe in the sense of not losing; leverage decides how small "
+        "a move ends the trade. The liquidation distance is about 1 / leverage: 2x about 50%, "
+        "3x about 33%, 5x about 20%, 10x about 10%.",
+        "Set it against the market's own swings: a coin that has fallen 10% in a day can "
+        "liquidate a 10x position in that day.",
+        "Without leverage (spot), the most you can lose is what you put in. Ask \"where is my "
+        "liquidation price on a 3x BTC long\" for the exact line.")),
+    (re.compile(r"\b(?:is|are)\s+(?:a\s+)?stable\s*coins?\s+(?:safe|risky)\b|\bcan\s+(?:usdt|usdc|"
+                r"a\s+stablecoin|stablecoins?|it)\s+(?:go\s+to\s+zero|crash|lose\s+(?:its|the)\s+"
+                r"peg|depeg)\b", re.I), (
+        "Bottom line: a stablecoin aims to stay at $1, backed by its issuer's reserves; the risk "
+        "is losing that peg if the reserves or the issuer fail.",
+        "It has happened: TerraUSD (UST) lost its peg in May 2022 and never recovered, and USDT "
+        "traded briefly below $1 in the same week before returning.",
+        "So it moves far less than a coin, but it is a claim on an issuer, not cash in a bank.")),
+    (re.compile(r"\b(?:buy|get|own)\s+(?:a\s+)?(?:half|part|fraction|piece|bit)\s+(?:of\s+)?"
+                r"(?:a\s+)?share\b|\bfractional\s+shares?\b", re.I), (
+        "Bottom line: yes in effect — on Bitget you buy a stock's rToken or perpetual by "
+        "amount, not by whole share, so half a share's worth is an ordinary order, within the "
+        "minimum order size Bitget sets for that market.",
+        "Neither is the share itself: it tracks the price; there is no vote, and the rToken's "
+        "terms (dividends, redemption) are Bitget's to set.",
+        "Ask \"what does it cost to buy $100 of NVDA\" for the fee on a real order.")),
+    (re.compile(r"\bvoting\s+rights?\b|\bdo\s+i\s+get\s+(?:to\s+)?vote\b|\bcan\s+i\s+vote\b",
+                re.I), (
+        "Bottom line: no — neither a stock's rToken nor its perpetual on Bitget makes you a "
+        "registered shareholder, so there is no vote.",
+        "What you hold is exposure to the price; whether an rToken pays dividends or can be "
+        "redeemed is set by Bitget's rToken terms, which this console has not verified.",)),
+)
+
+
 def reply(text: str, *, named: bool = False) -> Reply | None:
     """The newcomer answer to ``text``, or None when it is not one of these questions.
 
@@ -370,6 +498,9 @@ def reply(text: str, *, named: bool = False) -> Reply | None:
     2026-09-30: all five nameless forms were declined)."""
     from argus.lui.research.sizing import stated_capital
 
+    for asked, answer in _PLAIN:
+        if asked.search(text):
+            return Reply(lines=answer)
     if _LOAN.search(text):
         return Reply(lines=_LOAN_A)
     if _WHAT_NOW.search(text):

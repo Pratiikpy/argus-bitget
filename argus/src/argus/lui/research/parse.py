@@ -335,7 +335,8 @@ was answered with a volatility profile and the 24h change with a risk profile)."
 
 
 _PERIOD_Q = re.compile(
-    r"\b(?:over|in|during|for|across)\s+the\s+(?:last|past)\s+(?:(\d+)\s+)?(days?|weeks?|"
+    # "compare the last 3 months of NVDA vs AMD" had no preposition (a round-23 re-ask)
+    r"\b(?:(?:over|in|during|for|across|of)\s+)?the\s+(?:last|past)\s+(?:(\d+)\s+)?(days?|weeks?|"
     r"months?)\b|"
     r"\b(?:this|last|past)\s+(week|month)\b|\bcompare\s+(?:it\s+|that\s+)?(?:to|with)\s+last\s+"
     r"(week|month)\b|\bweek[\s-]on[\s-]week\b|\b(7|30|90)\s*d\b|\b(\d+)\s+days?\s+ago\b|"
@@ -1761,20 +1762,39 @@ _CONTRACT_SHARES = re.compile(
     r"(?P<n>\d[\d,]*)\s+(?P<name>[A-Za-z][\w.]{0,11})\s+(?:option\s+)?contracts?\s+(?:at|of|with|x)\s+"
     r"(?P<m>\d[\d,]*)\s+shares?(?:\s+each)?", re.I)
 _FUTURES_COUNT = re.compile(
-    # "short 3 MES micro futures" and "1 E-mini S&P future" are positions too (round 23)
-    r"(?P<n>\d+)\s+(?:(?:e-?mini|micro)\s+)?(?:(?P<code>MES|ES)|(?P<sp>(?:e-?mini\s+)?S&?P(?:\s*500)?|"
-    r"SP500))\s+(?:(?:e-?mini|micro)\s+)?(?:futures?|contracts?)(?:\s+contracts?)?\b", re.I)
-_FUTURES_BARE = re.compile(r"(?P<n>\d+)\s+(?P<code>MES|ES)\b(?!\s*(?:futures?|contracts?))")
+    # "short 3 MES micro futures" and "1 E-mini S&P future" are positions too (round 23); so are
+    # "2 NQ futures", "5 E-mini Nasdaq contracts" and "3 micro E-mini S&P" (round 24)
+    r"(?P<n>\d+)\s+(?P<what>(?:(?:micro|e-?mini)\s+){0,2}(?:S&?P(?:\s*500)?|SP500|nasdaq(?:[\s-]*100)?|"
+    r"NDX(?:100)?)|MES|ES|MNQ|NQ)\s+(?:(?:e-?mini|micro)\s+)?(?:(?:futures?|contracts?)"
+    r"(?:\s+contracts?)?\b|(?=[.,;]|\s+(?:from|at|and|if|when|is|are)\b))", re.I)
+_FUTURES_BARE = re.compile(
+    r"(?P<n>\d+)\s+(?P<what>MES|ES|MNQ|NQ)\b(?!\s*(?:futures?|contracts?))")
 """A future by its code alone, in capitals: "short 3 MES" (a round-23 re-ask)."""
+
+
+def future_code(what: str) -> str:
+    """The contract code a future was written as: "micro E-mini S&P" is MES, "E-mini Nasdaq" NQ."""
+    said = what.strip()
+    if said.upper() in _INDEX_FUTURES:
+        return said.upper()
+    nasdaq = re.search(r"nasdaq|ndx", said, re.I) is not None
+    micro = re.search(r"\bmicro\b", said, re.I) is not None
+    return ("MNQ" if micro else "NQ") if nasdaq else ("MES" if micro else "ES")
 _NAME_THEN_AMOUNT = re.compile(
     r"\b(?P<side>long|short)\s+(?P<name>[A-Za-z]{1,6})\s+(?P<amount>\$\s?\d[\d,.]*\s*"
     r"(?:k|m|mm|bn|million)?)(?![\w%])", re.I)
 """"long QQQ $1m": the amount after the name, put before it as the readers expect it."""
-_INDEX_FUTURES = {"ES": ("SP500USDT", 50), "MES": ("SP500USDT", 5)}
-"""S&P 500 futures by their dollar multiplier: an E-mini is $50 times the index, a micro $5."""
+_INDEX_FUTURES = {"ES": ("SP500USDT", 50), "MES": ("SP500USDT", 5),
+                  "NQ": ("NDX100USDT", 20), "MNQ": ("NDX100USDT", 2)}
+"""Index futures by their dollar multiplier (CME contract specs): an E-mini S&P is $50 times the
+index and a micro $5; an E-mini Nasdaq-100 is $20 and a micro $2."""
+FUTURES_COUNT, FUTURES_BARE, INDEX_FUTURES = _FUTURES_COUNT, _FUTURES_BARE, _INDEX_FUTURES
+"""The futures readers, public for the answerers that price a futures move exactly (round 24)."""
 _BOOK_SHORT = re.compile(r"(?:\bshort(?:ing)?\s+|-\s*)$", re.I)
 _AMOUNT_HELD = re.compile(
-    r"\b(?:long|short|hold|own|holding|i\s+have)\s+(?:\$\s?\d|[A-Za-z]{1,6}\s+\$\s?\d|\d[\d,.]*\s*(?:k|m)?\s+"
+    # "I hold -50 shares of TSLA" is a short (a hostile review, round 24)
+    r"\b(?:long|short|hold|own|holding|i\s+have)\s+(?:\$\s?\d|[A-Za-z]{1,6}\s+\$\s?\d|-?\s*\d[\d,.]*"
+    r"\s*(?:k|m)?\s+"
     r"(?:shares?\s+(?:of\s+)?|contracts?\s+(?:of\s+)?|units?\s+(?:of\s+)?)?[A-Za-z])", re.I)
 """A holding stated as an amount inside the question: "Long 100 AAPL, short $20k QQQ"."""
 
@@ -1846,17 +1866,43 @@ def _price_book(text: str) -> PricedBook | None:
     def index_future(m: re.Match[str]) -> str:
         # "2 ES contracts" was shocked through a beta and never priced (round 22): an E-mini is
         # $50 (a micro $5) times the S&P 500, read at Bitget's SP500 index perpetual
-        code = (m.group("code") or ("MES" if re.search(r"micro", m.group(0), re.I) else "ES"))
-        symbol, multiplier = _INDEX_FUTURES[code.upper()]
+        code = future_code(m.group("what"))
+        symbol, multiplier = _INDEX_FUTURES[code]
         level = _last_price(symbol)
         if level is None:
             return m.group(0)
         value = _number(m.group("n")) * multiplier * level
-        converted.append(f"{m.group('n')} {code.upper()} = {m.group('n')} x "
-                         f"${multiplier} x S&P 500 at {level:,.2f} = ${value:,.0f}")
-        return f"${value:.0f} SP500 "
+        index = "S&P 500" if symbol == "SP500USDT" else "Nasdaq-100"
+        converted.append(f"{m.group('n')} {code} = {m.group('n')} x "
+                         f"${multiplier} x {index} at {level:,.2f} = ${value:,.0f}")
+        return f"${value:.0f} {symbol.removesuffix('USDT')} "
 
     text = _NAME_THEN_AMOUNT.sub(lambda m: f"{m['side']} {m['amount']} {m['name']}", text)
+    def thousand_units(m: re.Match[str]) -> str:
+        count = float(m.group(1)) * 1000
+        converted.append(f"{m.group(0).strip()} read as {count:,.0f} units, not dollars")
+        return f"{count:g} "
+
+    # "10 billion shares of AAPL" and "2 million units" are counts (a hostile review, round 24)
+    text = re.sub(r"(?<![\w$.,])(\d+(?:\.\d+)?)\s*(billion|bn|million|mn)\s+(?=shares?\b|units?\b|"
+                  r"coins?\b|contracts?\b)",
+                  lambda m: "{:.0f} ".format(float(m.group(1)) * (
+                      1e9 if m.group(2).lower() in ("billion", "bn") else 1e6)),
+                  text, flags=re.I)
+    # "3.5k AMD" with no "$" and no "of" is a count, as "100 AAPL" is (a hostile review, round 24)
+    text = re.sub(r"(?<![\w$.,])(\d+(?:\.\d+)?)\s*k\s+(?=[A-Z]{2,6}\b)", thousand_units, text)
+    # "2m dollars of NVDA, 1.5m of MSFT" lost the first holding (a hostile review, round 24)
+    text = re.sub(r"(?<![\w$.,])(\d+(?:\.\d+)?)\s*(k|m|mm|million|bn)\s+"
+                  r"(?:(?:dollars?|usd|bucks)\s+)?(?:of|in)\s+(?=\$?[A-Za-z])", r"$\1\2 of ", text,
+                  flags=re.I)
+    # "TSLA -50 shares" is a short written after the name (a hostile review, round 24)
+    text = re.sub(r"\b([A-Za-z]{1,6})\s+-\s*(\d[\d,.]*)\s*(?:shares?|units?|coins?)?\b"
+                  # "QQQ -20%" is a move, not a short of 20 (round 24)
+                  r"(?![\d.,]|\s*%)",
+                  lambda m: (f"short {m.group(2)} {m.group(1)}"
+                             if resolve_name(m.group(1), trust_case=True) is not None
+                             and m.group(1).lower() not in ("hold", "own", "have", "long", "short")
+                             else m.group(0)), text)
     text = _CONTRACT_SHARES.sub(per_contract, text)
     text = _FUTURES_COUNT.sub(index_future, text)
     text = _FUTURES_BARE.sub(index_future, text)
@@ -1927,7 +1973,7 @@ def _price_book(text: str) -> PricedBook | None:
                          f"out")
             continue
         value = count * price
-        lines.append(f"{'short ' if count < 0 else ''}{abs(count):g} {_t(symbol)} = "
+        lines.append(f"{'short ' if count < 0 else ''}{abs(count):,.10g} {_t(symbol)} = "
                      f"${abs(value):,.0f} ({price:,.2f})")
         usd[symbol] = usd.get(symbol, 0.0) + value
     for symbol, value in usd.items():
@@ -2765,6 +2811,12 @@ def with_stated_amounts(request: ResearchRequest | None, text: str) -> ResearchR
     subject = shock_subject(text, set(priced.weights))
     notes = tuple(n for n in (request.notes if request is not None else ())
                   if "no book was stated" not in n and "equal weight" not in n)
+    if priced.value > 5e11:
+        # "10 billion shares of AAPL" was valued at $3.3 trillion without a word (a hostile
+        # review, round 24): a size no holder has is worked as stated, and said to be checked
+        notes = (*notes, f"the size stated is worth ${priced.value / 1e12:,.2f} trillion, more "
+                         f"than almost any listed company's whole market value — check the "
+                         f"count; it is worked as stated")
     return ResearchRequest(kind=ResearchKind.STRESS, symbols=tuple(priced.weights),
                            book=dict(priced.weights), shock_pct=-size if down else size,
                            shock_on=subject, notional=Decimal(str(round(priced.value, 2))),
@@ -4101,6 +4153,22 @@ def with_book(request: ResearchRequest | None, book_text: str,
                    "check the ticker")
     if cash and not request.cash:
         request = replace(request, cash=cash)
+    borrowed = re.search(r"\bcash\s*:?\s*-\s*(\d+(?:\.\d+)?)\s*%|-\s*(\d+(?:\.\d+)?)\s*%\s*"
+                         r"(?:in\s+)?cash\b|\bborrow(?:ed|ing)?\s+(\d+(?:\.\d+)?)\s*%|\bmargin\s+"
+                         r"(?:loan|debt)\s+(?:of\s+)?(\d+(?:\.\d+)?)\s*%", book_text, re.I)
+    if borrowed is not None and stated_total > 1.0 and request.leverage is None:
+        # "NVDA 120%, cash -20%": the holdings are 1.2x the trader's money, not a typo to scale
+        # away, and the -20% is a loan, not cash held (a hostile review, round 24)
+        held_total = sum(book.values()) or 1.0
+        book = {s: w / held_total for s, w in book.items()}
+        note = ("used your saved book ("
+                + ", ".join(f"{w * stated_total:.0%} {_t(s)}" for s, w in book.items())
+                + f", {stated_total - 1:.0%} borrowed); the holdings are {stated_total:g}x your "
+                  f"own money")
+        request = replace(request, leverage=round(stated_total, 4), cash=0.0)
+        return replace(request, book=book, symbols=tuple(dict.fromkeys(
+            (*request.symbols, *book))) if request.kind is ResearchKind.IMPACT else tuple(book),
+                       notes=(*request.notes, note))
     kept = tuple(n for n in request.notes
                  if "no current holdings" not in n and "no book was stated" not in n)
     if request.kind is ResearchKind.IMPACT:
