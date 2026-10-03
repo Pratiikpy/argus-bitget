@@ -38,7 +38,7 @@ MAX_FACTS = 40
 MAX_TEXT = 200
 
 KINDS = ("budget", "max_loss", "loss_usd", "horizon", "style", "capital", "thesis", "avoid",
-         "check", "goal", "book", "trade_risk", "cap")
+         "check", "goal", "book", "trade_risk", "cap", "tripwire")
 """``trade_risk`` is the share of the account the trader risks on one trade ("I won't risk more
 than 2% per trade"), and ``cap`` the largest weight one position may have ("no single position
 above 30% of the book"). Both were lost or misread as a risk budget (a judge, round 21)."""
@@ -409,6 +409,21 @@ def extract(question: str, now: datetime | None = None,
         named = research_symbols(m.group(1))[0]
         if named:
             add("avoid", named[0], "avoid", m.group(0))
+    from argus.lui.research import tripwire
+
+    # "If BTC drops below 80k I'll sell half": a decision made before the market tests it, kept
+    # and replayed against what happened (lui/research/tripwire.py)
+    if (m := tripwire.TRIPWIRE.search(text)) is not None:
+        named = research_symbols(m.group("sym"))[0]
+        price = None
+        if named and price_of is not None:
+            try:
+                price = float(price_of(named[0]))
+            except Exception:
+                price = None
+        plan = tripwire.read(text, price, now=now)
+        if plan is not None:
+            add("tripwire", plan.symbol, tripwire.value_of(plan), plan.words, price)
     return facts
 
 

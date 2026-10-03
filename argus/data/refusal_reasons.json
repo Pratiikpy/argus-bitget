@@ -1,7 +1,7 @@
 {
-  "as_of": "2026-10-02T20:15:02.835422+00:00",
-  "refusals": 998,
-  "refusals_with_a_gradeable_claim": 466,
+  "as_of": "2026-10-03T14:39:52.641829+00:00",
+  "refusals": 1010,
+  "refusals_with_a_gradeable_claim": 478,
   "hours_tolerance": 1.5,
   "round_trip_bps": 12.0,
   "base_clearance_about_2h": {
@@ -10,7 +10,7 @@
   },
   "by_claim": {
     "session_closed": {
-      "consistent": 357,
+      "consistent": 369,
       "contradicted": 0,
       "ungradeable": 0
     },
@@ -20,12 +20,12 @@
       "ungradeable": 0
     },
     "hours_to_discovery": {
-      "consistent": 343,
+      "consistent": 353,
       "contradicted": 0,
       "ungradeable": 0
     },
     "no_hedge": {
-      "consistent": 212,
+      "consistent": 222,
       "contradicted": 0,
       "ungradeable": 52
     },
@@ -37,7 +37,7 @@
     "moves_enough": {
       "consistent": 82,
       "contradicted": 31,
-      "ungradeable": 42
+      "ungradeable": 47
     },
     "move_too_small": {
       "consistent": 0,
@@ -329,6 +329,6 @@
       "verdict": "contradicted"
     }
   ],
-  "verdict": "998 refusal(s) on record; 466 carried at least one reason the record can check. Of 915 decision-time reason(s) graded, 915 agreed with the record and 0 contradicted it. `move_too_small` claims were borne out by the next ~2h move 0 of 2 time(s) (0%), against 28% for every ~2h refusal mark (one-sided exact binomial p = 1.00); no evidence the stated reason says more than the base rate does. `moves_enough` claims were borne out by the next ~2h move 82 of 113 time(s) (73%), against 72% for every ~2h refusal mark (one-sided exact binomial p = 0.49); no evidence the stated reason says more than the base rate does.",
+  "verdict": "1010 refusal(s) on record; 478 carried at least one reason the record can check. Of 947 decision-time reason(s) graded, 947 agreed with the record and 0 contradicted it. `move_too_small` claims were borne out by the next ~2h move 0 of 2 time(s) (0%), against 28% for every ~2h refusal mark (one-sided exact binomial p = 1.00); no evidence the stated reason says more than the base rate does. `moves_enough` claims were borne out by the next ~2h move 82 of 113 time(s) (73%), against 72% for every ~2h refusal mark (one-sided exact binomial p = 0.49); no evidence the stated reason says more than the base rate does.",
   "method": "Each checkable reason in a no_trade thesis is matched by a fixed pattern and set beside the record: session_phase and hours_to_discovery from the ledger, the desk's own hedge-menu note, the risk ruling, and the next ~2h mark for claims about the size of the coming move. Question and binary verdict from VisualWebArena's llm_ua_match (evaluation_harness/helper_functions.py:610-642, MIT); graded here by the record, not by a model."
 }

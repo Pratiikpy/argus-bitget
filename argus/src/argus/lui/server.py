@@ -1600,6 +1600,27 @@ def handle_ask(
                 "data": {}, "refused": False,
                 "reason": "", "classified_by": "memory", "memory": mem.dumps(facts),
                 "remembered": [], "turns": [*prior, text][-12:]}
+    from argus.lui.research import tripwire as _tripwire
+
+    if _tripwire.ASKED.search(text):
+        # "check my tripwires": each plan the trader set, replayed against Bitget's hourly prices
+        replayed = _tripwire.lines_for(facts, now=now)
+        lines = ([f"Bottom line: {len(replayed)} tripwire{'s' if len(replayed) != 1 else ''} "
+                  f"set in this browser.", *replayed] if replayed else
+                 ["Bottom line: no tripwire is set in this browser yet. Set one by saying what "
+                  "you will do before it happens, for example \"if BTC drops below 80k I'll sell "
+                  "half\"; every later answer about that name checks it."])
+        return {"lines": lines, "sources": [], "data": {}, "refused": False, "reason": "",
+                "classified_by": "tripwire", "memory": mem.dumps(facts),
+                "remembered": [f.text for f in new]}
+    set_now = [f for f in new if f.kind == "tripwire"]
+    if set_now and _statement_only(text):
+        plan = _tripwire.from_value(set_now[0].subject, set_now[0].value, set_now[0].text)
+        if plan is not None:
+            return {"lines": _tripwire.acknowledgement(plan, set_now[0].price_at),
+                    "sources": [], "data": {}, "refused": False, "reason": "",
+                    "classified_by": "tripwire", "memory": mem.dumps(facts),
+                    "remembered": [f.text for f in new]}
     from argus.lui.honesty import funds_instruction
 
     moved = funds_instruction(text)
@@ -1732,6 +1753,16 @@ def handle_ask(
         payload.update(lines=mem.acknowledgement([f for f in facts if f.key() in noted]),
                        refused=False, reason="",
                        classified_by="memory", sources=[])
+    trip_names = {f.subject for f in facts if f.kind == "tripwire"}
+    if trip_names and payload.get("lines") and not payload.get("refused"):
+        # a tripwire on a name the question is about is checked on that answer
+        from argus.lui.research import research_symbols as _symbols_in
+        from argus.lui.research import tripwire as _tripwire_check
+
+        asked = tuple(s for s in _symbols_in(text)[0] if s in trip_names)
+        if asked:
+            payload["lines"] = [*payload["lines"],
+                                *_tripwire_check.lines_for(facts, asked, now=now)]
     payload["memory"] = mem.dumps(facts)
     payload["remembered"] = [f.text for f in new]
     if SOMEONE_ELSE.search(text) and payload.get("lines") and not payload.get("refused"):
