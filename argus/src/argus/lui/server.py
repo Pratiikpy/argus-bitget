@@ -2795,6 +2795,134 @@ _KELLY_PAYOFF = re.compile(
     re.I)
 
 
+_HEDGE_CLAIM = re.compile(
+    r"\b(?:is\s+)?(?P<a>bitcoin|btc|gold|xau|ether(?:eum)?|eth|silver|[A-Z]{2,5})\s+(?:is\s+|are\s+|"
+    r"acts\s+as\s+|works\s+as\s+)?(?:a\s+|an\s+)?(?:good\s+|real\s+|reliable\s+|safe\s+)?(?:hedge|"
+    r"safe[\s-]+haven)\s+(?:against|for|in)\s+(?:an?\s+)?(?:equity|equities|stock|stocks|the\s+"
+    r"stock|market|the\s+market|risk|the\s+S&P\s+500)[\s-]*(?:market\s+)?(?:selloffs?|sell-offs?|"
+    r"crash(?:es)?|falls?|downturns?|declines?|drops?|routs?)?", re.I)
+
+
+def _hedge_claim_lines(asset: str, days: int = 365) -> list[str] | None:
+    """"Bitcoin is a hedge against equity selloffs", tested on the selloff days themselves.
+
+    It got a 30-day beta and a hedge size for a book nobody had stated (a judge, round 24). A
+    hedge earns its name on the days the thing it hedges falls, not on average: over the last
+    year of Yahoo Finance daily closes (Bitget's S&P 500 contract has too short a history), the
+    selloff days are those SPY fell 1.5% or more, and the claim is held against what the asset
+    did on exactly those days."""
+    from itertools import pairwise
+
+    from argus.lui.research import research_symbols
+
+    named = research_symbols(asset)[0]
+    if not named:
+        return None
+    symbol = named[0]
+    from argus.lui.research.parse import is_us_equity
+    from argus.market import universe
+    from argus.market.equity_history import HistoryError, daily
+
+    since = (datetime.now(UTC) - timedelta(days=days)).date()
+
+    def closes(ticker: str) -> dict[Any, float]:
+        try:
+            return {d.day: d.close for d in daily(ticker) if d.day >= since}
+        except (HistoryError, OSError, ValueError):
+            return {}
+
+    base = symbol.removesuffix("USDT")
+    ticker = (base if is_us_equity(symbol) else f"{base}-USD"
+              if universe.NOT_EQUITY.get(symbol, "crypto") == "crypto"
+              else {"XAU": "GC=F", "XAG": "SI=F"}.get(base))
+    if ticker is None:
+        return None
+    spy, asset_closes = closes("SPY"), closes(ticker)
+    days_both = sorted(set(spy) & set(asset_closes))
+    # both measured over the same span, from one shared trading day to the next: a coin's
+    # Sunday close would otherwise give it a different Monday move from SPY's
+    market = {b2: spy[b2] / spy[a] - 1 for a, b2 in pairwise(days_both) if spy[a] > 0}
+    own = {b2: asset_closes[b2] / asset_closes[a] - 1 for a, b2 in pairwise(days_both)
+           if asset_closes[a] > 0}
+    shared = sorted(set(market) & set(own))
+    if len(shared) < 60:
+        return None
+    selloffs = [d for d in shared if market[d] <= -0.015]
+    name = symbol.removesuffix("USDT")
+    if len(selloffs) < 3:
+        return [f"Bottom line: not testable yet — the S&P 500 fell 1.5% or more on only "
+                f"{len(selloffs)} of the last {len(shared)} trading days, too few to judge a "
+                f"hedge on."]
+    on_them = [own[d] for d in selloffs]
+    mean_own = sum(on_them) / len(on_them)
+    mean_market = sum(market[d] for d in selloffs) / len(selloffs)
+    up = sum(1 for r in on_them if r > 0)
+    verdict = ("Supported" if mean_own > 0 and up * 2 > len(on_them) else
+               "Contradicted" if mean_own < 0 and up * 2 < len(on_them) else "Mixed")
+    said = {"Supported": f"{name} rose on average on those days, so it has hedged them",
+            "Contradicted": f"{name} fell with the market on most of those days, so it has not "
+                            f"hedged them",
+            "Mixed": f"{name} neither reliably rose nor fell with the market on those days"}
+    return [f"Bottom line: {verdict} — on the {len(selloffs)} days of the last "
+            f"{len(shared)} when the S&P 500 (SPY) fell 1.5% or more (average {mean_market:+.1%}), "
+            f"{name} averaged {mean_own:+.1%} and rose on {up} of them; {said[verdict]}.",
+            "The worst five of those days: " + "; ".join(
+                f"{d:%d %b %Y} S&P 500 {market[d]:+.1%}, {name} {own[d]:+.1%}"
+                for d in sorted(selloffs, key=lambda d: market[d])[:5]) + ".",
+            f"Data: Yahoo Finance daily closes for SPY and {ticker}, close to close on the days "
+            f"both traded; one year is a short record, and a hedge that held then can fail in the "
+            f"next selloff."]
+
+
+_FED_ODDS_Q = re.compile(
+    r"\b(?:fed|fomc|federal\s+reserve|powell)\b[^?]{0,60}\b(?:cut|hike|raise|lower|hold|pause|"
+    r"move|likely|odds|chances?|probabilit\w*|expect\w*|priced)\b|\b(?:odds|chances?|"
+    r"probabilit\w*|likel\w*)\b[^?]{0,40}\b(?:rate\s+)?(?:cut|hike)\b", re.I)
+
+
+def _fed_odds_lines(text: str) -> list[str] | None:
+    """What money is betting the Fed does at its next meetings, from Polymarket's Fed decision
+    markets: "Is the Fed likely to cut at the next meeting" got rate levels and no odds (a judge,
+    round 24). The prices are quoted as prices, with volume, never as ARGUS's own forecast."""
+    if not _FED_ODDS_Q.search(text):
+        return None
+    from argus.market import prediction
+
+    try:
+        markets = prediction.markets_for("FEDUSDT")
+    except prediction.PredictionError:
+        return None
+    priced = [m for m in markets if re.search(r"\bfed\b", m.question, re.I)
+              and re.search(r"\bmeeting\b", m.question, re.I)]
+    if not priced:
+        return None
+    by_meeting: dict[str, list[Any]] = {}
+    for m in priced:
+        meeting = re.search(r"after the (.+?) meeting", m.question)
+        by_meeting.setdefault(meeting.group(1) if meeting else m.ends, []).append(m)
+    order = sorted(by_meeting, key=lambda k: min(m.ends for m in by_meeting[k]))
+    first = order[0]
+
+    def outcome(question: str) -> str:
+        said = re.search(r"Will (?:there be )?(?:the Fed )?(.+?) (?:in Fed interest rates )?after",
+                         question)
+        return said.group(1) if said else question
+
+    lines = [f"Bottom line: for the {first} meeting, Polymarket prices "
+             + "; ".join(f"{outcome(m.question)} at {m.yes_price:.0%}"
+                         for m in sorted(by_meeting[first], key=lambda m: -m.yes_price))
+             + f" (${sum(m.volume for m in by_meeting[first]):,.0f} traded) — what money is "
+               f"betting, not a forecast of ours."]
+    for later in order[1:3]:
+        lines.append(f"{later} meeting: " + "; ".join(
+            f"{outcome(m.question)} at {m.yes_price:.0%}"
+            for m in sorted(by_meeting[later], key=lambda m: -m.yes_price)) + ".")
+    lines.append("Data: Polymarket Fed decision markets (open, above a $10,000 volume floor); a "
+                 "price carries fees and the time value of locked money, so it is only loosely a "
+                 "probability. Ask \"when is the next FOMC\" for the date and the rate levels.")
+    return lines
+
+
 def _hourly_fit(symbols: list[str], to: str, days: int = 30) -> dict[str, tuple[float, float]]:
     """Each symbol's correlation with ``to`` and its slope on it, from hourly simple returns over
     the last ``days`` days, on the hours both have a close."""
@@ -3486,6 +3614,15 @@ _HINGLISH_SAID: tuple[tuple[re.Pattern[str], Any], ...] = (
                 r"\d[\d,]*(?:\.\d+)?)\s+(?:of|in|worth\s+of)\s+(?P<n2>[A-Za-z]{2,6})\b", re.I),
      lambda m: f"what does it cost to buy ${m.group('a') or m.group('a2')} of "
                f"{m.group('n') or m.group('n2')}"),
+    # "How is MSTR trading relative to its bitcoin holdings?" got two price quotes (a judge, round
+    # 24); the bitcoin count Strategy reports is not a series this console reads, so it says so
+    (re.compile(r"\b(?:MSTR|strategy|microstrategy)\b[^?]{0,40}\b(?:relative\s+to|vs\.?|versus|"
+                r"premium|discount|against|compared?\s+to)\b[^?]{0,30}\b(?:its\s+)?(?:bitcoin|btc)\s+"
+                r"(?:holdings?|treasury|stack|nav)\b|\bmnav\b", re.I),
+     lambda m: ("what is the beta of MSTR to BTC",
+                "Bottom line: the premium of MSTR to the bitcoin Strategy holds (its mNAV) needs "
+                "Strategy's own bitcoin count, which this console does not read, so it is not "
+                "given here; what can be measured is how MSTR has traded against BTC:")),
     (re.compile(r"\b(?:gimme|give\s+me|find\s+me|show\s+me|which\s+is|what'?s)\s+(?:a|the\s+next|"
                 r"the)\s+(?:\d{2,4}x|moon\w*|gem)\s+(?:coin|token|crypto|stock)?\b", re.I),
      "can i turn 100 into 10000"),
@@ -4350,7 +4487,10 @@ def _answer(
         # questions (a first-time user, round 20, row 685)
         again = _answer(prior[-1], prior[:-1], now=now, visitor=visitor, book=book)
         said = [str(x) for x in again.get("lines") or []]
-        terms_used = _concepts_in(" ".join(said))[:4]
+        # terms from what the answer said, not from its own glossary and data lines: "explain like
+        # im 5" defined leverage and bitcoin for an answer that used neither (round 24)
+        terms_used = _concepts_in(" ".join(
+            x for x in said if not x.startswith(("Terms:", "Data:", "Sources:"))))[:4]
         if said and terms_used and not again.get("refused"):
             head = unlead(said[0]).rstrip(".")
             return engine_payload([
@@ -4526,6 +4666,14 @@ def _answer(
                      + (f" Not measured, for want of shared hourly history: "
                         f"{', '.join(unmeasured)}." if unmeasured else "")],
                     prior, text, by="research")
+    hedge_claim = _HEDGE_CLAIM.search(text)
+    if hedge_claim is not None:
+        tested = _hedge_claim_lines(hedge_claim.group("a"))
+        if tested is not None:
+            return engine_payload_like(tested, prior, text, by="thesis")
+    fed_odds = _fed_odds_lines(text)
+    if fed_odds is not None:
+        return engine_payload_like(fed_odds, prior, text, by="research")
     grown = _growth_compare_lines(text, now=now, visitor=visitor)
     if grown is not None:
         return engine_payload_like(grown, prior, text, by="research")

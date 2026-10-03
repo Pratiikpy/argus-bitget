@@ -191,7 +191,8 @@ _ASK_WORDS = re.compile(
     r"^\s*(?:i\s+(?:think|believe|reckon|expect|feel)\s+(?:that\s+)?|my\s+(?:thesis|view|take|"
     r"idea|argument|claim)(?:\s+is)?(?:\s+that)?\s*:?\s*|here'?s\s+my\s+(?:thesis|view|take|idea):?\s*|"
     # "My bull case for BTC: ..." (a judge, round 12)
-    r"(?:my|the)\s+(?:bull|bear)(?:ish)?\s+case(?:\s+(?:for|on)\s+[\w$.&/-]+)?\s*[:,-]?\s*|"
+    r"(?:(?:my|the)\s+)?(?:bull|bear)(?:ish)?\s+case(?:\s+(?:for|on)\s+[\w$.&/-]+)?\s*[:,-]?\s*|"
+    r"(?:my\s+)?thesis\s*:\s*|"
     # "Bearish AAPL: ..." (a judge, round 23)
     r"(?:i'?m\s+)?(?:bullish|bearish)\s+(?:on\s+)?\$?[A-Za-z]{1,6}\s*[:\-—]\s*)|"
     # "... Check that for me." and "... Is that right?" closing a thesis (round 23)

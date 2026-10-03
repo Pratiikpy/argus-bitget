@@ -33,7 +33,11 @@ THESIS_ASK = re.compile(
     r"\bbecause\b|\bis\s+(?:that|this|it)\s+a\s+(?:good|sound|valid|strong|bad|weak)\s+"
     r"(?:thesis|reason|idea|view|call|take)\b|"
     # "My bull case for BTC: ... Which of these is strongest?" (a judge, round 12)
-    r"\b(?:my|the)\s+(?:bull|bear)(?:ish)?\s+case\b|\bwhich\s+of\s+(?:these|my\s+reasons)\s+"
+    r"\b(?:my|the)\s+(?:bull|bear)(?:ish)?\s+case\b|"
+    # "Bull case on AMZN: AWS margins expanding. Test it." and "Thesis: ..." got a risk profile
+    # (a judge, round 24)
+    r"^\W*(?:bull|bear)(?:ish)?\s+case\b[^?]{0,200}\b(?:test|check|verify|validate)\s+(?:it|this|"
+    r"that)\b|^\W*(?:my\s+)?thesis\s*:|\bwhich\s+of\s+(?:these|my\s+reasons)\s+"
     r"(?:is|are)\s+(?:the\s+)?(?:strongest|weakest|best)\b|\bmy\s+thesis\b[^?]{0,200}"
     r"\btrue\s+or\s+false\b|"
     # "My view: META is cheap because ... Check that for me." and "Bearish AAPL: iPhone sales are

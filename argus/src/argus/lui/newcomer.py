@@ -480,6 +480,19 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
         "Neither is the share itself: it tracks the price; there is no vote, and the rToken's "
         "terms (dividends, redemption) are Bitget's to set.",
         "Ask \"what does it cost to buy $100 of NVDA\" for the fee on a real order.")),
+    # "wat r the fees here" got a desk decision's evidence once the model allowance ran out (a
+    # first-time user, round 24)
+    (re.compile(r"\b(?:wh?at|wat)\s+(?:r|are|is)\s+(?:the\s+)?(?:trading\s+)?fees?\b|\bhow\s+much\s+"
+                r"(?:are|is|do)\s+(?:the\s+)?(?:trading\s+)?fees?\b|\bfees?\s+(?:on|at|for)\s+"
+                r"bitget\b", re.I), (
+        "Bottom line: this console is free and takes no cut; trading fees are Bitget's: on spot, "
+        "0.10% of the order at the standard (VIP 0) rate on Bitget's fee schedule, and on "
+        "perpetuals about 0.06% for an order that takes the price, each way.",
+        "Perpetuals also pay or receive funding every few hours while the position is open, and "
+        "every market order pays the spread; a full round trip on a perpetual is about 0.12% "
+        "before funding.",
+        "Ask \"what does it cost to buy $500 of BTC\" for the cost of a real order on the live "
+        "order book.")),
     (re.compile(r"^\W*(?:so\s+)?what(?:'s|\s+is)\s+(?:the\s+|a\s+)?(?:bid[\s-]+ask\s+)?spread\W*$",
                 re.I), (
         "Bottom line: the spread is the gap between the best price a buyer offers (the bid) and "

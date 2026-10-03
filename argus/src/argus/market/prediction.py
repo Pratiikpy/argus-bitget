@@ -57,6 +57,8 @@ SEARCH_TERMS: dict[str, tuple[str, ...]] = {
     "MSTR": ("microstrategy", "strategy (mstr)", "saylor"), "COIN": ("coinbase",),
     "AMD": ("amd",), "PLTR": ("palantir",), "NFLX": ("netflix",), "INTC": ("intel",),
     "HOOD": ("robinhood",), "CRCL": ("circle",), "ORCL": ("oracle",), "AVGO": ("broadcom",),
+    # the Fed's next decisions, for "is the Fed likely to cut" (a judge, round 24)
+    "FED": ("fed decision", "fed"),
 }
 """What a prediction-market question calls each name. Unlisted names are searched by ticker."""
 

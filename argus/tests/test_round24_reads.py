@@ -214,3 +214,28 @@ class TestRound24Remainder:
         fits = server._hourly_fit(["MSTRUSDT", "AAPLUSDT"], "BTCUSDT")
         assert fits["MSTRUSDT"][0] > 0.99 and abs(fits["MSTRUSDT"][1] - 1.0) < 1e-9
         assert fits["AAPLUSDT"][0] < fits["MSTRUSDT"][0]
+
+    def test_a_hedge_claim_is_judged_on_the_selloff_days(self, monkeypatch: pytest.MonkeyPatch
+                                                         ) -> None:
+        from datetime import date, timedelta
+        from types import SimpleNamespace
+
+        from argus.lui import server
+        from argus.market import equity_history
+
+        start = date(2025, 10, 6)
+        days = [start + timedelta(days=i) for i in range(120)]
+        spy, coin = [100.0], [100.0]
+        for i in range(1, 120):
+            fall = i % 10 == 0
+            spy.append(spy[-1] * (0.98 if fall else 1.002))
+            coin.append(coin[-1] * (0.95 if fall else 1.003))
+
+        def fake(ticker: str) -> list[object]:
+            series = spy if ticker == "SPY" else coin
+            return [SimpleNamespace(day=d, close=c) for d, c in zip(days, series, strict=True)]
+
+        monkeypatch.setattr(equity_history, "daily", fake)
+        said = server._hedge_claim_lines("bitcoin")
+        assert said is not None and said[0].startswith("Bottom line: Contradicted")
+        assert server._HEDGE_CLAIM.search("Is gold a safe haven for stock market crashes?")

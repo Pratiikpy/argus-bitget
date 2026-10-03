@@ -1990,11 +1990,24 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                                  f"borrowing costs.")
             book_beta = 0.0
             driven: dict[str, float] = {}
+            loose: list[str] = []
             for symbol, weight in request.book.items():
                 symbol_beta = beta(columns.get(symbol, []), columns[shocked])
                 if symbol_beta is not None:
                     book_beta += weight * symbol_beta
                     driven[symbol] = weight * symbol_beta
+                fit = (correlation(columns.get(symbol, []), columns[shocked])
+                       if symbol != shocked else None)
+                if fit is not None and fit * fit < 0.5:
+                    loose.append(f"{_t(symbol)} ({fit * fit:.0%})")
+            if loose:
+                # "60% SPY, 40% gold, stocks fall 20%" moved gold 21% through a beta that
+                # explains under a third of its moves, with no word of it (a first-time user,
+                # round 24): a figure carried by a loose fit is said to be one
+                lines.append(f"Read the beta-driven figure loosely for {', '.join(loose)}: "
+                             f"{shocked_name} explains only that share of its moves over this "
+                             f"window (R²), so in a real {shocked_name} fall it could move "
+                             f"much less or much more than shown.")
             # A hedged book's beta near zero turns each holding's share of the loss into a
             # ratio over almost nothing: "1017% of its loss" (a hostile review, round 21)
             if len(driven) > 1 and book_beta >= 0.2:
