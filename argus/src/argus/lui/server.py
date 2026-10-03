@@ -9090,7 +9090,20 @@ def _status() -> dict[str, Any]:
         "stale": None if newest is None else newest < expected,
         "last_expected_cycle_at": expected.isoformat(),
         "next_cycle_at": _next_scheduled_cycle(now).isoformat(),
+        "model_reader": _model_reader_state(),
     }
+
+
+def _model_reader_state() -> dict[str, Any]:
+    """Whether this instance's language-model reader is paused by its breaker (`lui/router.py`),
+    so a spent or failing key shows on /status instead of only in slower, plainer answers."""
+    client = _ROUTER if _ROUTER_BUILT else None
+    if client is None:
+        return {"configured": False, "paused": False, "reason": "",
+                "since": None, "seconds_left": 0,
+                "note": "not built on this instance yet" if not _ROUTER_BUILT else "no key"}
+    state = getattr(client, "state", None)
+    return {"configured": True, **(state() if callable(state) else {"paused": False})}
 
 
 CSP = ("default-src 'self'; script-src 'unsafe-inline'; "
@@ -9462,8 +9475,17 @@ class Handler(BaseHTTPRequestHandler):
                 checks, checked_at = live_checks()
                 from argus.lui.status_history import read as read_history
 
+                reader = _model_reader_state()
+                reader_line = (
+                    (f"paused since {reader.get('since')} after: {reader.get('reason')} — about "
+                     f"{reader.get('seconds_left')} s left; the console's own readers answer "
+                     f"meanwhile, with every figure still computed from live data")
+                    if reader.get("paused") else
+                    "not paused on this server instance" if reader.get("configured") else
+                    "no model on this instance yet; the console's own readers answer")
                 page = render_status(_status(), checks, checked_at,
-                                     sweep_lines(_ledger_path().parent), FAVICON,
+                                     [("Language model reader (Qwen)", reader_line),
+                                      *sweep_lines(_ledger_path().parent)], FAVICON,
                                      read_history(_ledger_path().parent / "status_history.jsonl"))
                 self._send(page.encode(), "text/html; charset=utf-8")
                 return

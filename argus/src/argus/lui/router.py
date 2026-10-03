@@ -53,8 +53,10 @@ and what it extracted — so a reader can audit the routing separately from the 
 from __future__ import annotations
 
 import json
+import re
+from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any, Protocol
 
 from argus.lui.question import (
@@ -361,8 +363,72 @@ def route(
     return routed, Routing(True, True, intent, confidence, why)
 
 
+CONSOLE_TIMEOUT_S = 45.0
+"""The console's own ceiling on one model call. The client's default, 600 s with three attempts on
+a 429 or a 5xx, is sized for the desk's long reasoning calls; a spent hackathon balance answered
+that way would hold a judge's question for half an hour (judging-week readiness, 2026-10-03)."""
+CONSOLE_RETRIES = 2
+PAUSE_S = 600.0
+"""How long the model is left alone after a failure that will not mend on the next call."""
+_LASTING = re.compile(r"HTTP (?:401|402|403|429|5\d\d)\b|insufficient|quota|balance|exceed|"
+                      r"failed after|transport|timed out|budget", re.I)
+
+
+class Breaker:
+    """The console's model client behind a circuit breaker.
+
+    A failure that will not mend on the next call — a spent balance (402, "insufficient", "quota"),
+    a revoked key (401/403), rate limiting (429), the gateway down (5xx), the transport failing, the
+    per-instance token budget spent — pauses the model for :data:`PAUSE_S`, and every call in the
+    pause fails at once with the same :class:`~argus.llm.qwen.QwenError` the readers already fall
+    back on. Each question then costs no wait at all, where before it paid the client's full retry
+    ladder again. Anything else (a malformed reply) passes through unpaused. :meth:`state` is what
+    /status shows, so the pause is visible rather than silent."""
+
+    def __init__(self, inner: Any, *, pause_s: float = PAUSE_S,
+                 clock: Callable[[], float] | None = None) -> None:
+        import time
+
+        self._inner = inner
+        self._pause_s = pause_s
+        self._clock = clock or time.monotonic
+        self._until = 0.0
+        self._reason = ""
+        self._since: str | None = None
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._inner, name)
+
+    def state(self) -> dict[str, Any]:
+        paused = self._clock() < self._until
+        return {"paused": paused, "reason": self._reason if paused else "",
+                "since": self._since if paused else None,
+                "seconds_left": round(self._until - self._clock()) if paused else 0}
+
+    def _guarded(self, method: str, *args: Any, **kwargs: Any) -> Any:
+        from argus.llm.qwen import QwenError
+
+        if self._clock() < self._until:
+            raise QwenError(f"model paused after: {self._reason}")
+        try:
+            return getattr(self._inner, method)(*args, **kwargs)
+        except QwenError as exc:
+            said = str(exc)
+            if _LASTING.search(said):
+                self._until = self._clock() + self._pause_s
+                self._reason = said[:120]
+                self._since = datetime.now(UTC).isoformat(timespec="seconds")
+            raise
+
+    def complete(self, *args: Any, **kwargs: Any) -> Any:
+        return self._guarded("complete", *args, **kwargs)
+
+    def complete_json(self, *args: Any, **kwargs: Any) -> Any:
+        return self._guarded("complete_json", *args, **kwargs)
+
+
 def build_router(budget_tokens: int = 20_000) -> Router | None:
-    """A Qwen client for routing, or ``None`` when one cannot be made.
+    """A Qwen client for routing, behind a :class:`Breaker`, or ``None`` when one cannot be made.
 
     Never raises. The console is expected to run without credentials — that is the state a judge is
     most likely to meet if the hackathon key is spent — and a routing layer that could break the
@@ -371,7 +437,8 @@ def build_router(budget_tokens: int = 20_000) -> Router | None:
     try:
         from argus.llm.provider import seat
 
-        return seat(budget_limit=budget_tokens)
+        return Breaker(seat(budget_limit=budget_tokens, timeout=CONSOLE_TIMEOUT_S,
+                            max_retries=CONSOLE_RETRIES))
     except Exception:  # missing key, bad URL, anything
         return None
 

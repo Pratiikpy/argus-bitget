@@ -1,0 +1,69 @@
+﻿=== ARGUS paper cycle 2026-10-03_2300 ===
+disk_free_gb=14.5
+sampling MSTRUSDT for 90s (weekend)...
+
+MARKOUT ΓÇö MSTRUSDT, 90s of weekend, 68 book sample(s), 40 print(s), 5% flagged RPI
+
+   horizon  prints    median      mean     worst
+        5s      40    -0.000    +0.077    -1.846
+       15s      30    -0.615    -0.431    -3.076
+       30s      30    +0.615    +0.236    -3.691
+       60s      14    +3.076    +2.131    -3.998
+
+  Over 30s the passive side of 30 print(s) gained a median +0.62bps on MSTRUSDT (weekend). No measurable adverse selection in this window ΓÇö which is a statement about 90 seconds, not about the instrument
+
+written to argus\data\markout.json
+markout_exit=0
+EXECUTABLE COST ΓÇö bps. 'quoted' is the full bid-ask spread; the size columns are
+slippage against mid, taking the ask (a size inside the touch reads half 'quoted').
+
+symbol         quoted      $1000      $5000     $25000    $100000
+-----------------------------------------------------------------
+NVDAUSDT         0.43       0.21       0.73       2.09       3.40
+TSLAUSDT         1.08       0.85       1.45       2.22       3.84
+AAPLUSDT         0.30       1.10       1.95       4.37      11.36
+MSFTUSDT         0.19       0.48       1.22       2.83       3.83
+METAUSDT         0.41       1.44       2.67       4.05      11.76
+GOOGLUSDT        2.33       1.16       1.48       1.89       3.71
+AMZNUSDT         1.59       1.43       2.19       3.36       4.77
+COINUSDT         1.63       0.99       2.60       3.75          ΓÇö
+MSTRUSDT         0.62       0.31       1.10       3.31       8.43
+QQQUSDT          0.13       0.14       0.44       1.81       3.11
+TQQQUSDT         1.23       1.38       3.43       7.20          ΓÇö
+SQQQUSDT         6.05       4.05       6.32      23.02      58.89
+
+12 book(s) written to argus\data\depth.json
+depth_exit=0
+recorded 12 snapshot(s) to argus\data\book_tape.jsonl
+
+  1044 snapshots over 462.616h: a near-touch level holds a median 3.0 contracts. **Change is reported per horizon, not pooled** ΓÇö a level moves a very different share of itself over 30 seconds than over an hour, and one median over both is a number about the sampling schedule rather than about the book. The shortest horizon with at least 100 observations is `under_30s`, where a level moves a median 24.0% of itself ΓÇö that is the figure the simulator should take, being nearest the per-event timescale it models. The attribution rule ΓÇö which side of a resting order a decrease came from ΓÇö is not in this data and cannot be, so it stays a swept assumption rather than a measurement.
+
+written to argus\data\book_calibration.json
+bookcalib_exit=0
+  NVDAUSDT: extended=14.1 overnight=10.8 rth=31.4 weekend=4.5 | reopen=51.5 (1.6x rth, n=64)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 4.5bps per bar against a 31.4bps regular-hours bar; no reduction, and this layer may not size up
+  TSLAUSDT: extended=14.5 overnight=11.6 rth=36.6 weekend=5.5 | reopen=76.9 (2.1x rth, n=64)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 5.5bps per bar against a 36.6bps regular-hours bar; no reduction, and this layer may not size up
+  AAPLUSDT: extended=9.5 overnight=7.0 rth=22.5 weekend=4.8 | reopen=39.9 (1.8x rth, n=64)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 4.8bps per bar against a 22.5bps regular-hours bar; no reduction, and this layer may not size up
+  MSFTUSDT: extended=12.5 overnight=8.7 rth=25.7 weekend=5.0 | reopen=39.3 (1.5x rth, n=64)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 5.0bps per bar against a 25.7bps regular-hours bar; no reduction, and this layer may not size up
+  METAUSDT: extended=15.8 overnight=9.6 rth=35.6 weekend=6.2 | reopen=61.8 (1.7x rth, n=64)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 6.2bps per bar against a 35.6bps regular-hours bar; no reduction, and this layer may not size up
+  GOOGLUSDT: extended=13.5 overnight=8.4 rth=23.7 weekend=5.6 | reopen=44.6 (1.9x rth, n=64)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 5.6bps per bar against a 23.7bps regular-hours bar; no reduction, and this layer may not size up
+  AMZNUSDT: extended=12.0 overnight=7.1 rth=23.2 weekend=4.8 | reopen=38.3 (1.7x rth, n=64)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 4.8bps per bar against a 23.2bps regular-hours bar; no reduction, and this layer may not size up
+  COINUSDT: extended=27.1 overnight=19.2 rth=60.5 weekend=13.1 | reopen=95.4 (1.6x rth, n=64)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 13.1bps per bar against a 60.5bps regular-hours bar; no reduction, and this layer may not size up
+  MSTRUSDT: extended=35.6 overnight=29.0 rth=59.8 weekend=16.7 | reopen=106.6 (1.8x rth, n=64)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 16.7bps per bar against a 59.8bps regular-hours bar; no reduction, and this layer may not size up
+  QQQUSDT: extended=8.8 overnight=9.0 rth=14.0 weekend=3.5 | reopen=26.1 (1.9x rth, n=64)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 3.5bps per bar against a 14.0bps regular-hours bar; no reduction, and this layer may not size up
+  TQQQUSDT: extended=25.6 overnight=27.5 rth=41.6 weekend=8.5 | reopen=76.0 (1.8x rth, n=64)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 8.5bps per bar against a 41.6bps regular-hours bar; no reduction, and this layer may not size up
+  SQQQUSDT: extended=25.7 overnight=28.6 rth=42.5 weekend=8.0 | reopen=77.6 (1.8x rth, n=64)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 8.0bps per bar against a 42.5bps regular-hours bar; no reduction, and this layer may not size up
+
+12 profile(s) written to argus\data\session_risk.json
+session_risk_exit=0

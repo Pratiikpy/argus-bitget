@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T15:32:28.241814+00:00",
+  "generated_at": "2026-10-03T17:31:50.795283+00:00",
   "window_days": 90,
   "measurements": [
     {
@@ -8,7 +8,7 @@
         "extended": 14.0791,
         "overnight": 10.7776,
         "rth": 31.4434,
-        "weekend": 4.4838
+        "weekend": 4.4617
       },
       "phase_counts": {
         "extended": 640,
@@ -20,7 +20,7 @@
       "reopen_bps": 51.5409,
       "reopens": 64,
       "reopen_multiple": 1.6392,
-      "measured_at": "2026-10-03T15:32:28.241814+00:00",
+      "measured_at": "2026-10-03T17:31:50.795283+00:00",
       "window_days": 90
     },
     {
@@ -29,7 +29,7 @@
         "extended": 14.4894,
         "overnight": 11.565,
         "rth": 36.5679,
-        "weekend": 5.5776
+        "weekend": 5.5191
       },
       "phase_counts": {
         "extended": 640,
@@ -41,7 +41,7 @@
       "reopen_bps": 76.8821,
       "reopens": 64,
       "reopen_multiple": 2.1024,
-      "measured_at": "2026-10-03T15:32:28.241814+00:00",
+      "measured_at": "2026-10-03T17:31:50.795283+00:00",
       "window_days": 90
     },
     {
@@ -50,7 +50,7 @@
         "extended": 9.5149,
         "overnight": 6.9514,
         "rth": 22.5201,
-        "weekend": 4.7982
+        "weekend": 4.7688
       },
       "phase_counts": {
         "extended": 640,
@@ -62,7 +62,7 @@
       "reopen_bps": 39.8688,
       "reopens": 64,
       "reopen_multiple": 1.7704,
-      "measured_at": "2026-10-03T15:32:28.241814+00:00",
+      "measured_at": "2026-10-03T17:31:50.795283+00:00",
       "window_days": 90
     },
     {
@@ -71,7 +71,7 @@
         "extended": 12.452,
         "overnight": 8.7345,
         "rth": 25.7249,
-        "weekend": 4.9931
+        "weekend": 4.9916
       },
       "phase_counts": {
         "extended": 640,
@@ -83,7 +83,7 @@
       "reopen_bps": 39.3166,
       "reopens": 64,
       "reopen_multiple": 1.5283,
-      "measured_at": "2026-10-03T15:32:28.241814+00:00",
+      "measured_at": "2026-10-03T17:31:50.795283+00:00",
       "window_days": 90
     },
     {
@@ -104,7 +104,7 @@
       "reopen_bps": 61.783,
       "reopens": 64,
       "reopen_multiple": 1.7355,
-      "measured_at": "2026-10-03T15:32:28.241814+00:00",
+      "measured_at": "2026-10-03T17:31:50.795283+00:00",
       "window_days": 90
     },
     {
@@ -113,7 +113,7 @@
         "extended": 13.4849,
         "overnight": 8.4407,
         "rth": 23.7225,
-        "weekend": 5.5505
+        "weekend": 5.5745
       },
       "phase_counts": {
         "extended": 640,
@@ -125,7 +125,7 @@
       "reopen_bps": 44.5635,
       "reopens": 64,
       "reopen_multiple": 1.8785,
-      "measured_at": "2026-10-03T15:32:28.241814+00:00",
+      "measured_at": "2026-10-03T17:31:50.795283+00:00",
       "window_days": 90
     },
     {
@@ -146,7 +146,7 @@
       "reopen_bps": 38.2843,
       "reopens": 64,
       "reopen_multiple": 1.6517,
-      "measured_at": "2026-10-03T15:32:28.241814+00:00",
+      "measured_at": "2026-10-03T17:31:50.795283+00:00",
       "window_days": 90
     },
     {
@@ -167,7 +167,7 @@
       "reopen_bps": 95.3965,
       "reopens": 64,
       "reopen_multiple": 1.5761,
-      "measured_at": "2026-10-03T15:32:28.241814+00:00",
+      "measured_at": "2026-10-03T17:31:50.795283+00:00",
       "window_days": 90
     },
     {
@@ -176,7 +176,7 @@
         "extended": 35.641,
         "overnight": 28.9726,
         "rth": 59.8298,
-        "weekend": 16.7032
+        "weekend": 16.6698
       },
       "phase_counts": {
         "extended": 640,
@@ -188,7 +188,7 @@
       "reopen_bps": 106.5882,
       "reopens": 64,
       "reopen_multiple": 1.7815,
-      "measured_at": "2026-10-03T15:32:28.241814+00:00",
+      "measured_at": "2026-10-03T17:31:50.795283+00:00",
       "window_days": 90
     },
     {
@@ -197,7 +197,7 @@
         "extended": 8.845,
         "overnight": 9.0076,
         "rth": 13.9806,
-        "weekend": 3.4682
+        "weekend": 3.4513
       },
       "phase_counts": {
         "extended": 640,
@@ -209,7 +209,7 @@
       "reopen_bps": 26.1054,
       "reopens": 64,
       "reopen_multiple": 1.8673,
-      "measured_at": "2026-10-03T15:32:28.241814+00:00",
+      "measured_at": "2026-10-03T17:31:50.795283+00:00",
       "window_days": 90
     },
     {
@@ -218,7 +218,7 @@
         "extended": 25.6412,
         "overnight": 27.4926,
         "rth": 41.6381,
-        "weekend": 8.4776
+        "weekend": 8.5488
       },
       "phase_counts": {
         "extended": 640,
@@ -230,7 +230,7 @@
       "reopen_bps": 75.9757,
       "reopens": 64,
       "reopen_multiple": 1.8247,
-      "measured_at": "2026-10-03T15:32:28.241814+00:00",
+      "measured_at": "2026-10-03T17:31:50.795283+00:00",
       "window_days": 90
     },
     {
@@ -251,7 +251,7 @@
       "reopen_bps": 77.6259,
       "reopens": 64,
       "reopen_multiple": 1.8251,
-      "measured_at": "2026-10-03T15:32:28.241814+00:00",
+      "measured_at": "2026-10-03T17:31:50.795283+00:00",
       "window_days": 90
     }
   ]
