@@ -1864,6 +1864,7 @@ def priced_book(text: str) -> PricedBook | None:
 
 
 def _price_book(text: str) -> PricedBook | None:
+    text = name_first_book(text)
     # The index as it is written in a sentence: "$5k in an S&P fund" (a first-user audit,
     # 2026-09-30).
     text = re.sub(r"\bS\s*&\s*P(?:\s*500)?(?![\w&])", "SP500", text, flags=re.I)
@@ -3974,9 +3975,48 @@ def read_request(text: str) -> ResearchRequest | None:
     return None
 
 
+_NAME_FIRST = re.compile(
+    r"^(?P<side>long|short)?\s*(?P<name>\$?[A-Za-z][\w.&]{0,11})\s*[:=]?\s*(?P<q>-?\d[\d,]*(?:\.\d+)?)"
+    r"\s*(?P<pct>%)?\s*(?P<unit>shares?|coins?|units?|contracts?|tokens?)?\s*$", re.I)
+_CASH_NAMES = frozenset({"USDT", "USDC", "USD", "CASH", "DOLLARS", "DAI", "FDUSD"})
+
+
+def name_first_book(text: str) -> str:
+    """A book written one holding per line with the name first ("BTC 0.5 / ETH 4 / NVDA 30 shares",
+    "USDT 10000", "TSLA 40 / COIN 30 / BTC 20 / cash 10"), rewritten amount first, the way the
+    readers below read it. The count was attached to the next line's name, so "BTC 0.5\nETH 4"
+    became 0.5 ETH and 4 SOL and BTC vanished (a judge, round 25). Weights are read when no
+    holding names a unit and the numbers add to about 100; cash names are cash. Text that is not
+    entirely in this form is returned unchanged."""
+    parts = [s.strip() for s in re.split(r"[\n/;]+|,(?=\s*[A-Za-z$])", text) if s.strip()]
+    if len(parts) < 1:
+        return text
+    found = [_NAME_FIRST.match(part) for part in parts]
+    if not all(found) or any((m.group("name").upper() in ("LONG", "SHORT")) for m in found if m):
+        return text
+    matches = [m for m in found if m is not None]
+    numbers = [float(m.group("q").replace(",", "")) for m in matches]
+    weights = (len(matches) >= 2 and not any(m.group("unit") for m in matches)
+               and 99.0 <= sum(abs(n) for n in numbers) <= 101.0) or any(m.group("pct")
+                                                                      for m in matches)
+    out = []
+    for m, n in zip(matches, numbers, strict=True):
+        name = m.group("name").lstrip("$").upper()
+        short = (m.group("side") or "").lower() == "short" or n < 0
+        size = f"{abs(n):g}"
+        if name in _CASH_NAMES:
+            out.append(f"{size}% cash" if weights else f"${size} cash")
+        elif weights:
+            out.append(f"{'-' if short else ''}{size}% {name}")
+        else:
+            out.append(f"{'short ' if short else ''}{size} {name}")
+    return ", ".join(out)
+
+
 def parse_book(text: str) -> dict[str, float]:
     """A saved book like "40% NVDA, 30% MSFT, 30% AAPL"; amounts ("long 2 NVDAUSDT", "$20k NVDA")
     priced at Bitget's last price (:func:`priced_book`); or bare names, read as equal weight."""
+    text = name_first_book(text)
     book: dict[str, float] = {}
     for _, symbol, weight in holding_pairs(text):
         book[symbol] = book.get(symbol, 0.0) + weight
@@ -4814,6 +4854,11 @@ def _plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, di
             multiple = float(raw.get("leverage")) if raw.get("leverage") else None
         except (TypeError, ValueError):
             multiple = None
+        if multiple is None:
+            # the multiple the trader wrote, when the model's reading left it out: "I'm long 3
+            # BTC at 20x" was assessed at the default 10x (a judge, round 26)
+            written = stated_multiple(text)
+            multiple = float(written.group(1)) if written else None
         side = "short" if str(raw.get("side") or "").lower() == "short" else "long"
         request = ResearchRequest(kind=kind, symbols=symbols[:1], leverage=multiple, side=side,
                                   parsed_by="model", notes=tuple(notes) if multiple else (

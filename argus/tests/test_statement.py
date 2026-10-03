@@ -115,3 +115,45 @@ def test_round25_reask_forms(text: str, total: str) -> None:
     priced = price_statement(text, price=no_live_price)
     assert priced is not None, text
     assert priced.lines[0].startswith(f"Bottom line: {total} in all"), priced.lines[0]
+
+
+@pytest.mark.parametrize(("text", "total"), [
+    # the clock times are times: 2 settlements are not a $1m fill
+    ("Long 100 AMD at 100. Sold 150 at 110. Mark 105.", "+$1,250.00"),
+    ("Short 100 AAPL at 150, covered 150 at 140, mark 145.", "+$1,250.00"),
+    ("AAPL 100 @150 now 160, MSFT -50 @300 now 290, NVDA 10 @ 500 now 450", "+$1,000.00"),
+    ("Long 100 AAPL at 150 mark 160, fees $12 total", "+$988.00"),
+    ("Long 2 ES at 5000, closed at 5010, commission $2.25 per contract per side", "+$991.00"),
+    ("Long 100 SAP at 200,50 mark 210,25", "+$975.00"),
+    ("Long 100 AAPL at $150 and 200 MSFT at $300; marks 160 and 290 respectively", "-$1,000.00"),
+    ("At 250 I shorted 100 TSLA; it's 240 now.", "+$1,000.00"),
+    ("Sold 100 AAPL at 170 that I bought at 150", "+$2,000.00"),
+    ("Long 100 AAPL at 150, it's up 10% since", "+$1,500.00"),
+    ("Bought 5 AAPL 200 calls at 3.20, now 1.10", "-$1,050.00"),
+    ("Sold 3 TSLA 250 puts at 5.00, now 7.50", "-$750.00"),
+    ("Bought 2 SPY 500/510 call spreads for 4.00, mark 6.50. P&L and max profit?", "+$500.00"),
+    ("Bought 100 AAPL at 10, bought 100 more at 20, sold 150 at 25, LIFO. Realised P&L?",
+     "+$1,250.00"),
+    ("Long 100 SAP at €200 mark €210, EURUSD 1.08. P&L in dollars?", "+$1,080.00"),
+    # 1,900 x 1.05 - 1,800 x 1.10
+    ("Long 10 SAP shares at 180 EUR, mark 190 EUR; EUR/USD 1.10 at entry and 1.05 now. P&L in "
+     "USD?", "+$15.00"),
+])
+def test_round26_hostile_forms(text: str, total: str) -> None:
+    priced = price_statement(text, price=lambda name: 333.0)
+    assert priced is not None, text
+    assert priced.lines[0].startswith(f"Bottom line: {total} in all"), priced.lines[0]
+
+
+def test_a_live_mark_far_from_the_traders_prices_is_not_used() -> None:
+    priced = price_statement("Bought 100 AAPL at 10, bought 100 more at 20, sold 150 at 25, "
+                             "FIFO. Realised and what's left?", price=lambda name: 333.0)
+    assert priced is not None and priced.lines[0].startswith("Bottom line: +$1,750.00 in all")
+    assert any(line.startswith("Still open and not priced") for line in priced.lines)
+
+
+def test_a_spread_quoted_at_its_net_has_its_limits() -> None:
+    priced = price_statement("Bought 2 SPY 500/510 call spreads for 4.00, mark 6.50")
+    assert priced is not None
+    assert "most it can make +$1,200.00, most it can lose -$800.00, breakeven 504" in \
+        priced.lines[1]

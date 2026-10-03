@@ -53,7 +53,11 @@ DCA_Q = re.compile(r"\bdca\b|dollar[\s-]cost\s+averag\w*|\baverag\w*\s+in(?:to)?
                    # "if I put $100 a week into bitcoin for a year" was priced as one $100 order
                    # (a first-time user, round 25)
                    r"\$\s?\d[\d,]*(?:\.\d+)?\s*(?:k\s+)?(?:a|per|every|each)\s+(?:week|month|"
-                   r"day)\b", re.I)
+                   r"day)\b|"
+                   # "did buying ETH every Monday in 2026 beat buying it all on Jan 1?" got the
+                   # year's return (a judge, round 26)
+                   r"\bbuy\w*\s+(?:\S+\s+){0,3}?(?:every|each)\s+(?:monday|tuesday|wednesday|"
+                   r"thursday|friday|saturday|sunday|week|month|day)\b", re.I)
 """A question about averaging into a position over time."""
 
 
@@ -98,6 +102,21 @@ def entry_date(text: str, today: date) -> date | None:
     m = re.search(r"\b(?:in|during|back\s+in|since)\s+(20\d\d|19\d\d)\b", low)
     if m:
         return date(int(m.group(1)), 1, 1)
+    # "every Friday this year ... a lump sum on 1 January" started a year back (a rephrased
+    # re-ask, round 26): this year is from 1 January, and a day named without a year is its
+    # latest past occurrence
+    if re.search(r"\b(?:this\s+year|so\s+far\s+this\s+year|ytd|year[\s-]to[\s-]date)\b", low):
+        return date(today.year, 1, 1)
+    m = re.search(r"\b(?:(?P<d>\d{1,2})(?:st|nd|rd|th)?\s+(?P<m>jan|feb|mar|apr|may|jun|jul|aug|"
+                  r"sep|oct|nov|dec)[a-z]*|(?P<m2>jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*"
+                  r"\.?\s+(?P<d2>\d{1,2})(?:st|nd|rd|th)?)\b(?!\s*,?\s*\d{4})", low)
+    if m:
+        try:
+            said = date(today.year, _MONTHS[m.group("m") or m.group("m2")],
+                        int(m.group("d") or m.group("d2")))
+        except ValueError:
+            return None
+        return said if said <= today else said.replace(year=today.year - 1)
     return None
 
 
@@ -219,9 +238,18 @@ def dca(text: str, symbol: str, *, today: date, daily: Callable[[str], Any] | No
     periodic = re.search(r"\$\s?(?P<a>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k)?\s+(?:a|per|every|each)\s+"
                          r"(?P<f>week|month|day)\b", text, re.I)
     every = periodic.group("f").lower() if periodic is not None else "month"
+    on_day = re.search(r"\b(?:every|each)\s+(?P<d>monday|tuesday|wednesday|thursday|friday|"
+                       r"saturday|sunday)\b", text, re.I)
+    weekday = (("monday", "tuesday", "wednesday", "thursday", "friday", "saturday",
+                "sunday").index(on_day.group("d").lower()) if on_day is not None else None)
+    if weekday is not None or (periodic is None and re.search(
+            r"\b(?:every|each)\s+week\b", text, re.I)):
+        every = "week"
     # the first trading day of each calendar month (or ISO week, or day) in the window
     buys, seen = [], set()
     for d in window:
+        if weekday is not None and d.day.weekday() != weekday:
+            continue
         key = ((d.day.year, d.day.month) if every == "month" else
                tuple(d.day.isocalendar()[:2]) if every == "week" else (d.day.toordinal(),))
         if key not in seen:
@@ -257,14 +285,19 @@ def dca(text: str, symbol: str, *, today: date, daily: Callable[[str], Any] | No
          f"{window[0].day:%d %b %Y} would be ${end_lump:,.0f} — {ahead} came out ahead."
          if periodic is not None else
          f"Bottom line: over {window[0].day:%b %Y} to {last.day:%b %Y}, ${stake:,.0f} put into "
-         f"{name} in {len(buys)} equal monthly buys would now be ${end_dca:,.0f}, against "
+         f"{name} in {len(buys)} equal "
+         f"{'buys every ' + on_day.group('d').title() if on_day is not None else every + 'ly buys'}"
+         f" would now be ${end_dca:,.0f}, against "
          f"${end_lump:,.0f} bought all at once on {window[0].day:%d %b %Y} — {ahead} came out "
          f"ahead."),
         f"The ride: the averaged account's worst fall from its peak was {abs(worst_dca):.1%}, the "
         f"lump sum's {abs(worst_lump):.1%} — averaging's case is the smaller fall while it builds, "
         f"not a higher end value.",
-        (f"The buys were ${part:,.0f} a month; the same ${stake:,.0f} spread weekly over a year "
-         f"is about ${stake / 52:,.0f} a week." if periodic is None else
+        (f"The buys were ${part:,.0f} a {every}"
+         + (f", at each {on_day.group('d').title()}'s daily close" if on_day is not None else "")
+         + (f"; the same ${stake:,.0f} spread weekly over a year is about ${stake / 52:,.0f} a "
+            f"week." if every == "month" else f"; ${stake:,.0f} in all, fees left out.")
+         if periodic is None else
          f"Each buy was ${part:,.0f} at that {every}'s first daily close; fees left out."),
         "The choice is yours and depends on what you would do in a fall; this is what one window "
         "of real closes did, not a forecast. Name another start (\"since 2022\") to see a "

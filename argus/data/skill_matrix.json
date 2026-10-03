@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T07:09:26.497703+00:00",
+  "generated_at": "2026-10-03T10:08:59.971124+00:00",
   "rounds": 1,
   "servers": {
     "bitget-signal": {
@@ -14,7 +14,7 @@
     "bitget-mcp-server": {
       "endpoint": "https://agent.bitget.com/mcp",
       "catalog_entries": 67,
-      "http_requests": 104,
+      "http_requests": 76,
       "requested": "2025-11-25",
       "negotiated": "2025-11-25",
       "server": "bitget-mcp-server 4.0.5",
@@ -30,16 +30,16 @@
     "upstream_5xx"
   ],
   "totals": {
-    "answered": 53,
-    "empty": 17,
-    "domain_error": 14,
+    "answered": 2,
+    "empty": 11,
+    "domain_error": 4,
     "protocol_error": 0,
     "transport_error": 2,
-    "upstream_5xx": 0,
+    "upstream_5xx": 67,
     "calls": 86,
     "tools": 86,
-    "tools_answering": 53,
-    "answer_rate": 0.6163
+    "tools_answering": 2,
+    "answer_rate": 0.0233
   },
   "by_server": {
     "bitget-signal": {
@@ -55,78 +55,78 @@
       "answer_rate": 0.1053
     },
     "bitget-mcp-server": {
-      "answered": 51,
-      "empty": 6,
-      "domain_error": 10,
+      "answered": 0,
+      "empty": 0,
+      "domain_error": 0,
       "protocol_error": 0,
       "transport_error": 0,
-      "upstream_5xx": 0,
+      "upstream_5xx": 67,
       "calls": 67,
       "tools": 67,
-      "tools_answering": 51,
-      "answer_rate": 0.7612
+      "tools_answering": 0,
+      "answer_rate": 0.0
     }
   },
   "by_skill": {
     "bitget-mcp-server/crypto": {
-      "answered": 26,
-      "empty": 3,
-      "domain_error": 10,
+      "answered": 0,
+      "empty": 0,
+      "domain_error": 0,
       "protocol_error": 0,
       "transport_error": 0,
-      "upstream_5xx": 0,
+      "upstream_5xx": 39,
       "calls": 39,
       "tools": 39,
-      "tools_answering": 26,
-      "answer_rate": 0.6667
+      "tools_answering": 0,
+      "answer_rate": 0.0
     },
     "bitget-mcp-server/equity": {
-      "answered": 21,
-      "empty": 1,
+      "answered": 0,
+      "empty": 0,
       "domain_error": 0,
       "protocol_error": 0,
       "transport_error": 0,
-      "upstream_5xx": 0,
+      "upstream_5xx": 22,
       "calls": 22,
       "tools": 22,
-      "tools_answering": 21,
-      "answer_rate": 0.9545
+      "tools_answering": 0,
+      "answer_rate": 0.0
     },
     "bitget-mcp-server/etf": {
-      "answered": 2,
-      "empty": 1,
+      "answered": 0,
+      "empty": 0,
       "domain_error": 0,
       "protocol_error": 0,
       "transport_error": 0,
-      "upstream_5xx": 0,
+      "upstream_5xx": 3,
       "calls": 3,
       "tools": 3,
-      "tools_answering": 2,
-      "answer_rate": 0.6667
+      "tools_answering": 0,
+      "answer_rate": 0.0
     },
     "bitget-mcp-server/news": {
       "answered": 0,
-      "empty": 1,
+      "empty": 0,
       "domain_error": 0,
       "protocol_error": 0,
       "transport_error": 0,
-      "upstream_5xx": 0,
+      "upstream_5xx": 1,
       "calls": 1,
       "tools": 1,
       "tools_answering": 0,
       "answer_rate": 0.0
     },
     "bitget-mcp-server/sentiment": {
-      "answered": 2,
+      "answered": 0,
       "empty": 0,
       "domain_error": 0,
       "protocol_error": 0,
       "transport_error": 0,
-      "upstream_5xx": 0,
+      "upstream_5xx": 2,
       "calls": 2,
       "tools": 2,
-      "tools_answering": 2,
-      "answer_rate": 1.0
+      "tools_answering": 0,
+      "answer_rate": 0.0
     },
     "macro-analyst": {
       "answered": 0,
@@ -202,43 +202,20 @@
     }
   },
   "failure_kinds": {
-    "domain": 11,
+    "upstream_5xx": 67,
     "tool_execution": 3,
-    "timeout": 2
+    "timeout": 2,
+    "domain": 1
   },
   "taxonomy_vs_legacy": {
-    "failures_typed": 16,
-    "failures_legacy_left_as_one_word": 10,
+    "failures_typed": 73,
+    "failures_legacy_left_as_one_word": 67,
     "disagreements": [
       {
         "tool": "backtest",
         "legacy": "empty",
         "typed": "domain_error",
         "kind": "domain"
-      },
-      {
-        "tool": "crypto_spot_ticker",
-        "legacy": "empty",
-        "typed": "answered",
-        "kind": ""
-      },
-      {
-        "tool": "crypto_spot_order_book",
-        "legacy": "empty",
-        "typed": "answered",
-        "kind": ""
-      },
-      {
-        "tool": "crypto_futures_ticker",
-        "legacy": "empty",
-        "typed": "answered",
-        "kind": ""
-      },
-      {
-        "tool": "crypto_futures_order_book",
-        "legacy": "empty",
-        "typed": "answered",
-        "kind": ""
       }
     ],
     "note": "Each row's legacy reading is the pre-2026-09-25 classifier applied to the same reply. 'failures_legacy_left_as_one_word' counts failures the old probes could only call 'error' or 'unavailable'; a disagreement is a row the old classifier put in a different answered/empty/failed bucket."
@@ -251,23 +228,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
-          "symbol": "BTC"
+          "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "11 item(s)",
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
         "seconds": 0.36,
-        "legacy": "ok"
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -275,21 +252,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "empty",
-            "kind": "",
-            "detail": "answered with no data",
-            "seconds": 0.34,
-            "legacy": "empty"
-          },
-          {
-            "args": {
-              "symbol": "BTC"
-            },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "11 item(s)",
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
             "seconds": 0.36,
-            "legacy": "ok"
+            "legacy": "error"
           }
         ]
       ]
@@ -301,23 +268,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
-          "symbol": "BTC"
+          "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "255 item(s)",
-        "seconds": 0.45,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.34,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -325,21 +292,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "empty",
-            "kind": "",
-            "detail": "answered with no data",
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
             "seconds": 0.34,
-            "legacy": "empty"
-          },
-          {
-            "args": {
-              "symbol": "BTC"
-            },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "255 item(s)",
-            "seconds": 0.45,
-            "legacy": "ok"
+            "legacy": "error"
           }
         ]
       ]
@@ -353,20 +310,20 @@
       "outcomes": {
         "answered": 0,
         "empty": 0,
-        "domain_error": 1,
+        "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
       "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "domain_error",
-        "kind": "domain",
-        "detail": "upstream answered 400",
-        "seconds": 0.34,
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.33,
         "legacy": "error"
       },
       "attempts": [
@@ -375,28 +332,10 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
-            "seconds": 0.34,
-            "legacy": "error"
-          },
-          {
-            "args": {
-              "symbol": "BTC"
-            },
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
-            "seconds": 0.38,
-            "legacy": "error"
-          },
-          {
-            "args": {},
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
-            "seconds": 0.36,
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.33,
             "legacy": "error"
           }
         ]
@@ -411,20 +350,20 @@
       "outcomes": {
         "answered": 0,
         "empty": 0,
-        "domain_error": 1,
+        "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
       "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "domain_error",
-        "kind": "domain",
-        "detail": "upstream answered 400",
-        "seconds": 0.36,
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.34,
         "legacy": "error"
       },
       "attempts": [
@@ -433,28 +372,10 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
-            "seconds": 0.36,
-            "legacy": "error"
-          },
-          {
-            "args": {
-              "symbol": "BTC"
-            },
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
-            "seconds": 0.36,
-            "legacy": "error"
-          },
-          {
-            "args": {},
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
-            "seconds": 0.36,
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.34,
             "legacy": "error"
           }
         ]
@@ -467,23 +388,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "542 item(s)",
-        "seconds": 0.72,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.34,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -491,11 +412,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "542 item(s)",
-            "seconds": 0.72,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.34,
+            "legacy": "error"
           }
         ]
       ]
@@ -507,23 +428,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "91 item(s)",
-        "seconds": 0.36,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.34,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -531,11 +452,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "91 item(s)",
-            "seconds": 0.36,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.34,
+            "legacy": "error"
           }
         ]
       ]
@@ -549,20 +470,20 @@
       "outcomes": {
         "answered": 0,
         "empty": 0,
-        "domain_error": 1,
+        "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
       "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "domain_error",
-        "kind": "domain",
-        "detail": "upstream answered 422",
-        "seconds": 0.67,
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.34,
         "legacy": "error"
       },
       "attempts": [
@@ -571,28 +492,10 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 422",
-            "seconds": 0.67,
-            "legacy": "error"
-          },
-          {
-            "args": {
-              "symbol": "BTC"
-            },
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 422",
-            "seconds": 0.33,
-            "legacy": "error"
-          },
-          {
-            "args": {},
             "outcome": "upstream_5xx",
             "kind": "upstream_5xx",
-            "detail": "upstream answered 502",
-            "seconds": 0.31,
+            "detail": "upstream answered 503",
+            "seconds": 0.34,
             "legacy": "error"
           }
         ]
@@ -605,23 +508,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "30 item(s)",
-        "seconds": 0.36,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.38,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -629,11 +532,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "30 item(s)",
-            "seconds": 0.36,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.38,
+            "legacy": "error"
           }
         ]
       ]
@@ -645,23 +548,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "30 item(s)",
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
         "seconds": 0.36,
-        "legacy": "ok"
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -669,11 +572,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "30 item(s)",
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
             "seconds": 0.36,
-            "legacy": "ok"
+            "legacy": "error"
           }
         ]
       ]
@@ -685,23 +588,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "30 item(s)",
-        "seconds": 0.34,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.39,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -709,11 +612,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "30 item(s)",
-            "seconds": 0.34,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.39,
+            "legacy": "error"
           }
         ]
       ]
@@ -725,23 +628,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "1 item(s)",
-        "seconds": 0.44,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.36,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -749,11 +652,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "1 item(s)",
-            "seconds": 0.44,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.36,
+            "legacy": "error"
           }
         ]
       ]
@@ -765,23 +668,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "1 item(s)",
-        "seconds": 1.59,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.38,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -789,11 +692,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "1 item(s)",
-            "seconds": 1.59,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.38,
+            "legacy": "error"
           }
         ]
       ]
@@ -805,23 +708,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "30 item(s)",
-        "seconds": 0.52,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.41,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -829,11 +732,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "30 item(s)",
-            "seconds": 0.52,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.41,
+            "legacy": "error"
           }
         ]
       ]
@@ -845,23 +748,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "4 item(s)",
-        "seconds": 0.41,
-        "legacy": "empty"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.36,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -869,11 +772,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "4 item(s)",
-            "seconds": 0.41,
-            "legacy": "empty"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.36,
+            "legacy": "error"
           }
         ]
       ]
@@ -887,20 +790,20 @@
       "outcomes": {
         "answered": 0,
         "empty": 0,
-        "domain_error": 1,
+        "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
       "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "domain_error",
-        "kind": "domain",
-        "detail": "upstream answered 400",
-        "seconds": 0.55,
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.33,
         "legacy": "error"
       },
       "attempts": [
@@ -909,20 +812,10 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
-            "seconds": 0.55,
-            "legacy": "error"
-          },
-          {
-            "args": {
-              "symbol": "BTC"
-            },
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
-            "seconds": 1.84,
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.33,
             "legacy": "error"
           }
         ]
@@ -935,23 +828,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "19 item(s)",
-        "seconds": 0.39,
-        "legacy": "empty"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -959,11 +852,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "19 item(s)",
-            "seconds": 0.39,
-            "legacy": "empty"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
           }
         ]
       ]
@@ -975,23 +868,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "100 item(s)",
-        "seconds": 0.39,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.36,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -999,11 +892,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "100 item(s)",
-            "seconds": 0.39,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.36,
+            "legacy": "error"
           }
         ]
       ]
@@ -1017,20 +910,20 @@
       "outcomes": {
         "answered": 0,
         "empty": 0,
-        "domain_error": 1,
+        "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
       "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "domain_error",
-        "kind": "domain",
-        "detail": "upstream answered 400",
-        "seconds": 0.67,
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.36,
         "legacy": "error"
       },
       "attempts": [
@@ -1039,28 +932,10 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
-            "seconds": 0.67,
-            "legacy": "error"
-          },
-          {
-            "args": {
-              "symbol": "BTC"
-            },
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
-            "seconds": 0.33,
-            "legacy": "error"
-          },
-          {
-            "args": {},
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
-            "seconds": 0.38,
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.36,
             "legacy": "error"
           }
         ]
@@ -1075,19 +950,19 @@
       "outcomes": {
         "answered": 0,
         "empty": 0,
-        "domain_error": 1,
+        "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
       "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "domain_error",
-        "kind": "domain",
-        "detail": "upstream answered 400",
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
         "seconds": 0.34,
         "legacy": "error"
       },
@@ -1097,28 +972,10 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
             "seconds": 0.34,
-            "legacy": "error"
-          },
-          {
-            "args": {
-              "symbol": "BTC"
-            },
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
-            "seconds": 0.33,
-            "legacy": "error"
-          },
-          {
-            "args": {},
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
-            "seconds": 0.36,
             "legacy": "error"
           }
         ]
@@ -1132,30 +989,30 @@
       "rounds": 1,
       "outcomes": {
         "answered": 0,
-        "empty": 1,
+        "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
       "answer_rate": 0.0,
       "latest": {
         "args": {},
-        "outcome": "empty",
-        "kind": "",
-        "detail": "answered with no data",
-        "seconds": 0.36,
-        "legacy": "empty"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.33,
+        "legacy": "error"
       },
       "attempts": [
         [
           {
             "args": {},
-            "outcome": "empty",
-            "kind": "",
-            "detail": "answered with no data",
-            "seconds": 0.36,
-            "legacy": "empty"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.33,
+            "legacy": "error"
           }
         ]
       ]
@@ -1167,23 +1024,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
-          "symbol": "BTC"
+          "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "20 item(s)",
-        "seconds": 0.45,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.36,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -1191,21 +1048,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "empty",
-            "kind": "",
-            "detail": "answered with no data",
-            "seconds": 0.34,
-            "legacy": "empty"
-          },
-          {
-            "args": {
-              "symbol": "BTC"
-            },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "20 item(s)",
-            "seconds": 0.45,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.36,
+            "legacy": "error"
           }
         ]
       ]
@@ -1217,23 +1064,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
-          "symbol": "BTC"
+          "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "100 item(s)",
-        "seconds": 0.61,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.33,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -1241,21 +1088,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "empty",
-            "kind": "",
-            "detail": "answered with no data",
-            "seconds": 0.39,
-            "legacy": "empty"
-          },
-          {
-            "args": {
-              "symbol": "BTC"
-            },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "100 item(s)",
-            "seconds": 0.61,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.33,
+            "legacy": "error"
           }
         ]
       ]
@@ -1267,23 +1104,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbols": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "324 item(s)",
-        "seconds": 1.53,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.36,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -1291,11 +1128,11 @@
             "args": {
               "symbols": "BTCUSDT"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "324 item(s)",
-            "seconds": 1.53,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.36,
+            "legacy": "error"
           }
         ]
       ]
@@ -1307,23 +1144,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
-          "symbol": "BTC"
+          "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "500 item(s)",
-        "seconds": 0.52,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.39,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -1331,21 +1168,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "empty",
-            "kind": "",
-            "detail": "answered with no data",
-            "seconds": 0.83,
-            "legacy": "empty"
-          },
-          {
-            "args": {
-              "symbol": "BTC"
-            },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "500 item(s)",
-            "seconds": 0.52,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.39,
+            "legacy": "error"
           }
         ]
       ]
@@ -1357,23 +1184,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
-          "symbol": "BTC"
+          "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "500 item(s)",
-        "seconds": 0.95,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.34,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -1381,21 +1208,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "empty",
-            "kind": "",
-            "detail": "answered with no data",
-            "seconds": 0.36,
-            "legacy": "empty"
-          },
-          {
-            "args": {
-              "symbol": "BTC"
-            },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "500 item(s)",
-            "seconds": 0.95,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.34,
+            "legacy": "error"
           }
         ]
       ]
@@ -1407,23 +1224,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
-          "symbol": "BTC"
+          "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "500 item(s)",
-        "seconds": 0.59,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.33,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -1431,21 +1248,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "empty",
-            "kind": "",
-            "detail": "answered with no data",
-            "seconds": 0.44,
-            "legacy": "empty"
-          },
-          {
-            "args": {
-              "symbol": "BTC"
-            },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "500 item(s)",
-            "seconds": 0.59,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.33,
+            "legacy": "error"
           }
         ]
       ]
@@ -1457,23 +1264,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "10 item(s)",
-        "seconds": 0.86,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.75,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -1481,11 +1288,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "10 item(s)",
-            "seconds": 0.86,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.75,
+            "legacy": "error"
           }
         ]
       ]
@@ -1497,23 +1304,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
-          "symbol": "BTC"
+          "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "500 item(s)",
-        "seconds": 0.89,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.36,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -1521,21 +1328,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "empty",
-            "kind": "",
-            "detail": "answered with no data",
-            "seconds": 0.39,
-            "legacy": "empty"
-          },
-          {
-            "args": {
-              "symbol": "BTC"
-            },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "500 item(s)",
-            "seconds": 0.89,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.36,
+            "legacy": "error"
           }
         ]
       ]
@@ -1548,22 +1345,22 @@
       "rounds": 1,
       "outcomes": {
         "answered": 0,
-        "empty": 1,
+        "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
       "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "empty",
-        "kind": "",
-        "detail": "answered with no data",
-        "seconds": 0.33,
-        "legacy": "empty"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.36,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -1571,21 +1368,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "empty",
-            "kind": "",
-            "detail": "answered with no data",
-            "seconds": 0.33,
-            "legacy": "empty"
-          },
-          {
-            "args": {
-              "symbol": "BTC"
-            },
-            "outcome": "empty",
-            "kind": "",
-            "detail": "answered with no data",
-            "seconds": 0.39,
-            "legacy": "empty"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.36,
+            "legacy": "error"
           }
         ]
       ]
@@ -1599,28 +1386,28 @@
       "outcomes": {
         "answered": 0,
         "empty": 0,
-        "domain_error": 1,
+        "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
       "answer_rate": 0.0,
       "latest": {
         "args": {},
-        "outcome": "domain_error",
-        "kind": "domain",
-        "detail": "upstream answered 400",
-        "seconds": 0.36,
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.38,
         "legacy": "error"
       },
       "attempts": [
         [
           {
             "args": {},
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
-            "seconds": 0.36,
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.38,
             "legacy": "error"
           }
         ]
@@ -1634,22 +1421,22 @@
       "rounds": 1,
       "outcomes": {
         "answered": 0,
-        "empty": 1,
+        "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
       "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "empty",
-        "kind": "",
-        "detail": "answered with no data",
-        "seconds": 0.36,
-        "legacy": "empty"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.33,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -1657,21 +1444,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "empty",
-            "kind": "",
-            "detail": "answered with no data",
-            "seconds": 0.36,
-            "legacy": "empty"
-          },
-          {
-            "args": {
-              "symbol": "BTC"
-            },
-            "outcome": "empty",
-            "kind": "",
-            "detail": "answered with no data",
-            "seconds": 0.34,
-            "legacy": "empty"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.33,
+            "legacy": "error"
           }
         ]
       ]
@@ -1683,23 +1460,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
-          "symbol": "BTC"
+          "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "500 item(s)",
-        "seconds": 0.66,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.38,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -1707,21 +1484,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "empty",
-            "kind": "",
-            "detail": "answered with no data",
-            "seconds": 0.36,
-            "legacy": "empty"
-          },
-          {
-            "args": {
-              "symbol": "BTC"
-            },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "500 item(s)",
-            "seconds": 0.66,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.38,
+            "legacy": "error"
           }
         ]
       ]
@@ -1735,20 +1502,20 @@
       "outcomes": {
         "answered": 0,
         "empty": 0,
-        "domain_error": 1,
+        "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
       "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "domain_error",
-        "kind": "domain",
-        "detail": "upstream answered 400",
-        "seconds": 0.36,
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
         "legacy": "error"
       },
       "attempts": [
@@ -1757,28 +1524,10 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
-            "seconds": 0.36,
-            "legacy": "error"
-          },
-          {
-            "args": {
-              "symbol": "BTC"
-            },
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
-            "seconds": 0.36,
-            "legacy": "error"
-          },
-          {
-            "args": {},
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
-            "seconds": 0.39,
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
             "legacy": "error"
           }
         ]
@@ -1793,19 +1542,19 @@
       "outcomes": {
         "answered": 0,
         "empty": 0,
-        "domain_error": 1,
+        "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
       "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "domain_error",
-        "kind": "domain",
-        "detail": "upstream answered 400",
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
         "seconds": 0.33,
         "legacy": "error"
       },
@@ -1815,28 +1564,10 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
             "seconds": 0.33,
-            "legacy": "error"
-          },
-          {
-            "args": {
-              "symbol": "BTC"
-            },
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
-            "seconds": 0.34,
-            "legacy": "error"
-          },
-          {
-            "args": {},
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
-            "seconds": 0.36,
             "legacy": "error"
           }
         ]
@@ -1849,23 +1580,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "91 item(s)",
-        "seconds": 0.55,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.36,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -1873,11 +1604,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "91 item(s)",
-            "seconds": 0.55,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.36,
+            "legacy": "error"
           }
         ]
       ]
@@ -1889,23 +1620,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "4 item(s)",
-        "seconds": 1.69,
-        "legacy": "empty"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.33,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -1913,11 +1644,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "4 item(s)",
-            "seconds": 1.69,
-            "legacy": "empty"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.33,
+            "legacy": "error"
           }
         ]
       ]
@@ -1931,19 +1662,19 @@
       "outcomes": {
         "answered": 0,
         "empty": 0,
-        "domain_error": 1,
+        "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
       "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "domain_error",
-        "kind": "domain",
-        "detail": "upstream answered 400",
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
         "seconds": 0.34,
         "legacy": "error"
       },
@@ -1953,20 +1684,10 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
             "seconds": 0.34,
-            "legacy": "error"
-          },
-          {
-            "args": {
-              "symbol": "BTC"
-            },
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 400",
-            "seconds": 0.33,
             "legacy": "error"
           }
         ]
@@ -1979,23 +1700,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "19 item(s)",
-        "seconds": 0.38,
-        "legacy": "empty"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.36,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2003,11 +1724,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "19 item(s)",
-            "seconds": 0.38,
-            "legacy": "empty"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.36,
+            "legacy": "error"
           }
         ]
       ]
@@ -2019,23 +1740,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "BTCUSDT"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "100 item(s)",
-        "seconds": 0.41,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.33,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2043,11 +1764,11 @@
             "args": {
               "symbol": "BTCUSDT"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "100 item(s)",
-            "seconds": 0.41,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.33,
+            "legacy": "error"
           }
         ]
       ]
@@ -2059,23 +1780,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "82 item(s)",
-        "seconds": 0.41,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.38,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2083,11 +1804,11 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "82 item(s)",
-            "seconds": 0.41,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.38,
+            "legacy": "error"
           }
         ]
       ]
@@ -2099,23 +1820,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "112 item(s)",
-        "seconds": 0.59,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2123,11 +1844,11 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "112 item(s)",
-            "seconds": 0.59,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
           }
         ]
       ]
@@ -2139,23 +1860,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "1172 item(s)",
-        "seconds": 0.8,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.34,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2163,11 +1884,11 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "1172 item(s)",
-            "seconds": 0.8,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.34,
+            "legacy": "error"
           }
         ]
       ]
@@ -2179,23 +1900,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "1172 item(s)",
-        "seconds": 0.81,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.33,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2203,11 +1924,11 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "1172 item(s)",
-            "seconds": 0.81,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.33,
+            "legacy": "error"
           }
         ]
       ]
@@ -2219,23 +1940,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "1 item(s)",
-        "seconds": 0.45,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.33,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2243,11 +1964,11 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "1 item(s)",
-            "seconds": 0.45,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.33,
+            "legacy": "error"
           }
         ]
       ]
@@ -2259,23 +1980,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "279 item(s)",
-        "seconds": 1.09,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.34,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2283,11 +2004,11 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "279 item(s)",
-            "seconds": 1.09,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.34,
+            "legacy": "error"
           }
         ]
       ]
@@ -2299,23 +2020,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "974 item(s)",
-        "seconds": 0.97,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.34,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2323,11 +2044,11 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "974 item(s)",
-            "seconds": 0.97,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.34,
+            "legacy": "error"
           }
         ]
       ]
@@ -2339,23 +2060,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "50 item(s)",
-        "seconds": 0.47,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.42,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2363,11 +2084,11 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "50 item(s)",
-            "seconds": 0.47,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.42,
+            "legacy": "error"
           }
         ]
       ]
@@ -2379,23 +2100,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "50 item(s)",
-        "seconds": 1.02,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.38,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2403,11 +2124,11 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "50 item(s)",
-            "seconds": 1.02,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.38,
+            "legacy": "error"
           }
         ]
       ]
@@ -2419,23 +2140,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "62 item(s)",
-        "seconds": 0.39,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.41,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2443,11 +2164,11 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "62 item(s)",
-            "seconds": 0.39,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.41,
+            "legacy": "error"
           }
         ]
       ]
@@ -2459,23 +2180,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "50 item(s)",
-        "seconds": 0.55,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.36,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2483,11 +2204,11 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "50 item(s)",
-            "seconds": 0.55,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.36,
+            "legacy": "error"
           }
         ]
       ]
@@ -2499,23 +2220,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "29 item(s)",
-        "seconds": 0.39,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.36,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2523,11 +2244,11 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "29 item(s)",
-            "seconds": 0.39,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.36,
+            "legacy": "error"
           }
         ]
       ]
@@ -2539,23 +2260,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "100 item(s)",
-        "seconds": 0.66,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.36,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2563,11 +2284,11 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "100 item(s)",
-            "seconds": 0.66,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.36,
+            "legacy": "error"
           }
         ]
       ]
@@ -2579,23 +2300,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "50 item(s)",
-        "seconds": 0.45,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.36,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2603,11 +2324,11 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "50 item(s)",
-            "seconds": 0.45,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.36,
+            "legacy": "error"
           }
         ]
       ]
@@ -2619,23 +2340,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "1 item(s)",
-        "seconds": 0.38,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.33,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2643,11 +2364,11 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "1 item(s)",
-            "seconds": 0.38,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.33,
+            "legacy": "error"
           }
         ]
       ]
@@ -2659,23 +2380,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "50 item(s)",
-        "seconds": 0.41,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.34,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2683,11 +2404,11 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "50 item(s)",
-            "seconds": 0.41,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.34,
+            "legacy": "error"
           }
         ]
       ]
@@ -2699,23 +2420,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "38 item(s)",
-        "seconds": 0.5,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.81,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2723,11 +2444,11 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "38 item(s)",
-            "seconds": 0.5,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.81,
+            "legacy": "error"
           }
         ]
       ]
@@ -2739,23 +2460,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "100 item(s)",
-        "seconds": 0.55,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.34,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2763,11 +2484,11 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "100 item(s)",
-            "seconds": 0.55,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.34,
+            "legacy": "error"
           }
         ]
       ]
@@ -2779,23 +2500,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "52 item(s)",
-        "seconds": 0.56,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.38,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2803,11 +2524,11 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "52 item(s)",
-            "seconds": 0.56,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.38,
+            "legacy": "error"
           }
         ]
       ]
@@ -2820,22 +2541,22 @@
       "rounds": 1,
       "outcomes": {
         "answered": 0,
-        "empty": 1,
+        "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
       "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "empty",
-        "kind": "",
-        "detail": "answered with no data",
-        "seconds": 0.42,
-        "legacy": "empty"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.81,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2843,18 +2564,10 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "empty",
-            "kind": "",
-            "detail": "answered with no data",
-            "seconds": 0.42,
-            "legacy": "empty"
-          },
-          {
-            "args": {},
-            "outcome": "domain_error",
-            "kind": "domain",
-            "detail": "upstream answered 422",
-            "seconds": 0.33,
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.81,
             "legacy": "error"
           }
         ]
@@ -2867,23 +2580,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "1 item(s)",
-        "seconds": 0.38,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.36,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2891,11 +2604,11 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "1 item(s)",
-            "seconds": 0.38,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.36,
+            "legacy": "error"
           }
         ]
       ]
@@ -2907,23 +2620,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "NVDA"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "1 item(s)",
-        "seconds": 0.31,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.36,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2931,11 +2644,11 @@
             "args": {
               "symbol": "NVDA"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "1 item(s)",
-            "seconds": 0.31,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.36,
+            "legacy": "error"
           }
         ]
       ]
@@ -2948,22 +2661,22 @@
       "rounds": 1,
       "outcomes": {
         "answered": 0,
-        "empty": 1,
+        "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
       "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "QQQ"
         },
-        "outcome": "empty",
-        "kind": "",
-        "detail": "answered with no data",
-        "seconds": 0.36,
-        "legacy": "empty"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.34,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -2971,11 +2684,11 @@
             "args": {
               "symbol": "QQQ"
             },
-            "outcome": "empty",
-            "kind": "",
-            "detail": "answered with no data",
-            "seconds": 0.36,
-            "legacy": "empty"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.34,
+            "legacy": "error"
           }
         ]
       ]
@@ -2987,23 +2700,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "QQQ"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "1 item(s)",
-        "seconds": 0.44,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.38,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -3011,11 +2724,11 @@
             "args": {
               "symbol": "QQQ"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "1 item(s)",
-            "seconds": 0.44,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.38,
+            "legacy": "error"
           }
         ]
       ]
@@ -3027,23 +2740,23 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {
           "symbol": "QQQ"
         },
-        "outcome": "answered",
-        "kind": "",
-        "detail": "19 item(s)",
-        "seconds": 0.36,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.31,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -3051,11 +2764,11 @@
             "args": {
               "symbol": "QQQ"
             },
-            "outcome": "answered",
-            "kind": "",
-            "detail": "19 item(s)",
-            "seconds": 0.36,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.31,
+            "legacy": "error"
           }
         ]
       ]
@@ -3068,22 +2781,22 @@
       "rounds": 1,
       "outcomes": {
         "answered": 0,
-        "empty": 1,
+        "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
       "answer_rate": 0.0,
       "latest": {
         "args": {
           "label": 1
         },
-        "outcome": "empty",
-        "kind": "",
-        "detail": "answered with no data",
-        "seconds": 0.92,
-        "legacy": "empty"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.39,
+        "legacy": "error"
       },
       "attempts": [
         [
@@ -3091,11 +2804,11 @@
             "args": {
               "label": 1
             },
-            "outcome": "empty",
-            "kind": "",
-            "detail": "answered with no data",
-            "seconds": 0.92,
-            "legacy": "empty"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.39,
+            "legacy": "error"
           }
         ]
       ]
@@ -3107,31 +2820,31 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {},
-        "outcome": "answered",
-        "kind": "",
-        "detail": "30 item(s)",
-        "seconds": 2.08,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.33,
+        "legacy": "error"
       },
       "attempts": [
         [
           {
             "args": {},
-            "outcome": "answered",
-            "kind": "",
-            "detail": "30 item(s)",
-            "seconds": 2.08,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.33,
+            "legacy": "error"
           }
         ]
       ]
@@ -3143,31 +2856,31 @@
       "args_source": "catalog params_summary",
       "rounds": 1,
       "outcomes": {
-        "answered": 1,
+        "answered": 0,
         "empty": 0,
         "domain_error": 0,
         "protocol_error": 0,
         "transport_error": 0,
-        "upstream_5xx": 0
+        "upstream_5xx": 1
       },
-      "answer_rate": 1.0,
+      "answer_rate": 0.0,
       "latest": {
         "args": {},
-        "outcome": "answered",
-        "kind": "",
-        "detail": "1 item(s)",
-        "seconds": 0.38,
-        "legacy": "ok"
+        "outcome": "upstream_5xx",
+        "kind": "upstream_5xx",
+        "detail": "upstream answered 503",
+        "seconds": 0.44,
+        "legacy": "error"
       },
       "attempts": [
         [
           {
             "args": {},
-            "outcome": "answered",
-            "kind": "",
-            "detail": "1 item(s)",
-            "seconds": 0.38,
-            "legacy": "ok"
+            "outcome": "upstream_5xx",
+            "kind": "upstream_5xx",
+            "detail": "upstream answered 503",
+            "seconds": 0.44,
+            "legacy": "error"
           }
         ]
       ]
@@ -3195,7 +2908,7 @@
         "outcome": "transport_error",
         "kind": "timeout",
         "detail": "timed out: no complete reply within 45s (stream held open by 3 keep-alive ping(s))",
-        "seconds": 45.3,
+        "seconds": 45.36,
         "legacy": "timeout"
       },
       "attempts": [
@@ -3208,7 +2921,7 @@
             "outcome": "transport_error",
             "kind": "timeout",
             "detail": "timed out: no complete reply within 45s (stream held open by 3 keep-alive ping(s))",
-            "seconds": 45.3,
+            "seconds": 45.36,
             "legacy": "timeout"
           }
         ]
@@ -3236,7 +2949,7 @@
         "outcome": "domain_error",
         "kind": "tool_execution",
         "detail": "Error executing tool cross_asset: ",
-        "seconds": 40.31,
+        "seconds": 40.44,
         "legacy": "tool_error"
       },
       "attempts": [
@@ -3248,7 +2961,7 @@
             "outcome": "domain_error",
             "kind": "tool_execution",
             "detail": "Error executing tool cross_asset: ",
-            "seconds": 40.31,
+            "seconds": 40.44,
             "legacy": "tool_error"
           }
         ]
@@ -3277,7 +2990,7 @@
         "outcome": "domain_error",
         "kind": "tool_execution",
         "detail": "Error executing tool global_assets: ",
-        "seconds": 15.41,
+        "seconds": 15.44,
         "legacy": "tool_error"
       },
       "attempts": [
@@ -3290,7 +3003,7 @@
             "outcome": "domain_error",
             "kind": "tool_execution",
             "detail": "Error executing tool global_assets: ",
-            "seconds": 15.41,
+            "seconds": 15.44,
             "legacy": "tool_error"
           }
         ]
@@ -3320,7 +3033,7 @@
         "outcome": "empty",
         "kind": "",
         "detail": "answered with no data",
-        "seconds": 20.36,
+        "seconds": 20.42,
         "legacy": "empty"
       },
       "attempts": [
@@ -3334,7 +3047,7 @@
             "outcome": "empty",
             "kind": "",
             "detail": "answered with no data",
-            "seconds": 20.36,
+            "seconds": 20.42,
             "legacy": "empty"
           }
         ]
@@ -3362,7 +3075,7 @@
         "outcome": "empty",
         "kind": "",
         "detail": "answered with no data",
-        "seconds": 20.34,
+        "seconds": 20.42,
         "legacy": "empty"
       },
       "attempts": [
@@ -3374,7 +3087,7 @@
             "outcome": "empty",
             "kind": "",
             "detail": "answered with no data",
-            "seconds": 20.34,
+            "seconds": 20.42,
             "legacy": "empty"
           }
         ]
@@ -3402,7 +3115,7 @@
         "outcome": "empty",
         "kind": "",
         "detail": "answered with no data",
-        "seconds": 20.34,
+        "seconds": 20.36,
         "legacy": "empty"
       },
       "attempts": [
@@ -3414,7 +3127,7 @@
             "outcome": "empty",
             "kind": "",
             "detail": "answered with no data",
-            "seconds": 20.34,
+            "seconds": 20.36,
             "legacy": "empty"
           }
         ]
@@ -3442,7 +3155,7 @@
         "outcome": "domain_error",
         "kind": "tool_execution",
         "detail": "Error executing tool crypto_market: ConnectTimeout('')",
-        "seconds": 30.45,
+        "seconds": 30.42,
         "legacy": "tool_error"
       },
       "attempts": [
@@ -3454,7 +3167,7 @@
             "outcome": "domain_error",
             "kind": "tool_execution",
             "detail": "Error executing tool crypto_market: ConnectTimeout('')",
-            "seconds": 30.45,
+            "seconds": 30.42,
             "legacy": "tool_error"
           }
         ]
@@ -3483,7 +3196,7 @@
         "outcome": "empty",
         "kind": "",
         "detail": "answered with no data",
-        "seconds": 20.31,
+        "seconds": 20.36,
         "legacy": "empty"
       },
       "attempts": [
@@ -3496,7 +3209,7 @@
             "outcome": "empty",
             "kind": "",
             "detail": "answered with no data",
-            "seconds": 20.31,
+            "seconds": 20.36,
             "legacy": "empty"
           }
         ]
@@ -3524,7 +3237,7 @@
         "outcome": "empty",
         "kind": "",
         "detail": "answered with no data",
-        "seconds": 15.38,
+        "seconds": 15.36,
         "legacy": "empty"
       },
       "attempts": [
@@ -3536,7 +3249,7 @@
             "outcome": "empty",
             "kind": "",
             "detail": "answered with no data",
-            "seconds": 15.38,
+            "seconds": 15.36,
             "legacy": "empty"
           }
         ]
@@ -3564,7 +3277,7 @@
         "outcome": "empty",
         "kind": "",
         "detail": "answered with no data",
-        "seconds": 15.48,
+        "seconds": 15.38,
         "legacy": "empty"
       },
       "attempts": [
@@ -3576,7 +3289,7 @@
             "outcome": "empty",
             "kind": "",
             "detail": "answered with no data",
-            "seconds": 15.48,
+            "seconds": 15.38,
             "legacy": "empty"
           }
         ]
@@ -3604,7 +3317,7 @@
         "outcome": "empty",
         "kind": "",
         "detail": "answered with no data",
-        "seconds": 20.73,
+        "seconds": 20.81,
         "legacy": "empty"
       },
       "attempts": [
@@ -3616,7 +3329,7 @@
             "outcome": "empty",
             "kind": "",
             "detail": "answered with no data",
-            "seconds": 20.73,
+            "seconds": 20.81,
             "legacy": "empty"
           }
         ]
@@ -3645,7 +3358,7 @@
         "outcome": "empty",
         "kind": "",
         "detail": "answered with no data",
-        "seconds": 30.31,
+        "seconds": 30.34,
         "legacy": "empty"
       },
       "attempts": [
@@ -3658,7 +3371,7 @@
             "outcome": "empty",
             "kind": "",
             "detail": "answered with no data",
-            "seconds": 30.31,
+            "seconds": 30.34,
             "legacy": "empty"
           }
         ]
@@ -3687,7 +3400,7 @@
         "outcome": "empty",
         "kind": "",
         "detail": "answered with no data",
-        "seconds": 15.3,
+        "seconds": 15.53,
         "legacy": "empty"
       },
       "attempts": [
@@ -3700,7 +3413,7 @@
             "outcome": "empty",
             "kind": "",
             "detail": "answered with no data",
-            "seconds": 15.3,
+            "seconds": 15.53,
             "legacy": "empty"
           }
         ]
@@ -3730,7 +3443,7 @@
         "outcome": "empty",
         "kind": "",
         "detail": "answered with no data",
-        "seconds": 15.36,
+        "seconds": 15.44,
         "legacy": "empty"
       },
       "attempts": [
@@ -3744,7 +3457,7 @@
             "outcome": "empty",
             "kind": "",
             "detail": "answered with no data",
-            "seconds": 15.36,
+            "seconds": 15.44,
             "legacy": "empty"
           }
         ]
@@ -3772,7 +3485,7 @@
         "outcome": "empty",
         "kind": "",
         "detail": "answered with no data",
-        "seconds": 30.33,
+        "seconds": 30.41,
         "legacy": "empty"
       },
       "attempts": [
@@ -3784,7 +3497,7 @@
             "outcome": "empty",
             "kind": "",
             "detail": "answered with no data",
-            "seconds": 30.33,
+            "seconds": 30.41,
             "legacy": "empty"
           }
         ]
@@ -3815,7 +3528,7 @@
         "outcome": "domain_error",
         "kind": "domain",
         "detail": "the JSON object must be str, bytes or bytearray, not dict",
-        "seconds": 0.45,
+        "seconds": 0.28,
         "legacy": "empty"
       },
       "attempts": [
@@ -3830,7 +3543,7 @@
             "outcome": "domain_error",
             "kind": "domain",
             "detail": "the JSON object must be str, bytes or bytearray, not dict",
-            "seconds": 0.45,
+            "seconds": 0.28,
             "legacy": "empty"
           }
         ]
@@ -3860,7 +3573,7 @@
         "outcome": "answered",
         "kind": "",
         "detail": "8 item(s)",
-        "seconds": 0.55,
+        "seconds": 0.5,
         "legacy": "ok"
       },
       "attempts": [
@@ -3874,7 +3587,7 @@
             "outcome": "answered",
             "kind": "",
             "detail": "8 item(s)",
-            "seconds": 0.55,
+            "seconds": 0.5,
             "legacy": "ok"
           }
         ]
@@ -3903,7 +3616,7 @@
         "outcome": "transport_error",
         "kind": "timeout",
         "detail": "timed out: no complete reply within 45s (stream held open by 3 keep-alive ping(s))",
-        "seconds": 45.36,
+        "seconds": 45.33,
         "legacy": "timeout"
       },
       "attempts": [
@@ -3916,7 +3629,7 @@
             "outcome": "transport_error",
             "kind": "timeout",
             "detail": "timed out: no complete reply within 45s (stream held open by 3 keep-alive ping(s))",
-            "seconds": 45.36,
+            "seconds": 45.33,
             "legacy": "timeout"
           }
         ]
@@ -3945,7 +3658,7 @@
         "outcome": "answered",
         "kind": "",
         "detail": "5 item(s)",
-        "seconds": 0.47,
+        "seconds": 0.39,
         "legacy": "ok"
       },
       "attempts": [
@@ -3958,7 +3671,7 @@
             "outcome": "answered",
             "kind": "",
             "detail": "5 item(s)",
-            "seconds": 0.47,
+            "seconds": 0.39,
             "legacy": "ok"
           }
         ]

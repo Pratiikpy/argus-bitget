@@ -28,7 +28,7 @@ from argus.lui.trace import trace_module
 EARNINGS_MOVE_Q = re.compile(
     r"\b(?:move[ds]?|moved|react(?:s|ed|ion)?|gap(?:ped|s)?|f[ae]ll|fallen|drop(?:ped|s)?|jump(?:ed|s)?|"
     r"r[io]se|risen|pop(?:ped)?|tank(?:ed)?|do|did|went)\b[^?]{0,60}\b(?:after|on|following|post|"
-    r"around)\b[^?]{0,40}\b(?:earnings|reports?|results|prints?|quarter)\b|"
+    r"around|to)\b[^?]{0,40}\b(?:earnings|reports?|results|prints?|quarter)\b|"
     r"\b(?:earnings|results|report|print)\s+(?:reaction|move|day\s+move|gap)s?\b|"
     r"\breacted\s+to\s+(?:its|their|the)\s+(?:last|latest|most\s+recent)\s+(?:print|report|"
     r"earnings|results)\b|"

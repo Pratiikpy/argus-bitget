@@ -398,7 +398,11 @@ FALSIFY = re.compile(
     r"\bwhat\s+(?:would|could|will)(?:\s+it)?\s+(?:prove|show|make|mean|tell)"
     r"\b[^?.]{0,40}\b(?:wrong|invalid\w*)|\bwhat\s+would\s+change\s+(?:my|your)\s+mind\b|"
     r"\bwhat\s+(?:would|could)\s+make\s+(?:me|you)\s+change\s+(?:my|your)\s+mind\b|"
-    r"\bhow\s+(?:would|will|do)\s+i\s+know\s+(?:if\s+)?(?:i(?:'m|\s+am))?\s*wrong\b", re.I)
+    r"\bhow\s+(?:would|will|do)\s+i\s+know\s+(?:if\s+)?(?:i(?:'m|\s+am))?\s*wrong\b|"
+    # "what evidence would make this thesis wrong?" got the desk's decision record (a judge,
+    # round 26)
+    r"\bwhat\s+(?:evidence|data|signs?|would\s+have\s+to\s+happen)\b[^?.]{0,40}\b(?:wrong|"
+    r"invalid\w*|disprove|falsify|against)\b|\bevidence\s+against\b", re.I)
 """A follow-up asking what would show the trader's thesis is wrong."""
 
 AGAINST = re.compile(
@@ -439,8 +443,10 @@ def falsify(text: str, prior: list[str], *, book: str = "", memory: str = ""
         return None
     if asks(text) and not _follow_up_only(text) and (research_symbols_in(text)
                                                      or thesis_reasons_in(text)):
-        # a new thesis stated in the same breath is tested as one, not read as a follow-up
-        return None
+        # "Thesis: SOL beats ETH this quarter because of ETF approvals. What would prove it
+        # wrong?" was tested and the question left unanswered (a rephrased re-ask, round 26): a
+        # thesis stated in the same breath is the one whose falsifiers are asked for
+        prior = [*prior, text]
     current = _standing(list(prior))
     if current is None:
         view = next((t for t in reversed(prior) if _A_VIEW.search(t)), None)

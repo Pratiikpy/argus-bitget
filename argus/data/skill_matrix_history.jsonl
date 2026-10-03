@@ -58,3 +58,4 @@
 {"at":"2026-10-03T01:09:42.845999+00:00","calls":86,"answered":53,"by_server":{"bitget-signal":{"calls":19,"answered":2,"upstream_5xx":0},"bitget-mcp-server":{"calls":67,"answered":51,"upstream_5xx":0}}}
 {"at":"2026-10-03T04:09:25.997718+00:00","calls":86,"answered":53,"by_server":{"bitget-signal":{"calls":19,"answered":2,"upstream_5xx":0},"bitget-mcp-server":{"calls":67,"answered":51,"upstream_5xx":0}}}
 {"at":"2026-10-03T07:09:26.497703+00:00","calls":86,"answered":53,"by_server":{"bitget-signal":{"calls":19,"answered":2,"upstream_5xx":0},"bitget-mcp-server":{"calls":67,"answered":51,"upstream_5xx":0}}}
+{"at":"2026-10-03T10:08:59.971124+00:00","calls":86,"answered":2,"by_server":{"bitget-signal":{"calls":19,"answered":2,"upstream_5xx":0},"bitget-mcp-server":{"calls":67,"answered":0,"upstream_5xx":67}}}

@@ -76,3 +76,16 @@ def test_mcp_stress_reads_weights_past_100_as_leverage(monkeypatch: pytest.Monke
     request = seen[0]
     assert request.leverage == 3.0
     assert any("3.00x leverage" in n for n in request.notes)
+
+
+@pytest.mark.parametrize(("book", "read"), [
+    ("BTC 0.5\nETH 4\nSOL 120\nNVDA 30 shares", "0.5 BTC, 4 ETH, 120 SOL, 30 NVDA"),
+    ("ETH 10 / SOL 200 / LINK 500", "10 ETH, 200 SOL, 500 LINK"),
+    ("USDT 10000\nCOIN 50 shares", "$10000 cash, 50 COIN"),
+    ("TSLA 40 / COIN 30 / BTC 20 / cash 10", "40% TSLA, 30% COIN, 20% BTC, 10% cash"),
+    ("40% NVDA, 30% MSFT, 30% AAPL", "40% NVDA, 30% MSFT, 30% AAPL"),
+])
+def test_a_book_written_name_first_keeps_each_count_with_its_name(book: str, read: str) -> None:
+    from argus.lui.research.parse import name_first_book
+
+    assert name_first_book(book) == read

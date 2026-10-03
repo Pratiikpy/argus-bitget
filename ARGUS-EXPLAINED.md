@@ -711,7 +711,7 @@ python -m argus.market.skills --symbol NVDAUSDT
 And to check the whole thing is what this document says it is:
 
 ```bash
-pytest                    # 11,282 tests
+pytest                    # 11,325 tests
 python -m argus.status    # 152/152 modules importable, 18/18 sub-themes, artefacts on disk
 ```
 
@@ -1765,10 +1765,10 @@ takes, and every artefact the system writes.
 
 | | |
 |---|---|
-| Source modules | **587** files across **20 packages** (2026-09-27) |
+| Source modules | **589** files across **20 packages** (2026-09-27) |
 | Registered and importable | **152/152** (`python -m argus.status` checks this at runtime) |
-| Test files / tests | **458 files**, **11,282 tests collected** |
-| Type and lint | `ruff` clean, `mypy --strict` clean on **584 source files** |
+| Test files / tests | **458 files**, **11,325 tests collected** |
+| Type and lint | `ruff` clean, `mypy --strict` clean on **586 source files** |
 | Artefacts written | **885** files under `argus/data/` |
 | Code-level teardowns of other people's systems | **56** under `research/architecture/` |
 | Runtime dependencies | **two**: `pydantic`, `python-dateutil`. No numpy, no pandas, no scipy |
@@ -2413,10 +2413,10 @@ source is a build failure, not a typo.
 
 | | |
 |---|---|
-| Source modules | 587 files, 20 packages; `mypy --strict` clean on 584 source files |
+| Source modules | 589 files, 20 packages; `mypy --strict` clean on 586 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 152/152 modules importable |
-| Tests | 11,282 tests collected, `ruff` clean |
+| Tests | 11,325 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
 | Artefacts on disk | 885 files under `argus/data/`, every one produced by running something |
 | Code-level teardowns of other systems | 62, each citing file and line |
