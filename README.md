@@ -1,7 +1,7 @@
 # ARGUS
 
 [![CI](https://github.com/Pratiikpy/argus-bitget/actions/workflows/ci.yml/badge.svg)](https://github.com/Pratiikpy/argus-bitget/actions/workflows/ci.yml)
-![tests](https://img.shields.io/badge/tests-11%2C168%20collected-2ea44f)
+![tests](https://img.shields.io/badge/tests-11%2C280%20collected-2ea44f)
 ![mypy](https://img.shields.io/badge/mypy-strict%20clean-2ea44f)
 ![register](https://img.shields.io/badge/register-6%20owned%20%C2%B7%2033%20tied%20%C2%B7%207%20lost-555)
 ![languages](https://img.shields.io/badge/answers%20in-8%20languages-555)
@@ -265,11 +265,11 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 11,213 tests collected
+pytest -q                       # 11,280 tests collected
 ```
 
-Nothing above needs a credential. On 2026-10-03, with every outbound connection refused, 10,900
-passed, 75 skipped and 0 failed of the 11,213 tests collected; the other 238 read a live
+Nothing above needs a credential. On 2026-10-03, with every outbound connection refused, 10,967
+passed, 75 skipped and 0 failed of the 11,280 tests collected; the other 238 read a live
 venue, feed or model and run apart
 (`pytest -m network`). Tests that need a rival's source cloned beside the repository skip
 and say which. `ARGUS_BLOCK_NETWORK=1` refuses every outbound connection, so
@@ -289,8 +289,8 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **11,213 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 579 source files** |
+| Tests | **11,280 tests collected** — `pytest -q` |
+| Types | **`mypy --strict` clean on 584 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
 | Sub-themes | **18/18 sub-themes** each resolve to an importable module and a test file (`python -m argus.status`). That is coverage, not a claim to lead them: 6 of 46 capabilities are OWNED against a named rival, and `/proof` says which |

@@ -1,0 +1,885 @@
+"""A trader's own written statement of positions, priced exactly: every leg, every fill, every mark.
+
+A hostile review in round 25 gave this console twenty-odd statements a broker's blotter settles in
+one line each, and it got most of them wrong in ways that move money:
+
+- marks the trader typed for each leg ("mark 3,300", "KO goes to 62, PEP to 175") were replaced by
+  Bitget's live price;
+- a hedge ("I hedge by shorting 1.5 BTC perp at 60k") was read as a second buy;
+- a basis trade (long spot, short perp) was netted to "$0" and the other legs dropped;
+- a closed trade ("sold at $165") was valued as still open;
+- micro and E-mini multipliers, option contract counts, fees, funding, scientific notation
+  ("3.5e2") and a negative oil price were ignored, misread or crashed the page.
+
+So the statement is read the way a blotter is kept, and computed the way a broker computes it:
+
+1. **Events, in the order written.** Each opening leg (``long``/``short``/``bought``/``shorting``
+   … a quantity, a name, a price), each later fill (``sold 1 at 3,500``, ``cover 1 at 19,800``,
+   ``the rest at 20,100``, ``+1,000 at 40``), each option (``sold 5 AAPL 220 puts at $3.00``) and
+   each spread (``bull call spread 200/210 at $6/$2, 5 lots``).
+2. **Lots, kept per side and per venue.** A long and a short in the same name are two positions,
+   as in Bitget's hedge mode and in any broker that allows both; a spot leg and a perpetual leg are
+   two instruments with two marks. A sale closes the oldest long lots first (FIFO), and LIFO is
+   computed beside it when the question names it — the lot conventions `pair()` in
+   ``argus.lui.journal`` uses for a typed journal.
+3. **Marks, from the trader first.** A price typed for a leg, a name, a venue or "the index" is
+   that leg's mark; Bitget's last price is used only for a leg the trader gave no mark for, and
+   the answer says which legs those were.
+4. **Contract arithmetic.** Index futures carry their exchange multipliers (CME: ES $50, MES $5,
+   NQ $20, MNQ $2, YM $5, MYM $0.50, RTY $50, M2K $5 a point; CL 1,000 barrels, GC 100 oz), US
+   equity options 100 shares a contract. Realised P&L is (exit - entry) x quantity x multiplier
+   for a long and the reverse for a short; unrealised is the same at the mark. A percentage fee is
+   charged on each fill's notional; dollar fees and funding are added as typed.
+
+What is not read here is said, not guessed: a statement whose legs cannot all be priced returns
+None and the question goes on to the engines that answer other things.
+"""
+
+from __future__ import annotations
+
+import re
+from collections.abc import Callable
+from dataclasses import dataclass, field
+
+from argus.lui.trace import trace_module
+
+NUM_POS = (r"(?:\d[\d,]*(?:\.\d+)?|\.\d+)(?:[eE][-+]?\d+)?"
+           r"(?:\s?(?:k|K|m|M|bn|mm)(?![A-Za-z]))?")
+NUM = r"[-\u2212]?\$?\s?" + NUM_POS
+"""A number as a trader types one: ``60k``, ``3,000``, ``1.5e2``, ``-37``, ``$0.0001``."""
+
+_STOP = (r"(?:at|from|for|of|the|and|entry|each|per|spot|perps?|perpetuals?|futures?|contracts?|"
+         r"shares?|lots?|units?|oz|ounces?|barrels?|bbl|short|long|to|now|mark|marked|in|"
+         r"on|a|an|it|all|my|i|is|then|with|by|sold|bought|another|more|rest|remaining|half|"
+         r"puts?|calls?|x|times|worth|usd|usdt|dollars?|bucks|was|were|plus|also|converges?|goes|"
+         r"went|moves?|moved|rall(?:y|ies|ied)|drops?|dropped|falls?|fell|rises?|rose|climbs?|"
+         r"climbed|trades|settles?|closes?|closed|ends?|value|valued|currently|marked|paid|fees?)\b")
+SYM = rf"(?!{_STOP})(?:[A-Za-z][A-Za-z0-9]{{0,9}}|\$[A-Za-z]{{1,6}})"
+
+MULTIPLIER = {"ES": 50.0, "MES": 5.0, "NQ": 20.0, "MNQ": 2.0, "YM": 5.0, "MYM": 0.5, "RTY": 50.0,
+              "M2K": 5.0, "CL": 1000.0, "MCL": 100.0, "GC": 100.0, "MGC": 10.0, "SI": 5000.0}
+"""Dollars per point (or per unit of price) of one contract, from CME's contract specifications."""
+_INDEX_GROUP = {"ES": "S&P 500", "MES": "S&P 500", "NQ": "Nasdaq-100", "MNQ": "Nasdaq-100",
+                "YM": "Dow", "MYM": "Dow", "RTY": "Russell 2000", "M2K": "Russell 2000"}
+_ALIASES = {"BITCOIN": "BTC", "ETHER": "ETH", "ETHEREUM": "ETH", "SOLANA": "SOL", "GOLD": "XAU",
+            "SILVER": "XAG", "OIL": "WTI", "CRUDE": "WTI", "DOGECOIN": "DOGE", "APPLE": "AAPL",
+            "NVIDIA": "NVDA", "TESLA": "TSLA", "MICROSOFT": "MSFT"}
+
+
+def number(raw: str) -> float:
+    """``60k`` → 60000, ``1.5e2`` → 150, ``-37`` → -37, ``$1,000`` → 1000."""
+    s = raw.strip().replace("\u2212", "-").replace("$", "").replace(",", "").replace(" ", "")
+    scale = 1.0
+    low = s.lower()
+    for suffix, factor in (("bn", 1e9), ("mm", 1e6), ("k", 1e3), ("m", 1e6)):
+        if low.endswith(suffix):
+            s, scale = s[: -len(suffix)], factor
+            break
+    return float(s) * scale
+
+
+def _symbol(raw: str | None) -> str | None:
+    if not raw:
+        return None
+    word = raw.lstrip("$").upper()
+    return _ALIASES.get(word, word)
+
+
+def _venue(raw: str | None) -> str:
+    if not raw:
+        return ""
+    raw = raw.lower()
+    if raw.startswith("spot"):
+        return "spot"
+    if raw.startswith(("perp", "future")):
+        return "perp"
+    return ""
+
+
+@dataclass
+class _Lot:
+    qty: float
+    price: float
+
+
+@dataclass
+class _Position:
+    symbol: str
+    venue: str
+    side: str
+    lots: list[_Lot] = field(default_factory=list)
+
+    @property
+    def qty(self) -> float:
+        return sum(lot.qty for lot in self.lots)
+
+    @property
+    def average(self) -> float:
+        q = self.qty
+        return sum(lot.qty * lot.price for lot in self.lots) / q if q else 0.0
+
+
+@dataclass(frozen=True)
+class _Event:
+    start: int
+    end: int
+    kind: str  # open | close | option | spread
+    side: str = ""  # long | short | sell | cover | close | buy
+    qty: float | None = None
+    rest: str = ""  # "all" | "half" when no number was given
+    symbol: str | None = None
+    venue: str = ""
+    price: float = 0.0
+    strike: float = 0.0
+    strike2: float = 0.0
+    premium2: float = 0.0
+    option: str = ""  # put | call
+    said: str = ""
+    currency: str = "USD"
+
+
+_SIDE = (r"i'?m\s+long|i'?m\s+short|i\s+am\s+long|i\s+am\s+short|went\s+long|went\s+short|"
+         r"hedge\s+by\s+shorting|sold\s+short|short[\s-]sold|shorted|shorting|short|long|bought|"
+         r"buying|buy|bot|added|add|hold|holding|own|i\s+have|sold|sell")
+_OPEN = re.compile(
+    rf"(?P<side>{_SIDE})\s+(?:another\s+)?(?P<qty>{NUM})\s*(?:x\s+)?(?:more\s+)?"
+    r"(?:(?:oz|ounces?|barrels?|bbl|shares?|contracts?|lots?|units?)\s+(?:of\s+)?)?"
+    rf"(?:(?P<sym>{SYM})\s+)?(?:(?P<venue>spot|perps?|perpetuals?|futures?|contracts?|shares?)"
+    r"\s+)?(?:(?P<side2>short|long)\s+)?(?:(?:bought|sold|entered|opened|shorted)\s+)?"
+    rf"(?:at|@|from|for|entry(?:\s+at)?)\s*(?P<px>{NUM})", re.I)
+_CURRENCY = {"$": "USD", "\u20ac": "EUR", "\u00a3": "GBP"}
+_AMOUNT_OPEN = re.compile(
+    rf"(?P<side>long|short|bought|buy|i\s+hold|holding|hold)\s+(?P<cur>[$\u20ac\u00a3])\s?"
+    rf"(?P<amt>{NUM_POS})\s+(?:of|in|worth\s+of)\s+(?P<sym>{SYM})\s+(?:at|@|from)\s*"
+    rf"(?P<px>{NUM})(?:\s*(?:EUR|USD|GBP|euros?|dollars?|pounds?))?", re.I)
+"""A leg stated as money: "long \u20ac20,000 of SAP at 200 EUR"."""
+_CLOSE = re.compile(
+    r"(?P<verb>sold|sell|selling|covered|cover|covering|closed|close|bought\s+back|buy\s+back|"
+    r"exited|exit|took\s+profit\s+on|bought|buy)\s+"
+    rf"(?:(?P<qty>{NUM})|(?P<all>the\s+rest|all(?:\s+of\s+it)?|it|everything|half))?\s*"
+    rf"(?:(?:of\s+)?(?:the\s+)?(?P<sym>{SYM})\s+)?(?:(?P<venue>spot|perps?)\s+)?"
+    rf"(?:at|@|for)\s*(?P<px>{NUM})", re.I)
+_REST = re.compile(rf"(?:and\s+)?(?P<verb>sold|sell|covered|cover|closed|close)?\s*(?:the\s+)?"
+                   rf"(?:rest|remainder|remaining)(?:\s+(?P<qty>{NUM_POS}))?(?:\s+(?:shares?|"
+                   rf"units?|coins?|contracts?))?\s+(?:at|@)\s*(?P<px>{NUM})", re.I)
+_PLUS = re.compile(rf"(?<![\w.%])\+\s?(?P<qty>{NUM})\s*(?:(?P<sym>{SYM})\s+)?(?:at|@)\s*"
+                   rf"(?P<px>{NUM})", re.I)
+_QTY_FIRST = re.compile(rf"(?<![\w.$%,])(?P<qty>{NUM})\s+(?P<sym>{SYM})\s*(?:at|@)\s*(?P<px>{NUM})",
+                        re.I)
+_SYM_FIRST = re.compile(rf"\b(?P<sym>[A-Z]{{2,6}})[:\s]+(?P<qty>{NUM})\s+(?:shares?\s+)?(?:at|@)\s*"
+                        rf"(?P<px>{NUM})")
+_SYM_SIDE_FIRST = re.compile(
+    rf"\b(?P<sym>[A-Za-z]{{2,10}})\s+(?P<side>long|short)\s+(?P<qty>{NUM_POS})\s*(?:@|at)\s*"
+    rf"(?P<px>{NUM})", re.I)
+"""A leg written ticker first: "ETH long 5 @ 2,800"."""
+_QTY_SYM_SIDE = re.compile(
+    rf"(?P<qty>{NUM_POS})\s+(?P<sym>{SYM})\s+(?:perps?\s+)?(?P<side>long|short)\b\s*[(,]?\s*"
+    rf"(?:entry|at|from|@|entered\s+at)\s*(?P<px>{NUM})", re.I)
+"""A leg written as a holding with its entry: "my 2 BTC long (entry 70k)"."""
+_OPTION = re.compile(
+    r"(?P<side>sold|sell|wrote|write|short|shorted|bought|buy|long)\s+(?P<n>\d[\d,]*)\s+"
+    rf"(?P<sym>{SYM})\s+\$?(?P<k>{NUM})\s*(?P<kind>puts?|calls?)\s+(?:at|for|@)\s*(?P<prem>{NUM})",
+    re.I)
+_SPREAD = re.compile(
+    r"(?P<way>bull|bear)\s+(?P<kind>call|put)\s+spread\s+(?:on\s+\S+\s+)?\$?(?P<k1>\d[\d.,]*)\s*/\s*"
+    r"\$?(?P<k2>\d[\d.,]*)\s+(?:at|for|@)\s*\$?(?P<p1>\d[\d.,]*)\s*/\s*\$?(?P<p2>\d[\d.,]*)"
+    r"(?:[^.;]*?\b(?P<n>\d+)\s+(?:lots?|contracts?|spreads?))?", re.I)
+_EXPIRY = re.compile(
+    rf"(?:at\s+expir\w*|expires?|on\s+expiry|settles?)[^.;]*?(?:is|at|=|closes\s+at)\s+(?P<px>{NUM})|"
+    rf"(?P<px2>{NUM})\s+at\s+expir\w*|\bis\s+(?P<px3>{NUM})\s+at\s+expir\w*|"
+    rf"\b(?:closes|settles|ends|finishes|expires)\s+(?:at\s+)?(?P<px4>{NUM})\s+(?:on|at)\s+"
+    rf"(?:the\s+)?expir\w*", re.I)
+_LEG_MARK = re.compile(
+    rf"\s*[,(]?\s*\(?\s*(?:(?:mark(?:ed)?|marked\s+at|mark\s+price|now(?:\s+at)?|currently(?:\s+at)?|"
+    rf"current(?:\s+price)?|last|price\s+now)\s*:?\s*)(?P<px>{NUM})", re.I)
+_STRONG = (r"is\s+now(?:\s+at)?|now\s+trades\s+at|now(?:\s+at)?|goes\s+to|went\s+to|moves?\s+to|"
+           r"moved\s+to|rall(?:y|ies|ied)\s+to|drops?\s+to|dropped\s+to|falls?\s+to|fell\s+to|"
+           r"rises?\s+to|rose\s+to|climbs?\s+to|climbed\s+to|converges?\s+at|marked\s+at|mark(?:ed)?|"
+           r"valued?\s+at|value\s+it\s+at|closes?\s+at|closed\s+at|trades\s+at|settles?\s+at|"
+           r"(?:the\s+)?index\s+(?:goes\s+|moves\s+|is\s+)?(?:to|at)|currently(?:\s+at)?|ends?\s+at")
+_MARK = re.compile(
+    rf"(?:(?P<sym>{SYM})\s+)?(?:(?P<venue>spot|perps?)\s+)?(?P<how>{_STRONG}|to|is\s+at|is|at|=|:)"
+    rf"\s*(?P<px>{NUM})(?!\s*%)(?:\s+(?P<venue2>spot|perps?))?", re.I)
+_PRONOUN_MARK = re.compile(
+    rf"\b(?:the\s+)?(?:stock|shares?|price|it|coin|token|underlying)\s+(?:is\s+)?(?:now\s+)?"
+    rf"(?:at|trades\s+at|is|=|:)?\s*(?P<px>{NUM})(?!\s*%)", re.I)
+"""A mark that names the holding by a pronoun: "Stock at 44", "the price is now 300"."""
+_BARE_MARK = re.compile(rf"\b(?P<sym>[A-Za-z]{{2,8}})\s+(?P<px>{NUM})(?!\s*(?:%|[A-Za-z]))", re.I)
+_PCT_MARK = re.compile(
+    rf"(?:(?P<sym>{SYM})\s+)?(?P<dir>falls?|fell|drops?|dropped|declines?|rises?|rose|gains?|gained|"
+    r"rall(?:y|ies|ied)|climbs?|is\s+up|is\s+down|goes\s+up|goes\s+down|up|down|[+\-\u2212])\s*(?:by\s+)?"
+    rf"(?P<pct>\d+(?:\.\d+)?)\s*%(?:\s+from\s+(?P<base>{NUM}))?", re.I)
+_VENUE_MARK = re.compile(
+    rf"\b(?P<venue>spot|perps?)\s+(?:at\s+|is\s+|now\s+|=\s*|:\s*)?(?P<px>{NUM})(?!\s*%)", re.I)
+_DOWN_WORDS = ("falls", "fall", "fell", "drops", "drop", "dropped", "declines", "decline",
+               "is down", "goes down", "down", "-", "\u2212")
+_MORE = re.compile(rf"(?:(?<!\d),\s*|\band\s+|\bthen\s+)(?:another\s+)?(?P<qty>{NUM_POS})\s+"
+                   rf"(?:more\s+)?(?:shares?\s+)?(?:at|@)\s*(?P<px>{NUM})", re.I)
+_FEE_PCT = re.compile(
+    rf"(?P<pct>{NUM})\s*%\s*(?:taker\s+|maker\s+|trading\s+|commission\s+)?(?:fees?|commission)"
+    r"(?:\s+(?P<each>each\s+(?:side|way)|per\s+side|both\s+(?:ways|sides)|on\s+each\s+\w+|"
+    r"round[\s-]trip|in\s+and\s+out))?|(?:fees?|commission)\s+(?:of\s+)?(?P<pct2>\d+(?:\.\d+)?)\s*%",
+    re.I)
+_FEE_USD = re.compile(rf"\$\s?(?P<usd>{NUM_POS})\s+(?:in\s+|of\s+)?(?:fees?|commissions?)\b", re.I)
+_FUNDING_USD = re.compile(
+    rf"(?P<dir>paid|pay|received|receive|got|earned|collected)?\s*\$\s?(?P<usd>{NUM_POS})\s+"
+    r"(?:in\s+|of\s+)?funding\b", re.I)
+_HYPOTHETICAL = re.compile(r"^\s*(?:should|shall|can|could|would)\s+i\b|\bwhat\s+if\s+i\s+"
+                           r"(?:buy|short|go|open)\b|\bthinking\s+(?:of|about)\s+(?:buying|shorting)",
+                           re.I)
+
+
+def _events(text: str) -> tuple[list[_Event], str]:
+    """Every leg, fill, option and spread in the text, in order, and the text with them blanked."""
+    taken: list[tuple[int, int]] = []
+    found: list[_Event] = []
+
+    def free(a: int, b: int) -> bool:
+        return all(b <= x or a >= y for x, y in taken)
+
+    def take(event: _Event) -> None:
+        taken.append((event.start, event.end))
+        found.append(event)
+
+    for m in _SPREAD.finditer(text):
+        # the two debit spreads only: a bull call buys the lower strike, a bear put the higher
+        if (m.group("way").lower(), m.group("kind").lower()) not in (("bull", "call"),
+                                                                      ("bear", "put")):
+            continue
+        if free(*m.span()):
+            k1, k2 = number(m.group("k1")), number(m.group("k2"))
+            take(_Event(m.start(), m.end(), "spread", side=m.group("way").lower(),
+                        qty=float(m.group("n") or 1), option=m.group("kind").lower(),
+                        strike=min(k1, k2), strike2=max(k1, k2), price=number(m.group("p1")),
+                        premium2=number(m.group("p2")), said=m.group(0)))
+    for pattern in (_SYM_SIDE_FIRST, _QTY_SYM_SIDE):
+        for m in pattern.finditer(text):
+            if free(*m.span()) and m.group("sym").lower() not in ("long", "short", "perp"):
+                take(_Event(m.start(), m.end(), "open", side=m.group("side").lower(),
+                            qty=number(m.group("qty")), symbol=_symbol(m.group("sym")),
+                            price=number(m.group("px")), said=m.group(0)))
+    for m in _AMOUNT_OPEN.finditer(text):
+        if free(*m.span()):
+            price = number(m.group("px"))
+            if price <= 0:
+                continue
+            word = m.group("side").lower()
+            take(_Event(m.start(), m.end(), "open", side="short" if word == "short" else "long",
+                        qty=number(m.group("amt")) / price, symbol=_symbol(m.group("sym")),
+                        price=price, said=m.group(0),
+                        currency=_CURRENCY.get(m.group("cur"), "USD")))
+    for m in _OPTION.finditer(text):
+        if free(*m.span()):
+            side = "short" if m.group("side").lower() in ("sold", "sell", "wrote", "write",
+                                                          "short", "shorted") else "long"
+            take(_Event(m.start(), m.end(), "option", side=side, qty=number(m.group("n")),
+                        symbol=_symbol(m.group("sym")), strike=number(m.group("k")),
+                        price=number(m.group("prem")),
+                        option="put" if m.group("kind").lower().startswith("put") else "call",
+                        said=m.group(0)))
+    for m in _OPEN.finditer(text):
+        if not free(*m.span()):
+            continue
+        word = m.group("side").lower()
+        short = "short" in word or (m.group("side2") or "").lower() == "short"
+        if word in ("bought", "buy", "buying", "bot") and not m.group("side2"):
+            side = "buy"  # a buy closes a short when one is open, else opens a long
+        elif word.startswith("sold") and not short:
+            side = "sell"
+        else:
+            side = "short" if short else "long"
+        take(_Event(m.start(), m.end(), "open", side=side, qty=number(m.group("qty")),
+                    symbol=_symbol(m.group("sym")), venue=_venue(m.group("venue")),
+                    price=number(m.group("px")), said=m.group(0)))
+    for m in _REST.finditer(text):
+        if free(*m.span()):
+            verb = (m.group("verb") or "").lower()
+            take(_Event(m.start(), m.end(), "close",
+                        side="cover" if verb.startswith("cover") else
+                        "sell" if verb.startswith("sel") or verb.startswith("sold") else
+                        "close" if verb.startswith("clos") else "", rest="all",
+                        price=number(m.group("px")), said=m.group(0)))
+    for m in _CLOSE.finditer(text):
+        if not free(*m.span()):
+            continue
+        verb = m.group("verb").lower()
+        side = ("cover" if verb.startswith(("cover", "bought back", "buy back")) else
+                "buy" if verb in ("bought", "buy") else
+                "close" if verb.startswith(("close", "exit", "took")) else "sell")
+        rest = "half" if (m.group("all") or "").lower() == "half" else (
+            "all" if m.group("all") or not m.group("qty") else "")
+        take(_Event(m.start(), m.end(), "open" if side == "buy" and not rest else "close",
+                    side=side, qty=number(m.group("qty")) if m.group("qty") else None, rest=rest,
+                    symbol=_symbol(m.group("sym")), venue=_venue(m.group("venue")),
+                    price=number(m.group("px")), said=m.group(0)))
+    for m in _PLUS.finditer(text):
+        if free(*m.span()):
+            take(_Event(m.start(), m.end(), "open", side="long", qty=number(m.group("qty")),
+                        symbol=_symbol(m.group("sym")), price=number(m.group("px")),
+                        said=m.group(0)))
+    for pattern in (_SYM_FIRST, _QTY_FIRST):
+        for m in pattern.finditer(text):
+            if free(*m.span()):
+                take(_Event(m.start(), m.end(), "open", side="long", qty=number(m.group("qty")),
+                            symbol=_symbol(m.group("sym")), price=number(m.group("px")),
+                            said=m.group(0)))
+    for m in _MORE.finditer(text):
+        if free(*m.span()):
+            take(_Event(m.start(), m.end(), "open", side="again", qty=number(m.group("qty")),
+                        price=number(m.group("px")), said=m.group(0)))
+    found.sort(key=lambda e: e.start)
+    blank = list(text)
+    for a, b in taken:
+        blank[a:b] = " " * (b - a)
+    return found, "".join(blank)
+
+
+@dataclass(frozen=True)
+class Statement:
+    lines: list[str]
+    total: float
+
+
+def _money(x: float) -> str:
+    sign = "+" if x > 0 else "-" if x < 0 else ""
+    if x and abs(x) < 0.01:
+        return f"{sign}${abs(x):.6g}"
+    return f"{sign}${abs(x):,.2f}"
+
+
+def _px(p: float) -> str:
+    if p and abs(p) < 0.01:
+        return f"{p:.6g}"
+    return f"{p:,.2f}".rstrip("0").rstrip(".") if p != int(p) else f"{p:,.0f}"
+
+
+def _group(symbol: str) -> str | None:
+    return _INDEX_GROUP.get(symbol)
+
+
+def price_statement(text: str, *, price: Callable[[str], float | None] | None = None,
+                    ) -> Statement | None:
+    """The statement's P&L, or None when the text is not a statement this reads in full."""
+    if _HYPOTHETICAL.search(text):
+        return None
+    events, rest = _events(text)
+    opens = [e for e in events if e.kind in ("open", "option", "spread")]
+    if not opens:
+        return None
+    lifo_asked = bool(re.search(r"\blifo\b", text, re.I))
+    # a name written once ("WTI: bought 10 barrels at -37 and sold at 20") is the context of the
+    # fills that follow it without one
+    first_name = re.search(rf"^\s*(?P<s>{SYM})\s*[:\-—]", text)
+    context = _symbol(first_name.group("s")) if first_name else None
+    resolved: list[_Event] = []
+    for event in events:
+        symbol = event.symbol or context
+        if event.kind != "spread" and symbol is None:
+            return None
+        if symbol:
+            context = symbol
+        resolved.append(_Event(**{**event.__dict__, "symbol": symbol}))
+    # venues only separate legs when one name is held on two venues
+    venues: dict[str, set[str]] = {}
+    for event in resolved:
+        if event.symbol:
+            venues.setdefault(event.symbol, set()).add(event.venue)
+    resolved = [_Event(**{**e.__dict__, "venue": e.venue if len(venues.get(e.symbol or "", set()))
+                          > 1 else ""}) for e in resolved]
+    held = {e.symbol for e in resolved if e.symbol}
+    marks = _marks(text, rest, resolved, held)
+    expiry = next((number(m.group("px") or m.group("px2") or m.group("px3") or m.group("px4"))
+                   for m in _EXPIRY.finditer(text)), None)
+    fee_pct, fee_each = _fee_rate(text)
+    fees_usd = sum(number(m.group("usd")) for m in _FEE_USD.finditer(text))
+    funding = sum(number(m.group("usd")) * (1 if (m.group("dir") or "").lower() in (
+        "received", "receive", "got", "earned", "collected") else -1)
+        for m in _FUNDING_USD.finditer(text))
+    if not marks and expiry is None and not any(e.kind == "close" for e in resolved) and not \
+            any(e.kind == "spread" for e in resolved) and not re.search(
+            r"p\s*&\s*l|\bp/l\b|\bpnl\b|\bprofit\b|\bloss\b|\bgain\b|\bnet\b|\bunreali[sz]ed\b|"
+            r"\bworth\b|\bvalue\b|\btotal\b|\bbreak[\s-]?even\b|\bfifo\b|\blifo\b|\bup\s+or\s+down\b",
+            text, re.I):
+        return None
+    rates = _fx_rates(text)
+    fx_of: dict[str, tuple[float, str]] = {}
+    for e in resolved:
+        if e.symbol and e.currency != "USD":
+            if e.currency not in rates:
+                return None  # a euro leg with no rate given is not turned into dollars by guess
+            fx_of[e.symbol] = (rates[e.currency], e.currency)
+    modes = ("FIFO", "LIFO") if lifo_asked else ("FIFO",)
+    results = [_run(resolved, marks, expiry, fee_pct, fee_each, mode, price, fx_of=fx_of)
+               for mode in modes]
+    if any(r is None for r in results):
+        return None
+    first = results[0]
+    assert first is not None
+    lines_out, total, unpriced, live_used, realised, unrealised, fees = first
+    if unpriced:
+        return None
+    total += funding - fees_usd
+    fee_said = fees + fees_usd
+    if expiry is None and all(e.kind in ("option", "spread") for e in resolved):
+        # no price at expiry was given: the payoff's shape is the answer, not a $0 total
+        return Statement([f"Bottom line: {lines_out[0]}", *lines_out[1:],
+                          "Each figure is per the premiums typed, at expiry, before fees; say "
+                          "the price at expiry for the result in dollars."], 0.0)
+    still_open = [line for line in lines_out if line.endswith("unrealised.")]
+    pieces = []
+    if realised or not still_open:
+        pieces.append(f"{_money(realised)} realised")
+    if still_open:
+        pieces.append(f"{_money(unrealised)} unrealised")
+    worth = sum(float(m.group(1).replace(",", "")) for line in still_open
+                if (m := re.search(r"worth \$([\d,.]+)", line)))
+    worth_asked = bool(worth and re.search(r"\b(?:worth|value|valued)\b", text, re.I))
+    if fee_said:
+        pieces.append(f"{_money(-fee_said)} fees")
+    if funding:
+        pieces.append(f"{_money(funding)} funding")
+    lead = (f"Bottom line: {_money(total)} in all — " + ", ".join(pieces) + "."
+            if not worth_asked else
+            f"Bottom line: worth ${worth:,.2f} at the mark — {_money(total)} in all against what "
+            f"was paid (" + ", ".join(pieces) + ").")
+    account = re.search(rf"\bof\s+(?:my\s+|a\s+|the\s+)?\$\s?(?P<a>{NUM_POS})\s+(?:account|book|"
+                        r"portfolio|capital)\b", text, re.I)
+    if account is not None and number(account.group("a")) > 0:
+        # "What is that as a % of my $90,000 account?" was left out (a hostile review, round 25)
+        size = number(account.group("a"))
+        lead = lead.removesuffix(".") + f" — {total / size:+.2%} of the ${size:,.0f} account."
+    even = _breakeven_line(text, resolved, marks)
+    if even is not None:
+        lead, lines_out = f"Bottom line: {even}", [lead.removeprefix("Bottom line: "), *lines_out]
+    out = [lead, *lines_out]
+    if lifo_asked and results[1] is not None:
+        lifo_total = results[1][1] + funding - fees_usd
+        lifo_real = results[1][4]
+        out.insert(1, f"FIFO (oldest lots sold first): {_money(realised)} realised; LIFO (newest "
+                      f"first): {_money(lifo_real)} realised — {_money(total)} and "
+                      f"{_money(lifo_total)} in all. The total at the mark is the same either way "
+                      f"when the remaining lots are marked too; the split between realised and "
+                      f"unrealised is what changes, which is what tax lots turn on.")
+    if live_used:
+        out.append("Marked at Bitget's last price, because no price was typed for it: "
+                   + ", ".join(sorted(live_used)) + ".")
+    out.append("Read from your own figures: each leg's entry, quantity and mark as typed"
+               + (f"; fees {fee_pct:g}% of each {'fill' if fee_each else 'opening fill'}'s "
+                  f"notional" if fee_pct else "")
+               + "; contract multipliers are CME's (ES $50, MES $5, NQ $20, MNQ $2 a point) and "
+                 "US equity options carry 100 shares a contract.")
+    return Statement(out, total)
+
+
+_DOUBLE_AT = re.compile(rf"\bdoubl(?:e|ing)\s+(?:my\s+|the\s+)?(?:position|stake|holding|it|"
+                        rf"size)\s+at\s+(?P<px>{NUM})", re.I)
+_ADD_IF = re.compile(rf"\bif\s+i\s+(?:add|buy|average\s+down\s+(?:by\s+buying|with))\s+"
+                     rf"(?:another\s+)?(?P<q>{NUM_POS})\s+(?:more\s+)?(?:\w+\s+)?(?:at|@)\s*"
+                     rf"(?P<px>{NUM})", re.I)
+
+
+def _breakeven_line(text: str, events: list[_Event],
+                    marks: dict[tuple[str, str], float]) -> str | None:
+    """The price that undoes the loss: "What do I need for breakeven if I double my position at
+    300?" got the current P&L alone (a hostile review, round 25). Breakeven is the average cost
+    of the shares held, before fees; a stated add moves it to the new average."""
+    if not re.search(r"\bbreak[\s-]?even\b", text, re.I):
+        return None
+    longs = [e for e in events if e.kind == "open" and e.side in ("long", "buy", "again")
+             and e.qty]
+    names = {e.symbol for e in longs}
+    if len(names) != 1 or not longs:
+        return None
+    held = sum(e.qty or 0.0 for e in longs)
+    cost = sum((e.qty or 0.0) * e.price for e in longs)
+    average = cost / held
+    name = longs[0].symbol
+    mark = next((v for (s, _v), v in marks.items() if s == name), None)
+    doubled, added = _DOUBLE_AT.search(text), _ADD_IF.search(text)
+    if doubled is None and added is None:
+        return (f"breakeven on {name} is {_px(average)}, the average cost of the {_px(held)} "
+                f"held, before fees.")
+    add_px = number((doubled or added).group("px"))  # type: ignore[union-attr]
+    add_qty = held if doubled is not None else number(added.group("q"))  # type: ignore[union-attr]
+    new_avg = (cost + add_qty * add_px) / (held + add_qty)
+    said = (f"breakeven after {'doubling' if doubled else f'adding {_px(add_qty)}'} at "
+            f"{_px(add_px)} is {_px(new_avg)} — the average of {_px(held)} at {_px(average)} and "
+            f"{_px(add_qty)} at {_px(add_px)}, before fees")
+    base = mark or add_px
+    return said + (f"; that is {new_avg / base - 1:+.1%} from {_px(base)}." if base else ".")
+
+
+def is_statement(text: str) -> bool:
+    """A statement this module should price before any other engine reads it: more than one fill,
+    a later fill, an option or spread, or a single leg carrying what the older single-leg reader
+    misses (scientific notation, a negative price, a fee or funding)."""
+    if _HYPOTHETICAL.search(text):
+        return False
+    if re.search(r"\b\d+(?:\.\d+)?\s*x\b", text, re.I) and re.search(r"\bliquidat\w*|\bstop\b",
+                                                                   text, re.I):
+        return False  # a levered entry with its liquidation or stop asked: `server`'s own engine
+    events, _rest = _events(text)
+    if not events:
+        return False
+    if len(events) >= 2 or any(e.kind != "open" or e.side in ("sell", "again") for e in events):
+        return True
+    if price_statement(text) is not None:
+        return True  # one leg with its own typed mark ("Long 10 SOL at 150, now 160")
+    return bool(re.search(r"\d[eE][-+]?\d", text) or events[0].price < 0 or _FEE_PCT.search(text)
+                or _FEE_USD.search(text) or _FUNDING_USD.search(text))
+
+
+_FX = re.compile(r"\b(?P<pair>EUR|GBP)\s*[/-]?\s*USD\s*(?:at|of|=|is|rate)?\s*"
+                 r"(?P<r>\d+(?:\.\d+)?)\b",
+                 re.I)
+
+
+def _fx_rates(text: str) -> dict[str, float]:
+    """Dollars per unit of each currency the statement states: "EURUSD 1.10"."""
+    return {m.group("pair").upper(): float(m.group("r")) for m in _FX.finditer(text)}
+
+
+def _fee_rate(text: str) -> tuple[float, bool]:
+    m = _FEE_PCT.search(text)
+    if m is None:
+        return 0.0, False
+    pct = number(m.group("pct") or m.group("pct2"))
+    return pct, bool(m.group("each")) or bool(re.search(r"\bsold|sell|closed|covered\b", text,
+                                                         re.I))
+
+
+def _marks(text: str, rest: str, events: list[_Event], held: set[str],
+           ) -> dict[tuple[str, str], float]:
+    """Each typed mark, keyed by (name, venue); "" venue is the name's mark on any venue.
+
+    Marks are read in the order written, and a mark that names no instrument ("converges at
+    72,000", "perp 64,300") belongs to the last one named before it — a leg or an earlier mark."""
+    marks: dict[tuple[str, str], float] = {}
+    seen: list[tuple[int, str]] = [(e.start, e.symbol) for e in events if e.symbol]
+
+    def name_before(at: int) -> str | None:
+        before = [s for p, s in seen if p < at]
+        return before[-1] if before else None
+
+    for e in events:
+        if e.kind == "open":
+            leg = _LEG_MARK.match(text, e.end)
+            if leg is not None and e.symbol:
+                marks[(e.symbol, e.venue)] = number(leg.group("px"))
+                rest = rest[:leg.start()] + " " * (leg.end() - leg.start()) + rest[leg.end():]
+    found: list[tuple[int, int, str, re.Match[str]]] = []
+    for kind, pattern in (("pronoun", _PRONOUN_MARK), ("mark", _MARK), ("venue", _VENUE_MARK),
+                          ("bare", _BARE_MARK), ("pct", _PCT_MARK)):
+        found += [(m.start(), m.end(), kind, m) for m in pattern.finditer(rest)]
+    found.sort(key=lambda f: (f[0], -f[1]))
+    taken_to = -1
+    weak_words = ("to", "is", "at", "is at", "=", ":")
+    for start, end, kind, m in found:
+        if start < taken_to:
+            continue
+        px_raw = m.groupdict().get("px")
+        if kind == "pct":
+            symbol = _symbol(m.group("sym")) if m.group("sym") else name_before(start)
+            if not symbol or symbol not in held or any(k[0] == symbol for k in marks):
+                continue
+            entries = [e for e in events if e.symbol == symbol and e.kind == "open"]
+            if not entries:
+                continue
+            base = number(m.group("base")) if m.group("base") else entries[0].price
+            down = m.group("dir").lower() in _DOWN_WORDS
+            marks[(symbol, "")] = base * (1 + (-1 if down else 1) * float(m.group("pct")) / 100)
+        elif kind == "bare":
+            symbol = _symbol(m.group("sym"))
+            if symbol not in held or symbol is None:
+                continue
+            marks.setdefault((symbol, ""), number(px_raw or "0"))
+        elif kind == "pronoun":
+            symbol = name_before(start)
+            if symbol is None:
+                continue
+            marks.setdefault((symbol, ""), number(px_raw or "0"))
+        elif kind == "venue":
+            symbol = name_before(start)
+            if symbol is None:
+                continue
+            marks.setdefault((symbol, _venue(m.group("venue"))), number(px_raw or "0"))
+        else:
+            how = m.group("how").lower()
+            named = (m.group("sym") or "").lower()
+            if "index" in how or named == "index":
+                for held_name in held:
+                    if _group(held_name):
+                        marks[(held_name, "")] = number(px_raw or "0")
+                taken_to = end
+                continue
+            symbol = _symbol(m.group("sym"))
+            venue = _venue(m.group("venue") or m.group("venue2"))
+            weak = how in weak_words
+            if symbol is not None and symbol not in held:
+                if weak:
+                    continue
+                symbol = None
+            if symbol is None:
+                if weak and not venue:
+                    continue
+                symbol = name_before(start)
+            if symbol is None:
+                continue
+            marks.setdefault((symbol, venue), number(px_raw or "0"))
+        seen.append((start, symbol))
+        seen.sort()
+        taken_to = end
+    # one index future marked carries its index's level to the others on that index
+    for (name, venue), level in list(marks.items()):
+        group = _group(name)
+        if group:
+            for other in held:
+                if _group(other) == group:
+                    marks.setdefault((other, venue), level)
+    return marks
+
+
+def _run(events: list[_Event], marks: dict[tuple[str, str], float], expiry: float | None,
+         fee_pct: float, fee_each: bool, mode: str, price: Callable[[str], float | None] | None,
+         *, fx_of: dict[str, tuple[float, str]] | None = None,
+         ) -> tuple[list[str], float, list[str], set[str], float, float, float] | None:
+    positions: dict[tuple[str, str, str], _Position] = {}
+    lines: list[str] = []
+    realised = unrealised = fees = 0.0
+    unpriced: list[str] = []
+    live_used: set[str] = set()
+
+    rates = fx_of or {}
+
+    def mult(symbol: str) -> float:
+        return MULTIPLIER.get(symbol, 1.0)
+
+    def to_usd(symbol: str) -> float:
+        return rates[symbol][0] if symbol in rates else 1.0
+
+    def fee(notional: float, opening: bool) -> float:
+        if not fee_pct or (not opening and not fee_each):
+            return 0.0
+        return abs(notional) * fee_pct / 100
+
+    def mark_of(symbol: str, venue: str) -> float | None:
+        for key in ((symbol, venue), (symbol, ""), *(k for k in marks if k[0] == symbol)):
+            if key in marks:
+                return marks[key]
+        if price is None:
+            return None
+        try:
+            live = price(symbol)
+        except Exception:
+            live = None
+        if live:
+            live_used.add(symbol)
+        return live
+
+    def consume(pos: _Position, qty: float, at: float, said: str) -> None:
+        nonlocal realised
+        left = qty
+        order = pos.lots if mode == "FIFO" else list(reversed(pos.lots))
+        gained = 0.0
+        for lot in order:
+            if left <= 0:
+                break
+            used = min(lot.qty, left)
+            gained += ((at - lot.price) * used * (1 if pos.side == "long" else -1)
+                       * mult(pos.symbol) * to_usd(pos.symbol))
+            lot.qty -= used
+            left -= used
+        pos.lots[:] = [lot for lot in pos.lots if lot.qty > 1e-12]
+        realised += gained
+        lines.append(f"{pos.symbol}: {'sold' if pos.side == 'long' else 'covered'} "
+                     f"{_px(qty - left)} at {_px(at)} against the {pos.side} — {_money(gained)} "
+                     f"realised" + (f" ({mode})" if mode == "LIFO" else "") + ".")
+        if left > 1e-9:
+            unpriced.append(f"{said} is larger than the {pos.side} position held")
+
+    last_close_side = "sell"
+    last_side = "long"
+    for e in events:
+        if e.side == "again":
+            e = _Event(**{**e.__dict__, "side": last_side})
+        elif e.kind == "open":
+            last_side = e.side
+        if e.kind == "spread":
+            lines.extend(_spread_lines(e, expiry))
+            payoff = _spread_value(e, expiry)
+            if payoff is not None:
+                realised += payoff
+            continue
+        symbol = e.symbol or ""
+        if e.kind == "option":
+            lines.append(_option_line(e, expiry))
+            value = _option_value(e, expiry)
+            if value is None:
+                continue
+            realised += value
+            continue
+        m = mult(symbol)
+        longs = positions.setdefault((symbol, e.venue, "long"), _Position(symbol, e.venue, "long"))
+        shorts = positions.setdefault((symbol, e.venue, "short"),
+                                      _Position(symbol, e.venue, "short"))
+        if e.kind == "open":
+            side = e.side
+            if side == "buy":
+                side = "cover" if shorts.qty > 0 and longs.qty == 0 else "long"
+            if side == "sell":
+                side = "sell" if longs.qty > 0 else "short"
+            if side in ("cover", "sell"):
+                target = shorts if side == "cover" else longs
+                consume(target, e.qty or target.qty, e.price, e.said)
+                fees += fee(e.price * (e.qty or 0) * m, False)
+                last_close_side = side
+                continue
+            pos = longs if side == "long" else shorts
+            pos.lots.append(_Lot(e.qty or 0.0, e.price))
+            fees += fee(e.price * (e.qty or 0) * m, True)
+            continue
+        # a close
+        side = e.side or last_close_side
+        if side == "close":
+            side = "sell" if longs.qty > 0 else "cover"
+        target = longs if side == "sell" else shorts
+        if target.qty <= 0:
+            return None
+        qty = e.qty if e.qty is not None else (target.qty / 2 if e.rest == "half" else target.qty)
+        consume(target, qty, e.price, e.said)
+        fees += fee(e.price * qty * m, False)
+        last_close_side = side
+    for pos in positions.values():
+        if pos.qty <= 1e-12:
+            continue
+        mark = mark_of(pos.symbol, pos.venue)
+        if mark is None:
+            unpriced.append(pos.symbol)
+            continue
+        sign = 1 if pos.side == "long" else -1
+        pnl = (mark - pos.average) * pos.qty * sign * mult(pos.symbol) * to_usd(pos.symbol)
+        unrealised += pnl
+        where = f" {pos.venue}" if pos.venue else ""
+        per = (f" x ${_px(mult(pos.symbol))} a point" if mult(pos.symbol) != 1 else "")
+        if pos.symbol in rates:
+            per += f" x {rates[pos.symbol][0]:g} USD per {rates[pos.symbol][1]}"
+        formula = (f"({_px(mark)} - {_px(pos.average)})" if pos.side == "long"
+                   else f"({_px(pos.average)} - {_px(mark)})")
+        lines.append(f"{pos.symbol}{where}: {pos.side} {_px(pos.qty)} from {_px(pos.average)}, "
+                     f"marked {_px(mark)}"
+                     + (f" (worth ${mark * pos.qty * to_usd(pos.symbol):,.2f})"
+                        if pos.side == "long" and mult(pos.symbol) == 1 else "")
+                     + f" — {formula} x {_px(pos.qty)}{per} = {_money(pnl)} "
+                     f"unrealised.")
+    total = realised + unrealised - fees
+    return lines, total, unpriced, live_used, realised, unrealised, fees
+
+
+def _option_value(e: _Event, expiry: float | None) -> float | None:
+    if expiry is None:
+        return None
+    payout = max(e.strike - expiry, 0.0) if e.option == "put" else max(expiry - e.strike, 0.0)
+    each = (payout - e.price) if e.side == "long" else (e.price - payout)
+    return each * 100 * (e.qty or 1)
+
+
+def _option_line(e: _Event, expiry: float | None) -> str:
+    n = e.qty or 1
+    kind = f"{e.option}{'s' if n != 1 else ''}"
+    head = (f"{e.symbol}: {e.side} {_px(n)} {_px(e.strike)} {kind} at {_px(e.price)} "
+            f"(100 shares each)")
+    even = e.strike - e.price if e.option == "put" else e.strike + e.price
+    if expiry is None:
+        if e.side == "short":
+            worst = ((e.strike - e.price) * 100 * n if e.option == "put" else None)
+            return (f"{head}: keeps {_money(e.price * 100 * n)} if it expires worthless; "
+                    + (f"the most it can lose is {_money(-(worst or 0))}, at a price of 0; "
+                       if worst is not None else "the loss on a short call has no cap; ")
+                    + f"breakeven {_px(even)}.")
+        return (f"{head}: the most it can lose is the {_money(-e.price * 100 * n)} paid; "
+                f"breakeven {_px(even)}.")
+    payout = max(e.strike - expiry, 0.0) if e.option == "put" else max(expiry - e.strike, 0.0)
+    value = _option_value(e, expiry) or 0.0
+    formula = (f"({_px(e.price)} - {_px(payout)})" if e.side == "short"
+               else f"({_px(payout)} - {_px(e.price)})")
+    return (f"{head}, {e.symbol} at {_px(expiry)} at expiry: each pays out {_px(payout)}, so "
+            f"{formula} x 100 x {_px(n)} = {_money(value)}.")
+
+
+def _spread_value(e: _Event, expiry: float | None) -> float | None:
+    if expiry is None:
+        return None
+    k1, k2, n = e.strike, e.strike2, e.qty or 1
+    if e.option == "call":
+        width_paid = min(max(expiry - k1, 0.0), k2 - k1)
+    else:
+        width_paid = min(max(k2 - expiry, 0.0), k2 - k1)
+    debit = e.price - e.premium2
+    return (width_paid - debit) * 100 * n if e.side in ("bull", "bear") else None
+
+
+def _spread_lines(e: _Event, expiry: float | None) -> list[str]:
+    k1, k2, n = e.strike, e.strike2, e.qty or 1
+    net = e.price - e.premium2
+    debit = net > 0
+    width = k2 - k1
+    if debit:
+        best, worst = (width - net) * 100 * n, net * 100 * n
+    else:
+        best, worst = -net * 100 * n, (width + net) * 100 * n
+    if e.option == "call":
+        breakeven = k1 + net if debit else k1 - net
+        legs = (f"buy the {_px(k1)} call at {_px(e.price)}, sell the {_px(k2)} call at "
+                f"{_px(e.premium2)}")
+    else:
+        breakeven = k2 - net if debit else k2 + net
+        legs = (f"buy the {_px(k2)} put at {_px(e.price)}, sell the {_px(k1)} put at "
+                f"{_px(e.premium2)}")
+    lines = [f"{e.side.capitalize()} {e.option} spread, {_px(n)} lot{'s' if n != 1 else ''} "
+             f"({legs}): net {'debit' if debit else 'credit'} {_px(abs(net))} a share; most it can "
+             f"make {_money(best)}, most it can lose {_money(-worst)}, breakeven {_px(breakeven)} "
+             f"at expiry (100 shares a contract)."]
+    value = _spread_value(e, expiry)
+    if value is not None:
+        lines.append(f"At {_px(expiry or 0)} at expiry it is worth {_money(value)} after the cost.")
+    return lines
+
+
+_SHARE_OF_BOOK = re.compile(
+    rf"(?:\$\s?(?P<total>{NUM_POS})[^%;]{{0,40}}?(?P<w>\d+(?:\.\d+)?)\s*%\s+(?:of\s+it\s+)?"
+    rf"(?:is\s+)?(?:in|into|on)\s+(?P<sym>{SYM})|(?P<w2>\d+(?:\.\d+)?)\s*%\s+of\s+(?:my\s+)?"
+    rf"(?:\$\s?)(?P<total2>{NUM_POS})\s+(?:portfolio\s+|book\s+|account\s+)?(?:is\s+)?"
+    rf"(?:in|into|on)\s+(?P<sym2>{SYM}))", re.I)
+
+
+def share_of_book(text: str) -> list[str] | None:
+    """"$50,000. 30% in NVDA. NVDA falls 20%": the move on the share, against the whole.
+
+    It was answered as if all $50,000 were in NVDA (a hostile review, round 25)."""
+    m = _SHARE_OF_BOOK.search(text)
+    if m is None:
+        return None
+    total = number(m.group("total") or m.group("total2"))
+    weight = float(m.group("w") or m.group("w2")) / 100
+    symbol = _symbol(m.group("sym") or m.group("sym2")) or ""
+    move = None
+    for p in _PCT_MARK.finditer(text[m.end():]):
+        named = _symbol(p.group("sym")) if p.group("sym") else symbol
+        if named == symbol:
+            down = p.group("dir").lower() in ("falls", "fall", "fell", "drops", "drop", "dropped",
+                                              "declines", "decline", "is down", "goes down",
+                                              "down", "-", "\u2212")
+            move = (-1 if down else 1) * float(p.group("pct")) / 100
+            break
+    if move is None or not 0 < weight <= 1 or total <= 0:
+        return None
+    held = total * weight
+    change = held * move
+    return [f"Bottom line: {'a loss' if change < 0 else 'a gain'} of {_money(abs(change))[1:]} "
+            f"({move * weight:+.2%} of the ${total:,.0f}) — the {move:+.0%} move hits only the "
+            f"{weight:.0%} in {symbol}, ${held:,.0f}; the book becomes ${total + change:,.0f}.",
+            f"{symbol}: ${held:,.0f} x {move:+.0%} = {_money(change)}; the other "
+            f"${total - held:,.0f} is read as unchanged, since no move was given for it."]
+
+
+trace_module(globals())

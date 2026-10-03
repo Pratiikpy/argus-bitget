@@ -1980,6 +1980,22 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                        if worst and len(request.book) > 1 else "")
                     + " (market-driven part only, through each beta)."
                 )
+                if (lead_here and shocked in request.book and len(request.book) > 1
+                        and outcome is outcomes[0]):
+                    # "if bitcoin halves, how much do I lose?" on $40k gold and $10k bitcoin was
+                    # answered with gold moved through its beta to bitcoin, $9,392, when the
+                    # question was bitcoin's own $5,000 (a first-time user, round 25): the named
+                    # holding alone first, the linked figure beside it
+                    own_move = float(outcome.shock.removeprefix("benchmark ").rstrip("%")) / 100
+                    part = request.book[shocked] * own_move
+                    said_alone = (f"${abs(part * stated_value):,.0f}" if stated_value else
+                                  f"{abs(part):.2%} of the book")
+                    lines[-1] = lines[-1].removeprefix("Bottom line: ")
+                    lines.insert(len(lines) - 1, (
+                        f"Bottom line: {shocked_name} alone {'gains' if part > 0 else 'loses'} "
+                        f"{said_alone} ({request.book[shocked]:.0%} of the book x "
+                        f"{own_move:+.0%}); if the other holdings also move with it as their "
+                        f"betas say, the book moves as below."))
                 levered = request.leverage or 0.0
                 if lead_here and levered > 1.0:
                     # "NVDA 120%, cash -20%" is 1.2x on the trader's own money, and was rescaled to

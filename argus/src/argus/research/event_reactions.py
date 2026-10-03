@@ -234,6 +234,11 @@ def _hourly(symbol: str) -> dict[datetime, float]:
     return {}
 
 
+hourly = _hourly
+"""A year of hourly closes for one contract, read by the on-demand study in
+`lui/research/macro_moves.py`."""
+
+
 def _block_sizes(window: EventWindow, bars: int) -> list[float]:
     """Absolute abnormal returns summed over non-overlapping ``bars``-long blocks of the
     estimation window: the name's ordinary 24-hour idiosyncratic move, for scale."""

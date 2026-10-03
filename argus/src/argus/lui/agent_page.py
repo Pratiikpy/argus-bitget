@@ -65,9 +65,23 @@ def _metrics(metrics: Mapping[str, Any], envelope: Mapping[str, Any]) -> str:
     # the whole book's equity, open positions included, so the two can point opposite ways.
     few = ""
     if isinstance(closed, int) and 0 < closed < SAMPLE_TO_READ:
+        # the next trade's effect, worked from the win count: "one more trade moves the win rate
+        # by 12 points or more" was printed beside 2 wins in 7, where a win takes it to 37.5% and
+        # a loss to 25.0% (a judge, round 25)
+        try:
+            rate = float(metrics.get("win_rate"))  # type: ignore[arg-type]
+        except (TypeError, ValueError):
+            rate = None
+        if rate is not None and 0.0 <= rate <= 1.0:
+            wins = round(rate * closed)
+            after_win, after_loss = (wins + 1) / (closed + 1), wins / (closed + 1)
+            moved = (f"the next win takes the win rate to {after_win:.1%} and the next loss to "
+                     f"{after_loss:.1%}, from {wins / closed:.1%} now")
+        else:
+            moved = (f"one more trade moves the win rate by up to {100 / (closed + 1):.0f} "
+                     f"points")
         few = (f"<p class='dim few'>On {closed} closed trade{'' if closed == 1 else 's'} these "
-               f"figures say little yet: one more trade moves the win rate by "
-               f"{100 / (closed + 1):.0f} points or more. The Sharpe is read from the whole "
+               f"figures say little yet: {moved}. The Sharpe is read from the whole "
                f"book's equity, open positions included; the win rate from closed trades "
                f"alone.</p>")
     return ("<div class='tw'><table class='m'><thead><tr><th>Metric</th><th>Agent</th>"

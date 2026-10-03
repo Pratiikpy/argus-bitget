@@ -198,6 +198,10 @@ _ASK_WORDS = re.compile(
     # "... Check that for me." and "... Is that right?" closing a thesis (round 23)
     r"\s*[.?!]?\s*(?:please\s+)?check\s+(?:that|this|it)(?:\s+(?:for\s+me|out))?[\s?.!]*$|"
     r"\s*[.?!]?\s*(?:is|isn'?t)\s+(?:that|this|it)\s+(?:right|correct|true|fair)[\s?.!]*$|"
+    # "... Is the data with me?" closing a thesis (a judge, round 25)
+    r"\s*[.?!]?\s*(?:is|are)\s+the\s+(?:data|numbers|facts)\s+(?:with\s+me|on\s+my\s+side|"
+    r"behind\s+me)[\s?.!]*$|\s*[.?!]?\s*do(?:es)?\s+the\s+(?:data|numbers)\s+(?:agree|back\s+"
+    r"(?:me|it|this)|support\s+(?:me|it|this))[\s?.!]*$|"
     # "... What would prove me wrong?" closing a thesis was read as a second reason (round 23)
     r"\s*[.?!]?\s*what\s+(?:would|could|might)\s+(?:prove|show|make)\s+(?:me|it|this|that)\s+"
     r"(?:wrong|be\s+wrong)[\s?.!]*$|"
@@ -769,7 +773,11 @@ _DIRECTION = re.compile(
     r"\bwill\b.{0,20}\b(?:go\s+up|go\s+down|rise|fall|rally|drop|climb|sink|moon|crash|pump|dump|"
     r"higher|lower)\w*|\b(?:go|goes|going|head|heads|headed|heading|move|moves|trend|trends)"
     r"\s+(?:up|down|higher|lower)\b|\b(?:keeps?|kept)\s+(?:running|rising|climbing|going\s+up|"
-    r"falling|sinking|going\s+down)\b|\b(?:runs?|keeps?\s+running)\s+(?:higher|further)\b", re.I)
+    r"falling|sinking|going\s+down)\b|\b(?:runs?|keeps?\s+running)\s+(?:higher|further)\b|"
+    # "I think Nvidia's run is over" was "not tested" (a judge, round 25): a call that a rise has
+    # ended is a direction, down
+    r"\b(?:run|rally|uptrend|bull\s+run|move\s+up)\s+is\s+(?:over|done|finished|ending)\b|"
+    r"\b(?:has|have)\s+(?:peaked|topped(?:\s+out)?)\b|\bwill\s+(?:reverse|roll\s+over)\b", re.I)
 """A bare direction: "X will go up", "BTC is heading lower", "NVDA keeps running" (read as nothing
 testable and scored "not tested", a judge, round 13)."""
 
@@ -850,7 +858,8 @@ def _direction(reason: Reason, long_run: Mapping[str, Any], name: str) -> Tested
         return Tested(reason.text, reason.kind, Result.NOT_TESTED,
                       f"No long-run daily history answered for {name}, so the direction cannot be "
                       f"set against what followed similar days.")
-    down = bool(re.search(r"\b(?:down|fall|drop|sink|crash|dump|lower)\b", reason.text, re.I))
+    down = bool(re.search(r"\b(?:down|fall|drop|sink|crash|dump|lower|over|done|finished|ending|"
+                          r"peaked|topped|reverse|roll\s+over)\b", reason.text, re.I))
     sign = -1 if down else 1
     best = max(rows, key=lambda r: sign * float(r.get("z") or 0))
     z = float(best.get("z") or 0)

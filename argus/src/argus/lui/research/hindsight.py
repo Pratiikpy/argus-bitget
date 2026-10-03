@@ -49,7 +49,11 @@ HINDSIGHT_Q = re.compile(
 
 DCA_Q = re.compile(r"\bdca\b|dollar[\s-]cost\s+averag\w*|\baverag\w*\s+in(?:to)?\b|"
                    r"\bbuy\s+(?:a\s+little\s+)?(?:every|each)\s+(?:week|month)\b|"
-                   r"\blump[\s-]?sum\b", re.I)
+                   r"\blump[\s-]?sum\b|"
+                   # "if I put $100 a week into bitcoin for a year" was priced as one $100 order
+                   # (a first-time user, round 25)
+                   r"\$\s?\d[\d,]*(?:\.\d+)?\s*(?:k\s+)?(?:a|per|every|each)\s+(?:week|month|"
+                   r"day)\b", re.I)
 """A question about averaging into a position over time."""
 
 
@@ -210,17 +214,27 @@ def dca(text: str, symbol: str, *, today: date, daily: Callable[[str], Any] | No
     if len(window) < 40:
         return ([f"Bottom line: too little of {ticker}'s history falls in that window to compare "
                  f"averaging with buying at once."], [], {})
-    # the first trading day of each calendar month in the window
+    # "$100 a week into bitcoin for a year" is $100 each week, not $100 in all (a first-time
+    # user, round 25): a sum said per period is each buy, on that period's first trading day
+    periodic = re.search(r"\$\s?(?P<a>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k)?\s+(?:a|per|every|each)\s+"
+                         r"(?P<f>week|month|day)\b", text, re.I)
+    every = periodic.group("f").lower() if periodic is not None else "month"
+    # the first trading day of each calendar month (or ISO week, or day) in the window
     buys, seen = [], set()
     for d in window:
-        key = (d.day.year, d.day.month)
+        key = ((d.day.year, d.day.month) if every == "month" else
+               tuple(d.day.isocalendar()[:2]) if every == "week" else (d.day.toordinal(),))
         if key not in seen:
             seen.add(key)
             buys.append(d)
-    # "I have $1,000 ... should I DCA into BTC" was worked on $10,000 (a first-time user,
-    # round 24): the amount said is the amount averaged
-    stake = stated_amount(text) or STAKE
-    part = stake / len(buys)
+    if periodic is not None:
+        part = float(periodic.group("a").replace(",", "")) * (1000 if periodic.group("k") else 1)
+        stake = part * len(buys)
+    else:
+        # "I have $1,000 ... should I DCA into BTC" was worked on $10,000 (a first-time user,
+        # round 24): the amount said is the amount averaged
+        stake = stated_amount(text) or STAKE
+        part = stake / len(buys)
     units_lump = stake / window[0].close
     units_dca, spent, worst_dca, peak_dca, worst_lump, peak_lump = 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
     buy_days = {d.day for d in buys}
@@ -237,15 +251,21 @@ def dca(text: str, symbol: str, *, today: date, daily: Callable[[str], Any] | No
     end_dca, end_lump = units_dca * last.close, units_lump * last.close
     ahead = "averaging" if end_dca > end_lump else "buying at once"
     lines = [
-        f"Bottom line: over {window[0].day:%b %Y} to {last.day:%b %Y}, ${stake:,.0f} put into "
-        f"{name} in {len(buys)} equal monthly buys would now be ${end_dca:,.0f}, against "
-        f"${end_lump:,.0f} bought all at once on {window[0].day:%d %b %Y} — {ahead} came out "
-        f"ahead.",
+        (f"Bottom line: ${part:,.0f} a {every} into {name} from {window[0].day:%d %b %Y} — "
+         f"{len(buys)} buys, ${stake:,.0f} in all — would now be worth ${end_dca:,.0f} "
+         f"({end_dca / stake - 1:+.1%}); the same ${stake:,.0f} bought all at once on "
+         f"{window[0].day:%d %b %Y} would be ${end_lump:,.0f} — {ahead} came out ahead."
+         if periodic is not None else
+         f"Bottom line: over {window[0].day:%b %Y} to {last.day:%b %Y}, ${stake:,.0f} put into "
+         f"{name} in {len(buys)} equal monthly buys would now be ${end_dca:,.0f}, against "
+         f"${end_lump:,.0f} bought all at once on {window[0].day:%d %b %Y} — {ahead} came out "
+         f"ahead."),
         f"The ride: the averaged account's worst fall from its peak was {abs(worst_dca):.1%}, the "
         f"lump sum's {abs(worst_lump):.1%} — averaging's case is the smaller fall while it builds, "
         f"not a higher end value.",
-        f"The buys were ${part:,.0f} a month; the same ${stake:,.0f} spread weekly over a year is "
-        f"about ${stake / 52:,.0f} a week.",
+        (f"The buys were ${part:,.0f} a month; the same ${stake:,.0f} spread weekly over a year "
+         f"is about ${stake / 52:,.0f} a week." if periodic is None else
+         f"Each buy was ${part:,.0f} at that {every}'s first daily close; fees left out."),
         "The choice is yours and depends on what you would do in a fall; this is what one window "
         "of real closes did, not a forecast. Name another start (\"since 2022\") to see a "
         "different window.",

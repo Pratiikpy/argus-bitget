@@ -88,6 +88,8 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     "sentiment_comparison.json",
     # Read by event questions: how each name reacted to CPI, Fed decisions and its earnings.
     "event_reactions.json",
+    # Read by name resolution: SEC's company names ("Micron" is MU), `market/company_names.py`.
+    "company_names.json",
     # Read by add-to-book questions: the post-trade beta's measured record against weekend-copilot.
     "copilot_rivals.json",
     "copilot_stress.json",

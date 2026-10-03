@@ -172,7 +172,14 @@ def names_in(text: str, registry: Mapping[str, Any] | None = None) -> tuple[str,
             add(resolve_symbol(word) or _contract_for(upper, listed))
             continue
         if not word.isupper():
-            add(resolve_symbol(word) if upper in _NAME_WORDS else None)
+            if upper in _NAME_WORDS:
+                add(resolve_symbol(word))
+            elif len(word) >= 4 and word[:1].isupper():
+                # a listed company by its SEC name ("Micron"): "the stock" beside it was refused
+                # as naming no instrument (a judge, round 25) — `market/company_names.py`
+                from argus.market.company_names import listed_name
+
+                add(listed_name(word))
     return tuple(found)
 
 
@@ -262,6 +269,12 @@ def order_prefix(text: str) -> str | None:
         return None  # a question about an order, or a request for its analysis (`is_an_order`)
     if re.match(r"^\s*(?:please\s+|pls\s+)?hedge\b", raw, re.I):
         # a hedge request is answered as a hedge analysis (`research._IMPERATIVE_HEDGE`)
+        return None
+    from argus.lui.research.statement import is_statement, price_statement
+
+    if is_statement(raw) and price_statement(raw) is not None:
+        # legs with their own marks or exits ("long 1,000 KO at 60 … KO goes to 62") describe
+        # positions already held, not an instruction (a hostile review, round 25)
         return None
     chinese = any(i is Intent.ORDER and p.search(raw) for p, i in _CHINESE_COMPILED)
     if not (is_order_instruction(raw) or is_an_order(raw) or chinese

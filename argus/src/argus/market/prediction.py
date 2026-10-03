@@ -75,6 +75,8 @@ class Market:
     volume: float
     ends: str
     url: str
+    token: str = ""
+    """The YES outcome's CLOB token, which `price_history` reads."""
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -100,6 +102,36 @@ def _search(term: str, *, timeout: float = 10.0) -> list[dict[str, Any]]:
     with _lock:
         _cache[term] = (now, events)
     return events
+
+
+CLOB = "https://clob.polymarket.com"
+
+
+def _yes_token(market: dict[str, Any]) -> str:
+    try:
+        return str(json.loads(market.get("clobTokenIds") or "[]")[0])
+    except (ValueError, IndexError, TypeError):
+        return ""
+
+
+def price_history(token: str, *, interval: str = "1w", timeout: float = 10.0,
+                  ) -> list[tuple[datetime, float]]:
+    """A market's YES price over ``interval`` from Polymarket's CLOB (``/prices-history``, keyless):
+    "how have those odds changed over the last week?" got today's odds alone (a judge, round 25)."""
+    if not token:
+        return []
+    try:
+        found = http.fetch_json(f"{CLOB}/prices-history", timeout=timeout,
+                                params={"market": token, "interval": interval, "fidelity": 360})
+    except http.RpcError as exc:
+        raise PredictionError(f"Polymarket price history failed: {http.reason_of(exc)}") from exc
+    out = []
+    for point in (found or {}).get("history") or []:
+        try:
+            out.append((datetime.fromtimestamp(int(point["t"]), UTC), float(point["p"])))
+        except (KeyError, TypeError, ValueError):
+            continue
+    return out
 
 
 def _yes(market: dict[str, Any]) -> float | None:
@@ -141,7 +173,8 @@ def relevant(events: list[dict[str, Any]], terms: tuple[str, ...], *,
                 question=question, yes_price=yes,
                 change_24h=float(change) if isinstance(change, (int, float)) else None,
                 volume=volume, ends=ends[:10],
-                url=f"https://polymarket.com/market/{market.get('slug') or ''}"))
+                url=f"https://polymarket.com/market/{market.get('slug') or ''}",
+                token=_yes_token(market)))
     low, high = INFORMATIVE
     found.sort(key=lambda m: (not low <= m.yes_price <= high, -m.volume))
     return found

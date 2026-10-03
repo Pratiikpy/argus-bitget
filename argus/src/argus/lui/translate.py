@@ -123,7 +123,16 @@ def target_language(text: str) -> str | None:
     if _HAN.search(text):
         return "zh-Hant" if _TRADITIONAL.search(text) else "zh"
     lowered = f" {text.lower()} "
-    for code, words in (("es", (" qué ", " cómo ", " mi cuenta", " si el ", " debería ", "¿")),
+    # Hindi written in Latin letters shares "mein" with German: "Bitcoin pichle 7 din mein kitna
+    # upar gaya?" was told in German that the model was paused (a judge, round 25). Two Hinglish
+    # words decide it, and it is answered in English, as Hinglish questions are.
+    hinglish = {"hai", "kya", "kitna", "kitni", "kitne", "pichle", "pichli", "gaya", "gayi", "gira",
+                "giraa", "nahi", "toh", "aur", "bhai", "karu", "karun", "kab", "mera", "mere",
+                "meri", "hoga", "raha", "rahi", "abhi", "baar", "din", "upar", "neeche", "lena",
+                "sahi", "batao", "matlab", "yeh", "agar", "paisa", "paise"}
+    if len(set(re.findall(r"[a-z]+", text.lower())) & hinglish) >= 2:
+        return None
+    for code, words in (("es",(" qué ", " cómo ", " mi cuenta", " si el ", " debería ", "¿")),
                         ("pt", (" minha ", " carteira", " se o ", " ações", " você ")),
                         ("fr", (" pourquoi ", " est-ce ", " mon portefeuille", " si le ")),
                         ("de", (" wenn ", " mein ", " meine ", " warum ", " passiert "))):

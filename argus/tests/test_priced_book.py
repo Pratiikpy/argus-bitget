@@ -105,7 +105,8 @@ class TestNothingIsSilent:
 
     def test_the_saved_book_answer_shows_each_conversion(self) -> None:
         lines = saved_book_lines("long 2 NVDAUSDT, long 1 TSLAUSDT, $5k cash")
-        assert lines[0].startswith("Bottom line: your saved book reads as 7% NVDA, 7% TSLA")
+        assert lines[0].startswith("Bottom line: your saved book is worth about $5,800 at "
+                                   "Bitget's last prices — 7% NVDA, 7% TSLA")
         assert "with 86% in cash" in lines[0]
         assert lines[1] == ("Priced at Bitget's last price: 2 NVDA = $400 (200.00), "
                             "1 TSLA = $400 (400.00), $5,000 cash.")

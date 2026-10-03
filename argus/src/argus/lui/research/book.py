@@ -282,6 +282,16 @@ def _book_report(request: ResearchRequest, data: MarketData,
                f"a {request.budget:.0%} risk budget, which {len(weights)} names cannot all meet."
                if 1 / len(weights) > request.budget else "")
         )
+        value = request.book_value or (float(request.notional) if request.notional else None)
+        if value:
+            # the trades that reach it, in dollars: "what trades get me there on a $50k book?"
+            # got a different target's caps that summed to $41k (a judge, round 25)
+            moves = {s: (balanced[s] * invested - weights[s]) * value for s in balanced}
+            lines.append(f"To get there on the ${value:,.0f} book: " + "; ".join(
+                f"{'buy' if d > 0 else 'sell'} about ${abs(d):,.0f} of {_t(s)}"
+                for s, d in sorted(moves.items(), key=lambda kv: kv[1]) if abs(d) >= 1)
+                + " — the buys are paid for by the sales, so the book's value is unchanged "
+                  "before fees.")
     elif has_short and all(w < 0 for w in weights.values()):
         # "I am short $50,000 of NVDA" was told its short "does not move with the longs enough to
         # hedge them" when there are no longs (a hostile review, round 22)
@@ -572,6 +582,15 @@ def _event_reaction(symbol: str, raw_text: str) -> tuple[list[str], list[Source]
         if symbol.removesuffix("USDT") in studied:
             return [f"{ticker} files no earnings of its own, so there is no earnings reaction to "
                     f"measure; ask how it reacts to CPI or Fed decisions."], []
+        # not one of the twelve studied names: measured now, on its own hourly closes
+        # ("How does bitcoin usually react on CPI day?" was refused, a judge, round 25)
+        from argus.lui.research.macro_moves import event_move_lines
+
+        on_demand = [line for kind in wanted if kind in ("CPI", "FOMC")
+                     for line in (event_move_lines(symbol, kind) or [])]
+        if on_demand:
+            return on_demand, [Source(kind="computation", ref="argus.lui.research.macro_moves",
+                                     detail="release-hour moves on Bitget hourly closes")]
         return [f"Event reactions are measured for the twelve names the desk trades "
                 f"({', '.join(studied)}); {ticker} is not one of them."], []
     when = str(report.get("generated_at", ""))[:10]
@@ -689,6 +708,12 @@ def _hedge_cost_text(total_bps: float, *, brief: bool = False) -> str:
     return f", for about {total_bps:.1f}bps to put on and hold {HEDGE_HOLDING_DAYS} days"
 
 
+HALF_ASKED = re.compile(r"\bhedge\s+(?:only\s+)?half\b|\bhalf\s+(?:of\s+)?(?:it|the\s+book|"
+                        r"my\s+book|the\s+(?:risk|exposure))\b|\b50\s*%\s+(?:of\s+)?(?:it|"
+                        r"the\s+book|my\s+book)\b", re.I)
+"""A hedge asked for half the book: "hedge half of it"."""
+
+
 def _hedge_plan(book: Mapping[str, float], value: Decimal,
                 raw_text: str) -> tuple[list[str], list[Source], dict[str, Any]]:
     """Every candidate hedge for ``book``, measured the same way, and the one to use.
@@ -749,6 +774,10 @@ def _hedge_plan(book: Mapping[str, float], value: Decimal,
         tickers = {}
     rows: list[dict[str, Any]] = []
     unmeasured: dict[str, str] = {}
+    # "hedge half of it" was answered with the full hedge (a judge, round 25). A hedge of a
+    # fraction h of the beta removes h(2 - h) of the variance the full one removes: the residual
+    # market part is (1 - h)^2 of what it was, so half the short removes three quarters of it.
+    fraction = 0.5 if HALF_ASKED.search(raw_text) else 1.0
     for leg in candidates:
         # Each leg is measured over its own overlap with the book, so one young listing (a
         # named leg with a short history) cannot shrink the window every other leg is read on.
@@ -766,7 +795,7 @@ def _hedge_plan(book: Mapping[str, float], value: Decimal,
             continue
         if slope <= 0 and leg not in named:
             continue
-        size = (value * Decimal(str(round(abs(slope), 4)))).quantize(Decimal("1"))
+        size = (value * Decimal(str(round(abs(slope) * fraction, 4)))).quantize(Decimal("1"))
         if size <= 0:
             unmeasured[leg] = "it does not move with this book at all"
             continue
@@ -782,7 +811,8 @@ def _hedge_plan(book: Mapping[str, float], value: Decimal,
                               cost_model=CostModel.bitget_perp(funding_rate=ticker.funding_rate))
         cost = quote.cost_model.charge(quote.entry_fill(size),
                                        holding_days=Decimal(HEDGE_HOLDING_DAYS), long=slope < 0)
-        rows.append({"leg": leg, "beta": slope, "r2": rho * rho, "size": size,
+        rows.append({"leg": leg, "beta": slope,
+                     "r2": rho * rho * fraction * (2 - fraction), "size": size,
                      "entry_bps": float((cost.commission + cost.spread) / size * 10000),
                      "funding_bps": float(cost.funding / size * 10000),
                      "total_bps": float(cost.bps_of(size)),
@@ -815,7 +845,11 @@ def _hedge_plan(book: Mapping[str, float], value: Decimal,
             f"{r['r2']:.0%} of the book's variance; entry {r['entry_bps']:.1f}bps"
             + (" (more than the visible book)" if not r["complete"] else "")
             + (f", funding over {HEDGE_HOLDING_DAYS} days {abs(funding):.1f}bps "
-               + ("paid" if funding > 0 else "received") if abs(funding) >= 0.05
+               + ("paid" if funding > 0 else "received")
+               # the dollars too: "cost per week in funding" got basis points alone (a judge,
+               # round 25)
+               + f" (about ${abs(funding) * float(r['size']) / 10_000:,.0f})"
+               if abs(funding) >= 0.05
                else ", no funding at the current rate")
             + (f" — {r['total_bps']:.1f}bps all in." if r["total_bps"] >= 0
                else f" — earns {abs(r['total_bps']):.1f}bps net."))
@@ -864,9 +898,13 @@ def _hedge_plan(book: Mapping[str, float], value: Decimal,
         head = head.replace("Bottom line: hedge with", f"Bottom line: {clause}, hedge with", 1)
     lines.insert(0, head)
     lines.extend(events)
-    lines.append(f"Sized on a ${value:,.0f} book" + (" (stated)" if value != HEDGE_BOOK_VALUE
+    lines.append(f"Sized on a ${value:,.0f} book" + (" (your book's own value)"
+                                                      if value != HEDGE_BOOK_VALUE
                                                       else " — say your book's value for its "
-                                                           "own sizes") + ".")
+                                                           "own sizes")
+                 + (", hedging half of it as asked: each short is half the full beta hedge and "
+                    "removes three quarters of the variance the full one would" if fraction < 1
+                    else "") + ".")
     return lines, [data.source, Source(kind="venue", ref="bitget order books + funding rates",
                                        detail=f"{', '.join(_t(r['leg']) for r in rows)}; live")], \
         {"legs": rows, "pick": best["leg"], "live": data.live}

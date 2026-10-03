@@ -399,8 +399,8 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
         "Measure it rather than take a label: ask \"how much could I lose on QQQ in a bad week\" "
         "and the same for BTC, and compare the dollars with what you could afford to lose.",
         "Without leverage, the most you can lose is what you put in.")),
-    (re.compile(r"\brevenge[\s-]?trad\w*|\bwin\s+(?:it\s+|my\s+money\s+|my\s+losses\s+)?back\b",
-                re.I), (
+    (re.compile(r"\brevenge[\s-]?trad\w*|\b(?:win|make|get|earn)\s+(?:it\s+|my\s+money\s+|my\s+"
+                r"losses\s+|that\s+)?back\b|\brecover\s+(?:my\s+)?loss(?:es)?\b", re.I), (
         "Bottom line: no — trading to win back a loss is how small losses become large "
         "ones: the size goes up while the judgement goes down.",
         "Stop for the day, write down what went wrong (size, exit, leverage), and come back with "
@@ -409,7 +409,8 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
         "the next trade.")),
     (re.compile(r"\b(?:i'?m|i\s+am)\s+\d{2}\b[^?]{0,40}\b(?:retired|retiree|pension\w*)\b|"
                 r"\bsuitable\s+for\s+(?:someone|a\s+person|people)\s+like\s+me\b|"
-                r"\b(?:retired|retiree)\b[^?]{0,40}\b(?:suitable|safe|right|okay|ok)\b", re.I), (
+                r"\b(?:retired|retiree)\b[^?]{0,40}\b(?:suitable|safe|right|okay|ok)\b|"
+                r"\bretirement\s+(?:savings|money|fund|nest\s+egg|pot)\b", re.I), (
         "Bottom line: whether it suits you is a question for a licensed adviser who knows your "
         "circumstances; this console is a research tool and cannot judge that.",
         "What it can show plainly: single coins and leverage can fall by half or more in a year, "
@@ -473,13 +474,48 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
         "traded briefly below $1 in the same week before returning.",
         "So it moves far less than a coin, but it is a claim on an issuer, not cash in a bank.")),
     (re.compile(r"\b(?:buy|get|own)\s+(?:a\s+)?(?:half|part|fraction|piece|bit)\s+(?:of\s+)?"
-                r"(?:a\s+)?share\b|\bfractional\s+shares?\b", re.I), (
+                r"(?:a\s+)?(?:share|one|coin|it)\b|\bfractional\s+shares?\b", re.I), (
         "Bottom line: yes in effect — on Bitget you buy a stock's rToken or perpetual by "
         "amount, not by whole share, so half a share's worth is an ordinary order, within the "
         "minimum order size Bitget sets for that market.",
         "Neither is the share itself: it tracks the price; there is no vote, and the rToken's "
         "terms (dividends, redemption) are Bitget's to set.",
         "Ask \"what does it cost to buy $100 of NVDA\" for the fee on a real order.")),
+    # Round 25, a first-time user: each of these got a desk log, a decline or a sentiment line
+    (re.compile(r"\bi(?:'?m|\s+am)\s+(?:only\s+)?(?:1[0-7]|thirteen|fourteen|fifteen|sixteen|"
+                r"seventeen)\b(?!\s*(?:%|x\b|k\b|thousand|years?\s+(?:into|of\s+trading)))",
+                re.I), (
+        "Bottom line: Bitget's terms require anyone using it to be at least 18 (section 2.2 of its "
+        "terms of use), so at 16 you cannot open an account there, with $200 or any amount.",
+        "Learning costs nothing: ask this console anything — \"how much could I lose on BTC "
+        "in a bad week with $200\" shows what that money would have been through — and keep "
+        "the $200 until you can decide for yourself, without leverage.",)),
+    (re.compile(r"\b(?:just\s+)?(?:hold(?:ing)?|keep(?:ing)?|stay(?:ing)?\s+in|park(?:ing)?)\s+"
+                r"(?:it\s+in\s+)?(?:usdt|usdc|stable\s*coins?|cash)\b", re.I), (
+        "Bottom line: holding USDT keeps the money near $1 a coin while you decide — it does "
+        "not grow, and it is not risk-free: it is a claim on its issuer, Tether.",
+        "It has wobbled: USDT traded briefly below $1 in May 2022, the week TerraUSD collapsed, "
+        "and recovered; TerraUSD itself never did.",
+        "Compared with buying a coin, the trade-off is giving up the upside to avoid the swings; "
+        "ask \"how much could I lose on BTC in a bad week\" to see what is being avoided.")),
+    (re.compile(r"\bsame\s+(?:thing\s+)?as\s+(?:owning|holding|buying)\s+(?:the\s+)?(?:actual\s+)?"
+                r"(?:bitcoin|btc|ether|eth|crypto|the\s+coin)\b", re.I), (
+        "Bottom line: on Bitget's spot market, yes — buying BTC there is owning bitcoin, held "
+        "in your Bitget account, and you can withdraw it to a wallet of your own.",
+        "A BTC perpetual is not: it is a contract on the price, with leverage, funding payments "
+        "and liquidation, and there is no coin to withdraw.",
+        "For a first buy without leverage, spot is the simple one.")),
+    (re.compile(r"\b(?:does\s+)?(?:anything|any\s+of\s+(?:this|these|it))\s+(?:here\s+)?pay\s+(?:me\s+)?"
+                r"(?:a\s+)?(?:regular\s+)?(?:income|dividends?|interest|yield)\b|\b(?:dividends?|"
+                r"passive\s+income|regular\s+income)\b[^?]{0,30}\b(?:here|on\s+bitget|from\s+this)\b",
+                re.I), (
+        "Bottom line: not the way a dividend does. A perpetual contract pays no dividend, and "
+        "whether a stock's rToken passes on its dividends is set by Bitget's rToken terms, which "
+        "this console has not verified.",
+        "The one regular payment on perpetuals is funding, and it changes sign: a position "
+        "receives it when the other side is crowded and pays it the rest of the time, so it is "
+        "not income you can plan on.",
+        "Ask \"what is the funding on BTC\" to see which side is paid right now.")),
     # "wat r the fees here" got a desk decision's evidence once the model allowance ran out (a
     # first-time user, round 24)
     (re.compile(r"\b(?:wh?at|wat)\s+(?:r|are|is)\s+(?:the\s+)?(?:trading\s+)?fees?\b|\bhow\s+much\s+"

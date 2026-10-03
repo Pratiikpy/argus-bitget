@@ -37,7 +37,16 @@ THESIS_ASK = re.compile(
     # "Bull case on AMZN: AWS margins expanding. Test it." and "Thesis: ..." got a risk profile
     # (a judge, round 24)
     r"^\W*(?:bull|bear)(?:ish)?\s+case\b[^?]{0,200}\b(?:test|check|verify|validate)\s+(?:it|this|"
-    r"that)\b|^\W*(?:my\s+)?thesis\s*:|\bwhich\s+of\s+(?:these|my\s+reasons)\s+"
+    r"that)\b|"
+    # "Bear case on Tesla: deliveries are peaking and margins are shrinking. Is the data with
+    # me?" was told no thesis had been stated (a judge, round 25)
+    r"\b(?:is|are)\s+the\s+(?:data|numbers|facts)\s+(?:with\s+me|on\s+my\s+side|behind\s+me)\b|"
+    r"\bdo(?:es)?\s+the\s+(?:data|numbers)\s+(?:agree|back\s+(?:me|it|this)|support\s+(?:me|it|"
+    r"this))\b|"
+    # "I think Nvidia's run is over. Test that." (a judge, round 25)
+    r"\bi\s+(?:think|believe|reckon|expect|feel)\b[^?]{0,160}[.!]\s*(?:please\s+)?(?:test|check|"
+    r"verify|validate|challenge)\s+(?:it|this|that)\b|"
+    r"^\W*(?:my\s+)?thesis\s*:|\bwhich\s+of\s+(?:these|my\s+reasons)\s+"
     r"(?:is|are)\s+(?:the\s+)?(?:strongest|weakest|best)\b|\bmy\s+thesis\b[^?]{0,200}"
     r"\btrue\s+or\s+false\b|"
     # "My view: META is cheap because ... Check that for me." and "Bearish AAPL: iPhone sales are
@@ -321,7 +330,13 @@ def _apply(revision: str, reasons: list[Any]) -> tuple[list[Any], list[Any]] | N
 SIZE_ASKED = re.compile(r"\bsiz(?:e|ing)\b|\bposition\b|\bhow\s+(?:much|big|large|small)\b", re.I)
 """A follow-up that also asks how big the position should be."""
 
-_BEARISH = re.compile(r"\b(?:short(?:ing)?|bearish|bear\s+case|fade|sell(?:ing)?)\b", re.I)
+_BEARISH = re.compile(
+    r"\b(?:short(?:ing)?|bearish|bear\s+case|fade|sell(?:ing)?)\b|"
+    # "I think Nvidia's run is over" was tested as a bull case and its follow-up "so should I cut
+    # it?" answered as a buy (a judge, round 25)
+    r"\b(?:run|rally|uptrend|party|bull\s+run|boom)\s+is\s+(?:over|done|finished|ending)\b|"
+    r"\b(?:overvalued|overpriced|overbought|peaked|peaking|topped|topping|bubble|going\s+(?:to\s+)?"
+    r"(?:fall|drop|crash|zero)|will\s+(?:fall|drop|crash)|headed\s+(?:lower|down))\b", re.I)
 
 
 def _case(earlier: str) -> str:

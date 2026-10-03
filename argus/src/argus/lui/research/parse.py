@@ -1075,7 +1075,21 @@ def resolve_name(raw: str, *, trust_case: bool = True) -> tuple[str, str] | None
         return universe.resolve(upper)
     if upper in _NAMED_COMPANIES:
         return universe.resolve(_NAMED_COMPANIES[upper])
+    word = raw.strip()
+    if len(word) >= 4 and word.isalpha() and (word[:1].isupper() or upper not in _LOWER_RISKY):
+        # a listed company by its name, from SEC's register ("Micron" is MUUSDT): it was read as
+        # no instrument (a judge, round 25) — `market/company_names.py`
+        from argus.market.company_names import listed_name
+
+        listed = listed_name(word)
+        if listed is not None:
+            return universe.resolve(listed)
     return None
+
+
+_LOWER_RISKY = frozenset({"ZOOM", "UBER", "VISA", "SNAP", "SHOP", "ARM"})
+"""Listed company names that are also ordinary lower-case words ("zoom in", "uber bullish"): read
+as the company only when written with a capital."""
 
 
 _LOWERCASE_INDEX = frozenset({"SPY", "IWM", "DIA", "GLD", "SLV", "TLT"})
@@ -1853,6 +1867,12 @@ def _price_book(text: str) -> PricedBook | None:
     # The index as it is written in a sentence: "$5k in an S&P fund" (a first-user audit,
     # 2026-09-30).
     text = re.sub(r"\bS\s*&\s*P(?:\s*500)?(?![\w&])", "SP500", text, flags=re.I)
+    # share counts in the trader's language: "50 Aktien Microsoft", "NVDA 100股" were read as an
+    # equal-weight list (a judge, round 25)
+    text = re.sub(r"(\d[\d.,]*)\s+(?:Aktien|Aktie|acciones|acción|actions|action|ações|azioni|"
+                  r"aandelen)\s+(?:de\s+|von\s+|der\s+|di\s+|van\s+)?", r"\1 shares of ", text,
+                  flags=re.I)
+    text = re.sub(r"([A-Za-z]{1,10})\s*(\d[\d.,]*)\s*(?:股|只)", r"\2 shares of \1", text)
     converted: list[str] = []
 
     def per_contract(m: re.Match[str]) -> str:
@@ -4052,7 +4072,13 @@ def saved_book_lines(book_text: str) -> list[str]:
     body = strip_budget(book_text) if budget is not None else book_text
     book, cash = split_cash(body, parse_book(body))
     held = [f"{w:.0%} {_t(s)}" for s, w in book.items()]
-    lines = [f"Bottom line: your saved book reads as {', '.join(held) or 'no listed holdings'}"
+    priced = priced_book(body)
+    worth = getattr(priced, "value", 0.0) or 0.0
+    # its value first: "Wie viel ist mein Depot wert" was answered with weights alone (a judge,
+    # round 25)
+    lines = [(f"Bottom line: your saved book is worth about ${worth:,.0f} at Bitget's last prices "
+              f"— " if worth else "Bottom line: your saved book reads as ")
+             + f"{', '.join(held) or 'no listed holdings'}"
              + (f", with {cash:.0%} in cash" if cash else "")
              + (f"; your risk budget is {budget:.0%} of book risk for any one name."
                 if budget is not None else
@@ -4177,8 +4203,18 @@ def with_book(request: ResearchRequest | None, book_text: str,
         return replace(request, book=book, symbols=(candidate, *others), notes=(*kept, note))
     if request.kind in (ResearchKind.STRESS, ResearchKind.BOOK):
         valued = priced_book(book_text)
+        # a value said in the question wins: "what trades get me there on a $50k book?" on a
+        # book saved as weights (a judge, round 25)
+        said = re.search(r"\b(?:book|portfolio|account)\s+(?:is\s+)?worth\s+\$\s?(?P<a>\d[\d,]*"
+                         r"(?:\.\d+)?)\s*(?P<k>k|m)?\b|\bon\s+a\s+\$\s?(?P<a2>\d[\d,]*(?:\.\d+)?)"
+                         r"\s*(?P<k2>k|m)?\s+(?:book|portfolio|account)\b", question or "", re.I)
+        stated_value = None
+        if said is not None:
+            stated_value = float((said.group("a") or said.group("a2")).replace(",", "")) * {
+                "k": 1e3, "m": 1e6}.get((said.group("k") or said.group("k2") or "").lower(), 1.0)
         return replace(request, book=book, symbols=tuple(book), notes=(*kept, note),
-                       book_value=valued.value if valued is not None and valued.value else None)
+                       book_value=stated_value or (valued.value if valued is not None
+                                                   and valued.value else None))
     if request.kind is ResearchKind.MACRO and not request.symbols:
         return replace(request, book=book, symbols=tuple(book), notes=(*kept, note))
     if (request.kind is ResearchKind.HEDGE and len(request.symbols) == 1
@@ -4206,7 +4242,15 @@ def with_book(request: ResearchRequest | None, book_text: str,
         # "hedge my crypto" with a saved 60/40 BTC/ETH book was answered for BTC alone (critic,
         # 2026-09-24): the default is only for a trader who has not said what they hold.
         kept = tuple(n for n in kept if "read as bitcoin" not in n)
-        return replace(request, book=book, symbols=tuple(book), notes=(*kept, note))
+        # sized on the saved book's own value, not the $100,000 default: a book of 100 AAPL and
+        # 50 NVDA, $45,079 by the console's own count, was hedged with a $104,680 short (a judge,
+        # round 25)
+        priced = priced_book(book_text)
+        notional = request.notional
+        if notional is None and priced is not None and priced.value:
+            notional = Decimal(str(round(priced.value * (1 - priced.cash), 2)))
+        return replace(request, book=book, symbols=tuple(book), notes=(*kept, note),
+                       notional=notional)
     return request
 
 

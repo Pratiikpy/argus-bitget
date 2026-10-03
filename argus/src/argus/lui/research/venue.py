@@ -261,7 +261,8 @@ def _leverage(symbol: str, multiple: float, side: str, *, closure: str | None = 
         liq = entry_price * (1 - distance if side == "long" else 1 + distance)
         lines.append(f"Liquidation price: a {multiple:g}x {side} opened at the last price, "
                      f"{entry_price:,.6g}, is liquidated near {liq:,.6g} on isolated margin, "
-                     f"{distance:.1%} {'below' if side == 'long' else 'above'} entry; cross "
+                     f"{distance:.1%} ({abs(entry_price - liq):,.6g} in price) "
+                     f"{'below' if side == 'long' else 'above'} entry; cross "
                      f"margin moves it by whatever else the account holds.")
         payload_liq: float | None = liq
     else:

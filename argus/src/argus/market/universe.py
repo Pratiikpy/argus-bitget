@@ -108,6 +108,7 @@ ALIASES: dict[str, str] = {
     "BITCOIN": "BTCUSDT",
     "BTC": "BTCUSDT",
     "ETHEREUM": "ETHUSDT",
+    "ETHER": "ETHUSDT",         # the coin's own name; "How does ether react to Fed decisions?"
     "ETH": "ETHUSDT",
     "SOLANA": "SOLUSDT",
     "SOL": "SOLUSDT",
