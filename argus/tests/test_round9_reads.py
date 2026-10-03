@@ -159,7 +159,7 @@ def test_the_console_keeps_answers_in_the_order_asked_and_shows_a_saved_book() -
     from argus.lui.server import PAGE, allowance_note
 
     assert "pending-${++askSeq}" in PAGE and "id=\"clearbook\"" in PAGE.replace("'", '"')
-    assert "counted per network address" in allowance_note("203.0.113.9")
+    assert "for your network address" in allowance_note("203.0.113.9")
 
 
 def test_the_proof_page_explains_its_words() -> None:

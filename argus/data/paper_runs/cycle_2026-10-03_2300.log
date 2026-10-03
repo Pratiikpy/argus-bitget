@@ -67,3 +67,93 @@ bookcalib_exit=0
 
 12 profile(s) written to argus\data\session_risk.json
 session_risk_exit=0
+symbol        RTH bps/h  wknd bps/h  attenuation  anchor
+NVDAUSDT          32.22        4.25         7.58  OK
+TSLAUSDT          35.77        5.36         6.67  OK
+AAPLUSDT          22.35        3.83         5.84  OK
+MSFTUSDT          25.19        3.84         6.56  OK
+METAUSDT          36.52        5.40         6.76  OK
+GOOGLUSDT         24.67        5.18         4.76  OK
+AMZNUSDT          24.28        3.88         6.26  OK
+COINUSDT          59.94       11.77         5.09  OK
+MSTRUSDT          59.13       15.77         3.75  OK
+QQQUSDT           14.30        3.09         4.63  OK
+TQQQUSDT          43.36        7.38         5.88  OK
+SQQQUSDT          44.43        6.19         7.18  OK
+
+  all 12 shipped instruments still attenuate past 2.5x when the anchor market shuts
+
+written to argus\data\universe_validation.json
+universe_exit=0
+CPI dates: 13, FOMC decisions: 57 -> argus\data\event_calendar.json
+  Wed 14 Oct 12:30 UTC  US CPI release
+  Wed 28 Oct 18:00 UTC  FOMC rate decision
+  Tue 10 Nov 13:30 UTC  US CPI release
+calendar_exit=0
+event_reactions.json is under 20h old; not refreshed
+event_reactions_exit=0
+502 macro readings written
+macro_exit=0
+  NVDAUSDT hedged with NVDA index (all): r=+0.987 [95% low +0.986], optimal ratio 0.977 removes 97.5% of variance, one-for-one removes 97.4%, n=1438
+  NVDAUSDT hedged with NVDA index (extended): r=+0.998 [95% low +0.998], optimal ratio 0.988 removes 99.7% of variance, one-for-one removes 99.7%, n=423
+  NVDAUSDT hedged with NVDA index (overnight): r=+0.992 [95% low +0.991], optimal ratio 0.980 removes 98.5% of variance, one-for-one removes 98.5%, n=339
+  NVDAUSDT hedged with NVDA index (rth): r=+0.999 [95% low +0.999], optimal ratio 0.984 removes 99.8% of variance, one-for-one removes 99.8%, n=253
+  NVDAUSDT hedged with NVDA index (weekend): r=+0.996 [95% low +0.995], optimal ratio 1.002 removes 99.1% of variance, one-for-one removes 99.1%, n=396
+  TSLAUSDT hedged with TSLA index (all): r=+0.988 [95% low +0.987], optimal ratio 0.989 removes 97.7% of variance, one-for-one removes 97.7%, n=1438
+  TSLAUSDT hedged with TSLA index (extended): r=+0.999 [95% low +0.998], optimal ratio 0.996 removes 99.7% of variance, one-for-one removes 99.7%, n=423
+  TSLAUSDT hedged with TSLA index (overnight): r=+0.996 [95% low +0.995], optimal ratio 0.997 removes 99.2% of variance, one-for-one removes 99.2%, n=339
+  TSLAUSDT hedged with TSLA index (rth): r=+0.999 [95% low +0.999], optimal ratio 0.994 removes 99.9% of variance, one-for-one removes 99.9%, n=253
+  TSLAUSDT hedged with TSLA index (weekend): r=+0.985 [95% low +0.981], optimal ratio 0.992 removes 97.0% of variance, one-for-one removes 97.0%, n=396
+  AAPLUSDT hedged with AAPL index (all): r=+0.985 [95% low +0.984], optimal ratio 0.979 removes 97.1% of variance, one-for-one removes 97.1%, n=1438
+  AAPLUSDT hedged with AAPL index (extended): r=+0.996 [95% low +0.995], optimal ratio 0.980 removes 99.2% of variance, one-for-one removes 99.2%, n=423
+  AAPLUSDT hedged with AAPL index (overnight): r=+0.993 [95% low +0.992], optimal ratio 1.001 removes 98.7% of variance, one-for-one removes 98.7%, n=339
+  AAPLUSDT hedged with AAPL index (rth): r=+0.998 [95% low +0.998], optimal ratio 0.980 removes 99.7% of variance, one-for-one removes 99.6%, n=253
+  AAPLUSDT hedged with AAPL index (weekend): r=+0.993 [95% low +0.992], optimal ratio 1.000 removes 98.7% of variance, one-for-one removes 98.7%, n=396
+  MSFTUSDT hedged with MSFT index (all): r=+0.983 [95% low +0.981], optimal ratio 0.996 removes 96.6% of variance, one-for-one removes 96.6%, n=1438
+  MSFTUSDT hedged with MSFT index (extended): r=+0.996 [95% low +0.995], optimal ratio 0.991 removes 99.2% of variance, one-for-one removes 99.2%, n=423
+  MSFTUSDT hedged with MSFT index (overnight): r=+0.992 [95% low +0.990], optimal ratio 0.990 removes 98.4% of variance, one-for-one removes 98.4%, n=339
+  MSFTUSDT hedged with MSFT index (rth): r=+0.997 [95% low +0.996], optimal ratio 1.001 removes 99.4% of variance, one-for-one removes 99.4%, n=253
+  MSFTUSDT hedged with MSFT index (weekend): r=+0.995 [95% low +0.993], optimal ratio 1.005 removes 98.9% of variance, one-for-one removes 98.9%, n=396
+  METAUSDT hedged with META index (all): r=+0.989 [95% low +0.988], optimal ratio 0.989 removes 97.8% of variance, one-for-one removes 97.8%, n=1438
+  METAUSDT hedged with META index (extended): r=+0.998 [95% low +0.998], optimal ratio 0.986 removes 99.6% of variance, one-for-one removes 99.6%, n=423
+  METAUSDT hedged with META index (overnight): r=+0.996 [95% low +0.995], optimal ratio 0.998 removes 99.2% of variance, one-for-one removes 99.2%, n=339
+  METAUSDT hedged with META index (rth): r=+0.999 [95% low +0.999], optimal ratio 0.994 removes 99.8% of variance, one-for-one removes 99.8%, n=253
+  METAUSDT hedged with META index (weekend): r=+0.996 [95% low +0.995], optimal ratio 1.004 removes 99.2% of variance, one-for-one removes 99.2%, n=396
+  GOOGLUSDT hedged with GOOGL index (all): r=+0.979 [95% low +0.977], optimal ratio 0.981 removes 95.9% of variance, one-for-one removes 95.8%, n=1438
+  GOOGLUSDT hedged with GOOGL index (extended): r=+0.997 [95% low +0.997], optimal ratio 0.992 removes 99.5% of variance, one-for-one removes 99.5%, n=423
+  GOOGLUSDT hedged with GOOGL index (overnight): r=+0.994 [95% low +0.993], optimal ratio 1.002 removes 98.8% of variance, one-for-one removes 98.8%, n=339
+  GOOGLUSDT hedged with GOOGL index (rth): r=+0.998 [95% low +0.998], optimal ratio 0.987 removes 99.7% of variance, one-for-one removes 99.6%, n=253
+  GOOGLUSDT hedged with GOOGL index (weekend): r=+0.988 [95% low +0.985], optimal ratio 1.008 removes 97.6% of variance, one-for-one removes 97.6%, n=396
+  AMZNUSDT hedged with AMZN index (all): r=+0.979 [95% low +0.977], optimal ratio 0.997 removes 95.9% of variance, one-for-one removes 95.9%, n=1438
+  AMZNUSDT hedged with AMZN index (extended): r=+0.995 [95% low +0.994], optimal ratio 1.009 removes 99.0% of variance, one-for-one removes 99.0%, n=423
+  AMZNUSDT hedged with AMZN index (overnight): r=+0.995 [95% low +0.994], optimal ratio 1.003 removes 99.0% of variance, one-for-one removes 99.0%, n=339
+  AMZNUSDT hedged with AMZN index (rth): r=+0.996 [95% low +0.995], optimal ratio 1.004 removes 99.2% of variance, one-for-one removes 99.2%, n=253
+  AMZNUSDT hedged with AMZN index (weekend): r=+0.991 [95% low +0.989], optimal ratio 1.001 removes 98.1% of variance, one-for-one removes 98.1%, n=396
+  COINUSDT hedged with COIN index (all): r=+0.986 [95% low +0.984], optimal ratio 0.992 removes 97.1% of variance, one-for-one removes 97.1%, n=1438
+  COINUSDT hedged with COIN index (extended): r=+0.998 [95% low +0.997], optimal ratio 0.993 removes 99.6% of variance, one-for-one removes 99.6%, n=423
+  COINUSDT hedged with COIN index (overnight): r=+0.994 [95% low +0.993], optimal ratio 0.997 removes 98.9% of variance, one-for-one removes 98.9%, n=339
+  COINUSDT hedged with COIN index (rth): r=+0.999 [95% low +0.999], optimal ratio 0.995 removes 99.9% of variance, one-for-one removes 99.9%, n=253
+  COINUSDT hedged with COIN index (weekend): r=+0.997 [95% low +0.996], optimal ratio 0.997 removes 99.4% of variance, one-for-one removes 99.4%, n=396
+  MSTRUSDT hedged with MSTR index (all): r=+0.982 [95% low +0.980], optimal ratio 0.992 removes 96.4% of variance, one-for-one removes 96.4%, n=1438
+  MSTRUSDT hedged with MSTR index (extended): r=+0.999 [95% low +0.999], optimal ratio 0.994 removes 99.8% of variance, one-for-one removes 99.8%, n=423
+  MSTRUSDT hedged with MSTR index (overnight): r=+0.993 [95% low +0.991], optimal ratio 0.993 removes 98.5% of variance, one-for-one removes 98.5%, n=339
+  MSTRUSDT hedged with MSTR index (rth): r=+1.000 [95% low +1.000], optimal ratio 0.994 removes 99.9% of variance, one-for-one removes 99.9%, n=253
+  MSTRUSDT hedged with MSTR index (weekend): r=+0.996 [95% low +0.995], optimal ratio 0.999 removes 99.2% of variance, one-for-one removes 99.2%, n=396
+  QQQUSDT hedged with QQQ index (all): r=+0.961 [95% low +0.957], optimal ratio 0.975 removes 92.4% of variance, one-for-one removes 92.3%, n=1438
+  QQQUSDT hedged with QQQ index (extended): r=+0.996 [95% low +0.995], optimal ratio 0.990 removes 99.2% of variance, one-for-one removes 99.2%, n=423
+  QQQUSDT hedged with QQQ index (overnight): r=+0.982 [95% low +0.978], optimal ratio 0.998 removes 96.5% of variance, one-for-one removes 96.5%, n=339
+  QQQUSDT hedged with QQQ index (rth): r=+0.997 [95% low +0.997], optimal ratio 0.993 removes 99.5% of variance, one-for-one removes 99.5%, n=253
+  QQQUSDT hedged with QQQ index (weekend): r=+0.983 [95% low +0.979], optimal ratio 1.011 removes 96.6% of variance, one-for-one removes 96.6%, n=396
+  TQQQUSDT hedged with TQQQ index (all): r=+0.970 [95% low +0.966], optimal ratio 0.982 removes 94.0% of variance, one-for-one removes 94.0%, n=1438
+  TQQQUSDT hedged with TQQQ index (extended): r=+0.998 [95% low +0.997], optimal ratio 0.989 removes 99.6% of variance, one-for-one removes 99.6%, n=423
+  TQQQUSDT hedged with TQQQ index (overnight): r=+0.980 [95% low +0.976], optimal ratio 0.992 removes 96.1% of variance, one-for-one removes 96.1%, n=339
+  TQQQUSDT hedged with TQQQ index (rth): r=+0.998 [95% low +0.998], optimal ratio 0.987 removes 99.6% of variance, one-for-one removes 99.6%, n=253
+  TQQQUSDT hedged with TQQQ index (weekend): r=+0.986 [95% low +0.982], optimal ratio 1.018 removes 97.1% of variance, one-for-one removes 97.1%, n=396
+  SQQQUSDT hedged with SQQQ index (all): r=+0.963 [95% low +0.959], optimal ratio 0.983 removes 92.6% of variance, one-for-one removes 92.6%, n=1438
+  SQQQUSDT hedged with SQQQ index (extended): r=+0.995 [95% low +0.994], optimal ratio 0.984 removes 99.0% of variance, one-for-one removes 98.9%, n=423
+  SQQQUSDT hedged with SQQQ index (overnight): r=+0.978 [95% low +0.973], optimal ratio 0.992 removes 95.7% of variance, one-for-one removes 95.7%, n=339
+  SQQQUSDT hedged with SQQQ index (rth): r=+0.995 [95% low +0.994], optimal ratio 1.002 removes 99.1% of variance, one-for-one removes 99.1%, n=253
+  SQQQUSDT hedged with SQQQ index (weekend): r=+0.988 [95% low +0.986], optimal ratio 1.021 removes 97.6% of variance, one-for-one removes 97.6%, n=396
+
+60 measurement(s) written to argus\data\hedge_effectiveness.json
+effectiveness_exit=0

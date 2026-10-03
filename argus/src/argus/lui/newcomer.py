@@ -129,7 +129,9 @@ _MONEY_SAFE = re.compile(
 how rTokens and perpetuals differ)."""
 
 _WITHDRAW = re.compile(
-    r"\bhow\s+(?:do|can|would)\s+i\s+(?:withdraw|take\s+out|cash\s+out|get\s+(?:my\s+)?money\s+out)"
+    # "how do i actually get my money out if i wanna stop" (a first-time user, round 28)
+    r"\bhow\s+(?:do|can|would)\s+i\s+(?:actually\s+|even\s+|ever\s+)?(?:withdraw|take\s+out|"
+    r"cash\s+out|get\s+(?:my\s+)?(?:money|funds|cash)\s+(?:back\s+)?out)"
     r"|\bwithdraw(?:al|ing)?\s+(?:my\s+)?(?:money|funds|crypto|usdt|cash)\b", re.I)
 """Taking money out, which happens on Bitget: "how do I withdraw my money" was declined (a
 first-time user, round 12)."""
@@ -339,6 +341,83 @@ _TRUST_A = (
 user, round 27)."""
 
 explains(*_TRUST_A)
+
+# Round 28 (a first-time user): questions about speculation, other exchanges, identity checks,
+# hidden costs and beginner mistakes were declined or answered with the perpetual-versus-rToken
+# explainer.
+_SPECULATION = re.compile(
+    r"\bis\s+(?:it|this|that|crypto|trading|all\s+this)\s+(?:just\s+|basically\s+|really\s+)?"
+    r"(?:gambling|a\s+casino|a\s+scam|a\s+ponzi)\b|\bno\s+(?:real\s+)?(?:use|utility|purpose)\b|"
+    r"\bwhy\s+(?:would|do|does|did)\s+(?:a\s+|these\s+|those\s+)?(?:coins?|tokens?|memes?|"
+    r"memecoins?)\b[^?]{0,40}\b(?:go|went)\s+up\b|\b(?:dog|meme|joke|shit|frog)\s*coins?\b[^?]{0,40}"
+    r"\b(?:still\s+a\s+thing|worth\s+it|legit|real|a\s+thing)\b|\bmade\s+bank\b", re.I)
+_SPECULATION_A = (
+    "Bottom line: a coin with no business behind it has no earnings to anchor its price, so it "
+    "moves on attention and on money coming in or going out — which is how it can multiply in "
+    "weeks and then lose most of that again. Whether it is gambling comes down to the size: a "
+    "small amount you could lose entirely and shrug off is a bet; your savings is not.",
+    "Ask \"how much could I lose on DOGE in a bad week\" for what that looks like in numbers, "
+    "or \"early signals\" for which coins are moving unusually today — a list to read, not to "
+    "buy.",
+    "This console never says to buy or sell; it measures what a coin has done.",
+)
+_OTHER_EXCHANGE = re.compile(
+    r"\bbitget\b[^?]{0,60}\b(?:coinbase|binance|kraken|okx|bybit|robinhood|kucoin|gemini|"
+    r"crypto\.com|etoro)\b|\b(?:coinbase|binance|kraken|okx|bybit|robinhood|kucoin|gemini|"
+    r"crypto\.com|etoro)\b[^?]{0,60}\bbitget\b", re.I)
+_OTHER_EXCHANGE_A = (
+    "Bottom line: this console reads Bitget's markets and does not rate exchanges, so it will "
+    "not say which is better — the comparison worth making is what each charges, what each "
+    "lists, and how each holds your money.",
+    "On Bitget, from its published schedule at the standard level: 0.10% a side on spot, 0.02% "
+    "(maker) and 0.06% (taker) on USDT perpetuals; beside crypto it lists US-stock perpetuals "
+    "and rTokens. The other exchange's own fee and listing pages give the same figures for it.",
+    "Bitget publishes a Proof of Reserves page and a Protection Fund page; read the equivalent "
+    "on any exchange before keeping money there. If you meant Coinbase's stock, it trades on "
+    "Bitget as COIN — ask \"what is COIN doing today\".",
+)
+_KYC = re.compile(
+    r"\b(?:verify|verified|verification|kyc)\b[^?]{0,40}\b(?:id|identity|bitget|account|start|"
+    r"trade|use)\b|\b(?:id|identity|passport)\b[^?]{0,30}\b(?:to\s+(?:use|trade|start|sign\s+up|"
+    r"buy)|for\s+bitget)\b|\bkyc\b", re.I)
+_KYC_A = (
+    "Bottom line: Bitget asks for identity verification (KYC) — which features need it, and "
+    "when, is set by Bitget's rules for your country, on its help centre and on the sign-up "
+    "screens themselves.",
+    "This console needs none of that: there is no account, no login and no ID here, because it "
+    "only reads public market data and answers questions.",
+)
+_HIDDEN_FEES = re.compile(
+    r"\bhidden\s+(?:fees?|costs?|charges?)\b|\bfees?\b[^?]{0,30}\b(?:hit\s+with|catch|surprise|"
+    r"sneaky)\b|\b(?:all|every|any\s+other)\s+(?:the\s+)?(?:fees?|costs?|charges?)\b", re.I)
+_HIDDEN_FEES_A = (
+    "Bottom line: nothing on Bitget is hidden, but more than one cost applies: the trading fee "
+    "(0.10% a side on spot; 0.02% maker or 0.06% taker on perpetuals, at the standard level), "
+    "the spread you cross with a market order, funding every few hours while a perpetual is "
+    "open, and a network fee on a crypto withdrawal that depends on the coin and the network.",
+    "Bitget shows the withdrawal fee on the withdrawal screen before you confirm, and funding "
+    "on each contract's page. Ask \"what does it cost to buy $500 of BTC\" for the fee and "
+    "spread on the live order book, or \"if I trade 10 times a day with $500 how much do fees "
+    "eat\" for what frequent trading costs a month.",
+    "This console itself is free and takes no cut.",
+)
+_MISTAKES = re.compile(
+    r"\b(?:biggest|common|worst|typical|main|top|usual)\s+(?:beginner\s+|newbie\s+|rookie\s+)?"
+    r"(?:mistakes?|errors?|traps?)\b|\bmistakes?\s+(?:that\s+)?(?:beginners?|newbies?|new\s+"
+    r"traders?|people)\b|\bwhat\s+should\s+i\s+(?:avoid|watch\s+out\s+for|not\s+do)\b", re.I)
+_MISTAKES_A = (
+    "Bottom line: the costliest beginner mistakes are sizes and habits, not picks — too much "
+    "leverage, trading too often, putting in money you cannot lose, and buying after a big run "
+    "because it is in the news.",
+    "Leverage: at 10x a fall of about 9.5% (the 10% margin less Bitget's 0.5% maintenance margin "
+    "at the first tier) closes the position and takes the whole margin; BTC fell 14% in one day "
+    "in February 2026.",
+    "Trading often: ten round trips a day on $500 cost about $180 a month in perpetual fees "
+    "(0.12% each) — 36% of the money, before any gain or loss.",
+    "Size: the usual rule is to hold only what you could lose on the worst day on record without "
+    "it changing your life — ask \"how much could I lose on BTC in a bad week\" for the figure.",
+)
+explains(*_SPECULATION_A, *_OTHER_EXCHANGE_A, *_KYC_A, *_HIDDEN_FEES_A, *_MISTAKES_A)
 explains(*_LOOKAHEAD_A, *_OVERFIT_A, *_SURVIVOR_A, *_COSTS_A, *_NOT_ADVICE, *_BUYING, *_LOSING,
          *_LOSS_HAPPENS_A, *_BEGINNER_SAFE_A,
          *_GOING_WRONG, *_NO_GUARANTEE, *_SAFE, *_WITHDRAWING, *_PLACING, *_FREE_TO_USE)
@@ -591,6 +670,11 @@ def reply(text: str, *, named: bool = False) -> Reply | None:
         return Reply(lines=_NO_GUARANTEE)
     if _TRUST.search(text):
         return Reply(lines=_TRUST_A)
+    for asked_now, answer_now in ((_OTHER_EXCHANGE, _OTHER_EXCHANGE_A), (_KYC, _KYC_A),
+                                  (_HIDDEN_FEES, _HIDDEN_FEES_A), (_MISTAKES, _MISTAKES_A),
+                                  (_SPECULATION, _SPECULATION_A)):
+        if asked_now.search(text):
+            return Reply(lines=answer_now)
     if _ADVICE.search(text):
         return Reply(lines=_NOT_ADVICE)
     if _MONEY_SAFE.search(text):

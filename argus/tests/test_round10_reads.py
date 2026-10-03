@@ -205,7 +205,7 @@ def test_the_pause_says_when_it_lifts() -> None:
     server._VISITS["198.51.100.7"] = [time.monotonic() - 3300.0]
     try:
         assert server.allowance_back_in("198.51.100.7") == 5
-        assert "about 5 more minutes at most" in server.allowance_note("198.51.100.7")
+        assert "frees the next question in about 5 minutes" in server.allowance_note("198.51.100.7")
     finally:
         del server._VISITS["198.51.100.7"]
     assert server.allowance_back_in("198.51.100.8") == 0

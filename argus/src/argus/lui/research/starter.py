@@ -25,11 +25,15 @@ from argus.lui.trace import trace_module
 STARTER_Q = re.compile(
     # "i got like 700 bucks lying around, wat shud i buy" and "I'm new and have $2,000 - what's
     # a sensible way to begin?" were filed as notes and never answered (round 23)
-    r"\b(?:i|and)\s+(?:only\s+|just\s+)?(?:have|got|own|saved|can\s+(?:put|invest|spare))\s+"
+    # "ok so i put in like 300 bucks total wut do i do with it" was kept as a note and its
+    # question dropped (a first-time user, round 28)
+    r"\b(?:i|and)\s+(?:only\s+|just\s+|already\s+)?(?:have|got|own|saved|put\s+in|deposited|"
+    r"can\s+(?:put|invest|spare))\s+"
     r"(?:about\s+|around\s+|"
     r"roughly\s+|only\s+|like\s+|maybe\s+|just\s+)?\$?\s*(?P<amount>\d[\d,]*(?:\.\d+)?)\s*"
     r"(?P<unit>k|thousand|grand|dollars?|usd|usdt|bucks)?\b.{0,300}?(?:wh?at\s+(?:should|shud|"
-    r"shld|do|can|would)\s+i\s+(?:do|buy|get)|(?:sensible|good|best|smart|right)\s+(?:way|place)\s+"
+    r"shld|do|can|would)\s+i\s+(?:do|buy|get)|w(?:u|ha|a|ah)t\s+(?:do|should|shud|can)\s+i\s+"
+    r"do\s+with\s+it|(?:sensible|good|best|smart|right)\s+(?:way|place)\s+"
     r"to\s+(?:begin|start)|(?:way|how)\s+to\s+(?:begin|start)|where\s+(?:should|do|can)\s+"
     r"i\s+(?:put|invest|start)|how\s+(?:should|do|can)\s+i\s+(?:invest|start|begin)|what\s+(?:should|"
     r"do)\s+i\s+(?:buy|invest\s+in)|to\s+invest|invest\s+it|where\s+to\s+start|what\s+to\s+buy|"

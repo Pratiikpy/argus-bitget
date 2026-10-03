@@ -128,7 +128,8 @@ _HORIZON = re.compile(
     r"\b(?P<n3>\d{1,3}|one|two|three|four|six)[\s-]+(?P<u3>hours?|days?|weeks?|months?|years?)"
     r"[\s-]+(?:time\s+|investment\s+|holding\s+|trading\s+)?horizon\b", re.I)
 _HOLDS = re.compile(
-    r"\b(?:i\s+(?:currently\s+|now\s+)?(?:hold|own|have)|i(?:'?m|\s+am)\s+(?:holding|long|in)|"
+    r"\b(?:i\s+(?:currently\s+|now\s+|already\s+|still\s+)?(?:hold|own|have)|i(?:'?m|\s+am)\s+"
+    r"(?:holding|long|in)|"
     r"my\s+(?:current\s+)?(?:book|portfolio|holdings?|allocation)\s+(?:is|are|reads|looks\s+like|:)"
     r")\b[^.?!;\n]*", re.I)
 """Holdings said in a sentence: "I hold 40% NVDA, 30% MSFT, 30% AAPL". Kept as the book, so a later
@@ -405,6 +406,15 @@ def extract(question: str, now: datetime | None = None,
         pairs = holding_pairs(m.group(0))
         if pairs and sum(w for _, _, w in pairs) <= 1.0001:
             add("book", "", str(len(pairs)), m.group(0))
+            continue
+        # "i already own some apple stock on bitget like 2 shares" was declined (a first-time
+        # user, round 28): a count of one named holding is a book of that holding, kept as "2
+        # AAPL" so the book reader prices it
+        counted = re.search(r"(?P<n>\d+(?:\.\d+)?)\s+(?:shares?|coins?|units?|tokens?|contracts?)"
+                            r"\b", m.group(0), re.I)
+        held_names = research_symbols(m.group(0))[0]
+        if counted is not None and len(held_names) == 1:
+            add("book", "", "1", f"{counted.group('n')} {held_names[0].removesuffix('USDT')}")
     if (m := _GOAL.search(text)) is not None:
         goal = next(g for g in m.groups() if g)
         add("goal", "", goal.strip(" ."), m.group(0))

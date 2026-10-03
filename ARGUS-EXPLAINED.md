@@ -711,7 +711,7 @@ python -m argus.market.skills --symbol NVDAUSDT
 And to check the whole thing is what this document says it is:
 
 ```bash
-pytest                    # 11,408 tests
+pytest                    # 11,428 tests
 python -m argus.status    # 152/152 modules importable, 18/18 sub-themes, artefacts on disk
 ```
 
@@ -1198,7 +1198,7 @@ why.
 
 ## Part 11 — The quantitative half, brutally
 
-**The paper-trading log has 1027 decisions on record (2026-10-01). Two were trades — seq 797, BUY 1 NVDAUSDT at 232.45, opened 2026-09-28 13:47 UTC and settled 2026-09-29 at 230.96, a net loss of 1.78 USDT after 0.29 of costs; and seq 884, SELL 1 METAUSDT at 728.17, opened 2026-09-30 13:41 UTC and settled 2026-10-01 at 731.55, a net loss of 4.45 USDT after 1.07 of costs. Every other one is a refusal, and 978 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
+**The paper-trading log has 1029 decisions on record (2026-10-01). Two were trades — seq 797, BUY 1 NVDAUSDT at 232.45, opened 2026-09-28 13:47 UTC and settled 2026-09-29 at 230.96, a net loss of 1.78 USDT after 0.29 of costs; and seq 884, SELL 1 METAUSDT at 728.17, opened 2026-09-30 13:41 UTC and settled 2026-10-01 at 731.55, a net loss of 4.45 USDT after 1.07 of costs. Every other one is a refusal, and 978 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
 
 Track 2 is 50% scored on Sharpe ratio, maximum drawdown and win rate computed from that log. With
 two settled trades, Sharpe and maximum drawdown **do not exist** and the win rate is 0% of two. Not
@@ -1767,7 +1767,7 @@ takes, and every artefact the system writes.
 |---|---|
 | Source modules | **592** files across **20 packages** (2026-09-27) |
 | Registered and importable | **152/152** (`python -m argus.status` checks this at runtime) |
-| Test files / tests | **458 files**, **11,408 tests collected** |
+| Test files / tests | **458 files**, **11,428 tests collected** |
 | Type and lint | `ruff` clean, `mypy --strict` clean on **589 source files** |
 | Artefacts written | **888** files under `argus/data/` |
 | Code-level teardowns of other people's systems | **56** under `research/architecture/` |
@@ -2416,7 +2416,7 @@ source is a build failure, not a typo.
 | Source modules | 592 files, 20 packages; `mypy --strict` clean on 589 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 152/152 modules importable |
-| Tests | 11,408 tests collected, `ruff` clean |
+| Tests | 11,428 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
 | Artefacts on disk | 888 files under `argus/data/`, every one produced by running something |
 | Code-level teardowns of other systems | 62, each citing file and line |
