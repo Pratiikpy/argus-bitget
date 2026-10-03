@@ -733,7 +733,9 @@ def weekend_lines(text: str, prior: Sequence[str]) -> list[str] | None:
 
     if not re.search(r"\bweekends?\b|\bsaturdays?\b|\bsundays?\b|\bsat(?:urday)?\s+(?:and|&|or)\s+"
                      r"sun", text, re.I) or not re.search(
-            r"\b(?:trade|trading|traded|buy|sell|open|closed?|available|work)\b", text, re.I):
+            # "is NVDA tradable on saturday and sunday" (round 27, live re-ask)
+            r"\b(?:trade|trading|traded|trad(?:e)?able|buy|sell|open|closed?|available|work)\b",
+            text, re.I):
         return None
     named = _named_before(text, prior)
     if not named:

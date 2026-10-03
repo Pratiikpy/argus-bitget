@@ -364,3 +364,36 @@ class TestPagesWithoutJavaScript:
                         "fees).")
         assert server._cost_basis_line("40% NVDA, 60% BTC") is None
         assert server._ABOUT_MY_BOOK.search("how risky is my book")
+
+
+class TestLiveReAskFindings:
+    """What the live re-ask of round 27 in new phrasings still caught."""
+
+    def test_the_wall_as_a_refusal_is_replaced(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        wall = ("ETH trades on Bitget (ETHUSDT) but is not one of the twelve stock perpetuals "
+                "the desk decides on, so there is no decision about it on the record")
+        asked: list[str] = []
+
+        def answered(text: str, prior: list[str], **_kw: Any) -> dict[str, Any]:
+            asked.append(text)
+            if "newbie" in text:
+                return {"lines": [wall], "sources": [], "data": {}, "refused": True,
+                        "reason": wall, "classified_by": "patterns"}
+            return {"lines": ["Bottom line: holding ETH has meant this."], "sources": [],
+                    "data": {}, "refused": False, "reason": "", "classified_by": "research"}
+
+        monkeypatch.setattr(server, "_answer", answered)
+        got = server.handle_ask("total newbie here, should i get some eth now", [])
+        assert got["lines"][0] == "Bottom line: holding ETH has meant this."
+        assert asked[-1] == "should I buy ETH" and not got["refused"]
+
+    def test_what_did_i_say_reads_memory(self) -> None:
+        facts = mem.extract("want to build up my $500 slowly",
+                            now=datetime(2026, 10, 3, tzinfo=UTC))
+        said = mem.recall_one("what did i say my budget was", facts)
+        assert said is not None and "$500" in said[0]
+
+    def test_a_daily_routine_says_daily(self) -> None:
+        assert server._routine_lines(None, daily=True)[0].startswith(
+            "Bottom line: a daily five-minute check")
+        assert server._routine_lines(None)[0].startswith("Bottom line: a weekly routine")

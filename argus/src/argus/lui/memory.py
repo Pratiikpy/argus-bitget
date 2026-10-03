@@ -1246,6 +1246,9 @@ _RECALL_ONE_FORMS = tuple(re.compile(p, re.I) for p in (
     # computed figure, not a remembered one.
     r"\bwhat(?:\s+(?:was|is|were|are)|'?s)\s+the\s+" + _WHAT_KEPT
     + r"\s+(?:i|we)\s+(?:told|gave|said|set|mentioned)\b[^?]*\??\s*$",
+    # "what did i say my budget was" (round 27, live re-ask)
+    r"\bwhat\s+(?:did|have)\s+(?:i|we)\s+(?:say|said|tell\s+you|told\s+you|give|set)\s+(?:my\s+|"
+    r"the\s+)?" + _WHAT_KEPT + r"\b(?:\s+(?:was|is|to\s+be))?\s*\??\s*$",
     r"\b(?:remind|tell)\s+me\s+(?:again\s+)?what\s+(?:i|we)\s+(?:said|told\s+you|gave|set)\s+"
     r"(?:my\s+|the\s+)?" + _WHAT_KEPT + r"\b(?:\s+(?:was|is))?\s*\??\s*$",
     r"\b(?:remind|tell)\s+me\s+(?:again\s+)?what\s+(?:my\s+)?" + _WHAT_KEPT

@@ -1804,7 +1804,9 @@ def _round27_follow_up(text: str, prior: list[str], *, now: datetime | None, vis
 
             sum_said = next((first_money.amount_of(q) for q in reversed(prior[-6:])
                              if first_money.amount_of(q) is not None), None)
-        return engine_payload_like(_routine_lines(sum_said), prior, text, by="newcomer")
+        daily = bool(re.search(r"\bdaily\b|\bevery\s+day\b", text, re.I))
+        return engine_payload_like(_routine_lines(sum_said, daily=daily), prior, text,
+                                   by="newcomer")
     return None
 
 
@@ -1879,12 +1881,16 @@ def _dollars(value: float) -> str:
     return f"-${abs(value):,.0f}" if value < 0 else f"${value:,.0f}"
 
 
-def _routine_lines(amount: float | None) -> list[str]:
+def _routine_lines(amount: float | None, *, daily: bool = False) -> list[str]:
     """"ok give me a weekly routine" got "no book is saved" (a first-time user, round 27): a short
-    routine made of questions this console answers, for the sum said when one was."""
+    routine made of questions this console answers, for the sum said when one was. Asked for a
+    daily one, it says the daily part is a five-minute check and the rest is weekly."""
     sized = f" for ${amount:,.0f}" if amount else ""
-    return [f"Bottom line: a weekly routine{sized} that takes about fifteen minutes — each step "
-            f"is a question you can ask here:",
+    lead = (f"Bottom line: a daily five-minute check{sized}, with a longer look once a week — "
+            f"each step is a question you can ask here:" if daily else
+            f"Bottom line: a weekly routine{sized} that takes about fifteen minutes — each step "
+            f"is a question you can ask here:")
+    return [lead,
             "Monday: “anything big this week” — the US releases and earnings that move markets.",
             "On any day you hold something: “what is BTC doing today”, and a tripwire so you do "
             "not have to watch — “if BTC falls below 60000 I sell” is kept and checked each time "
@@ -2254,8 +2260,10 @@ def handle_ask(
                        refused=False, reason="",
                        classified_by="memory", sources=[])
     lead = str((payload.get("lines") or [""])[0])
+    # the wall comes back as a refusal of a desk-record question on the live console ("total
+    # newbie here, should i get some eth now", round 27 live re-ask), and is replaced the same way
     if ("is not one of the twelve stock perpetuals the desk decides on" in lead
-            and not payload.get("refused") and not _IN_WALL_RETRY.get()):
+            and not _IN_WALL_RETRY.get()):
         # "is that enough to buy bitcoin?", "ok and sol" and a tripwire on ETH met the desk's own
         # universe, which answers a question nobody asked (a first-time user, round 27): a
         # question about a listed coin that no engine took gets the coin's own picture
@@ -2265,16 +2273,20 @@ def handle_ask(
                                            if _symbols_on(q)[0]), ())
         if on:
             name = on[0].removesuffix("USDT")
+            # a buying question keeps its shape: what holding the name has meant
+            buying = re.search(r"\b(?:buy|get|grab|invest|ape|put\s+money)\b", text, re.I)
+            retry = f"should I buy {name}" if buying else f"what is {name} doing today"
             retry_token = _IN_WALL_RETRY.set(True)
             try:
-                instead = _answer(f"what is {name} doing today", prior, now=now,
-                                  visitor=visitor, book=book)
+                instead = _answer(retry, prior, now=now, visitor=visitor, book=book)
             finally:
                 _IN_WALL_RETRY.reset(retry_token)
-            if instead.get("lines") and "twelve stock perpetuals" not in str(
-                    instead["lines"][0]):
-                payload = {**instead, "lines": [*instead["lines"],
-                                                f"Read as: what {name} is doing today."]}
+            if (instead.get("lines") and not instead.get("refused")
+                    and "twelve stock perpetuals" not in str(instead["lines"][0])):
+                shown = [str(x) for x in instead["lines"]]
+                if len(shown) > 5 and _NEWCOMER_SAID.search(" ".join([*prior[-6:], text])):
+                    shown = _newcomer_cut(shown)
+                payload = {**instead, "lines": [*shown, f"Read as: “{retry}”."]}
     trip_names = {f.subject.split("|", 1)[0] for f in facts if f.kind == "tripwire"}
     if trip_names and payload.get("lines") and not payload.get("refused"):
         # a tripwire on a name the question is about is checked on that answer
@@ -6081,9 +6093,11 @@ def _answer(
         from argus.lui.research import early_signals as _waking
 
         scanned = _waking.lines(now=now, top=5)
-        no_pick = ("Bottom line: nobody can tell you which coin will 10x, and this console names "
-                "none — the coins that do were rarely predictable, and most that are pitched as "
-                "the next one fall instead.")
+        tenfold = re.search(r"\d+x", text, re.I)
+        said_multiple = tenfold.group(0).lower() if tenfold else "multiply"
+        no_pick = (f"Bottom line: nobody can tell you which coin will {said_multiple}, and this "
+                   f"console names none — the coins that do were rarely predictable, and most "
+                   f"that are pitched as the next one fall instead.")
         body = ([no_pick, "What it can show is which ones are moving unusually right now, which is "
                        "a list to read, not to buy:", *[str(x) for x in scanned[1:]]]
                 if scanned else [no_pick, "Ask \"early signals\" for what is moving unusually "
