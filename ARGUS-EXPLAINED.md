@@ -711,7 +711,7 @@ python -m argus.market.skills --symbol NVDAUSDT
 And to check the whole thing is what this document says it is:
 
 ```bash
-pytest                    # 11,428 tests
+pytest                    # 11,454 tests
 python -m argus.status    # 152/152 modules importable, 18/18 sub-themes, artefacts on disk
 ```
 
@@ -1198,7 +1198,7 @@ why.
 
 ## Part 11 — The quantitative half, brutally
 
-**The paper-trading log has 1029 decisions on record (2026-10-01). Two were trades — seq 797, BUY 1 NVDAUSDT at 232.45, opened 2026-09-28 13:47 UTC and settled 2026-09-29 at 230.96, a net loss of 1.78 USDT after 0.29 of costs; and seq 884, SELL 1 METAUSDT at 728.17, opened 2026-09-30 13:41 UTC and settled 2026-10-01 at 731.55, a net loss of 4.45 USDT after 1.07 of costs. Every other one is a refusal, and 978 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
+**The paper-trading log has 1039 decisions on record (2026-10-01). Two were trades — seq 797, BUY 1 NVDAUSDT at 232.45, opened 2026-09-28 13:47 UTC and settled 2026-09-29 at 230.96, a net loss of 1.78 USDT after 0.29 of costs; and seq 884, SELL 1 METAUSDT at 728.17, opened 2026-09-30 13:41 UTC and settled 2026-10-01 at 731.55, a net loss of 4.45 USDT after 1.07 of costs. Every other one is a refusal, and 978 have settled as abstentions.** Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they recorded fills the risk layer had refused, a `paper/runner.py` defect found and disclosed on 2026-09-20; they stay in the chain unedited and are excluded from every derived figure (`paper/corrections.py`).
 
 Track 2 is 50% scored on Sharpe ratio, maximum drawdown and win rate computed from that log. With
 two settled trades, Sharpe and maximum drawdown **do not exist** and the win rate is 0% of two. Not
@@ -1765,11 +1765,11 @@ takes, and every artefact the system writes.
 
 | | |
 |---|---|
-| Source modules | **592** files across **20 packages** (2026-09-27) |
+| Source modules | **593** files across **20 packages** (2026-09-27) |
 | Registered and importable | **152/152** (`python -m argus.status` checks this at runtime) |
-| Test files / tests | **458 files**, **11,428 tests collected** |
-| Type and lint | `ruff` clean, `mypy --strict` clean on **589 source files** |
-| Artefacts written | **888** files under `argus/data/` |
+| Test files / tests | **458 files**, **11,454 tests collected** |
+| Type and lint | `ruff` clean, `mypy --strict` clean on **590 source files** |
+| Artefacts written | **898** files under `argus/data/` |
 | Code-level teardowns of other people's systems | **56** under `research/architecture/` |
 | Runtime dependencies | **two**: `pydantic`, `python-dateutil`. No numpy, no pandas, no scipy |
 
@@ -2009,7 +2009,7 @@ Also in this package, each described by the first sentence of its own docstring:
 `resolve` — the auto-resolver and the scoreboard, structurally unable to answer early.
 `open_register` — commits a batch and submits its head to four Bitcoin calendars.
 
-Live: **421 claims across all twelve stock perpetuals** (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — what the chain's head was when that proof was taken, so it timestamps the first 36 claims and not the 120 added after. Each scheduled cycle appends and re-anchors; the live head is `41f21e5d743cbb46`. Anchored
+Live: **426 claims across all twelve stock perpetuals** (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — what the chain's head was when that proof was taken, so it timestamps the first 36 claims and not the 120 added after. Each scheduled cycle appends and re-anchors; the live head is `41f21e5d743cbb46`. Anchored
 2026-09-14. The resolver runs on every scheduled cycle.
 
 Also in this package, each described by the first sentence of its own docstring:
@@ -2413,12 +2413,12 @@ source is a build failure, not a typo.
 
 | | |
 |---|---|
-| Source modules | 592 files, 20 packages; `mypy --strict` clean on 589 source files |
+| Source modules | 593 files, 20 packages; `mypy --strict` clean on 590 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 152/152 modules importable |
-| Tests | 11,428 tests collected, `ruff` clean |
+| Tests | 11,454 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
-| Artefacts on disk | 888 files under `argus/data/`, every one produced by running something |
+| Artefacts on disk | 898 files under `argus/data/`, every one produced by running something |
 | Code-level teardowns of other systems | 62, each citing file and line |
 | Competitor entries read at source | 5, each cloned and verified or refuted |
 | Live data sources reaching a decision | 15 |
@@ -3042,7 +3042,7 @@ and anchored. That opening head is `bc36478291a06bc3`, submitted to four indepen
 calendars: `a.pool.opentimestamps.org`, `b.pool.opentimestamps.org`,
 `alice.btc.calendar.opentimestamps.org` and `finney.calendar.eternitywall.com`. The `.ots` proofs
 are in `argus/data/anchors/`, and anyone can verify them with the reference OpenTimestamps client
-without our cooperation. **148 of the 176 carry a Bitcoin block-header attestation** (blocks
+without our cooperation. **148 of the 184 carry a Bitcoin block-header attestation** (blocks
 966,822–969,251); the other 20 are still calendar-pending, which is what a proof honestly
 says until Bitcoin has confirmed it. `python -m argus.register.anchorcheck` re-counts both.
 
@@ -3053,7 +3053,7 @@ says until Bitcoin has confirmed it. `python -m argus.register.anchorcheck` re-c
 > were upgraded against their calendars and rewritten in the standard format. Nothing committed
 > changed; upgrading only appends the path from our digest to a block header.
 
-Each scheduled cycle appends and re-anchors, so the register grows: it now holds **421 falsifiable
+Each scheduled cycle appends and re-anchors, so the register grows: it now holds **426 falsifiable
 claims about all twelve stock perpetuals**, head `41f21e5d743cbb46`. The opening figures above are kept as
 the dated historical record — a register that quietly restates its own opening head would be
 defeating its own purpose — and `eval/docclaims.py` checks the live count on every run.

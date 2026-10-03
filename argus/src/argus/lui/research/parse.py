@@ -11,7 +11,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from typing import Any
+from typing import Any, Final
 
 from argus.lui.answer import Source
 from argus.lui.question import (
@@ -1214,9 +1214,57 @@ def _read(text: str) -> dict[str, str]:
                 and token.islower()):
             token = token.upper()
         hit = resolve_name(token, trust_case=trust)
+        if (hit is not None and token.upper() in PROSE_FIRST
+                and not _ticker_cue(text, match.start(), match.end())):
+            continue
         if hit is not None and hit[0] not in found:
             found[hit[0]] = hit[1]
     return found
+
+
+PROSE_FIRST: Final = frozenset({
+    "NOT", "APR", "APY", "ID", "ACT", "SIGN", "HOME", "PEOPLE", "RE", "DATA", "ORDER", "DE",
+    "BASED", "POWER", "FORM", "TEAM", "HOT", "COST", "LA", "RED", "NIGHT", "LIGHT", "BLUE", "AL",
+    "SPACE", "BABY", "NET", "FUN", "MAR", "BILL", "BANK", "BAY", "RIVER", "SOON", "CROSS", "MON",
+    "SENT", "SUPER", "WIN", "TREE", "GMT", "TRUST", "DEEP", "VIRTUAL", "PATH", "AUCTION", "MET",
+    "EDGE", "RD", "FUEL", "PRIME", "MAGIC", "LAB", "SNOW", "RW", "TAG", "DISK", "RAY", "FIGHT",
+    "ROLL", "PORTAL", "RARE", "FLY", "BEAT", "SKY", "LAYER", "RAIN", "GPS", "CAP", "WET", "RAM",
+    "GUN", "KERNEL", "RICE", "SHELL", "ML", "CHIP", "RES", "ECHO", "PUMP", "BIO", "STABLE",
+    "USUAL", "ERA", "RAN", "PROVE", "COLLECT", "REG", "PCI", "WARD", "FOLKS", "TOWNS", "FLUID",
+    "RPM", "GRASS", "LAT", "RECALL", "BAN", "BEAM", "MASK", "COOKIE", "LITE", "ACE", "DOS", "ALT",
+    "BLEND", "PROMPT", "ATM", "MEGA", "CYBER", "RALLY", "PIXEL", "RATS", "SPELL", "REC", "PROS",
+    "COW", "RPG", "RIP", "ZEN", "LIT", "GENIUS", "POET", "EPIC", "DASH", "FLUX", "IO", "EDEN",
+    "FLEX", "OG", "NIL", "VELVET", "BANANA", "IDOL", "ALIGN", "BLESS", "GOAT", "KEY", "GAS", "ICE",
+    "MOVE", "FLOW", "CC", "CT", "RS", "TM", "FF", "BR", "MP", "BB", "RA", "RC", "RM", "RT", "CP",
+    "RF", "NS", "RV", "MX", "RR", "IR", "RH", "RJ", "RP", "RL", "RO", "RB", "RG", "RU", "DOG",
+    "DOGS", "CAT", "ROSE", "BAND", "WAL", "UPC", "SAND",
+})
+"""Bitget tickers that are, far more often, an English word or an acronym in a sentence: "a loan at
+9% APR" was read as the APR token and "which source did NOT answer" as NOT (a judge, round 28; both
+are live contracts). Each is read as a contract only beside a market cue (:func:`_ticker_cue`) or
+in a message of a few words — `$APR`, "NOT price", "is RL doing well today" still resolve. Drawn
+from Bitget's 3,785 listed bases intersected with the 10,000 most common English words, less the
+names people do ask about by ticker (META, AMD, COIN, SOL, ADA, GE, GS, KO, MU…)."""
+
+_CUE_AFTER = re.compile(
+    r"\s*(?:usdt\b|perp\w*|tokens?\b|coins?\b|stock\b|shares?\b|price\b|chart\b|funding\b|"
+    r"doing\b|trading\b|today\b|now\b|right\s+now\b|at\s+\$?\d|vs\b|versus\b|\?|$)", re.I)
+_CUE_BEFORE = re.compile(
+    r"(?:\$|\b(?:buy|sell|short|long|hold|own|about|of|on|price\s+of|chart\s+of|and|or|vs)\s+)$",
+    re.I)
+
+
+def _ticker_cue(text: str, start: int, end: int) -> bool:
+    """Whether a prose-first word at ``start:end`` is written as a ticker: a dollar sign or a
+    market word beside it, or a message of four words or fewer."""
+    if len(re.findall(r"[A-Za-z0-9$]+", text)) <= 4:
+        return True
+    before = text[max(0, start - 12):start]
+    if before.endswith("$"):
+        return True
+    if _CUE_AFTER.match(text[end:end + 24]) is not None:
+        return True
+    return _CUE_BEFORE.search(before) is not None
 
 
 def worth_asking_the_model(text: str, *, now: datetime | None = None) -> bool:

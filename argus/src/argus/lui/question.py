@@ -566,7 +566,11 @@ _PROSE_TICKERS = frozenset({"COIN", "COINS"})
 _COIN_THE_WORD = re.compile(
     r"\b(?:this|that|these|a|an|the|which|what|any|every|each|some|one|good|bad|best|new|small|"
     r"meme|alt|stable|shit|privacy|gaming|ai|my|your|our|their|his|her|another|other|favorite|"
-    r"favourite|next|single|native|base|utility|governance|crypto)\s+coin\b", re.I)
+    r"favourite|next|single|native|base|utility|governance|crypto|"
+    # "my friend made bank on some dog coin thing" was read as Coinbase (a first-time user,
+    # round 28)
+    r"dog|doge|frog|cat|joke|pump|scam|random|tiny|cheap|penny|hyped|trending|new-ish|that\s+one)"
+    r"\s+coin\b", re.I)
 _NAMED_COIN = re.compile(r"\b[A-Z][A-Z0-9]{1,11}\s+coin\b")
 """A coin named by its ticker ("what's the price of QWXZ coin") uses "coin" as the word. Case
 matters: the ticker is written in capitals, the word after it is not. Read as Coinbase, that

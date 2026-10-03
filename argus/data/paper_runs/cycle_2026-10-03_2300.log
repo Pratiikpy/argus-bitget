@@ -157,3 +157,475 @@ macro_exit=0
 
 60 measurement(s) written to argus\data\hedge_effectiveness.json
 effectiveness_exit=0
+{
+  "ran_at": "2026-10-03T17:40:38.083226+00:00",
+  "risk_policy": "68ceeadb52fc4ce0721006d8016744de7bc4d135ae75eb0aaca20e68f6460712",
+  "decisions_written": [
+    {
+      "seq": 1028,
+      "symbol": "NVDAUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.68,
+      "attests_llm_decided": true,
+      "notes_written": 25,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 31.00 \u2014 earnings dominates: confidence 0.72 against 0.45"
+      ],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    },
+    {
+      "seq": 1029,
+      "symbol": "TSLAUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.58,
+      "attests_llm_decided": true,
+      "notes_written": 26,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:magnitude] event (bullish) vs sentiment (bullish), gap 42.00 \u2014 event dominates: confidence 0.55 against 0.35",
+        "[conflict:direction] event (bullish) vs earnings (bearish), gap 11.00 \u2014 earnings dominates: 9 distinct sources against 7",
+        "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 31.00 \u2014 earnings dominates: confidence 0.62 against 0.35"
+      ],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    },
+    {
+      "seq": 1030,
+      "symbol": "AAPLUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.6,
+      "attests_llm_decided": true,
+      "notes_written": 25,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    },
+    {
+      "seq": 1031,
+      "symbol": "MSFTUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.72,
+      "attests_llm_decided": true,
+      "notes_written": 23,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.27 \u2014 earnings dominates: confidence 0.62 against 0.35"
+      ],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    },
+    {
+      "seq": 1032,
+      "symbol": "METAUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.55,
+      "attests_llm_decided": true,
+      "notes_written": 25,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    },
+    {
+      "seq": 1033,
+      "symbol": "GOOGLUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.62,
+      "attests_llm_decided": true,
+      "notes_written": 26,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    },
+    {
+      "seq": 1034,
+      "symbol": "AMZNUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.72,
+      "attests_llm_decided": true,
+      "notes_written": 25,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 41.00 \u2014 earnings dominates: confidence 0.82 against 0.35"
+      ],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    },
+    {
+      "seq": 1035,
+      "symbol": "COINUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.68,
+      "attests_llm_decided": true,
+      "notes_written": 24,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:magnitude] event (bearish) vs earnings (bearish), gap 33.00 \u2014 earnings dominates: confidence 0.72 against 0.55",
+        "[grounding] 1 of 3 figure(s) do not resolve to anything the desk was given: 80bps",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    },
+    {
+      "seq": 1036,
+      "symbol": "MSTRUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.52,
+      "attests_llm_decided": true,
+      "notes_written": 27,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:direction] event (bearish) vs sentiment (bullish), gap 5.00 \u2014 sentiment dominates: confidence 0.55 against 0.35",
+        "[conflict:magnitude] event (bearish) vs earnings (bearish), gap 82.00 \u2014 earnings dominates: confidence 0.72 against 0.35",
+        "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 77.00 \u2014 earnings dominates: confidence 0.72 against 0.55",
+        "[grounding] 1 of 10 figure(s) do not resolve to anything the desk was given: 8.22",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    },
+    {
+      "seq": 1037,
+      "symbol": "QQQUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.68,
+      "attests_llm_decided": true,
+      "notes_written": 26,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    },
+    {
+      "seq": 1038,
+      "symbol": "TQQQUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.72,
+      "attests_llm_decided": true,
+      "notes_written": 26,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    },
+    {
+      "seq": 1039,
+      "symbol": "SQQQUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.92,
+      "attests_llm_decided": true,
+      "notes_written": 25,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    }
+  ],
+  "settled_this_cycle": [],
+  "postmortem": null,
+  "marked_this_cycle": [
+    {
+      "seq": 1017,
+      "symbol": "NVDAUSDT",
+      "horizon_hours": 1.9861,
+      "move_bps": "0.4261",
+      "lean": "up"
+    },
+    {
+      "seq": 1018,
+      "symbol": "TSLAUSDT",
+      "horizon_hours": 1.9861,
+      "move_bps": "-4.5802",
+      "lean": "up"
+    },
+    {
+      "seq": 1019,
+      "symbol": "AAPLUSDT",
+      "horizon_hours": 1.9861,
+      "move_bps": "7.7989",
+      "lean": "up"
+    },
+    {
+      "seq": 1020,
+      "symbol": "MSFTUSDT",
+      "horizon_hours": 1.9861,
+      "move_bps": "4.6345",
+      "lean": "up"
+    },
+    {
+      "seq": 1021,
+      "symbol": "METAUSDT",
+      "horizon_hours": 1.9861,
+      "move_bps": "14.0033",
+      "lean": "up"
+    },
+    {
+      "seq": 1022,
+      "symbol": "GOOGLUSDT",
+      "horizon_hours": 1.9861,
+      "move_bps": "10.7821",
+      "lean": "up"
+    },
+    {
+      "seq": 1023,
+      "symbol": "AMZNUSDT",
+      "horizon_hours": 1.9861,
+      "move_bps": "7.5427",
+      "lean": "up"
+    },
+    {
+      "seq": 1024,
+      "symbol": "COINUSDT",
+      "horizon_hours": 1.9861,
+      "move_bps": "1.6264",
+      "lean": "down"
+    },
+    {
+      "seq": 1025,
+      "symbol": "MSTRUSDT",
+      "horizon_hours": 1.9861,
+      "move_bps": "28.9587",
+      "lean": "down"
+    },
+    {
+      "seq": 1026,
+      "symbol": "QQQUSDT",
+      "horizon_hours": 1.9861,
+      "move_bps": "8.1321",
+      "lean": "up"
+    },
+    {
+      "seq": 1027,
+      "symbol": "TQQQUSDT",
+      "horizon_hours": 1.9861,
+      "move_bps": "23.4221",
+      "lean": "up"
+    }
+  ],
+  "tokens_spent": 312266,
+  "unreported_calls": 0,
+  "token_budget": 330000,
+  "stopped_early": "",
+  "chain": {
+    "entries": 1039,
+    "chain_intact": true,
+    "links_intact": true,
+    "first_break_at": null,
+    "truncated": false,
+    "anchor": "anchor agrees with the log",
+    "head_hash": "45fe69211ceae780",
+    "tampered_settlements": [],
+    "unsealed_settlements": []
+  },
+  "protocol": "argus-paper-v1 v3 (sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8)",
+  "resumed": [],
+  "fill_alarms": []
+}
+exit=0
+
+cycle 84: 5 claim(s) on NVDAUSDT, head 752ef2ee0b100bdc
+    resolves 2026-10-04T18:21
+    resolves 2026-10-06T18:21
+    resolves 2026-10-10T18:21
+    resolves 2026-10-17T18:21
+    resolves 2026-11-02T18:21
+  anchored to 4 calendar(s)
+
+  210 claim(s) resolve inside the window and 337 are still open when it starts
+cadence_exit=0
+4 claim(s) resolved this run
+  Γ£ô GOOGLUSDT abs_move_above_bps 217.67 by 2026-10-03T18:12 (p=0.60) [ca7819b35d1b]  observed |-224.01| = 224.01
+  Γ£ù MSTRUSDT abs_move_above_bps 440.04 by 2026-10-03T18:15 (p=0.60) [78b1e7c119af]  observed |212.47| = 212.47
+  Γ£ô NVDAUSDT abs_move_above_bps 75.46 by 2026-10-03T18:17 (p=0.60) [38236f0f5bc5]  observed |178.60| = 178.60
+  Γ£ô MSTRUSDT abs_move_above_bps 141.79 by 2026-10-03T18:16 (p=0.60) [5f06c68a92ac]  observed |380.33| = 380.33
+
+REGISTER ΓÇö 426 claim(s), 247 resolved, 177 pending, 2 unresolvable
+  argus                 247 resolved  Brier 0.2215  hit rate 69%
+
+  THE WALL ΓÇö 76 claim(s) we got wrong, most confident first:
+    Γ£ù NVDAUSDT abs_move_above_bps 45.46 by 2026-09-15T09:21 (p=0.60) [381cbc033f4b]  observed |12.25| = 12.25
+    Γ£ù TSLAUSDT abs_move_above_bps 50.23 by 2026-09-15T09:21 (p=0.60) [c387181dd2e6]  observed |-5.58| = 5.58
+    Γ£ù AAPLUSDT abs_move_above_bps 37.55 by 2026-09-15T09:21 (p=0.60) [2588c7bcd941]  observed |-12.37| = 12.37
+    Γ£ù AMZNUSDT abs_move_above_bps 40.7 by 2026-09-15T09:21 (p=0.60) [d71b10a405eb]  observed |-32.76| = 32.76
+    Γ£ù MSTRUSDT abs_move_above_bps 138.15 by 2026-09-15T09:21 (p=0.60) [919de6cb9750]  observed |-22.67| = 22.67
+    Γ£ù TSLAUSDT abs_move_above_bps 50.28 by 2026-09-16T18:14 (p=0.60) [5eec2201b2a4]  observed |-13.14| = 13.14
+    Γ£ù AAPLUSDT abs_move_above_bps 37.55 by 2026-09-16T20:11 (p=0.60) [4ae4dfa61cdf]  observed |33.15| = 33.15
+    Γ£ù METAUSDT abs_move_above_bps 66.48 by 2026-09-17T16:11 (p=0.60) [fe99a2216199]  observed |41.36| = 41.36
+    Γ£ù TQQQUSDT abs_move_above_bps 182.37 by 2026-09-17T18:17 (p=0.60) [394c43522a43]  observed |168.28| = 168.28
+    Γ£ù QQQUSDT abs_move_above_bps 31.84 by 2026-09-18T18:10 (p=0.60) [933c2db4e3a6]  observed |14.50| = 14.50
+
+written to argus\data\register_scoreboard.json
+register_exit=0
+CYCLE CHECK ΓÇö cycle_2026-10-03_2300.log
+
+  PASS     exit_code
+           process exited 0
+  PASS     symbols_decided
+           12 of 12 symbols produced a decision
+  PASS     ran_to_completion
+           the cycle reached every symbol it was given
+  PASS     token_budget
+           312,266 of 330,000 spent (95%)
+  PASS     cumulative_tokens
+           24,079,572 token(s) across 82 recorded cycle(s), 293,653 per cycle ΓÇö roughly 1,174,613/day at four cycles. The key's remaining balance is not observable from here; this is the burn rate, not a runway
+  PASS     budget_not_exhausted
+           the guard did not fire
+  PASS     chain_intact
+           the hash chain verified after the write
+  PASS     leans_recorded
+           12 of 12 row(s) carry a lean and a lean_confidence
+  PASS     leans_gradeable
+           12 of 12 decision(s) state a direction (9 up, 3 down, 0 none)
+  PASS     verdicts_parsed
+           every verdict parsed
+  PASS     session
+           session phase(s) seen: weekend  (anchor market shut)
+
+  11/11 checks passed. The cycle ran with the anchor market shut, so it says nothing about whether this desk trades
+
+written to argus\data\cycle_check.json
+check_exit=0
+REFUSAL ALPHA ù 790 mark(s)
+
+  horizon              marks  directional  correct  coverage  accuracy  forgone
+  about_2h               589          586      325   99.5%   55.5%    -8.9
+  4h_to_12h                1            1        0  100.0%    0.0%   -51.7
+  overnight_12h_plus     200          195       90   97.5%   46.2%   -19.5
+
+  At the `about_2h` horizon: 325 of 586 directional calls went the right way. 95% interval (bootstrap over 54 decision cycles) 50.3% to 60.6%. It excludes a coin flip. But calling `up` every time was right 53.4% of the time, and cycle by cycle the lean beat that naive call 22 times and lost 22 (10 tied) ù so there is no evidence yet that the lean knows more than the direction of the tape. Median net edge forgone by standing aside: -8.9bps after a 12.0bps round trip ù refusing saved money on the typical decision.
+
+written to argus\data\refusal_alpha.json
+
+REASON AGAINST RECORD ù 1033 refusal(s) on record; 500 carried at least one reason the record can check. Of 1005 decision-time reason(s) graded, 1005 agreed with the record and 0 contradicted it. `move_too_small` claims were borne out by the next ~2h move 0 of 2 time(s) (0%), against 30% for every ~2h refusal mark (one-sided exact binomial p = 1.00); no evidence the stated reason says more than the base rate does. `moves_enough` claims were borne out by the next ~2h move 83 of 120 time(s) (69%), against 70% for every ~2h refusal mark (one-sided exact binomial p = 0.59); no evidence the stated reason says more than the base rate does.
+written to argus\data\refusal_reasons.json
+refusal_exit=0
+15 panel(s); 3 figure(s) not yet measurable
+  unavailable: Sharpe ╖ drawdown ╖ win rate ╖ Sharpe
+  unavailable: Sharpe ╖ drawdown ╖ win rate ╖ max drawdown
+  unavailable: Search bake-off ╖ stable winner
+written to argus\cockpit.html
+cockpit_exit=0
+recorded 5 probe(s) at 2026-10-03 18:22 UTC: 4 answered
+status_record_exit=0
+DEPLOY SYNC
+
+  package   9 of 665 file(s) refreshed
+  artefacts 11 of 80 file(s) refreshed
+  ledger    1031 -> 1039 decisions
+            the bundle was missing 8 decision(s) (1% of the record)
+
+  manifest -> deploy\sync_manifest.json
+  NOT deployed ΓÇö publishing stays a human's decision.
+deploysync_exit=0
+vercel.cmd : Vercel CLI 54.9.1 (Node.js 22.17.0)
+At argus\run_paper_cycle.ps1:124 char:5
++     & "$env:APPDATA\npm\vercel.cmd" deploy --prod --yes 2>&1 | ForEac ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Vercel CLI 54.9.1 (Node.js 22.17.0):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Retrieving projectΓÇª
+Deploying pratiikpys-projects/argus-desk
+Uploading [--------------------] (0.0B/15.3MB)
+Uploading [=====---------------] (3.8MB/15.3MB)
+Uploading [==========----------] (7.7MB/15.3MB)
+Uploading [===============-----] (11.5MB/15.3MB)
+Uploading [====================] (15.3MB/15.3MB)
+  Inspect     https://vercel.com/pratiikpys-projects/argus-desk/AFxVrr2W4MXepgfTSNxHzTiJ5ArX
+Γû▓ Production  https://argus-desk-mfrs1f8ih-pratiikpys-projects.vercel.app
+BuildingΓÇª
+BuildingΓÇª
+Running build in Washington, D.C., USA (East) ΓÇô iad1
+Build machine configuration: 2 cores, 8 GB
+Retrieving list of deployment files...
+Downloading 751 deployment files...
+Restored build cache from previous deployment (JBkqEn9sgXw93U4XMAbFcqypXyUK)
+Running "vercel build"
+Vercel CLI 62.1.0
+WARNING! Due to `builds` existing in your configuration file, the Build and Development Settings defined in your 
+Project Settings will not apply. Learn More: https://vercel.link/unused-build-settings
+No Python version specified in .python-version, pyproject.toml, or Pipfile.lock. Using python version: 3.12
+Using uv 0.10.11
+Installing required dependencies from requirements.txt...
+Compiling Python bytecode...
+Build Completed in /vercel/output [4s]
+Deploying outputs...
+Deployment completed
+Creating build cache...
+Created build cache: 1s
+Uploading build cache [7.42 MB]
+Build cache uploaded: 129.000ms
+[2K[1A[2K[GΓû▓ Production  https://argus-desk-mfrs1f8ih-pratiikpys-projects.vercel.app
+CompletingΓÇª
+Γû▓ Aliased     https://deploy-topaz-seven-64.vercel.app
+
+Γ£ô Ready in 35s
+Due to `builds` existing in your configuration file, the Build and Development Settings defined in your Project 
+Settings will not apply. Learn More: https://vercel.link/unused-build-settings
+https://argus-desk-mfrs1f8ih-pratiikpys-projects.vercel.app
+publish_exit=0

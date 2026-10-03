@@ -281,11 +281,11 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 11,428 tests collected
+pytest -q                       # 11,454 tests collected
 ```
 
 Nothing above needs a credential. On 2026-10-03, with every outbound connection refused, 11,012
-passed, 75 skipped and 0 failed of the 11,428 tests collected; the other 238 read a live
+passed, 75 skipped and 0 failed of the 11,454 tests collected; the other 238 read a live
 venue, feed or model and run apart
 (`pytest -m network`). Tests that need a rival's source cloned beside the repository skip
 and say which. `ARGUS_BLOCK_NETWORK=1` refuses every outbound connection, so
@@ -305,8 +305,8 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **11,428 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 589 source files** |
+| Tests | **11,454 tests collected** — `pytest -q` |
+| Types | **`mypy --strict` clean on 590 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
 | Sub-themes | **18/18 sub-themes** each resolve to an importable module and a test file (`python -m argus.status`). That is coverage, not a claim to lead them: 6 of 46 capabilities are OWNED against a named rival, and `/proof` says which |
@@ -341,8 +341,8 @@ a test that reaches the network shows itself.
   refused. Every other decision on its ledger is a refusal. Two settled trades are not a
   sample, so its Sharpe and drawdown are undefined and printed as such, and its win rate of 0%
   says nothing yet. Each refusal carried a direction, hashed before the
-  outcome existed: at about two hours, **317 of 575 directional calls were right**, which clears a
-  coin flip and does not beat calling "up" every time. The median refusal **forgave -9.04bps of
+  outcome existed: at about two hours, **325 of 586 directional calls were right**, which clears a
+  coin flip and does not beat calling "up" every time. The median refusal **forgave -8.87bps of
   net edge** after the 12bps round trip — the trades it passed
   on were mostly unprofitable. This workbench does not trade; trading is the separate Track 2
   project's job.

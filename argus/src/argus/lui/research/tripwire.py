@@ -268,8 +268,10 @@ FOLLOW_UP: Final = re.compile(
 "ok did it fire now"): both were declined after 26 seconds (a first-time user, round 27)."""
 
 CHANGE: Final = re.compile(
-    r"\b(?:change|move|set|make|update|raise|lower)\s+(?:it|that|the\s+(?:level|tripwire|trigger))"
-    r"\s+to\s+\$?(?P<lvl>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k\b)?",
+    # "Change that tripwire to 82000 instead." left it at 80,000 (a judge, round 28)
+    r"\b(?:change|move|set|make|update|raise|lower|bump|drop)\s+(?:it|that|this|the|my)(?:\s+"
+    r"(?:level|tripwire|trigger|stop|alert|plan|one))?\s+(?:up\s+|down\s+)?to\s+\$?"
+    r"(?P<lvl>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k\b)?",
     re.I,
 )
 DELETE: Final = re.compile(

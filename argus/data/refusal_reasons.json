@@ -1,16 +1,16 @@
 {
-  "as_of": "2026-10-03T16:24:37.823192+00:00",
-  "refusals": 1021,
-  "refusals_with_a_gradeable_claim": 489,
+  "as_of": "2026-10-03T18:22:07.292383+00:00",
+  "refusals": 1033,
+  "refusals_with_a_gradeable_claim": 500,
   "hours_tolerance": 1.5,
   "round_trip_bps": 12.0,
   "base_clearance_about_2h": {
-    "cleared": 407,
-    "marks": 578
+    "cleared": 410,
+    "marks": 589
   },
   "by_claim": {
     "session_closed": {
-      "consistent": 379,
+      "consistent": 390,
       "contradicted": 0,
       "ungradeable": 0
     },
@@ -20,12 +20,12 @@
       "ungradeable": 0
     },
     "hours_to_discovery": {
-      "consistent": 361,
+      "consistent": 372,
       "contradicted": 0,
       "ungradeable": 0
     },
     "no_hedge": {
-      "consistent": 230,
+      "consistent": 240,
       "contradicted": 0,
       "ungradeable": 52
     },
@@ -35,9 +35,9 @@
       "ungradeable": 0
     },
     "moves_enough": {
-      "consistent": 82,
-      "contradicted": 36,
-      "ungradeable": 44
+      "consistent": 83,
+      "contradicted": 37,
+      "ungradeable": 43
     },
     "move_too_small": {
       "consistent": 0,
@@ -49,14 +49,14 @@
     "move_too_small": {
       "borne_out": 0,
       "graded": 2,
-      "base_rate": 0.2958,
+      "base_rate": 0.3039,
       "p_one_sided": 1.0
     },
     "moves_enough": {
-      "borne_out": 82,
-      "graded": 118,
-      "base_rate": 0.7042,
-      "p_one_sided": 0.6304
+      "borne_out": 83,
+      "graded": 120,
+      "base_rate": 0.6961,
+      "p_one_sided": 0.5859
     }
   },
   "forward_claims": [
@@ -367,8 +367,16 @@
       "stated": "\u2026in this exact weekend phase, and the binding constraint was direction, not size.",
       "recorded": "next move -3.0bps over 1.91h against a 12bps round trip (refusal_marks.jsonl)",
       "verdict": "contradicted"
+    },
+    {
+      "seq": 1026,
+      "symbol": "QQQUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026n absolute terms, confirming that the binding constraint is direction, not size, and direction cannot be reliably called with the anchor as\u2026",
+      "recorded": "next move +8.1bps over 1.99h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
     }
   ],
-  "verdict": "1021 refusal(s) on record; 489 carried at least one reason the record can check. Of 973 decision-time reason(s) graded, 973 agreed with the record and 0 contradicted it. `move_too_small` claims were borne out by the next ~2h move 0 of 2 time(s) (0%), against 30% for every ~2h refusal mark (one-sided exact binomial p = 1.00); no evidence the stated reason says more than the base rate does. `moves_enough` claims were borne out by the next ~2h move 82 of 118 time(s) (69%), against 70% for every ~2h refusal mark (one-sided exact binomial p = 0.63); no evidence the stated reason says more than the base rate does.",
+  "verdict": "1033 refusal(s) on record; 500 carried at least one reason the record can check. Of 1005 decision-time reason(s) graded, 1005 agreed with the record and 0 contradicted it. `move_too_small` claims were borne out by the next ~2h move 0 of 2 time(s) (0%), against 30% for every ~2h refusal mark (one-sided exact binomial p = 1.00); no evidence the stated reason says more than the base rate does. `moves_enough` claims were borne out by the next ~2h move 83 of 120 time(s) (69%), against 70% for every ~2h refusal mark (one-sided exact binomial p = 0.59); no evidence the stated reason says more than the base rate does.",
   "method": "Each checkable reason in a no_trade thesis is matched by a fixed pattern and set beside the record: session_phase and hours_to_discovery from the ledger, the desk's own hedge-menu note, the risk ruling, and the next ~2h mark for claims about the size of the coming move. Question and binary verdict from VisualWebArena's llm_ua_match (evaluation_harness/helper_functions.py:610-642, MIT); graded here by the record, not by a model."
 }
