@@ -468,6 +468,11 @@ SLANG_Q: Final = re.compile(
 def slang_lines(text: str) -> list[str] | None:
     """Every slang term the question asks about, in plain words."""
     asked = [m.group("t").lower() for m in SLANG_Q.finditer(text)]
+    if not asked and len(re.findall(r"[a-z']+", text.lower())) <= 3 and (
+            text.strip().endswith("?")
+            or re.match(r"^\W*(?:and|or|what\s+about|how\s+about)\b", text, re.I)):
+        # "and hodl?" after "what does fomo mean" repeated FOMO (round 29, live re-ask)
+        asked = [k for k in SLANG if re.search(rf"\b{re.escape(k)}\b", text, re.I)]
     if not asked:
         found = [k for k in SLANG if re.search(rf"\b{re.escape(k)}\b", text, re.I)]
         asked = found if found and re.search(r"\b(?:mean|stand\s+for|means|meaning|no\s+clue|"

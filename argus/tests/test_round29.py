@@ -276,3 +276,16 @@ def test_an_unread_trending_list_is_said(monkeypatch: pytest.MonkeyPatch) -> Non
     monkeypatch.setattr(early_signals, "_trending", lambda: None)
     lines = early_signals.lines()
     assert lines is not None and lines[-1].startswith("CoinGecko's trending list did not answer")
+
+
+class TestLiveReAsk29:
+    """What the live re-ask of round 29 in new phrasings still caught."""
+
+    def test_phrasings(self) -> None:
+        assert server._HOW_RISKY.search("is day trading crypto actually that dangerous")
+        assert server._START_WITH.search("whats the least amount i need to start trading")
+        assert server._RTOKEN_FOLLOW.search("would QQQ be better than that?")
+
+    def test_a_bare_slang_follow_up(self) -> None:
+        lines = newcomer.slang_lines("and hodl?")
+        assert lines is not None and lines[0].startswith("Bottom line: HODL:")

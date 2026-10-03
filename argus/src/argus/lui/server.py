@@ -1648,7 +1648,10 @@ _RTOKEN_HELD = re.compile(
     r"(?:\b(?P<n>\d[\d,]*(?:\.\d+)?)\s+)?\bR(?P<b>[A-Z]{2,6})(?:USDT)?\b(?![a-z])")
 _RTOKEN_FOLLOW = re.compile(
     r"\bhedg\w*|\bprotect\w*|\bpairing\b|\bdollar\s+loss\b|\bhow\s+much\s+(?:would|could)\s+i\s+"
-    r"lose\b|\bthe\s+hedge\b|\bweekend\b|\bovernight\b", re.I)
+    r"lose\b|\bthe\s+hedge\b|\bweekend\b|\bovernight\b|"
+    # "would QQQ be better than that?" after the pairing got a momentum comparison (round 29)
+    r"\b(?:qqq|spy|smh|index)\b[^?]{0,40}\b(?:better|instead|rather)\b|\bbetter\s+than\s+that\b",
+    re.I)
 
 
 def _rtoken_dollars(lines: list[str], qty: str | None, base: str) -> str | None:
@@ -1749,7 +1752,9 @@ def _measured_accuracy_lines() -> list[str] | None:
              f"Bottom line: {lead.get('name')}: {str(lead.get('state')).upper()} — {first}"]
     for row in rows[1:]:
         said = str((row.get("blockers") or [row.get("note") or ""])[0])
-        lines.append(f"{row.get('name')}: {str(row.get('state')).upper()} — {said[:300]}")
+        # the register's first sentence; its provenance notes stay on /proof
+        said = re.split(r"(?<=[.;])\s+(?=[A-Z(])|\s+Source:", said, maxsplit=1)[0]
+        lines.append(f"{row.get('name')}: {str(row.get('state')).upper()} — {said[:240]}")
     lines.append("From the capability register (/proof), where every comparison was run on the "
                  "same inputs and losses are kept.")
     return lines
@@ -1779,7 +1784,8 @@ _NORMAL_ASK = re.compile(
 _START_WITH = re.compile(
     r"\bhow\s+much\s+(?:money\s+)?(?:should|do|can|would)\s+(?:i|a\s+beginner|beginners|someone)\s+"
     r"(?:even\s+|really\s+)?(?:need\s+to\s+)?(?:start|begin)(?:\s+(?:with|trading\s+with|out))?\b|"
-    r"\b(?:minimum|least)\s+(?:amount|money)\s+(?:to\s+)?(?:start|begin|trade)\b", re.I)
+    r"\b(?:minimum|least|smallest)\s+(?:amount|money|sum)\b[^?]{0,30}\b(?:start|begin|trade|"
+    r"trading|invest\w*)\b", re.I)
 _LEVERAGE_NEW = re.compile(
     r"\b(?P<x>\d+)\s*x\b[^?]{0,120}\b(?:good\s+idea|safe|ok(?:ay)?|smart|bad\s+idea|worth\s+it|"
     r"should\s+i)\b", re.I)
@@ -1830,8 +1836,9 @@ def _goal_money_lines(text: str, prior: list[str], book: str) -> list[str] | Non
 
 
 _HOW_RISKY = re.compile(
-    r"\bis\s+(?:crypto|trading|crypto\s+trading|day\s+trading|bitcoin|futures|this|it)\s+"
-    r"(?:(?:really|that|so|actually|even|super|very)\s+)*(?:risky|dangerous|safe)\b", re.I)
+    r"\bis\s+(?:(?:day|swing|crypto|leveraged|futures)\s+)?(?:crypto|trading|crypto\s+trading|"
+    r"day\s+trading|bitcoin|futures|leverage|this|it)(?:\s+(?:crypto|coins?|stocks?))?\s+"
+    r"(?:(?:really|that|so|actually|even|super|very|too)\s+)*(?:risky|dangerous|safe)\b", re.I)
 
 
 def _how_risky_lines() -> list[str] | None:
@@ -2619,7 +2626,8 @@ def _round27_follow_up(text: str, prior: list[str], *, now: datetime | None, vis
             if mine is not None:
                 # the line about the asker leads; the definition follows it
                 body = ["Bottom line: " + mine.removeprefix("For you: "),
-                        *(x for x in body if x is not mine and not x.startswith("Read as:"))]
+                        *(x.replace("Bottom line: ", "", 1) for x in body
+                          if x is not mine and not x.startswith("Read as:"))]
                 lev["lines"] = body
             return lev
     for plain_asked, plain_said in _newcomer.EARLY_PLAIN:
@@ -3220,6 +3228,13 @@ def handle_ask(
                                 f"\"how much could I lose on {sold_name} in a bad week\", and a "
                                 f"tripwire so the decision is made in advance — \"if "
                                 f"{sold_name} falls below <price> I sell\"."]
+        crossed = next((x for x in payload.get("lines") or []
+                        if str(x).startswith("The last MACD cross was")), None)
+        if crossed is not None and re.search(r"\bcross\w*\b|\bbullish\s+or\s+bearish\b", text,
+                                             re.I):
+            # "is it a bullish or bearish cross?" had its answer six lines down (round 29)
+            rest = [x for x in payload["lines"] if x is not crossed]
+            payload["lines"] = [*rest[:1], crossed, *rest[1:]]
         premises = (_premise_lines(text, now, book)
                     if payload.get("lines") and not payload.get("refused") else [])
         if premises:
