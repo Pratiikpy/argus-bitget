@@ -4428,9 +4428,7 @@
         "baseline_reproduced",
         "implementation_complete",
         "same_input_comparison",
-        "statistically_valid_evaluation",
         "costs_included",
-        "out_of_sample_test",
         "ablation",
         "adversarial_test",
         "failure_cases_documented",
@@ -4686,7 +4684,10 @@
         "reproducibility_proven",
         "no_specialist_capability_superior"
       ],
-      "conditions_unproven": []
+      "conditions_unproven": [
+        "statistically_valid_evaluation",
+        "out_of_sample_test"
+      ]
     },
     {
       "name": "A book under a trader's own limits (caps, groups, number of names) vs. skfolio MeanRisk",
@@ -5620,6 +5621,16 @@
       "capability": "Where a stop sits in the noise, measured against Rook's invalidation price",
       "problem": "statistically_valid_evaluation is claimed but not evidenced",
       "detail": "the groupwise audit flags data/stopquality_comparison.json :: net return with the stop: ARGUS vs a 1x ATR stop [flips_across_halves:chronological halves]"
+    },
+    {
+      "capability": "Where a shut stock should open: the perpetual-implied open, against gloaming and nocturne",
+      "problem": "statistically_valid_evaluation is claimed but not evidenced",
+      "detail": "the groupwise audit predates the current data/overnight_comparison.json; re-run python -m argus.eval.groupwise_audit"
+    },
+    {
+      "capability": "Where a shut stock should open: the perpetual-implied open, against gloaming and nocturne",
+      "problem": "out_of_sample_test is claimed but not evidenced",
+      "detail": "the groupwise audit predates the current data/overnight_comparison.json; re-run python -m argus.eval.groupwise_audit"
     },
     {
       "capability": "The chance a position breaks its loss limit, searched over observed moves and recorded order books, vs. a normal-shock Monte Carlo",

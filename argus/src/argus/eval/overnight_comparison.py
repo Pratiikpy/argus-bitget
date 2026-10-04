@@ -150,6 +150,56 @@ def collect_premarket() -> dict[str, Any]:
     return inputs
 
 
+PYTH_TIMES: tuple[time, ...] = (time(3, 30), time(9))
+"""The two reads Pyth is scored at: before any pre-market (its overnight session, 20:00-04:00) and
+the console's 09:00, where Yahoo's pre-market print already competes."""
+
+
+def collect_pyth(*, token: str | None = None) -> dict[str, Any]:
+    """Add Pyth's price for every stock at 03:30 and 09:00 New York before each scored open
+    (`market/pyth.py`, build-list 4.7), as ``inputs["pyth"][stock] = [[read_at, price,
+    published_at, session], ...]``. Every other series stays as fetched. Needs a Pyth Pro key."""
+    from argus.market import pyth
+
+    path = DATA / "inputs.json"
+    inputs: dict[str, Any] = json.loads(path.read_text("utf-8"))
+    feeds = pyth.symbols(asset_type="equity")
+    ids = {stock: feed.lazer_id for stock in UNIVERSE
+           if (feed := pyth.equity_feed(stock, feeds)) is not None}
+    opens = sorted({session["day"] for stock in UNIVERSE
+                    for session in inputs["sessions"].get(stock) or []})
+    out: dict[str, list[list[Any]]] = {stock: [] for stock in ids}
+    by_id = {v: k for k, v in ids.items()}
+    for day in opens:
+        for clock in PYTH_TIMES:
+            moment = _ny(date.fromisoformat(day), clock)
+            try:
+                read = pyth.prices_at(list(ids.values()),
+                                      datetime.fromtimestamp(moment, UTC), token=token)
+            except pyth.PythError as exc:
+                inputs.setdefault("failures", {})[f"pyth_{day}_{clock:%H%M}"] = str(exc)[:160]
+                continue
+            for lazer_id, price in read.items():
+                if lazer_id in by_id:
+                    out[by_id[lazer_id]].append([moment, price.price,
+                                                 price.published.timestamp(), price.session])
+    inputs["pyth"] = out
+    inputs["pyth_feeds"] = ids
+    inputs["pyth_fetched"] = datetime.now(UTC).isoformat(timespec="seconds")
+    path.write_text(json.dumps(inputs), "utf-8", newline="\n")
+    return inputs
+
+
+def pyth_at(reads: Sequence[Sequence[Any]], moment: float, *,
+            stale: float = 2 * 3600) -> float | None:
+    """Pyth's price read at ``moment``, if it was published within ``stale`` seconds before it:
+    a feed whose last print is older is not quoting, whatever price it still carries."""
+    for read_at, price, published, _session in reads:
+        if float(read_at) == moment and 0 <= moment - float(published) <= stale:
+            return float(price)
+    return None
+
+
 def _earnings_dates_sec(ticker: str) -> list[str]:
     """Every 8-K item 2.02 ("results of operations") this issuer has filed, as SEC acceptance
     timestamps (UTC, ISO 8601), in the submissions feed's own order (newest first; not resorted,
@@ -573,8 +623,9 @@ def general_tool(inputs: dict[str, Any], scored: list[dict[str, Any]]) -> dict[s
     the obvious estimate of its open, and the perpetual's lead over gloaming may be nothing the
     stock's own quote does not already show. At 03:30 no US venue this harness can read is
     quoting, and the perpetual is scored alone against the last close, which is where the
-    capability's claim actually lives. Blue Ocean ATS, which quotes overnight, is a paid feed and
-    is not run.
+    capability's claim actually lives. Pyth Pro quotes the stock itself overnight and pre-market
+    (:func:`collect_pyth`); with its quotes saved, ``pyth`` scores the perpetual against them on
+    the rows where Pyth was quoting, and without them the block says it was not run.
 
     ``adversarial.stale_perpetual`` is a price-identity proxy, not a volume read: the saved
     hourly candles (`h2h_gloaming/inputs.json`) carry only ``(bar end, close)``, `_hourly_bitget`
@@ -587,6 +638,7 @@ def general_tool(inputs: dict[str, Any], scored: list[dict[str, Any]]) -> dict[s
                  for k, v in (inputs.get("premarket") or {}).items()}
     if not premarket:
         return None
+    pyth_reads: dict[str, list[list[Any]]] = inputs.get("pyth") or {}
     hourly = {k: [(float(t), float(c)) for t, c in v] for k, v in inputs["hourly"].items()}
     at_nine: list[dict[str, Any]] = []
     at_three: list[dict[str, Any]] = []
@@ -597,24 +649,34 @@ def general_tool(inputs: dict[str, Any], scored: list[dict[str, Any]]) -> dict[s
             # Two hours of staleness at most: the 08:00-09:00 bar, or the one before it on a
             # quiet morning. An older print is not a pre-market price.
             nine = _at(series, _ny(opened, time(9)), stale=2 * 3600)
+            reads = pyth_reads.get(row["stock"]) or []
+            pyth_nine = pyth_at(reads, _ny(opened, time(9)))
             if nine:
                 at_nine.append({**row, "estimates": {
-                    **row["estimates"], "premarket_0900": nine / row["close"] - 1}})
+                    **row["estimates"], "premarket_0900": nine / row["close"] - 1,
+                    **({"pyth_0900": pyth_nine / row["close"] - 1} if pyth_nine else {})}})
             early = _ny(opened, time(3, 30))
             perp = _at(hourly.get(f"{row['stock']}USDT") or [], early)
             if perp:
                 console = console_implied_open(f"{row['stock']}USDT", perp,
                                                datetime.fromtimestamp(early, UTC))
+                pyth_early = pyth_at(reads, early)
                 if console is not None:
                     at_three.append({**row, "estimates": {
-                        "zero": 0.0, "argus_perp_0330": console[0] / row["close"] - 1}})
+                        "zero": 0.0, "argus_perp_0330": console[0] / row["close"] - 1,
+                        **({"pyth_0330": pyth_early / row["close"] - 1} if pyth_early else {})}})
     out: dict[str, Any] = {
         "premarket_fetched": inputs.get("premarket_fetched"),
         "method": "the stock's own last pre-market print at or before 09:00 New York (Yahoo, "
                   "includePrePost), over the prior regular close; and the console's implied open "
                   "at 03:30 New York, before any pre-market, over the same close",
-        "not_run": "Blue Ocean ATS overnight quotes (paid feed)",
     }
+    if pyth_reads:
+        out["pyth_fetched"] = inputs.get("pyth_fetched")
+    else:
+        out["not_run"] = ("Pyth Pro's overnight and pre-market equity quotes (market/pyth.py, "
+                          "build-list 4.7): every price read needs a Pyth Pro key, and none is "
+                          "configured; `python -m argus.eval.overnight_comparison --pyth` runs it")
     if len(at_nine) >= 20:
         # The nights an estimator is most likely to fail on, scored separately so a win on quiet
         # nights cannot hide a loss on the ones that matter: the biggest tenth of gaps (earnings,
@@ -665,6 +727,23 @@ def general_tool(inputs: dict[str, Any], scored: list[dict[str, Any]]) -> dict[s
             "rows": len(at_three), "nights": len({r["opened"] for r in at_three}),
             "summary": {n: _summary(at_three, n) for n in ("argus_perp_0330", "zero")},
             "paired": _paired(at_three, "argus_perp_0330", "zero")}
+    out["pyth"] = pyth_block(at_nine, at_three) if pyth_reads else None
+    return out
+
+
+def pyth_block(at_nine: Sequence[dict[str, Any]],
+               at_three: Sequence[dict[str, Any]]) -> dict[str, Any]:
+    """The perpetual against Pyth's own quote of the stock, on the rows where Pyth was quoting:
+    at 03:30 from its overnight session, at 09:00 from its pre-market one."""
+    out: dict[str, Any] = {}
+    for key, rows, ours, theirs in (("at_0330", at_three, "argus_perp_0330", "pyth_0330"),
+                                     ("at_0900", at_nine, "argus_perp", "pyth_0900")):
+        both = [r for r in rows if theirs in r["estimates"]]
+        out[key] = {"rows": len(both), "rows_without_a_pyth_quote": len(rows) - len(both),
+                    "nights": len({r["opened"] for r in both})}
+        if len(both) >= 20:
+            out[key]["summary"] = {n: _summary(both, n) for n in (ours, theirs)}
+            out[key]["paired"] = _paired(both, ours, theirs)
     return out
 
 
@@ -945,6 +1024,8 @@ def main() -> int:  # pragma: no cover - CLI
         collect_premarket()
     if "--earnings" in sys.argv:
         collect_earnings()
+    if "--pyth" in sys.argv:
+        collect_pyth()
     report = score()
     artefact.write(REPORT, report)
     print(json.dumps({k: report.get(k) for k in ("scored_rows", "nights", "summary",

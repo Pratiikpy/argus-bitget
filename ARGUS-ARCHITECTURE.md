@@ -8,11 +8,11 @@ that produced them.
 
 | | |
 |---|---|
-| Source | **624 source files**, 20 packages (measured 2026-09-27) |
+| Source | **625 source files**, 20 packages (measured 2026-09-27) |
 | Registered and importable at runtime | **152/152** (`python -m argus.status`) |
-| Tests | **12,074 tests collected**; CI runs every one that needs no network with each outbound connection refused, and the 238 that read a live venue, feed or model in a separate advisory job |
-| Static analysis | `ruff` clean; `mypy --strict` clean on the 621 files it checks (the three vendored files are excluded) |
-| Artefacts | **937** files under `argus/data/`; each one a document cites is written by a named command, and a test fails if a cited artefact has no writer |
+| Tests | **12,087 tests collected**; CI runs every one that needs no network with each outbound connection refused, and the 238 that read a live venue, feed or model in a separate advisory job |
+| Static analysis | `ruff` clean; `mypy --strict` clean on the 622 files it checks (the three vendored files are excluded) |
+| Artefacts | **942** files under `argus/data/`; each one a document cites is written by a named command, and a test fails if a cited artefact has no writer |
 | External systems torn down at code level | **57 code-level teardowns** under `research/architecture/`, each citing `file:line` |
 | Runtime dependencies | **two** — `pydantic`, `python-dateutil` |
 
@@ -430,7 +430,7 @@ the same inputs (counted 2026-09-27). The ones that judge the system itself:
 
 **The capability ladder** is enforced in code: LOST → TIED → IMPLEMENTED → OWNED, with OWNED requiring
 thirteen conditions including a reproduced baseline, same-input comparison, out-of-sample test,
-ablation and adversarial test. Live (`data/standing.json`): **6 of 49 capabilities are OWNED**,
+ablation and adversarial test. Live (`data/standing.json`): **5 of 49 capabilities are OWNED**,
 35 TIED, 0 IMPLEMENTED, 8 LOST — re-derived by `python -m argus.eval.standing` from the artefacts.
 
 ---

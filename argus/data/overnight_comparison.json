@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-29T10:10:43+00:00",
+  "generated": "2026-10-04T22:04:43+00:00",
   "inputs_fetched": "2026-09-25T08:00:07+00:00",
   "target": "gap from the last regular close to the next regular open, per stock",
   "predicted_at": "09:00 New York time on the opening day",
@@ -319,7 +319,7 @@
   "general_tool_premarket": {
     "premarket_fetched": "2026-09-29T01:05:03+00:00",
     "method": "the stock's own last pre-market print at or before 09:00 New York (Yahoo, includePrePost), over the prior regular close; and the console's implied open at 03:30 New York, before any pre-market, over the same close",
-    "not_run": "Blue Ocean ATS overnight quotes (paid feed)",
+    "not_run": "Pyth Pro's overnight and pre-market equity quotes (market/pyth.py, build-list 4.7): every price read needs a Pyth Pro key, and none is configured; `python -m argus.eval.overnight_comparison --pyth` runs it",
     "adversarial": {
       "largest_tenth_of_gaps": {
         "rows": 91,
@@ -428,7 +428,8 @@
         "nights": 113,
         "verdict": "a better"
       }
-    }
+    },
+    "pyth": null
   },
   "costs_net": {
     "cost_bps_round_trip": 12.0,
@@ -14445,7 +14446,7 @@
       },
       "errors": [],
       "artefact": "data/overnight_comparison.json",
-      "created_at": "2026-09-29T10:10:43+00:00"
+      "created_at": "2026-10-04T22:04:43+00:00"
     },
     {
       "comparison": "overnight",
@@ -14522,7 +14523,7 @@
       },
       "errors": [],
       "artefact": "data/overnight_comparison.json",
-      "created_at": "2026-09-29T10:10:43+00:00"
+      "created_at": "2026-10-04T22:04:43+00:00"
     },
     {
       "comparison": "overnight",
@@ -14599,7 +14600,7 @@
       },
       "errors": [],
       "artefact": "data/overnight_comparison.json",
-      "created_at": "2026-09-29T10:10:43+00:00"
+      "created_at": "2026-10-04T22:04:43+00:00"
     },
     {
       "comparison": "overnight",
@@ -14676,7 +14677,7 @@
       },
       "errors": [],
       "artefact": "data/overnight_comparison.json",
-      "created_at": "2026-09-29T10:10:43+00:00"
+      "created_at": "2026-10-04T22:04:43+00:00"
     },
     {
       "comparison": "overnight",
@@ -14753,7 +14754,7 @@
       },
       "errors": [],
       "artefact": "data/overnight_comparison.json",
-      "created_at": "2026-09-29T10:10:43+00:00"
+      "created_at": "2026-10-04T22:04:43+00:00"
     }
   ]
 }

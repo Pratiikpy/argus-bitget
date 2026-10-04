@@ -48,7 +48,8 @@ ASKED: Final = re.compile(
     # "would buying ETH whenever RSI drops under 25 ... have made money, or was that luck?" got a
     # base-rate answer (live, 2026-10-05): the verb need not sit next to "would"
     r"\bwould\b[^?]{0,140}\bhave\s+(?:made|lost|earned)\s+(?:money|anything)|"
-    r"\b(?:buy\w*|go(?:ing)?\s+long|short\w*)\s+[^?]{0,30}\bwhenever\b|"
+    r"\b(?:buy\w*|bought|go(?:ing)?\s+long|short\w*)\s+[^?]{0,30}\b(?:whenever|every\s+time|"
+    r"each\s+time|any\s+time)\b|"
     r"(?:strategy|rule)\s*:)", re.I)
 _RSI: Final = re.compile(r"\brsi\s*(?:\(\s*(?P<n>\d{1,3})\s*\))?[^.;]{0,40}?\b(?:below|under|<|"
                          r"drops?\s+(?:below|under|to)|falls?\s+(?:below|under|to))\s*(?P<lo>\d{1,2})"
@@ -60,9 +61,11 @@ _CROSS: Final = re.compile(r"\b(?P<fast>\d{1,3})\s*(?:/|and|-|vs\.?)\s*(?P<slow>
                            r"(?P<slow2>\d{1,3})\s*(?:day\s+)?(?P<kind2>e?ma|sma)?\s*cross\w*", re.I)
 _ABOVE_MA: Final = re.compile(r"\babove\s+(?:its\s+|the\s+)?(?P<n>\d{1,3})[\s-]*(?:day|d|week)?"
                               r"[\s-]*(?P<kind>e?ma|sma|moving\s+average|average)\b", re.I)
-_MOVE: Final = re.compile(r"\b(?P<verb>fall(?:s|en)?|fell|drop(?:s|ped)?|dip(?:s|ped)?|down|"
-                          r"los(?:e|es|t)|rise[sn]?|rose|jump(?:s|ed)?|gain(?:s|ed)?|up|"
-                          r"rall(?:y|ies|ied))\s+(?:by\s+)?(?:more\s+than\s+|at\s+least\s+|over\s+)?"
+_MOVE: Final = re.compile(r"\b(?P<verb>fall(?:s|en|ing)?|fell|drop(?:s|ped|ping)?|dip(?:s|ped)?|"
+                          r"down|los(?:e|es|t|ing)|dump(?:s|ed)?|tank(?:s|ed)?|crash(?:es|ed)?|"
+                          r"plunge[sd]?|sink(?:s)?|sank|slump(?:s|ed)?|rise[sn]?|rising|rose|"
+                          r"jump(?:s|ed)?|gain(?:s|ed)?|up|rall(?:y|ies|ied)|pump(?:s|ed)?|"
+                          r"spike[sd]?|surge[sd]?|soar(?:s|ed)?|rip(?:s|ped)?)\s+(?:by\s+)?(?:more\s+than\s+|at\s+least\s+|over\s+)?"
                           r"(?P<pct>\d+(?:\.\d+)?)\s*%\s*(?:or\s+more\s+)?(?:in\s+(?:a|one)\s+day|"
                           r"on\s+the\s+day|in\s+a\s+session|daily|that\s+day)?", re.I)
 _HOLD: Final = re.compile(r"\bhold(?:ing|s)?\s+(?:it\s+|for\s+)?(?P<n>\d{1,3}|a|one|two|three)"
@@ -139,7 +142,8 @@ def read_rule(text: str) -> Rule | None:
                     {"n": n, "ema": float(ema)}, short)
     move = _MOVE.search(text)
     if move is not None:
-        down = re.match(r"fall|fell|drop|dip|down|los", move.group("verb"), re.I) is not None
+        down = re.match(r"fall|fell|drop|dip|down|los|dump|tank|crash|plunge|sink|sank|slump",
+                        move.group("verb"), re.I) is not None
         pct = float(move.group("pct")) / 100
         held = _HOLD.search(text)
         if held is not None:

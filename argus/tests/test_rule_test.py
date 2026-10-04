@@ -50,6 +50,9 @@ class TestReading:
         "would buying ETH whenever RSI drops under 25 and selling once it's above 60 have made "
         "money, or was that luck?",
         "what if I short BTC whenever it rises 5% in a day",
+        # trader verbs and "every time" (live, 2026-10-05: this got a QQQ stress answer)
+        "what happens if I short ETH every time it pumps 6% in a day",
+        "if I buy ETH any time it crashes 10% and hold a week, does it work?",
     ])
     def test_a_rule_asked_without_the_word_backtest_is_still_run(self, text: str) -> None:
         assert rt.ASKED.search(text)
@@ -58,6 +61,8 @@ class TestReading:
     @pytest.mark.parametrize(("text", "rose"), [
         ("what if I short BTC whenever it rises 5% in a day", True),
         ("backtest short ETH when it drops 5%, hold 3 days", False),
+        ("what happens if I short ETH every time it pumps 6% in a day", True),
+        ("backtest shorting SOL when it dumps 5%", False),
     ])
     def test_short_is_the_trade_whichever_way_the_trigger_moves(self, text: str,
                                                                 rose: bool) -> None:
