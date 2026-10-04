@@ -3214,9 +3214,15 @@ def shock_subject(raw: str, weighted: set[str]) -> str | None:
     # because two holdings were named and neither was "outside" (found 2026-09-25).
     for shock in _NAMED_SHOCK.finditer(raw):
         # only the clause the shock verb sits in: "...50% AAPL. If NVDA drops 10%" has AAPL inside
-        # the 24 characters before it, and two names read as no subject (2026-10-01 audit)
-        clause = re.split(r"[.;,?!]|\band\b|\bif\b|\bwhat\b", raw[max(0, shock.start() - 24):
-                                                                  shock.start() + 1], flags=re.I)
+        # the 24 characters before it, and two names read as no subject (2026-10-01 audit). The
+        # verb, not the match: "80% BTC and SOL drops 30%" matches from the weight, and the
+        # subject is the name before "drops" (a live re-ask, round 36)
+        verb = re.search(r"\b(?:drop|fall|fell|crash|crater|tank|dump|plung|spik|jump|los|shed|"
+                         r"slid|slip|sink|sank|surg|rall|ris|rose|gain|climb|soar)\w*",
+                         shock.group(0), re.I)
+        at = shock.start() + (verb.start() if verb else 0)
+        clause = re.split(r"[.;,?!]|\band\b|\bif\b|\bwhat\b", raw[max(0, at - 24):at + 1],
+                          flags=re.I)
         before, _ = research_symbols(clause[-1])
         if len(before) == 1 and before[0] in named:
             return None if before[0] == BENCHMARK else before[0]
@@ -3271,7 +3277,13 @@ def holding_shocks(raw: str) -> dict[str, float]:
         size = float(match.group("pct"))
         move = -size if (_SHOCK_FALLS.match(match.group("verb"))
                          or re.match(r"(?:shed|slid|slip)", match.group("verb"), re.I)) else size
-        for name in re.split(r"\s*(?:,|\band\b|&)\s*", match.group("names")):
+        names = re.split(r"\s*(?:,|\band\b|&)\s*", match.group("names"))
+        if (re.search(r"\d\s*%\s*$", raw[:match.start()])
+                and not re.search(r"\b(?:both|all|each|together)\b", match.group(0), re.I)):
+            # "20% SOL, 80% BTC and SOL drops 30%": the first name is a holding's weight, not a
+            # second name for the fall (a live re-ask, round 36)
+            names = names[1:]
+        for name in names:
             symbols, _ = research_symbols(name)
             if len(symbols) == 1:
                 found[symbols[0]] = move

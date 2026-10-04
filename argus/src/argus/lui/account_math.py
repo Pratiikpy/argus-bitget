@@ -605,8 +605,10 @@ _NOTIONAL_HELD: Final = re.compile(
     r"(?P<a>\d[\d,]*(?:\.\d+)?)\s*(?P<u>k)?\s*(?:usd|usdt|dollars?)?\s*(?:of\s+)?(?:notional|"
     r"exposure|position)", re.I)
 _PRICE_MOVE: Final = re.compile(
-    r"\b(?:price|it|the\s+price)\s+(?P<dir>rises|rise|goes\s+up|climbs|jumps|falls|fall|drops|"
-    r"drop|goes\s+down|declines)\s+(?:by\s+)?(?P<p>\d+(?:\.\d+)?)\s*(?:%|percent)", re.I)
+    # the price, or the name itself: "If ETH goes up 5%, how much do I lose?" (round 36 re-ask)
+    r"\b(?:price|it|the\s+price|(?-i:[A-Z]{2,10}))\s+(?P<dir>rises|rise|goes\s+up|climbs|jumps|"
+    r"falls|fall|drops|drop|goes\s+down|declines)\s+(?:by\s+)?(?P<p>\d+(?:\.\d+)?)\s*(?:%|percent)",
+    re.I)
 
 
 def position_pnl_lines(text: str) -> list[str] | None:

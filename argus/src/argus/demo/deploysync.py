@@ -90,6 +90,9 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     "event_reactions.json",
     # Read by name resolution: SEC's company names ("Micron" is MU), `market/company_names.py`.
     "company_names.json",
+    # The Polymarket crowd's scored record (`market/crowd_record.py`): resolved markets never
+    # change, so they are scored once; the console fetches only the days since.
+    "crowd_record.json",
     # Read by add-to-book questions: the post-trade beta's measured record against weekend-copilot.
     "copilot_rivals.json",
     "copilot_stress.json",

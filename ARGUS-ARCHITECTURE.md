@@ -8,11 +8,11 @@ that produced them.
 
 | | |
 |---|---|
-| Source | **614 source files**, 20 packages (measured 2026-09-27) |
+| Source | **615 source files**, 20 packages (measured 2026-09-27) |
 | Registered and importable at runtime | **152/152** (`python -m argus.status`) |
-| Tests | **11,949 tests collected**; CI runs every one that needs no network with each outbound connection refused, and the 238 that read a live venue, feed or model in a separate advisory job |
-| Static analysis | `ruff` clean; `mypy --strict` clean on the 611 files it checks (the three vendored files are excluded) |
-| Artefacts | **908** files under `argus/data/`; each one a document cites is written by a named command, and a test fails if a cited artefact has no writer |
+| Tests | **11,959 tests collected**; CI runs every one that needs no network with each outbound connection refused, and the 238 that read a live venue, feed or model in a separate advisory job |
+| Static analysis | `ruff` clean; `mypy --strict` clean on the 612 files it checks (the three vendored files are excluded) |
+| Artefacts | **910** files under `argus/data/`; each one a document cites is written by a named command, and a test fails if a cited artefact has no writer |
 | External systems torn down at code level | **57 code-level teardowns** under `research/architecture/`, each citing `file:line` |
 | Runtime dependencies | **two** — `pydantic`, `python-dateutil` |
 

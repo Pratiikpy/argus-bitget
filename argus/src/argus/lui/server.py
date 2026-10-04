@@ -26,6 +26,7 @@ import contextvars
 import itertools
 import json
 import logging
+import math
 import os
 import re
 import threading
@@ -3576,6 +3577,19 @@ def _round27_follow_up(text: str, prior: list[str], *, now: datetime | None, vis
     rumour = _venue_rumour_lines(text)
     if rumour is not None:
         return engine_payload_like(rumour, prior, text, by="research")
+    if re.search(r"\btrue\b|\bright\b|\bcorrect\b|\baccurate\b|\breally\b|\bis\s+that\b|"
+                 r"\bcheck\b", text, re.I):
+        from argus.lui import claims as _claims
+
+        checked_pe = _claims.pe_claim_line(text, tuple(symbols_in(text)[0]))
+        if checked_pe is not None:
+            # "Someone on twitter says Tesla trades at just 40x forward earnings now. True?" got
+            # the warning about social-media tips and no figure (a live re-ask, round 36)
+            return engine_payload_like(
+                [checked_pe.replace("Premise check: ", "Bottom line: ", 1),
+                 "Data: Yahoo Finance's quote summary (forward P/E on the analysts' estimate of "
+                 "the next twelve months' earnings); a multiple says what the price assumes, "
+                 "not whether the stock is cheap."], prior, text, by="research")
     contracts_said = _contracts_worth_lines(text, prior, now=now, visitor=visitor)
     if contracts_said is not None:
         return engine_payload_like(contracts_said, prior, text, by="arithmetic")
@@ -5413,6 +5427,10 @@ def handle_ask(
                     payload = again
         premises = (_premise_lines(text, now, book)
                     if payload.get("lines") and not payload.get("refused") else [])
+        # a premise the answer already leads with is not said twice (round 36 re-ask)
+        said_already = " ".join(str(x) for x in payload.get("lines") or [])
+        premises = [p for p in premises
+                    if p.removeprefix("Premise check: ") not in said_already]
         data_said = [str(x) for x in payload.get("lines") or [] if str(x).startswith("Data:")]
         if len(data_said) > 1:
             # two engines each closed with their own Data line ("Bitget's position tier table";
@@ -5515,7 +5533,13 @@ def handle_ask(
             INSIDER_TIP,
         )
 
-        if (INSIDER_TIP.search(text) and payload.get("lines")
+        public_source = re.search(
+            # "Someone on twitter says Tesla trades at 40x forward earnings" is a public claim, not
+            # an insider's tip (a live re-ask, round 36)
+            r"\b(?:twitter|tweet\w*|x\.com|reddit|newsletter|article|blog|analysts?|tv|cnbc|"
+            r"bloomberg|reuters|youtube|tiktok|podcast)\b|\bforward\s+earnings\b|\bp\s*/\s*e\b",
+            text, re.I)
+        if (INSIDER_TIP.search(text) and not public_source and payload.get("lines")
                 and INSIDER_LINE not in payload["lines"]):
             payload["lines"] = [INSIDER_LINE, *payload["lines"]]
 
@@ -7471,6 +7495,63 @@ _POLYMARKET_Q = re.compile(r"\bpolymarket\b|\bprediction\s+markets?\b|\bbetting\
                            r"odds)\b|\bwhat\s+(?:is|are)\s+(?:the\s+)?(?:crowd|bettors)\b", re.I)
 
 
+_CROWD_RECORD_Q = re.compile(
+    r"\b(?:how\s+(?:accurate|good|reliable|well[\s-]calibrated|right|often\s+right)|track\s+"
+    r"record|calibrat\w*|brier|can\s+(?:i|we|you)\s+trust|trust\w*\s+(?:the\s+)?(?:odds|prices?|"
+    r"crowd)|been\s+right|accuracy|hit\s+rate|worth\s+(?:anything|trusting)|any\s+good|"
+    # "is the prediction market crowd any good at calling where SOL closes?" (a re-ask, 4.6)
+    r"good\s+at|(?:accurate|reliable|right)\s+(?:at|on|about))\b", re.I)
+_CROWD_SUBJECT = re.compile(r"\b(?:polymarket|prediction\s+markets?|crowd|betting\s+"
+                            r"(?:markets?|odds)|bettors)\b", re.I)
+_CROWD_FOLLOW = re.compile(r"^\W*(?:but\s+|and\s+|so\s+)?(?:can\s+(?:i|we)\s+trust\s+(?:that|those|"
+                           r"these|them|it|this)|how\s+(?:accurate|good|reliable)\s+(?:is|are|has)\s+"
+                           r"(?:that|those|it|this|they|polymarket)|(?:is|are)\s+(?:that|those|"
+                           r"they|it)\s+(?:accurate|reliable|any\s+good))\b", re.I)
+
+
+def _level_distance(question: str, value: float) -> float:
+    """How far the dollar level a market names is from ``value``, in log terms; infinite when it
+    names none."""
+    stated = [float(x.replace(",", "")) for x in re.findall(r"\$(\d[\d,]*(?:\.\d+)?)", question)]
+    stated = [x for x in stated if x > 0]
+    if not stated or value <= 0:
+        return math.inf
+    return min(abs(math.log(x / value)) for x in stated)
+
+
+def _crowd_record_lines(text: str, prior: list[str]) -> list[str] | None:
+    """How good the Polymarket crowd has been, scored on resolved markets of the same kind
+    (`market/crowd_record.py`, build-list 4.6): "can I trust those odds?" after a Polymarket answer
+    was re-read as a new question about the name, and nothing scored the crowd's past prices."""
+    from argus.lui.research import research_symbols
+    from argus.market import crowd_record
+
+    asked = _CROWD_RECORD_Q.search(text) is not None and _CROWD_SUBJECT.search(text) is not None
+    follow = (_CROWD_FOLLOW.search(text) is not None
+              and any(_POLYMARKET_Q.search(q) or _FED_ODDS_Q.search(q) for q in prior[-2:]))
+    if not (asked or follow):
+        return None
+    source = text if research_symbols(text)[0] else next(
+        (q for q in reversed(prior[-2:]) if research_symbols(q)[0]), text)
+    named = research_symbols(source)[0]
+    symbol = named[0] if named else "BTCUSDT"
+    base = symbol.removesuffix("USDT")
+    if base not in crowd_record.SERIES:
+        listed = ", ".join(crowd_record.SERIES)
+        return [f"Bottom line: the crowd's record is scored on Polymarket's daily price ladders, "
+                f"which run for {listed}; {base} has no such series, so there is no scored record "
+                f"for it here.",
+                "Ask how accurate Polymarket has been on bitcoin, and the close calls are scored "
+                "against a coin flip with the calibration by band."]
+    # "between $X and $Y" questions are the range ladder; everything else the "above" ladder
+    ranged = re.search(r"\bprice\s+on\b|\brange|\bbetween\b", text, re.I) is not None
+    said = crowd_record.lines(symbol, question_family=" price on " if ranged else None)
+    if not named:
+        said.insert(1, "No name was given, so this is bitcoin's daily ladder, Polymarket's busiest "
+                       "price series; ask about ETH, SOL or XRP for theirs.")
+    return said
+
+
 def _polymarket_lines(text: str, prior: list[str]) -> list[str] | None:
     """"What's Polymarket saying about bitcoin hitting 100k this year?" was re-read as "is it a
     good time to buy BTC?" (a judge, round 25): the markets on that name, the one naming the
@@ -7501,6 +7582,8 @@ def _polymarket_lines(text: str, prior: list[str]) -> list[str] | None:
         return [f"Bottom line: Polymarket has no open market on {named[0].removesuffix('USDT')} "
                 f"above its $10,000 volume floor, so there is no crowd price to quote."]
     level = re.search(r"(\d+(?:\.\d+)?)\s*(k|m)?\b", source.replace(",", ""), re.I)
+    named_level = True
+    value = 0.0
     if level is not None:
         value = float(level.group(1)) * {"k": 1e3, "m": 1e6}.get((level.group(2) or "").lower(), 1)
         words = (f"{value:,.0f}", f"{value / 1e3:g}k", f"{value:.0f}")
@@ -7509,7 +7592,11 @@ def _polymarket_lines(text: str, prior: list[str]) -> list[str] | None:
         markets.sort(key=lambda m: (
             not any(w in m.question.replace("$", "") for w in words),
             by_year and not re.search(r"December\s+31|by\s+end\s+of|in\s+20\d\d|this\s+year",
-                                      m.question, re.I)))
+                                      m.question, re.I),
+            # "ETH hitting 5k?" led with "dip to $2,100" (a re-ask, 4.6): with no market naming
+            # the level, the rung nearest to it comes first
+            _level_distance(m.question, value)))
+        named_level = any(w in markets[0].question.replace("$", "") for w in words)
     name = named[0].removesuffix("USDT")
     top = markets[:3]
     lines = [f"Bottom line: Polymarket prices \u201c{top[0].question}\u201d at "
@@ -7517,7 +7604,10 @@ def _polymarket_lines(text: str, prior: list[str]) -> list[str] | None:
              f"what money is betting on {name}, not a forecast of ours."]
     lines += [f"Also: \u201c{m.question}\u201d {m.yes_price:.0%} (${m.volume:,.0f})."
               for m in top[1:]]
-    if level is not None and by_year and not re.search(
+    if level is not None and not named_level and value >= 10:
+        lines.insert(1, f"No open market above the volume floor names {value:,.0f}; the one above "
+                        f"is the nearest level that money is betting on.")
+    elif level is not None and by_year and not re.search(
             r"December\s+31|by\s+end\s+of|in\s+20\d\d|this\s+year", top[0].question, re.I):
         lines.insert(1, "No open market above the volume floor prices that level by the end of "
                         "the year; the one above is the nearest in time that names it.")
@@ -9301,7 +9391,9 @@ def _restated(text: str, prior: list[str], book: str = "") -> tuple[str, str | N
             name, lead = premise
             return f"is it a good time to buy {name}?", lead
     all_in = _ALL_IN.search(text)
-    if all_in is not None:
+    if all_in is not None and not re.search(r"\bhedg\w*", text, re.I):
+        # "my account is $80k, all in BTC — I can put $1,000 toward a hedge" states a holding and
+        # asks for a hedge (a live re-ask, round 36)
         named = research_symbols(all_in.group("name") or all_in.group("name2") or "")[0]
         if named:
             # "so should i just put it all in btc?" got beta, kurtosis and Euler decomposition
@@ -10228,7 +10320,9 @@ def _answer(
         tested = _hedge_claim_lines(hedge_claim.group("a"))
         if tested is not None:
             return engine_payload_like(tested, prior, text, by="thesis")
-    fed_odds = _fed_odds_lines(text, prior)
+    fed_odds = _crowd_record_lines(text, prior)
+    if fed_odds is None:
+        fed_odds = _fed_odds_lines(text, prior)
     if fed_odds is None:
         fed_odds = _polymarket_lines(text, prior)
     if fed_odds is not None:

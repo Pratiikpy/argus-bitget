@@ -166,3 +166,10 @@ class TestHostile:
     def test_a_hypothetical_failure_is_not_a_rumour(self) -> None:
         assert server._venue_rumour_lines("what happens to my coins if Bitget goes bankrupt?") \
             is None
+
+    def test_a_weighted_name_is_not_a_second_shock(self) -> None:
+        assert parse.holding_shocks("and if my portfolio were 20% SOL, 80% BTC and SOL drops "
+                                    "30%?") == {}
+        assert parse.holding_shocks("BTC and SOL drop 30%") == {"BTCUSDT": -30.0,
+                                                                "SOLUSDT": -30.0}
+        assert len(parse.holding_shocks("If 50% NVDA and TSLA both fall 10%")) == 2

@@ -41,7 +41,9 @@ _BOTH: Final = re.compile(r"\benter\s+and\s+exit|\bin\s+and\s+out\b|\bround[\s-]
                           r"and\b|\bbuy\s+and\s+(?:then\s+)?sell\b|\bopen\s+and\s+close\b", re.I)
 _ENTRY_ONLY: Final = re.compile(r"\b(?:enter|entering|get\s+in(?:to)?|open(?:ing)?|buy(?:ing)?)\b"
                                 r"(?![^?]{0,40}\b(?:exit|out|close|sell)\b)", re.I)
-_DOLLARS: Final = re.compile(r"\$\s?(?P<a>\d[\d,]*(?:\.\d+)?)\s*(?P<u>k|m|mm|million)?\b", re.I)
+_DOLLARS: Final = re.compile(r"\$\s?(?P<a>\d[\d,]*(?:\.\d+)?)\s*(?P<u>k|m|mm|million|bn|b|billion|"
+                             r"trillion|tn)?\b", re.I)
+"""A dollar size with its scale: "$500 billion" was read as $500 (a live re-ask, round 36)."""
 _UNITS: Final = re.compile(r"(?<![\w.$,])(?P<n>\d[\d,]*(?:\.\d+)?)\s+(?P<name>[A-Za-z]{2,10})\b")
 
 
@@ -51,7 +53,9 @@ def _size(text: str, book: str, symbol: str) -> tuple[Decimal, str] | None:
     if dollars is not None:
         unit = (dollars.group("u") or "").lower()
         amount = Decimal(dollars.group("a").replace(",", "")) * (
-            1000 if unit == "k" else 1_000_000 if unit in ("m", "mm", "million") else 1)
+            1000 if unit == "k" else 1_000_000 if unit in ("m", "mm", "million") else
+            1_000_000_000 if unit in ("b", "bn", "billion") else
+            1_000_000_000_000 if unit in ("tn", "trillion") else 1)
         return amount, f"${amount:,.0f} as stated"
     from argus.lui.research import research_symbols
     from argus.lui.research.parse import last_price
