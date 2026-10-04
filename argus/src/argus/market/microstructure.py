@@ -39,7 +39,7 @@ from enum import StrEnum
 from typing import Any
 
 from argus.truth import http
-from argus.truth.evidence import Evidence
+from argus.truth.evidence import Evidence, Kind
 
 SHORT_VOLUME_URL = "https://cdn.finra.org/equity/regsho/daily/CNMSshvol{stamp}.txt"
 """FINRA's consolidated daily short-volume file. ``CNMS`` is every US market centre combined.
@@ -331,7 +331,7 @@ def evidence(
         out.append(Evidence(
             id=f"finra-short-{short.ticker}-{short.as_of.isoformat()}",
             claim=short.render(),
-            source="macro",
+            kind=Kind.POSITIONING, source="macro",
             available_at=datetime.combine(short.as_of, datetime.min.time(), tzinfo=UTC),
             # FINRA is the regulator publishing its own consolidated tape, so the number is a
             # fact. It is 0.95 rather than 1.0 because short *volume* is not short *interest* —
@@ -345,7 +345,7 @@ def evidence(
         out.append(Evidence(
             id=f"halt-{halt.ticker}-{halt.halted_at.isoformat()}",
             claim=halt.render(),
-            source="news",
+            kind=Kind.NEWS, source="news",
             available_at=halt.halted_at,
             credibility=1.0,  # the venue stating its own trading state
             attributes={"reason_code": halt.reason_code, "kind": halt.kind.value,

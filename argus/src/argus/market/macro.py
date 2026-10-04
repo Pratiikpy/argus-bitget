@@ -38,7 +38,7 @@ from decimal import Decimal
 from typing import Any
 
 from argus.truth import http
-from argus.truth.evidence import Evidence
+from argus.truth.evidence import Evidence, Kind
 
 CURVE_URL = (
     "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml"
@@ -226,7 +226,7 @@ def evidence(curve: Curve, *, as_of: datetime) -> list[Evidence]:
         Evidence(
             id=f"ust-curve-{curve.as_of.isoformat()}",
             claim=curve.render(),
-            source="macro",
+            kind=Kind.MACRO, source="macro",
             available_at=stamp,
             # The issuer of the instrument, published on a fixed schedule. Nothing in the evidence
             # set is more authoritative about rates than the Treasury is.
@@ -246,7 +246,7 @@ def evidence(curve: Curve, *, as_of: datetime) -> list[Evidence]:
                     if spread < 0 else ""
                 )
             ),
-            source="macro",
+            kind=Kind.MACRO, source="macro",
             available_at=stamp,
             credibility=1.0,
             attributes={"spread_10y2y_bps": str(spread), "inverted": str(spread < 0)},
@@ -324,8 +324,10 @@ def fear_greed_evidence(reading: FearGreed, *, as_of: datetime) -> list[Evidence
             #
             # The classification is also simply more accurate: this is a venue-level risk-appetite
             # reading, the same kind of object as the Treasury curve and the volatility index, and
-            # not a narrative about any company.
-            source="macro",
+            # not a narrative about any company. Its kind (build-list 5.2) is a sentiment index,
+            # which no analyst reads: the decision-maker sees it directly, so the measured cost
+            # above does not come back through the type.
+            kind=Kind.SENTIMENT_INDEX, source="macro",
             available_at=reading.as_of,
             # Deliberately low. It is a real published number about a related market, which is a
             # weaker thing than a filing about this company, and the credibility says so.

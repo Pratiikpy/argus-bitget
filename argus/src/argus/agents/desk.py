@@ -61,7 +61,7 @@ from argus.agents.earnings import EarningsRead
 from argus.agents.entitygate import check as check_entities
 from argus.agents.meta_pm import MarketFrame, MetaPM, deliberation_cost_bps
 from argus.agents.recall import recall
-from argus.agents.selection import select
+from argus.agents.selection import reads, select
 from argus.cost.model import CostModel
 from argus.decision.escalation import Escalation
 from argus.decision.escalation import Signals as EscalationSignals
@@ -487,9 +487,10 @@ class TradingDesk:
         notes.extend(selection.render())
         chosen = set(selection.run)
 
-        event_evidence = [e for e in evidence if e.source in ("sec-edgar", "news", "macro")]
-        social_evidence = [e for e in evidence if e.source == "social"]
-        earnings_evidence = [e for e in evidence if e.source in ("filing", "transcript")]
+        # By kind, not channel (build-list 5.2): `agents/selection.reads` is the one rule.
+        event_evidence = [e for e in evidence if reads("event", e)]
+        social_evidence = [e for e in evidence if reads("sentiment", e)]
+        earnings_evidence = [e for e in evidence if reads("earnings", e)]
 
         causal_chain: CausalChain | None = None
         earnings_read: EarningsRead | None = None

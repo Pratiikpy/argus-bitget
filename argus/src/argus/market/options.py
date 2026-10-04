@@ -39,7 +39,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from argus.truth import http
-from argus.truth.evidence import Evidence
+from argus.truth.evidence import Evidence, Kind
 
 CHAIN_URL = "https://cdn.cboe.com/api/global/delayed_quotes/options/{symbol}.json"
 INDEX_URL = "https://cdn.cboe.com/api/global/delayed_quotes/options/_{symbol}.json"
@@ -234,7 +234,7 @@ def options_evidence(symbol: str, *, as_of: datetime,
     except (http.RpcError, OptionsError, ValueError, KeyError) as exc:
         return [], f"options:{symbol}: unavailable ({http.reason_of(exc)})"
     return [Evidence(id=f"options-{symbol}-{as_of.date().isoformat()}", claim=summary.claim(),
-                     source="news", available_at=as_of, credibility=0.9)], (
+                     kind=Kind.DERIVATIVES, source="news", available_at=as_of, credibility=0.9)], (
         f"options:{symbol}: {summary.quoted_contracts} quoted contracts")
 
 

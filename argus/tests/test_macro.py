@@ -281,10 +281,13 @@ def test_the_risk_appetite_index_does_not_route_to_the_sentiment_analyst() -> No
     analyst, so one market-wide reading made a DEMOTED analyst run on all eleven symbols and
     charged deliberation for it on every one.
     """
-    from argus.agents.selection import SOURCES
+    from argus.agents.selection import DIRECT, reads
+    from argus.truth.evidence import Kind
 
     got = fear_greed_evidence(
         FearGreed(as_of=AT, value=61, classification="Greed"), as_of=AT
     )[0]
     assert got.source == "macro"
-    assert got.source not in SOURCES["sentiment"]
+    # by kind since build-list 5.2: an index no analyst reads, which the decision-maker sees
+    assert got.kind is Kind.SENTIMENT_INDEX and got.kind in DIRECT
+    assert not any(reads(a, got) for a in ("sentiment", "event", "earnings"))

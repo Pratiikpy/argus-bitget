@@ -54,7 +54,7 @@ from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-from argus.market.skills import PROBES, Health, Probe, SkillReport, hollow
+from argus.market.skills import PROBES, Health, Probe, SkillReport, hollow, kind_for
 from argus.truth import http
 from argus.truth.evidence import Evidence
 from argus.truth.paths import DATA_DIR
@@ -547,6 +547,7 @@ def evidence(rows: Sequence[MirrorRow], *, as_of: datetime) -> list[Evidence]:
             id=f"mirror-{row.probe.tool}-{row.probe.action}-{int(as_of.timestamp())}",
             claim=(f"[{row.probe.skill}, Bitget server dark; read from {row.upstream}, {via}] "
                    f"{row.probe.yields}: {json.dumps(row.payload, default=str)[:300]}"),
+            kind=kind_for(row.probe),
             source="macro" if row.probe.skill == "macro-analyst" else "social",
             available_at=as_of,
             credibility=0.75 if row.same_upstream else 0.7,

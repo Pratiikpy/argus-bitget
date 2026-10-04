@@ -43,7 +43,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Any
 
-from argus.truth.evidence import Evidence
+from argus.truth.evidence import CHANNELS, Evidence, Kind, kind_of
 
 MIN_EVIDENCE = 1
 """Below this an analyst has nothing to read and is skipped regardless of cost."""
@@ -64,14 +64,35 @@ health line scores 0.1 and must not summon an analyst, while a single full-credi
 1.0 and must."""
 
 
-# Which sources each analyst is entitled to read. Taken from `agents/desk.py:140-143` so the two
-# cannot drift: selection that disagreed with routing would skip an analyst over evidence it was
-# never going to see.
-SOURCES: dict[str, frozenset[str]] = {
-    "event": frozenset({"sec-edgar", "news", "macro"}),
-    "sentiment": frozenset({"social"}),
-    "earnings": frozenset({"filing", "transcript"}),
+# Which kinds of evidence each analyst is entitled to read (build-list 5.2). `agents/desk.py`
+# routes with :func:`reads` too, so selection and routing cannot drift: selection that disagreed
+# with routing would skip an analyst over evidence it was never going to see.
+#
+# Until 2026-10-05 this keyed on the channel (``source``), and channels were standing in for
+# types: every bitget-signal Skill but macro arrived as ``social``, so the sentiment analyst
+# summarised RSI, MACD and the news briefing as crowd mood; the Bitget quote line, a dark-pool
+# summary and an option-chain summary arrived as ``news``, and FINRA short volume as ``macro``, so
+# the event analyst was handed statistics as events (counted over the record in
+# `eval/evidence_routing.py`). Each analyst now reads the prose it exists to read.
+KINDS: dict[str, frozenset[Kind]] = {
+    "event": frozenset({Kind.FILING, Kind.NEWS, Kind.MACRO}),
+    "sentiment": frozenset({Kind.SOCIAL}),
+    "earnings": frozenset({Kind.FUNDAMENTAL, Kind.ESTIMATE, Kind.REPORT, Kind.TRANSCRIPT}),
 }
+
+DIRECT: frozenset[Kind] = frozenset({
+    Kind.QUOTE, Kind.TECHNICAL, Kind.DERIVATIVES, Kind.POSITIONING, Kind.SENTIMENT_INDEX,
+    Kind.ONCHAIN, Kind.COVERAGE,
+})
+"""Kinds no analyst summarises: numbers the decision-maker reads as they are, in its own frame.
+A market-wide gauge sent to the sentiment analyst made it run on every symbol (the Fear & Greed
+finding in `market/macro.py`), and a quote needs no one to restate it."""
+
+
+def reads(analyst: str, item: Evidence) -> bool:
+    """Whether ``analyst`` is entitled to read ``item``."""
+    found = kind_of(item)
+    return found is not None and found in KINDS.get(analyst, frozenset())
 
 # Content an analyst needs before its evidence is worth its cost. A source match alone is weak: a
 # generic headline arrives on the `news` channel and so does a merger announcement. Matched against
@@ -139,15 +160,14 @@ class Selection:
     **Found by a demonstration abstaining for the wrong reason.** A scenario fixture wrote an 8-K
     with ``source="sec"`` instead of the canonical ``sec-edgar``. The item was gathered, counted in
     the evidence list and displayed in the trace — and routed to nobody, because
-    :data:`SOURCES` maps channels and an unknown one matches no analyst. The panel note said
+    routing mapped channels and an unknown one matched no analyst. The panel note said
     "event not run - no evidence on its channels", which is a true statement about the *analyst* and
     says nothing about the *item*, and the decision that followed looked like judgement.
 
     :attr:`evidence_not_read` cannot catch this: it sums the evidence belonging to skipped analysts,
     and an orphan belongs to none of them, so it is invisible to a counter whose docstring promises
-    it is never zero silently. The live sources are all routed
-    (``sec-edgar``/``filing``/``social``), so this is a guard against the next source added rather
-    than a live defect — which is exactly when it is cheap to add."""
+    it is never zero silently. Kinds the decision-maker reads directly (:data:`DIRECT`) are routed
+    by design and are not orphans; an item with no kind and an unknown channel is."""
     """The panel would have been empty and the strongest candidate was run anyway. A panel of one
     reached this way is a different thing from a panel of one that was chosen, and conflating them
     would let a desk report a considered decision it never made."""
@@ -191,8 +211,8 @@ class Selection:
             lines.append(
                 f"[panel] WARNING {len(self.orphaned)} evidence source(s) reached no analyst: "
                 f"{', '.join(self.orphaned)}. No analyst is entitled to read them, so they were "
-                f"counted as evidence and used by nobody. Expected one of "
-                f"{', '.join(sorted(set().union(*SOURCES.values())))}"
+                f"counted as evidence and used by nobody. Expected a kind, or one of the "
+                f"channels {', '.join(sorted(CHANNELS))}"
             )
         for skipped in self.skipped:
             # The "went unexamined" clause is only true when something was there to examine. On the
@@ -242,13 +262,13 @@ def assess(
     cost_bps: Decimal,
 ) -> Assessment:
     """Score one analyst against the evidence it is entitled to read."""
-    sources = SOURCES.get(analyst, frozenset())
-    mine = [e for e in evidence if e.source in sources]
+    kinds = KINDS.get(analyst, frozenset())
+    mine = [e for e in evidence if reads(analyst, e)]
 
     if len(mine) < MIN_EVIDENCE:
         return Assessment(
             analyst=analyst, evidence_count=0, relevance=0.0, cost_bps=cost_bps, run=False,
-            reason=f"no evidence on its channels ({', '.join(sorted(sources)) or 'none'})",
+            reason=f"no evidence of its kinds ({', '.join(sorted(kinds)) or 'none'})",
         )
 
     # Relevance counts only evidence whose content this analyst can actually act on, but the count
@@ -325,21 +345,23 @@ def select(
                 for a in assessments
             ]
 
-    known = set().union(*SOURCES.values())
-    orphaned = tuple(sorted({str(e.source) for e in evidence if str(e.source) not in known}))
+    routed = set().union(*KINDS.values()) | DIRECT
+    orphaned = tuple(sorted({str(e.source) for e in evidence if kind_of(e) not in routed}))
     return Selection(
         assessments=tuple(assessments), floor_applied=floor_applied, orphaned=orphaned,
     )
 
 
 __all__ = [
+    "DIRECT",
+    "KINDS",
     "MIN_EVIDENCE",
     "MIN_RELEVANCE",
-    "SOURCES",
     "STALE_AFTER",
     "STALE_WEIGHT",
     "Assessment",
     "Selection",
     "assess",
+    "reads",
     "select",
 ]

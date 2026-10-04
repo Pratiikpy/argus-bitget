@@ -42,7 +42,7 @@ from typing import Any
 from argus.market.evidence import FEED_USER_AGENT, EdgarSource
 from argus.market.sue import MIN_QUARTERS, SueError, read_dated, yoy_window
 from argus.truth import http
-from argus.truth.evidence import Evidence
+from argus.truth.evidence import Evidence, Kind
 
 TIMEOUT = 15
 
@@ -268,7 +268,7 @@ def _sue_evidence(ticker: str, eps_facts: list[Fact]) -> tuple[list[Evidence], l
                 f"({magnitude} standard deviation(s) of surprise, EPS change "
                 f"{sue.eps_change:+.4f} vs a historical deviation of {sue.eps_std:.4f})"
             ),
-            source="filing",
+            kind=Kind.FUNDAMENTAL, source="filing",
             available_at=datetime.combine(known_on, datetime.min.time(), tzinfo=UTC),
             credibility=1.0,
             attributes={
@@ -448,7 +448,7 @@ class FundamentalsSource:
                     Evidence(
                         id=f"xbrl-{ticker}-{concept}-{fact.end.isoformat()}",
                         claim=fact.render(),
-                        source="filing",
+                        kind=Kind.FUNDAMENTAL, source="filing",
                         available_at=datetime.combine(
                             fact.filed, datetime.min.time(), tzinfo=UTC
                         ),
@@ -473,7 +473,7 @@ class FundamentalsSource:
                             f"({recent[1].end.isoformat()} to {recent[0].end.isoformat()}), "
                             f"both quarterly durations"
                         ),
-                        source="filing",
+                        kind=Kind.FUNDAMENTAL, source="filing",
                         available_at=datetime.combine(
                             recent[0].filed, datetime.min.time(), tzinfo=UTC
                         ),

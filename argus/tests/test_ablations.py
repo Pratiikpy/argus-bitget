@@ -112,9 +112,9 @@ class TestTheModuleIsHonestAboutItsFrames:
 
     def test_the_analyst_list_matches_the_desk(self) -> None:
         """A selection ablation over a different analyst set would measure a different system."""
-        from argus.agents.selection import SOURCES
+        from argus.agents.selection import KINDS
 
-        assert set(ANALYSTS) == set(SOURCES)
+        assert set(ANALYSTS) == set(KINDS)
 
     def test_the_risk_appetite_index_no_longer_triggers_sentiment(self) -> None:
         """The defect this harness found: one market-wide index on the `social` channel made a

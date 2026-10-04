@@ -20,15 +20,16 @@ from decimal import Decimal
 import pytest
 
 from argus.agents.selection import (
+    DIRECT,
+    KINDS,
     MIN_RELEVANCE,
-    SOURCES,
     STALE_AFTER,
     Assessment,
     Selection,
     assess,
     select,
 )
-from argus.truth.evidence import Evidence
+from argus.truth.evidence import Evidence, Kind
 
 AS_OF = datetime(2026, 9, 12, 18, 0, tzinfo=UTC)
 BPS = Decimal("15.2")
@@ -217,15 +218,30 @@ class TestItIsDeterministicAndAuditable:
         for row in payload["assessments"]:
             assert row["reason"] and "relevance" in row
 
-    def test_the_source_map_matches_what_the_desk_routes_on(self) -> None:
+    def test_the_kind_map_matches_what_the_desk_routes_on(self) -> None:
         """Selection that disagreed with routing would skip an analyst over unseen evidence."""
-        assert SOURCES["event"] == frozenset({"sec-edgar", "news", "macro"})
-        assert SOURCES["sentiment"] == frozenset({"social"})
-        assert SOURCES["earnings"] == frozenset({"filing", "transcript"})
+        assert KINDS["event"] == frozenset({Kind.FILING, Kind.NEWS, Kind.MACRO})
+        assert KINDS["sentiment"] == frozenset({Kind.SOCIAL})
+        assert KINDS["earnings"] == frozenset({Kind.FUNDAMENTAL, Kind.ESTIMATE, Kind.REPORT,
+                                               Kind.TRANSCRIPT})
+        # every kind is either read by an analyst or read directly, never neither
+        assert set().union(*KINDS.values()) | DIRECT == set(Kind)
+        assert not set().union(*KINDS.values()) & DIRECT
 
-    def test_an_analyst_with_no_channel_evidence_says_which_channels_it_wanted(self) -> None:
+    def test_an_analyst_with_no_evidence_of_its_kinds_says_which_it_wanted(self) -> None:
         got = assess("sentiment", [_ev("sec-edgar")], as_of=AS_OF, cost_bps=BPS)
         assert "social" in got.reason
+
+    def test_a_skill_reading_on_the_social_channel_is_not_crowd_mood(self) -> None:
+        """bitget-signal's RSI arrived on the social channel and the sentiment analyst read it."""
+        rsi = Evidence(id="skill-technical_analysis-rsi-1", claim="RSI 71", source="social",
+                       available_at=AS_OF, credibility=0.75, kind=Kind.TECHNICAL)
+        post = Evidence(id="twitter-1", claim="NVDA to the moon", source="social",
+                        available_at=AS_OF, credibility=0.9, kind=Kind.SOCIAL)
+        got = assess("sentiment", [rsi, post], as_of=AS_OF, cost_bps=BPS)
+        assert got.evidence_count == 1
+        selection = select([rsi], as_of=AS_OF, deliberation_bps=BPS)
+        assert not selection.orphaned  # read by the decision-maker directly, by design
 
     def test_the_threshold_is_a_named_constant_not_a_literal(self) -> None:
         weak = _ev("social", claim="mood", credibility=MIN_RELEVANCE - 0.01)

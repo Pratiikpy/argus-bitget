@@ -37,10 +37,11 @@ Five sources, in order of trust:
 publish time, and :func:`gather` refuses anything stamped after ``as_of``. A feed cannot leak the
 future into a decision by being fast.
 
-**Routing.** ``Evidence.source`` is the routing key the desk already uses
-(``desk.py``: ``sec-edgar``/``news``/``macro`` → event analyst; ``social`` → sentiment;
-``filing``/``transcript`` → earnings). This module emits those strings and nothing else, so the
-analysts that were starved are the ones that get fed.
+**Routing.** Each item carries a :class:`~argus.truth.evidence.Kind`, and the desk routes by
+kind (`agents/selection.reads`, build-list 5.2): event filings and headlines to the event analyst,
+posts to the sentiment analyst, periodic reports to the earnings analyst. ``source`` stays the
+channel (``sec-edgar``, ``filing``, ``news``, ``social``) and is what the headline cap below and
+`eval/sourceaudit.py` count by.
 """
 
 from __future__ import annotations
@@ -59,7 +60,7 @@ from typing import Any
 
 from argus.market.rpc import LABELS, ErrorKind, JsonRpcClient, RpcError, ToolResult, payload_failure
 from argus.truth import http
-from argus.truth.evidence import Evidence
+from argus.truth.evidence import Evidence, Kind
 
 # The SEC requires a User-Agent that identifies the requester and rejects anonymous clients (403).
 # The contact is read from the environment so no personal address is committed to source.
@@ -437,15 +438,15 @@ class EdgarSource:
                         ". This is a catch-all item: the code constrains nothing about the "
                         "contents, so it is neither news nor the absence of news until read."
                     )
-                source = "sec-edgar"
+                source, kind = "sec-edgar", Kind.FILING
             else:
                 suffix = f" — {f.description}" if f.description else ""
                 claim = f"{ticker} filed {f.form}{suffix}"
-                source = "filing"
+                source, kind = "filing", Kind.REPORT
             out.append(Evidence(
                 id=f"edgar-{f.accession}",
                 claim=claim,
-                source=source,
+                kind=kind, source=source,
                 available_at=f.accepted,
                 credibility=1.0,  # a filing is the issuer's own statement under liability
                 attributes={
@@ -555,7 +556,7 @@ class RssSource:
                 out.append(Evidence(
                     id=f"rss-{key}-{abs(hash(h.link or h.title)) % 10**10}",
                     claim=f"{h.title} ({key})",
-                    source=source,
+                    kind=Kind.NEWS, source=source,
                     available_at=h.published,
                     credibility=0.7,  # secondary reporting; a filing is 1.0
                 ))
@@ -652,7 +653,7 @@ class BitgetSkillSource:
                     f"Crypto Fear & Greed index {payload.get('value')} "
                     f"({payload.get('value_classification', '')})"
                 ),
-                source="social",
+                kind=Kind.SENTIMENT_INDEX, source="social",
                 # A snapshot at fetch time; the index carries no earlier stamp.
                 available_at=as_of,
                 credibility=0.6,
@@ -769,7 +770,7 @@ class TwitterSource:
             out.append(Evidence(
                 id=f"twitter-{tweet.get('id', created.timestamp())}",
                 claim=text[:280],
-                source="social",
+                kind=Kind.SOCIAL, source="social",
                 available_at=created,
                 credibility=0.4,
                 attributes={
@@ -863,7 +864,7 @@ class RedditSource:
             out.append(Evidence(
                 id=f"reddit-{fields.get('id', created.timestamp())}",
                 claim=claim[:280],
-                source="social",
+                kind=Kind.SOCIAL, source="social",
                 available_at=created,
                 credibility=0.35,
                 attributes={

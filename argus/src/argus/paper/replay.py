@@ -59,7 +59,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-from argus.truth.evidence import Evidence
+from argus.truth.evidence import Evidence, Kind
 from argus.truth.paths import DATA_DIR
 
 REPLAY_PATH = DATA_DIR / "replay_ledger.jsonl"
@@ -136,7 +136,7 @@ def frame_at(
                     f"{symbol} last {usable[-1].close}; "
                     f"{len(usable)} hourly bars of history to this instant"
                 ),
-                source="news",
+                kind=Kind.QUOTE, source="news",
                 available_at=at,
                 credibility=1.0,
             ),

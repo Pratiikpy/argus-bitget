@@ -42,7 +42,7 @@ from typing import Any
 
 from argus.market.evidence import FEED_USER_AGENT, EdgarSource
 from argus.truth import http
-from argus.truth.evidence import Evidence
+from argus.truth.evidence import Evidence, Kind
 
 MAX_DOCUMENT_BYTES = 2_000_000
 """A Form 4 is a few kilobytes. This is four orders of magnitude of headroom and still a bound."""
@@ -425,7 +425,7 @@ class InsiderSource:
             Evidence(
                 id=f"form4-{g.accession}-{g.code}",
                 claim=g.render(),
-                source="sec-edgar",
+                kind=Kind.FILING, source="sec-edgar",
                 available_at=g.accepted_at,
                 credibility=1.0 if g.is_conviction else 0.6,
                 # The structured record behind the sentence. `argus.agents.claims` settles a thesis

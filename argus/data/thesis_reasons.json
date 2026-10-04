@@ -1,0 +1,34 @@
+{
+  "decisions": 385,
+  "sentences": 1367,
+  "states": {
+    "traced": 978,
+    "no figure": 267,
+    "partly": 103,
+    "untraced": 19
+  },
+  "with_a_figure": 1100,
+  "traced_share_of_figure_reasons": 0.8891,
+  "traced_to_kind": {
+    "frame": 358,
+    "social": 290,
+    "fundamental": 273,
+    "quote": 243,
+    "technical": 178,
+    "coverage": 177,
+    "estimate": 177,
+    "macro": 151,
+    "news": 99,
+    "filing": 47,
+    "positioning": 46,
+    "sentiment_index": 42,
+    "onchain": 35
+  },
+  "frame_facts_available": [
+    "entry_price",
+    "hours_to_discovery",
+    "entry_cost_bps",
+    "stated_confidence",
+    "lean_confidence"
+  ]
+}

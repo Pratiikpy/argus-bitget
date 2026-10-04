@@ -29,7 +29,7 @@ from typing import Any
 
 from argus.truth import http
 from argus.truth.clocks import us_equity_holidays
-from argus.truth.evidence import Evidence
+from argus.truth.evidence import Evidence, Kind
 
 WEEKS_URL = "https://api.finra.org/data/group/otcMarket/name/weeklyDownloadDetails"
 SUMMARY_URL = "https://api.finra.org/data/group/otcMarket/name/weeklySummary"
@@ -210,7 +210,8 @@ def dark_pool_evidence(symbol: str, *, as_of: datetime,
     # the record needs; the week itself is a fortnight or more older still.
     published = datetime.fromisoformat(pool.latest.published[:10]).replace(tzinfo=UTC)
     return [Evidence(id=f"darkpool-{symbol}-{pool.latest.week_start.isoformat()}",
-                     claim=pool.claim(), source="news", available_at=min(published, as_of),
+                     claim=pool.claim(), kind=Kind.POSITIONING, source="news",
+                     available_at=min(published, as_of),
                      credibility=0.9)], (
         f"darkpool:{symbol}: week of {pool.latest.week_start.isoformat()}")
 

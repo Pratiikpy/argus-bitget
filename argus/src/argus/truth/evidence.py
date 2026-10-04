@@ -58,7 +58,9 @@ class Kind(StrEnum):
     NEWS = "news"
     """Published articles and headlines, and venue notices such as a trading halt."""
     FILING = "filing"
-    """A regulatory filing as filed (8-K, 10-Q, Form 4)."""
+    """An event filing as filed (8-K, Form 4): something happened."""
+    REPORT = "report"
+    """A periodic report as filed (10-Q, 10-K): the quarter's account, the earnings analyst's."""
     FUNDAMENTAL = "fundamental"
     """Reported company figures (XBRL facts, earnings surprise)."""
     ESTIMATE = "estimate"
@@ -118,6 +120,9 @@ _BY_CHANNEL: dict[str, Kind] = {
 }
 """The old channel-as-type reading, used only for an item that carries no kind."""
 
+CHANNELS: frozenset[str] = frozenset(_BY_CHANNEL)
+"""The channels an untyped item can be routed by."""
+
 
 def kind_of(item: Evidence) -> Kind | None:
     """``item.kind``, or for an untyped item the type its channel used to stand for; ``None`` for
@@ -125,4 +130,4 @@ def kind_of(item: Evidence) -> Kind | None:
     return item.kind if item.kind is not None else _BY_CHANNEL.get(item.source)
 
 
-__all__ = ["Evidence", "Kind", "kind_of"]
+__all__ = ["CHANNELS", "Evidence", "Kind", "kind_of"]

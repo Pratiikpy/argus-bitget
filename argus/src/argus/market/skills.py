@@ -40,7 +40,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any, Protocol
 
-from argus.truth.evidence import Evidence
+from argus.truth.evidence import Evidence, Kind
 from argus.truth.paths import DATA_DIR
 
 RSI_AGREEMENT_POINTS = 5.0
@@ -172,6 +172,32 @@ PROBES: tuple[Probe, ...] = (
     Probe("market-intel", "crypto_market", "trending", {},
           "attention: trending coins"),
 )
+
+TOOL_KINDS: dict[str, Kind] = {
+    "technical_analysis": Kind.TECHNICAL,
+    "sentiment_index": Kind.SENTIMENT_INDEX,
+    "derivatives_sentiment": Kind.POSITIONING,
+    "macro_indicators": Kind.MACRO,
+    "rates_yields": Kind.MACRO,
+    "cross_asset": Kind.MACRO,
+    "global_assets": Kind.QUOTE,
+    "news_feed": Kind.NEWS,
+    "tradfi_news": Kind.NEWS,
+    "defi_analytics": Kind.ONCHAIN,
+    "network_status": Kind.ONCHAIN,
+    "crypto_market": Kind.SENTIMENT_INDEX,
+}
+"""What each tool's answer is (build-list 5.2). Every Skill but macro used to arrive on the
+``social`` channel, so the sentiment analyst read RSI, MACD and the news briefing as crowd mood."""
+
+
+def kind_for(item: Probe) -> Kind:
+    """The kind of evidence ``item`` yields; a tool not in :data:`TOOL_KINDS` is refused rather
+    than routed by a guess."""
+    try:
+        return TOOL_KINDS[item.tool]
+    except KeyError:
+        raise KeyError(f"no evidence kind declared for Skill tool {item.tool!r}") from None
 
 
 def classify_reply(payload: Any, status: str) -> tuple[Health, str]:
@@ -428,6 +454,7 @@ def evidence(report: SkillReport, *, as_of: datetime) -> list[Evidence]:
                 f"[{row.probe.skill}] {row.probe.yields}: "
                 f"{json.dumps(payload, default=str)[:300]}"
             ),
+            kind=kind_for(row.probe),
             source="macro" if row.probe.skill == "macro-analyst" else "social",
             available_at=as_of,
             # A vendor-computed indicator is a real reading of a real series, but it is one

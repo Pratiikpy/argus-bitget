@@ -1,0 +1,60 @@
+{
+  "pattern": "JPMorgan Ask David (LangChain Interrupt, 2025-05-29)",
+  "nodes": [
+    {
+      "node": "supervisor",
+      "ask_david": "supervisor routing to a sub-graph",
+      "argus": "the question classifier (patterns + kind model) and Qwen planner",
+      "measure": "questions routed to the right kind, blind 12-language set, classifier alone",
+      "value": "219/240 (91.2%)",
+      "artefact": "data/lui_final_heldout_report.json",
+      "dated": "2026-09-25"
+    },
+    {
+      "node": "structured data",
+      "ask_david": "structured-data agent (NL to SQL/API)",
+      "argus": "the engines reading SEC XBRL, Bitget and FRED by API",
+      "measure": "FinanceBench metrics-generated questions answered from XBRL",
+      "value": "50/50 (best rival 46/50)",
+      "artefact": "data/financebench_xbrl.json",
+      "dated": "2026-09-25"
+    },
+    {
+      "node": "unstructured documents",
+      "ask_david": "RAG over documents",
+      "argus": "filing Q&A over SEC 8-K and 10-Q text, cited by passage",
+      "measure": "answerable questions right; sentences supported by their cited passage",
+      "value": "25/27 right, 3/3 unanswerable refused; 66/71 sentences supported, 0 fabricated citations",
+      "artefact": "data/document_qa_eval.json",
+      "dated": "2026-09-25"
+    },
+    {
+      "node": "analytics",
+      "ask_david": "analytics agent (API tools, text-to-code)",
+      "argus": "backtests, stress, sizing and the backtest critic",
+      "measure": "planted backtest defects caught, false alarms on clean code",
+      "value": "17/17 caught, 0/4 false alarms (backtest-truth 5/17)",
+      "artefact": "data/backtest_critic_comparison.json",
+      "dated": ""
+    },
+    {
+      "node": "personalisation",
+      "ask_david": "personalisation node (same facts, the reader's register)",
+      "argus": "trader memory (what the trader says about themselves) and the saved book",
+      "measure": "last blind set: facts recalled; memories invented from talk about others",
+      "value": "recall 15/20 (mem0 18/20); false memories 0/12 (mem0 7/12)",
+      "artefact": "data/memory_comparison.json",
+      "dated": "2026-09-30"
+    },
+    {
+      "node": "reflection",
+      "ask_david": "reflection node (an LLM judge checks the draft before it returns)",
+      "argus": "deterministic: every line labelled by source, no source no answer, untraced figures marked",
+      "measure": "content lines carrying a provenance label, unseen questions",
+      "value": "147/156 (94.2%)",
+      "artefact": "data/provenance_unseen.json",
+      "dated": "2026-09-25"
+    }
+  ],
+  "weak_link": "personalisation recall on the last blind set; and a reflection node that checks figures, not sense"
+}

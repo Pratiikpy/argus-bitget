@@ -108,7 +108,7 @@ from argus.risk.hedgeability import (
 )
 from argus.risk.session_risk import lookup as session_lookup
 from argus.truth.clocks import DualClock, SessionState
-from argus.truth.evidence import Evidence
+from argus.truth.evidence import Evidence, Kind
 from argus.truth.paths import DATA_DIR
 
 _LOG = logging.getLogger(__name__)
@@ -1107,7 +1107,7 @@ def run_once(
                     f"quoted spread {ticker.spread_bps:.2f}bps, "
                     f"24h base volume {ticker.base_volume}"
                 ),
-                source="news",
+                kind=Kind.QUOTE, source="news",
                 available_at=ticker.fetched_at,
                 credibility=1.0,
             ),
@@ -1186,7 +1186,7 @@ def run_once(
         evidence.append(Evidence(
             id=f"feeds-{symbol}",
             claim="evidence feeds: " + "; ".join(gathered.status),
-            source="news",
+            kind=Kind.COVERAGE, source="news",
             available_at=now,
             credibility=0.1,
         ))

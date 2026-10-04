@@ -30,15 +30,15 @@ timestamps are microseconds.
 
 from __future__ import annotations
 
-import json
 import os
 import urllib.parse
-import urllib.request
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Final
+
+from argus.truth import http
 
 HISTORY_URL: Final = "https://pyth.dourolabs.app"
 CHANNEL: Final = "fixed_rate@200ms"
@@ -90,18 +90,15 @@ def key() -> str | None:
 
 
 def _get(path: str, params: Sequence[tuple[str, str]], *, token: str | None) -> Any:
+    # ``ids`` repeats, so the query is encoded here rather than from a mapping
     url = f"{HISTORY_URL}{path}?{urllib.parse.urlencode(params)}"
-    headers = {"User-Agent": "argus/1.0", "Accept": "application/json"}
-    if token:
-        headers["Authorization"] = f"Bearer {token}"
+    headers = {"Authorization": f"Bearer {token}"} if token else None
     try:
-        with urllib.request.urlopen(urllib.request.Request(url, headers=headers),
-                                    timeout=TIMEOUT_S) as response:
-            return json.load(response)
-    except urllib.error.HTTPError as exc:
-        raise PythError(f"Pyth {path} answered HTTP {exc.code}") from exc
-    except (urllib.error.URLError, TimeoutError, ValueError) as exc:
-        raise PythError(f"Pyth {path} did not answer ({type(exc).__name__})") from exc
+        return http.fetch_json(url, headers=headers, timeout=TIMEOUT_S)
+    except http.RpcError as exc:
+        status = http.status_of(exc)
+        raise PythError(f"Pyth {path} answered HTTP {status}" if status is not None
+                        else f"Pyth {path} did not answer ({http.reason_of(exc)})") from exc
 
 
 def parse_feed(raw: Mapping[str, Any]) -> Feed:

@@ -288,22 +288,30 @@ class TestTheScenarioEvidenceIsRoutable:
     """The scenario abstained for the wrong reason once: its 8-K carried ``source="sec"``, which no
     analyst reads, so the filing reached nobody and the desk decided on a social post alone."""
 
-    def test_every_scenario_source_reaches_an_analyst(self) -> None:
-        from argus.agents.selection import SOURCES
+    def test_every_scenario_item_is_read_by_someone(self) -> None:
+        from argus.agents.selection import DIRECT, KINDS
         from argus.demo.flow import sleeping_anchor_frame
+        from argus.truth.evidence import kind_of
 
-        known = set().union(*SOURCES.values())
+        routed = set().union(*KINDS.values()) | DIRECT
         _, evidence = sleeping_anchor_frame()
-        orphans = [e.source for e in evidence if e.source not in known]
+        orphans = [e.id for e in evidence if kind_of(e) not in routed]
         assert not orphans, f"scenario evidence nobody reads: {orphans}"
 
-    def test_the_filing_is_on_the_event_analysts_channel(self) -> None:
-        from argus.agents.selection import SOURCES
+    def test_the_filing_reaches_the_event_analyst(self) -> None:
+        from argus.agents.selection import reads
         from argus.demo.flow import sleeping_anchor_frame
 
         _, evidence = sleeping_anchor_frame()
         filing = next(e for e in evidence if "8-K" in e.claim)
-        assert filing.source in SOURCES["event"]
+        assert reads("event", filing)
+
+    def test_the_scenario_is_dated_after_what_the_model_may_know(self) -> None:
+        from argus.agents.meta_pm import MODEL_KNOWLEDGE_BOUND
+        from argus.demo.flow import sleeping_anchor_frame
+
+        as_of, _ = sleeping_anchor_frame()
+        assert as_of >= MODEL_KNOWLEDGE_BOUND
 
     def test_the_filing_is_available_before_the_decision(self) -> None:
         from argus.demo.flow import sleeping_anchor_frame

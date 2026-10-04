@@ -32,7 +32,7 @@ from argus.agents.quarantine import STANDING_INSTRUCTION, render_for_prompt
 from argus.llm.base import ChatModel
 from argus.llm.qwen import Thinking
 from argus.truth.clocks import SessionState
-from argus.truth.evidence import Evidence
+from argus.truth.evidence import Evidence, Kind, kind_of
 
 COST_PREAMBLE = """You are measuring, not deciding. Report the move you actually see, with its
 direction and its size in basis points, however small. A 4bps move is a 4bps move: say "bullish,
@@ -229,11 +229,15 @@ def chain_event(symbol: str, evidence: list[Evidence]) -> str:
     The runner puts the `mkt-{symbol}` quote first, and the chain used `evidence[0]`, so all 138
     recorded chains (2026-09-14 to 09-23) named a price as their event; together with the prompt
     never asking for `chain_falsifiers`, no link was ever gradable. Found by the rival review of
-    2026-09-24."""
-    rank = {"filing": 0, "sec-edgar": 0, "transcript": 0, "news": 1, "social": 2, "macro": 3}
-    events = [item for item in evidence if not item.id.startswith("mkt-")]
+    2026-09-24. Ranked by kind since 2026-10-05 (build-list 5.2), so the quote is recognised as
+    a quote rather than by its id, and a dark-pool or option-chain summary — channelled as news —
+    no longer outranks a real headline's place."""
+    rank = {Kind.FILING: 0, Kind.REPORT: 0, Kind.FUNDAMENTAL: 0, Kind.TRANSCRIPT: 0,
+            Kind.NEWS: 1, Kind.SOCIAL: 2, Kind.MACRO: 3}
+    events = [item for item in evidence
+              if kind_of(item) is not Kind.QUOTE and not item.id.startswith("mkt-")]
     if events:
-        return min(events, key=lambda item: rank.get(item.source, 4)).claim
+        return min(events, key=lambda item: rank.get(kind_of(item) or Kind.COVERAGE, 4)).claim
     return evidence[0].claim if evidence else symbol
 
 

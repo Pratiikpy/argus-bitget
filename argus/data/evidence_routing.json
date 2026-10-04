@@ -1,0 +1,64 @@
+{
+  "decisions": 385,
+  "analysts": {
+    "event": {
+      "handed_before": 6215,
+      "handed_now": 5060,
+      "before_not_its_kind": 1925,
+      "before_not_its_kind_share": 0.3097,
+      "before_by_kind": {
+        "macro": 2309,
+        "news": 1599,
+        "quote": 770,
+        "sentiment_index": 385,
+        "positioning": 385,
+        "coverage": 385,
+        "filing": 382
+      },
+      "no_longer_handed": {
+        "quote": 770,
+        "sentiment_index": 385,
+        "positioning": 385,
+        "coverage": 385
+      },
+      "newly_handed": {
+        "news": 770
+      }
+    },
+    "sentiment": {
+      "handed_before": 11499,
+      "handed_now": 5893,
+      "before_not_its_kind": 5606,
+      "before_not_its_kind_share": 0.4875,
+      "before_by_kind": {
+        "social": 5893,
+        "technical": 2142,
+        "positioning": 1155,
+        "sentiment_index": 770,
+        "news": 770,
+        "onchain": 769
+      },
+      "no_longer_handed": {
+        "technical": 2142,
+        "positioning": 1155,
+        "sentiment_index": 770,
+        "news": 770,
+        "onchain": 769
+      },
+      "newly_handed": {}
+    },
+    "earnings": {
+      "handed_before": 3884,
+      "handed_now": 3884,
+      "before_not_its_kind": 0,
+      "before_not_its_kind_share": 0.0,
+      "before_by_kind": {
+        "fundamental": 3236,
+        "estimate": 648
+      },
+      "no_longer_handed": {},
+      "newly_handed": {}
+    }
+  },
+  "unknown_producers": {}
+}

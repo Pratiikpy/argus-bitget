@@ -41,7 +41,7 @@ from pathlib import Path
 from typing import Any
 
 from argus.truth import http
-from argus.truth.evidence import Evidence
+from argus.truth.evidence import Evidence, Kind
 from argus.truth.paths import DATA_DIR
 
 QUOTE_URL = "https://cdn.cboe.com/api/global/delayed_quotes/quotes/_VIX.json"
@@ -307,7 +307,7 @@ def evidence(reading: Reading, *, as_of: datetime) -> list[Evidence]:
         Evidence(
             id=f"vix-{reading.as_of.date().isoformat()}",
             claim=reading.render(),
-            source="macro",
+            kind=Kind.MACRO, source="macro",
             available_at=reading.as_of,
             # 0.9, not 1.0: CBOE is authoritative about the index, and the index is a market's
             # opinion about the future rather than a fact about it.

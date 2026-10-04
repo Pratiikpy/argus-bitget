@@ -381,7 +381,7 @@ free to abstain here exactly as it does on the live log.
 def sleeping_anchor_frame() -> tuple[datetime, list[Any]]:
     """The scenario's evidence, with the times that make it a point-in-time problem."""
     from argus.truth.clocks import ET
-    from argus.truth.evidence import Evidence
+    from argus.truth.evidence import Evidence, Kind
 
     # 15 March, not 8 March. The 8th is the US spring-forward date, and 02:31 ET does not exist
     # that morning: the filing timestamp landed inside the skipped hour, converted to 07:31 UTC —
@@ -389,8 +389,13 @@ def sleeping_anchor_frame() -> tuple[datetime, list[Any]]:
     # A point-in-time system whose own demonstration contains a look-ahead would be the worst
     # possible place to learn that, and it was a test comparing against the UTC instant that caught
     # it. The scenario is identical on any ordinary Sunday, so it uses one.
-    as_of = datetime(2026, 3, 15, 3, 0, tzinfo=ET)
-    filed = datetime(2026, 3, 15, 2, 31, tzinfo=ET)
+    #
+    # 13 September, not 15 March, since 2026-10-05: the scenario is put to the live model, and a
+    # state dated before `agents/meta_pm.MODEL_KNOWLEDGE_BOUND` (1 September) is refused, because
+    # the model may recall what followed. The recorded March run (`data/flow_trace_scenario.json`)
+    # stays as it was, dated. 13 September is a Sunday with no clock change near it.
+    as_of = datetime(2026, 9, 13, 3, 0, tzinfo=ET)
+    filed = datetime(2026, 9, 13, 2, 31, tzinfo=ET)
     return as_of.astimezone(UTC), [
         Evidence(
             id="sec-8k-1",
@@ -398,7 +403,7 @@ def sleeping_anchor_frame() -> tuple[datetime, list[Any]]:
                 "SEC 8-K filed 02:31 ET: FY revenue guidance revised down 7% against prior "
                 "guidance; company cites a delayed data-centre order book."
             ),
-            source="sec-edgar",
+            kind=Kind.FILING, source="sec-edgar",
             available_at=filed,
             credibility=1.0,
             attributes={"form": "8-K", "guidance_change_pct": -7.0},
@@ -406,7 +411,7 @@ def sleeping_anchor_frame() -> tuple[datetime, list[Any]]:
         Evidence(
             id="social-1",
             claim="Viral post claims a 20% cut. No independent source carries it.",
-            source="social",
+            kind=Kind.SOCIAL, source="social",
             available_at=filed,
             credibility=0.18,
         ),
@@ -418,7 +423,7 @@ def sleeping_anchor_frame() -> tuple[datetime, list[Any]]:
             ),
             # `news`, not `market`: the live runner emits its price fact on this channel
             # (`paper/runner.py:378`) and a source no analyst reads is evidence nobody sees.
-            source="news",
+            kind=Kind.QUOTE, source="news",
             available_at=as_of,
             credibility=1.0,
         ),

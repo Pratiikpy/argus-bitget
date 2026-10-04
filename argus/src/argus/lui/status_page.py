@@ -285,7 +285,20 @@ def sweep_lines(data: Path) -> list[tuple[str, str]]:
                            if scored else "none has printed yet")
                         + (f", {events['pending']} pending" if events.get("pending") else "")))
     out.extend(self_audit_lines(data))
+    out.extend(node_lines(data))
     return out
+
+
+def node_lines(data: Path) -> list[tuple[str, str]]:
+    """Each part of the console measured on its own (build-list 5.1), JPMorgan's Ask David
+    practice of evaluating every sub-agent alone to find the weak link
+    (`eval/node_scorecard.py`)."""
+    from argus.eval.node_scorecard import card
+
+    return [(f"Part measured alone: {row['node']}",
+             f"{row['value']} — {row['measure']}"
+             + (f" ({row['dated']})" if row["dated"] else ""))
+            for row in card(data)]
 
 
 def self_audit_lines(data: Path) -> list[tuple[str, str]]:

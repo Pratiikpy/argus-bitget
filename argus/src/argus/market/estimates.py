@@ -38,7 +38,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any
 
-from argus.truth.evidence import Evidence
+from argus.truth.evidence import Evidence, Kind
 
 TIMEOUT = 20
 _UA = (
@@ -354,7 +354,7 @@ class EstimatesSource:
             Evidence(
                 id=f"consensus-{ticker}-{r.period}-{int(as_of.timestamp())}",
                 claim=r.render(),
-                source="filing",
+                kind=Kind.ESTIMATE, source="filing",
                 # Dated at the fetch, never earlier: Yahoo does not say when the consensus formed.
                 available_at=as_of,
                 # A survey of analyst opinion, not a filed figure. Below a 10-Q, above a headline.
