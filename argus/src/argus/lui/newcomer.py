@@ -93,7 +93,8 @@ _GOOD_TIME = re.compile(
     r"\bis\s+(?:now|this|today|it)\s+(?:a\s+)?(?:good|bad|the\s+right|right)\s+time\s+to\s+"
     r"(?:buy|invest|get\s+in|start|sell|get\s+out)\b|\bshould\s+i\s+(?:buy|invest|get\s+in|sell|"
     r"get\s+out)(?:\s+(?:my|all\s+my|everything|some)?\s*(?:crypto|coins?|stocks?|shares?|"
-    r"holdings|positions?))?\s+(?:right\s+)?now\b|"
+    # "ok but fr should i buy rn" — "rn" is texting shorthand for "right now" (round 33)
+    r"holdings|positions?))?\s+(?:right\s+now|now|today|rn)\b|"
     # "is it too late to buy bitcoin now, feels like its already so high" (round 32)
     r"\bis\s+it\s+too\s+late\s+to\s+(?:buy|invest(?:\s+in)?|get\s+in|sell|get\s+out)\b", re.I)
 _HOW_MUCH_BARE = re.compile(
@@ -521,6 +522,12 @@ def slang_lines(text: str) -> list[str] | None:
         asked = found if found and re.search(r"\b(?:mean|stand\s+for|means|meaning|no\s+clue|"
                                              r"don'?t\s+(?:get|know))\b", text, re.I) else []
     if not asked:
+        # "wen moon" has no "?" and no "mean" keyword, but both words are slang on their own
+        # (a first-time user, round 33)
+        bare_words = re.findall(r"[a-z']+", text.lower())
+        if 2 <= len(bare_words) <= 3 and all(w in SLANG for w in bare_words):
+            asked = list(dict.fromkeys(bare_words))
+    if not asked:
         return None
     said = [f"{k.upper() if len(k) <= 5 else k}: {SLANG[k]}." for k in dict.fromkeys(asked)]
     return ["Bottom line: " + said[0], *said[1:],
@@ -569,6 +576,227 @@ _WHAT_NOW_A = (
 
 
 _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
+    # "omg i think i lost access to my 2fa app how do i get back into my bitget account" was
+    # answered with revenge-trading advice, because "get back into" matched the only answer
+    # that mentions getting money "back" (a first-time user, round 33)
+    (re.compile(r"\blost\s+(?:access\s+to\s+)?(?:my\s+)?2fa\b|\b2fa\b[^?]{0,40}\b(?:lost|lose|"
+                r"gone|broken|deleted|new\s+phone)\b|\b(?:get\s+back\s+into|regain\s+access\s+"
+                r"to|locked\s+out\s+of)\s+(?:my\s+)?(?:bitget\s+)?account\b", re.I), (
+        "Bottom line: recover it through Bitget's own account-recovery process (it will ask "
+        "you to verify your identity) — this console has no access to any Bitget account and "
+        "cannot reset your 2FA or log you in.",
+        "On Bitget's own login page, look for its account-recovery or \"reset 2FA\" option; "
+        "check Bitget's help centre for the exact steps, since they depend on what "
+        "verification you already have on file and can change.",
+        "Never give a 2FA code, a password or your seed phrase to anyone who contacts you "
+        "offering to \"help\" recover your account — that is always a scam. Bitget support "
+        "will never ask you for these.")),
+    # "if i forgot my seed phrase too is my money just gone forever" was answered about a
+    # stablecoin losing its peg, because "my money just gone" is also that pattern's text (a
+    # first-time user, round 33)
+    (re.compile(r"\b(?:forgot|forgotten|lost)\s+(?:my\s+)?seed\s*phrase\b|\bseed\s*phrase\b"
+                r"[^?]{0,40}\b(?:gone\s+forever|lost\s+forever|can'?t\s+(?:get|access)|"
+                r"forever)\b", re.I), (
+        "Bottom line: if your coins are sitting on Bitget and were never moved to your own "
+        "wallet, they are not tied to a seed phrase at all — what matters there is logging "
+        "back into your account, which is Bitget's own account-recovery process.",
+        "A seed phrase only matters for a self-custody wallet. If you moved coins into one of "
+        "those and have lost both the phrase and the only device that wallet lives on, with "
+        "no backup anywhere else, that access is gone for good — nobody, not even the "
+        "wallet's maker, can restore it.",
+        "If you still have the device, or a backup of the phrase written down elsewhere, you "
+        "are not locked out — the risk is only losing the phrase and the device together.")),
+    # "ok and whats a seed phrase, why is everyone so scared about it" (a first-time user,
+    # round 33)
+    (re.compile(r"\bwhat(?:'?s|\s+is)\s+(?:a\s+)?seed\s*phrase\b|\bseed\s*phrase\b[^?]{0,40}\b"
+                r"(?:scared|afraid|worried|important|matter)\b|\bwhy\s+(?:is\s+)?(?:everyone"
+                r"\s+)?(?:so\s+)?scared\s+(?:of|about)\s+(?:a\s+|the\s+|their\s+)?seed\s*"
+                r"phrase\b", re.I), (
+        "Bottom line: a seed phrase (also called a recovery phrase) is a list of usually 12 "
+        "or 24 words that is the master key to a self-custody wallet — anyone who has those "
+        "words can move every coin in that wallet, no password needed.",
+        "That is why people are scared of it: unlike a forgotten password, there is no reset. "
+        "Lose the words with no backup and the coins are gone for good; let someone else see "
+        "them and they can take everything, instantly, with no way to undo it.",
+        "It only applies to a wallet you hold yourself — money kept in a Bitget account does "
+        "not use a seed phrase at all.")),
+    # "what even is a crypto wallet lol do i need one to use bitget" was refused outright (a
+    # first-time user, round 33)
+    (re.compile(r"\bwhat(?:'?s|\s+is|\s+even\s+is|\s+are)\s+(?:a\s+|an\s+)?(?:crypto\s+|"
+                r"hardware\s+|software\s+)?wallets?\b|\bdo\s+i\s+(?:even\s+|really\s+)?need\s+"
+                r"a\s+(?:crypto\s+)?wallet\b", re.I), (
+        "Bottom line: no — a crypto wallet is not required to use Bitget. An exchange account "
+        "like Bitget's holds coins for you, the way a bank holds cash, so you log in and "
+        "trade without ever touching a wallet.",
+        "A crypto wallet is software (or a physical device) that holds the keys controlling "
+        "coins directly on the blockchain itself — this is called self-custody, and it's "
+        "optional, not a requirement to buy, sell or hold on Bitget.",
+        "Some people later move coins off an exchange into their own wallet for more control. "
+        "That is a separate, extra step, not something you need on day one.")),
+    # "im withdrawing usdt from bitget, which network should i pick erc20 or trc20 idk the
+    # diff" got generic withdrawal boilerplate, never the actual difference (a first-time
+    # user, round 33)
+    (re.compile(r"(?=.*\berc[\s-]?20\b)(?=.*\btrc[\s-]?20\b)|\b(?:erc|trc)[\s-]?20\b[^?]{0,60}"
+                r"\b(?:network|which|pick|diff\w*|idk)\b|\b(?:network|which|pick|diff\w*)\b"
+                r"[^?]{0,60}\b(?:erc|trc)[\s-]?20\b", re.I), (
+        "Bottom line: ERC20 and TRC20 are two different blockchain networks that USDT can "
+        "move on — Ethereum (ERC20) and TRON (TRC20) — and the receiving address must be on "
+        "the same network you send to, or the transfer can be lost.",
+        "They are not interchangeable: an Ethereum address accepts ERC20, a TRON address "
+        "accepts TRC20, and sending ERC20 USDT to a TRC20-only address (or the reverse) is "
+        "the classic way to lose a transfer.",
+        "Fees differ too, and change over time — Bitget shows the exact network fee for each "
+        "option right on the withdrawal screen before you confirm, so check there rather than "
+        "guessing.",
+        "If you are not sure which network the receiving wallet or exchange actually "
+        "supports, ask it directly before you pick one here — matching networks is the one "
+        "thing that matters most.")),
+    # "oh no i think i sent my usdt using the wrong network to my other wallet, is it gone"
+    # was refused outright (a first-time user, round 33)
+    (re.compile(r"\bsent\s+(?:my\s+)?(?:usdt|usdc|crypto|coins?|btc|eth)\s+(?:using\s+|on\s+)?"
+                r"(?:the\s+)?wrong\s+network\b|\bwrong\s+network\b[^?]{0,40}\b(?:sent|send|"
+                r"gone|lost)\b", re.I), (
+        "Bottom line: not always gone — it depends on whether the address you sent to also "
+        "exists and is usable on the network you actually sent through. Sometimes it can be "
+        "recovered; sometimes it genuinely cannot.",
+        "Find the transaction hash (Bitget's withdrawal history has it) and contact the "
+        "support team of the platform or wallet that received it — not Bitget's, since the "
+        "funds already left Bitget — and give them the hash and both networks involved.",
+        "Being honest about the odds: recovery is not guaranteed, it can take time, and the "
+        "receiving platform may charge a fee or simply not be able to help, depending on how "
+        "its wallet is built. Check Bitget's help centre for its own guidance on this, since "
+        "the exact process can differ by coin and network.")),
+    # "whats an etf, is bitcoin an etf" got a 20-line market data dump instead of a definition
+    # (a first-time user, round 33)
+    (re.compile(r"\bwhat(?:'?s|\s+is|\s+are)\s+(?:an?\s+)?etfs?\b|\bis\s+bitcoin\s+an?\s+etf\b"
+                r"|\bis\s+btc\s+an?\s+etf\b", re.I), (
+        "Bottom line: an ETF (exchange-traded fund) is a fund that holds a basket of assets "
+        "(stocks, bonds, gold, or something else) and itself trades on a stock exchange like "
+        "a share, so you buy one thing and get exposure to everything inside it.",
+        "Bitcoin itself is not an ETF — it is a coin, traded directly on exchanges like "
+        "Bitget. What does exist are spot bitcoin ETFs: funds that hold actual bitcoin and "
+        "trade on traditional stock exchanges, a separate product from holding bitcoin "
+        "directly.",
+        "Buying bitcoin on Bitget and buying a spot bitcoin ETF through a stockbroker both "
+        "end up tracking bitcoin's price, but through very different accounts, fees and "
+        "ownership — the ETF holder owns fund shares, not the coin.")),
+    # "theres this coin at $0.0001 thats so cheap right i can buy millions of them" was read
+    # as the stock ticker COIN (Coinbase), even when named=True (a first-time user, round 33)
+    (re.compile(r"\$?0\.0+\d+\b[^?]{0,60}\bcheap\b|\bcheap\b[^?]{0,60}\$?0\.0+\d+\b|\$0\.0+\d+"
+                r"\b[^?]{0,60}\bbuy\s+(?:millions?|thousands?|lots?|a\s+ton)\b", re.I), (
+        "Bottom line: a low unit price does not mean a coin is cheap — what matters is market "
+        "cap (price times how many coins exist) and total supply, not the price of one coin.",
+        "A coin at $0.0001 with trillions of coins in existence can be worth more overall than "
+        "a coin at $50,000 with 19 million coins — BTC looks \"expensive\" per coin only "
+        "because so few of them exist, not because it is a better deal.",
+        "Buying \"millions\" of a $0.0001 coin costs the same $100 as buying a tiny fraction "
+        "of an expensive one — neither is cheaper in what you actually get for your money.",
+        "Ask for a coin's market cap by name, not its price alone, to see what it is really "
+        "worth.")),
+    # "ok so whats actually safer than crypto for retirement money then" repeated Q13's
+    # answer almost word for word and never named an alternative (a first-time user, round 33)
+    (re.compile(r"\bsafer\s+than\s+crypto\s+for\s+retirement\b|\bwhat(?:'?s|\s+is)\s+"
+                r"(?:actually\s+)?safer\s+(?:than\s+crypto\s+)?for\s+retirement\b|\bsafest\s+"
+                r"(?:place|option|thing)\s+for\s+retirement\s+(?:money|savings|funds)\b",
+                re.I), (
+        "Bottom line: no pick here, but the things usually called \"safer\" for money someone "
+        "will need to live on are: government bonds or T-bills (a government's own IOU, among "
+        "the lowest-risk assets that exist), broad stock-market index funds (hundreds of "
+        "companies at once, so no single company's failure wipes it out), and savings "
+        "accounts protected by a government deposit-insurance scheme up to a set limit.",
+        "None of those is risk-free either — bonds lose value if sold before maturity when "
+        "rates rise, and index funds can still fall 30-50% in a bad year — they are just far "
+        "less volatile than a single coin or a leveraged crypto position.",
+        "Which mix actually suits your parents is a question for a licensed financial adviser "
+        "who knows their full situation and how soon they need the money — not something "
+        "this console can judge.")),
+    # "how is that different than just buying once with all my money at the start" repeated
+    # the DCA definition it had just given instead of answering the follow-up (a first-time
+    # user, round 33)
+    (re.compile(r"\bhow\s+is\s+that\s+different\s+(?:than|from)\s+(?:just\s+)?buying\s+once\s+"
+                r"(?:with\s+)?(?:all\s+)?(?:my\s+)?money\s+at\s+the\s+start\b|\bdca\b[^?]{0,40}"
+                r"\blump\s+sum\b|\blump\s+sum\b[^?]{0,40}\bdca\b", re.I), (
+        "Bottom line: buying it all at once (a lump sum) puts the whole amount to work from "
+        "day one; dollar-cost averaging (DCA) spreads that same money across several "
+        "purchases over time instead of committing it all on one day's price.",
+        "The trade-off: if the price rises afterward, the lump sum does better because all "
+        "the money was already in; if it falls first, DCA does better because later "
+        "purchases buy in cheaper. In markets that trend upward most of the time, the lump "
+        "sum has usually won slightly more often, on average.",
+        "What DCA actually buys you is not a better average price — it is less regret: you "
+        "are never the person who put everything in on the single worst possible day, "
+        "because no one day held all of it.")),
+    # (voice run-on) "...or should i split it into different coins to be safe" was ignored —
+    # only the lump-sum-risk half of the question got answered (a first-time user, round 33)
+    (re.compile(r"\bsplit\w*\s+(?:it\s+|the\s+money\s+|my\s+money\s+)?(?:up\s+)?(?:into|"
+                r"between|across|among)\s+(?:\d+\s+)?(?:different\s+)?coins?\b|\bspread\w*\s+"
+                r"(?:it\s+)?(?:across|between|among)\s+(?:different\s+)?coins?\b|"
+                r"\bdiversify\w*\s+(?:across|between|among|into)\s+(?:different\s+)?coins?\b",
+                re.I), (
+        "Bottom line: splitting money across several coins helps less than it sounds like it "
+        "should — most crypto coins rise and fall together, heavily tied to what bitcoin "
+        "does, so a bad day for bitcoin is usually a bad day for the rest of the portfolio "
+        "too, just by different amounts.",
+        "That is different from spreading money across unrelated things (stocks and bonds, "
+        "say, which often move in opposite directions) — inside crypto alone, the coins "
+        "mostly move the same way at once, so splitting mainly changes how much you lose or "
+        "gain, not whether you do.",
+        "It still removes the risk of one project failing outright — a hack, a scam, a coin "
+        "going to zero specifically — that part is real. It just does not protect against "
+        "crypto itself having a bad week, the way holding something outside crypto entirely "
+        "would.")),
+    # "is it better to keep my coins on bitget or move them somewhere else" matched nothing —
+    # the same custody answer "is it safe to keep crypto on bitget" already gets, needed
+    # without relying on the language model (a first-time user, round 33)
+    (re.compile(r"\bkeep\s+(?:my\s+)?(?:coins?|crypto|money|funds?)\s+on\s+bitget\b[^?]{0,40}"
+                r"\bmove\s+(?:them|it)\s+(?:somewhere\s+else|elsewhere|off(?:\s+(?:of\s+)?"
+                r"(?:it|bitget))?|to\s+(?:a\s+|my\s+own\s+)?wallet)\b", re.I), _BITGET_SAFE_A),
+    # "what time does the crypto market close like what time should i trade" was answered
+    # around the desk's own session state, never plainly "crypto never closes" (a first-time
+    # user, round 33)
+    (re.compile(r"\bwhat\s+time\s+does\s+(?:the\s+)?crypto\s+market\s+close\b|\bwhen\s+does\s+"
+                r"(?:the\s+)?crypto\s+market\s+close\b|\bdoes\s+(?:the\s+)?crypto\s+market\s+"
+                r"(?:ever\s+)?close\b|\bwhat\s+time\s+(?:should|do)\s+i\s+trade\s+crypto\b|"
+                r"\bcrypto\s+market\s+(?:hours|close\s+time|closing\s+time)\b", re.I), (
+        "Bottom line: crypto never closes — it trades 24 hours a day, 7 days a week, "
+        "including weekends and holidays, because it is not tied to any country's stock "
+        "exchange hours.",
+        "There is no \"best time\" set by the market being open or shut, the way there is "
+        "for stocks. Volume (how much is trading) rises and falls through the day and the "
+        "week, which can affect the spread, but the market itself is always open.",
+        "Bitget's US-stock perpetual contracts also trade around the clock, 24/7 — unlike "
+        "the actual stock (which only trades during its own exchange's hours), the "
+        "perpetual on it keeps trading even while that stock market is shut, and can gap "
+        "when the real market reopens.")),
+    # "whats the difference between a coin and a token" was refused outright (a first-time
+    # user, round 33)
+    (re.compile(r"\b(?:difference|diff)\s+between\s+(?:a\s+)?coins?\s+and\s+(?:a\s+)?tokens?\b"
+                r"|\bcoins?\s+(?:vs\.?|versus)\s+tokens?\b", re.I), (
+        "Bottom line: a coin runs on its own blockchain (Bitcoin, Ether, Solana) and that "
+        "blockchain's own network validates and processes it; a token is built on top of "
+        "someone else's blockchain (most USDT and thousands of others run on Ethereum or "
+        "similar chains) using that chain's own rules.",
+        "A coin pays its network's own transaction (gas) fees; a token's fees are paid in "
+        "the coin of whichever blockchain it is built on, not in the token itself — sending "
+        "USDT on Ethereum, for example, costs ETH in gas, not USDT.",
+        "Day to day the difference rarely matters for buying and holding on Bitget — both "
+        "are just assets you can trade — but it decides which network a withdrawal uses, "
+        "which is why Bitget asks you to pick one (see \"erc20 vs trc20\", for example).")),
+    # "if i buy bitcoin on bitget do i actually own it or does bitget just owe me" got the
+    # desk's volatility stats and never touched ownership (a first-time user, round 33)
+    (re.compile(r"\bdo\s+i\s+(?:actually\s+)?own\s+it\b[^?]{0,40}\b(?:bitget\s+)?owe\s+me\b|"
+                r"\bown\s+(?:it|the\s+coin|the\s+crypto|bitcoin)\s+or\s+(?:does\s+)?bitget\s+"
+                r"(?:just\s+)?owe\s+me\b|\bdoes\s+bitget\s+(?:just\s+)?owe\s+me\b", re.I), (
+        "Bottom line: on Bitget, you hold a claim on Bitget for that coin, not the coin "
+        "itself sitting separately with your name on it — Bitget owes it to you and is "
+        "expected to deliver it on request, the way a bank owes you the cash in your "
+        "account.",
+        "What backs that claim: Bitget publishes proof-of-reserves reports on its own site "
+        "showing it holds enough to cover what it owes depositors — read those for yourself "
+        "rather than taking it on faith.",
+        "The only way to hold the coin itself, with nobody owing you anything, is to "
+        "withdraw it to a self-custody wallet that only you control — at the cost of then "
+        "being responsible for its own seed phrase and security.")),
     # "he said its been working for him for 2 months and he showed me screenshots of profits" —
     # the follow-up to a "trading bot" question got the same canned refusal as the question
     # itself (a first-time user, round 32)

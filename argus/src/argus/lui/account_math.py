@@ -313,9 +313,54 @@ def funding_lines(text: str) -> list[str] | None:
     return lines
 
 
+_RATE_CHANGE: Final = re.compile(
+    r"\bfunding(?:\s+rate)?\b[^?.]{0,30}?\b(?:moved|went|rose|jumped|increased|changed|climbed)\s+"
+    r"from\s+(?P<a>\d+(?:\.\d+)?)\s*%\s+to\s+(?P<b>\d+(?:\.\d+)?)\s*%", re.I)
+
+
+def rate_change_lines(text: str) -> list[str] | None:
+    """A funding change said in percent, and the claims made about its size, checked.
+
+    "funding moved from 0.01% to 0.02% — support told me that's a 1 percentage point jump equal
+    to 100x; should I close before this 1900% annualized funding hits?" got the live rate and no
+    yes or no (a hostile review, round 33). The change is 0.01 points, a doubling, and 0.02%
+    every 8 hours is about 22% a year."""
+    m = _RATE_CHANGE.search(text)
+    if m is None:
+        return None
+    before, after = float(m.group("a")), float(m.group("b"))
+    if before <= 0:
+        return None
+    points, times = after - before, after / before
+    per_day = 24 / 8
+    yearly = after * per_day * 365
+    claims_wrong = []
+    stated_points = re.search(r"(\d+(?:\.\d+)?)\s*percentage\s+points?", text, re.I)
+    if stated_points and abs(float(stated_points.group(1)) - points) > 1e-9:
+        claims_wrong.append(f"not {stated_points.group(1)} percentage point(s) but "
+                            f"{points:g}")
+    stated_times = re.search(r"\b(\d+(?:\.\d+)?)\s*x\b", text, re.I)
+    if stated_times and abs(float(stated_times.group(1)) - times) > 0.05:
+        claims_wrong.append(f"not {stated_times.group(1)}x but {times:g}x")
+    stated_year = re.search(r"(\d[\d,]*(?:\.\d+)?)\s*%\s*(?:annuali[sz]ed|a\s+year|per\s+year|"
+                            r"yearly|apr|apy)", text, re.I)
+    if stated_year and abs(float(stated_year.group(1).replace(",", "")) - yearly) > 1:
+        claims_wrong.append(f"not {stated_year.group(1)}% a year but about {yearly:.0f}%")
+    verdict = ("no — " + "; ".join(claims_wrong) if claims_wrong else
+               "the arithmetic for that change")
+    return [f"Bottom line: {verdict}. Funding going from {before:g}% to {after:g}% per 8-hour "
+            f"settlement is a rise of {points:g} percentage points, {times:g} times the rate, and "
+            f"{after:g}% every 8 hours held for a year is about {yearly:.0f}% "
+            f"({after:g}% x 3 settlements a day x 365).",
+            f"On a $10,000 position that is ${10_000 * after / 100:,.2f} a settlement against "
+            f"${10_000 * before / 100:,.2f} before; whether to close is your call — the cost is a "
+            f"measured figure, not an emergency. Bitget caps funding per settlement (±0.30% on "
+            f"BTCUSDT); ask \"what is BTC funding\" for the live rate."]
+
+
 def lines(text: str) -> list[str] | None:
     for rule in (liquidation_move_lines, compounded_lines, margin_lines, equity_lines,
-                 funding_lines):
+                 rate_change_lines, funding_lines):
         found = rule(text)
         if found is not None:
             return found

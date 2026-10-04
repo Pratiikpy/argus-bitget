@@ -2612,10 +2612,144 @@ _ENTRY_TIMING = re.compile(
     r"a\s+(?:dip|pullback|better\s+price))\b", re.I)
 """When to buy, asked as a choice between now and later."""
 _RESEARCH_CASE = re.compile(
-    r"\b(?:research|investment|bull|bear|trade)\s+case\b|\bcase\s+for\s+(?:going\s+)?(?:long|short|"
+    r"\b(?:research|investment|bull|bear|trade)\s+case\b|\b(?:investment\s+)?memo\b|\bwrite[\s-]?up"
+    r"\b|\bcase\s+for\s+(?:going\s+)?(?:long|short|"
     r"buying|selling|owning)\b|\b(?:actual|real|hard)\s+(?:evidence|data)\b|\bevidence\s+"
     r"(?:for|behind|backing|that)\b|\bwhat\s+(?:hard\s+)?(?:data|evidence)\s+backs\b", re.I)
 _CASE_FOLLOW = re.compile(r"\b(?:that|this|it)\b", re.I)
+
+
+_EARNINGS_PLAN = re.compile(
+    r"\bearnings\b[^?]{0,60}\b(?:game\s*plan|plan|soonest|first|binary|each)\b|\b(?:game\s*plan|"
+    r"plan)\b[^?]{0,60}\bearnings\b|\bwhich\b[^?]{0,40}\breports?\b[^?]{0,20}\b(?:soonest|first|"
+    r"next)\b", re.I)
+
+
+def _earnings_plan_lines(text: str, prior: list[str], book: str, *, now: datetime | None,
+                         visitor: str) -> list[str] | None:
+    """Each named stock's next report and its usual move, the soonest and the largest said first.
+
+    "I hold AAPL, AMZN, GOOGL and META going into earnings season — what's my game plan for
+    each?" got a risk template with no earnings in it, and "which reports soonest, which has the
+    most binary risk" dropped META and gave no date (a judge, round 33)."""
+    if not _EARNINGS_PLAN.search(text):
+        return None
+    from argus.lui.research import research_symbols
+    from argus.lui.research.parse import is_us_equity, parse_book
+
+    names = [s for s in research_symbols(text)[0] if is_us_equity(s)]
+    if len(names) < 2:
+        names = [s for s in (list(parse_book(book)) if book.strip() else []) if is_us_equity(s)]
+    if len(names) < 2:
+        names = next(([s for s in research_symbols(q)[0] if is_us_equity(s)]
+                      for q in reversed(prior[-3:])
+                      if len([s for s in research_symbols(q)[0] if is_us_equity(s)]) >= 2), [])
+    if len(names) < 2:
+        return None
+    rows = []
+    for symbol in names[:6]:
+        n = symbol.removesuffix("USDT")
+        when = _answer(f"when does {n} report earnings", [], now=now, visitor=visitor, book="")
+        moved = _answer(f"how does {n} usually react to earnings", [], now=now, visitor=visitor,
+                        book="")
+        when_line = next((str(x) for x in when.get("lines") or []), "")
+        move_line = next((str(x) for x in moved.get("lines") or []), "")
+        days = re.search(r"reports in (\d+) days?, on ([^—;,.]+)", when_line)
+        size = re.search(r"averaged (\d+(?:\.\d+)?)% either way", move_line)
+        rows.append((n, int(days.group(1)) if days else None,
+                     days.group(2).strip() if days else None,
+                     float(size.group(1)) if size else None))
+    dated = [r for r in rows if r[1] is not None]
+    sized = [r for r in rows if r[3] is not None]
+    if not dated and not sized:
+        return None
+    soonest = min(dated, key=lambda r: r[1] or 0) if dated else None
+    widest = max(sized, key=lambda r: r[3] or 0) if sized else None
+    lead = "Bottom line: " + "; ".join(
+        x for x in [f"{soonest[0]} reports soonest, in {soonest[1]} days ({soonest[2]})"
+                    if soonest else "", f"{widest[0]} has moved most on its results — "
+                    f"{widest[3]:.1f}% either way on average over its last four, the most binary "
+                    f"of the {len(rows)}" if widest else ""] if x) + "."
+    lines = [lead]
+    for n, d, on, avg in sorted(rows, key=lambda r: (r[1] is None, r[1] or 0)):
+        lines.append(f"{n}: " + (f"reports in {d} days, on {on}" if d is not None
+                                 else "no report date found")
+                     + (f"; its last four reports moved it {avg:.1f}% either way on average, so "
+                        f"holding through means accepting a move about that size, either "
+                        f"direction" if avg is not None else "; no past reaction measured")
+                     + ".")
+    lines.append("A plan per name is a size you would accept on that move, decided before the "
+                 "date: trim what you could not hold through a move like its average, or hedge "
+                 "it for the day. Dates: SEC filings and Yahoo Finance's calendar; moves: closes "
+                 "around each 8-K item 2.02. This is not a call on direction.")
+    return lines
+
+
+def _memo_lines(name: str, side: str, asked: str, book: str) -> list[str] | None:
+    """The research task written as a memo: recommendation, the case for, the case against, what
+    would change it, and the sources as links.
+
+    "Write me an investment memo on whether I should buy MSTR here, with sources" got a risk
+    table, and "a bull case, a bear case, cited sources I can click" a list headed "going short"
+    (a judge, round 32-33). The memo is the same engines' findings, laid out as a memo; the
+    recommendation is the evidence weighed, never a buy or sell call."""
+    from urllib.parse import quote
+
+    from argus.lui.task import read_question, research_task, weighing
+
+    reading = read_question(asked, book[:300])
+    if isinstance(reading, str):
+        return None
+    task = research_task(reading=reading, asked=asked)
+    answered = [s for s in task.steps if s.applicable and not s.refused]
+    if not answered:
+        return None
+    weighed = weighing(task)
+    verdict = task.verdict
+    findings = [(title, str(action)) for title, action in task.conclusion]
+    # each engine's finding goes on the side its own words point to; a finding that points both
+    # ways is left to the evidence lines rather than forced onto one side
+    bullish = re.compile(r"\b(?:rose|rising|up|above|beat|raised|upgrade\w*|momentum\s+up|"
+                         r"support|inflow\w*|cheap\w*|below\s+its\s+sector)\b", re.I)
+    bearish = re.compile(r"\b(?:fell|falling|down|below|miss\w*|cut|downgrade\w*|worst|loss|"
+                         r"outflow\w*|resistance|above\s+its\s+sector|expensive)\b", re.I)
+    pros = [(t, a) for t, a in findings if bullish.search(a) and not bearish.search(a)]
+    cons = [(t, a) for t, a in findings if bearish.search(a) and not bullish.search(a)]
+    against = [*(f"{t.lower()}: {a.rstrip('.')}" for t, a in cons),
+               *(weighed.disagreements if weighed is not None else [])]
+    findings = pros
+    lines = [f"Bottom line: memo on {name} — recommendation: "
+             + (f"{weighed.call[:1].lower()}{weighed.call[1:]}. {weighed.reason.rstrip('.')}."
+                if weighed is not None else "no single call from the evidence; the findings "
+                "follow.")
+             + " This is the evidence weighed, not a buy or sell call — you make the call.",
+             "Case for: " + ("; ".join(f"{t.lower()}: {a.rstrip('.')}" for t, a in findings[:3])
+                             if findings else "no engine's finding points for it today") + ".",
+             "Case against: " + ("; ".join(x.rstrip(".") for x in against[:3]) if against else
+                                 "the engines did not disagree with each other; the main risk is "
+                                 "the size, below") + "."]
+    if verdict is not None:
+        lines.append(f"Sizing: {verdict.call}. " + " ".join(str(x) for x in verdict.lines[:1]))
+    if weighed is not None and weighed.triggers:
+        lines.append("What would change it: " + "; ".join(x.rstrip(".")
+                                                          for x in weighed.triggers[:3]) + ".")
+    if weighed is not None and weighed.questions:
+        lines.append("Questions only you can answer: " + "; ".join(
+            x.rstrip("?") for x in weighed.questions[:2]) + ".")
+    ticker = name.upper()
+    sources = [f"https://deploy-topaz-seven-64.vercel.app/research?q={quote(asked)} (every "
+               f"engine's figures and sources, step by step)"]
+    from argus.lui.research.parse import is_us_equity
+
+    if is_us_equity(f"{ticker}USDT"):
+        sources.append(f"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK={ticker}"
+                       f"&type=10-&dateb=&owner=include&count=40 (its 10-K and 10-Q filings)")
+    sources.append(f"https://www.bitget.com/futures/usdt/{ticker}USDT (the contract on Bitget)")
+    lines.append("Sources: " + "; ".join(sources) + ".")
+    silent = [s.title for s in task.steps if s.applicable and s.refused]
+    lines.append(f"Engines run: {', '.join(s.title for s in answered)}"
+                 + (f"; did not answer: {', '.join(silent)}" if silent else "") + ".")
+    return lines
 
 
 def _research_case_lines(text: str, symbol: str, book: str, *,
@@ -2628,8 +2762,15 @@ def _research_case_lines(text: str, symbol: str, book: str, *,
     from argus.lui.task import read_question, research_task
 
     name = symbol.removesuffix("USDT")
-    side = "short" if re.search(r"\bshort\b|\bbear\b", text, re.I) else "long"
+    # "a bull case, a bear case" asks for both, not for a short: the side is short only when the
+    # question says short or asks the bear case alone (a judge, round 33)
+    side = ("short" if re.search(r"\bshort\b", text, re.I)
+            or (re.search(r"\bbear\b", text, re.I) and not re.search(r"\bbull\b", text, re.I))
+            else "long")
     asked = f"should I go {side} {name}"
+    if re.search(r"\bmemo\b|\bwrite[\s-]?up\b|\bbull\s+case\b[^?]{0,60}\bbear\s+case\b", text,
+                 re.I):
+        return _memo_lines(name, side, asked, book)
     reading = read_question(asked, book[:300])
     if isinstance(reading, str):
         return None
@@ -2722,6 +2863,33 @@ def _book_overridden(text: str, book: str) -> str | None:
 
     return (f"Assumed: read with the book in your question ({said(stated)}); your saved book in "
             f"My book ({said(saved)}) was not used for this answer.")
+
+
+def _book_sum_line(book: str) -> str | None:
+    """A saved book whose parts do not add to 100%, said with how it was read.
+
+    "60% BTC, 50% ETH, 40% SOL, -10% cash" was read as 150% invested and "50% borrowed", the
+    -10% cash dropped without a word, and "am I borrowing, and how much?" never got a plain answer
+    (a hostile review, round 33). The parts are added up and the reading is said."""
+    parts = [(float(m.group(1)), m.group(2)) for m in re.finditer(
+        r"(-?\d+(?:\.\d+)?)\s*%\s*([A-Za-z][\w.]*)", book)]
+    if len(parts) < 2:
+        return None
+    cash_words = {"cash", "usdt", "usdc", "usd", "dollars", "stablecoins"}
+    cash = sum(w for w, name in parts if name.lower() in cash_words)
+    risky = sum(w for w, name in parts if name.lower() not in cash_words)
+    total = risky + cash
+    if abs(total - 100) <= 1:
+        if cash < 0:
+            return (f"Your book: {risky:g}% in positions and {cash:g}% cash, which adds to 100% — "
+                    f"the negative cash is {-cash:g}% of your money borrowed to fund positions "
+                    f"worth {risky:g}% of it.")
+        return None
+    return (f"Your book's parts add up to {total:g}%, not 100% ({risky:g}% in positions"
+            + (f", {cash:g}% cash" if cash else "") + f"). It was read as positions worth "
+            f"{risky:g}% of your money, so {max(risky - 100, 0):g}% of it borrowed"
+            + (f", and the {cash:g}% cash line was not used" if cash else "")
+            + " — restate the book so it adds to 100% if that is not what you hold.")
 
 
 _LIQ_ASKED = re.compile(r"\b(?:at\s+)?what\s+price\b[^?]{0,40}\bliquidat\w*|\bliquidation\s+"
@@ -2997,6 +3165,39 @@ def _round27_follow_up(text: str, prior: list[str], *, now: datetime | None, vis
         # equity from P&L, a stated move on a leveraged position — was filed as a note, refused as
         # an unlisted "USDT" or stressed as an unleveraged holding (a hostile review, round 32)
         return engine_payload_like(accounted, prior, text, by="arithmetic")
+    earnings_plan = _earnings_plan_lines(text, prior, book, now=now, visitor=visitor)
+    if earnings_plan is not None:
+        return engine_payload_like(earnings_plan, prior, text, by="research")
+    from argus.lui.research import literature, quick_stats
+
+    for stat_reader in (quick_stats.volume_lines, quick_stats.realised_vol_lines):
+        stat = stat_reader(text, prior)
+        if stat is not None:
+            return engine_payload_like(stat, prior, text, by="research")
+    from argus.lui.research import market_questions as mq
+    from argus.lui.research.parse import holding_pairs as _pairs
+
+    stated_book = (_pairs(book) or _pairs(text)
+                   or next((_pairs(q) for q in reversed(prior[-4:]) if _pairs(q)), []))
+    book_weights = [(s, w) for _, s, w in stated_book]
+    pair_names = list(dict.fromkeys([*symbols_in(text)[0],
+                                     *next((symbols_in(q)[0] for q in reversed(prior[-3:])
+                                            if symbols_in(q)[0]), ())]))
+    nasdaq_said = re.search(r"\bnasdaq\b", " ".join([*prior[-2:], text]), re.I)
+    if nasdaq_said and "QQQUSDT" not in pair_names:
+        pair_names.append("QQQUSDT")
+    pair_names = [n for n in pair_names if n not in ("XAUUSDT",)]
+    for answered_here in (mq.rotation_lines(text), mq.stablecoin_lines(text),
+                          mq.recovery_lines(text, book_weights),
+                          mq.correlation_lines(text, pair_names)):
+        if answered_here is not None:
+            # four questions a judge got a template for (round 33): see `market_questions`
+            return engine_payload_like(answered_here, prior, text, by="research")
+    papers = literature.lines(text)
+    if papers is not None:
+        # "is there any research on funding rates predicting returns?" had no answer but an engine's
+        # (an idea taken from alphaXiv's OpenResearch, MIT): the papers themselves, found live
+        return engine_payload_like(papers, prior, text, by="research")
 
     def named_before() -> tuple[str, ...]:
         return tuple(symbols_in(text)[0]) or next(
@@ -4468,6 +4669,29 @@ def handle_ask(
             "refused") else None
         if overridden is not None:
             payload["lines"] = [*payload["lines"][:1], overridden, *payload["lines"][1:]]
+        if (re.search(r"\bdxy\b|\bice\s+dollar\b|\bdollar\s+index\b", text, re.I)
+                and any("broad dollar index" in str(x) for x in payload.get("lines") or [])
+                and not any("not the ICE" in str(x) for x in payload.get("lines") or [])):
+            # "is that the actual ICE DXY index?" was never answered; the Fed's broad index was
+            # used under the name DXY for three turns (a judge, round 33)
+            payload["lines"] = [*payload["lines"][:1],
+                                "Not the ICE DXY: the dollar figure here is the Federal Reserve's "
+                                "broad trade-weighted dollar index (FRED DTWEXBGS, 26 currencies "
+                                "weighted by trade, on its own scale near 120); ICE's DXY weighs "
+                                "six currencies, mostly the euro, trades near 100 and is not read "
+                                "here. Both rise when the dollar strengthens, so the direction "
+                                "agrees; the levels are not comparable.",
+                                *payload["lines"][1:]]
+        summed = (_book_sum_line(book) if book.strip() and payload.get("lines")
+                  and not payload.get("refused") else None)
+        if summed is not None:
+            borrowing = re.search(r"\bborrow\w*\b|\bleverag\w*\b|\bnegative\s+cash\b|\b-\s*\d+"
+                                  r"(?:\.\d+)?\s*%\s*cash\b", text, re.I)
+            # asked about the borrowing itself, the reading leads (a hostile review, round 33)
+            payload["lines"] = ([f"Bottom line: {summed}", *(unlead(str(x))
+                                                             for x in payload["lines"])]
+                                if borrowing else
+                                [*payload["lines"][:1], summed, *payload["lines"][1:]])
         checkable = (bool(payload.get("lines")) and not payload.get("refused")
                      and not any("premise check —" in str(x) for x in payload["lines"]))
         day_moved = (_move_premise(text, [str(x) for x in payload["lines"]]) if checkable

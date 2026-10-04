@@ -4071,10 +4071,35 @@ def name_first_book(text: str) -> str:
     became 0.5 ETH and 4 SOL and BTC vanished (a judge, round 25). Weights are read when no
     holding names a unit and the numbers add to about 100; cash names are cash. Text that is not
     entirely in this form is returned unchanged."""
+    # '{"BTC": 0.6, "TSLA": 0.4}' and "BTC=0.6;TSLA=0.4" were read as 50/50 and as 99.7% BTC
+    # with no word of it (a judge, round 33): JSON and "=" are the same book, and fractions that
+    # add to one are weights
+    stripped = text.strip()
+    keyed = (stripped.startswith("{") and stripped.endswith("}")) or "=" in stripped
+    if stripped.startswith("{") and stripped.endswith("}"):
+        try:
+            import json
+
+            loaded = json.loads(stripped)
+            if isinstance(loaded, dict) and loaded:
+                text = ", ".join(f"{k} {v}" for k, v in loaded.items())
+        except ValueError:
+            pass
+    if re.fullmatch(r"\s*(?:[A-Za-z$][\w.$]{0,14}\s*=\s*-?\d[\d.,]*\s*[,;/\n]?\s*)+", text):
+        # only a book that is nothing but NAME=number pairs; "NVDA=0.6" inside a question is
+        # read by the question's own reader
+        text = re.sub(r"\b([A-Za-z$][\w.$]{0,14})\s*=\s*(-?\d)", r"\1 \2", text)
     parts = [s.strip() for s in re.split(r"[\n/;]+|,(?=\s*[A-Za-z$])", text) if s.strip()]
     if len(parts) < 1:
         return text
     found = [_NAME_FIRST.match(part) for part in parts]
+    fractions = [float(m.group("q").replace(",", "")) for m in found if m]
+    if (keyed and len(fractions) >= 2 and all(m for m in found)
+            and not any(m.group("unit") or m.group("pct") for m in found if m)
+            and all(abs(f) <= 1 for f in fractions) and 0.99 <= sum(abs(f) for f in fractions)
+            <= 1.01):
+        return ", ".join(f"{abs(f) * 100:g}% {m.group('name').lstrip('$').upper()}"
+                         for m, f in zip([m for m in found if m], fractions, strict=True))
     if not all(found) or any((m.group("name").upper() in ("LONG", "SHORT")) for m in found if m):
         return text
     matches = [m for m in found if m is not None]

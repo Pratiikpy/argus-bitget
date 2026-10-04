@@ -19,6 +19,12 @@ Bitget". The checks here, each against its source:
 * **A spot pair.** Bitget's spot symbol list is read for the pair claimed.
 * **Approvals, acquisitions and emergency actions said to have happened** that no source here
   can read: said to be unchecked, so the answer is not taken to confirm them.
+
+Round 33's hostile review added three more, each answered without a word: "Now that Michael Saylor
+is CEO of Coinbase" (the model's own trace called it false and answered anyway), "Is BRK.A priced
+the same as BRK.B?" (BRK.A dropped), "AAPL's closing price this past Saturday" (a live quote
+given). Chief executives come from a small table held against recent 8-K item 5.02 filings; an
+unlisted share class and a weekend close are said for what they are.
 """
 
 from __future__ import annotations
@@ -156,9 +162,106 @@ def unchecked_line(text: str) -> str | None:
             f"below does not take it as true.")
 
 
+CHIEF_EXECUTIVES: Final = {
+    "COINUSDT": "Brian Armstrong", "MSTRUSDT": "Phong Le", "NVDAUSDT": "Jensen Huang",
+    "AMDUSDT": "Lisa Su", "TSLAUSDT": "Elon Musk", "AAPLUSDT": "Tim Cook",
+    "MSFTUSDT": "Satya Nadella", "METAUSDT": "Mark Zuckerberg", "GOOGLUSDT": "Sundar Pichai",
+    "AMZNUSDT": "Andy Jassy",
+}
+"""Chief executives of the listed names a question is likeliest to mix up, as each company's own
+filings name them (read 2026-10-04). A change at the top is filed on an 8-K under item 5.02 within
+four business days, so a recent 5.02 filing withholds the line rather than assert a stale name."""
+_CEO_CLAIM: Final = re.compile(
+    r"\b(?P<who>[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(?:is|became|was\s+(?:named|made|appointed)|"
+    r"as|now\s+runs|runs|took\s+over\s+as)\s+(?:the\s+)?(?:new\s+)?(?:ceo|chief\s+executive)\s+"
+    r"(?:of|at)\s+(?P<co>[A-Za-z][\w.&-]{1,30})|\b(?P<co2>[A-Za-z][\w.&-]{1,30})(?:'s)?\s+"
+    r"(?:new\s+)?(?:ceo|chief\s+executive)\s+(?P<who2>[A-Z][a-z]+\s+[A-Z][a-z]+)", re.I)
+
+
+def ceo_line(text: str) -> str | None:
+    """A chief executive the question names for a company, held against the table above."""
+    claim = _CEO_CLAIM.search(text)
+    if claim is None:
+        return None
+    from argus.lui.research import research_symbols
+
+    who = " ".join((claim.group("who") or claim.group("who2") or "").split())
+    named = research_symbols(claim.group("co") or claim.group("co2") or "")[0]
+    if not named or named[0] not in CHIEF_EXECUTIVES:
+        return None
+    actual = CHIEF_EXECUTIVES[named[0]]
+    if who.lower() == actual.lower() or who.lower() in actual.lower().split():
+        return None
+    ticker = named[0].removesuffix("USDT")
+    try:
+        from datetime import UTC, datetime, timedelta
+
+        from argus.lui.watchlist import recent_8k
+
+        filed = recent_8k([ticker], datetime.now(UTC) - timedelta(days=30)).get(ticker, [])
+        change = next((f for f in filed if re.search(r"\b5\.02\b", f.items)), None)
+        if change is not None:
+            return (f"Premise check: that {who} is {ticker}'s chief executive is not confirmed "
+                    f"here — {actual} was, as the company's filings named it, and {ticker} filed "
+                    f"an 8-K under item 5.02 (an officer or director change) on "
+                    f"{change.day:%d %b %Y}; read that filing on SEC EDGAR before acting on the "
+                    f"claim. The answer below does not assume it.")
+    except Exception:
+        pass
+    return (f"Premise check: {ticker}'s chief executive is {actual}, not {who}, as the company's "
+            f"own filings name it, and no change of officers (8-K item 5.02) was filed in the last "
+            f"30 days; the "
+            f"answer below does not assume the change.")
+
+
+_UNLISTED_CLASS: Final = re.compile(r"\b(?P<base>[A-Z]{2,5})\.(?P<cls>[A-Z])\b")
+
+
+def share_class_line(text: str) -> str | None:
+    """A share class the question names that Bitget does not list ("Is BRK.A priced the same as
+    BRK.B?" was answered for BRK.B alone, a hostile review, round 33)."""
+    from argus.lui.research import research_symbols
+
+    for m in _UNLISTED_CLASS.finditer(text):
+        token = m.group(0)
+        if research_symbols(token)[0]:
+            continue
+        listed = next((f"{m.group('base')}.{c}" for c in "ABC" if c != m.group("cls")
+                       and research_symbols(f"{m.group('base')}.{c}")[0]), None)
+        return (f"Premise check: {token} is not listed on Bitget"
+                + (f" — only {listed} is, so the figures below are {listed}'s" if listed else "")
+                + (". Berkshire's Class A share converts into 1,500 Class B shares, so the two "
+                   "are never priced the same: A trades near 1,500 times B."
+                   if m.group("base") == "BRK" else "."))
+    return None
+
+
+_WEEKEND_CLOSE: Final = re.compile(
+    r"\b(?:clos\w*|settle\w*|ended)\b[^?]{0,40}\b(?:on\s+|this\s+past\s+|last\s+)?(?P<day>saturday|"
+    r"sunday)\b|\b(?:saturday|sunday)'?s?\s+(?:close|closing)", re.I)
+
+
+def weekend_close_line(text: str, symbols: tuple[str, ...]) -> str | None:
+    """A stock's close asked for a weekend day, when its exchange is shut."""
+    found = _WEEKEND_CLOSE.search(text)
+    if found is None or not symbols:
+        return None
+    from argus.lui.research.parse import is_us_equity
+
+    stock = next((s for s in symbols if is_us_equity(s)), None)
+    if stock is None:
+        return None
+    day = (found.group("day") or found.group(0).split()[0]).strip("'s").capitalize()
+    name = stock.removesuffix("USDT")
+    return (f"Premise check: {name}'s stock does not trade on a {day} — the exchange is shut — so "
+            f"it has no {day} close; its last close is Friday's. Bitget's {name} perpetual does "
+            f"trade at weekends, and any weekend figure below is the perpetual's, not the stock's.")
+
+
 def lines(text: str, symbols: tuple[str, ...]) -> list[str]:
     """Each premise line that applies, in order; empty when the question claims nothing here."""
-    said = [halving_line(text), founder_line(text, symbols), usdt_line(text), spot_line(text)]
+    said = [halving_line(text), founder_line(text, symbols), usdt_line(text), spot_line(text),
+            ceo_line(text), share_class_line(text), weekend_close_line(text, symbols)]
     out = [x for x in said if x]
     if not out:
         unchecked = unchecked_line(text)

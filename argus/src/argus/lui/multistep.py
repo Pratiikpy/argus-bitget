@@ -155,7 +155,16 @@ def parts(question: str, book: str = "") -> list[Part] | None:
     # beside it, not a question: joined back, "what if the nasdaq drops 10%? I hold …" is one.
     joined: list[str] = []
     for piece in pieces:
-        if joined and (_HOLDINGS_ONLY.match(piece) or _HOLDINGS_ONLY.match(joined[-1])
+        # "I need to sell $2 million of SOL without moving the market much. How should I split
+        # the order?" ran as two questions, the second on an invented $50,000 of NVDA (a judge,
+        # round 33): a statement followed by a question about "the order" or "it" is one question
+        refers_back = (joined and not research_symbols(piece)[0]
+                       and re.search(r"\bthe\s+(?:order|trade|position|book|plan|sale|purchase)\b|"
+                                     r"\b(?:it|that|this|them)\b", piece, re.I)
+                       and re.match(r"\s*i(?:'m|\s+am)?\s+(?:need|want|plan|have\s+to|going\s+"
+                                    r"to|would\s+like|must|intend)\b", joined[-1], re.I))
+        if joined and (refers_back or _HOLDINGS_ONLY.match(piece)
+                       or _HOLDINGS_ONLY.match(joined[-1])
                        or _ELABORATES.match(piece)
                        or (_WORST_CASE.match(piece)
                            and re.search(r"\bliquidat|\b\d+(?:\.\d+)?\s*x\b|\bleverage",
