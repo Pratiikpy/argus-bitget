@@ -425,3 +425,14 @@ class TestLiveReAskRound31:
         from argus.lui.research import parse
 
         assert parse._EXECUTION.search("what does it cost to close out a $300,000 long in ETH")
+
+
+@pytest.mark.parametrize(("said", "concept"), [
+    ("is BTC a good buy right now", False),
+    ("is ETH a good investment", False),
+    ("is 10x leverage ok for a small account", True),
+])
+def test_a_buy_question_is_not_a_definition(said: str, concept: bool) -> None:
+    from argus.lui.concepts import concept_asked
+
+    assert (concept_asked(said) is not None) is concept

@@ -75,7 +75,8 @@ _PLACE_TRADE = re.compile(
     r"(?:trade|order|position)\b", re.I)
 """Placing a trade, which happens on Bitget: "how do I place a trade" was declined (round 17)."""
 _FREE = re.compile(
-    r"\b(?:is|are)\s+(?:this|it|argus|the\s+(?:console|tool|app|site|service))\s+(?:really\s+)?"
+    r"\b(?:is|are)\s+(?:this|it|argus|(?:the|this)\s+(?:console|tool|app|site|service))\s+"
+    r"(?:really\s+)?"
     r"(?:free|paid|free\s+to\s+use)\b|\bdo\s+i\s+(?:have\s+to|need\s+to)\s+(?:pay|sign\s*up|"
     r"register|log\s*in|create\s+an?\s+account)\b|\bhow\s+much\s+(?:does|is)\s+(?:argus|this\s+"
     r"(?:console|tool|app|site|service))\s+(?:cost|to\s+use)\b|\bany\s+(?:fees?|charges?|"
@@ -92,7 +93,9 @@ _GOOD_TIME = re.compile(
     r"\bis\s+(?:now|this|today|it)\s+(?:a\s+)?(?:good|bad|the\s+right|right)\s+time\s+to\s+"
     r"(?:buy|invest|get\s+in|start|sell|get\s+out)\b|\bshould\s+i\s+(?:buy|invest|get\s+in|sell|"
     r"get\s+out)(?:\s+(?:my|all\s+my|everything|some)?\s*(?:crypto|coins?|stocks?|shares?|"
-    r"holdings|positions?))?\s+(?:right\s+)?now\b", re.I)
+    r"holdings|positions?))?\s+(?:right\s+)?now\b|"
+    # "is it too late to buy bitcoin now, feels like its already so high" (round 32)
+    r"\bis\s+it\s+too\s+late\s+to\s+(?:buy|invest(?:\s+in)?|get\s+in|sell|get\s+out)\b", re.I)
 _HOW_MUCH_BARE = re.compile(
     r"\bhow\s+much\s+(?:money\s+)?(?:should|can|could|do)\s+i\s+(?:put\s+in(?:to)?|invest|start\s+with)"
     r"\b|\brecommend\w*\b|\bwhat\s+would\s+you\s+do\s+with\b", re.I)
@@ -137,22 +140,30 @@ _BITGET_SAFE = re.compile(
     # "can i trust bitget with my money" (a live re-ask, round 31)
     r"\b(?:trust|rely\s+on)\s+bitget\b|\bbitget\s+(?:\w+\s+){0,2}(?:trustworthy|legit|a\s+scam)\b|"
     r"\b(?:safe|ok|okay)\s+(?:to|for)\s+(?:keep|keeping|leave|leaving|store|storing|hold|holding)\s+"
-    r"(?:my\s+)?(?:money|crypto|funds|coins|savings)\b", re.I)
+    r"(?:my\s+)?(?:money|crypto|funds|coins|savings)\b|"
+    # "if bitget the company goes down or gets hacked what happens to my coins" (round 32)
+    r"\bbitget\b[^?]{0,40}\b(?:goes?\s+down|shuts?\s+down|collapses?|folds?|gets?\s+hacked|is\s+"
+    r"hacked|goes?\s+bankrupt|fails?|disappears?)\b[^?]{0,60}\b(?:happens?|happen)\b[^?]{0,20}"
+    r"\b(?:my\s+)?(?:coins?|crypto|money|funds)\b", re.I)
 _BITGET_SAFE_A = (
     "Bottom line: that is Bitget's to show and yours to check — this console does not audit "
     "Bitget, and no exchange is risk-free.",
-    "What Bitget publishes for you to check: its proof-of-reserves reports and its protection "
-    "fund, on its own site. Read the latest before deciding how much to leave there.",
-    "For a long time: money on any exchange carries that exchange's risk. Many people keep only "
-    "what they trade on the exchange and move coins they hold for years to a wallet they control "
-    "— which then makes keeping its recovery phrase safe their own job.",
-    "This console never holds, moves or touches money.")
+    "If it failed or was hacked: coins held on Bitget are a claim on Bitget, not coins sitting "
+    "separately with your name on them. You would queue behind every other depositor, and "
+    "getting money back from a failed exchange can take years and can still come back short.",
+    "What Bitget publishes for you to check now: its proof-of-reserves reports and its "
+    "protection fund, on its own site.",
+    "Coins moved to a wallet only you control are not exposed to Bitget failing at all, "
+    "because Bitget never held them — which then makes keeping that wallet's recovery phrase "
+    "safe your own job. This console never holds, moves or touches money.")
 
 _WITHDRAW = re.compile(
     # "how do i actually get my money out if i wanna stop" (a first-time user, round 28)
     r"\bhow\s+(?:do|can|would)\s+i\s+(?:actually\s+|even\s+|ever\s+)?(?:withdraw|take\s+out|"
     r"cash\s+out|get\s+(?:my\s+)?(?:money|funds|cash)\s+(?:back\s+)?out)"
-    r"|\bwithdraw(?:al|ing)?\s+(?:my\s+)?(?:money|funds|crypto|usdt|cash)\b", re.I)
+    r"|\bwithdraw(?:al|ing)?\s+(?:my\s+)?(?:money|funds|crypto|usdt|cash)\b"
+    # "mera paisa bitget se bank account me kaise nikalu, withdraw kaise karu" (Hinglish, round 32)
+    r"|\bwithdraw\s+kaise\s+kar\w*\b|\b(?:paisa|paise)\b[^?]{0,40}\bnikal\w*\b", re.I)
 """Taking money out, which happens on Bitget: "how do I withdraw my money" was declined (a
 first-time user, round 12)."""
 
@@ -444,9 +455,17 @@ explains(*_SPECULATION_A, *_OTHER_EXCHANGE_A, *_KYC_A, *_HIDDEN_FEES_A, *_MISTAK
 
 OTHER_EXCHANGE: Final = _OTHER_EXCHANGE
 OTHER_EXCHANGE_A: Final = _OTHER_EXCHANGE_A
-TAX: Final = re.compile(r"\btax(?:es|ed)?\b|\birs\b|\bhmrc\b|\bcapital\s+gains?\b", re.I)
+TAX: Final = re.compile(
+    r"\btax(?:es|ed)?\b|\birs\b|\bhmrc\b|\bcapital\s+gains?\b|"
+    # "will this loss show up anywhere i can use it later, like against profits" (round 32)
+    r"\bshow\s+up\s+anywhere\b[^?]{0,40}\buse\s+it\s+later\b|"
+    r"\b(?:use|count|offset|claim|carr(?:y|ies)\s+(?:it\s+)?forward)\w*\b[^?]{0,40}\b(?:against|"
+    r"to\s+offset)\s+(?:(?:future\s+|my\s+|any\s+)?profits?|gains?)\b",
+    re.I)
 """A tax question, taken before the research readers: "i made 500 on eth this year, do i pay taxes
-on that" was answered with ETH's year-to-date move (a live re-ask, round 31)."""
+on that" was answered with ETH's year-to-date move (a live re-ask, round 31); "will this loss show
+up anywhere i can use it later, like against profits" is the same question without the word "tax"
+(a first-time user, round 32)."""
 TAX_FOLLOW: Final = re.compile(r"\b(?:lost|loss\w*|report\w*|count|counts|owe|pay|declare\w*)\b",
                                re.I)
 EARLY_PLAIN: Final = ((_KYC, _KYC_A), (_MISTAKES, _MISTAKES_A), (_SPECULATION, _SPECULATION_A),
@@ -550,6 +569,158 @@ _WHAT_NOW_A = (
 
 
 _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
+    # "he said its been working for him for 2 months and he showed me screenshots of profits" —
+    # the follow-up to a "trading bot" question got the same canned refusal as the question
+    # itself (a first-time user, round 32)
+    (re.compile(r"\bscreenshots?\s+of\s+(?:his\s+|her\s+|their\s+|the\s+)?profits?\b|\bshowed\s+"
+                r"me\s+(?:his\s+|the\s+)?(?:screenshots?|proof|profits?)\b|\b(?:been\s+)?working"
+                r"\s+for\s+him\s+for\s+\d+\s+(?:months?|weeks?|years?)\b", re.I), (
+        "Bottom line: screenshots and a run of months working are not proof — a screenshot can "
+        "be edited in seconds, and in a Ponzi scheme early \"profits\" are just other people's "
+        "new money being paid out, which is exactly what makes it look real for a while.",
+        "The real tells: a return that never varies with the market, no public or auditable "
+        "record (only what he shows you), and pressure to recruit more people or add more "
+        "money — recruiting is how a Ponzi stays fed.",
+        "A real trading result shows losing months too. Ask to see one, or a statement straight "
+        "from the exchange itself, not a screenshot he chose to send.")),
+    # "ok so how do i actually check if something like that is legit before i put money in" (a
+    # first-time user, round 32)
+    (re.compile(r"\bhow\s+do\s+i\s+(?:actually\s+)?(?:check|know|tell|verify)\s+if\s+(?:something|"
+                r"that|this|it)\s+(?:like\s+that\s+)?is\s+legit\b|\bhow\s+(?:do|can)\s+i\s+"
+                r"(?:check|know|verify)\s+(?:something|that|this|it)\s+is(?:n'?t)?\s+a\s+scam\b|"
+                r"\bis\s+(?:something|this|that)\s+like\s+that\s+legit\b", re.I), (
+        "Bottom line: four checks, before any money goes in: who actually holds the money (you, "
+        "or them); can you deposit a small amount and then actually withdraw it back out, not "
+        "just see a balance; is whoever runs it licensed to handle money where you live; and "
+        "does it promise a fixed return regardless of what the market does.",
+        "Any \"guaranteed\" or fixed return is the biggest red flag on its own — no real "
+        "strategy guarantees a return, so one that claims to has already shown itself false.",
+        "Search the name plus \"scam\" or \"review\" before sending anything, and never send "
+        "money to \"unlock\" a withdrawal or \"verify\" an account — that request is itself the "
+        "scam.")),
+    # "some guy dmed me on instagram saying he can double my crypto in 24 hrs if i send him some
+    # first, is this real" (a first-time user, round 32)
+    (re.compile(r"\bdoubl\w*\s+(?:my|your|the|it|his|her)?\s*(?:crypto|money|coins?|btc|eth|"
+                r"funds?)\b[^?]{0,80}\bsend\b[^?]{0,30}\bfirst\b", re.I), (
+        "Bottom line: no — this is always a scam. Nobody doubles money by having you send money "
+        "or crypto to them first; once it is sent, it is gone, and asking you to send first is "
+        "the whole scheme, not a step in a real one.",
+        "The DM, the urgency (\"24 hours\"), and the promise of a guaranteed multiple are the "
+        "same pattern every time, on every platform — Instagram, WhatsApp, Telegram, it does "
+        "not matter.",
+        "Block and report the account; do not reply, and never send anything \"to unlock\" a "
+        "bigger return — that request is the scam working as intended.")),
+    # a candlestick chart, explained plainly — "can someone explain how to read a candlestick
+    # chart like im 5 years old" was refused entirely (a first-time user, round 32)
+    (re.compile(r"\b(?:explain|read|understand)\b[^?]{0,40}\bcandlesticks?\b|\bwhat(?:'?s|\s+is|"
+                r"\s+are)\s+(?:a\s+|an?\s+)?candlesticks?\b|\bhow\s+(?:do|to|can)\s+(?:i\s+)?read"
+                r"\s+(?:a\s+|the\s+)?candlestick\s+charts?\b", re.I), (
+        "Bottom line: one candle is the price over one time period (a minute, an hour, a day — "
+        "whatever the chart is set to): it opens at one price, trades up and down, and closes "
+        "at another; the candle's body is the gap between the open and the close.",
+        "Green (sometimes white or blue) means the close was higher than the open — price rose "
+        "over that period; red (sometimes black) means the close was lower than the open — "
+        "price fell.",
+        "The thin lines above and below the body are wicks (or \"shadows\"): the highest and "
+        "lowest price reached during the period, even if the price came back before the close.",
+        "A chart is just many of these candles side by side, each one a snapshot of a short "
+        "window of trading.")),
+    # "whats the green and red mean on it" — a standalone follow-up about candle colour (round 32)
+    (re.compile(r"\b(?:green\s+and\s+red|red\s+and\s+green)\b[^?]{0,40}\bmean\b|\bwhat(?:'?s|"
+                r"\s+does)\s+green\s+mean\b.{0,30}\bred\b", re.I), (
+        "Bottom line: on a candlestick chart, green means the price closed higher than it "
+        "opened over that candle's period (it rose); red means it closed lower than it opened "
+        "(it fell).",
+        "The exact colours can differ by chart (some use white/black instead) — the rule that "
+        "matters is whichever colour that chart's own legend marks as \"up.\"",
+        "A green candle after a red one does not predict anything by itself — it is just what "
+        "already happened in that window.")),
+    # "whats a wick then, i see lines sticking out the top and bottom" (round 32)
+    (re.compile(r"\bwhat(?:'?s|\s+is|\s+are)\s+(?:a\s+|the\s+)?wicks?\b|\blines?\s+sticking\s+out"
+                r"\b", re.I), (
+        "Bottom line: a wick (also called a shadow) is the thin line sticking out of a candle's "
+        "body — it marks the highest and lowest price traded during that candle's period, even "
+        "though the price did not stay there.",
+        "A long wick on top means price pushed up and was pushed back down before the close; a "
+        "long wick on the bottom means it was pushed down and bought back up. The body (the "
+        "thick part) is just the open-to-close range.",
+        "On its own a wick is history, not a forecast — it shows what happened in that window, "
+        "not what happens next.")),
+    # "ok and is there a pattern that means its about to go up" got read as a ticker lookup for
+    # the word "pattern" (a first-time user, round 32)
+    (re.compile(r"\bis\s+there\s+a\s+pattern\b[^?]{0,60}\b(?:about\s+to|going\s+to|gonna)\s+"
+                r"(?:go\s+up|rise|pump|moon)\b|\b(?:candle|candlestick|chart)\s*patterns?\b|"
+                r"\bpatterns?\s+(?:that|which)\s+(?:means?|predicts?|signals?)\b", re.I), (
+        "Bottom line: no — no candlestick pattern reliably means a price is about to go up. "
+        "Patterns (hammer, engulfing, head-and-shoulders and the rest) show up both before a "
+        "rise and before a fall; studied carefully, most are close to a coin flip, and the best "
+        "of them only a little better than that in some conditions, and worse than even in "
+        "others.",
+        "Even a pattern with a genuine small edge is usually eaten by fees and the spread once "
+        "you trade it: a Bitget perpetual round trip at taker is about 0.12%, bigger than most "
+        "patterns' measured edge.",
+        "Treat a pattern as one more observation, not a signal: what has actually followed a "
+        "similar setup on a real contract is something this console can check — ask \"has BTC "
+        "been here before\" for the base rate, not a pattern read off a picture.")),
+    # "i get 5000 rupees allowance a month, how much of that should i put into crypto" and "what
+    # if i only do 500 rupees a month instead, is that even worth it" were misread as a request
+    # to trade an INR pair (a first-time user, round 32)
+    (re.compile(r"\b(?:allowance|salary|stipend|pocket\s+money|income|pay)\b[^?]{0,50}\b(?:a|per|"
+                r"each|every)\s+month\b[^?]{0,60}\b(?:how\s+much|worth\s+it|invest|crypto|"
+                r"put\s+(?:in|into))\b|\b\d+\s*(?:rupees?|inr|rs\.?|dollars?|usd|naira|pesos?|"
+                r"pounds?|euros?)\b[^?]{0,20}\b(?:a|per|each|every)\s+month\b[^?]{0,60}\b(?:how\s+"
+                r"much|worth\s+it|crypto|invest|put\s+(?:in|into))\b", re.I), (
+        "Bottom line: no fixed percentage is right for everyone — the honest rule is to put in "
+        "only money you could fully lose without it touching rent, food, books or bills, and "
+        "never money you might need back within a few months.",
+        "Before anything goes into crypto, a small buffer in cash comes first: a bad month in "
+        "crypto and a bad month in your own life landing together is the situation to avoid.",
+        "If you do try it, a small fixed amount repeated every month beats guessing a "
+        "percentage — a small, steady amount is a reasonable way to learn, as long as it is "
+        "small enough to lose entirely without it mattering.",
+        "At that size, fees matter more: Bitget's spot fee is about 0.10% a side (buying and "
+        "selling), so on a small monthly amount that is a real share of a tiny trade, not just "
+        "a rounding error.")),
+    # "ok what about just keeping my cash in the bank instead of either" (after gold vs bitcoin,
+    # a first-time user, round 32)
+    (re.compile(r"\bwhat\s+about\s+(?:just\s+)?(?:keeping|leaving)\s+(?:my\s+)?cash\s+in\s+"
+                r"(?:the\s+)?bank\b|\b(?:keep(?:ing)?|leav(?:e|ing)|just\s+hold(?:ing)?)\s+"
+                r"(?:my\s+)?cash\s+in\s+(?:the\s+)?bank\b[^?]{0,40}\b(?:instead|rather\s+than|"
+                r"vs\.?|versus)\b", re.I), (
+        "Bottom line: cash in a bank keeps its number the same — $100 stays $100 — and in most "
+        "countries a bank deposit is insured up to a limit (the US's FDIC covers $250,000 per "
+        "depositor per bank; other countries set their own limit), which neither gold nor "
+        "bitcoin offers.",
+        "What it does not keep is its buying power: inflation quietly reduces what that same "
+        "$100 buys every year, even while the number on the statement never changes.",
+        "Gold and bitcoin do not hold a steady nominal value the way cash does — both have "
+        "fallen sharply more than once — so the trade-off is stability now against the chance, "
+        "not the certainty, of beating inflation later.",
+        "No call here on which to hold — that depends on what you need the money for and when.")),
+    # "so if i buy and then sell the same day do i get charged fees twice" (round 32)
+    (re.compile(r"\bcharged?\s+fees?\s+twice\b|\bfees?\s+(?:charged\s+)?twice\b|\bdo\s+i\s+(?:get"
+                r"\s+)?(?:pay|charged?)\s+fees?\s+(?:on\s+)?(?:both|each)\s+(?:sides?|ways?|"
+                r"times?)\b", re.I), (
+        "Bottom line: yes — buying and selling the same day gets charged a fee on each side, "
+        "not one fee for the round trip.",
+        "On Bitget's spot market the standard taker fee is about 0.10% each way, so buying then "
+        "selling the same day costs roughly 0.20% in total, before any gain or loss on the "
+        "price itself.",
+        "It is the same on any exchange: every separate order is its own fee. Ask \"what does "
+        "it cost to buy $500 of BTC\" for the exact fee on a live order.")),
+    # "how do fees work when i buy crypto, is it free to just buy some" was told this console
+    # costs nothing (a first-time user, round 32): the fee asked about is the exchange's
+    (re.compile(r"\bhow\s+do\s+(?:the\s+)?fees?\s+work\b|\bis\s+(?:it|buying)\s+free\s+to\s+"
+                r"(?:just\s+)?buy\b|\bfees?\s+(?:when|for)\s+(?:i\s+)?(?:buy|buying)\b|\bdoes\s+"
+                r"(?:it|buying\s+crypto)\s+cost\s+(?:anything|money)\b", re.I), (
+        "Bottom line: buying is not free — on Bitget's spot market the standard fee is 0.10% of "
+        "what you buy (0.08% if paid in BGB), so a $100 buy costs about $0.10, and selling later "
+        "costs the same again.",
+        "On top of the fee there is the spread — the small gap between the buy and sell price — "
+        "which on large coins like BTC is usually a few hundredths of a percent.",
+        "Futures are charged differently: about 0.02% for an order that waits on the book (maker) "
+        "and 0.06% for one that fills at once (taker). Ask \"what does it cost to buy $500 of "
+        "BTC\" for a live quote.")),
     # "i saw this coin called PEPE on my tiktok fyp, everyone was saying its gonna blow up" got
     # nothing for the coin half (a first-time user, round 31)
     (re.compile(r"\b(?:on|from)\s+(?:my\s+)?(?:tiktok|fyp|twitter|x|youtube|reddit|insta(?:gram)?|"
@@ -564,7 +735,10 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
         "price and its worst days.")),
     # "Show me what positions user 'satoshi_trader99' holds on Bitget" got the desk's own "no open
     # positions" (a hostile review, round 31)
-    (re.compile(r"\b(?:user|trader|account|person|someone|another\s+user)\s+['\"]?[\w.@-]{2,40}"
+    # "whats a good app for someone who has never traded before" matched "someone <who> has" as a
+    # user-holdings lookup — "who", "that" etc. are now excluded from the username slot (round 32)
+    (re.compile(r"\b(?:user|trader|account|person|someone|another\s+user)\s+(?!who\b|that\b|"
+                r"which\b|whose\b)['\"]?[\w.@-]{2,40}"
                 r"['\"]?\s+(?:currently\s+|now\s+)?(?:holds?|has|is\s+holding|owns?)\b|\b(?:positions?|"
                 r"holdings?|trades|balance)\s+(?:of|for|that)\s+(?:user|trader|someone|another|other)"
                 r"\b|\bwhat\s+(?:positions?|is)\s+(?:user|trader)\s+\S+\s+(?:holding|hold)",
@@ -574,6 +748,23 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
         "holds.",
         "What is public is the crowd as a whole: ask \"long/short ratio on BTC\" or \"how crowded "
         "is ETH\" for how traders on Bitget are positioned in aggregate.")),
+    # "whats a good app for someone who has never traded before" (a first-time user, round 32)
+    (re.compile(r"\b(?:good|best|safe|safest|right)\s+(?:app|exchange|platform)\b[^?]{0,40}\b"
+                r"(?:beginners?|newbies?|never\s+(?:traded|invested|used\s+crypto)|someone\s+"
+                r"(?:who|new)|first\s+time)\b|\bwhat\s+app\s+should\s+i\s+use\b|\bwhich\s+"
+                r"(?:app|exchange|platform)\s+(?:should|is\s+best)\b", re.I), (
+        "Bottom line: no app named here — but four things are worth checking on any exchange "
+        "before a first-time trader signs up: is it licensed to operate where you live, and "
+        "does it publish proof of reserves (evidence it actually holds what it owes "
+        "depositors)?",
+        "Look for simple spot buying first — owning the coin outright, no leverage — before "
+        "any app's futures or leverage screens; those are not where a beginner should start.",
+        "Check its fee schedule before funding it (a spot fee of about 0.1% a side is "
+        "typical), and that it offers two-factor authentication (2FA) on login and on "
+        "withdrawals.",
+        "Before trusting it with real money, send a small amount in and withdraw a small "
+        "amount back out first — a working withdrawal is worth more than any review you "
+        "read.")),
     # Round 31, a first-time user: each of these was answered with the desk's own P&L, its open
     # positions, the "this console is free" block, or nothing.
     (re.compile(r"\b(?:stable\s*coin|usdt|usdc|tether)\b[^?]{0,80}\b(?:de-?peg\w*|lost\s+(?:its|the)"
@@ -625,13 +816,14 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
         "list of restricted regions, which this console has not read: check them on Bitget "
         "before depositing.",
         "Everything here — prices, risks, costs — is the same wherever you ask from.")),
-    (re.compile(r"\btax(?:es|ed)?\b|\birs\b|\bhmrc\b|\bcapital\s+gains?\b|\breport\s+(?:it|this|"
-                r"that|my\s+(?:gains?|losses|profits?))\b", re.I), (
+    (re.compile(TAX.pattern + r"|\breport\s+(?:it|this|that|my\s+(?:gains?|losses|profits?))\b",
+                re.I), (
         "Bottom line: not tax advice — the rules are your country's — but in many countries "
         "selling, swapping or spending crypto at a gain is taxable whether or not the money "
         "reaches your bank.",
-        "If you lost money, it still counts — it is usually worth reporting: in many countries a "
-        "loss on crypto offsets gains, this year or later.",
+        "If you lost money, it still counts — it is usually worth reporting, and in many "
+        "countries a loss can offset a gain you made this year or carry forward to offset "
+        "profits in a later year.",
         "This console does not send anything to the IRS or any tax office — it holds no account. "
         "Reporting is normally the taxpayer's job, though exchanges in some countries also report "
         "to the tax office. Keep a record of every buy and sell with its date and price; this "
@@ -849,6 +1041,43 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
 )
 
 
+_SCAM_FIXED_RETURN: Final = re.compile(
+    # "my friend said i should put my savings into a trading bot he showed me, it promises 2%
+    # daily returns, should i do it" (a first-time user, round 32)
+    r"\b(?:promis\w+|guarantees?)\b[^?]{0,60}?(?P<pct>\d{1,3}(?:\.\d+)?)\s*%\s*(?:a\s+|per\s+|"
+    r"every\s+|each\s+)?(?P<period>daily|weekly|day|week)\b|"
+    r"(?P<pct2>\d{1,3}(?:\.\d+)?)\s*%\s*(?:a\s+|per\s+|every\s+|each\s+)?(?P<period2>daily|"
+    r"weekly|day|week)\b[^?]{0,40}?\b(?:guarante\w+|promis\w+|returns?)\b",
+    re.I)
+
+
+def _scam_return_lines(text: str) -> tuple[str, ...] | None:
+    """A fixed daily or weekly return, compounded out to a year, so the absurdity is a number
+    rather than a feeling: "2% daily returns" was refused outright, twice, in the same
+    conversation (a first-time user, round 32)."""
+    found = _SCAM_FIXED_RETURN.search(text)
+    if found is None:
+        return None
+    pct = float(found.group("pct") or found.group("pct2"))
+    period = (found.group("period") or found.group("period2") or "").lower()
+    daily = period in ("day", "daily")
+    n = 365 if daily else 52
+    multiple = (1 + pct / 100) ** n
+    word = "day" if daily else "week"
+    return (
+        f"Bottom line: no — {pct:g}% a {word}, compounded, is about {multiple:,.0f}x your money "
+        f"in a year ((1 + {pct:g}/100)^{n} ≈ {multiple:,.0f}x) — no real trading "
+        f"strategy returns anything close to that, ever.",
+        "What a promise like this always is: a fixed return paid whatever the market does, "
+        "screenshots of profits instead of a public and checkable record, and pressure to add "
+        "more money or bring in other people — the marks of a Ponzi scheme, not a strategy.",
+        "Before anything like this gets money: find out who actually holds it, try "
+        "withdrawing a small amount back out (not just watching a balance go up), and check "
+        "whether it is licensed to take money where you live. Any guaranteed return is the red "
+        "flag on its own.",
+    )
+
+
 _STOP_WORDS: Final = frozenset({
     "a", "an", "the", "is", "are", "was", "were", "be", "to", "of", "in", "on", "for", "and",
     "or", "but", "if", "it", "its", "this", "that", "do", "does", "did", "i", "me", "my",
@@ -920,6 +1149,9 @@ def _reply_one(text: str, *, named: bool = False) -> Reply | None:
     2026-09-30: all five nameless forms were declined)."""
     from argus.lui.research.sizing import stated_capital
 
+    bot_return = _scam_return_lines(text)
+    if bot_return is not None:
+        return Reply(lines=bot_return)
     for asked, answer in _PLAIN:
         if asked.search(text):
             return Reply(lines=_lead_by_question(text, answer))
@@ -942,12 +1174,20 @@ def _reply_one(text: str, *, named: bool = False) -> Reply | None:
     for asked_now, answer_now in ((_OTHER_EXCHANGE, _OTHER_EXCHANGE_A), (_KYC, _KYC_A),
                                   (_HIDDEN_FEES, _HIDDEN_FEES_A), (_MISTAKES, _MISTAKES_A),
                                   (_SPECULATION, _SPECULATION_A)):
-        if asked_now.search(text):
+        if asked_now.search(text) and not (
+                # "Coinbase's COIN stock ... what's its spread?" names the company for its stock
+                # and asks a market figure of it (a hostile review, round 32)
+                asked_now is _OTHER_EXCHANGE and named
+                and re.search(r"\b(?:spread|price|funding|volume|depth|order\s+book|beta|"
+                              r"chart)\b", text, re.I)):
             return Reply(lines=answer_now)
     if _ADVICE.search(text):
         return Reply(lines=_NOT_ADVICE)
     if _BITGET_SAFE.search(text):
-        return Reply(lines=_BITGET_SAFE_A)
+        # what happens if it fails leads when that is the question (a first-time user, round 32)
+        failing = re.search(r"\b(?:hack\w*|fail\w*|goes\s+down|bankrupt\w*|collaps\w*|bust)\b",
+                            text, re.I)
+        return Reply(lines=_lead_by_question(text, _BITGET_SAFE_A) if failing else _BITGET_SAFE_A)
     if _MONEY_SAFE.search(text):
         return Reply(lines=_SAFE)
     if _WITHDRAW.search(text):
@@ -1026,6 +1266,8 @@ _PLAIN_WORDS: Final[tuple[tuple[re.Pattern[str], str], ...]] = tuple(
         (r"\bperpetual(?:\s+contract)?\b", "contract"),
         (r"\bbeta\b", "how much it moves with the stock market"),
         (r"\bkurtosis\b", "how often it makes very big moves"),
+        (r"\bskew\b", "whether its big moves lean up or down"),
+        (r"\bR²\b|\bR2\b|\br-squared\b", "the share of its moves the benchmark explains"),
         (r"\bthe\s+Nasdaq-100\s+\(QQQ\)|\bthe\s+Nasdaq-100\b", "the big US tech stocks"),
         (r"\bmiddle\s+range\b", "normal range"),
         (r"\bper\s+8h\s+settlement\b", "every 8 hours")))

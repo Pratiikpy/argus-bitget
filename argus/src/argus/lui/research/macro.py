@@ -115,7 +115,7 @@ def write_macro_snapshot(days: int = 120) -> int:
 
 RATES_UP = re.compile(r"\b(?:hikes?|hiking|hiked|tighten\w*|rates?\s+(?:rise|rising|go\s+up|up)|"
                       r"(?:rising|higher|climbing)\s+(?:rates?|yields?)|yields?\s+(?:rise|rising|up)|"
-                      r"raises?\s+rates?)\b", re.I)
+                      r"raises?\s+rates?|hawkish\w*)\b", re.I)
 """A question about rates going up: the illustration then moves the 10-year up, not down. A
 2022-style hike question was answered with "if a Fed cut took the 10-year down" (stranger QA,
 2026-09-29)."""

@@ -413,7 +413,13 @@ _WEEKEND_TRADING_Q = re.compile(
     r"weekends?\b|\bweekend\s+(?:trading|hours|session)\b", re.I)
 
 
-_RATIO_Q = re.compile(r"\bratio\b", re.I)
+_RATIO_Q = re.compile(
+    # "compare NVDA and AMD on trailing P/E ratio" led with NVDA's price over AMD's, 0.37, where
+    # their P/E ratios stand at 0.18 to one (a judge, round 32): a named valuation or risk ratio
+    # is not the price ratio
+    r"(?<!p/e\s)(?<!pe\s)(?<!sharpe\s)(?<!sortino\s)(?<!debt\s)(?<!current\s)(?<!quick\s)"
+    r"(?<!payout\s)(?<!earnings\s)(?<!calmar\s)\bratios?\b"
+    r"(?!\s+of\s+(?:debt|earnings|sales|book))", re.I)
 
 
 _SINCE_HIGH_Q = re.compile(
@@ -899,6 +905,9 @@ _MACRO = re.compile(
     rf"dollar{_DOLLAR_UNIT}|dxy|recession|"
     r"bond\s+market|(?<!funding\s)rates?\s+(?:environment|backdrop|outlook|regime)|"
     r"how\s+are\s+rates|"
+    # "what happens to my book if rates rise" was declined (round 32 re-run)
+    r"(?<!funding\s)rates?\s+(?:rise|rising|go\s+up|climb\w*|fall|falling|go\s+down|drop\w*)|"
+    r"(?:rising|higher|falling|lower)\s+rates|"
     r"(?<!funding\s)rates?\s+(?:looking|right\s+now|today))\b",
     re.I,
 )

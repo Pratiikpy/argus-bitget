@@ -109,4 +109,88 @@ def event_move_lines(symbol: str, kind: str) -> list[str] | None:
     return lines
 
 
+def _around(symbol: str, at: datetime) -> float | None:
+    """The move from the last hourly close before ``at`` to the close 24 hours after it."""
+    import time
+
+    from argus.market.history import fetch_window
+
+    candles = None
+    for attempt in range(3):
+        # four windows at once can draw Bitget's 429; a short wait and a retry, so a release is
+        # not dropped from the count on a rate limit (counts of 7 and 9 on two runs, round 32)
+        try:
+            candles = fetch_window(symbol, start=at - timedelta(hours=3),
+                                   end=at + timedelta(hours=26), interval="1H", pause=0.0)
+            break
+        except Exception:
+            time.sleep(0.5 * (attempt + 1))
+    if candles is None:
+        return None
+    closes = {c.ts: float(c.close) for c in candles}
+    before = max((t for t in closes if t <= at - timedelta(minutes=30)), default=None)
+    if before is None or closes[before] <= 0:
+        return None
+    after = closes.get(before + timedelta(hours=24))
+    return after / closes[before] - 1 if after is not None else None
+
+
+def book_event_lines(weights: list[tuple[str, float]], kind: str) -> list[str] | None:
+    """What each past release did to a stated book: the weighted 24-hour move of the names held,
+    release by release, its worst and its average size. A "hawkish surprise" is not labelled on
+    the record, so the worst decision day stands in for it and the answer says so; a name with
+    no hourly history around the releases is left out and named."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    from argus.research.event_reactions import cpi_releases, fomc_decisions
+
+    now = datetime.now(UTC)
+    times = [t for t in (cpi_releases()[0] if kind == "CPI" else fomc_decisions())
+             if now - timedelta(days=365) < t < now - timedelta(hours=25)]
+    per: dict[datetime, float] = {}
+    covered: dict[datetime, float] = {}
+    missing: list[str] = []
+    # Only the hours around each release are read — a year of hourly closes per name took most
+    # of a minute for a three-name book (round 32), where these windows take seconds
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        jobs = {(symbol, at): pool.submit(_around, symbol, at) for symbol, _ in weights
+                for at in times}
+        found = {key: job.result() for key, job in jobs.items()}
+    for symbol, weight in weights:
+        got = {at: found[(symbol, at)] for at in times if found[(symbol, at)] is not None}
+        if not got:
+            missing.append(symbol.removesuffix("USDT"))
+            continue
+        for at, day in got.items():
+            per[at] = per.get(at, 0.0) + weight * float(day or 0.0)
+            covered[at] = covered.get(at, 0.0) + weight
+    present = sum(w for s, w in weights if s.removesuffix("USDT") not in missing)
+    complete = {at: move / present for at, move in per.items()
+                if present and covered.get(at, 0.0) >= present - 1e-9}
+    if len(complete) < 2:
+        return None
+    label = "CPI release" if kind == "CPI" else "Fed decision"
+    worst_at = min(complete, key=lambda at: complete[at])
+    best_at = max(complete, key=lambda at: complete[at])
+    size = sum(abs(v) for v in complete.values()) / len(complete)
+    held = ", ".join(f"{w:.0%} {s.removesuffix('USDT')}" for s, w in weights)
+    lines = [f"Bottom line: on the last {len(complete)} {label}s your book ({held}) moved "
+             f"{size:.1%} either way over the next 24 hours on average; its worst was "
+             f"{complete[worst_at]:+.1%} after {worst_at:%d %b %Y} and its best "
+             f"{complete[best_at]:+.1%} after {best_at:%d %b %Y}.",
+             f"A hawkish surprise is not labelled on the record, so the worst of these is the "
+             f"closest measured stand-in: a move like {complete[worst_at]:+.1%} on the whole book, "
+             f"before any leverage multiplies it.",
+             "Each release: " + "; ".join(f"{at:%d %b %Y} {move:+.1%}"
+                                          for at, move in sorted(complete.items(),
+                                                                 reverse=True)[:6]) + "."]
+    if missing:
+        lines.append(f"Left out, no hourly history around the releases: {', '.join(missing)}.")
+    lines.append("Release times: " + ("the BLS CPI archive, 08:30 New York" if kind == "CPI"
+                                      else "the Federal Reserve calendar, 14:00 New York")
+                 + "; prices: Bitget hourly closes, from the last close before each release to "
+                   "24 hours after.")
+    return lines
+
+
 trace_module(globals())
