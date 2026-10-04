@@ -259,3 +259,53 @@ def test_a_stated_funding_rate_is_used_and_held_against_the_cap(
                               "I earn shorting $10,000 of ETH?")
     assert said is not None and "pay about $50,000.00 each settlement" in said[0]
     assert "cannot happen" in said[1] and "$30.00" in said[1]
+
+
+class TestLiveReAskRound32:
+    def test_a_dollar_amount_before_a_name_starting_with_m_keeps_the_name(self) -> None:
+        # "$25,000 META" read the M as millions and the name as "ETA"
+        assert parse._BOOK_USD.search("$25,000 META").group(5).upper() == "META"
+        assert parse._BOOK_USD.search("$1m MSTR").group(2).lower() == "m"
+
+    def test_the_other_two_keep_their_size(self) -> None:
+        prior = ["I run MSFT, META and GOOGL perps at $25,000 each (I hold $25,000 MSFT, $25,000 "
+                 "META, $25,000 GOOGL.)"]
+        said = server._each_expanded("now make META $50,000 and leave the other two at $25,000 "
+                                     "each", prior)
+        assert said.endswith("(I hold $50,000 META, $25,000 MSFT, $25,000 GOOGL.)")
+
+    def test_things_that_could_hurt_me_is_a_personal_thesis(self) -> None:
+        assert server._PERSONAL_THESIS.search("with what I hold, what are the main things that "
+                                              "could hurt me over the next three months?")
+
+    def test_a_coin_between_leverage_and_side_and_a_past_tense_move(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.market import bitget
+
+        monkeypatch.setattr(bitget, "maintenance_margin_rate", lambda symbol, notional: 0.004)
+        said = account_math.lines("I put 50 USDT margin on a 50x BTC long and BTC fell 3%. Did I "
+                                  "get liquidated and how much did I lose?")
+        assert said is not None and said[0].startswith("Bottom line: yes")
+
+    def test_where_am_i_in_total(self) -> None:
+        said = account_math.lines("account was $40k, lost 30% then gained 30%, where am I now in "
+                                  "total?")
+        assert said is not None and "-9.00%" in said[0] and "$36,400 now" in said[1]
+
+    def test_equity_said_after_the_sum(self) -> None:
+        said = account_math.lines("with $200k equity I open $1M notional at 10x, what's my margin "
+                                  "and effective leverage?")
+        assert said is not None and "effective leverage is 5.00x" in said[2]
+
+    def test_a_liquidation_with_the_margin_said_as_with(self) -> None:
+        got = server._round27_follow_up("got liquidated on a 20x eth long with 200 usdt, what "
+                                        "happened to my money", [], now=None, visitor="local",
+                                        book="")
+        assert got is not None and "200 USDT of margin at 20x" in got["lines"][0]
+        assert "in ETH" in got["lines"][0]
+
+    def test_wicks_explained(self) -> None:
+        from argus.lui import newcomer
+
+        said = newcomer.reply("explain candle wicks to me like im new")
+        assert said is not None and "wick" in said.lines[0]

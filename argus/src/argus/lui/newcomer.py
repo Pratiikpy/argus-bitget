@@ -637,7 +637,10 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
         "already happened in that window.")),
     # "whats a wick then, i see lines sticking out the top and bottom" (round 32)
     (re.compile(r"\bwhat(?:'?s|\s+is|\s+are)\s+(?:a\s+|the\s+)?wicks?\b|\blines?\s+sticking\s+out"
-                r"\b", re.I), (
+                # "explain candle wicks to me like im new" was declined (a live re-ask, round 32)
+                r"\b|\b(?:candle(?:stick)?\s+)?wicks?\b[^?]{0,40}\b(?:mean|like\s+i'?m|explain\w*|"
+                r"new)\b|\b(?:explain|what\s+do)\b[^?]{0,20}\b(?:candle(?:stick)?\s+)?wicks?\b",
+                re.I), (
         "Bottom line: a wick (also called a shadow) is the thin line sticking out of a candle's "
         "body — it marks the highest and lowest price traded during that candle's period, even "
         "though the price did not stay there.",

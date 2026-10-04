@@ -1823,7 +1823,10 @@ _BOOK_CASH_USD = re.compile(
 
 
 _BOOK_USD = re.compile(
-    r"(?<![\w.%])(?:\$\s?(\d[\d,]*(?:\.\d+)?)\s*(k|m)?|(\d[\d,]*(?:\.\d+)?)\s*(k|m)\b)\s*"
+    # the unit letter must stand alone: "$25,000 META" read the M as millions and the name as
+    # "ETA", and the book lost META (a live re-ask, round 32)
+    r"(?<![\w.%])(?:\$\s?(\d[\d,]*(?:\.\d+)?)\s*(?:(k|m)(?![A-Za-z]))?|(\d[\d,]*(?:\.\d+)?)\s*"
+    r"(k|m)\b)\s*"
     r"(?:(?:in|of|worth\s+of|into|en|dans|em|de)\s+(?:an?\s+|my\s+|the\s+)?|(?:long|short)\s+)?"
     r"([A-Za-z][A-Za-z0-9.]{1,15})\b", re.I)
 """"$20k NVDA", "20k in TSLA", "$5,000 of BTC", "$5k in an S&P fund": a holding stated as its

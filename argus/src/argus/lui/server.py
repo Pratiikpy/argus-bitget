@@ -2849,7 +2849,7 @@ _EQUAL_PARTS = re.compile(r"\bequal\s+(?:notional|weights?|sizes?|amounts?|parts
                           r"in\s+each)\b", re.I)
 
 
-def _each_expanded(text: str) -> str:
+def _each_expanded(text: str, prior: list[str] | None = None) -> str:
     """A book said as names and one size for all — "TSLA, AAPL and AMZN, $50,000 notional each";
     "long BTC, long ETH, long SOL, all 5x, equal notional" — with the holdings written out, so
     every engine reads every name at its size.
@@ -2861,6 +2861,16 @@ def _each_expanded(text: str) -> str:
     from argus.lui.research.parse import holding_pairs
 
     names = list(dict.fromkeys(research_symbols(text)[0]))
+    others_at = 0
+    if prior and re.search(r"\b(?:the\s+)?other\s+(?:two|three|four|ones?|names?|legs?)\b|"
+                           r"\bthe\s+rest\b", text, re.I):
+        # "now make META $50,000 and leave the other two at $25,000 each" names one; the others
+        # are the book written out in the turn before (a live re-ask, round 32)
+        before = next((m.group(1) for q in reversed(prior[-3:])
+                       for m in [re.search(r"\(I hold ([^)]*)\.\)\s*$", q)] if m), "")
+        names += [n for n in research_symbols(before)[0] if n not in names]
+        others = re.search(r"other\s+(?:two|three|four|ones?|names?|legs?)|the\s+rest", text, re.I)
+        others_at = others.start() if others else 0
     if len(names) < 2 or holding_pairs(text):
         return text
     amounts = [(m.start(), float(m.group("a").replace(",", "")) * (1000 if m.group("k") else 1))
@@ -2875,7 +2885,7 @@ def _each_expanded(text: str) -> str:
         sized = []
         for n in names:
             at = re.search(rf"\b{re.escape(n.removesuffix('USDT'))}\b", text, re.I)
-            spot = at.start() if at else 0
+            spot = at.start() if at else others_at
             after = [a for p, a in amounts if p > spot]
             sized.append((n, after[0] if after else amounts[-1][1]))
         held = ", ".join(f"${a:,.0f} {n.removesuffix('USDT')}" for n, a in sized)
@@ -2894,7 +2904,13 @@ _PERSONAL_THESIS = re.compile(
     r"portfolio|holdings)|the\s+next\s+(?:quarter|month|year))\b|\bwhat\s+should\s+i\s+"
     r"(?:specifically\s+|really\s+)?(?:be\s+)?(?:worr(?:y|ied)|concerned|nervous)\b|\b(?:worr(?:y|ied)|"
     r"concerned)\s+about\s+(?:given|because\s+of)\s+what\s+i\s+(?:hold|own)\b|\bbecause\s+of\s+what\s+"
-    r"i\s+(?:hold|own)\b", re.I)
+    r"i\s+(?:hold|own)\b|"
+    # "with what I hold, what are the main things that could hurt me over the next three months?"
+    # was filed as a note (a live re-ask, round 32)
+    r"\b(?:things?|risks?|what)\s+(?:that\s+)?(?:could|might|would|can)\s+(?:hurt|hit|damage|sink)\s+"
+    r"(?:me|my\s+(?:book|portfolio|holdings|positions))\b|\bbiggest\s+risks?\s+(?:to|in|for)\s+my\s+"
+    r"(?:book|portfolio|holdings)\b|\bwhat\s+could\s+go\s+wrong\s+(?:with|for|in)\s+my\s+(?:book|"
+    r"portfolio|holdings)\b", re.I)
 """A thesis for the trader's own book: "Given my book, write me a personalized thesis for the next
 quarter — what should I specifically be worried about because of what I hold?" was refused as not
 the desk's record, though each part of it is an engine the console runs (a judge, round 32)."""
@@ -3017,7 +3033,9 @@ def _round27_follow_up(text: str, prior: list[str], *, now: datetime | None, vis
                                r"(?:overnight|me|my)\b", " ".join([*prior[-2:], text]), re.I)
     lev_margin = re.search(r"\b(?P<x>\d+(?:\.\d+)?)\s*x\b[^?.]{0,30}?\b(?:on|with)\s+\$?"
                            r"(?P<m>\d[\d,]*(?:\.\d+)?)\s*(?:usdt|usd|dollars?|bucks)?\s*(?:of\s+)?"
-                           r"margin\b|\b\$?(?P<m2>\d[\d,]*(?:\.\d+)?)\s*(?:usdt|usd|dollars?)?\s+"
+                           r"margin\b|\b(?P<x3>\d+(?:\.\d+)?)\s*x\b[^?.]{0,30}?\bwith\s+\$?"
+                           r"(?P<m3>\d[\d,]*(?:\.\d+)?)\s*(?:usdt|usd|dollars?|bucks)\b|"
+                           r"\b\$?(?P<m2>\d[\d,]*(?:\.\d+)?)\s*(?:usdt|usd|dollars?)?\s+"
                            r"(?:of\s+)?margin\b[^?.]{0,30}?\b(?P<x2>\d+(?:\.\d+)?)\s*x\b", text,
                            re.I)
     if was_liquidated and (re.search(r"\b(?:mean|where|what\s+happened|money\s+go|gone)\b", text,
@@ -3034,14 +3052,19 @@ def _round27_follow_up(text: str, prior: list[str], *, now: datetime | None, vis
                     "whole $100. The exchange closes it a little before that (the maintenance "
                     "margin) so the loss never exceeds what you put in on isolated margin."]
         if lev_margin is not None:
-            lev_x = float(lev_margin.group("x") or lev_margin.group("x2"))
-            margin_in = float((lev_margin.group("m") or lev_margin.group("m2")).replace(",", ""))
+            lev_x = float(lev_margin.group("x") or lev_margin.group("x2") or lev_margin.group("x3"))
+            margin_in = float((lev_margin.group("m") or lev_margin.group("m2")
+                               or lev_margin.group("m3")).replace(",", ""))
+            from argus.lui.research import research_symbols
+
+            coin = next((n[0].removesuffix("USDT") for q in [text, *reversed(prior[-2:])]
+                         for n in [research_symbols(q)[0]] if n), "the coin")
             if lev_x > 0 and margin_in > 0:
                 said_liq = [f"Bottom line: on your numbers, {margin_in:,.0f} USDT of margin at "
                             f"{lev_x:g}x held a {margin_in * lev_x:,.0f} USDT position, so a fall "
-                            f"of a little under {1 / lev_x:.0%} in BTC used up the margin and the "
-                            f"position was closed — the {margin_in:,.0f} USDT went to cover that "
-                            f"loss, and on isolated margin that is the most you lose.",
+                            f"of a little under {1 / lev_x:.0%} in {coin} used up the margin and "
+                            f"the position was closed — the {margin_in:,.0f} USDT went to cover "
+                            f"that loss, and on isolated margin that is the most you lose.",
                             said_liq[0].replace("Bottom line: ", "In plain words: ", 1)]
         said_liq.append("It cannot be undone or claimed back; what helps next time is lower "
                         "leverage, a stop-loss placed before the liquidation price, and a size "
@@ -4134,7 +4157,7 @@ def handle_ask(
     plain = " ".join(PICTOGRAPHS.sub(" ", text).split())
     if plain and plain != text.strip() and any(c.isalnum() for c in plain):
         text = plain
-    expanded = _each_expanded(text)
+    expanded = _each_expanded(text, prior)
     if expanded != text and not book.strip():
         # the written-out holdings are the book for every part of the answer, not a clause the
         # part-by-part reader splits off on its own (a judge, round 32)

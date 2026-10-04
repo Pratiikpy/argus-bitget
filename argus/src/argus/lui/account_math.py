@@ -53,13 +53,17 @@ _MOVE: Final = re.compile(
     r"jumped|increased|decreased)\s+(?:by\s+)?(?:another\s+|a\s+further\s+)?(?P<p>\d+(?:\.\d+)?)"
     r"\s*%", re.I)
 _START: Final = re.compile(
-    rf"\b(?:start(?:ed|ing)?\s+(?:with|at|out\s+with)|starting\s+(?:balance|equity|capital)\s+"
+    rf"\b(?:start(?:ed|ing)?\s+(?:with|at|out\s+with)|(?:account|balance|portfolio|book)\s+"
+    rf"(?:was|of|at)|had|starting\s+(?:balance|equity|capital)\s+"
     rf"(?:was|of|is)|began\s+with|initial\s+(?:balance|equity|capital)\s+(?:was|of|is))\s+\$?\s*"
     rf"(?P<a>{_NUM})\s*(?P<u>{_UNIT})?\b", re.I)
 _TOTAL_ASKED: Final = re.compile(r"\b(?:total|overall|combined|net)\b[^?]{0,30}\b(?:loss|"
                                  r"change|return|drop|gain)|\bbalance\s+now\b|\bhow\s+much\s+"
-                                 r"(?:do\s+i\s+have|is\s+left)|\bwhat\s+is\s+my\s+balance\b",
-                                 re.I)
+                                 r"(?:do\s+i\s+have|is\s+left)|\bwhat\s+is\s+my\s+balance\b|"
+                                 # "lost 30% then gained 30%, where am I now in total?" (a live
+                                 # re-ask, round 32)
+                                 r"\bwhere\s+am\s+i\b|\bin\s+total\b|\bam\s+i\s+back\b|"
+                                 r"\bbroke\s+even\b", re.I)
 
 
 def compounded_lines(text: str) -> list[str] | None:
@@ -96,8 +100,10 @@ _NOTIONAL: Final = re.compile(
     rf"(?:usdt|usd|dollars?)?\s+(?:notional|position)\b", re.I)
 _DEPOSIT: Final = re.compile(
     rf"\b(?:deposit(?:ed)?|fund(?:ed)?\s+(?:it\s+|my\s+account\s+)?with|have|account\s+of|"
-    rf"balance\s+of|equity\s+of)\s+\$?\s*(?P<a>{_NUM})\s*(?P<u>{_UNIT})?\s*(?:usdt|usd|dollars?)?",
-    re.I)
+    rf"balance\s+of|equity\s+of)\s+\$?\s*(?P<a>{_NUM})\s*(?P<u>{_UNIT})?\s*(?:usdt|usd|dollars?)?|"
+    # "with $200k equity I open $1M notional" (a live re-ask, round 32)
+    rf"\$\s?(?P<a2>{_NUM})\s*(?P<u2>{_UNIT})?\s*(?:usdt|usd)?\s+(?:of\s+)?(?:equity|balance|"
+    rf"capital|in\s+(?:my\s+)?account)\b", re.I)
 _MARGIN_ASKED: Final = re.compile(r"\b(?:required|initial|needed|how\s+much)\s+margin\b|\bmargin\s+"
                                   r"(?:required|needed)\b|\bexposure\b|\beffective\s+leverage\b",
                                   re.I)
@@ -122,10 +128,12 @@ def margin_lines(text: str) -> list[str] | None:
              f"The math: margin = notional / leverage = {notional:,.0f} / {lev:g} = "
              f"{margin:,.0f}."]
     deposit = next((d for d in _DEPOSIT.finditer(text)
-                    if _amount(d.group("a"), d.group("u")) != notional), None)
+                    if _amount(d.group("a") or d.group("a2"), d.group("u") or d.group("u2"))
+                    != notional), None)
     if deposit is not None:
-        held = _amount(deposit.group("a"), deposit.group("u"))
-        lines.append(f"Against the {_money(held)} deposited: the margin uses "
+        held = _amount(deposit.group("a") or deposit.group("a2"),
+                       deposit.group("u") or deposit.group("u2"))
+        lines.append(f"Against the {_money(held)} in the account: the margin uses "
                      f"{margin / held:.1%} of it, and the account's effective leverage is "
                      f"{notional / held:.2f}x "
                      f"(exposure / equity) — the {lev:g}x setting only says how little margin "
@@ -179,10 +187,13 @@ def equity_lines(text: str) -> list[str] | None:
 _LEVERED: Final = re.compile(
     rf"\b(?P<m>{_NUM})\s*(?P<mu>btc|eth|sol|usdt|usd|dollars?)?\s*(?:as|of|in)?\s*margin\b|"
     rf"\bmargin\s+(?:of\s+)?\$?\s*(?P<m2>{_NUM})\s*(?P<mu2>btc|eth|sol|usdt|usd)?", re.I)
-_LEV_SIDE: Final = re.compile(r"\b(?P<x>\d+(?:\.\d+)?)\s*x\s+(?P<side>long|short)\b|\b(?P<side2>"
+_LEV_SIDE: Final = re.compile(r"\b(?P<x>\d+(?:\.\d+)?)\s*x\s+(?:[A-Za-z]{2,10}\s+)?"
+                              r"(?P<side>long|short)\b|\b(?P<side2>"
                               r"long|short)\b[^.?]{0,20}?\bat\s+(?P<x2>\d+(?:\.\d+)?)\s*x\b", re.I)
-_STATED_MOVE: Final = re.compile(r"\b(?P<v>drops?|falls?|rises?|jumps?|moves?\s+(?:down|up)|"
-                                 r"goes\s+(?:down|up))\s+(?:by\s+)?(?P<p>\d+(?:\.\d+)?)\s*%", re.I)
+_STATED_MOVE: Final = re.compile(r"\b(?P<v>drops?|dropped|falls?|fell|rises?|rose|jumps?|"
+                                 r"jumped|moves?\s+(?:down|up)|moved\s+(?:down|up)|goes\s+"
+                                 r"(?:down|up)|went\s+(?:down|up))\s+(?:by\s+)?(?P<p>\d+(?:\.\d+)?)"
+                                 r"\s*%", re.I)
 
 
 def liquidation_move_lines(text: str) -> list[str] | None:
@@ -199,7 +210,8 @@ def liquidation_move_lines(text: str) -> list[str] | None:
     side = (lev_said.group("side") or lev_said.group("side2")).lower()
     amount = float((margin_said.group("m") or margin_said.group("m2")).replace(",", ""))
     unit = (margin_said.group("mu") or margin_said.group("mu2") or "usd").lower()
-    fell = re.match(r"drop|fall|moves?\s+down|goes\s+down", move.group("v"), re.I) is not None
+    fell = re.match(r"drop|fall|fell|move[sd]?\s+down|goes\s+down|went\s+down", move.group("v"),
+                    re.I) is not None
     against = fell == (side == "long")
     pct = float(move.group("p")) / 100
     if lev <= 0 or amount <= 0:
