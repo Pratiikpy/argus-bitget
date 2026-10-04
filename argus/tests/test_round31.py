@@ -365,3 +365,63 @@ def test_a_stated_day_drop_is_held_against_the_day() -> None:
     assert said is not None and "not -8%" in said and "no dip of that size" in said
     assert server._move_premise("AAPL dropped 1% yesterday, why",
                                 ["Bottom line: AAPL moved -1.1% yesterday (02 Oct, UTC)."]) is None
+
+
+class TestLiveReAskRound31:
+    TODAY = date(2026, 10, 4)
+
+    def test_a_needed_sum_with_a_date_is_a_target_and_answered(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        said = "i need 400 dollars for a festival in 4 weeks and i have 80"
+        target = goal_target.stated(said, today=self.TODAY)
+        assert target is not None and (target.start, target.goal, target.days) == (80, 400, 28)
+        monkeypatch.setattr(goal_target, "realism_lines",
+                            lambda t: [f"Bottom line: turning ${t.start:,.0f} into ${t.goal:,.0f}"])
+        got = goal_target.lines(said, [], now=datetime(2026, 10, 4, tzinfo=UTC))
+        assert got is not None and "turning $80 into $400" in got[0]
+
+    def test_a_need_without_a_date_is_not_a_target(self) -> None:
+        assert goal_target.stated("i need 10 bucks for fees and i have 3", today=self.TODAY) is None
+
+    @pytest.mark.parametrize(("said", "prior"), [
+        ("i made 500 on eth this year, do i pay taxes on that", []),
+        ("what if i lost instead, does that count", ["i made 500 on eth, do i pay taxes on that"]),
+    ])
+    def test_tax_is_answered_before_the_research_readers(self, said: str,
+                                                         prior: list[str]) -> None:
+        got = server._round27_follow_up(said, prior, now=None, visitor="local", book="")
+        assert got is not None and got["classified_by"] == "newcomer"
+        assert "tax" in " ".join(got["lines"]).lower()
+
+    def test_a_loss_follow_up_leads_with_the_loss_line(self) -> None:
+        got = server._round27_follow_up("what if i lost instead, does that count",
+                                        ["i made 500 on eth, do i pay taxes on that"], now=None,
+                                        visitor="local", book="")
+        assert got is not None and got["lines"][0].startswith("Bottom line: If you lost money")
+
+    def test_trusting_bitget_is_the_bitget_answer(self) -> None:
+        said = newcomer.reply("saw a coin on twitter everyone says will 100x, and also can i "
+                              "trust bitget with my money")
+        assert said is not None and any("Bitget's to show" in x for x in said.lines)
+
+    @pytest.mark.parametrize(("said", "average"), [
+        ("I bought ETH at 2400 and again at 2000, same size each — where's my average?", 2200.0),
+        ("bought BTC at 60k and 40k, same dollars each, my average?", 48000.0),
+    ])
+    def test_equal_buys_average(self, said: str, average: float,
+                                monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setattr(position_math, "_last", lambda symbol: None)
+        got = position_math.average_entry_lines(said)
+        assert got is not None and f"{average:,.2f}" in got[0]
+
+    def test_which_goes_first_is_the_cut_first_question(self) -> None:
+        assert mandate.CUT_FIRST.search("which goes first if markets drop 20%?")
+
+    def test_stems(self) -> None:
+        assert [newcomer._stem(w) for w in ("counts", "countries", "losses", "loss")] == [
+            "count", "countr", "loss", "loss"]
+
+    def test_a_close_out_cost_is_an_execution_question(self) -> None:
+        from argus.lui.research import parse
+
+        assert parse._EXECUTION.search("what does it cost to close out a $300,000 long in ETH")

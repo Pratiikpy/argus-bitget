@@ -3397,6 +3397,23 @@ def _round27_follow_up(text: str, prior: list[str], *, now: datetime | None, vis
                           if x is not mine and not x.startswith("Read as:"))]
                 lev["lines"] = body
             return lev
+    taxed = _newcomer.TAX.search(text) or (
+        prior and _newcomer.TAX.search(prior[-1]) and _newcomer.TAX_FOLLOW.search(text)
+        and len(text.split()) <= 14)
+    if taxed and not about_the_record(text):
+        # "i made 500 on eth this year, do i pay taxes on that" got ETH's year-to-date move, and
+        # "what if i lost instead, does that count" a risk table (a live re-ask, round 31)
+        tax_said = _newcomer.reply(text if _newcomer.TAX.search(text) else f"{text} (tax)",
+                                   named=True)
+        if tax_said is not None and tax_said.lines:
+            tax_lines = [x.removeprefix("Bottom line: ") for x in tax_said.lines]
+            loss_at = next((i for i, x in enumerate(tax_lines) if x.startswith("If you lost")),
+                           None)
+            if loss_at and re.search(r"\blos[st]\w*\b", text, re.I):
+                # the loss is the question asked, so its line leads
+                tax_lines.insert(0, tax_lines.pop(loss_at))
+            tax_lines[0] = f"Bottom line: {tax_lines[0][:1].upper()}{tax_lines[0][1:]}"
+            return engine_payload_like(tax_lines, prior, text, by="newcomer")
     for plain_asked, plain_said in _newcomer.EARLY_PLAIN:
         if plain_asked.search(text):
             # "do they make you upload a passport on bitget" was taken by the venue explainer
@@ -4046,9 +4063,15 @@ def handle_ask(
             "refused") else None
         if overridden is not None:
             payload["lines"] = [*payload["lines"][:1], overridden, *payload["lines"][1:]]
-        day_moved = (_move_premise(text, [str(x) for x in payload["lines"]])
-                     if payload.get("lines") and not payload.get("refused")
-                     and not any("premise check —" in str(x) for x in payload["lines"]) else None)
+        checkable = (bool(payload.get("lines")) and not payload.get("refused")
+                     and not any("premise check —" in str(x) for x in payload["lines"]))
+        day_moved = (_move_premise(text, [str(x) for x in payload["lines"]]) if checkable
+                     else None)
+        if day_moved is None and checkable:
+            # "NVDA fell 10% yesterday after earnings, buy the dip?" was answered with its past
+            # earnings reactions and never told it rose that day (a live re-ask, round 31)
+            yesterday = _yesterday_line(text, now)
+            day_moved = _move_premise(text, [yesterday]) if yesterday else None
         if day_moved is not None:
             # the day digest answers outside `_research_payload`, where a move said in the
             # question was never held against the day it measured (round 31)
@@ -4511,7 +4534,7 @@ def _move_premise(text: str, lines: list[str]) -> str | None:
             return (f"Bottom line: premise check — {day.group(1)} moved {moved_pct:+.1f}% "
                     f"{day.group(3)} ({day.group(4)}), not {'-' if fell else '+'}{said_pct:g}%; "
                     f"there is no {'dip' if fell else 'jump'} of that size to "
-                    f"{'buy' if fell else 'chase'} on the record. The day's figures follow.")
+                    f"{'buy' if fell else 'chase'} on the record.")
         return None
     # "what's up with TSLA" and "up to date" claim no direction
     said = re.sub(r"\bwhat'?s\s+up\b|\bup\s+to\b|\bsup\b|\bset\s+up\b|\bshow(?:s|ed)?\s+up\b",
@@ -4530,6 +4553,37 @@ def _move_premise(text: str, lines: list[str]) -> str | None:
                     f"not {'down' if down else 'up'}; what is behind the move follows.")
         return None
     return None
+
+
+def _yesterday_line(text: str, now: datetime | None) -> str | None:
+    """Yesterday's open-to-close move of the name ``text`` names, said the way the day answer
+    says it, when the question states a move for yesterday in percent; None otherwise."""
+    if not re.search(r"\byesterday\b", text, re.I) or not re.search(r"\d\s*%", text):
+        return None
+    from argus.lui.research import research_symbols
+    from argus.market import history
+
+    named = research_symbols(text)[0]
+    if not named:
+        return None
+    from argus.lui.research.parse import is_us_equity
+
+    day = (now or datetime.now(UTC)).date() - timedelta(days=1)
+    while is_us_equity(named[0]) and day.weekday() >= 5:
+        # a stock's "yesterday" on a Sunday is Friday's session, not a flat weekend candle
+        day -= timedelta(days=1)
+    start = datetime(day.year, day.month, day.day, tzinfo=UTC)
+    try:
+        candles = history.fetch_window(named[0], start=start, end=start + timedelta(days=1),
+                                       interval="1Dutc")
+    except Exception:
+        return None
+    candle = next((c for c in candles if c.ts.date() == day), None)
+    if candle is None or float(candle.open) <= 0:
+        return None
+    moved = float(candle.close) / float(candle.open) - 1
+    return (f"Bottom line: {named[0].removesuffix('USDT')} moved {moved:+.1%} yesterday "
+            f"({day:%d %b}, UTC).")
 
 
 def _rule_check(text: str, lines: list[str]) -> str | None:
@@ -4883,8 +4937,8 @@ def _spot_cost_line(text: str, request: ResearchRequest) -> str | None:
             or re.search(r"\b(?:perp\w*|futures?|leverag\w*|\d+\s*x\b|short)", text, re.I)
             # "exit a $500,000 long in SOL" was told the spot fee for "a first buy" (round 31):
             # an exit is not a first buy, and a stated long is the perpetual's
-            or re.search(r"\b(?:exit\w*|sell\w*|dump\w*|clos(?:e|ing)|unwind\w*|long)\b", text,
-                         re.I)):
+            or re.search(r"\b(?:exit\w*|sell\w*|dump\w*|clos(?:e|ing)|unwind\w*|unload\w*|"
+                         r"offload\w*|liquidat\w*|long)\b", text, re.I)):
         return None
     from argus.market.bitget import spot_taker_fee
 

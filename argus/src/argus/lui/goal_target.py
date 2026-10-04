@@ -112,10 +112,20 @@ SAFER: Final = re.compile(r"\b(?:safer|less\s+risky|riskier|more\s+dangerous)\b"
 _LEVERAGE_SAID: Final = re.compile(r"\bleverage|\bfutures\b|\bperps?\b|\bmargin\b", re.I)
 
 
+_NEED: Final = re.compile(
+    r"\b(?:need|needs|want|gotta\s+(?:get|have)|have\s+to\s+(?:get|have|make))\s+(?:like\s+|about\s+|"
+    r"around\s+)?\$?\s*(?P<b>\d[\d,]*(?:\.\d+)?)(?![\d,.]*\d)\s*(?P<kb>k|grand|thousand)?\s*"
+    r"(?:bucks|dollars?|usd|usdt)?\b", re.I)
+"""A sum needed by a date, said before what is held: "i need 400 dollars for a festival in 4 weeks
+and i have 80" was filed as a note (a live re-ask, round 31)."""
+
+
 def stated(text: str, *, today: date) -> Target | None:
     """The target ``text`` states, with the days it allows."""
     m = TARGET.search(text)
     it = _TARGET_IT.search(text) if m is None else None
+    if it is None and m is None and (_IN_SPAN.search(text) or _BY_YEAR_END.search(text)):
+        it = _NEED.search(text)
     have = _HAVE.search(text) if it is not None else None
     doubled = _DOUBLE.search(text) if m is None else None
     if m is not None:
@@ -298,8 +308,10 @@ def lines(text: str, prior: list[str], *, now: datetime | None = None) -> list[s
     """The answer when ``text`` is about a stated money target, or None."""
     today = (now or datetime.now(UTC)).date()
     here = stated(text, today=today)
-    if here is not None and (REALISTIC.search(text) or "?" in text or re.search(
-            r"\b(?:should|can|could|would)\s+i\b|\bhow\s+(?:do|can|should)\s+i\b", text, re.I)):
+    # a goal said in full — the sum, the target and the date — is a question in itself
+    if here is not None and (REALISTIC.search(text) or "?" in text or here.deadline is not None
+                             or re.search(r"\b(?:should|can|could|would)\s+i\b|\bhow\s+(?:do|"
+                                          r"can|should)\s+i\b", text, re.I)):
         return realism_lines(here)
     target = remembered(text, prior, today=today)
     if target is None:

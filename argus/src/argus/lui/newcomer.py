@@ -134,6 +134,8 @@ _BITGET_SAFE = re.compile(
     # "is bitget safe for keep my money there long time, i am worry" got the desk's track record
     # (a first-time user, round 30)
     r"\bis\s+bitget\s+(?:\w+\s+){0,2}(?:safe|legit|trustworthy|secure|a\s+scam|reliable)\b|"
+    # "can i trust bitget with my money" (a live re-ask, round 31)
+    r"\b(?:trust|rely\s+on)\s+bitget\b|\bbitget\s+(?:\w+\s+){0,2}(?:trustworthy|legit|a\s+scam)\b|"
     r"\b(?:safe|ok|okay)\s+(?:to|for)\s+(?:keep|keeping|leave|leaving|store|storing|hold|holding)\s+"
     r"(?:my\s+)?(?:money|crypto|funds|coins|savings)\b", re.I)
 _BITGET_SAFE_A = (
@@ -442,6 +444,11 @@ explains(*_SPECULATION_A, *_OTHER_EXCHANGE_A, *_KYC_A, *_HIDDEN_FEES_A, *_MISTAK
 
 OTHER_EXCHANGE: Final = _OTHER_EXCHANGE
 OTHER_EXCHANGE_A: Final = _OTHER_EXCHANGE_A
+TAX: Final = re.compile(r"\btax(?:es|ed)?\b|\birs\b|\bhmrc\b|\bcapital\s+gains?\b", re.I)
+"""A tax question, taken before the research readers: "i made 500 on eth this year, do i pay taxes
+on that" was answered with ETH's year-to-date move (a live re-ask, round 31)."""
+TAX_FOLLOW: Final = re.compile(r"\b(?:lost|loss\w*|report\w*|count|counts|owe|pay|declare\w*)\b",
+                               re.I)
 EARLY_PLAIN: Final = ((_KYC, _KYC_A), (_MISTAKES, _MISTAKES_A), (_SPECULATION, _SPECULATION_A),
                       (_HIDDEN_FEES, _HIDDEN_FEES_A))
 """The plain answers the console's router takes before its research readers see the question:
@@ -623,8 +630,8 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
         "Bottom line: not tax advice — the rules are your country's — but in many countries "
         "selling, swapping or spending crypto at a gain is taxable whether or not the money "
         "reaches your bank.",
-        "If you lost money, it is usually still worth reporting: in many countries a loss on "
-        "crypto offsets gains, this year or later.",
+        "If you lost money, it still counts — it is usually worth reporting: in many countries a "
+        "loss on crypto offsets gains, this year or later.",
         "This console does not send anything to the IRS or any tax office — it holds no account. "
         "Reporting is normally the taxpayer's job, though exchanges in some countries also report "
         "to the tax office. Keep a record of every buy and sell with its date and price; this "
@@ -851,6 +858,17 @@ _STOP_WORDS: Final = frozenset({
     "still"})
 
 
+def _stem(word: str) -> str:
+    """A word without its plural or tense ending: "covers" meets "cover", "counts" meets "count",
+    and "countries" stays apart from both (a five-letter cut joined it to "count", round 31)."""
+    if word.endswith("sses"):
+        return word[:-2]
+    for end in ("ing", "ies", "es", "ed", "s"):
+        if word.endswith(end) and not word.endswith("ss") and len(word) - len(end) >= 3:
+            return word[: -len(end)]
+    return word
+
+
 def _lead_by_question(text: str, answer: tuple[str, ...]) -> tuple[str, ...]:
     """The answer with the line that best answers this question first.
 
@@ -858,10 +876,10 @@ def _lead_by_question(text: str, answer: tuple[str, ...]) -> tuple[str, ...]:
     "how do I know if the trader is good or lucky" and "does Bitget cover me" both opened with what
     copy trading is (a first-time user, round 31). The lines already held each answer; the one
     sharing most words with the question now leads, and the rest follow in their order."""
-    words = {w[:5] for w in re.findall(r"[a-z]{3,}", text.lower()) if w not in _STOP_WORDS}
+    words = {_stem(w) for w in re.findall(r"[a-z]{3,}", text.lower()) if w not in _STOP_WORDS}
     if not words or len(answer) < 2:
         return answer
-    scores = [len(words & {w[:5] for w in re.findall(r"[a-z]{3,}", line.lower())})
+    scores = [len(words & {_stem(w) for w in re.findall(r"[a-z]{3,}", line.lower())})
               for line in answer]
     best = max(range(len(answer)), key=lambda i: (scores[i], -i))
     if best == 0 or scores[best] <= scores[0] + 1:

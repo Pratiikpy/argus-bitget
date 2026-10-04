@@ -113,7 +113,10 @@ ASKS: Final = re.compile(
     r"\bquantify\b|\bsize\s+(?:this|it|the|my)\b|\bvar\b|\bvalue[\s-]+at[\s-]+risk\b", re.I)
 CUT_FIRST: Final = re.compile(
     r"\b(?:which|what)\s+(?:single\s+)?(?:line\s+item|position|holding|name|one)\b[^?]{0,60}\b(?:cut|"
-    r"trim|reduce|sell)\b|\b(?:cut|trim|reduce)\s+(?:first|which)\b", re.I)
+    r"trim|reduce|sell)\b|\b(?:cut|trim|reduce)\s+(?:first|which)\b|"
+    # "which goes first if markets drop 20%?" after an allocation (a live re-ask, round 31)
+    r"\b(?:which|what)\s+(?:one\s+|line\s+|position\s+|holding\s+)?(?:goes|gets\s+cut|do\s+(?:i|we)\s+"
+    r"(?:sell|cut))\s+first\b", re.I)
 COMPARE_6040: Final = re.compile(
     r"\b60\s*/\s*40\b|\bsixty[\s-]+forty\b|\b(?:stock|equity)[\s/-]+bond\s+(?:book|portfolio|mix)\b",
     re.I)

@@ -231,6 +231,8 @@ _EXECUTION = re.compile(
     r"cost\s+of\s+(?:buying|selling)|"
     # "what does it cost to buy $500 of BTC" was refused as not a desk stock (2026-09-30)
     r"(?:does|would|will|did)\s+it\s+cost\s+to\s+(?:buy|sell)|\bcost\s+to\s+(?:buy|sell)\b|"
+    # "what does it cost to close out a $300,000 long in ETH" read as a worst-day table (round 31)
+    r"\bcost\s+(?:me\s+)?to\s+(?:close(?:\s+out)?|exit|unwind|unload|get\s+out\s+of)\b|"
     r"(?:sell|selling|exit|exiting|unload\w*|dump\w*)\s+"
     r"(?:\$|\d)|scal(?:e|ing)\s+(?:in|into|out)|break\s+(?:up|down)\s+(?:an?\s+)?(?:\w+\s+){0,2}"
     r"order|smaller\s+(?:clips|chunks|pieces|orders|slices)|in\s+(?:tranches|chunks|pieces)|"

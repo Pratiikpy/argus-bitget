@@ -121,7 +121,15 @@ _BUY: Final = re.compile(rf"\b(?:bought|buy|added|add|got|purchased)\s+(?:anothe
                          + r")\s+)?(?:at|@)\s+\$?(?P<p2>" + _NUM + r")\s*(?P<k2>k)?\b", re.I)
 AVERAGE_ASKED: Final = re.compile(
     r"\baverage\s+(?:entry|price|cost|buy\s+price)\b|\bbreak[\s-]?even\s+price\b|\bcost\s+"
-    r"basis\b|\bdca\b", re.I)
+    r"basis\b|\bdca\b|\b(?:my|the)\s+average\b", re.I)
+_SAME_SIZE: Final = re.compile(r"\b(?:same|equal)\s+(?:size|amount|quantity|dollars?|money)\b|"
+                               r"\b(?:the\s+)?same\s+each\b", re.I)
+"""Buys of equal size with no quantity: "I bought ETH at 2400 and again at 2000, same size each —
+where's my average and what's my P&L now?" got a risk table (a live re-ask, round 31)."""
+_AT_PRICE: Final = re.compile(rf"(?:\band\s+(?:again\s+)?(?:at\s+|@\s*)?|\bat|@)\s*\$?(?P<p>{_NUM})"
+                              r"\s*(?P<k>k)?\b", re.I)
+_BOUGHT_NAME: Final = re.compile(rf"\b(?:bought|buy|got|added|purchased|entered)\s+(?P<s>{_SYM})"
+                                 r"\s+(?:at|@)", re.I)
 
 
 def average_entry_lines(text: str) -> list[str] | None:
@@ -135,7 +143,7 @@ def average_entry_lines(text: str) -> list[str] | None:
         if q > 0 and p > 0:
             fills.append((q, p))
     if len(fills) < 2:
-        return None
+        return _equal_size_lines(text)
     total_q = sum(q for q, _ in fills)
     cost = sum(q * p for q, p in fills)
     average = cost / total_q
@@ -150,6 +158,41 @@ def average_entry_lines(text: str) -> list[str] | None:
         lines.append(f"At Bitget's last {price:,.2f} that is {price / average - 1:+.1%} on the "
                      f"average, {'+' if pnl >= 0 else '-'}${abs(pnl):,.0f} on the {total_q:g} "
                      f"{name}, before fees.")
+    return lines
+
+
+def _equal_size_lines(text: str) -> list[str] | None:
+    """Buys of the same size, said by price alone. Same quantity each gives the plain mean of the
+    prices; the same dollars each gives their harmonic mean (more units bought where cheaper), and
+    the answer says which it used."""
+    if not _SAME_SIZE.search(text):
+        return None
+    prices = [_k(m.group("p"), m.group("k")) for m in _AT_PRICE.finditer(text)]
+    prices = [x for x in prices if x > 0]
+    if len(prices) < 2:
+        return None
+    dollars = bool(re.search(r"\b(?:same|equal)\s+(?:dollars?|money|amount\s+of\s+money)\b|\$\s?\d"
+                             r"[\d,]*\s+each\b", text, re.I))
+    if dollars:
+        average = len(prices) / sum(1 / x for x in prices)
+        how = (f"the same dollars each buys more where the price is lower, so the average is the "
+               f"harmonic mean: {len(prices)} / (" + " + ".join(f"1/{x:,.0f}" for x in prices)
+               + f") = {average:,.2f}")
+    else:
+        average = sum(prices) / len(prices)
+        how = ("the same quantity each, so the average is the plain mean: ("
+               + " + ".join(f"{x:,.0f}" for x in prices) + f") / {len(prices)} = {average:,.2f}")
+    named = _BOUGHT_NAME.search(text)
+    symbol = _symbol(named.group("s")) if named else None
+    name = symbol.removesuffix("USDT") if symbol else None
+    lines = [f"Bottom line: your average entry is {average:,.2f}"
+             + (f" on {name}" if name else "") + ".",
+             f"The math: {how}." + ("" if dollars else " If each buy was the same dollar amount "
+                                    "instead, say so: the average is then a little lower.")]
+    if symbol is not None and (price := _last(symbol)) is not None:
+        lines.append(f"At Bitget's last {price:,.2f} that is {price / average - 1:+.1%} on the "
+                     f"average, before fees; with no size given, that percentage is the P&L on "
+                     f"the whole position.")
     return lines
 
 
