@@ -37,6 +37,10 @@ class TestCoverage:
                                "not (bitget-signal news_feed).")
         assert "2 calls to the language model (Qwen)" in said
         assert guide.cost_line(coverage.Record()).startswith("What this step read: nothing new")
+        cached = coverage.Record()
+        cached.note_model_call()
+        assert guide.cost_line(cached).endswith("1 call to the language model (Qwen) on the "
+                                                "hackathon key.")
 
 
 class TestSteps:

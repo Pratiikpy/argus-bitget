@@ -115,7 +115,8 @@ def briefing(book: dict[str, float]) -> tuple[list[str], list[Any], str | None] 
                     else f"{_t(symbol)}: no 24-hour move read")
             if own is not None and move is not None:
                 said += f" ({own:+.2f}% of it its own, the rest the market's)"
-            said += f"; {len(heads)} headline{'s' if len(heads) != 1 else ''} in 48 hours, {latest}"
+            said += (f"; {len(heads)} headline{'s' if len(heads) != 1 else ''} in 48 hours, "
+                     f"{latest}" if heads else f"; {latest}")
             if filed:
                 said += f"; {len(filed)} SEC filing{'s' if len(filed) != 1 else ''} this week"
             rows.append(said + ".")
@@ -177,11 +178,14 @@ def cost_line(record: Record) -> str:
     """What one guided step read and what it cost, from the transport's own count."""
     reached = sorted(s for s, ok in record.answered.items() if ok)
     missing = record.missing
-    if not reached and not missing and not record.model_calls:
+    if not reached and not missing:
         # a step answered wholly from reads this server made minutes ago (the stress step after
-        # the research) reached nothing new, and says so rather than going quiet
+        # the research) reached nothing new, and says so rather than "0 sources answered ()"
+        calls = record.model_calls
         return ("What this step read: nothing new — every figure came from data this server read "
-                "in the last few minutes. Cost: $0 in data; no language-model call.")
+                "in the last few minutes. Cost: $0 in data; "
+                + (f"{calls} call{'s' if calls != 1 else ''} to the language model (Qwen) on the "
+                   f"hackathon key." if calls else "no language-model call."))
     said = (f"What this step read: {len(reached)} source{'s' if len(reached) != 1 else ''} "
             f"answered ({', '.join(reached[:12])}{MORE if len(reached) > 12 else ''})")
     if missing:

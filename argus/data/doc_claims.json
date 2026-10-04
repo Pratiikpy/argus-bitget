@@ -249,39 +249,39 @@
       "doc": "explained",
       "line": 1772,
       "quoted": [
-        "910"
+        "911"
       ],
       "live": [
-        910
+        911
       ],
       "status": "OK",
-      "excerpt": "910** files under `argus/data/`"
+      "excerpt": "911** files under `argus/data/`"
     },
     {
       "claim": "data_files",
       "doc": "explained",
       "line": 2421,
       "quoted": [
-        "910"
+        "911"
       ],
       "live": [
-        910
+        911
       ],
       "status": "OK",
-      "excerpt": "910 files under `argus/data/`"
+      "excerpt": "911 files under `argus/data/`"
     },
     {
       "claim": "data_files",
       "doc": "architecture",
       "line": 15,
       "quoted": [
-        "910"
+        "911"
       ],
       "live": [
-        910
+        911
       ],
       "status": "OK",
-      "excerpt": "910** files under `argus/data/`"
+      "excerpt": "911** files under `argus/data/`"
     },
     {
       "claim": "memory_effect",
@@ -1454,13 +1454,13 @@
       "doc": "readme",
       "line": 226,
       "quoted": [
-        "1010"
+        "1021"
       ],
       "live": [
-        1010
+        1021
       ],
       "status": "OK",
-      "excerpt": "1010 have settled as abstentions"
+      "excerpt": "1021 have settled as abstentions"
     },
     {
       "claim": "settled_abstentions",
@@ -1468,7 +1468,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        1010
+        1021
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -1478,13 +1478,13 @@
       "doc": "explained",
       "line": 1201,
       "quoted": [
-        "1010"
+        "1021"
       ],
       "live": [
-        1010
+        1021
       ],
       "status": "OK",
-      "excerpt": "1010 have settled as abstentions"
+      "excerpt": "1021 have settled as abstentions"
     },
     {
       "claim": "leans_recorded",

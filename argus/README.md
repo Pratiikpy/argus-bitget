@@ -223,7 +223,7 @@ that was read. None of them is claimed as *proven better* — see "The honest pa
   BUY 1 NVDAUSDT at 232.45, opened 2026-09-28 13:47 UTC, settled 2026-09-29 at 230.96 for a net
   loss of 1.78 USDT; seq 884, SELL 1 METAUSDT at 728.17, opened 2026-09-30 13:41 UTC, settled
   2026-10-01 at 731.55 for a net loss of 4.45 USDT. Net across both: -6.22 USDT, 0 of 2 right.
-  Every other entry is a refusal, and 1010 have settled as abstentions. Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they record fills
+  Every other entry is a refusal, and 1021 have settled as abstentions. Two rows (seq 264, 265) carry `verdict: trade` and are **void** — they record fills
   the risk layer had refused, and are excluded everywhere (see the correction at the top of this
   file and `paper/corrections.py`). Track 2's quantitative half — Sharpe, max drawdown, win rate —
   is computed from settled trades, and two settled trades are not a sample, so those three numbers are undefined. `eval/performance.py`
