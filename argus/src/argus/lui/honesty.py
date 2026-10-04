@@ -267,6 +267,12 @@ def order_prefix(text: str) -> str | None:
                             r"\b(?:and|then)\s+(?:show|tell|give)\b|\bresulting\b|"
                             r"怎么|怎样|如何|应该|是否|要不要|吗|呢|影响|什么|哪", raw, re.I):
         return None  # a question about an order, or a request for its analysis (`is_an_order`)
+    if re.search(r"\b(?:don'?t|do\s+not|never)\s+let\s+me\b|\bunless\s+i\s+(?:confirm|say|"
+                 r"check)\b|\bwithout\s+(?:checking|asking|flagging)\b|\bremember\s+(?:that\s+)?"
+                 r"i\b", raw, re.I):
+        # "Never let me open a position larger than $8k unless I confirm" is a rule to keep, not
+        # an order (a live re-ask, round 35)
+        return None
     if re.match(r"^\s*(?:please\s+|pls\s+)?hedge\b", raw, re.I):
         # a hedge request is answered as a hedge analysis (`research._IMPERATIVE_HEDGE`)
         return None

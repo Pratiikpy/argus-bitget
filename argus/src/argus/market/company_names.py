@@ -153,6 +153,13 @@ def us_ticker(text: str) -> tuple[str, str] | None:
     return None
 
 
+def names_for(ticker: str) -> list[str]:
+    """The one-word names a headline uses for ``ticker`` ("NVDA" -> ["Nvidia"]), from the same
+    table :func:`us_ticker` reads the other way."""
+    wanted = ticker.upper()
+    return [word.title() for word, held in _names()["first"].items() if held == wanted]
+
+
 def listed_name(word: str) -> str | None:
     """A one-word company name ("Micron") as its Bitget contract, when Bitget lists the issuer."""
     from argus.market import universe

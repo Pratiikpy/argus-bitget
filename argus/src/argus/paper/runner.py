@@ -1121,6 +1121,7 @@ def run_once(
             symbol, as_of=now,
             insider=InsiderSource(), fundamentals=FundamentalsSource(),
             twitter=TwitterSource(), reddit=RedditSource(),
+            last_price=float(ticker.last),
         )
         evidence.extend(gathered.evidence)
 

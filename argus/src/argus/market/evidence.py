@@ -905,6 +905,7 @@ def gather(
     fundamentals: Any | None = None,
     keywords: Iterable[str] = (),
     max_headlines: int = 6,
+    last_price: float | None = None,
 ) -> Gathered:
     """Everything knowable about ``symbol`` at ``as_of``, and nothing after it.
 
@@ -998,6 +999,23 @@ def gather(
     leaked = [e for e in evidence if e.available_at > as_of]
     if leaked:
         raise EvidenceError(f"{len(leaked)} items stamped after as_of reached the gather; refusing")
+
+    if last_price:
+        # A price an item states for the name, set against the venue's own: HeyArka's
+        # plausible-falsehood vector ("already trading near $260.96", 40% off the market) reached
+        # the model as plain evidence until 2026-10-04 (`truth/price_claims.py`)
+        from argus.market.company_names import names_for
+        from argus.market.universe import ALIASES
+        from argus.truth.price_claims import annotate
+
+        named = [*names_for(underlying_ticker(symbol)),
+                 *(alias.title() for alias, held in ALIASES.items()
+                   if held == symbol.upper() and alias.isalpha() and len(alias) > 3)]
+        before = [e.claim for e in evidence]
+        evidence = annotate(evidence, symbol, last_price, named)
+        noted = sum(1 for old, new in zip(before, evidence, strict=True) if old != new.claim)
+        if noted:
+            status.append(f"price check: {noted} item(s) state a price far from the venue's")
 
     evidence.sort(key=lambda e: e.available_at, reverse=True)
 

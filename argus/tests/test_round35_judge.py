@@ -278,3 +278,19 @@ class TestLiveReAskRound35:
         monkeypatch.setattr(equity_history, "daily",
                             lambda t: [Day(date(2026, 1, 2), 4.0), Day(date(2026, 1, 5), 3.0)])
         assert book_engine._risk_free(date(2026, 1, 1), date(2026, 2, 1)) == pytest.approx(0.035)
+
+    def test_a_bare_book_line_and_a_rule_are_kept_not_ordered(self) -> None:
+        from argus.lui import honesty
+
+        said = ("Book: $50k ETH, $50k SOL. Never let me open a position larger than $8k unless I "
+                "confirm.")
+        facts = memory.extract(said)
+        assert memory.get(facts, "book") is not None
+        cap = memory.get(facts, "cap_usd")
+        assert cap is not None and cap.value == "8000"
+        assert honesty.order_prefix(said) is None
+
+    def test_stated_dollars_price_a_bare_name(self) -> None:
+        from argus.lui.research.parse import parse_notional
+
+        assert parse_notional("I'd like to put $12k into AVAX") == 12000

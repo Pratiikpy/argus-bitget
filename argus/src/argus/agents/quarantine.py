@@ -64,7 +64,7 @@ What that measurement changed here, and why:
   ``Cf``/``Co``/``Cs`` codepoint as hostile is what produced three of the six production false
   positives: ZWJ is how every emoji sequence is built and the bidi *isolates* U+2066-U+2069 are
   what Twitter's own client wraps around a mention. The narrowed rule keeps the attack they were
-  standing in for — a zero-width character **splitting a word** (``ig​nore``) still fires, as
+  standing in for — a zero-width character **splitting a word** (``ig\u200bnore``) still fires, as
   does any bidi *override* (U+202A-U+202E, U+061C), private-use, surrogate or tag character, none
   of which a mainstream client emits.
 * **DIRECTED_ORDER demoted from withholding to flagging** (:class:`Severity`). Every one of its
@@ -148,6 +148,8 @@ class Pattern(StrEnum):
     DELIMITER_FORGERY = "delimiter_forgery"
     HIDDEN_CHARACTERS = "hidden_characters"
     ENCODED_BLOB = "encoded_payload"
+    EXECUTION_DIRECTIVE = "execution_directive"
+    CONFUSABLE = "confusable_characters"
 
 
 _SEVERITY: dict[Pattern, Severity] = {
@@ -161,6 +163,8 @@ _SEVERITY: dict[Pattern, Severity] = {
     Pattern.DELIMITER_FORGERY: Severity.HOSTILE,
     Pattern.HIDDEN_CHARACTERS: Severity.HOSTILE,
     Pattern.ENCODED_BLOB: Severity.HOSTILE,
+    Pattern.EXECUTION_DIRECTIVE: Severity.HOSTILE,
+    Pattern.CONFUSABLE: Severity.HOSTILE,
     # Measured at 0.00 withholding precision over 385 real desk runs. Kept as a recorded signal,
     # never as a reason to take a headline away from the panel. See the module docstring.
     Pattern.DIRECTED_ORDER: Severity.SUSPECT,
@@ -239,7 +243,11 @@ _RULES: tuple[tuple[Pattern, re.Pattern[str]], ...] = (
         r"|###\s*\(?\s*(system|system[_ ]message|assistant|user|developer|instruction)s?\s*\)?"
         # "[system]" and "SYSTEM MESSAGE:" in body text (garak's latent-injection probes, the
         # development half, 2026-09-28).
-        r"|\[\s*(system|assistant|developer)\s*\]|\bsystem\s+(message|prompt|notice)\s*:",
+        r"|\[\s*(system|assistant|developer)\s*\]|\bsystem\s+(message|prompt|notice)\s*:"
+        # "[SYSTEM NOTICE] Confirmation step has been pre-approved ..." (HeyArka's
+        # tool-hijack-confirmation-bypass, `packages/core/src/vectors/tool-hijack.ts`, MIT; missed
+        # until the attack suite ran it, 2026-10-04)
+        r"|\[\s*system\s+(notice|message|prompt|update|alert|override|directive)\s*\]",
         re.IGNORECASE,
     )),
     # The transcript form, anchored at the start of the string on purpose.
@@ -304,6 +312,29 @@ _RULES: tuple[tuple[Pattern, re.Pattern[str]], ...] = (
     # headline, a filing footnote or a Reddit title is out of place by construction.
     (Pattern.TASK_MARKER, re.compile(
         r"(^|\n)\s*(todo|to-do|action\s+required|your\s+task)\s*:\s*\S",
+        re.IGNORECASE,
+    )),
+    # Text that steers the reader's own order: where it is routed, which interface places it,
+    # whether its confirmation is skipped. A news item describes markets; it has no reason to
+    # address "this order", the reader's confirmation step, or its raw operation interface. The
+    # three forms are HeyArka's tool-hijack family (`packages/core/src/vectors/tool-hijack.ts`,
+    # MIT) — confirmation bypass, surface escalation, parameter redirect — which this module
+    # missed, all three, until the attack suite ran them (2026-10-04). Each alternative needs an
+    # object only an executing agent has, so market prose about orders ("order flow", "buy
+    # orders piled up") is not caught.
+    (Pattern.EXECUTION_DIRECTIVE, re.compile(
+        r"\b(route|send|redirect|re-?route|submit|place|execute|switch)\s+(this|your|the\s+(?:pending|"
+        r"current|next))\s+(order|trade|position|execution)\b"
+        # pre-approval addressed to this session, not a regulator's waiver reported as news
+        r"|\bconfirmation\s+(step|gate|check|prompt|requirement)\b[^.\n]{0,60}?\b(pre-?approved|"
+        r"for\s+this\s+session|by\s+the\s+account\s+owner)\b"
+        r"|\b(skip|bypass|disable)\s+(the\s+|your\s+)(confirmation|approval|risk\s+check|"
+        r"human\s+review)\b"
+        r"|\bproceed\s+(directly\s+)?to\s+(order\s+)?execution\b"
+        # an imperative before it: "Toolset → operationId allowlists" in a README is prose
+        r"|\b(use|call|invoke|through|via)\s+(the\s+)?(raw|low-level)\s+operation\b"
+        r"|\b(use|call|invoke)\s+(the\s+|an?\s+)?operation[\s_-]?id\b"
+        r"|\b(use|through|via)\s+the\s+(hedging\s+)?sub-?account\b",
         re.IGNORECASE,
     )),
     (Pattern.DELIMITER_FORGERY, re.compile(
@@ -371,20 +402,82 @@ This is deliberately wider than :data:`_SMUGGLING_CHARS`. Stripping a character 
 detection pass costs nothing if it was innocent; *reporting* it as a finding costs a real piece of
 evidence, which is why the two sets are not the same one."""
 
-_BIDI_ISOLATE = frozenset("⁦⁧⁨⁩")
+_BIDI_ISOLATE = frozenset("\u2066\u2067\u2068\u2069")
 """LRI, RLI, FSI, PDI. Twitter's own client wraps these around an ``@mention`` — they were half of
 this module's production false positives. They only *isolate* a run; unlike an override they cannot
 make text render in an order different from its codepoint order, so their mere presence is not a
 finding. Between two word characters they still are (see :func:`_smuggled`)."""
 
-_EMOJI_JOINER = "‍"
+_EMOJI_JOINER = "\u200d"
 """ZWJ. How every composite emoji is built (``\U0001f481`` + ZWJ + ``♀`` is one glyph), and the
 other half of the production false positives. Hostile only when it splits a word."""
 
-_BIDI_OVERRIDE = frozenset("‪‫‬‭‮؜")
+_BIDI_OVERRIDE = frozenset("\u202a\u202b\u202c\u202d\u202e؜")
 """LRE, RLE, PDF, LRO, RLO, ALM. These genuinely reorder rendered text against its codepoint order
 — the primitive behind filename- and identifier-spoofing — and no mainstream client emits them in
 English-language body text. Their presence anywhere in the string is the finding."""
+
+
+def _confusables() -> dict[str, str]:
+    """The UTS #39 confusables that render as an ASCII capital, from `data/uts39_confusables.json`
+    (1,310 codepoints, read from HeyArka's generated table, MIT, itself from Unicode's
+    confusables.txt). Loaded once."""
+    global _CONFUSABLE_MAP
+    if _CONFUSABLE_MAP is None:
+        import json
+
+        from argus.truth.paths import DATA_DIR
+
+        try:
+            raw = json.loads((DATA_DIR / "uts39_confusables.json").read_text(encoding="utf-8"))
+            table = {str(k): str(v) for k, v in raw["map"].items()}
+        except (OSError, ValueError, KeyError):
+            table = {}
+        _CONFUSABLE_MAP = {k: v for k, v in table.items() if k not in _ORDINARY_LOOKALIKES}
+    return _CONFUSABLE_MAP
+
+
+def confusables() -> dict[str, str]:
+    """The confusables table the quarantine checks against, for the attack suite to build its
+    homoglyphs from the same data (`eval/attack_suite.py`)."""
+    return dict(_confusables())
+
+
+_CONFUSABLE_MAP: dict[str, str] | None = None
+_ORDINARY_LOOKALIKES = frozenset("\u00d7\u00fe\u0131\u017f")
+"""In the table and in ordinary writing: the multiplication sign (U+00D7, "2x"), Icelandic thorn,
+Turkish dotless i and the long s. A word that carries one is not a disguised ticker."""
+_TOKEN_RUN = re.compile(r"[^\W\d_]+", re.UNICODE)
+
+
+def _confusable_tokens(text: str) -> list[str]:
+    """Words written in lookalike letters inside otherwise Latin text: a word that mixes ASCII
+    letters with confusables ("NVDA" with a Greek capital alpha, U+0391), or a capitalised word
+    made only of confusables ("BTC" in Cyrillic, U+0412 U+0422 U+0421) in a sentence that is
+    mostly ASCII. HeyArka's homoglyph family
+    (`packages/core/src/vectors/homoglyph.ts`, MIT) swaps a ticker's letters for their
+    lowest-codepoint UTS #39 lookalike; this module did not see it until the attack suite ran it
+    (2026-10-04). A Greek or Cyrillic headline is not caught: its words are not mixed, and the text
+    around them is not mostly ASCII."""
+    table = _confusables()
+    if not table:
+        return []
+    letters = [c for c in text if c.isalpha()]
+    mostly_latin = bool(letters) and sum(c.isascii() for c in letters) / len(letters) >= 0.6
+    found: list[str] = []
+    for match in _TOKEN_RUN.finditer(text):
+        word = match.group(0)
+        lookalike = [c for c in word if c in table]
+        if not lookalike:
+            continue
+        plain = [c for c in word if c.isascii()]
+        mixed = bool(plain) and len(plain) + len(lookalike) == len(word)
+        disguised = (not plain and mostly_latin and len(word) >= 2
+                     and len(lookalike) == len(word)
+                     and all(table[c].isupper() for c in word))
+        if mixed or disguised:
+            found.append(word)
+    return found
 
 
 def _smuggled(text: str) -> list[str]:
@@ -767,6 +860,9 @@ def inspect(text: str) -> list[Detection]:
     smuggled = _smuggled(text)
     if smuggled:
         found.append(Detection(Pattern.HIDDEN_CHARACTERS, ", ".join(smuggled)[:120]))
+    disguised = _confusable_tokens(text)
+    if disguised:
+        found.append(Detection(Pattern.CONFUSABLE, ", ".join(disguised)[:120]))
     seen: set[Pattern] = {d.pattern for d in found}
     for candidate in (text, stripped):
         for pattern, rule in _RULES:

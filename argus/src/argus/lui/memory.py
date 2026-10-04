@@ -151,7 +151,9 @@ _HOLDS = re.compile(
     r"my\s+(?:current\s+)?(?:book|portfolio|holdings?|allocation)\s+(?:is|are|reads|looks\s+like)"
     r")\b[^.?!;\n]*|"
     # "Here is my book: $40,000 BTC, ..." was not kept (a judge, round 35): no space before ":"
-    r"\bmy\s+(?:current\s+)?(?:book|portfolio|holdings?|allocation)\s*:[^.?!;\n]*", re.I)
+    r"\bmy\s+(?:current\s+)?(?:book|portfolio|holdings?|allocation)\s*:[^.?!;\n]*|"
+    # "Book: $50k ETH, $50k SOL." opening a message or a sentence (a live re-ask, round 35)
+    r"(?:^|(?<=[.;!]\s))\s*(?:book|portfolio|holdings?|positions?|allocation)\s*:[^.?!;\n]*", re.I)
 """Holdings said in a sentence: "I hold 40% NVDA, 30% MSFT, 30% AAPL". Kept as the book, so a later
 "what are my exposures if I add 10% XOM" is asked of it (a judge, round 13, 2026-09-30: the book
 was said once in chat, and the next answer read "your book is 100% Energy")."""

@@ -1845,7 +1845,11 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                                                        lambda m: m.group(1).upper(), x)
                                                 for x in lines), *dollar_lines[1:]]
             if _BOOK_HISTORY_Q.search(raw_text) and request.book:
-                history = _book_history_lines(request.book, request.cash, raw_text)
+                # "over the last year" was measured over 499 days (a live re-ask, round 35)
+                last_year = re.search(r"\b(?:last|past|this)\s+(?:12\s+months|year)\b|\b1\s*y"
+                                      r"(?:ea)?r\b", raw_text, re.I)
+                history = _book_history_lines(request.book, request.cash, raw_text,
+                                              days_back=366 if last_year else 500)
                 if history is not None:
                     lines = [*history[0], *(re.sub(r"^(?:Actionable|Bottom line):\s*(\w)",
                                                    lambda m: m.group(1).upper(), x)

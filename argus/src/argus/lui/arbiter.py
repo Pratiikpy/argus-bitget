@@ -265,8 +265,12 @@ def arbitrate(text: str, *, book: str, model: Any, instruction: bool, desk_first
         # ledger has nothing on such a name; its risk profile is the honest answer, said as such.
         named = [s for s in research_symbols(text)[0] if s not in TRADED_SYMBOLS]
         if named:
+            from argus.lui.research.parse import parse_notional
+
+            # "I'd like to put $12k into AVAX" was priced on a worked-example $10,000, "no amount
+            # was given" (a live re-ask, round 35): the stated dollars are the position
             request = ResearchRequest(
-                kind=ResearchKind.IMPACT, symbols=(named[0],),
+                kind=ResearchKind.IMPACT, symbols=(named[0],), notional=parse_notional(text),
                 notes=((
                     # "and ETH?" was told no question was recognised while it was answered
                     # (a first-time user, round 11): a bare name is a question about the name.
