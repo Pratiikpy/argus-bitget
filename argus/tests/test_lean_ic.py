@@ -81,3 +81,26 @@ def test_the_live_artefacts_render_every_self_audit_row() -> None:
     rows = self_audit_lines(DATA_DIR)
     assert len(rows) == 5
     assert all(text and "None" not in text for _, text in rows)
+
+
+@pytest.mark.parametrize("asked", [
+    "is the desk's lean actually predictive?",
+    "does your confidence predict anything?",
+    "is ARGUS's directional call better than a coin?",
+])
+def test_a_question_about_the_leans_skill_is_answered_from_the_record(asked: str) -> None:
+    from argus.lui.server import _LEAN_SKILL, _lean_record_lines
+
+    assert _LEAN_SKILL.search(asked)
+    lines = _lean_record_lines()
+    if lines is None:
+        pytest.skip("the graded record is not in this checkout")
+    assert lines[0].startswith("Bottom line:")
+    assert any("Lean IC" in line for line in lines)
+
+
+@pytest.mark.parametrize("asked", ["what is NVDA's lean", "will the desk be right tomorrow?"])
+def test_a_question_that_is_not_about_the_leans_record_is_left_alone(asked: str) -> None:
+    from argus.lui.server import _LEAN_SKILL
+
+    assert not _LEAN_SKILL.search(asked)

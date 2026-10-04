@@ -45,6 +45,10 @@ ASKED: Final = re.compile(
     r"\b(?:backtest\w*|back[\s-]test\w*|test\s+(?:a|this|my|the)\s+(?:strategy|rule|system)|"
     r"how\s+(?:would|did|does|has)\b[^?]{0,60}\b(?:have\s+)?(?:done|do|performed|perform|worked|work|fared)|"
     r"does\s+(?:buying|selling|shorting|a|the)\b[^?]{0,80}\bwork|would\s+(?:have\s+)?made\s+money|"
+    # "would buying ETH whenever RSI drops under 25 ... have made money, or was that luck?" got a
+    # base-rate answer (live, 2026-10-05): the verb need not sit next to "would"
+    r"\bwould\b[^?]{0,140}\bhave\s+(?:made|lost|earned)\s+(?:money|anything)|"
+    r"\b(?:buy\w*|go(?:ing)?\s+long|short\w*)\s+[^?]{0,30}\bwhenever\b|"
     r"(?:strategy|rule)\s*:)", re.I)
 _RSI: Final = re.compile(r"\brsi\s*(?:\(\s*(?P<n>\d{1,3})\s*\))?[^.;]{0,40}?\b(?:below|under|<|"
                          r"drops?\s+(?:below|under|to)|falls?\s+(?:below|under|to))\s*(?P<lo>\d{1,2})"
@@ -65,8 +69,12 @@ _HOLD: Final = re.compile(r"\bhold(?:ing|s)?\s+(?:it\s+|for\s+)?(?P<n>\d{1,3}|a|
                           r"\s*(?P<unit>days?|weeks?|months?|sessions?)\b", re.I)
 _BREAKOUT: Final = re.compile(r"\b(?P<n>\d{1,3})[\s-]*day\s+(?:high|highs|breakout)\b(?:[^.?]{0,40}"
                               r"\b(?P<m>\d{1,3})[\s-]*day\s+low)?", re.I)
-_SHORT: Final = re.compile(r"\bshort\s+(?:when|if|it|on)|\blong[\s/-]*short\b|\bboth\s+sides\b",
-                           re.I)
+_SHORT: Final = re.compile(r"\bshort(?:ing|s)?\s+(?:(?:it|on|when|whenever|if|after|every)\b|"
+                           r"[A-Za-z$]{2,12}\s+(?:when|whenever|if|after|every|on)\b)|"
+                           r"\bsell(?:ing)?\s+(?:it\s+)?short\b|\blong[\s/-]*short\b|"
+                           r"\bboth\s+sides\b", re.I)
+"""Short as the trade: "short BTC whenever it rises 5%" was tested as a buy (2026-10-05), since
+only "short when/if/it/on" was read. "Short-term", "short interest" and "in short" do not match."""
 VOL_SIZED: Final = re.compile(r"\b(?:vol(?:atility)?[\s-]*(?:target\w*|sized?|sizing|scaled?|"
                               r"adjusted)|siz\w+\s+(?:it\s+)?by\s+vol\w*|garch|risk[\s-]*parity)\b",
                               re.I)
@@ -145,7 +153,7 @@ def read_rule(text: str) -> Rule | None:
         else:
             days = sessions = DEFAULT_HOLD
             assumed = (f"held {DEFAULT_HOLD} days (no holding period stated)",)
-        side = "short" if short and not down else "long"
+        side = "short" if short else "long"
         return Rule("move", f"{'buy' if side == 'long' else 'short'} at the close of a day it "
                     f"{'fell' if down else 'rose'} {pct:.1%} or more, hold {days} days",
                     {"pct": pct, "down": float(down), "days": days, "sessions": sessions,
@@ -232,7 +240,7 @@ def positions(rule: Rule, closes: Sequence[float]) -> list[float]:
                 held = 0.0
             weights.append(held)
     elif rule.kind == "move":
-        side = -1.0 if p["short"] and not p["down"] else 1.0
+        side = -1.0 if p["short"] else 1.0
         for i, c in enumerate(closes):
             if hold_left > 0:
                 hold_left -= 1

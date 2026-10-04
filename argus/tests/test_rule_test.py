@@ -36,12 +36,42 @@ class TestReading:
         # past tense, as a trader asks it on the live console (2026-10-05)
         ("would buying ETH every time it dropped 5% in a day and holding 10 days have made "
          "money? backtest it", "move", {"pct": 0.05, "down": 1.0, "days": 10}),
+        # no "backtest" at all, and "would" far from "made money" (live, 2026-10-05)
+        ("would buying ETH whenever RSI drops under 25 and selling once it's above 60 have made "
+         "money, or was that luck?", "rsi", {"n": 14, "lo": 25, "hi": 60}),
     ])
     def test_each_rule_family(self, text: str, kind: str, params: dict[str, float]) -> None:
         rule = rt.read_rule(text)
         assert rule is not None and rule.kind == kind
         for key, value in params.items():
             assert rule.params[key] == pytest.approx(value), key
+
+    @pytest.mark.parametrize("text", [
+        "would buying ETH whenever RSI drops under 25 and selling once it's above 60 have made "
+        "money, or was that luck?",
+        "what if I short BTC whenever it rises 5% in a day",
+    ])
+    def test_a_rule_asked_without_the_word_backtest_is_still_run(self, text: str) -> None:
+        assert rt.ASKED.search(text)
+        assert rt.read_rule(text) is not None
+
+    @pytest.mark.parametrize(("text", "rose"), [
+        ("what if I short BTC whenever it rises 5% in a day", True),
+        ("backtest short ETH when it drops 5%, hold 3 days", False),
+    ])
+    def test_short_is_the_trade_whichever_way_the_trigger_moves(self, text: str,
+                                                                rose: bool) -> None:
+        rule = rt.read_rule(text)
+        assert rule is not None and rule.label.startswith("short")
+        move = 1.06 if rose else 0.94
+        weights = rt.positions(rule, [100.0, 100.0 * move, 100.0 * move, 100.0 * move])
+        assert weights[1] == -1.0
+
+    def test_short_term_and_short_interest_are_not_a_short(self) -> None:
+        for text in ("backtest short-term: buy NVDA when it falls 3%",
+                     "backtest buying ETH when it drops 5% (short interest is high)"):
+            rule = rt.read_rule(text)
+            assert rule is not None and rule.label.startswith("buy")
 
     def test_an_unstated_part_is_said_to_be_assumed(self) -> None:
         rule = rt.read_rule("backtest buying SOL when it drops 4%")

@@ -5288,6 +5288,10 @@ def _handle_ask(
         from argus.lui.research import rule_test
 
         critique = rule_test.lines(text)
+    if critique is None and _LEAN_SKILL.search(text):
+        # "is the desk's lean actually predictive?" was refused as a forecast on the live console,
+        # where the planner reads first (2026-10-05): the graded record answers it before that
+        critique = _lean_record_lines()
     if critique is not None:
         critic_payload = engine_payload_like(critique, prior, text[:500], by="research")
         critic_payload["memory"] = memory
@@ -6495,6 +6499,32 @@ _REFUSALS_RIGHT = re.compile(
     r"(?:refusals?|abstentions?|no[\s-]trades?|leans?)\s+(?:right|correct|accurate|vindicated)|"
     r"\b(?:refusals?|abstentions?)\b[^?]{0,30}\b(?:right|correct|accura\w*|hit\s+rate|track\s+"
     r"record)\b", re.I)
+_LEAN_SKILL = re.compile(
+    r"\b(?:the\s+desk'?s?|desk'?s|your|its|the\s+(?:agent|model)'?s?|argus'?s?)\s+(?:own\s+)?"
+    r"(?:leans?|calls?|confidence|predictions?|signals?|directional\s+calls?|views?)\b[^?]{0,40}"
+    r"\b(?:predictive|predict\w*|skill\w*|edge|information\s+coefficient|ic|any\s+good|"
+    r"better\s+than\s+(?:chance|a\s+coin|luck)|luck)\b|"
+    r"\b(?:information\s+coefficient|IC)\s+of\s+(?:the\s+desk|your|its|the\s+lean)", re.I)
+"""Whether the desk's own directional view carries information — answered from its graded record
+(`eval/lean_ic.py`, `eval/refusal.py`), not refused as a request for a forecast (live, 2026-10-05:
+"is the desk's lean actually predictive?" was declined as one)."""
+
+
+def _lean_record_lines() -> list[str] | None:
+    """The desk's leans graded two ways — how often they went the right way, and whether their
+    confidence ranks the move — or ``None`` when the record has neither."""
+    from argus.eval import lean_ic
+    from argus.lui.answer import _data_path, _lean_grading
+
+    graded = _lean_grading()
+    if not graded:
+        return None
+    ranked = lean_ic.line(_data_path("lean_ic.json"))
+    return [f"Bottom line: {graded[:1].lower()}{graded[1:]}", *([ranked] if ranked else []),
+            "Data: data/refusal_alpha.json and data/lean_ic.json, graded by `python -m "
+            "argus.eval.refusal` and `python -m argus.eval.lean_ic`; /status shows both live."]
+
+
 _SOLD_SHORT_LOSS = re.compile(
     r"\b(?:sold|went|am|i'?m)\s+short\s+(?P<n>\d[\d,]*)\s+(?:shares?\s+(?:of"
     r"\s+)?)?(?P<name>[A-Za-z]"
@@ -10343,17 +10373,12 @@ def _answer(
         judged = _judge_last(prior, now=now, visitor=visitor, book=book)
         if judged is not None:
             return engine_payload(judged, [], {}, by="intro")
-    if _REFUSALS_RIGHT.search(text):
+    if _REFUSALS_RIGHT.search(text) or _LEAN_SKILL.search(text):
         # "How often were the desk's refusals right?" got one decision's evidence list when the
         # model was paused (a hostile review, round 21): the graded record answers it
-        from argus.lui.answer import _lean_grading
-
-        graded = _lean_grading()
-        if graded:
-            return engine_payload([f"Bottom line: {graded[:1].lower()}{graded[1:]}",
-                                   "Data: data/refusal_alpha.json, graded by "
-                                   "`python -m argus.eval.refusal`; /status shows it live."],
-                                  [], {}, by="record")
+        graded_lines = _lean_record_lines()
+        if graded_lines:
+            return engine_payload(graded_lines, [], {}, by="record")
     short_loss = _SOLD_SHORT_LOSS.search(text)
     if short_loss is not None and not book.strip() and "what is my P&L" not in text:
         # "I sold short 100 TSLA yesterday. If TSLA rallies 10% how much do I lose?" was declined
