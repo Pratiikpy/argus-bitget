@@ -90,7 +90,9 @@ _GO_WRONG = re.compile(
     r"\bwhat\s+(?:could|can|might|would)\s+go\s+wrong\b|\bwhat\s+are\s+the\s+(?:main\s+|biggest\s+)?"
     r"risks\b|\bwhat\s+(?:could|can)\s+i\s+lose\b", re.I)
 _GOOD_TIME = re.compile(
-    r"\bis\s+(?:now|this|today|it)\s+(?:a\s+)?(?:good|bad|the\s+right|right)\s+time\s+to\s+"
+    # "wassup is now good time buy" dropped both the article and the infinitive, and the strict
+    # match missed it even with the model available (round 36)
+    r"\bis\s+(?:now|this|today|it)\s+(?:a\s+)?(?:good|bad|the\s+right|right)\s+time\s+(?:to\s+)?"
     r"(?:buy|invest|get\s+in|start|sell|get\s+out)\b|\bshould\s+i\s+(?:buy|invest|get\s+in|sell|"
     r"get\s+out)(?:\s+(?:my|all\s+my|everything|some)?\s*(?:crypto|coins?|stocks?|shares?|"
     # "ok but fr should i buy rn" — "rn" is texting shorthand for "right now" (round 33)
@@ -98,7 +100,10 @@ _GOOD_TIME = re.compile(
     # "is it too late to buy bitcoin now, feels like its already so high" (round 32)
     r"\bis\s+it\s+too\s+late\s+to\s+(?:buy|invest(?:\s+in)?|get\s+in|sell|get\s+out)\b", re.I)
 _HOW_MUCH_BARE = re.compile(
-    r"\bhow\s+much\s+(?:money\s+)?(?:should|can|could|do)\s+i\s+(?:put\s+in(?:to)?|invest|start\s+with)"
+    # "how much money should i actually start with" put a filler word between "i" and the verb,
+    # which the gap-free match missed outright, and fell through to a ticker misread (round 36)
+    r"\bhow\s+much\s+(?:money\s+)?(?:should|can|could|do)\s+i\s+(?:actually\s+|really\s+|even\s+|"
+    r"just\s+)?(?:put\s+in(?:to)?|invest|start\s+with)"
     r"\b|\brecommend\w*\b|\bwhat\s+would\s+you\s+do\s+with\b", re.I)
 
 _GUARANTEE = re.compile(
@@ -142,10 +147,21 @@ _BITGET_SAFE = re.compile(
     r"\b(?:trust|rely\s+on)\s+bitget\b|\bbitget\s+(?:\w+\s+){0,2}(?:trustworthy|legit|a\s+scam)\b|"
     r"\b(?:safe|ok|okay)\s+(?:to|for)\s+(?:keep|keeping|leave|leaving|store|storing|hold|holding)\s+"
     r"(?:my\s+)?(?:money|crypto|funds|coins|savings)\b|"
-    # "if bitget the company goes down or gets hacked what happens to my coins" (round 32)
+    # "if bitget the company goes down or gets hacked what happens to my coins" (round 32); "what
+    # happens to my money if bitget the app goes down or crashes" put the effect-question first
+    # and named a verb ("crashes") the list did not have, and both were refused (round 36)
     r"\bbitget\b[^?]{0,40}\b(?:goes?\s+down|shuts?\s+down|collapses?|folds?|gets?\s+hacked|is\s+"
-    r"hacked|goes?\s+bankrupt|fails?|disappears?)\b[^?]{0,60}\b(?:happens?|happen)\b[^?]{0,20}"
-    r"\b(?:my\s+)?(?:coins?|crypto|money|funds)\b", re.I)
+    r"hacked|goes?\s+bankrupt|fails?|disappears?|crash(?:es|ed)?)\b[^?]{0,80}\b(?:happens?|"
+    r"happen)\b[^?]{0,20}\b(?:my\s+)?(?:coins?|crypto|money|funds)\b|"
+    r"\bwhat\s+happens\s+to\s+(?:my\s+)?(?:coins?|crypto|money|funds)\b[^?]{0,100}\bbitget\b"
+    r"[^?]{0,40}\b(?:goes?\s+down|shuts?\s+down|collapses?|folds?|gets?\s+hacked|is\s+hacked|"
+    r"goes?\s+bankrupt|fails?|disappears?|crash(?:es|ed)?)\b|"
+    # "if bitget shuts down one day where does my money actually go" names the exchange and the
+    # failure first, then asks where the money ends up — not "what happens" (round 36)
+    r"\bbitget\b[^?]{0,40}\b(?:goes?\s+down|shuts?\s+down|collapses?|folds?|gets?\s+hacked|is\s+"
+    r"hacked|goes?\s+bankrupt|fails?|disappears?|crash(?:es|ed)?)\b[^?]{0,80}\bwhere\s+(?:does|"
+    r"is|do)\s+(?:my\s+)?(?:coins?|crypto|money|funds)\b",
+    re.I)
 _BITGET_SAFE_A = (
     "Bottom line: that is Bitget's to show and yours to check — this console does not audit "
     "Bitget, and no exchange is risk-free.",
@@ -204,7 +220,14 @@ _FOR_ME = re.compile(
     r"sell|do\s+(?:it|the\s+trading|everything))\s+"
     # "can u just buy it for me" was declined as "'that' has nothing to refer to" (round 22)
     r"(?:(?:it|that|this|them|some|one|the\s+\w+)\s+)?(?:for|on\s+behalf\s+of)\s+me\b|"
-    r"\bmanage\s+my\s+(?:money|account|portfolio|funds)\b|\bauto[\s-]?trade\s+for\s+me\b", re.I)
+    r"\bmanage\s+my\s+(?:money|account|portfolio|funds)\b|\bauto[\s-]?trade\s+for\s+me\b|"
+    # "ok just buy me 100 dollars of bitcoin then" is a blunt imperative with no modal verb at
+    # all, and it was silently filed as a remembered position size instead of refused — the
+    # single most serious finding of round 36
+    r"\b(?:ok(?:ay)?\s+)?(?:just\s+|please\s+|go\s+ahead\s+and\s+)*(?:buy|sell|get|short|long)"
+    r"\s+me\s+(?:\$\d|an?\s+\d|\d|some\b|a\s+(?:bit|little)\s+of\b)|"
+    r"\b(?:just\s+|please\s+|go\s+ahead\s+and\s+)*(?:buy|sell|trade|get|short|long)\s+(?:it\b|"
+    r"that\b|this\b|them\b|some\b|my\s+\w+\b|\d[\d,.]*\b)[^?]{0,30}\bfor\s+me\b", re.I)
 """Handing the trading over: "can u just trade for me" got the generic refusal (round 21)."""
 _TRADING_FOR_YOU = (
     "Bottom line: no — this console never trades for anyone, holds no money and cannot reach "
@@ -685,7 +708,11 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
     # "whats an etf, is bitcoin an etf" got a 20-line market data dump instead of a definition
     # (a first-time user, round 33)
     (re.compile(r"\bwhat(?:'?s|\s+is|\s+are)\s+(?:an?\s+)?etfs?\b|\bis\s+bitcoin\s+an?\s+etf\b"
-                r"|\bis\s+btc\s+an?\s+etf\b", re.I), (
+                r"|\bis\s+btc\s+an?\s+etf\b|"
+                # "someone told me to just buy an etf instead of coins, what even is that"
+                # named the term earlier in the sentence and asked about it referentially, not
+                # right next to "what's" (round 36)
+                r"\betfs?\b[^?]{0,60}\bwhat(?:'?s|\s+is|\s+even\s+is)\s+that\b", re.I), (
         "Bottom line: an ETF (exchange-traded fund) is a fund that holds a basket of assets "
         "(stocks, bonds, gold, or something else) and itself trades on a stock exchange like "
         "a share, so you buy one thing and get exposure to everything inside it.",
@@ -696,6 +723,22 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
         "Buying bitcoin on Bitget and buying a spot bitcoin ETF through a stockbroker both "
         "end up tracking bitcoin's price, but through very different accounts, fees and "
         "ownership — the ETF holder owns fund shares, not the coin.")),
+    # "whats a perpetual, ppl keep saying perp this perp that" has no bare "define perpetual"
+    # pattern anywhere in this file — only "what is a perp" (the console's own suggested
+    # phrasing, used elsewhere in this file) worked; a first-time user's own wording of the
+    # identical question was refused (round 36)
+    (re.compile(r"\bwhat(?:'?s|\s+is|\s+are|\s+even\s+is)\s+(?:a\s+|an?\s+)?perpetuals?\b|"
+                r"\bperps?\s+this\s+perps?\s+that\b|\b(?:everyone|people|ppl)\s+(?:keep\s+)?"
+                r"(?:saying|says|say|talking\s+about)\s+perps?\b", re.I), (
+        "Bottom line: a perpetual (\"perp\") is a futures contract with no expiry date — unlike "
+        "an ordinary futures contract, which settles on a fixed date, a perpetual just keeps "
+        "trading, so it needs its own way to track the real price.",
+        "That mechanism is funding: a small payment every few hours between everyone long and "
+        "everyone short the contract, which pulls the perpetual's price back toward the spot "
+        "price instead of letting it drift away.",
+        "It also adds leverage, which spot buying does not: you can trade a larger position "
+        "than the cash you put up, and a large enough move against you closes (liquidates) "
+        "it. Ask \"what is liquidation\" next.")),
     # "theres this coin at $0.0001 thats so cheap right i can buy millions of them" was read
     # as the stock ticker COIN (Coinbase), even when named=True (a first-time user, round 33)
     (re.compile(r"\$?0\.0+\d+\b[^?]{0,60}\bcheap\b|\bcheap\b[^?]{0,60}\$?0\.0+\d+\b|\$0\.0+\d+"
@@ -742,6 +785,32 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
         "What DCA actually buys you is not a better average price — it is less regret: you "
         "are never the person who put everything in on the single worst possible day, "
         "because no one day held all of it.")),
+    # "whats DCA i keep seeing it everywhere" has no pattern at all for a bare definition — only
+    # the lump-sum-comparison form above is covered, and the bare term reads as an unknown
+    # ticker instead (round 36; reproduced identically in Hinglish: "...usko kya bolte hain, DCA
+    # wagera?")
+    (re.compile(r"\bwhat(?:'?s|\s+is|\s+does)\s+dca\b(?![^?]{0,40}\blump\s+sum\b)|\bdca\b[^?]"
+                r"{0,20}\b(?:wagera|waghera|mean|means|stand\s+for|or\s+something|is\s+that)\b|"
+                r"\bi\s+keep\s+seeing\s+dca\b", re.I), (
+        "Bottom line: DCA stands for dollar-cost averaging — putting in a fixed amount at "
+        "regular intervals (say, $50 every week) instead of all at once.",
+        "It does not beat a lump sum on average in a market that mostly trends upward, but it "
+        "means no single day's price decides the whole amount, which is why people nervous "
+        "about timing use it.",
+        "It is not a Bitget product or a coin — it is a buying habit, done by placing the "
+        "same order on a schedule.")),
+    # "idk man just tell me yes or no" pushed for a binary call after a timing question got the
+    # generic refusal, and got nothing at all — not even a restatement of why (round 36)
+    (re.compile(r"\b(?:just\s+)?(?:tell\s+me|give\s+me|say)\s+(?:a\s+)?yes\s+or\s+no\b|\byes\s+"
+                r"or\s+no\s*[?!.]*\s*$", re.I), (
+        "Bottom line: no yes or no here — this console will not give a flat call on whether to "
+        "buy, sell or trade; no honest source can, and one that claims to is guessing or "
+        "selling something.",
+        "What it gives instead: what has actually happened in similar past moments for a real "
+        "name — ask \"has BTC been here before\" for how often a setup like today's rose or "
+        "fell afterward, and by how much. That is a base rate, not a prediction.",
+        "The decision stays yours either way; this just gives you something real to decide "
+        "with.")),
     # (voice run-on) "...or should i split it into different coins to be safe" was ignored —
     # only the lump-sum-risk half of the question got answered (a first-time user, round 33)
     (re.compile(r"\bsplit\w*\s+(?:it\s+|the\s+money\s+|my\s+money\s+)?(?:up\s+)?(?:into|"
@@ -767,6 +836,12 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
     (re.compile(r"\bkeep\s+(?:my\s+)?(?:coins?|crypto|money|funds?)\s+on\s+bitget\b[^?]{0,40}"
                 r"\bmove\s+(?:them|it)\s+(?:somewhere\s+else|elsewhere|off(?:\s+(?:of\s+)?"
                 r"(?:it|bitget))?|to\s+(?:a\s+|my\s+own\s+)?wallet)\b", re.I), _BITGET_SAFE_A),
+    # "so should i move it to a wallet instead then" was a bare follow-up with no "keep on
+    # bitget" of its own in the same message, and read as an unknown ticker lookup for the word
+    # "wallet" instead (round 36)
+    (re.compile(r"\bshould\s+i\s+move\s+(?:it|them|everything|my\s+(?:coins?|crypto|money|"
+                r"funds?))\s+(?:to\s+(?:a\s+|my\s+own\s+)?wallet\b|somewhere\s+else\b|"
+                r"elsewhere\b|off\s+(?:of\s+)?(?:it|bitget)\b)", re.I), _BITGET_SAFE_A),
     # "what time does the crypto market close like what time should i trade" was answered
     # around the desk's own session state, never plainly "crypto never closes" (a first-time
     # user, round 33)

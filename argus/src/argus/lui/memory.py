@@ -186,7 +186,12 @@ _CAPITAL = re.compile(
     r"(?:margin|collateral|buying\s+power)\b|"
     # "i want to grow my $300 slowly" kept "slowly" and lost the $300 (a first-time user, round 27)
     r"\b(?:grow|build\s+up|invest|start\s+with|got|have)\s+(?:only\s+|just\s+|like\s+|about\s+)?"
-    r"(?:my\s+|this\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)(?![\d,.]*\d)\s*(k|m)?\b(?!\s*(?:of|in|on|worth)\b(?!\s+(?:fresh\s+|new\s+|spare\s+|free\s+)?(?:cash|savings|money|capital)\b))",
+    r"(?:my\s+|this\s+)?\$\s*(\d[\d,]*(?:\.\d+)?)(?![\d,.]*\d)\s*(k|m)?\b(?!\s*(?:of|in|on|worth)\b(?!\s+(?:fresh\s+|new\s+|spare\s+|free\s+)?(?:cash|savings|money|capital)\b))|"
+    # "I hold 70% ETH, 30% SOL, total $50,000" and "my portfolio is worth $80k" were not kept, so
+    # a later hedge was sized on a default book (a judge, round 36)
+    r"(?:,\s*total|\b(?:in\s+total|totalling|totaling)|\b(?:my|the)\s+(?:book|portfolio|account|"
+    r"holdings?)\s+(?:is\s+)?worth)\s+(?:of\s+|about\s+|around\s+)?\$\s*"
+    r"(\d[\d,]*(?:\.\d+)?)(?![\d,.]*\d)\s*(k|m)?\b",
     re.I)
 _THESIS = re.compile(
     r"\bi\s+(?:think|believe|expect|reckon|bet)\s+(?:that\s+)?(.{2,40}?)\s+(?:will|is\s+going\s+to|"
@@ -354,10 +359,10 @@ def extract(question: str, now: datetime | None = None,
         add("style", "", re.sub(r"[\s-]+", "-", (m.group(1) or m.group(2) or m.group(3)
                                                   or "").lower()), m.group(0))
     if (m := _CAPITAL.search(text)) is not None:
-        amount = float((m.group(1) or m.group(3) or m.group(5) or m.group(7) or m.group(9)
-                        or m.group(11) or m.group(13) or "0").replace(",", ""))
-        unit = (m.group(2) or m.group(4) or m.group(6) or m.group(8) or m.group(10)
-                or m.group(12) or m.group(14) or "").lower()
+        groups = m.groups()
+        amount = float(next((g for g in groups[0::2] if g), "0").replace(",", ""))
+        unit = next((u or "" for g, u in zip(groups[0::2], groups[1::2], strict=True) if g),
+                    "").lower()
         amount *= 1_000 if unit == "k" else 1_000_000 if unit == "m" else 1
         if amount >= 100:
             add("capital", "", f"{amount:.0f}", m.group(0))
@@ -847,7 +852,9 @@ def apply(request: Any, facts: list[Fact], question: str) -> tuple[Any, list[str
     capital = get(facts, "capital")
     if (capital is not None and request.notional is None
             and request.kind in (ResearchKind.BOOK, ResearchKind.HEDGE)
-            and not re.search(r"\$|\d+\s*k\b", question, re.I)):
+            # a dollar figure that is the hedge's budget is not the book's value (round 36)
+            and (getattr(request, "hedge_budget", None) is not None
+                 or not re.search(r"\$|\d+\s*k\b", question, re.I))):
         from decimal import Decimal
 
         request = replace(request, notional=Decimal(capital.value))

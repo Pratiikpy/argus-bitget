@@ -93,6 +93,58 @@ def _realised(symbol: str, days: int) -> float | None:
     return math.sqrt(var) * math.sqrt(365)
 
 
+MOVE_VS_VOL: Final = re.compile(
+    r"\b(?:bigger|larger|smaller|more|less|unusual|normal|abnormal|outsized)\b[^?]{0,60}\b(?:typical|"
+    r"usual|normal|average)\s+(?:daily\s+|weekly\s+)?(?:volatility|vol|moves?|swings?|range)\b|"
+    r"\bhow\s+(?:unusual|big|normal|extreme)\s+(?:is|was)\s+(?:that|this|a)\b[^?]{0,40}\bmove\b",
+    re.I)
+_STATED_MOVE: Final = re.compile(
+    r"\b(?P<dir>fell|dropped|lost|slid|sank|rose|gained|jumped|climbed|moved|is\s+(?:up|down)|was\s+"
+    r"(?:up|down)|went\s+(?:up|down))\s+(?:by\s+)?(?P<pct>\d+(?:\.\d+)?)\s*%\s*(?:(?:this|last|over\s+"
+    r"the\s+(?:last|past))\s+)?(?P<per>week|day|month|24\s*hours|today)?", re.I)
+
+
+def move_vs_vol_lines(text: str, prior: list[str]) -> list[str] | None:
+    """A stated move set against the name's own typical swing, daily and over the same span.
+
+    "COIN fell 6.1% this week. Was that move bigger or smaller than COIN's typical daily
+    volatility?" was answered with a book's volatility, the comparison never made (a judge, round
+    36). The day's swing is the standard deviation of daily log returns over 30 days of Bitget's
+    UTC-day candles; over a span it scales by the square root of the days (a random-walk
+    convention, said as one)."""
+    if MOVE_VS_VOL.search(text) is None:
+        return None
+    named = _named(text, prior)
+    stated = _STATED_MOVE.search(text) or next(
+        (m for q in reversed(prior[-2:]) if (m := _STATED_MOVE.search(q))), None)
+    if not named or stated is None:
+        return None
+    symbol = named[0]
+    annual = _realised(symbol, 30)
+    if annual is None:
+        return None
+    daily = annual / math.sqrt(365)
+    per = (stated.group("per") or "day").lower()
+    days = 7 if per.startswith("week") else 30 if per.startswith("month") else 1
+    move = float(stated.group("pct")) / 100
+    span = daily * math.sqrt(days)
+    name = symbol.removesuffix("USDT")
+    times_day = move / daily if daily else 0.0
+    z = move / span if span else 0.0
+    size = ("well within" if z < 0.75 else "about the size of" if z < 1.25 else
+            "bigger than" if z < 2 else "far bigger than")
+    lead = (f"Bottom line: a {move:.1%} move is {times_day:.1f} times {name}'s typical day "
+            f"({daily:.1%}), so {'bigger' if move > daily else 'smaller'} than its daily "
+            f"volatility" + (f"; over the {days} days it took, it is {size} the typical "
+                            f"{days}-day swing ({span:.1%}), {z:.1f} standard deviations"
+                            if days > 1 else "") + ".")
+    return [lead,
+            f"{name}'s realised volatility over the last 30 days is {annual:.0%} a year; a "
+            f"span's typical swing is the day's times the square root of its days, a convention "
+            f"that assumes days are independent.",
+            "Data: Bitget USDT-futures daily candles (UTC days), log returns."]
+
+
 def realised_vol_lines(text: str, prior: list[str]) -> list[str] | None:
     if REALISED_VOL.search(text) is None:
         return None

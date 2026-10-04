@@ -600,10 +600,84 @@ def sats_lines(text: str) -> list[str] | None:
     return lines
 
 
+_NOTIONAL_HELD: Final = re.compile(
+    r"\b(?P<side>short|long)\s+(?P<name>[A-Za-z]{2,10})\b[^?.]{0,40}?(?P<neg>-)?\s*\$?\s?"
+    r"(?P<a>\d[\d,]*(?:\.\d+)?)\s*(?P<u>k)?\s*(?:usd|usdt|dollars?)?\s*(?:of\s+)?(?:notional|"
+    r"exposure|position)", re.I)
+_PRICE_MOVE: Final = re.compile(
+    r"\b(?:price|it|the\s+price)\s+(?P<dir>rises|rise|goes\s+up|climbs|jumps|falls|fall|drops|"
+    r"drop|goes\s+down|declines)\s+(?:by\s+)?(?P<p>\d+(?:\.\d+)?)\s*(?:%|percent)", re.I)
+
+
+def position_pnl_lines(text: str) -> list[str] | None:
+    """A stated position's dollar P&L on a stated move of its own price. "I am short BTC with -5000
+    USD of notional exposure … If price rises 10 percent, what is my dollar P&L?" got a QQQ +10%
+    stress in percentages (a hostile review, round 36). The sign of the notional is read from the
+    side named, and a negative figure for a short is said to mean the same thing."""
+    held = _NOTIONAL_HELD.search(text)
+    move = _PRICE_MOVE.search(text)
+    if held is None or move is None or not re.search(r"\bp\s*&\s*l\b|\bpnl\b|\bprofit\b|"
+                                                     r"\bloss\b|\bmake\b|\blose\b", text, re.I):
+        return None
+    size = _amount(held.group("a"), held.group("u"))
+    if not size:
+        return None
+    short = held.group("side").lower() == "short"
+    up = move.group("dir").lower().startswith(("rise", "goes up", "climb", "jump"))
+    pct = float(move.group("p")) / 100
+    change = size * pct * (1 if up else -1) * (-1 if short else 1)
+    name = held.group("name").upper()
+    return [f"Bottom line: about {'+' if change >= 0 else '-'}{_money(abs(change))} — a "
+            f"{_money(size)} {'short' if short else 'long'} in {name} "
+            f"{'loses' if change < 0 else 'makes'} {pct:.0%} of its notional when {name} "
+            f"{'rises' if up else 'falls'} {pct:.0%}.",
+            ("A negative notional for a short means the same position; it was read as a "
+             f"{_money(size)} short." if held.group("neg") else
+             "The move is the asset's own; funding and fees over the holding come on top.")]
+
+
+def funding_cost_lines(text: str) -> list[str] | None:
+    """Funding in dollars on a stated notional, at the rate Bitget is charging now. "My BTC
+    perpetual notional is 5e4 USD. What is my daily funding cost in dollars right now?" got the rate
+    in percent only (a hostile review, round 36)."""
+    if not (re.search(r"\bfunding\b", text, re.I)
+            and re.search(r"\bdollars?\b|\$|\busd\b|\bcost\b", text, re.I)) or re.search(
+                r"\d\s*%", text):
+        return None  # a rate stated in the question is read by `funding_lines`
+    from argus.lui.research import research_symbols
+    from argus.lui.research.parse import parse_notional
+    from argus.market.bitget import public_get
+
+    notional = parse_notional(text)
+    named = research_symbols(text)[0]
+    if notional is None or not named:
+        return None
+    symbol = named[0]
+    try:
+        got = (public_get("/api/v2/mix/market/current-fund-rate",
+                          {"productType": "USDT-FUTURES", "symbol": symbol}) or [{}])[0]
+        rate = float(got.get("fundingRate") or 0)
+        hours = int(got.get("fundingRateInterval") or 8)
+    except Exception:
+        return None
+    size = float(notional)
+    per = size * rate
+    daily = per * 24 / hours
+    short = re.search(r"\bshort\b", text, re.I) is not None
+    pays = (rate >= 0) != short
+    name = symbol.removesuffix("USDT")
+    return [f"Bottom line: about ${abs(daily):,.2f} a day on ${size:,.0f} of {name} — "
+            f"{'paid' if pays else 'received'} by a {'short' if short else 'long'} at Bitget's "
+            f"current rate of {rate:+.4%} every {hours} hours (${abs(per):,.2f} a settlement).",
+            f"Over a 30-day month at this rate that is about ${abs(daily) * 30:,.0f}; the rate is "
+            f"reset at every settlement, so this is today's pace, not a forecast. Read just now "
+            f"from Bitget's current-fund-rate endpoint."]
+
+
 def lines(text: str) -> list[str] | None:
-    for rule in (liquidation_move_lines, compounded_lines, margin_lines, equity_lines,
-                 rate_change_lines, funding_lines, var_check_lines, tax_lot_lines,
-                 cost_of_lines, bps_lines, sharpe_lines, sats_lines):
+    for rule in (position_pnl_lines, funding_cost_lines, liquidation_move_lines, compounded_lines,
+                 margin_lines, equity_lines, rate_change_lines, funding_lines, var_check_lines,
+                 tax_lot_lines, cost_of_lines, bps_lines, sharpe_lines, sats_lines):
         found = rule(text)
         if found is not None:
             return found

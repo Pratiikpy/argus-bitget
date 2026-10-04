@@ -1367,6 +1367,9 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                           reason="the hedge candidates could not be measured",
                           lines=["The candidate hedges' prices or order books did not arrive, so "
                                  "no hedge can be measured just now. Try again shortly."])
+        budget_line = _hedge_budget_line(request, hedge_found, float(value))
+        if budget_line is not None:
+            found.insert(1, budget_line)
         found.extend(f"Assumed: {note}." for note in request.notes)
         found.append("Data: live Bitget hourly candles (30 days), order books and funding rates. "
                      "This is analysis, not advice — you make the call.")
@@ -2693,6 +2696,45 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                  for note in request.notes)
     lines.append(f"Data: {data.provenance}. This is analysis, not advice — you make the call.")
     return Answer(question=question, lines=lines, sources=sources, data=payload)
+
+
+HEDGE_MARGIN_LEVERAGE = 5
+"""The leverage a hedge's margin is shown at when a budget is stated: an illustration, said as one,
+since the trader's own leverage is not known."""
+
+
+def _hedge_budget_line(request: ResearchRequest, found: Mapping[str, Any],
+                       book_value: float) -> str | None:
+    """What a stated hedge budget buys: the full hedge's own cost against it, and — if the budget
+    is all the margin the trader will post — the part of the hedge it carries and the variance
+    that part removes. A short is not bought, so "$500 on the hedge" was ambiguous, and was read as
+    the whole book's value (a judge, round 36)."""
+    budget = getattr(request, "hedge_budget", None)
+    legs = [r for r in found.get("legs", ()) if r.get("leg") == found.get("pick")]
+    if budget is None or not legs:
+        return None
+    from argus.lui.research.parse import HEDGE_HOLDING_DAYS
+
+    leg = legs[0]
+    size, r2, total_bps = float(leg["size"]), float(leg["r2"]), float(leg["total_bps"])
+    spend = float(budget)
+    cost = size * total_bps / 10_000
+    margin = size / HEDGE_MARGIN_LEVERAGE
+    carried = min(size, spend * HEDGE_MARGIN_LEVERAGE)
+    fraction = carried / size if size else 0.0
+    removed = r2 * (1 - (1 - fraction) ** 2)
+    name = _t(str(leg["leg"]))
+    cost_said = (f"earns about ${abs(cost):,.0f} net over {HEDGE_HOLDING_DAYS} days (its funding "
+                 f"outweighs the entry)" if cost < 0 else
+                 f"costs about ${cost:,.0f} to put on and hold {HEDGE_HOLDING_DAYS} days")
+    return (f"Against your ${spend:,.0f}: a short is not bought, so the budget pays for two "
+            f"things. The full hedge for the ${book_value:,.0f} book, a ${size:,.0f} {name} short, "
+            f"{cost_said} — {'inside' if cost <= spend else 'over'} your ${spend:,.0f}. It also "
+            f"holds margin, which is not spent: about ${margin:,.0f} at "
+            f"{HEDGE_MARGIN_LEVERAGE}x (an illustration). If ${spend:,.0f} is all the margin you "
+            f"will post, at {HEDGE_MARGIN_LEVERAGE}x it carries a ${carried:,.0f} short, "
+            f"{fraction:.0%} of the full hedge, removing about {removed:.0%} of the book's "
+            f"variance instead of {r2:.0%}.")
 
 
 # Every engine here is a traced step from import on (lui/trace.py, trace_module).

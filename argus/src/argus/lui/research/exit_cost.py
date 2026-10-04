@@ -33,8 +33,10 @@ ASKED: Final = re.compile(
     r"round[\s-]?trip|close\s+(?:it|them|this|that|my\s+\w+|the\s+\w+|everything|all)?\s*out|"
     r"close\s+(?:it|them|my\s+\w+(?:\s+position)?)\b|exit(?:ing)?|unwind\w*|get\s+out|sell\s+"
     r"(?:it|them|all|everything|my\s+\w+)|liquidat(?:e|ing)\s+my|dump(?:ing)?\s+(?:it|my))|"
-    r"\b(?:enter\s+and\s+exit|close\s+(?:it|them|my\s+\w+)?\s*out|exit(?:ing)?|unwind\w*|get\s+out\s+"
-    r"of)\b[^?]{0,80}\b(?:cost|costs|slippage|fees?|impact)\b", re.I)
+    r"\b(?:enter\s+and\s+exit|close\s+(?:it|them|my\s+\w+)?\s*out|exit(?:ing)?|unwind\w*|"
+    # "go in and out of $2M ETH today, what's the round trip cost" (a live re-ask, round 35)
+    r"get\s+out\s+of|(?:go|get)\s+in\s+and\s+out|in\s+and\s+out\s+of|round[\s-]?trip)\b[^?]{0,80}"
+    r"\b(?:cost|costs|slippage|fees?|impact)\b", re.I)
 _BOTH: Final = re.compile(r"\benter\s+and\s+exit|\bin\s+and\s+out\b|\bround[\s-]?trip|\bget\s+in\s+"
                           r"and\b|\bbuy\s+and\s+(?:then\s+)?sell\b|\bopen\s+and\s+close\b", re.I)
 _ENTRY_ONLY: Final = re.compile(r"\b(?:enter|entering|get\s+in(?:to)?|open(?:ing)?|buy(?:ing)?)\b"
@@ -132,6 +134,17 @@ def lines(text: str, book: str = "") -> list[str] | None:
         try:
             ticker = fetch_tickers()[symbol]
             volume = ticker.base_volume * ticker.last
+            if notional > volume:
+                # "$900,000,000,000 long BTC" was priced at 4,017bps by the impact law, a curve
+                # calibrated on orders a small share of a day's volume (a hostile review, round 36)
+                return [f"Bottom line: it cannot be done as one trade — ${notional:,.0f} is "
+                        f"{notional / volume:,.0f} times {name}'s whole last 24 hours of volume on "
+                        f"Bitget (${volume:,.0f}), so there is no market at that size to price.",
+                        "The square-root impact law the console uses is calibrated on orders that "
+                        "are a small share of a day's volume; this far past it, any number it gave "
+                        "would be invented, so none is given.",
+                        f"Size read: {how}. For a size the market can absorb, ask the cost of a "
+                        f"round trip in a figure below the day's volume."]
             leg_impact = CostModel.bitget_perp().impact_bps(notional / volume,
                                                             _daily_volatility_bps(symbol))
         except Exception:

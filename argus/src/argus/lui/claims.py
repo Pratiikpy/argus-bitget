@@ -72,7 +72,8 @@ _SPOT_CLAIM: Final = re.compile(
 _UNCHECKED_EVENT: Final = re.compile(
     r"\b(?P<who>sec|cftc|fed|federal\s+reserve|bitget|binance|coinbase|blackrock|the\s+us|us\s+"
     r"government|congress)\b[^.?]{0,40}\b(?P<what>approved|approves|acquired|acquires|bought|"
-    r"banned|bans|delisted|listed|launched|announced|declared)\b[^.?]{0,80}\b(?P<when>yesterday|"
+    r"banned|bans|delisted|listed|launched|announced|declared|classified|designated|recognized|"
+    r"recognised|made)\b[^.?]{0,80}\b(?P<when>yesterday|"
     r"today|last\s+week|this\s+week|last\s+night|just\s+now|this\s+month)\b|\b(?P<who2>sec|cftc|"
     r"bitget|binance|blackrock)\b\s+(?:just\s+)?(?P<what2>approved|acquired|banned|delisted)\b",
     re.I)
@@ -389,12 +390,61 @@ def consensus_line(text: str, symbols: tuple[str, ...]) -> str | None:
     return f"Premise check: {basis}; {stated:.2f} is {gap:+.0%} against it, as you said."
 
 
+_PE_CLAIM = re.compile(
+    r"\b(?P<kind>forward|trailing|fwd)?\s*(?:p\s*/\s*e|pe|price[\s-]+to[\s-]+earnings)(?:\s+ratio)?"
+    r"(?:\s+(?:is|of|at|only|just|around|about|near|was|now|sits\s+at))*\s+~?(?P<x>\d+(?:\.\d+)?)\s*x?"
+    r"\b|\b(?P<y>\d+(?:\.\d+)?)\s*x\s+(?P<kind2>forward|trailing)?\s*earnings\b", re.I)
+
+
+def pe_claim_line(text: str, symbols: tuple[str, ...]) -> str | None:
+    """A P/E stated as fact, set against the company's own on Yahoo Finance: "a newsletter claims
+    Nvidia's forward P/E is only 12x" was answered as a 12x leveraged long (a judge, round 36)."""
+    said = _PE_CLAIM.search(text)
+    if said is None:
+        return None
+    from argus.lui.research.parse import is_us_equity
+
+    stocks = [s for s in symbols if is_us_equity(s)]
+    if not stocks:
+        return None
+    ticker = stocks[0].removesuffix("USDT")
+    forward = (said.group("kind") or said.group("kind2") or "").lower() in ("forward", "fwd")
+    from argus.market.estimates import EstimatesSource
+
+    def figure(symbol: str, key: str) -> float | None:
+        try:
+            node = (EstimatesSource().summary(symbol, "summaryDetail").get("summaryDetail")
+                    or {}).get(key)
+        except Exception:
+            return None
+        value = node.get("raw") if isinstance(node, dict) else node
+        return float(value) if isinstance(value, int | float) else None
+
+    key = "forwardPE" if forward else "trailingPE"
+    actual = figure(ticker, key)
+    if actual is None:
+        return None
+    stated = float(said.group("x") or said.group("y"))
+    label = "forward" if forward else "trailing"
+    market = figure("SPY", "trailingPE") if re.search(r"\bs\s*&\s*p|\bmarket\b|\bspy\b", text,
+                                                       re.I) else None
+    gap = stated / actual - 1
+    verdict = ("matches" if abs(gap) < 0.05 else
+               f"is {abs(gap):.0%} {'below' if gap < 0 else 'above'} it")
+    return (f"Premise check: {ticker}'s {label} P/E is {actual:.1f} on Yahoo Finance; the stated "
+            f"{stated:g}x {verdict}"
+            + (f". The S&P 500 (SPY) trades at {market:.1f} times trailing earnings, so "
+               f"{ticker} is {'cheaper' if actual < market else 'dearer'} than the index on that "
+               f"basis" if market else "")
+            + ".")
+
+
 def lines(text: str, symbols: tuple[str, ...]) -> list[str]:
     """Each premise line that applies, in order; empty when the question claims nothing here."""
     said = [halving_line(text), founder_line(text, symbols), usdt_line(text), spot_line(text),
             ceo_line(text), share_class_line(text), weekend_close_line(text, symbols),
             corporate_event_line(text, symbols), spot_leverage_line(text),
-            consensus_line(text, symbols)]
+            consensus_line(text, symbols), pe_claim_line(text, symbols)]
     out = [x for x in said if x]
     if not out:
         unchecked = unchecked_line(text)

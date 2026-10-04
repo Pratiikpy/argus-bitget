@@ -230,6 +230,11 @@ def _under_cap(weights: Mapping[str, float], cap: float) -> dict[str, float]:
     return out
 
 
+def year_worst_day(symbol: str, *, short: bool = False) -> float | None:
+    """The public face of :func:`_year_worst_day`, resolved at call time."""
+    return _year_worst_day(symbol, short=short)
+
+
 def _year_worst_day(symbol: str, *, short: bool = False) -> float | None:
     """The worst close-to-close day of the last year for ``symbol``, in percent (the biggest
     rise when ``short``), from Yahoo Finance daily closes; None when they do not answer."""

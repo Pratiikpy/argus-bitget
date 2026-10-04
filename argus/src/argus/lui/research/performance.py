@@ -192,7 +192,8 @@ def asked_period(text: str, now: datetime | None = None) -> Period | None:
                      r"the\s+(?:past|last))\s+(?P<n>\d+|a|an|one|two|three|four|five|six|seven|eight|"
                      r"nine|ten|twelve)?\s*(?P<u>days?|weeks?|months?|years?)\b|"
                      r"\b(?P<n2>\d+|a|an|one|two|three|six|twelve)\s+(?P<u2>days?|weeks?|months?|"
-                     r"years?)\s+ago\b|\b(?P<n3>\d+)\s*(?P<u3>d|w|m|y)\b(?!\w)|"
+                     # "$2M ETH" is two million dollars, not two months (a live re-ask, round 35)
+                     r"years?)\s+ago\b|(?<![$\d.,])\b(?P<n3>\d+)\s*(?P<u3>d|w|m|y)\b(?!\w)|"
                      r"\b(?P<n4>\d+|one|two|three|six|twelve)[\s-](?P<u4>day|week|month|year)\b",
                      text, re.I)
     cjk = re.search(r"(?:过去|最近|近)\s*(?P<n>\d+|[一两二三四五六七八九十]+)\s*个?\s*"

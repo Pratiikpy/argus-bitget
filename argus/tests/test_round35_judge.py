@@ -294,3 +294,12 @@ class TestLiveReAskRound35:
         from argus.lui.research.parse import parse_notional
 
         assert parse_notional("I'd like to put $12k into AVAX") == 12000
+
+    def test_two_million_dollars_is_not_two_months(self) -> None:
+        from argus.lui.research import exit_cost
+        from argus.lui.research.performance import asked_period
+
+        said = "I want to go in and out of $2M ETH today, what's the round trip cost on the book?"
+        assert asked_period("go in and out of $2M ETH today") is None
+        assert asked_period("ETH over the last 2m") is not None
+        assert exit_cost.ASKED.search(said)

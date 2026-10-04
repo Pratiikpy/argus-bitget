@@ -40,7 +40,6 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import subprocess
 import sys
 import tempfile
@@ -187,13 +186,12 @@ def answer_for(scenario: Scenario, request_id: str) -> HumanResponse:
     )
 
 
-_TIMING = re.compile(r"ran concurrently in \d+(\.\d+)?s")
-
-
 def comparable(run: DeskRun) -> dict[str, Any]:
     """The whole record, with the one wall-clock value normalised. See the module docstring."""
     record = run.as_dict()
-    record["notes"] = [_TIMING.sub("ran concurrently in <t>s", n) for n in record["notes"]]
+    from argus.agents.desk import WALL_CLOCK
+
+    record["notes"] = [WALL_CLOCK.sub("ran concurrently in <t>s", n) for n in record["notes"]]
     return record
 
 

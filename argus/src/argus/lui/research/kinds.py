@@ -215,6 +215,11 @@ class ResearchRequest:
     stress of the saved book is said in money too (a hostile review, round 22: "if BTC hits
     $1,000,000" on a saved 1 BTC gave percentages only)."""
 
+    hedge_budget: Decimal | None = None
+    """What the trader will spend on a hedge ("I only want to spend $500 on the hedge"), which is
+    not the book's value: read as the book's value, a $50,000 book was hedged as a $500 one (a
+    judge, round 36)."""
+
     def as_dict(self) -> dict[str, Any]:
         return {
             "kind": str(self.kind),
@@ -225,6 +230,7 @@ class ResearchRequest:
             "shock_on": self.shock_on,
             "shock_pct": self.shock_pct,
             "notional": None if self.notional is None else str(self.notional),
+            "hedge_budget": None if self.hedge_budget is None else str(self.hedge_budget),
             "urgent": self.urgent,
             "parsed_by": self.parsed_by,
             "notes": list(self.notes),

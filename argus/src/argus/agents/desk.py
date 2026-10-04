@@ -22,6 +22,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import re
 import time
 from collections.abc import Callable, Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor
@@ -101,6 +102,9 @@ from argus.truth.grounding import check as check_grounding
 from argus.truth.grounding import extract as extract_figures
 
 _ZERO = Decimal("0")
+
+WALL_CLOCK = re.compile(r"ran concurrently in \d+(?:\.\d+)?s")
+"""The one wall-clock figure in a run's notes, masked wherever the run is signed or compared."""
 
 
 @dataclass
@@ -331,7 +335,10 @@ class DeskContinuation:
             "proof": asdict(self.proof),
             "frame": asdict(self.frame),
             "panel": self.panel.as_dict(),
-            "notes": list(self.notes),
+            # the panel's wall-clock latency is not decision state: a run paused, killed and resumed
+            # in another process signed a different hash for the same decision whenever the
+            # machine was loaded (tests/test_pause.py, 2026-10-04)
+            "notes": [WALL_CLOCK.sub("ran concurrently in <t>s", n) for n in self.notes],
             "evidence_sources": list(self.evidence_sources),
             "causal_chain": None if self.causal_chain is None else self.causal_chain.as_dict(),
             "earnings_read": (

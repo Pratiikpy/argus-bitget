@@ -877,6 +877,19 @@ def price_forecast_asked(text: str) -> bool:
     return bool(PRICE_FORECAST.search(text)) and not PAST_PREDICTION.search(text)
 
 
+_MULTIPLE = re.compile(
+    r"\b(?:forward\s+|trailing\s+|fwd\s+)?(?:p\s*/\s*e|pe|price[\s-]+to[\s-]+(?:earnings|sales|book)|"
+    r"ev\s*/\s*ebitda|p\s*/\s*s|p\s*/\s*b|multiple)(?:\s+ratio)?(?:\s+(?:is|of|at|only|just|around|"
+    r"about|near|of\s+only|was|now))*\s+~?\d+(?:\.\d+)?\s*x?\b|\b\d+(?:\.\d+)?\s*x\s+(?:forward\s+|"
+    r"trailing\s+)?(?:earnings|sales|ebitda|revenue|book|free\s+cash\s+flow)\b", re.I)
+"""A valuation multiple ("forward P/E is only 12x", "12x forward earnings"), which is not leverage:
+the claim was answered as a 12x leveraged long's liquidation price (a judge, round 36)."""
+
+
+def _without_multiples(text: str) -> str:
+    return _MULTIPLE.sub(" ", text)
+
+
 _LEVERAGE = re.compile(r"\b(\d+(?:\.\d+)?)\s*x\b(?!\s*(?:the\s+)?atr)|"
                        r"(?<!balance\ssheet\s)(?<!balance-sheet\s)(?<!financial\s)(?<!operating\s)"
                        r"(?<!corporate\s)\bleverage\w*|\bliquidat\w*|\bmargin\b"
@@ -2741,7 +2754,12 @@ def _mandate_lines(symbol: str, size: float, raw_series: Mapping[str, Mapping[da
     return lines
 
 
+_SCIENTIFIC = re.compile(r"(?<![\w.])(\d+(?:\.\d+)?)[eE]\+?(\d{1,2})\b")
+
+
 def parse_notional(text: str) -> Decimal | None:
+    # "5e4 USD" is 50,000 (a hostile review, round 36): written out before the reader below
+    text = _SCIENTIFIC.sub(lambda m: f"{Decimal(m.group(1)) * 10 ** int(m.group(2)):f}", text)
     best: Decimal | None = None
     for match in _NOTIONAL.finditer(text):
         digits, unit = match.group(1), (match.group(2) or "").lower()
@@ -3798,7 +3816,7 @@ def read_request(text: str) -> ResearchRequest | None:
             notes=(*((assumed,) if assumed else ()),
                    "whether to hold is your call; this is how past windows of that length went"))
     if (symbols and not pairs and _WEEKEND_GAP_Q.search(raw) and not is_an_order(raw)
-            and not _LEVERAGE.search(raw)
+            and not _LEVERAGE.search(_without_multiples(raw))
             and not re.search(r"\bnews\b|\bheadlines?\b|\bwhy\b|\bexplain\w*|\bgapped\b",
                               raw, re.I)):
         weekend = bool(re.search(r"\bweekend|\bmonday", raw, re.I))
@@ -3850,7 +3868,7 @@ def read_request(text: str) -> ResearchRequest | None:
                                notes=_forecast_note(raw) or ("a forecast was asked for; this is "
                                                              "what followed similar past states, "
                                                              "not a prediction",))
-    lever = _LEVERAGE.search(raw)
+    lever = _LEVERAGE.search(_without_multiples(raw))
     if lever and symbols and not pairs:
         amount = stated_multiple(raw)
         return ResearchRequest(
@@ -4661,12 +4679,36 @@ def _contextual_follow_up(text: str, prior: list[str],
         found = _previous_request(prior, book_text)
         if found is not None and found[1].kind is ResearchKind.STRESS:
             earlier, base = found
-            size = abs(float(shock.group(1)))
+            # The size is the one beside the move, and a book said in the same breath is the new
+            # book: "What if my book is 70% BTC, 30% ETH instead, and BTC drops 25%?" became QQQ
+            # -70% on the old 50/50 book (a judge, round 36)
+            moved = re.search(
+                r"(?:\b(?P<sym>[A-Za-z]{2,10})\s+)?\b(?:drops?|falls?|crash(?:es)?|dumps?|"
+                r"declines?|tanks?|slides?|sinks?|rall(?:y|ies)|spikes?|surges?|rises?)\s+(?:by\s+)?"
+                r"(?:another\s+)?(?P<pct>-?\d+(?:\.\d+)?)\s*%|(?P<pct2>-?\d+(?:\.\d+)?)\s*%\s+"
+                r"(?:drop|fall|crash|decline|move|rally|dump)", text, re.I)
+            size = abs(float((moved.group("pct") or moved.group("pct2")) if moved
+                             else shock.group(1)))
             move = -size if not re.search(r"\b(?:rally|rallies|spike|surge|rise)", text,
                                           re.I) else size
-            return replace(base, shock_pct=move, notes=(
-                *base.notes, f"read as the previous question — \"{earlier[:60]}\" — with a "
-                             f"{move:+g}% move"))
+            changes: dict[str, Any] = {"shock_pct": move}
+            said = [f"a {move:+g}% move"]
+            subject = research_symbols(moved.group("sym"))[0] if moved and moved.group("sym") \
+                else ()
+            if subject:
+                changes["shock_on"] = subject[0]
+                said[0] = f"{_t(subject[0])} {move:+g}%"
+            rest = text[:moved.start()] + text[moved.end():] if moved else text
+            restated = parse_book(rest) if re.search(r"\d\s*%", rest) else {}
+            if len(restated) >= 2 and restated != base.book:
+                holdings, cash_left = split_cash(rest, restated)
+                changes.update(book=holdings, cash=cash_left, symbols=tuple(holdings))
+                base = replace(base, notes=tuple(n for n in base.notes if "saved book" not in n))
+                said.append("the book " + ", ".join(f"{w:.0%} {_t(sym)}"
+                                                    for sym, w in holdings.items()))
+            return replace(base, **changes, notes=(
+                *base.notes, f"read as the previous question — \"{earlier[:60]}\" — with "
+                             + " and ".join(said)))
     if research_symbols(text)[0]:
         return None
     asset = _ASSET_CLASS.search(text)

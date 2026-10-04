@@ -2092,6 +2092,14 @@ def _premise_lines(text: str, now: datetime | None, book: str) -> list[str]:
 
     clock = now or datetime.now(UTC)
     said: list[str] = []
+    negative = re.search(r"(?<![\w.])-\s?(\d+(?:\.\d+)?)\s*x\b", text)
+    if negative is not None and re.search(r"\bleverage\b|\blong\b|\bshort\b", text, re.I):
+        # "a BTC long with -10x leverage" was read as 10x without a word (a hostile review,
+        # round 36): leverage has no sign, and the side is the one named
+        side = "short" if re.search(r"\bshort\b", text, re.I) else "long"
+        said.append(f"Premise check: leverage has no sign — -{negative.group(1)}x was read as "
+                    f"{negative.group(1)}x on the {side} you named; a short is a direction, not a "
+                    f"negative leverage.")
     claimed_date = _TODAY_CLAIM.search(text)
     if claimed_date is not None:
         raw = re.sub(r"(\d)(?:st|nd|rd|th)", r"\1", claimed_date.group("date")).replace(",", "")
@@ -2107,6 +2115,11 @@ def _premise_lines(text: str, now: datetime | None, book: str) -> list[str]:
             said.append(f"Premise check: today is {clock:%d %b %Y} (UTC), not {stated:%d %b %Y}; "
                         f"every figure below is as of now.")
     fed = _FED_CLAIM.search(text)
+    if fed is not None and re.search(r"\b(?:to|will|would|could|may|might|expected|likely|plans?|"
+                                     r"set|going)\s+(?:to\s+)?$", text[:fed.start("v")], re.I):
+        # "the Fed is on track to cut rates this month" says what may happen, not that it did;
+        # it was checked against the funds rate as a cut already made (a judge, round 36)
+        fed = None
     if fed is not None:
         funds = _fed_funds_now()
         if funds is not None:
@@ -2804,9 +2817,20 @@ def _research_case_lines(text: str, symbol: str, book: str, *,
             or (re.search(r"\bbear\b", text, re.I) and not re.search(r"\bbull\b", text, re.I))
             else "long")
     asked = f"should I go {side} {name}"
+    sized = re.search(rf"(\d+(?:\.\d+)?)\s*%\s*(?:of\s+|more\s+)?{re.escape(name)}\b", text, re.I)
+    if sized is not None and side == "long":
+        # "should I add 15% TSLA" was worked at the 20% default (a judge, round 36)
+        asked = f"should I add {sized.group(1)}% {name}"
     if re.search(r"\bmemo\b|\bwrite[\s-]?up\b|\bbull\s+case\b[^?]{0,60}\bbear\s+case\b", text,
                  re.I):
         return _memo_lines(name, side, asked, book)
+    from argus.lui.research.parse import holding_pairs
+
+    adding = re.search(r"\b(?:add|adding|buy|buying)\b", text, re.I)
+    held = holding_pairs(text[:adding.start()]) if adding else []
+    if held:
+        # the holdings said before the add, not the add itself folded into the book
+        book = ", ".join(f"{w * 100:g}% {s.removesuffix('USDT')}" for _, s, w in held)
     reading = read_question(asked, book[:300])
     if isinstance(reading, str):
         return None
@@ -2891,8 +2915,12 @@ def _book_overridden(text: str, book: str) -> str | None:
                  text, re.I):
         # "how many ETH do I hold?" asks about the saved book; it states no book of its own
         return None
+    # the holdings come before an add verb: "I hold 40% NVDA … should I add 15% TSLA" holds no
+    # TSLA, and was said back as a book of 13% TSLA (a judge, round 36)
+    adding = re.search(r"\b(?:add|adding|buy|buying)\b", text, re.I)
     try:
-        stated, saved = parse_book(text), parse_book(book)
+        stated = parse_book(text[:adding.start()] if adding else text)
+        saved = parse_book(book)
     except Exception:
         return None
     if not stated or not saved or set(stated) == set(saved):
@@ -3347,6 +3375,64 @@ def _engine_explained(text: str, prior: list[str], *, now: datetime | None, visi
     return lines
 
 
+_HEDGE_BUDGET = re.compile(
+    r"\b(?:spend|budget|pay|afford|put\s+up|allocate|use)\b[^?.\d$]{0,25}\$\s?"
+    r"(?P<a>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k)?\b|\$\s?(?P<b>\d[\d,]*(?:\.\d+)?)\s*(?P<k2>k)?\s+"
+    r"(?:budget|to\s+spend|on\s+(?:the|a|this)\s+hedge|for\s+(?:the|a|this)\s+hedge|of\s+hedg\w*"
+    r"\s+budget)", re.I)
+
+
+def _with_hedge_budget(request: Any, text: str) -> Any:
+    """A hedge question's stated spend kept as the budget it is, not as the book's value: "I only
+    want to spend $500 on the hedge" on a $50,000 book sized every leg on a $500 book (a judge,
+    round 36)."""
+    from dataclasses import replace as _replace
+    from decimal import Decimal
+
+    from argus.lui.research.kinds import ResearchKind
+
+    said = _HEDGE_BUDGET.search(text)
+    if request is None or request.kind is not ResearchKind.HEDGE or said is None:
+        return request
+    amount = Decimal((said.group("a") or said.group("b")).replace(",", "")) * (
+        1000 if (said.group("k") or said.group("k2")) else 1)
+    notional = None if request.notional == amount else request.notional
+    return _replace(request, hedge_budget=amount, notional=notional)
+
+
+def _weight_at_risk_line(symbol: str, weight_pct: float, old: str, *, now: datetime | None,
+                         visitor: str) -> str | None:
+    """How much of the book rides on a name's own measured moves at a new weight: its average move
+    on its last reports and its worst day in a year, each times the weight."""
+    name = symbol.removesuffix("USDT")
+    reacted = _answer(f"how does {name} usually react to earnings", [], now=now, visitor=visitor,
+                      book="")
+    first = str((reacted.get("lines") or [""])[0])
+    earn = re.search(r"averaged (\d+(?:\.\d+)?)% either way", first)
+    from argus.lui.research.book import year_worst_day
+
+    try:
+        worst = year_worst_day(symbol, short=False)
+    except Exception:
+        worst = None
+    if earn is None and worst is None:
+        return None
+    before = re.match(r"\s*(\d+(?:\.\d+)?)", old)
+    was = float(before.group(1)) if before else None
+    bits = []
+    if earn is not None:
+        move = float(earn.group(1))
+        bits.append(f"{name}'s average move on its last reports, {move:.1f}% either way, is "
+                    f"{move * weight_pct / 100:.1f}% of the book at {weight_pct:g}%"
+                    + (f" against {move * was / 100:.1f}% at {was:g}%" if was else ""))
+    if worst is not None:
+        bits.append(f"its worst day in a year, {worst:+.1f}%, would be "
+                    f"{worst * weight_pct / 100:+.1f}% of the book"
+                    + (f" against {worst * was / 100:+.1f}%" if was else ""))
+    return ("The per-name figures below do not depend on the weight, but how much of the book "
+            "rides on them does: " + "; ".join(bits) + ".")
+
+
 def _book_history_answer(text: str, book: str) -> list[str] | None:
     """The book's own drawdown and Sharpe, held at its weights: "What is the max drawdown of this
     book over the last year, and its Sharpe ratio?" was answered name by name with the Sharpe never
@@ -3373,6 +3459,97 @@ def _book_history_answer(text: str, book: str) -> list[str] | None:
                        "they all traded; the book is held at its weights and rebalanced daily."]
 
 
+_VENUE_RUMOUR = re.compile(
+    r"\bbitget\b[^?]{0,80}\b(?:shutting\s+down|shut(?:s|ting)?\s+down|closing\s+(?:down|for\s+good)|"
+    r"bankrupt\w*|insolven\w*|(?:halt|freez|suspend|stopp)\w*\s+(?:all\s+)?withdrawals?|exit\s+scam|"
+    r"collaps\w*|being\s+(?:shut|closed)|ceas\w+\s+operations?|going\s+under)\b", re.I)
+
+
+def _venue_rumour_lines(text: str) -> list[str] | None:
+    """A rumour that Bitget itself is failing, met with what can be checked and what cannot.
+
+    "Bitget just announced it is shutting down completely … Should I withdraw all my funds right
+    now?" got a Treasury-yield write-up (a hostile review, round 36). No source here reads Bitget's
+    announcements or its balance sheet, so the rumour is not confirmed or denied; what is read live
+    is whether its public market service is answering, and that is said for what it is."""
+    if _VENUE_RUMOUR.search(text) is None or re.search(
+            r"\bwhat\s+(?:happens|would\s+happen)\b|\bif\s+bitget\b|\bwhat\s+if\b", text, re.I):
+        return None  # "what happens to my coins if Bitget goes bankrupt" is a question, not news
+    from argus.market.bitget import fetch_tickers
+
+    try:
+        btc = fetch_tickers().get("BTCUSDT")
+    except Exception:
+        btc = None
+    live = (f"Bitget's public market service is answering right now (BTC last "
+            f"{float(btc.last):,.1f} "
+            f"at {btc.fetched_at:%H:%M} UTC) — that shows the exchange is running, not that it is "
+            f"solvent." if btc is not None else
+            "Bitget's public market service did not answer just now, which on its own says "
+            "nothing either way — it can be a network problem.")
+    return [
+        "Bottom line: nothing this console reads confirms that — it has no source for Bitget's "
+        "announcements or its finances, so treat it as an unconfirmed rumour until Bitget's own "
+        "announcement page or its verified accounts say it.",
+        live,
+        "What can be checked yourself: Bitget's official announcements; its monthly "
+        "proof-of-reserves report, which shows whether customer balances are backed; and whether "
+        "withdrawals are working, by withdrawing a small amount. A real closure is announced by "
+        "the exchange with a withdrawal window, not first by a third party.",
+        "Whether to move funds is your decision; the general rule is to keep on any exchange only "
+        "what you are actively trading. This console makes no call either way.",
+    ]
+
+
+_CONTRACTS_SAID = re.compile(
+    r"(?P<n>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k)?\s+contracts?\s+(?:of\s+)?(?P<name>[A-Za-z]{2,12})\b",
+    re.I)
+
+
+def _contracts_worth_lines(text: str, prior: list[str], *, now: datetime | None,
+                           visitor: str) -> list[str] | None:
+    """A position given in contracts, valued both ways it can be meant, and any liquidation price
+    it asks for. "My position is 1.2k contracts of ETHUSDT perpetual… What is that worth in USD
+    right now, and what is my liquidation price at 5x?" answered the liquidation half only (a
+    hostile review, round 36). Bitget's USDT perpetuals are sized in the coin itself, with a size
+    step (its contract list's ``sizeMultiplier``, 0.01 for ETHUSDT); some exchanges size a
+    contract as a fixed slice of a coin. Both readings are given, said as such."""
+    said = _CONTRACTS_SAID.search(text)
+    if said is None or not re.search(r"\bworth\b|\bvalue\b|\bin\s+(?:usd|dollars)\b", text, re.I):
+        return None
+    from argus.lui.research import research_symbols as symbols_in
+    from argus.market.bitget import fetch_tickers, public_get
+
+    named = symbols_in(said.group("name"))[0]
+    if not named:
+        return None
+    symbol = named[0]
+    count = float(said.group("n").replace(",", "")) * (1000 if said.group("k") else 1)
+    try:
+        last = float(fetch_tickers()[symbol].last)
+        rows = public_get("/api/v2/mix/market/contracts",
+                          {"productType": "USDT-FUTURES", "symbol": symbol}) or []
+        step = float(rows[0]["sizeMultiplier"]) if rows else None
+    except Exception:
+        return None
+    base = symbol.removesuffix("USDT")
+    lines = [f"Bottom line: read as {count:,.0f} {base} — how Bitget sizes its USDT perpetuals, in "
+             f"the coin itself — the position is worth about ${count * last:,.0f} at Bitget's last "
+             f"{last:,.2f}."]
+    if step:
+        lines.append(f"If your app counts contracts as Bitget's size step ({step:g} {base} each, "
+                     f"from its contract list), {count:,.0f} of them is {count * step:g} {base}, "
+                     f"about ${count * step * last:,.0f}. Check which unit your position screen "
+                     f"shows.")
+    leverage = re.search(r"(\d+(?:\.\d+)?)\s*x\b", text)
+    if leverage is not None and re.search(r"\bliquidat", text, re.I):
+        side = "short" if re.search(r"\bshort\b", text, re.I) else "long"
+        found = _answer(f"where is my liquidation price on a {leverage.group(1)}x {side} on {base}",
+                        [], now=now, visitor=visitor, book="")
+        lines += [str(x).replace("Bottom line: ", "", 1) for x in (found.get("lines") or [])[:1]]
+    return lines
+
+
 def _round27_follow_up(text: str, prior: list[str], *, now: datetime | None, visitor: str,
                        book: str) -> dict[str, Any] | None:
     """Follow-ups a first-time user asked that were answered with the previous answer again or
@@ -3386,7 +3563,22 @@ def _round27_follow_up(text: str, prior: list[str], *, now: datetime | None, vis
         # single-question reader matched one item (a hostile review, round 30)
         return None
     from argus.lui import account_math
+    from argus.lui import honesty as _honesty
 
+    if _honesty.impossible_date(text) is not None:
+        # "BTC's closing price on February 30, 2027" was answered with the last seven days (a
+        # hostile review, round 36): the calendar check runs before any reader takes the question
+        calendar_refusal = _honesty.honest_answer(text, prior=prior, book=book)
+        if calendar_refusal is not None:
+            refusal = engine_payload_like(calendar_refusal[1], prior, text, by="unsupported")
+            refusal["intent"] = "research"  # a research question, answered by its refusal
+            return refusal
+    rumour = _venue_rumour_lines(text)
+    if rumour is not None:
+        return engine_payload_like(rumour, prior, text, by="research")
+    contracts_said = _contracts_worth_lines(text, prior, now=now, visitor=visitor)
+    if contracts_said is not None:
+        return engine_payload_like(contracts_said, prior, text, by="arithmetic")
     accounted = account_math.lines(text)
     if accounted is not None:
         # an account described in figures — successive losses on a balance, margin on a notional,
@@ -3416,6 +3608,20 @@ def _round27_follow_up(text: str, prior: list[str], *, now: datetime | None, vis
             if table is not None and re.search(r"\btable\b|\btabular\b|\btabulate\b", text, re.I):
                 levels_answer["table"] = table
             return levels_answer
+    from argus.lui.research import option_strategies
+
+    strategies = option_strategies.lines(text)
+    if strategies is not None:
+        # "covered call versus cash-secured put … which has worse tail risk?" got the stock's
+        # concentration in the book (a judge, round 36)
+        return engine_payload_like(strategies, prior, text, by="research")
+    from argus.lui.research import loss_budget
+
+    budgeted = loss_budget.lines(text, book)
+    if budgeted is not None:
+        # "I cannot lose more than 3% of total capital this month. How large a SOL position can I
+        # add?" was answered by the per-trade check, SOL's own fall against 3% (a judge, round 36)
+        return engine_payload_like(budgeted, prior, text, by="research")
     from argus.lui.research import exit_cost
 
     leaving = exit_cost.lines(text, book or next(
@@ -3614,7 +3820,8 @@ def _round27_follow_up(text: str, prior: list[str], *, now: datetime | None, vis
                 prior, text, by="research")
     for stat_reader in (quick_stats.volume_lines, quick_stats.realised_vol_lines,
                         quick_stats.momentum_lines, quick_stats.depth_lines,
-                        quick_stats.ath_lines, quick_stats.bear_market_lines):
+                        quick_stats.ath_lines, quick_stats.bear_market_lines,
+                        quick_stats.move_vs_vol_lines):
         stat = stat_reader(text, prior)
         if stat is not None:
             return engine_payload_like(stat, prior, text, by="research")
@@ -4060,7 +4267,12 @@ def _round27_follow_up(text: str, prior: list[str], *, now: datetime | None, vis
         # "What's the research case right now for going long SOLUSDT — give me the actual
         # evidence" got a fundamentals refusal for a coin, and "what hard data backs that" the
         # same (a judge, round 30): a case asked for is the research task, every engine run
-        case = _research_case_lines(text, case_names[0], book,
+        # the name being added, not the first name held: "I hold 40% NVDA … should I add 15%
+        # TSLA? Give me the full research case" ran all eight engines on NVDA (a judge, round 36)
+        adding = re.search(r"\b(?:add|adding|buy|buying|go(?:ing)?\s+long(?:\s+on)?|open(?:ing)?\s+"
+                           r"a\s+(?:long|position)\s+in|put\b[^?.]{0,30}?\binto)\b", text, re.I)
+        added = symbols_in(text[adding.end():])[0] if adding else ()
+        case = _research_case_lines(text, added[0] if added else case_names[0], book,
                                     detail=not symbols_in(text)[0])
         if case is not None:
             return engine_payload_like(case, prior, text, by="research-task")
@@ -4555,8 +4767,19 @@ def _round27_follow_up(text: str, prior: list[str], *, now: datetime | None, vis
             if number is not None and number.group(0) not in " ".join(body):
                 # a horizon the book report does not read was said to have been applied (round
                 # 28, live re-ask): the answer says the value changes none of its figures
-                note += (f" None of the figures below uses that value — they are measured the "
-                         f"same way either way, so {new_value} changes nothing here.")
+                weight = re.fullmatch(r"\s*(\d+(?:\.\d+)?)\s*%\s*", new_value)
+                weighted_name = next(iter(symbols_in(asked)[0]), None)
+                riding = (_weight_at_risk_line(weighted_name, float(weight.group(1)), old_value,
+                                               now=now, visitor=visitor)
+                          if weight and weighted_name else None)
+                if riding is not None:
+                    # "What if I am holding 60% AMD instead of 25%?" before earnings was told 60%
+                    # "changes nothing here" (a judge, round 36): the per-name figures do not
+                    # move, but how much of the book rides on them does
+                    note += " " + riding
+                else:
+                    note += (f" None of the figures below uses that value — they are measured "
+                             f"the same way either way, so {new_value} changes nothing here.")
             again["lines"] = [*body[:1], note, *body[1:]]
             return again
     from argus.lui.research import venue_facts
@@ -4910,6 +5133,13 @@ def handle_ask(
 
     new = memory_model.combined(text, _model_for(visitor, count=False), now,
                                 price_of=_price_now)
+    from argus.lui import honesty as _orders
+
+    if new and (_orders.order_prefix(text) is not None or re.search(
+            r"\b(?:buy|sell|get|short|long)\s+me\b|\bfor\s+me\b[^?]{0,20}$", text, re.I)):
+        # "buy me $100 of bitcoin" was kept as the trader's capital and answered "noted" (a
+        # first-time user, round 36): an order is refused, and nothing in it is remembered
+        new = [f for f in new if f.kind not in ("capital", "book", "loss_usd")]
     facts = mem.merge(facts, new)
     before_sale = mem.get(facts, "book")
     traded_facts = mem.apply_trades(facts, text, now)
@@ -7347,6 +7577,22 @@ def _fed_odds_lines(text: str, prior: list[str] | None = None) -> list[str] | No
                          for m in sorted(by_meeting[first], key=lambda m: -m.yes_price))
              + f" (${sum(m.volume for m in by_meeting[first]):,.0f} traded) — what money is "
                f"betting, not a forecast of ours."]
+    if (re.search(r"\bcut\w*\b", text, re.I) and re.search(r"\b(?:hold|on\s+hold|pause|unchanged|"
+                                                         r"no\s+change)\b", text, re.I)
+            and re.search(r"\bwhich\b|\bwho\b[^?]{0,20}\bright\b|\bheadline", text, re.I)):
+        # Two headlines, "on track to cut" and "on hold", and "which is right?" got the odds
+        # without anyone saying which headline they back (a judge, round 36)
+        def share(word: str) -> float:
+            return float(sum(m.yes_price for m in by_meeting[first]
+                             if re.search(word, outcome(m.question), re.I)))
+
+        hold, cut = share(r"no change"), share(r"decrease")
+        backed = ("on hold" if hold > cut else "a cut")
+        lines.insert(0, f"Bottom line: the market backs the {backed} headline for the {first} "
+                        f"meeting — no change priced at {hold:.0%}, a cut at {cut:.0%} on "
+                        f"Polymarket. That is what money is betting, not a fact until the "
+                        f"decision; the odds for each outcome are below.")
+        lines[1] = lines[1].replace("Bottom line: for", "The odds: for", 1)
     for later in order[1:3]:
         lines.append(f"{later} meeting: " + "; ".join(
             f"{outcome(m.question)} at {m.yes_price:.0%}"
@@ -7951,7 +8197,7 @@ def _levered_entry_lines(text: str) -> list[str] | None:
                             f"sits beyond the liquidation line near {liq:,.2f}: the position is "
                             f"liquidated first and the stop never fires. A stop has to sit "
                             f"{'below' if short else 'above'} {liq:,.2f} to protect anything.")))
-        lines[1] = lines[1].replace("Bottom line: ", "", 1)
+        lines[1] = lines[1].replace("Bottom line: for", "The odds: for", 1)
     if margin is not None and notional is not None:
         lines.append(f"Size: ${notional:,.0f} of {name} on ${margin:,.2f} of margin "
                      f"(${notional:,.0f} ÷ {lev:g}).")
@@ -8479,6 +8725,23 @@ def _rupee_lines(text: str, prior: list[str], *, now: datetime | None,
         return None
     count = float(units.group("q")) if units else 1.0
     name = symbol.removesuffix("USDT")
+    if re.search(r"\bfunding\b", text, re.I):
+        # "what's the funding rate for BTC perpetual and how much is it in INR terms?" got the
+        # rupee price and no funding rate (a hostile review, round 36): both, the rate in rupees
+        from argus.market.bitget import public_get
+
+        try:
+            got = (public_get("/api/v2/mix/market/current-fund-rate",
+                              {"productType": "USDT-FUTURES", "symbol": symbol}) or [{}])[0]
+            funding = float(got.get("fundingRate") or 0)
+            hours = got.get("fundingRateInterval") or "8"
+        except Exception:
+            funding = None
+        if funding is not None:
+            return [f"Bottom line: {name}'s funding rate is {funding:+.4%} every {hours} hours — "
+                    f"on one {name} (₹{last * rate:,.0f}) that is about "
+                    f"₹{abs(funding) * last * rate:,.2f} a settlement, paid by longs to shorts "
+                    f"when positive.", note]
     return [f"Bottom line: {count:g} {name} is about ₹{count * last * rate:,.0f} "
             f"({count:g} x {last:,.2f} USDT x {rate:,.2f}).", note]
 
@@ -11112,6 +11375,7 @@ def _research_payload(
         sized = detect_research(text)
         if sized is not None and sized.kind is ResearchKind.IMPACT:
             request = sized
+    request = _with_hedge_budget(request, text)
     if facts:
         request, used = mem.apply(request, facts, text)
     sizing_leg = (request is not None and request.kind is ResearchKind.IMPACT
