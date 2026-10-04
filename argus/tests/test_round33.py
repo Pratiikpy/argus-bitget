@@ -127,3 +127,15 @@ class TestJudge:
 
         said = literature.lines("any papers on funding rates", fetch=down)
         assert said is not None and "did not answer" in said[0]
+
+
+@pytest.mark.parametrize("said", ["are chip stocks losing to software stocks lately?"])
+def test_rotation_phrasings(said: str) -> None:
+    assert market_questions.ROTATION.search(said)
+
+
+def test_recovery_phrasing_and_the_fall_not_the_weight() -> None:
+    said = "I hold 70% BTC 30% SOL, if it drops 40% how long did it take to come back historically?"
+    assert market_questions.RECOVERY.search(said)
+    drawn = market_questions._DRAW.search(said)
+    assert drawn is not None and drawn.group(1) == "40"

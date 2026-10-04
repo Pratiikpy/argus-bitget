@@ -30,14 +30,16 @@ from argus.lui.trace import trace_module
 
 ROTATION: Final = re.compile(
     r"\brotat\w*\b[^?]{0,80}\b(?:semi\w*|chip\w*|software|tech|sector)\b|\b(?:semi\w*|chip\w*)\b"
-    r"[^?]{0,60}\b(?:weaker|stronger|lagging|leading|outperform\w*|underperform\w*)\b[^?]{0,40}"
+    r"[^?]{0,60}\b(?:weaker|stronger|lagging|leading|outperform\w*|underperform\w*|losing\s+to|"
+    r"beating|winning\s+against|trailing|ahead\s+of|behind)\b[^?]{0,40}"
     r"\bsoftware\b|\bsoftware\b[^?]{0,60}\b(?:weaker|stronger|lagging|leading|outperform\w*|"
     r"underperform\w*)\b[^?]{0,40}\b(?:semi\w*|chip\w*)\b", re.I)
 SEMIS: Final = ("SMHUSDT", "NVDAUSDT", "AMDUSDT", "AVGOUSDT", "TSMUSDT", "MUUSDT")
 SOFTWARE: Final = ("MSFTUSDT", "ORCLUSDT", "CRMUSDT", "ADBEUSDT", "PLTRUSDT")
 
 RECOVERY: Final = re.compile(
-    r"\bhow\s+long\b[^?]{0,80}\b(?:recover\w*|get\s+back|break\s+even|back\s+to\s+even|new\s+high"
+    r"\bhow\s+long\b[^?]{0,80}\b(?:recover\w*|get\s+back|come\s+back|bounce\s+back|break\s+even|"
+    r"back\s+to\s+(?:even|the\s+high|where\s+it\s+was)|new\s+high"
     r"|make\s+(?:it\s+)?back)\b|\b(?:days?|months?|time)\s+to\s+(?:recover|make\s+a\s+new\s+high"
     r"|get\s+back)\b|\brecovery\s+time\b", re.I)
 _DRAW: Final = re.compile(
