@@ -680,7 +680,7 @@ A judge should not have to discover these.
   to it — rather than the earlier and false "no hedge placeable".
 - **No usage data.** This has not been put in front of traders yet. The plan is ten supervised
   sessions measuring whether the risk-share figure changes the ticket.
-- **Superiority is claimed only where a named competitor was run on the same input.** 5 of 49
+- **Superiority is claimed only where a named competitor was run on the same input.** 6 of 49
   capabilities are OWNED under that rule; the rest are TIED, IMPLEMENTED or LOST and are called that, and
   every comparison we lost is published on `/wrong`. On 2026-09-24 seven earlier OWNED grades were
   withdrawn because the rival they beat does not lead its sub-theme; they stay IMPLEMENTED until
@@ -1380,7 +1380,7 @@ route to it — is now what the layer sees.
 - **One model, no ensemble, no adversarial overturn.**
 - **"Owned" is a conjunction, not a score.** An owned capability needs a reproduced baseline, a
   same-input comparison, an out-of-sample test, an ablation and an adversarial test, among thirteen
-  conditions. On 2026-09-12 zero met that bar; the register now reads 5 of 49 capabilities are
+  conditions. On 2026-09-12 zero met that bar; the register now reads 6 of 49 capabilities are
   OWNED, each re-derived from its artefacts by `eval/standing.py`, never from prose.
 
 ---
@@ -1769,7 +1769,7 @@ takes, and every artefact the system writes.
 | Registered and importable | **152/152** (`python -m argus.status` checks this at runtime) |
 | Test files / tests | **458 files**, **12,087 tests collected** |
 | Type and lint | `ruff` clean, `mypy --strict` clean on **622 source files** |
-| Artefacts written | **942** files under `argus/data/` |
+| Artefacts written | **947** files under `argus/data/` |
 | Code-level teardowns of other people's systems | **56** under `research/architecture/` |
 | Runtime dependencies | **two**: `pydantic`, `python-dateutil`. No numpy, no pandas, no scipy |
 
@@ -2418,7 +2418,7 @@ source is a build failure, not a typo.
 | Modules registered and importable | 152/152 modules importable |
 | Tests | 12,087 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
-| Artefacts on disk | 942 files under `argus/data/`, every one produced by running something |
+| Artefacts on disk | 947 files under `argus/data/`, every one produced by running something |
 | Code-level teardowns of other systems | 62, each citing file and line |
 | Competitor entries read at source | 5, each cloned and verified or refuted |
 | Live data sources reaching a decision | 15 |
@@ -2445,7 +2445,7 @@ source is a build failure, not a typo.
 That last row is the one to read twice. An *owned* capability needs a reproduced baseline, a
 same-input comparison, an out-of-sample test, an ablation and an adversarial test — thirteen
 conditions in all, enforced in code by `argus/eval/standing.py`, which raises at import if anything
-claims OWNED without them. It read zero when this table was first written; today 5 of 49
+claims OWNED without them. It read zero when this table was first written; today 6 of 49
 capabilities are OWNED, 35 are TIED, 0 are IMPLEMENTED and 8 are LOST, and three rows were
 removed on 2026-09-29 with their reasons on `/wrong`. It read 20 until the
 per-group check of 2026-09-25 withdrew twelve, 8 until a general-purpose validator tied
@@ -3042,7 +3042,7 @@ and anchored. That opening head is `bc36478291a06bc3`, submitted to four indepen
 calendars: `a.pool.opentimestamps.org`, `b.pool.opentimestamps.org`,
 `alice.btc.calendar.opentimestamps.org` and `finney.calendar.eternitywall.com`. The `.ots` proofs
 are in `argus/data/anchors/`, and anyone can verify them with the reference OpenTimestamps client
-without our cooperation. **148 of the 208 carry a Bitcoin block-header attestation** (blocks
+without our cooperation. **148 of the 212 carry a Bitcoin block-header attestation** (blocks
 966,822–969,251); the other 20 are still calendar-pending, which is what a proof honestly
 says until Bitcoin has confirmed it. `python -m argus.register.anchorcheck` re-counts both.
 

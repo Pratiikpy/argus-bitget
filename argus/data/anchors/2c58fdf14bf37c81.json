@@ -1,0 +1,35 @@
+{
+  "digest": "2c58fdf14bf37c8141a449e2ea6a78a250cf707be20ebafaeee9d3e6311ecf4a",
+  "subject": "ARGUS capability register (data/standing.json)",
+  "anchored": true,
+  "independent_calendars": 4,
+  "receipts": [
+    {
+      "calendar": "https://a.pool.opentimestamps.org",
+      "proof_hex": "f008b2999c0e465e8a2708f0100df5db9195b25ec9221ad601bc8ac35008f120e75e0a9009251b4ef8abd88fd573f4c9c0fa9030dcd1f08987994f770a727e7208f02097438cf622b410e0c2c35f8289def957daf81e30d120006b2cecd26b555a00cf08f1046ac2d447f00808608ee3b086d34f0083dfe30d2ef90c8e2e2d68747470733a2f2f616c6963652e6274632e63616c656e6461722e6f70656e74696d657374616d70732e6f7267",
+      "proof_bytes": 172,
+      "submitted_at": "2026-10-04T22:33:39.524662+00:00"
+    },
+    {
+      "calendar": "https://b.pool.opentimestamps.org",
+      "proof_hex": "f0084743a9758e4e60e408f010fdcd1a5e39b3850ef4ecf63bea1579a808f1206feeef84df6fe8eea6c2ba01d0768e1721b511cb967a1b05a53568e3f99d05db08f1046ac2d448f008542085ded8061edd0083dfe30d2ef90c8e2c2b68747470733a2f2f626f622e6274632e63616c656e6461722e6f70656e74696d657374616d70732e6f7267",
+      "proof_bytes": 135,
+      "submitted_at": "2026-10-04T22:33:39.524662+00:00"
+    },
+    {
+      "calendar": "https://alice.btc.calendar.opentimestamps.org",
+      "proof_hex": "f0085a25697f88f797cc08f0104a1801aed859a88ba044b9ee3abc3bef08f120eaec6096840027278c6b5074e383d8eceeedc7229b20010875d92ddbd6b9b45908f1046ac2d44af00806893c170e74ad290083dfe30d2ef90c8e2e2d68747470733a2f2f616c6963652e6274632e63616c656e6461722e6f70656e74696d657374616d70732e6f7267",
+      "proof_bytes": 137,
+      "submitted_at": "2026-10-04T22:33:39.524662+00:00"
+    },
+    {
+      "calendar": "https://finney.calendar.eternitywall.com",
+      "proof_hex": "f010c88a6c26d421f1f76cc4c8b2072a419a08f020b4bebdea4293e29a5c00d872e050a62f82bc4c7be46ad9d5ac5b5cba5fb1931f08f12031edb1554789e42386db92f363a01208a67729b69c8bfb836db1213215eb6f0108f1046ac2d44cf0082ac9576c2ca105fc0083dfe30d2ef90c8e292868747470733a2f2f66696e6e65792e63616c656e6461722e657465726e69747977616c6c2e636f6d",
+      "proof_bytes": 156,
+      "submitted_at": "2026-10-04T22:33:39.524662+00:00"
+    }
+  ],
+  "failures": [],
+  "status": "pending-bitcoin-confirmation",
+  "note": ""
+}

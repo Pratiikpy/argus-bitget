@@ -605,5 +605,15 @@
     ]
    }
   ]
+ },
+ "reference": {
+  "rival": "MrMaca11an/backtest-truth",
+  "licence": "MIT",
+  "commit": "9674f79c7948bcc9b8e5939faf8d6ab2b7746902",
+  "entry": "backtest_truth check_source, imported from the clone and run unmodified on every fixture and independent script"
+ },
+ "reproducibility": {
+  "command": "python -m argus.eval.backtest_critic_comparison",
+  "identical_on_rerun": true
  }
 }

@@ -1752,6 +1752,24 @@ ADAPTERS: dict[str, Callable[[str], Entry]] = {
     "data/general_coint_comparison.json": _not_checkable(
         WITHOUT_ROWS, "160 simulated universes reduced to FDR, FWER and power per pipeline; "
         "eval/general_coint_comparison.py would need to record each universe's discoveries"),
+    "data/attack_suite.json": _not_checkable(
+        DESIGNED, "HeyArka's 16 designed attack vectors through ARGUS's evidence stages: a "
+        "property of the screens on authored cases, not a measurement over a population"),
+    "data/heyarka_corpus.json": _not_checkable(
+        NO_ROWS, "the attack suite's frozen inputs: HeyArka's payloads byte for byte, no result"),
+    "data/heyarka_shield_probe.json": _not_checkable(
+        DESIGNED, "HeyArka's own shield run on the same 16 designed vectors"),
+    "data/backtest_critic_comparison.json": _not_checkable(
+        DESIGNED, "21 authored fixtures (17 planted defects, 4 clean) and 16 independent "
+        "scripts, each read by both linters: cases chosen to contain or not contain a defect, "
+        "with no population to break down by symbol or date"),
+    "data/memory_comparison.json": _not_checkable(
+        DESIGNED, "authored trader sentences in four frozen held-out sets, each read by ARGUS "
+        "and mem0: recall and false-positive counts over written cases"),
+    "data/vol_target_comparison.json": _not_checkable(
+        WITHOUT_ROWS, "about 1,320 daily net returns per coin and arm reduced to per-arm "
+        "metrics on three coins; eval/vol_target_comparison.py would need to record each day's "
+        "net return per arm for a chronological split"),
     "data/review_rivals.json": _review_rivals,
     "data/perception_breadth.json": _perception_breadth,
     "data/injection_classifier_rival.json": _injection_rival,

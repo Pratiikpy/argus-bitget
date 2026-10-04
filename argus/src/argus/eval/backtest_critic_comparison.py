@@ -276,9 +276,30 @@ def independent() -> dict[str, Any] | None:
     return {"files": len(rows), "argus": tally("argus"), "rival": tally("rival"), "rows": rows}
 
 
+def _rival_commit() -> str | None:
+    import subprocess
+
+    try:
+        return subprocess.run(["git", "-C", str(RIVAL), "rev-parse", "HEAD"], capture_output=True,
+                              text=True, timeout=30, check=True).stdout.strip() or None
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
 def main() -> int:  # pragma: no cover - CLI
     result = run()
     result["independent"] = independent()
+    # Both runs read only the fixtures and the clones, with nothing random or timed in the rows,
+    # so a second run must reproduce the first exactly; it is run and compared, not assumed.
+    again = {**run(), "independent": independent()}
+    result["reference"] = {
+        "rival": "MrMaca11an/backtest-truth", "licence": "MIT", "commit": _rival_commit(),
+        "entry": "backtest_truth check_source, imported from the clone and run unmodified on "
+                 "every fixture and independent script"}
+    result["reproducibility"] = {
+        "command": "python -m argus.eval.backtest_critic_comparison",
+        "identical_on_rerun": again == {k: v for k, v in result.items()
+                                        if k not in ("reference", "reproducibility")}}
     OUT.write_text(json.dumps(result, indent=1) + "\n", encoding="utf-8", newline="\n")
     for row in result["rows"]:
         print(f"{row['fixture']:<45} planted={row['planted']!s:<18} argus={row['argus_flags']} "

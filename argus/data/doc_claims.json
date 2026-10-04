@@ -249,39 +249,39 @@
       "doc": "explained",
       "line": 1772,
       "quoted": [
-        "942"
+        "947"
       ],
       "live": [
-        942
+        947
       ],
       "status": "OK",
-      "excerpt": "942** files under `argus/data/`"
+      "excerpt": "947** files under `argus/data/`"
     },
     {
       "claim": "data_files",
       "doc": "explained",
       "line": 2421,
       "quoted": [
-        "942"
+        "947"
       ],
       "live": [
-        942
+        947
       ],
       "status": "OK",
-      "excerpt": "942 files under `argus/data/`"
+      "excerpt": "947 files under `argus/data/`"
     },
     {
       "claim": "data_files",
       "doc": "architecture",
       "line": 15,
       "quoted": [
-        "942"
+        "947"
       ],
       "live": [
-        942
+        947
       ],
       "status": "OK",
-      "excerpt": "942** files under `argus/data/`"
+      "excerpt": "947** files under `argus/data/`"
     },
     {
       "claim": "memory_effect",
@@ -371,13 +371,13 @@
       "doc": "public-readme",
       "line": 313,
       "quoted": [
-        "56"
+        "52"
       ],
       "live": [
-        56
+        52
       ],
       "status": "OK",
-      "excerpt": "lists 56 conditions claimed but not evidenced"
+      "excerpt": "lists 52 conditions claimed but not evidenced"
     },
     {
       "claim": "register_claims",
@@ -596,60 +596,60 @@
       "doc": "readme",
       "line": 270,
       "quoted": [
-        "5",
+        "6",
         "49"
       ],
       "live": [
-        5,
+        6,
         49
       ],
       "status": "OK",
-      "excerpt": "5 of 49 capabilities are OWNED"
+      "excerpt": "6 of 49 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
       "doc": "readme",
       "line": 442,
       "quoted": [
-        "5",
+        "6",
         "49"
       ],
       "live": [
-        5,
+        6,
         49
       ],
       "status": "OK",
-      "excerpt": "5 of 49 capabilities are OWNED"
+      "excerpt": "6 of 49 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
       "doc": "public-readme",
       "line": 219,
       "quoted": [
-        "5",
+        "6",
         "49"
       ],
       "live": [
-        5,
+        6,
         49
       ],
       "status": "OK",
-      "excerpt": "5 of 49 capabilities are OWNED"
+      "excerpt": "6 of 49 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
       "doc": "public-readme",
       "line": 312,
       "quoted": [
-        "5",
+        "6",
         "49"
       ],
       "live": [
-        5,
+        6,
         49
       ],
       "status": "OK",
-      "excerpt": "5 of 49 capabilities are OWNED"
+      "excerpt": "6 of 49 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
@@ -657,7 +657,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        5,
+        6,
         49
       ],
       "status": "ABSENT",
@@ -668,60 +668,60 @@
       "doc": "explained",
       "line": 683,
       "quoted": [
-        "5",
+        "6",
         "49"
       ],
       "live": [
-        5,
+        6,
         49
       ],
       "status": "OK",
-      "excerpt": "5 of 49 capabilities are OWNED"
+      "excerpt": "6 of 49 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
       "doc": "explained",
       "line": 1383,
       "quoted": [
-        "5",
+        "6",
         "49"
       ],
       "live": [
-        5,
+        6,
         49
       ],
       "status": "OK",
-      "excerpt": "5 of 49 capabilities are OWNED"
+      "excerpt": "6 of 49 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
       "doc": "explained",
       "line": 2448,
       "quoted": [
-        "5",
+        "6",
         "49"
       ],
       "live": [
-        5,
+        6,
         49
       ],
       "status": "OK",
-      "excerpt": "5 of 49 capabilities are OWNED"
+      "excerpt": "6 of 49 capabilities are OWNED"
     },
     {
       "claim": "standing_owned",
       "doc": "architecture",
       "line": 433,
       "quoted": [
-        "5",
+        "6",
         "49"
       ],
       "live": [
-        5,
+        6,
         49
       ],
       "status": "OK",
-      "excerpt": "5 of 49 capabilities are OWNED"
+      "excerpt": "6 of 49 capabilities are OWNED"
     },
     {
       "claim": "standing_tied",
@@ -1256,14 +1256,14 @@
       "line": 165,
       "quoted": [
         "148",
-        "208"
+        "212"
       ],
       "live": [
         148,
-        208
+        212
       ],
       "status": "OK",
-      "excerpt": "148 of the 208 proofs carry a Bitcoin"
+      "excerpt": "148 of the 212 proofs carry a Bitcoin"
     },
     {
       "claim": "anchors_confirmed",
@@ -1271,14 +1271,14 @@
       "line": 3045,
       "quoted": [
         "148",
-        "208"
+        "212"
       ],
       "live": [
         148,
-        208
+        212
       ],
       "status": "OK",
-      "excerpt": "148 of the 208 carry a Bitcoin"
+      "excerpt": "148 of the 212 carry a Bitcoin"
     },
     {
       "claim": "ledger_decisions",

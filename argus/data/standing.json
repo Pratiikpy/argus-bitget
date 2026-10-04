@@ -4428,7 +4428,9 @@
         "baseline_reproduced",
         "implementation_complete",
         "same_input_comparison",
+        "statistically_valid_evaluation",
         "costs_included",
+        "out_of_sample_test",
         "ablation",
         "adversarial_test",
         "failure_cases_documented",
@@ -4684,10 +4686,7 @@
         "reproducibility_proven",
         "no_specialist_capability_superior"
       ],
-      "conditions_unproven": [
-        "statistically_valid_evaluation",
-        "out_of_sample_test"
-      ]
+      "conditions_unproven": []
     },
     {
       "name": "A book under a trader's own limits (caps, groups, number of names) vs. skfolio MeanRisk",
@@ -5221,9 +5220,11 @@
       "baseline": "MrMaca11an/backtest-truth (MIT), its static AST checks (backtest_truth/ast_checks.py check_source) run from its clone on identical code",
       "conditions_met": [
         "best_implementation_studied",
+        "baseline_reproduced",
         "implementation_complete",
         "same_input_comparison",
-        "failure_cases_documented"
+        "failure_cases_documented",
+        "reproducibility_proven"
       ],
       "conditions_missing": [
         "best_method_studied",
@@ -5287,10 +5288,7 @@
         "failure_cases_documented",
         "reproducibility_proven"
       ],
-      "conditions_unproven": [
-        "baseline_reproduced",
-        "reproducibility_proven"
-      ]
+      "conditions_unproven": []
     },
     {
       "name": "Volatility-targeted sizing (walk-forward GARCH) against fixed size, after fees",
@@ -5560,7 +5558,7 @@
     {
       "capability": "LUI intent routing, measured against Rasa's real DIET classifier",
       "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "the groupwise audit predates the current data/lui_comparison.json; re-run python -m argus.eval.groupwise_audit"
+      "detail": "the groupwise audit flags data/lui_comparison.json :: sealed intent routing: ARGUS's cascade vs Rasa's DIET [carried_by_one_group:intent=performance]"
     },
     {
       "capability": "Numeric decision grounding vs. TradingAgents' real, unchecked TraderProposal",
@@ -5621,16 +5619,6 @@
       "capability": "Where a stop sits in the noise, measured against Rook's invalidation price",
       "problem": "statistically_valid_evaluation is claimed but not evidenced",
       "detail": "the groupwise audit flags data/stopquality_comparison.json :: net return with the stop: ARGUS vs a 1x ATR stop [flips_across_halves:chronological halves]"
-    },
-    {
-      "capability": "Where a shut stock should open: the perpetual-implied open, against gloaming and nocturne",
-      "problem": "statistically_valid_evaluation is claimed but not evidenced",
-      "detail": "the groupwise audit predates the current data/overnight_comparison.json; re-run python -m argus.eval.groupwise_audit"
-    },
-    {
-      "capability": "Where a shut stock should open: the perpetual-implied open, against gloaming and nocturne",
-      "problem": "out_of_sample_test is claimed but not evidenced",
-      "detail": "the groupwise audit predates the current data/overnight_comparison.json; re-run python -m argus.eval.groupwise_audit"
     },
     {
       "capability": "The chance a position breaks its loss limit, searched over observed moves and recorded order books, vs. a normal-shock Monte Carlo",
@@ -5645,17 +5633,7 @@
     {
       "capability": "Trader memory across sessions (what the trader says about themselves) vs. mem0",
       "problem": "out_of_sample_test is claimed but not evidenced",
-      "detail": "no groupwise check has run on its artefacts: data/memory_comparison.json: not in the audit"
-    },
-    {
-      "capability": "Backtest critic, eight checks with quoted lines, vs. backtest-truth's static linter",
-      "problem": "baseline_reproduced is claimed but not evidenced",
-      "detail": "data/backtest_critic_comparison.json records nothing about baseline_reproduced: no key among baseline, reference, parity, agreement, expected, divergence..."
-    },
-    {
-      "capability": "Backtest critic, eight checks with quoted lines, vs. backtest-truth's static linter",
-      "problem": "reproducibility_proven is claimed but not evidenced",
-      "detail": "data/backtest_critic_comparison.json records nothing about reproducibility_proven: no key among reproducibility, reproducible, deterministic, identical, seed, seeds..."
+      "detail": "no groupwise check has run on its artefacts: data/memory_comparison.json: designed_cases - authored trader sentences in four frozen held-out sets, each read by ARGUS and mem0: recall and false-positive counts over written cases"
     }
   ],
   "clean": false,

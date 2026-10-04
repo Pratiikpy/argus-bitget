@@ -216,7 +216,7 @@ OWNED only after that rival has been run on the same input and beaten. OWNED nee
 conditions: the rival's best implementation read and reproduced, a same-input comparison with
 costs, out-of-sample, ablation, an adversarial test, documented failure cases and reproducibility.
 
-**5 of 49 capabilities are OWNED, 35 are TIED, 0 are IMPLEMENTED, and 8 are LOST.**
+**6 of 49 capabilities are OWNED, 35 are TIED, 0 are IMPLEMENTED, and 8 are LOST.**
 
 | OWNED | Against |
 |---|---|
@@ -309,8 +309,8 @@ a test that reaches the network shows itself.
 | Types | **`mypy --strict` clean on 622 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
-| Sub-themes | **18/18 sub-themes** each resolve to an importable module and a test file (`python -m argus.status`). That is coverage, not a claim to lead them: 5 of 49 capabilities are OWNED against a named rival, and `/proof` says which |
-| Register self-check | **Not clean, and said so**: `data/standing.json` lists 56 conditions claimed but not evidenced, every one on a TIED (41) or LOST (11) row; none on the 6 OWNED rows, which is what OWNED requires (`python -m argus.eval.standing`) |
+| Sub-themes | **18/18 sub-themes** each resolve to an importable module and a test file (`python -m argus.status`). That is coverage, not a claim to lead them: 6 of 49 capabilities are OWNED against a named rival, and `/proof` says which |
+| Register self-check | **Not clean, and said so**: `data/standing.json` lists 52 conditions claimed but not evidenced, every one on a TIED (41) or LOST (11) row; none on the 6 OWNED rows, which is what OWNED requires (`python -m argus.eval.standing`) |
 | Understanding | **81.7%** of 240 questions in 12 languages, written blind by an agent that never saw this repository and scored once, were read correctly by the console with no language model (52.1% before the 2026-09-25 fixes); with Qwen reading first, as on the live site, 85.0% — `data/lui_final_heldout_report.json`. Which engine each question reaches is re-scored on every change by `eval/kind_routing.py` |
 | Quoted figures | Every figure these documents quote is re-checked against its artefact by `python -m argus.eval.docclaims --tests`, which fails if one has drifted |
 

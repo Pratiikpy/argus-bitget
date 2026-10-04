@@ -1,11 +1,13 @@
 {
-  "generated_at": "2026-09-29T17:00:50+00:00",
+  "generated_at": "2026-10-04T22:32:37+00:00",
   "method": "Mind2Web metric.py:236-259 (MIT): per-group mean and count, macro average, 0/1/2/3/>3 histogram; read by argus.eval.groupwise into four flags (carried_by_one_group, single_group, macro_disagrees, flips_across_halves)",
   "register_artefacts": [
     "data/abstention_comparison.json",
     "data/allocation_comparison.json",
     "data/analogstress_comparison.json",
     "data/arbitrage_comparison.json",
+    "data/attack_suite.json",
+    "data/backtest_critic_comparison.json",
     "data/claimcheck_comparison.json",
     "data/cointegration.json",
     "data/cointegration_comparison.json",
@@ -40,6 +42,8 @@
     "data/grammar_comparison.json",
     "data/h2h_baserate/summary.json",
     "data/h2h_optic/summary.json",
+    "data/heyarka_corpus.json",
+    "data/heyarka_shield_probe.json",
     "data/infoextract_comparison.json",
     "data/injection_classifier_rival.json",
     "data/journal_comparison.json",
@@ -47,6 +51,7 @@
     "data/lui_rematch.json",
     "data/lui_rematch_inputs.json",
     "data/mandate_comparison.json",
+    "data/memory_comparison.json",
     "data/nco_bakeoff.json",
     "data/openbb_breadth_raw.json",
     "data/overfit_gates.json",
@@ -79,14 +84,15 @@
     "data/stress_search_comparison.json",
     "data/track1_study.json",
     "data/void_comparison.json",
+    "data/vol_target_comparison.json",
     "data/workbench_comparison.json",
     "data/xa_arena.json"
   ],
   "counts": {
     "checked": 55,
-    "designed_cases": 28,
-    "aggregate_without_rows": 16,
-    "no_rows": 5
+    "designed_cases": 32,
+    "aggregate_without_rows": 17,
+    "no_rows": 6
   },
   "flagged": [
     {
@@ -100,19 +106,6 @@
       "readings": [
         "NVDAUSDT/QQQUSDT carries the headline: without it the other 65 pair group(s) total -0.25, which does not point the same way",
         "in-sample cointegration vs out-of-sample stationarity, each against 5%: the halves disagree \u2014 first 0.010606, second -0.019697 (full -0.004545)"
-      ]
-    },
-    {
-      "artefact": "data/event_reactions.json",
-      "headline": "abnormal return around scheduled events",
-      "role": "context",
-      "flags": [
-        "carried_by_one_group:symbol=TSLAUSDT",
-        "carried_by_one_group:kind=earnings"
-      ],
-      "readings": [
-        "TSLAUSDT carries the headline: without it the other 11 symbol group(s) total 2644.2, which does not point the same way",
-        "earnings carries the headline: without it the other 2 kind group(s) total 788.7, which does not point the same way"
       ]
     },
     {
@@ -175,6 +168,17 @@
       ]
     },
     {
+      "artefact": "data/lui_comparison.json",
+      "headline": "sealed intent routing: ARGUS's cascade vs Rasa's DIET",
+      "role": "argus_vs_rival",
+      "flags": [
+        "carried_by_one_group:intent=performance"
+      ],
+      "readings": [
+        "performance carries the headline: without it the other 7 intent group(s) total 0.0, which does not point the same way"
+      ]
+    },
+    {
       "artefact": "data/lui_rematch.json",
       "headline": "ARGUS's cascade vs Rasa's default pipeline, out of scope",
       "role": "argus_vs_rival",
@@ -218,8 +222,8 @@
         "carried_by_one_group:phase=rth"
       ],
       "readings": [
-        "COINUSDT carries the headline: without it the other 11 symbol group(s) total -3734.1356, which does not point the same way",
-        "rth carries the headline: without it the other 2 phase group(s) total -4527.3782, which does not point the same way"
+        "COINUSDT carries the headline: without it the other 11 symbol group(s) total -3546.9783, which does not point the same way",
+        "rth carries the headline: without it the other 2 phase group(s) total -4284.3938, which does not point the same way"
       ]
     },
     {
@@ -330,6 +334,17 @@
       ]
     },
     {
+      "artefact": "data/skill_matrix.json",
+      "headline": "Bitget MCP tools that answer",
+      "role": "context",
+      "flags": [
+        "carried_by_one_group:server=bitget-signal"
+      ],
+      "readings": [
+        "bitget-signal carries the headline: without it the other 1 server group(s) total 0.0, which does not point the same way"
+      ]
+    },
+    {
       "artefact": "data/stopquality_comparison.json",
       "headline": "net return with the stop: ARGUS vs a 1x ATR stop",
       "role": "argus_vs_rival",
@@ -436,6 +451,17 @@
       ],
       "readings": [
         "the whole headline is one symbol (NVDAUSDT)"
+      ]
+    },
+    {
+      "artefact": "data/lui_comparison.json",
+      "headline": "sealed intent routing: ARGUS's cascade vs Rasa's DIET",
+      "role": "argus_vs_rival",
+      "flags": [
+        "carried_by_one_group:intent=performance"
+      ],
+      "readings": [
+        "performance carries the headline: without it the other 7 intent group(s) total 0.0, which does not point the same way"
       ]
     },
     {
@@ -605,6 +631,20 @@
       "status": "designed_cases",
       "reason": "three designed spreads and 60 constructed spreads reduced to counts; the real per-symbol basis lives in data/arbitrage_study.json, which no proof cites",
       "sha256": "bd9ee798433f80fb856517b7c766cfc1d774266982e1afeb36a1d9b993a97e97",
+      "flagged": false,
+      "headlines": []
+    },
+    "data/attack_suite.json": {
+      "status": "designed_cases",
+      "reason": "HeyArka's 16 designed attack vectors through ARGUS's evidence stages: a property of the screens on authored cases, not a measurement over a population",
+      "sha256": "4bd791ce9fdaca467b7fd2ead3dd6a4de8172a5337a627b114b22a5a0a4dac4e",
+      "flagged": false,
+      "headlines": []
+    },
+    "data/backtest_critic_comparison.json": {
+      "status": "designed_cases",
+      "reason": "21 authored fixtures (17 planted defects, 4 clean) and 16 independent scripts, each read by both linters: cases chosen to contain or not contain a defect, with no population to break down by symbol or date",
+      "sha256": "82091a456f9395d8ca3d8eaec8bdee51d7fbcda6335ab15e3df8705527fb3658",
       "flagged": false,
       "headlines": []
     },
@@ -3978,7 +4018,7 @@
     "data/desk_notes.jsonl": {
       "status": "no_rows",
       "reason": "free-text notes per live cycle; the feedlist harness reduces them to one distinct-source count and no per-cycle value is recorded",
-      "sha256": "85967ce7fca1ec81efdc4947e15d94efe4567e110603f5a84047c57cc62b2d8c",
+      "sha256": "9956f208f80f0729fe27c3ad20d48a48683cbd72288171726c8a77c1b4ba6bf7",
       "flagged": false,
       "headlines": []
     },
@@ -4258,63 +4298,60 @@
     "data/event_reactions.json": {
       "status": "checked",
       "reason": "one row per (symbol, event kind) with enough events for an average; cells below the study's own minimum carry no average and are left out, as the study leaves them out",
-      "sha256": "044d9ac848ed4d1c84847142807ee6798c5be91b6a3eeab04d289fe7a6f86bab",
-      "flagged": true,
+      "sha256": "cd8846c2bf63732529de7dadc3d76808c384d87d2fa8b68fe4080c27311cea2d",
+      "flagged": false,
       "headlines": [
         {
           "name": "abnormal return around scheduled events",
           "headline": "average cumulative abnormal return, bps",
           "orientation": "bps",
-          "items": 23,
-          "micro_mean": -4.039583,
-          "total": -775.6,
+          "items": 19,
+          "micro_mean": -6.333742,
+          "total": -1032.4,
           "broken_down": true,
-          "flags": [
-            "carried_by_one_group:symbol=TSLAUSDT",
-            "carried_by_one_group:kind=earnings"
-          ],
-          "flagged": true,
+          "flags": [],
+          "flagged": false,
           "tables": [
             {
               "key": "symbol",
               "groups": 12,
-              "micro_mean": -4.039583,
-              "macro_mean": -1.058062,
+              "micro_mean": -6.333742,
+              "macro_mean": -8.338818,
               "direction": -1,
-              "largest_contributor": "TSLAUSDT",
-              "largest_share_of_total": 4.4092,
-              "total_without_largest": 2644.2,
+              "largest_contributor": "METAUSDT",
+              "largest_share_of_total": 0.9781,
+              "total_without_largest": -22.6,
               "loss_histogram": {
-                "0": 0.25,
-                "1": 0.5,
-                "2": 0.25,
+                "0": 0.1667,
+                "1": 0.75,
+                "2": 0.0833,
                 "3": 0.0,
                 ">3": 0.0
               },
-              "carried_by_one_group": true,
+              "carried_by_one_group": false,
               "single_group": false,
               "macro_disagrees": false,
-              "reading": "TSLAUSDT carries the headline: without it the other 11 symbol group(s) total 2644.2, which does not point the same way",
+              "reading": "no single symbol carries the headline: without the largest contributor (METAUSDT, 97.8% of the total) the rest still point the same way",
               "per_group": [
                 {
-                  "group": "TSLAUSDT",
-                  "rows": 3,
-                  "weight": 27.0,
-                  "total": -3419.8,
-                  "mean": -126.659259,
-                  "mean_se": 113.961614,
-                  "share_of_total": 4.4092,
-                  "opposing": 1
+                  "group": "METAUSDT",
+                  "rows": 1,
+                  "weight": 11.0,
+                  "total": -1009.8,
+                  "mean": -91.8,
+                  "mean_se": null,
+                  "share_of_total": 0.9781,
+                  "opposing": 0
                 },
                 {
-                  "group": "METAUSDT",
+                  "group": "MSTRUSDT",
                   "rows": 2,
-                  "weight": 16.0,
-                  "total": -1091.8,
-                  "mean": -68.2375,
-                  "mean_se": 40.263618,
-                  "share_of_total": 1.4077,
-                  "opposing": 0
+                  "weight": 17.0,
+                  "total": -689.9,
+                  "mean": -40.582353,
+                  "mean_se": 166.985367,
+                  "share_of_total": 0.6682,
+                  "opposing": 1
                 },
                 {
                   "group": "MSFTUSDT",
@@ -4323,18 +4360,28 @@
                   "total": -510.4,
                   "mean": -46.4,
                   "mean_se": null,
-                  "share_of_total": 0.6581,
+                  "share_of_total": 0.4944,
                   "opposing": 0
+                },
+                {
+                  "group": "TSLAUSDT",
+                  "rows": 2,
+                  "weight": 18.0,
+                  "total": -438.4,
+                  "mean": -24.355556,
+                  "mean_se": 36.673299,
+                  "share_of_total": 0.4246,
+                  "opposing": 1
                 },
                 {
                   "group": "GOOGLUSDT",
                   "rows": 2,
-                  "weight": 18.0,
-                  "total": -64.6,
-                  "mean": -3.588889,
-                  "mean_se": 1.434151,
-                  "share_of_total": 0.0833,
-                  "opposing": 0
+                  "weight": 17.0,
+                  "total": 3.1,
+                  "mean": 0.182353,
+                  "mean_se": 3.960951,
+                  "share_of_total": -0.003,
+                  "opposing": 1
                 },
                 {
                   "group": "SQQQUSDT",
@@ -4343,17 +4390,7 @@
                   "total": 18.5,
                   "mean": 3.7,
                   "mean_se": null,
-                  "share_of_total": -0.0239,
-                  "opposing": 1
-                },
-                {
-                  "group": "AAPLUSDT",
-                  "rows": 2,
-                  "weight": 16.0,
-                  "total": 32.2,
-                  "mean": 2.0125,
-                  "mean_se": 2.029201,
-                  "share_of_total": -0.0415,
+                  "share_of_total": -0.0179,
                   "opposing": 1
                 },
                 {
@@ -4363,17 +4400,27 @@
                   "total": 32.5,
                   "mean": 6.5,
                   "mean_se": null,
-                  "share_of_total": -0.0419,
+                  "share_of_total": -0.0315,
+                  "opposing": 1
+                },
+                {
+                  "group": "AAPLUSDT",
+                  "rows": 1,
+                  "weight": 11.0,
+                  "total": 35.2,
+                  "mean": 3.2,
+                  "mean_se": null,
+                  "share_of_total": -0.0341,
                   "opposing": 1
                 },
                 {
                   "group": "AMZNUSDT",
                   "rows": 2,
-                  "weight": 17.0,
-                  "total": 103.5,
-                  "mean": 6.088235,
-                  "mean_se": 68.795469,
-                  "share_of_total": -0.1334,
+                  "weight": 16.0,
+                  "total": 84.0,
+                  "mean": 5.25,
+                  "mean_se": 78.177634,
+                  "share_of_total": -0.0814,
                   "opposing": 1
                 },
                 {
@@ -4383,72 +4430,52 @@
                   "total": 330.8,
                   "mean": 19.458824,
                   "mean_se": 44.832186,
-                  "share_of_total": -0.4265,
+                  "share_of_total": -0.3204,
                   "opposing": 1
                 },
                 {
                   "group": "NVDAUSDT",
                   "rows": 2,
-                  "weight": 20.0,
-                  "total": 750.5,
-                  "mean": 37.525,
-                  "mean_se": 3.26621,
-                  "share_of_total": -0.9676,
-                  "opposing": 2
-                },
-                {
-                  "group": "MSTRUSDT",
-                  "rows": 3,
-                  "weight": 23.0,
-                  "total": 1439.9,
-                  "mean": 62.604348,
-                  "mean_se": 103.324212,
-                  "share_of_total": -1.8565,
+                  "weight": 19.0,
+                  "total": 478.2,
+                  "mean": 25.168421,
+                  "mean_se": 11.338753,
+                  "share_of_total": -0.4632,
                   "opposing": 2
                 },
                 {
                   "group": "COINUSDT",
                   "rows": 2,
-                  "weight": 17.0,
-                  "total": 1603.1,
-                  "mean": 94.3,
-                  "mean_se": 22.441479,
-                  "share_of_total": -2.0669,
-                  "opposing": 2
+                  "weight": 16.0,
+                  "total": 633.8,
+                  "mean": 39.6125,
+                  "mean_se": 50.147272,
+                  "share_of_total": -0.6139,
+                  "opposing": 1
                 }
               ]
             },
             {
               "key": "kind",
-              "groups": 3,
-              "micro_mean": -4.039583,
-              "macro_mean": -33.923385,
+              "groups": 2,
+              "micro_mean": -6.333742,
+              "macro_mean": -6.583136,
               "direction": -1,
-              "largest_contributor": "earnings",
-              "largest_share_of_total": 2.0169,
-              "total_without_largest": 788.7,
+              "largest_contributor": "CPI",
+              "largest_share_of_total": 0.6888,
+              "total_without_largest": -321.3,
               "loss_histogram": {
                 "0": 0.0,
-                "1": 0.3333,
+                "1": 0.0,
                 "2": 0.0,
                 "3": 0.0,
-                ">3": 0.6667
+                ">3": 1.0
               },
-              "carried_by_one_group": true,
+              "carried_by_one_group": false,
               "single_group": false,
               "macro_disagrees": false,
-              "reading": "earnings carries the headline: without it the other 2 kind group(s) total 788.7, which does not point the same way",
+              "reading": "no single kind carries the headline: without the largest contributor (CPI, 68.9% of the total) the rest still point the same way",
               "per_group": [
-                {
-                  "group": "earnings",
-                  "rows": 2,
-                  "weight": 13.0,
-                  "total": -1564.3,
-                  "mean": -120.330769,
-                  "mean_se": 329.231218,
-                  "share_of_total": 2.0169,
-                  "opposing": 1
-                },
                 {
                   "group": "CPI",
                   "rows": 12,
@@ -4456,17 +4483,17 @@
                   "total": -711.1,
                   "mean": -6.026271,
                   "mean_se": 15.410428,
-                  "share_of_total": 0.9168,
+                  "share_of_total": 0.6888,
                   "opposing": 6
                 },
                 {
                   "group": "FOMC",
-                  "rows": 9,
-                  "weight": 61.0,
-                  "total": 1499.8,
-                  "mean": 24.586885,
-                  "mean_se": 22.784234,
-                  "share_of_total": -1.9337,
+                  "rows": 7,
+                  "weight": 45.0,
+                  "total": -321.3,
+                  "mean": -7.14,
+                  "mean_se": 41.970824,
+                  "share_of_total": 0.3112,
                   "opposing": 5
                 }
               ]
@@ -4476,10 +4503,10 @@
           "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
           "notes": [],
           "interval": {
-            "low": -46.58359,
-            "high": 32.655747,
+            "low": -36.34129,
+            "high": 22.081366,
             "method": "bootstrap over rows (no order recorded)",
-            "units": 23,
+            "units": 19,
             "block_length": 1.0,
             "spans_zero": true,
             "resamples": 2000
@@ -10590,6 +10617,20 @@
       "flagged": false,
       "headlines": []
     },
+    "data/heyarka_corpus.json": {
+      "status": "no_rows",
+      "reason": "the attack suite's frozen inputs: HeyArka's payloads byte for byte, no result",
+      "sha256": "7f19f462ceec6ad9ce79d58d1d3ec7e6ed7c6cf7f4ade4fd2cc80e233343459e",
+      "flagged": false,
+      "headlines": []
+    },
+    "data/heyarka_shield_probe.json": {
+      "status": "designed_cases",
+      "reason": "HeyArka's own shield run on the same 16 designed vectors",
+      "sha256": "dd2990eed5ab1ea6f56440df8baeb7850b0c6f95e8b41913f00221477eb377fa",
+      "flagged": false,
+      "headlines": []
+    },
     "data/incremental_value.json": {
       "status": "aggregate_without_rows",
       "reason": "42 instants reduced to per-baseline win/loss counts",
@@ -10872,29 +10913,31 @@
     "data/lui_comparison.json": {
       "status": "checked",
       "reason": "one row per sealed question, regenerated from the deployed cascade and Rasa's vendored predictions, parity-checked against the published counts",
-      "sha256": "8e13c86c915d4231f84f16614611b148df8c113c3d8973f64978a7f8e452b862",
-      "flagged": false,
+      "sha256": "95d9a2d0c221c949b6a2f7acfa18fc6ae0928d5a83cbdb6a74086fc840a0dae2",
+      "flagged": true,
       "headlines": [
         {
           "name": "sealed intent routing: ARGUS's cascade vs Rasa's DIET",
           "headline": "(ARGUS right) - (Rasa right) per sealed question",
           "orientation": "positive = ARGUS right where Rasa was not",
           "items": 293,
-          "micro_mean": -0.023891,
-          "total": -7.0,
+          "micro_mean": -0.013652,
+          "total": -4.0,
           "broken_down": true,
-          "flags": [],
-          "flagged": false,
+          "flags": [
+            "carried_by_one_group:intent=performance"
+          ],
+          "flagged": true,
           "tables": [
             {
               "key": "lang",
               "groups": 2,
-              "micro_mean": -0.023891,
-              "macro_mean": -0.027026,
+              "micro_mean": -0.013652,
+              "macro_mean": -0.012741,
               "direction": -1,
-              "largest_contributor": "en",
-              "largest_share_of_total": 0.5714,
-              "total_without_largest": -3.0,
+              "largest_contributor": "zh",
+              "largest_share_of_total": 0.75,
+              "total_without_largest": -1.0,
               "loss_histogram": {
                 "0": 0.0,
                 "1": 0.0,
@@ -10905,18 +10948,8 @@
               "carried_by_one_group": false,
               "single_group": false,
               "macro_disagrees": false,
-              "reading": "no single lang carries the headline: without the largest contributor (en, 57.1% of the total) the rest still point the same way",
+              "reading": "no single lang carries the headline: without the largest contributor (zh, 75.0% of the total) the rest still point the same way",
               "per_group": [
-                {
-                  "group": "en",
-                  "rows": 105,
-                  "weight": 105.0,
-                  "total": -4.0,
-                  "mean": -0.038095,
-                  "mean_se": 0.03561,
-                  "share_of_total": 0.5714,
-                  "opposing": 5
-                },
                 {
                   "group": "zh",
                   "rows": 188,
@@ -10924,7 +10957,17 @@
                   "total": -3.0,
                   "mean": -0.015957,
                   "mean_se": 0.020623,
-                  "share_of_total": 0.4286,
+                  "share_of_total": 0.75,
+                  "opposing": 6
+                },
+                {
+                  "group": "en",
+                  "rows": 105,
+                  "weight": 105.0,
+                  "total": -1.0,
+                  "mean": -0.009524,
+                  "mean_se": 0.034491,
+                  "share_of_total": 0.25,
                   "opposing": 6
                 }
               ]
@@ -10932,23 +10975,23 @@
             {
               "key": "intent",
               "groups": 8,
-              "micro_mean": -0.023891,
-              "macro_mean": -0.025045,
+              "micro_mean": -0.013652,
+              "macro_mean": -0.01266,
               "direction": -1,
               "largest_contributor": "performance",
-              "largest_share_of_total": 0.5714,
-              "total_without_largest": -3.0,
+              "largest_share_of_total": 1.0,
+              "total_without_largest": 0.0,
               "loss_histogram": {
                 "0": 0.25,
                 "1": 0.25,
-                "2": 0.375,
-                "3": 0.125,
+                "2": 0.25,
+                "3": 0.25,
                 ">3": 0.0
               },
-              "carried_by_one_group": false,
+              "carried_by_one_group": true,
               "single_group": false,
               "macro_disagrees": false,
-              "reading": "no single intent carries the headline: without the largest contributor (performance, 57.1% of the total) the rest still point the same way",
+              "reading": "performance carries the headline: without it the other 7 intent group(s) total 0.0, which does not point the same way",
               "per_group": [
                 {
                   "group": "performance",
@@ -10957,18 +11000,8 @@
                   "total": -4.0,
                   "mean": -0.102564,
                   "mean_se": 0.071563,
-                  "share_of_total": 0.5714,
+                  "share_of_total": 1.0,
                   "opposing": 2
-                },
-                {
-                  "group": "decision_why",
-                  "rows": 27,
-                  "weight": 27.0,
-                  "total": -2.0,
-                  "mean": -0.074074,
-                  "mean_se": 0.074074,
-                  "share_of_total": 0.2857,
-                  "opposing": 1
                 },
                 {
                   "group": "position",
@@ -10977,18 +11010,8 @@
                   "total": -2.0,
                   "mean": -0.05,
                   "mean_se": 0.034899,
-                  "share_of_total": 0.2857,
+                  "share_of_total": 0.5,
                   "opposing": 0
-                },
-                {
-                  "group": "decision_list",
-                  "rows": 40,
-                  "weight": 40.0,
-                  "total": -1.0,
-                  "mean": -0.025,
-                  "mean_se": 0.056472,
-                  "share_of_total": 0.1429,
-                  "opposing": 2
                 },
                 {
                   "group": "abstention_why",
@@ -10997,6 +11020,26 @@
                   "total": 0.0,
                   "mean": 0.0,
                   "mean_se": 0.032513,
+                  "share_of_total": -0.0,
+                  "opposing": 1
+                },
+                {
+                  "group": "decision_list",
+                  "rows": 40,
+                  "weight": 40.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.062017,
+                  "share_of_total": -0.0,
+                  "opposing": 3
+                },
+                {
+                  "group": "decision_why",
+                  "rows": 27,
+                  "weight": 27.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.053376,
                   "share_of_total": -0.0,
                   "opposing": 1
                 },
@@ -11027,7 +11070,7 @@
                   "total": 2.0,
                   "mean": 0.051282,
                   "mean_se": 0.051282,
-                  "share_of_total": -0.2857,
+                  "share_of_total": -0.5,
                   "opposing": 3
                 }
               ]
@@ -11037,8 +11080,8 @@
           "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
           "notes": [],
           "interval": {
-            "low": -0.05802,
-            "high": 0.010239,
+            "low": -0.047782,
+            "high": 0.020478,
             "method": "bootstrap over rows (no order recorded)",
             "units": 293,
             "block_length": 1.0,
@@ -11478,6 +11521,13 @@
       "status": "designed_cases",
       "reason": "the same authored fuzz corpus through two servers",
       "sha256": "a61a8c73f4dbcbec5b6a25c34cccf7f8c6d00b9f52b0de8e2a42b9ff651786c2",
+      "flagged": false,
+      "headlines": []
+    },
+    "data/memory_comparison.json": {
+      "status": "designed_cases",
+      "reason": "authored trader sentences in four frozen held-out sets, each read by ARGUS and mem0: recall and false-positive counts over written cases",
+      "sha256": "f04ae5b77059d40906e62c291af224a9a6d438ecc0b715f702c9b79337693dd1",
       "flagged": false,
       "headlines": []
     },
@@ -12480,7 +12530,7 @@
     "data/overnight_comparison.json": {
       "status": "checked",
       "reason": "per-night rows regenerated from the saved inputs",
-      "sha256": "668b962a1660333c9e188bc70abae85492763f470c1afab584a22f6f6c589e0b",
+      "sha256": "96cd4d75d953897ae9662db14a5a135fe5e900bc5477ca5a0ffdac3bca24b89d",
       "flagged": false,
       "headlines": [
         {
@@ -16385,16 +16435,16 @@
     "data/paper_ledger.jsonl": {
       "status": "checked",
       "reason": "one row per graded abstention on the live paper ledger",
-      "sha256": "591b10347a60dd6bfe5ac135f9ac56c7319e3a37ccefe9c117e0eef2858e822f",
+      "sha256": "3b86afa03e222fc08947fa12913819966fb178995d9ff218be04c3d1e6efed3c",
       "flagged": true,
       "headlines": [
         {
           "name": "value of standing aside",
           "headline": "abstention value, bps net of the fee never paid (observatory.AbstentionOutcome.value_bps via scorecard.score_ledger)",
           "orientation": "positive = the abstention avoided a loss",
-          "items": 635,
-          "micro_mean": 6.997924,
-          "total": 4443.6816,
+          "items": 863,
+          "micro_mean": 7.861792,
+          "total": 6784.7262,
           "broken_down": true,
           "flags": [
             "carried_by_one_group:symbol=COINUSDT",
@@ -16405,12 +16455,12 @@
             {
               "key": "symbol",
               "groups": 12,
-              "micro_mean": 6.997924,
-              "macro_mean": 6.65262,
+              "micro_mean": 7.861792,
+              "macro_mean": 6.997804,
               "direction": 1,
               "largest_contributor": "COINUSDT",
-              "largest_share_of_total": 1.8403,
-              "total_without_largest": -3734.1356,
+              "largest_share_of_total": 1.5228,
+              "total_without_largest": -3546.9783,
               "loss_histogram": {
                 "0": 0.0,
                 "1": 0.0,
@@ -16421,126 +16471,126 @@
               "carried_by_one_group": true,
               "single_group": false,
               "macro_disagrees": false,
-              "reading": "COINUSDT carries the headline: without it the other 11 symbol group(s) total -3734.1356, which does not point the same way",
+              "reading": "COINUSDT carries the headline: without it the other 11 symbol group(s) total -3546.9783, which does not point the same way",
               "per_group": [
                 {
                   "group": "COINUSDT",
-                  "rows": 54,
-                  "weight": 54.0,
-                  "total": 8177.8172,
-                  "mean": 151.441059,
-                  "mean_se": 73.961517,
-                  "share_of_total": 1.8403,
-                  "opposing": 21
-                },
-                {
-                  "group": "MSFTUSDT",
-                  "rows": 57,
-                  "weight": 57.0,
-                  "total": 2443.4733,
-                  "mean": 42.867953,
-                  "mean_se": 21.342281,
-                  "share_of_total": 0.5499,
-                  "opposing": 16
-                },
-                {
-                  "group": "AMZNUSDT",
-                  "rows": 56,
-                  "weight": 56.0,
-                  "total": 1565.8281,
-                  "mean": 27.961216,
-                  "mean_se": 18.394895,
-                  "share_of_total": 0.3524,
-                  "opposing": 24
+                  "rows": 76,
+                  "weight": 76.0,
+                  "total": 10331.7045,
+                  "mean": 135.94348,
+                  "mean_se": 54.492292,
+                  "share_of_total": 1.5228,
+                  "opposing": 27
                 },
                 {
                   "group": "GOOGLUSDT",
-                  "rows": 56,
-                  "weight": 56.0,
-                  "total": 1155.2835,
-                  "mean": 20.630062,
-                  "mean_se": 23.12588,
-                  "share_of_total": 0.26,
-                  "opposing": 22
+                  "rows": 78,
+                  "weight": 78.0,
+                  "total": 3128.8666,
+                  "mean": 40.113674,
+                  "mean_se": 19.577201,
+                  "share_of_total": 0.4612,
+                  "opposing": 29
+                },
+                {
+                  "group": "MSFTUSDT",
+                  "rows": 79,
+                  "weight": 79.0,
+                  "total": 1565.9169,
+                  "mean": 19.821733,
+                  "mean_se": 16.895288,
+                  "share_of_total": 0.2308,
+                  "opposing": 29
                 },
                 {
                   "group": "AAPLUSDT",
-                  "rows": 58,
-                  "weight": 58.0,
-                  "total": 832.5775,
-                  "mean": 14.354784,
-                  "mean_se": 12.873276,
-                  "share_of_total": 0.1874,
-                  "opposing": 23
-                },
-                {
-                  "group": "SQQQUSDT",
-                  "rows": 32,
-                  "weight": 32.0,
-                  "total": 811.3812,
-                  "mean": 25.355663,
-                  "mean_se": 62.556788,
-                  "share_of_total": 0.1826,
-                  "opposing": 14
-                },
-                {
-                  "group": "TSLAUSDT",
-                  "rows": 58,
-                  "weight": 58.0,
-                  "total": 744.0022,
-                  "mean": 12.827624,
-                  "mean_se": 21.975837,
-                  "share_of_total": 0.1674,
-                  "opposing": 25
-                },
-                {
-                  "group": "QQQUSDT",
-                  "rows": 51,
-                  "weight": 51.0,
-                  "total": -255.0987,
-                  "mean": -5.001935,
-                  "mean_se": 13.698568,
-                  "share_of_total": -0.0574,
-                  "opposing": 21
-                },
-                {
-                  "group": "NVDAUSDT",
-                  "rows": 58,
-                  "weight": 58.0,
-                  "total": -1971.6655,
-                  "mean": -33.994233,
-                  "mean_se": 18.978043,
-                  "share_of_total": -0.4437,
-                  "opposing": 35
-                },
-                {
-                  "group": "TQQQUSDT",
-                  "rows": 43,
-                  "weight": 43.0,
-                  "total": -2601.9145,
-                  "mean": -60.50964,
-                  "mean_se": 48.23586,
-                  "share_of_total": -0.5855,
-                  "opposing": 20
-                },
-                {
-                  "group": "METAUSDT",
-                  "rows": 58,
-                  "weight": 58.0,
-                  "total": -2733.8623,
-                  "mean": -47.135557,
-                  "mean_se": 40.110048,
-                  "share_of_total": -0.6152,
+                  "rows": 80,
+                  "weight": 80.0,
+                  "total": 1492.0535,
+                  "mean": 18.650669,
+                  "mean_se": 12.57845,
+                  "share_of_total": 0.2199,
                   "opposing": 30
                 },
                 {
+                  "group": "SQQQUSDT",
+                  "rows": 36,
+                  "weight": 36.0,
+                  "total": 954.7351,
+                  "mean": 26.520419,
+                  "mean_se": 55.533466,
+                  "share_of_total": 0.1407,
+                  "opposing": 15
+                },
+                {
+                  "group": "AMZNUSDT",
+                  "rows": 78,
+                  "weight": 78.0,
+                  "total": 624.7429,
+                  "mean": 8.009524,
+                  "mean_se": 14.575363,
+                  "share_of_total": 0.0921,
+                  "opposing": 41
+                },
+                {
+                  "group": "QQQUSDT",
+                  "rows": 70,
+                  "weight": 70.0,
+                  "total": 495.3546,
+                  "mean": 7.076494,
+                  "mean_se": 10.666613,
+                  "share_of_total": 0.073,
+                  "opposing": 24
+                },
+                {
+                  "group": "TSLAUSDT",
+                  "rows": 80,
+                  "weight": 80.0,
+                  "total": -468.0743,
+                  "mean": -5.850929,
+                  "mean_se": 20.039869,
+                  "share_of_total": -0.069,
+                  "opposing": 38
+                },
+                {
+                  "group": "METAUSDT",
+                  "rows": 79,
+                  "weight": 79.0,
+                  "total": -2134.8448,
+                  "mean": -27.023352,
+                  "mean_se": 30.113215,
+                  "share_of_total": -0.3147,
+                  "opposing": 37
+                },
+                {
+                  "group": "NVDAUSDT",
+                  "rows": 78,
+                  "weight": 78.0,
+                  "total": -2573.3977,
+                  "mean": -32.992278,
+                  "mean_se": 15.137205,
+                  "share_of_total": -0.3793,
+                  "opposing": 46
+                },
+                {
                   "group": "MSTRUSDT",
-                  "rows": 54,
-                  "weight": 54.0,
-                  "total": -3724.1404,
-                  "mean": -68.965563,
-                  "mean_se": 79.364115,
-                  "share_of_total": -0.8381,
+                  "rows": 76,
+                  "weight": 76.0,
+                  "total": -3299.9023,
+                  "mean": -43.419767,
+                  "mean_se": 59.096151,
+                  "share_of_total": -0.4864,
+                  "opposing": 37
+                },
+                {
+                  "group": "TQQQUSDT",
+                  "rows": 53,
+                  "weight": 53.0,
+                  "total": -3332.4288,
+                  "mean": -62.876015,
+                  "mean_se": 39.427194,
+                  "share_of_total": -0.4912,
                   "opposing": 27
                 }
               ]
@@ -16548,12 +16598,12 @@
             {
               "key": "phase",
               "groups": 3,
-              "micro_mean": 6.997924,
-              "macro_mean": 40.355951,
+              "micro_mean": 7.861792,
+              "macro_mean": 40.775789,
               "direction": 1,
               "largest_contributor": "rth",
-              "largest_share_of_total": 2.0188,
-              "total_without_largest": -4527.3782,
+              "largest_share_of_total": 1.6315,
+              "total_without_largest": -4284.3938,
               "loss_histogram": {
                 "0": 0.3333,
                 "1": 0.0,
@@ -16564,17 +16614,17 @@
               "carried_by_one_group": true,
               "single_group": false,
               "macro_disagrees": false,
-              "reading": "rth carries the headline: without it the other 2 phase group(s) total -4527.3782, which does not point the same way",
+              "reading": "rth carries the headline: without it the other 2 phase group(s) total -4284.3938, which does not point the same way",
               "per_group": [
                 {
                   "group": "rth",
-                  "rows": 430,
-                  "weight": 430.0,
-                  "total": 8971.0598,
-                  "mean": 20.86293,
-                  "mean_se": 14.595525,
-                  "share_of_total": 2.0188,
-                  "opposing": 204
+                  "rows": 623,
+                  "weight": 623.0,
+                  "total": 11069.12,
+                  "mean": 17.767448,
+                  "mean_se": 10.852635,
+                  "share_of_total": 1.6315,
+                  "opposing": 289
                 },
                 {
                   "group": "extended",
@@ -16583,42 +16633,42 @@
                   "total": 123.0009,
                   "mean": 123.0009,
                   "mean_se": null,
-                  "share_of_total": 0.0277,
+                  "share_of_total": 0.0181,
                   "opposing": 0
                 },
                 {
                   "group": "weekend",
-                  "rows": 204,
-                  "weight": 204.0,
-                  "total": -4650.3791,
-                  "mean": -22.795976,
-                  "mean_se": 20.55747,
-                  "share_of_total": -1.0465,
-                  "opposing": 74
+                  "rows": 239,
+                  "weight": 239.0,
+                  "total": -4407.3947,
+                  "mean": -18.440982,
+                  "mean_se": 17.579023,
+                  "share_of_total": -0.6496,
+                  "opposing": 91
                 }
               ]
             }
           ],
           "split_half": {
             "label": "chronological halves",
-            "cut": "2026-09-20T19:41:14.160382+00:00",
-            "first_items": 315,
-            "second_items": 320,
-            "first_mean": 10.949586,
-            "second_mean": 3.108006,
-            "full_mean": 6.997924,
+            "cut": "2026-09-23T15:42:26.830491+00:00",
+            "first_items": 428,
+            "second_items": 435,
+            "first_mean": 8.014223,
+            "second_mean": 7.711814,
+            "full_mean": 7.861792,
             "flips_across_halves": false,
             "contradicts_full_sample": false,
-            "reading": "chronological halves: both halves point the same way as the full sample \u2014 first 10.949586, second 3.108006, full 6.997924"
+            "reading": "chronological halves: both halves point the same way as the full sample \u2014 first 8.014223, second 7.711814, full 7.861792"
           },
           "split_half_note": "",
           "notes": [],
           "interval": {
-            "low": -40.112054,
-            "high": 46.332066,
+            "low": -28.443982,
+            "high": 36.746623,
             "method": "stationary bootstrap over order values",
-            "units": 61,
-            "block_length": 3.825,
+            "units": 83,
+            "block_length": 3.969,
             "spans_zero": true,
             "resamples": 2000
           },
@@ -20084,7 +20134,7 @@
     "data/refusal_alpha.json": {
       "status": "aggregate_without_rows",
       "reason": "per-horizon aggregates bootstrapped over decision cycles; per-mark rows are not kept",
-      "sha256": "a4f2fe386614743e12e338213f44df7011ebb2811dfe3d51f3610351f17a03e3",
+      "sha256": "cc824d2182c92b60db00b6089d83ff4abfe700a092937ae0c49f0fd7bb4e3174",
       "flagged": false,
       "headlines": []
     },
@@ -23263,29 +23313,31 @@
     "data/skill_matrix.json": {
       "status": "checked",
       "reason": "one row per tool",
-      "sha256": "b6bbbc033883e907a67c7e8ad0b87a3bb80753f8b90e67b64ec65643c1e253b3",
-      "flagged": false,
+      "sha256": "493c442af352fd00c61e1cf4c7eb3df983930a7e524db3f26332e2038a83aed8",
+      "flagged": true,
       "headlines": [
         {
           "name": "Bitget MCP tools that answer",
           "headline": "answer rate per tool",
           "orientation": "rate",
           "items": 86,
-          "micro_mean": 0.627907,
-          "total": 54.0,
+          "micro_mean": 0.023256,
+          "total": 2.0,
           "broken_down": true,
-          "flags": [],
-          "flagged": false,
+          "flags": [
+            "carried_by_one_group:server=bitget-signal"
+          ],
+          "flagged": true,
           "tables": [
             {
               "key": "server",
               "groups": 2,
-              "micro_mean": 0.627907,
-              "macro_mean": 0.440691,
+              "micro_mean": 0.023256,
+              "macro_mean": 0.052632,
               "direction": 1,
-              "largest_contributor": "bitget-mcp-server",
-              "largest_share_of_total": 0.963,
-              "total_without_largest": 2.0,
+              "largest_contributor": "bitget-signal",
+              "largest_share_of_total": 1.0,
+              "total_without_largest": 0.0,
               "loss_histogram": {
                 "0": 1.0,
                 "1": 0.0,
@@ -23293,21 +23345,11 @@
                 "3": 0.0,
                 ">3": 0.0
               },
-              "carried_by_one_group": false,
+              "carried_by_one_group": true,
               "single_group": false,
               "macro_disagrees": false,
-              "reading": "no single server carries the headline: without the largest contributor (bitget-mcp-server, 96.3% of the total) the rest still point the same way",
+              "reading": "bitget-signal carries the headline: without it the other 1 server group(s) total 0.0, which does not point the same way",
               "per_group": [
-                {
-                  "group": "bitget-mcp-server",
-                  "rows": 67,
-                  "weight": 67.0,
-                  "total": 52.0,
-                  "mean": 0.776119,
-                  "mean_se": 0.05131,
-                  "share_of_total": 0.963,
-                  "opposing": 0
-                },
                 {
                   "group": "bitget-signal",
                   "rows": 19,
@@ -23315,7 +23357,17 @@
                   "total": 2.0,
                   "mean": 0.105263,
                   "mean_se": 0.072335,
-                  "share_of_total": 0.037,
+                  "share_of_total": 1.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "bitget-mcp-server",
+                  "rows": 67,
+                  "weight": 67.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0,
                   "opposing": 0
                 }
               ]
@@ -23323,12 +23375,12 @@
             {
               "key": "skill",
               "groups": 11,
-              "micro_mean": 0.627907,
-              "macro_mean": 0.511019,
+              "micro_mean": 0.023256,
+              "macro_mean": 0.121212,
               "direction": 1,
-              "largest_contributor": "bitget-mcp-server/crypto",
-              "largest_share_of_total": 0.4815,
-              "total_without_largest": 28.0,
+              "largest_contributor": "server-only (no SKILL.md names it)",
+              "largest_share_of_total": 0.5,
+              "total_without_largest": 1.0,
               "loss_histogram": {
                 "0": 1.0,
                 "1": 0.0,
@@ -23339,58 +23391,8 @@
               "carried_by_one_group": false,
               "single_group": false,
               "macro_disagrees": false,
-              "reading": "no single skill carries the headline: without the largest contributor (bitget-mcp-server/crypto, 48.1% of the total) the rest still point the same way",
+              "reading": "no single skill carries the headline: without the largest contributor (server-only (no SKILL.md names it), 50.0% of the total) the rest still point the same way",
               "per_group": [
-                {
-                  "group": "bitget-mcp-server/crypto",
-                  "rows": 39,
-                  "weight": 39.0,
-                  "total": 26.0,
-                  "mean": 0.666667,
-                  "mean_se": 0.076472,
-                  "share_of_total": 0.4815,
-                  "opposing": 0
-                },
-                {
-                  "group": "bitget-mcp-server/equity",
-                  "rows": 22,
-                  "weight": 22.0,
-                  "total": 21.0,
-                  "mean": 0.954545,
-                  "mean_se": 0.045455,
-                  "share_of_total": 0.3889,
-                  "opposing": 0
-                },
-                {
-                  "group": "bitget-mcp-server/etf",
-                  "rows": 3,
-                  "weight": 3.0,
-                  "total": 2.0,
-                  "mean": 0.666667,
-                  "mean_se": 0.333333,
-                  "share_of_total": 0.037,
-                  "opposing": 0
-                },
-                {
-                  "group": "bitget-mcp-server/sentiment",
-                  "rows": 2,
-                  "weight": 2.0,
-                  "total": 2.0,
-                  "mean": 1.0,
-                  "mean_se": 0.0,
-                  "share_of_total": 0.037,
-                  "opposing": 0
-                },
-                {
-                  "group": "bitget-mcp-server/news",
-                  "rows": 1,
-                  "weight": 1.0,
-                  "total": 1.0,
-                  "mean": 1.0,
-                  "mean_se": null,
-                  "share_of_total": 0.0185,
-                  "opposing": 0
-                },
                 {
                   "group": "server-only (no SKILL.md names it)",
                   "rows": 3,
@@ -23398,7 +23400,7 @@
                   "total": 1.0,
                   "mean": 0.333333,
                   "mean_se": 0.333333,
-                  "share_of_total": 0.0185,
+                  "share_of_total": 0.5,
                   "opposing": 0
                 },
                 {
@@ -23408,7 +23410,57 @@
                   "total": 1.0,
                   "mean": 1.0,
                   "mean_se": null,
-                  "share_of_total": 0.0185,
+                  "share_of_total": 0.5,
+                  "opposing": 0
+                },
+                {
+                  "group": "bitget-mcp-server/crypto",
+                  "rows": 39,
+                  "weight": 39.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "bitget-mcp-server/equity",
+                  "rows": 22,
+                  "weight": 22.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "bitget-mcp-server/etf",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "bitget-mcp-server/news",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": null,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "bitget-mcp-server/sentiment",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0,
                   "opposing": 0
                 },
                 {
@@ -23458,12 +23510,12 @@
           "split_half_note": "the rows carry no order (no date or sequence), so no chronological split",
           "notes": [],
           "interval": {
-            "low": 0.523256,
-            "high": 0.732558,
+            "low": 0.0,
+            "high": 0.05814,
             "method": "bootstrap over rows (no order recorded)",
             "units": 86,
             "block_length": 1.0,
-            "spans_zero": false,
+            "spans_zero": true,
             "resamples": 2000
           },
           "role": "context",
@@ -25586,6 +25638,13 @@
           "claim_of": ""
         }
       ]
+    },
+    "data/vol_target_comparison.json": {
+      "status": "aggregate_without_rows",
+      "reason": "about 1,320 daily net returns per coin and arm reduced to per-arm metrics on three coins; eval/vol_target_comparison.py would need to record each day's net return per arm for a chronological split",
+      "sha256": "dd1ce674a64e9c5d35f565c733a0d825f4dbbbab6c26f32a5c45428c8d0346bf",
+      "flagged": false,
+      "headlines": []
     },
     "data/weekend_significance.json": {
       "status": "checked",
