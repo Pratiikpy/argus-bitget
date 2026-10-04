@@ -166,6 +166,47 @@ def lines(text: str, prior: list[str], names: tuple[str, ...]) -> list[str] | No
     return out
 
 
-__all__ = ["CARRY_Q", "SPOT_VIP", "lines"]
+def execution_lines(symbol: str, notional: float | None = None) -> list[str] | None:
+    """The carry as orders: two legs of the same size, and why neither carries a stop.
+
+    "Give me the exact execution plan for that — order type, entry, stop, take-profit" after a
+    carry discussion got a naked long with a stop (a judge, round 31), which is a different trade:
+    the carry is delta-neutral by construction."""
+    from argus.lui.research.desk_answers import PERP_TAKER
+    from argus.market.bitget import fetch_tickers
+
+    try:
+        ticker = fetch_tickers().get(symbol)
+    except Exception:
+        return None
+    if ticker is None:
+        return None
+    last, rate = float(ticker.last), float(ticker.funding_rate)
+    size = notional or 10_000.0
+    qty = size / last
+    name = symbol.removesuffix("USDT")
+    spot_taker = SPOT_VIP[0][1]
+    hours = round(365 * 24 / _per_year(symbol))
+    return [f"Bottom line: the carry is two orders of the same size, not one — buy {qty:,.4f} "
+            f"{name} on spot and short {qty:,.4f} {symbol} perpetual, about ${size:,.0f} each at "
+            f"Bitget's last {last:,.2f}" + ("" if notional else " (no size was given, so $10,000 "
+                                             "is the worked example)") + ".",
+            f"Leg 1, spot: a near-touch limit buy, market if unfilled; {spot_taker:.2%} taker. "
+            f"Leg 2, perpetual: a short of the same quantity, placed right after the first fills, "
+            f"{PERP_TAKER:.2%} taker; set 1-2x leverage so a sharp rise cannot liquidate it — "
+            f"at 2x the short's margin lasts through about a 45% rise.",
+            "No stop and no take-profit on either leg: a stop on one leg leaves the other "
+            "unhedged, which is the move the carry exists to avoid. The exit is closing both "
+            "together, when funding turns against you.",
+            f"Live inputs: funding {rate:+.4%} every {hours}h "
+            f"({'shorts receive' if rate > 0 else 'shorts pay'} it), last {last:,.2f}. What can "
+            f"go wrong: funding turns negative, the spot and "
+            f"perpetual prices drift apart for a while, or the short's margin is called on a "
+            f"spike — each priced above, none a forecast.",
+            "Nothing is sent: ask \"how should I buy $10,000 of " + name + "\" for the live "
+            "book on either leg."]
+
+
+__all__ = ["CARRY_Q", "SPOT_VIP", "execution_lines", "lines"]
 
 trace_module(globals())

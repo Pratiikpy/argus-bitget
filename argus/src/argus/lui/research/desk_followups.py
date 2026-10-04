@@ -209,8 +209,13 @@ def book_beta_lines(text: str, prior: Sequence[str], book: str) -> list[str] | N
     target = _names(re.sub(r"(?i)^(?:nasdaq|ndx|nasdaq-100)$", "QQQ", asks.group("b")))
     if not target:
         return None
-    priced = priced_book(book)
-    weights = dict(priced.weights) if priced is not None else parse_book(book)
+    # A book the question states wins over the saved one: "I hold 40% TSLA and 60% COIN — what is
+    # my book beta to QQQ?" was computed on the saved 100% AAPL while the answer said the stated
+    # book was used (a hostile review, round 31)
+    stated = parse_book(text) if re.search(r"\b(?:i\s+(?:hold|own|have)|my\s+(?:book|portfolio)\s+"
+                                           r"(?:is|=))\b", text, re.I) else {}
+    priced = None if stated else priced_book(book)
+    weights = stated or (dict(priced.weights) if priced is not None else parse_book(book))
     if not weights:
         return None
     base = _hourly_returns(target[0])
@@ -246,6 +251,10 @@ def crypto_crash_lines(text: str, book: str) -> list[str] | None:
     if shock is None or not book.strip() or re.search(r"\bnasdaq|\bs&p|\bqqq\b|\bspx\b", text,
                                                       re.I):
         return None
+    from argus.lui.research.parse import parse_book
+
+    if re.search(r"\bi\s+(?:hold|own|have)\b", text, re.I) and parse_book(text):
+        return None  # a book stated in the question is the stress engine's, not the saved one
     priced = priced_book(book)
     if priced is None or not priced.value:
         return None

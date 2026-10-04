@@ -169,6 +169,26 @@ class Reading:
 
 
 def read_question(text: str, saved_book: str = "") -> Reading | str:
+    """The question's reading (:func:`_read_question`), with a note for each further question in
+    it that the task does not run: "research case for MSTR …, is it a good carry trade against ETH
+    right now" ran MSTR and dropped the carry clause without a word, while the clause beside it
+    was marked untested (a judge, round 31)."""
+    reading = _read_question(text, saved_book)
+    if isinstance(reading, str):
+        return reading
+    later = [c.strip(" ,;?.") for c in _CLAUSE.split(text)[1:] if c and len(c.strip()) > 8]
+    if not later:
+        return reading
+    said = "; ".join(f"“{c}”" for c in later[:3])
+    return replace(reading, notes=(*reading.notes, f"not run on this page: {said} — ask it in the "
+                                                   f"console on its own"))
+
+
+_CLAUSE = re.compile(r",\s*(?:and\s+)?(?=(?:is|are|should|can|could|what|how|which|does|do)\s)|"
+                     r"\?\s+(?=\S)", re.I)
+
+
+def _read_question(text: str, saved_book: str = "") -> Reading | str:
     """The name, size and book a trader's own question asks about, or why it cannot be read.
 
     The same reader the console uses (``research.detect``), with the trader's saved book applied

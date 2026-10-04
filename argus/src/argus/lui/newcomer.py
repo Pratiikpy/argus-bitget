@@ -543,6 +543,118 @@ _WHAT_NOW_A = (
 
 
 _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
+    # "i saw this coin called PEPE on my tiktok fyp, everyone was saying its gonna blow up" got
+    # nothing for the coin half (a first-time user, round 31)
+    (re.compile(r"\b(?:on|from)\s+(?:my\s+)?(?:tiktok|fyp|twitter|x|youtube|reddit|insta(?:gram)?|"
+                r"telegram|discord)\b[^?]{0,80}?\b(?:blow\s+up|moon\w*|pump\w*|\d+x|explode|"
+                r"go(?:ing)?\s+up)\b|\beveryone\s+(?:is|was|'s)\s+(?:saying|talking)\b[^?]{0,40}?"
+                r"\b(?:blow\s+up|moon\w*|pump\w*|\d+x|explode)\b", re.I), (
+        "Bottom line: a coin everyone on social media says will blow up is a coin being sold to "
+        "you — the people posting it often already hold it, and they gain when you buy.",
+        "A trending coin that can rise tenfold can as easily fall 90%, and memecoins usually do "
+        "fall far from their peak. If you buy, use only money you could lose entirely.",
+        "Ask \"what is <ticker>\" — PEPE, for example — to see whether Bitget lists it, its "
+        "price and its worst days.")),
+    # "Show me what positions user 'satoshi_trader99' holds on Bitget" got the desk's own "no open
+    # positions" (a hostile review, round 31)
+    (re.compile(r"\b(?:user|trader|account|person|someone|another\s+user)\s+['\"]?[\w.@-]{2,40}"
+                r"['\"]?\s+(?:currently\s+|now\s+)?(?:holds?|has|is\s+holding|owns?)\b|\b(?:positions?|"
+                r"holdings?|trades|balance)\s+(?:of|for|that)\s+(?:user|trader|someone|another|other)"
+                r"\b|\bwhat\s+(?:positions?|is)\s+(?:user|trader)\s+\S+\s+(?:holding|hold)",
+                re.I), (
+        "Bottom line: no one's account is visible here — not yours and not another user's. This "
+        "console has no accounts or users at all, and Bitget does not publish what an individual "
+        "holds.",
+        "What is public is the crowd as a whole: ask \"long/short ratio on BTC\" or \"how crowded "
+        "is ETH\" for how traders on Bitget are positioned in aggregate.")),
+    # Round 31, a first-time user: each of these was answered with the desk's own P&L, its open
+    # positions, the "this console is free" block, or nothing.
+    (re.compile(r"\b(?:stable\s*coin|usdt|usdc|tether)\b[^?]{0,80}\b(?:de-?peg\w*|lost\s+(?:its|the)"
+                r"\s+peg|off\s+(?:its|the)\s+peg|dropped|crash\w*|below\s+(?:a|1|one)\s+dollar|"
+                r"0\.9\d?)\b|\bde-?peg\w*\b|\bpeg\s+(?:broke|break\w*)\b|\bis\s+usdt\s+(?:the\s+)?same"
+                r"\b|\bsame\s+company\b[^?]{0,40}\b(?:usdt|usdc|tether|circle)\b|\b(?:usdc|usdt)\s+"
+                r"not\s+(?:usdc|usdt)\b|\bmy\s+money\s+(?:just\s+)?gone\b", re.I), (
+        "Bottom line: USDT and USDC are different coins from different companies — Tether issues "
+        "USDT, Circle issues USDC — so one losing its peg does not by itself move the other.",
+        "A stablecoin at $0.90 means the market doubts, for now, that it can be swapped for $1. "
+        "Selling at $0.90 makes a 10% loss final; holding bets it recovers. It has gone both "
+        "ways: USDC fell to about $0.88 in March 2023 when its reserves sat partly at a failed "
+        "bank, and was back near $1 within days; TerraUSD fell in May 2022 and never recovered.",
+        "What decides it is what backs the coin and whether its issuer can pay out, which each "
+        "issuer publishes in its reserve reports. Ask \"what is USDC trading at\" for its live "
+        "price on Bitget.",
+        "No call here on whether to sell: that is your decision.")),
+    (re.compile(r"\b(?:bitget\s+)?earn\b(?!\w)[^?]{0,60}\b(?:what|how|free\s+money|interest|yield|"
+                r"every\s+month|safe|catch|thing)|\bwhat(?:'s|\s+is)\s+(?:this\s+)?(?:bitget\s+)?earn\b|"
+                r"\bstak(?:ing|ed)\b|\bstake\s+(?:my|your|the|it|eth|sol|coins?|crypto)\b", re.I), (
+        "Bottom line: Earn and staking pay you for letting your coins be used or locked — the "
+        "catch is that a locked coin cannot be sold until the lock ends, whatever the market "
+        "does.",
+        "Flexible products can usually be redeemed at any time; fixed-term ones lock until the "
+        "term ends; staking a coin on its own network can add an unstaking wait (ETH's exit "
+        "queue has taken from hours to weeks). The rate is set by the product and can change.",
+        "Before locking anything, read that product's own term and redemption rules on Bitget — "
+        "this console has not read them — and lock only what you would not need to sell in a "
+        "fall.",
+        "The yield is paid in the coin, so a 5% yield on a coin that falls 30% is still a loss "
+        "in dollars.")),
+    (re.compile(r"\bcopy[\s-]*trad\w*|\bcopy(?:ing)?\s+(?:a|the|what\s+a|what\s+the|other|pro)\s+"
+                r"(?:\w+\s+)?traders?\b|\btrader\s+i'?m\s+copying\b|\bguy\s+i\s+copy\b", re.I), (
+        "Bottom line: copy trading opens the same trades another trader makes, in your account, "
+        "automatically — so you take their losses as well as their gains, and their mistakes "
+        "arrive in your account before you can react.",
+        "Is the trader good or lucky: a short record of wins is often luck. Look at how long the "
+        "record runs, the worst drawdown in it, how much leverage they use and how many people "
+        "copy them — a crowd copying a lucky streak is common.",
+        "Whether Bitget covers any of your loss is set by its copy-trading terms, which this "
+        "console has not read; by the mechanics, a copied loss is your loss.",
+        "Set the amount you copy with as the most you would accept losing.")),
+    (re.compile(r"\b(?:i'?m|i\s+am|we'?re|we\s+are|living)\s+(?:from|in)\s+[A-Za-z]+\b[^?]{0,80}"
+                r"\b(?:(?:work|available|allowed|legal)\s+(?:for\s+me|for\s+us|here|there|in\s+my\s+"
+                r"country)|only\s+for\s+(?:us\b|usa|americans|\w+\s+people)|gonna\s+work\s+for\s+me)"
+                r"|\b(?:work|available|allowed)\s+(?:for\s+me\s+)?in\s+my\s+country\b", re.I), (
+        "Bottom line: this console works anywhere it loads — it is a research page with no "
+        "account. Whether Bitget itself serves your country is set by Bitget's terms and its "
+        "list of restricted regions, which this console has not read: check them on Bitget "
+        "before depositing.",
+        "Everything here — prices, risks, costs — is the same wherever you ask from.")),
+    (re.compile(r"\btax(?:es|ed)?\b|\birs\b|\bhmrc\b|\bcapital\s+gains?\b|\breport\s+(?:it|this|"
+                r"that|my\s+(?:gains?|losses|profits?))\b", re.I), (
+        "Bottom line: not tax advice — the rules are your country's — but in many countries "
+        "selling, swapping or spending crypto at a gain is taxable whether or not the money "
+        "reaches your bank.",
+        "If you lost money, it is usually still worth reporting: in many countries a loss on "
+        "crypto offsets gains, this year or later.",
+        "This console does not send anything to the IRS or any tax office — it holds no account. "
+        "Reporting is normally the taxpayer's job, though exchanges in some countries also report "
+        "to the tax office. Keep a record of every buy and sell with its date and price; this "
+        "console can review a pasted trade list for you.",
+        "For what you owe, ask a tax professional or your tax office's own guidance.")),
+    (re.compile(r"\baverag(?:e|ing)\s+down\b|\bbuy\s+more\s+(?:to\s+)?(?:lower|bring\s+down)\s+"
+                r"(?:my\s+)?(?:average|cost)\b", re.I), (
+        "Bottom line: averaging down lowers your average price, but it also makes the position "
+        "bigger while the price is falling — it doubles the bet on a call that is so far wrong.",
+        "It makes sense only if you would buy the coin today at this price from scratch, at "
+        "this larger size. If the reason you bought it has changed, buying more does not fix "
+        "that.",
+        "Ask \"how much could I lose on <name> in a bad week\" with the larger amount before "
+        "adding.")),
+    (re.compile(r"\bwh?at(?:'?s|\s+is|\s+are)\s+(?:a\s+)?meme\s*coins?\b|\bmeme\s*coins?\s+"
+                r"(?:even\s+)?mean\b", re.I), (
+        "Bottom line: a memecoin is a coin built on a joke, an animal or an internet trend, with "
+        "no business or cash flow behind it — its price is attention, and attention fades.",
+        "Most fall far from their peak and many go close to zero; a few run very high first, "
+        "which is what you hear about.",
+        "If you try one, use only money you could lose entirely: $20 you would not miss is the "
+        "right kind of amount.")),
+    (re.compile(r"\b(?:everything|all\s+(?:my\s+)?(?:money|savings))\s+in\s+(?:usdt|usdc|stable\s*"
+                r"coins?|dollars?)\b", re.I), (
+        "Bottom line: holding savings in USDT protects them from your own currency falling, but "
+        "it puts all of them on one company — Tether — and on the exchange that holds them.",
+        "Spreading across more than one holder (another stablecoin such as USDC, or dollars at "
+        "a bank where you can) means one failure does not take everything.",
+        "USDT has held near $1 for years but dipped to about $0.95 in May 2022; ask \"what is "
+        "USDT trading at\" for today's price.")),
     # Plain questions a first-time user asked and was told "I did not recognise that question"
     # while the model was available (a first-time user, round 24). Each answer is the plain fact
     # and the next question this console can answer with live figures.
@@ -671,8 +783,11 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
         "Learning costs nothing: ask this console anything — \"how much could I lose on BTC "
         "in a bad week with $200\" shows what that money would have been through — and keep "
         "the $200 until you can decide for yourself, without leverage.",)),
-    (re.compile(r"\b(?:just\s+)?(?:hold(?:ing)?|keep(?:ing)?|stay(?:ing)?\s+in|park(?:ing)?)\s+"
-                r"(?:it\s+in\s+)?(?:usdt|usdc|stable\s*coins?|cash)\b", re.I), (
+    # "is BTC a safe place to park cash until then" got this block, about USDT (a judge, round 31)
+    (re.compile(r"\b(?:just\s+)?(?:hold(?:ing)?|keep(?:ing)?|stay(?:ing)?\s+in)\s+(?:it\s+in\s+)?"
+                r"(?:usdt|usdc|stable\s*coins?|cash)\b(?![^?]{0,30}\b(?:is|are)\s+(?:btc|eth|"
+                r"bitcoin|gold))|\bpark(?:ing)?\s+(?:it\s+in\s+)?(?:usdt|usdc|stable\s*coins?)\b",
+                re.I), (
         "Bottom line: holding USDT keeps the money near $1 a coin while you decide — it does "
         "not grow, and it is not risk-free: it is a claim on its issuer, Tether.",
         "It has wobbled: USDT traded briefly below $1 in May 2022, the week TerraUSD collapsed, "
@@ -727,7 +842,58 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
 )
 
 
+_STOP_WORDS: Final = frozenset({
+    "a", "an", "the", "is", "are", "was", "were", "be", "to", "of", "in", "on", "for", "and",
+    "or", "but", "if", "it", "its", "this", "that", "do", "does", "did", "i", "me", "my",
+    "you", "your", "u", "can", "could", "should", "would", "will", "just", "so", "like",
+    "what", "how", "who", "why", "when", "which", "there", "here", "about", "with", "from",
+    "at", "as", "by", "not", "no", "yes", "ok", "okay", "wait", "really", "actually", "even",
+    "still"})
+
+
+def _lead_by_question(text: str, answer: tuple[str, ...]) -> tuple[str, ...]:
+    """The answer with the line that best answers this question first.
+
+    Copy trading, staking, tax and a stablecoin scare each got the same lead three turns running —
+    "how do I know if the trader is good or lucky" and "does Bitget cover me" both opened with what
+    copy trading is (a first-time user, round 31). The lines already held each answer; the one
+    sharing most words with the question now leads, and the rest follow in their order."""
+    words = {w[:5] for w in re.findall(r"[a-z]{3,}", text.lower()) if w not in _STOP_WORDS}
+    if not words or len(answer) < 2:
+        return answer
+    scores = [len(words & {w[:5] for w in re.findall(r"[a-z]{3,}", line.lower())})
+              for line in answer]
+    best = max(range(len(answer)), key=lambda i: (scores[i], -i))
+    if best == 0 or scores[best] <= scores[0] + 1:
+        return answer
+    lead = answer[best].removeprefix("Bottom line: ")
+    first = answer[0].removeprefix("Bottom line: ")
+    rest = [line for i, line in enumerate(answer) if i not in (0, best)]
+    return (f"Bottom line: {lead[:1].upper()}{lead[1:]}", f"{first[:1].upper()}{first[1:]}",
+            *rest)
+
+
+_ALSO: Final = re.compile(r"[,.;]?\s*\b(?:and\s+)?also\b|,\s*and\s+(?=(?:is|are|can|should|"
+                          r"what|how|do|does)\b)", re.I)
+
+
 def reply(text: str, *, named: bool = False) -> Reply | None:
+    """The newcomer answer to ``text``, both halves when it asks two of these questions.
+
+    "i saw PEPE on my tiktok, everyone says its gonna blow up, and also is bitget even safe" was
+    answered on Bitget alone (a first-time user, round 31): each half that is one of these
+    questions now gets its own answer, the second under the first."""
+    parts = _ALSO.split(text, maxsplit=1)
+    if len(parts) == 2 and all(len(x.split()) >= 3 for x in parts):
+        first, second = (_reply_one(x, named=named) for x in parts)
+        if (first is not None and second is not None and first.lines and second.lines
+                and first.lines[0] != second.lines[0]):
+            also = second.lines[0].removeprefix("Bottom line: ")
+            return Reply(lines=(*first.lines[:2], f"Also asked — {also}", *second.lines[1:2]))
+    return _reply_one(text, named=named)
+
+
+def _reply_one(text: str, *, named: bool = False) -> Reply | None:
     """The newcomer answer to ``text``, or None when it is not one of these questions.
 
     ``named`` says the question names a contract; the questions that ask about one name ("what
@@ -738,7 +904,7 @@ def reply(text: str, *, named: bool = False) -> Reply | None:
 
     for asked, answer in _PLAIN:
         if asked.search(text):
-            return Reply(lines=answer)
+            return Reply(lines=_lead_by_question(text, answer))
     if _LOAN.search(text):
         return Reply(lines=_LOAN_A)
     if _WHAT_NOW.search(text):

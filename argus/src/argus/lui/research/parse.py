@@ -869,8 +869,13 @@ def price_forecast_asked(text: str) -> bool:
     return bool(PRICE_FORECAST.search(text)) and not PAST_PREDICTION.search(text)
 
 
-_LEVERAGE = re.compile(r"\b(\d+(?:\.\d+)?)\s*x\b(?!\s*(?:the\s+)?atr)|\bleverage\w*|"
-                       r"\bliquidat\w*|\bmargin\b", re.I)
+_LEVERAGE = re.compile(r"\b(\d+(?:\.\d+)?)\s*x\b(?!\s*(?:the\s+)?atr)|"
+                       r"(?<!balance\ssheet\s)(?<!balance-sheet\s)(?<!financial\s)(?<!operating\s)"
+                       r"(?<!corporate\s)\bleverage\w*|\bliquidat\w*|\bmargin\b"
+                       r"(?!\s+(?:of\s+safety|expansion|compression|squeeze))", re.I)
+"""Trading leverage. A company's balance-sheet, financial or operating leverage is not: "research
+case for MSTR including BTC balance sheet leverage" was read as a 10x leverage question (a judge,
+round 31); nor is a profit margin."""
 
 _NEW_MONEY = re.compile(
     r"\b(?:put|invest(?:ing)?|buy(?:ing)?|add(?:ing)?|get\s+into|start)\b", re.I)

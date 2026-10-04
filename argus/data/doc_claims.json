@@ -13,52 +13,52 @@
       "doc": "readme",
       "line": 55,
       "quoted": [
-        "11,549"
+        "11,604"
       ],
       "live": [
-        11549
+        11604
       ],
       "status": "OK",
-      "excerpt": "11,549 tests collected"
+      "excerpt": "11,604 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 284,
       "quoted": [
-        "11,549"
+        "11,604"
       ],
       "live": [
-        11549
+        11604
       ],
       "status": "OK",
-      "excerpt": "11,549 tests collected"
+      "excerpt": "11,604 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 288,
       "quoted": [
-        "11,549"
+        "11,604"
       ],
       "live": [
-        11549
+        11604
       ],
       "status": "OK",
-      "excerpt": "11,549 tests collected"
+      "excerpt": "11,604 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 308,
       "quoted": [
-        "11,549"
+        "11,604"
       ],
       "live": [
-        11549
+        11604
       ],
       "status": "OK",
-      "excerpt": "11,549 tests collected"
+      "excerpt": "11,604 tests collected"
     },
     {
       "claim": "tests_passing",
@@ -66,7 +66,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        11549
+        11604
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -76,78 +76,78 @@
       "doc": "explained",
       "line": 714,
       "quoted": [
-        "11,549"
+        "11,604"
       ],
       "live": [
-        11549
+        11604
       ],
       "status": "OK",
-      "excerpt": "11,549 tests"
+      "excerpt": "11,604 tests"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 1770,
       "quoted": [
-        "11,549"
+        "11,604"
       ],
       "live": [
-        11549
+        11604
       ],
       "status": "OK",
-      "excerpt": "11,549 tests collected"
+      "excerpt": "11,604 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 2419,
       "quoted": [
-        "11,549"
+        "11,604"
       ],
       "live": [
-        11549
+        11604
       ],
       "status": "OK",
-      "excerpt": "11,549 tests collected"
+      "excerpt": "11,604 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "architecture",
       "line": 13,
       "quoted": [
-        "11,549"
+        "11,604"
       ],
       "live": [
-        11549
+        11604
       ],
       "status": "OK",
-      "excerpt": "11,549 tests collected"
+      "excerpt": "11,604 tests collected"
     },
     {
       "claim": "source_files",
       "doc": "readme",
       "line": 55,
       "quoted": [
-        "594"
+        "597"
       ],
       "live": [
-        594
+        597
       ],
       "status": "OK",
-      "excerpt": "strict clean on 594 source files"
+      "excerpt": "strict clean on 597 source files"
     },
     {
       "claim": "source_files",
       "doc": "public-readme",
       "line": 309,
       "quoted": [
-        "594"
+        "597"
       ],
       "live": [
-        594
+        597
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 594 source files"
+      "excerpt": "strict` clean on 597 source files"
     },
     {
       "claim": "source_files",
@@ -155,7 +155,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        594
+        597
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -165,84 +165,84 @@
       "doc": "explained",
       "line": 1771,
       "quoted": [
-        "594"
+        "597"
       ],
       "live": [
-        594
+        597
       ],
       "status": "OK",
-      "excerpt": "strict` clean on **594 source files"
+      "excerpt": "strict` clean on **597 source files"
     },
     {
       "claim": "source_files",
       "doc": "explained",
       "line": 2416,
       "quoted": [
-        "594"
+        "597"
       ],
       "live": [
-        594
+        597
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 594 source files"
+      "excerpt": "strict` clean on 597 source files"
     },
     {
       "claim": "source_files",
       "doc": "architecture",
       "line": 14,
       "quoted": [
-        "594"
+        "597"
       ],
       "live": [
-        594
+        597
       ],
       "status": "OK",
-      "excerpt": "strict` clean on the 594 files"
+      "excerpt": "strict` clean on the 597 files"
     },
     {
       "claim": "source_tree",
       "doc": "explained",
       "line": 1768,
       "quoted": [
-        "597",
+        "600",
         "20"
       ],
       "live": [
-        597,
+        600,
         20
       ],
       "status": "OK",
-      "excerpt": "597** files across **20 packages"
+      "excerpt": "600** files across **20 packages"
     },
     {
       "claim": "source_tree",
       "doc": "explained",
       "line": 2416,
       "quoted": [
-        "597",
+        "600",
         "20"
       ],
       "live": [
-        597,
+        600,
         20
       ],
       "status": "OK",
-      "excerpt": "597 files, 20 packages"
+      "excerpt": "600 files, 20 packages"
     },
     {
       "claim": "source_tree",
       "doc": "architecture",
       "line": 11,
       "quoted": [
-        "597",
+        "600",
         "20"
       ],
       "live": [
-        597,
+        600,
         20
       ],
       "status": "OK",
-      "excerpt": "597 source files**, 20 packages"
+      "excerpt": "600 source files**, 20 packages"
     },
     {
       "claim": "data_files",

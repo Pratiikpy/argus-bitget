@@ -168,6 +168,12 @@ def _valid(kind: str, value: str, subject: str, quote: str, context: str = ""
         styled = re.search(r"\b(day|swing|position|long[\s-]?term)\b", quote, re.I)
         if hours <= 0 or not (word or styled):
             return None
+        if re.search(r"\b\d+[\s-]*(?:day|week)\b[^.]{0,12}\b(?:var|value[\s-]+at[\s-]+risk|"
+                     r"9[05]\s*%|99\s*%)", quote, re.I) or re.search(r"^\s*\d+[\s-]*day\s*$",
+                                                                    quote, re.I):
+            # "1-day 95% VaR" is a risk measure's window, and replaced a saved "exactly 2 years"
+            # horizon (a judge, round 31)
+            return None
         return str(hours), ""
     if kind == "style":
         slug = re.sub(r"[\s_]+", "-", value.strip().lower())

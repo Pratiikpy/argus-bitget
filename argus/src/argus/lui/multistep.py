@@ -42,8 +42,10 @@ from 4 for a numbered checklist of eight questions (a hostile review, round 30);
 each is shown by its own lead and two lines, the rest one ask away."""
 FULL_PARTS = 4
 """Up to this many parts, each is shown in full below the leads."""
-_NUMBERED = re.compile(r"(?:^|[\s,;:])(?:and\s+)?\(?\d{1,2}[).]\s+(?=\S)")
-"""An item of a numbered list: "1) ", "(2) ", "3. "."""
+_NUMBERED = re.compile(r"(?:^|[\s,;:])(?:and\s+)?(?:\(?\d{1,2}[).]\s+|\([a-h]\)\s*)(?=\S)")
+"""An item of a numbered or lettered list: "1) ", "(2) ", "3. ", "(a) " — "(a) what is
+BTC's price (b) is it a good time to buy (c) what leverage" answered (b) alone (a hostile
+review, round 31)."""
 
 _SPLIT = re.compile(
     r"(?<=[?.!;])\s+(?=\S)|\s*;\s*|\s+(?:and\s+)?then\s+(?=(?:what|how|is|are|should|can|tell|"
@@ -105,7 +107,8 @@ def _formal(piece: str) -> str:
 
 
 _CONSOLE_ONLY = re.compile(r"\b(?:max(?:imum)?|highest|most)\s+(?:allowed\s+)?leverage\b|"
-                           r"\bleverage\s+(?:cap|limit)\b", re.I)
+                           r"\bleverage\s+(?:cap|limit)\b|\b(?:good|right|bad)\s+(?:time\s+to\s+"
+                           r"(?:buy|sell|get\s+in)|entry)\b|\bwhat\s+leverage\s+should\b", re.I)
 """Items a research engine would misread: "what's the max leverage Bitget allows on TSLA" went to
 the liquidation reader at 10x; the console's own tier-list reader answers it."""
 
@@ -168,15 +171,16 @@ def parts(question: str, book: str = "") -> list[Part] | None:
     earlier: list[str] = []
     for piece in pieces:
         request = with_book(detect(piece) or detect(_formal(piece)), book, piece)
-        if listed and _CONSOLE_ONLY.search(piece):
+        console_only = bool(listed and _CONSOLE_ONLY.search(piece))
+        if console_only:
             request = None  # a venue fact the console's own reader answers (see _CONSOLE_ONLY)
         inherited = ""
-        if request is None and earlier:
+        if request is None and earlier and not console_only:
             request = follow_up(piece, earlier, book)
             if request is not None:
                 named = research_symbols(" ".join(earlier))[0]
                 inherited = named[-1] if named else ""
-        if (request is None and earlier and not research_symbols(piece)[0]
+        if (request is None and earlier and not console_only and not research_symbols(piece)[0]
                 and re.search(r"\bwhich\b|\bbetter\b|\bstronger\b", piece, re.I)):
             # "…which is cheaper on valuation and which has better momentum?" asks both parts of
             # both names; the second ran as one name's technicals (a judge, round 19, row 673)
@@ -186,7 +190,7 @@ def parts(question: str, book: str = "") -> list[Part] | None:
                 request = with_book(detect(f"{piece}, {both}"), book, piece)
                 inherited = (" and ".join(n.removesuffix("USDT") for n in named[:2])
                              if request is not None else "")
-        if request is None and earlier and not research_symbols(piece)[0]:
+        if request is None and earlier and not console_only and not research_symbols(piece)[0]:
             named = research_symbols(" ".join(earlier))[0]
             if named:
                 name = named[-1].removesuffix("USDT")
@@ -197,7 +201,8 @@ def parts(question: str, book: str = "") -> list[Part] | None:
                     spelled = f"{piece} {name}"
                 request = with_book(detect(spelled), book, piece)
                 inherited = named[-1] if request is not None else ""
-        if (request is None and earlier and found and found[-1].request is not None
+        if (request is None and earlier and not console_only and found
+                and found[-1].request is not None
                 and found[-1].request.kind is ResearchKind.MACRO):
             # "…; how does that affect BTC": the macro read, for the name this part gives
             named = research_symbols(piece)[0]
@@ -209,7 +214,10 @@ def parts(question: str, book: str = "") -> list[Part] | None:
                 # an item of a numbered list is a question the asker numbered: it is answered by
                 # the console as a whole (``request`` None), or said to be unanswered, never
                 # dropped (a hostile review, round 30)
-                found.append(Part(text=piece, request=None))
+                named = research_symbols(" ".join(earlier))[0]
+                found.append(Part(text=piece, request=None,
+                                  inherited=named[-1] if named and not research_symbols(piece)[0]
+                                  else ""))
             continue
         held = next((p.request for p in reversed(found) if p.request is not None
                      and p.request.book), None)
@@ -286,7 +294,11 @@ def answer(question: str, found: list[Part], run: Any) -> tuple[list[str], list[
     # so the parts' source counts (`truth/coverage.py`) and their step trace (`lui/trace.py`)
     # were silently dropped from multi-part answers.
     with ContextPool(max_workers=len(budget)) as pool:
-        results = list(pool.map(lambda p: run(p.text, p.request), budget))
+        # an item the console answers whole carries the name an earlier item gave it ("(b) is it
+        # a good time to buy" after "(a) what is BTC's price")
+        results = list(pool.map(lambda p: run(
+            f"{p.text} ({bare_symbol(p.inherited)})" if p.request is None and p.inherited
+            else p.text, p.request), budget))
     unread = sum(1 for r in results if getattr(r, "refused", False))
     leads: list[str] = []
     body: list[str] = []

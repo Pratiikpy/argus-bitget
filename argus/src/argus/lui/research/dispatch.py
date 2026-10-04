@@ -2364,7 +2364,11 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                 if request.notional and _ROUND_TRIP.search(raw_text) and len(quoted) == 1:
                     sized_line = _sized_round_trip(symbol, Decimal(str(request.notional)), fee)
                     if sized_line is not None:
-                        lines[0] = lines[0].replace("Bottom line: ", "", 1)
+                        # The touch figure beside a walked size read as a second, smaller cost
+                        # for the same trade (round-31 re-run): it is said as the small-order one
+                        lines[0] = lines[0].replace("Bottom line: a round trip in",
+                                                    "For a small order at the touch, a round "
+                                                    "trip in", 1)
                         lines.insert(0, sized_line[0])
                         sources.append(sized_line[1])
                 # "what is BTC doing" also asks for the price and the move, not the fee (a

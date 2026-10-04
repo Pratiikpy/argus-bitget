@@ -275,7 +275,7 @@ def schema_errors(schema: Mapping[str, Any], value: Any, path: str = "") -> list
     array), ``properties``, ``required``, ``items`` and schema-valued ``additionalProperties`` —
     plus one rule the JSON grammar implies: a number must be finite. Booleans are not numbers
     (JSON Schema's own rule; Python's ``bool`` is an ``int``). Properties not declared are
-    allowed, as the schemas do not forbid them.
+    refused at the top level by name, since a misspelt one would otherwise be dropped silently.
     """
     where = path or "arguments"
     kind = schema.get("type")
@@ -292,6 +292,12 @@ def schema_errors(schema: Mapping[str, Any], value: Any, path: str = "") -> list
                 errors += schema_errors(props[key], item, child)
             elif isinstance(extra, Mapping):
                 errors += schema_errors(extra, item, f"{where}[{_echo(key)}]")
+            elif not path and props:
+                # `argus_stress` called with "shock_symbol"/"shock_pct" dropped both silently and
+                # ran its QQQ -10% default as if asked (a judge, round 31): a tool's own argument
+                # names are the only ones it reads, so any other is refused by name
+                errors.append(f"{_echo(key)} is not an argument of this tool (it takes "
+                              f"{', '.join(props)})")
         return errors
     if kind == "string" and not isinstance(value, str):
         return [f"{where} must be a string, not {type(value).__name__}"]

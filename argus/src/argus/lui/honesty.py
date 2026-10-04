@@ -53,7 +53,7 @@ from concurrent.futures import TimeoutError as FutureTimeout
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Any, Final, TypeVar
 
 from argus.truth import http
 from argus.truth.endpoints import BITGET_API
@@ -1263,7 +1263,27 @@ def future_date_asked_as_past(text: str, today: date) -> date | None:
             continue
         if day > today:
             return day
+    # "What was BTC's closing price on Bitget on January 1, 2030?" got today's quote with no word
+    # that the date had not happened (a hostile review, round 31): written dates too
+    for m in _WRITTEN_DATE.finditer(text):
+        month = _MONTH_NUM.get((m.group("m") or m.group("m2")).lower()[:3])
+        try:
+            day = date(int(m.group("y") or m.group("y2")), month or 0,
+                       int(m.group("d") or m.group("d2")))
+        except (TypeError, ValueError):
+            continue
+        if day > today:
+            return day
     return None
+
+
+_MONTH_NUM: Final = {m: i for i, m in enumerate(
+    ("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"), 1)}
+_WRITTEN_DATE: Final = re.compile(
+    r"\b(?P<m>jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?\s+(?P<d>\d{1,2})"
+    r"(?:st|nd|rd|th)?,?\s+(?P<y>\d{4})\b|\b(?P<d2>\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?"
+    r"(?P<m2>jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?,?\s+(?P<y2>\d{4})\b",
+    re.I)
 
 
 _NUMERIC_DATE = re.compile(r"(?<![\d/.-])(\d{1,2})[/.](\d{1,2})[/.](\d{4})(?![\d/.-])")

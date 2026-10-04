@@ -38,7 +38,8 @@ _BY_YEAR_END: Final = re.compile(
     r"\b(?:by\s+|before\s+)?(?:the\s+)?end\s+of\s+(?:this|the)\s+year\b|\bby\s+(?:december|dec|"
     r"new\s+year'?s?|christmas)\b|\b(?:this|by\s+the\s+end\s+of\s+the)\s+year\b|\beoy\b", re.I)
 _IN_SPAN: Final = re.compile(
-    r"\b(?:in|within|over|by)\s+(?:the\s+next\s+)?(?P<n>\d+|a|one|two|three|six)\s+(?P<u>days?|"
+    r"\b(?:in|within|over|by)\s+(?:the\s+next\s+)?(?:like\s+|about\s+|around\s+)?"
+    r"(?P<n>\d+|a|one|two|three|six)\s+(?P<u>days?|"
     r"weeks?|months?|years?)\b", re.I)
 _WORDS: Final = {"a": 1, "one": 1, "two": 2, "three": 3, "six": 6}
 _UNIT_DAYS: Final = {"day": 1, "week": 7, "month": 30, "year": 365}
@@ -55,8 +56,8 @@ DAILY_OR_HOLD: Final = re.compile(
     r"(?:just\s+)?(?:day\s*)?trad",
     re.I)
 MISSED: Final = re.compile(
-    r"\bif\s+it\s+(?:does\s*n[o']?t|doesnt|does\s+not|wont|won'?t|never)\s+(?:work\s+out|happen|"
-    r"get\s+there|hit|reach)\b|\bif\s+i\s+(?:miss|don'?t\s+(?:hit|reach|make))\b|\bwhat\s+if\s+i\s+"
+    r"\bif\s+it\s+(?:does\s*n[o']?t|doesnt|does\s+not|wont|won'?t|never)\s+(?:work(?:\s+out)?|"
+    r"happen|get\s+there|hit|reach)\b|\bif\s+i\s+(?:miss|don'?t\s+(?:hit|reach|make))\b|\bwhat\s+if\s+i\s+"
     r"(?:miss|fail|don'?t\s+make\s+it)\b", re.I)
 REALISTIC: Final = re.compile(
     r"\b(?:is\s+(?:that|this|it)\s+(?:even\s+)?(?:realistic|possible|doable|achievable|"
@@ -82,12 +83,51 @@ def _money(value: str, k: str | None) -> float:
     return float(value.replace(",", "")) * (1000 if k else 1)
 
 
+_TARGET_IT: Final = re.compile(
+    r"\b(?:turn|grow|make|get|flip)\s+(?:it|that|this|them|my\s+money)\s+(?:in)?to\s+(?:like\s+|"
+    r"about\s+|around\s+)?\$?\s*(?P<b>\d[\d,]*(?:\.\d+)?)(?![\d,.]*\d)\s*(?P<kb>k|grand|thousand)?"
+    r"\b", re.I)
+_HAVE: Final = re.compile(
+    r"\b(?:got|have|has|holding|saved)\s+(?:only\s+|just\s+|like\s+|about\s+)*\$?\s*"
+    r"(?P<a>\d[\d,]*(?:\.\d+)?)(?![\d,.]*\d)\s*(?P<ka>k|grand|thousand)?\s*(?:bucks|dollars?|usd|"
+    r"usdt)?", re.I)
+""""i only got 50 bucks to my name, i need to turn it into like 300 for a concert ticket in 3
+weeks, is that even possible" was filed as a note and never answered (a first-time user, round
+31): the sum held and the sum wanted, said apart."""
+
+
+_DOUBLE: Final = re.compile(
+    r"\b(?P<m>double|triple|quadruple|10x|5x|3x|2x)\s+(?:my\s+|the\s+|this\s+)?\$?\s*(?P<a>\d[\d,]*"
+    r"(?:\.\d+)?)(?![\d,.]*\d)\s*(?P<ka>k|grand|thousand)?\s*(?:bucks|dollars?|usd|usdt)?\b", re.I)
+_MULTIPLE: Final = {"double": 2.0, "2x": 2.0, "triple": 3.0, "3x": 3.0, "quadruple": 4.0,
+                    "5x": 5.0, "10x": 10.0}
+"""A target said as a multiple: "my goal is to double 1000 dollars in like 6 months" was filed as a
+note (a first-time user, round 31)."""
+NEW_DATE: Final = re.compile(
+    r"\b(?:in|is|by)\s+(?P<n>\d+|a|one|two|three|six)\s+(?P<u>days?|weeks?|months?)\s+(?:not|"
+    r"instead\s+of)\s+\d+|\b(?:not|instead\s+of)\s+\d+\s*(?:days?|weeks?|months?)?[^?]{0,20}?\b(?:"
+    r"in|is|it'?s)\s+(?P<n2>\d+)\s+(?P<u2>days?|weeks?|months?)\b", re.I)
+"""A deadline moved: "actually wait the concert is in 5 weeks not 3"."""
+SAFER: Final = re.compile(r"\b(?:safer|less\s+risky|riskier|more\s+dangerous)\b", re.I)
+_LEVERAGE_SAID: Final = re.compile(r"\bleverage|\bfutures\b|\bperps?\b|\bmargin\b", re.I)
+
+
 def stated(text: str, *, today: date) -> Target | None:
     """The target ``text`` states, with the days it allows."""
     m = TARGET.search(text)
-    if m is None:
+    it = _TARGET_IT.search(text) if m is None else None
+    have = _HAVE.search(text) if it is not None else None
+    doubled = _DOUBLE.search(text) if m is None else None
+    if m is not None:
+        start, goal = _money(m.group("a"), m.group("ka")), _money(m.group("b"), m.group("kb"))
+    elif doubled is not None:
+        start = _money(doubled.group("a"), doubled.group("ka"))
+        goal = start * _MULTIPLE[doubled.group("m").lower()]
+    elif it is not None and have is not None:
+        start, goal = (_money(have.group("a"), have.group("ka")),
+                       _money(it.group("b"), it.group("kb")))
+    else:
         return None
-    start, goal = _money(m.group("a"), m.group("ka")), _money(m.group("b"), m.group("kb"))
     if start <= 0 or goal <= start:
         return None
     if _BY_YEAR_END.search(text):
@@ -105,12 +145,29 @@ def stated(text: str, *, today: date) -> Target | None:
 
 
 def remembered(text: str, prior: list[str], *, today: date) -> Target | None:
-    """The target this message or one of the last few states."""
-    for said in (text, *reversed(prior[-6:])):
-        target = stated(said, today=today)
+    """The target this message or one of the last few states, with any later moved date applied.
+
+    "the concert is in 5 weeks not 3" moved the date, and the next turn still answered with the old
+    one (a first-time user, round 31): a date moved after the target was set now carries."""
+    turns = [*prior[-6:], text]
+    for at in range(len(turns) - 1, -1, -1):
+        target = stated(turns[at], today=today)
         if target is not None:
+            for later in turns[at + 1:-1]:
+                target = moved_target(target, later, today=today) or target
             return target
     return None
+
+
+def moved_target(target: Target, text: str, *, today: date) -> Target | None:
+    """``target`` with the deadline ``text`` moves it to, or None when ``text`` moves nothing."""
+    moved = NEW_DATE.search(text)
+    if moved is None:
+        return None
+    n = (moved.group("n") or moved.group("n2")).lower()
+    unit = (moved.group("u") or moved.group("u2")).lower().rstrip("s")
+    days = (int(n) if n.isdigit() else _WORDS[n]) * _UNIT_DAYS[unit]
+    return Target(target.start, target.goal, days, today + timedelta(days=days))
 
 
 def _count(symbol: str, days: int, needed: float) -> tuple[int, int, float, float] | None:
@@ -204,40 +261,71 @@ def daily_or_hold_lines(target: Target | None) -> list[str]:
             "Ask \"what does it cost to trade BTC\" for the fee arithmetic on one trade."]
 
 
-def missed_lines(target: Target | None) -> list[str]:
+def missed_lines(target: Target | None, text: str = "") -> list[str]:
     when = (f" ({target.deadline:%d %b %Y})" if target is not None and target.deadline else "")
-    return [f"Bottom line: decide it now, not on the date{when} — the date is yours, the "
-            "market's moves are not, and a missed target is the moment people double the size or "
-            "add leverage to catch up, which is how a missed goal becomes a lost stake.",
-            "The three honest options when the date comes: keep what is there and move the date; "
+    decide = (f"decide it now, not on the date{when} — the date is yours, the market's moves are "
+              "not, and a missed target is the moment people double the size or add leverage to "
+              "catch up, which is how a missed goal becomes a lost stake.")
+    rest = ["The three honest options when the date comes: keep what is there and move the date; "
             "take it out and stop; or accept the result and change nothing. None of them is "
             "\"bet bigger\".",
             "Write down today the loss at which you stop — for example 30% of what you started "
             "with — and keep to it whatever the date.",
             "Ask \"how much could I lose on BTC in a bad month\" with your amount to see that loss "
             "in dollars."]
+    if re.search(r"\bborrow\w*|\bloan\b", text, re.I):
+        # The borrowing question is the one asked, so it leads (a first-time user, round 31).
+        return ["Bottom line: no — borrowing to make up a miss is the most expensive version of "
+                "\"bet bigger\": a loss then leaves a debt as well, with interest.",
+                f"{decide[:1].upper()}{decide[1:]}", *rest]
+    return [f"Bottom line: {decide}", *rest]
+
+
+def safer_lines(target: Target) -> list[str]:
+    """Holding against leverage for the same target, said for someone who has never traded."""
+    lev = 5.0
+    return [f"Bottom line: buying and holding without leverage is the safer of the two — the most "
+            f"you can lose is the ${target.start:,.0f} you put in, and only if the coin goes to "
+            f"zero; with {lev:g}x leverage a fall of about {1 / lev - 0.004:.0%} closes the "
+            f"position and the ${target.start:,.0f} is gone.",
+            f"Leverage makes the +{target.needed:.0%} target closer and the total loss far more "
+            f"likely at the same time; for someone who has never traded, the first mistake with "
+            f"leverage is usually the whole stake.",
+            "Ask \"what happens on a 3x long on BTC\" to see the line for any leverage."]
 
 
 def lines(text: str, prior: list[str], *, now: datetime | None = None) -> list[str] | None:
     """The answer when ``text`` is about a stated money target, or None."""
     today = (now or datetime.now(UTC)).date()
     here = stated(text, today=today)
-    if here is not None and (REALISTIC.search(text) or "?" in text):
+    if here is not None and (REALISTIC.search(text) or "?" in text or re.search(
+            r"\b(?:should|can|could|would)\s+i\b|\bhow\s+(?:do|can|should)\s+i\b", text, re.I)):
         return realism_lines(here)
     target = remembered(text, prior, today=today)
     if target is None:
         return daily_or_hold_lines(None) if DAILY_OR_HOLD.search(text) else None
+    moved = moved_target(target, text, today=today)
+    if moved is not None:
+        before, days = target.days, moved.days
+        target = moved
+        again = realism_lines(target)
+        if again is not None:
+            return [again[0], f"What changed: {before} days became {days}; the rise needed is "
+                              f"the same +{target.needed:.0%}, measured now over {days}-day "
+                              f"windows.", *again[1:]]
+    if SAFER.search(text) and any(_LEVERAGE_SAID.search(q) for q in [*prior[-3:], text]):
+        return safer_lines(target)
     if FOCUS.search(text):
         return focus_lines(target)
     if DAILY_OR_HOLD.search(text):
         return daily_or_hold_lines(target)
     if MISSED.search(text):
-        return missed_lines(target)
+        return missed_lines(target, text)
     return None
 
 
-__all__ = ["DAILY_OR_HOLD", "FOCUS", "MISSED", "REALISTIC", "TARGET", "Target",
-           "daily_or_hold_lines", "focus_lines", "lines", "missed_lines", "realism_lines",
-           "remembered", "stated"]
+__all__ = ["DAILY_OR_HOLD", "FOCUS", "MISSED", "NEW_DATE", "REALISTIC", "SAFER", "TARGET",
+           "Target", "daily_or_hold_lines", "focus_lines", "lines", "missed_lines",
+           "moved_target", "realism_lines", "remembered", "safer_lines", "stated"]
 
 trace_module(globals())

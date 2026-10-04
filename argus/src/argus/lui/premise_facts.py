@@ -141,6 +141,121 @@ def ticker(text: str, symbol: str) -> str | None:
             + ". The figures below are for " + real + ".")
 
 
+EARNINGS_CLAIM: Final = re.compile(
+    r"\b(?:earnings|results|reported|report(?:ed)?|earnings\s+call)\b[^.?]{0,40}?\b(?:yesterday|"
+    r"this\s+morning|today|last\s+night|earlier\s+today)\b|\b(?:yesterday|this\s+morning|today|"
+    r"last\s+night)\b[^.?]{0,30}?\b(?:earnings|reported|results)\b", re.I)
+LEADERSHIP_CLAIM: Final = re.compile(
+    r"\b(?:ceo|chief\s+executive|cfo|chairman|founder)\b[^.?]{0,40}?\b(?:stepped\s+down|steps\s+"
+    r"down|resign\w*|was\s+fired|fired|left|quit|replaced|ousted|departed)\b|\b(?:stepped\s+down|"
+    r"resign\w*|was\s+fired|ousted)\b[^.?]{0,30}?\b(?:as\s+)?(?:ceo|chief\s+executive|cfo|"
+    r"chairman)\b", re.I)
+INDEX_CLAIM: Final = re.compile(
+    r"\b(?:removed|dropped|kicked\s+out|deleted|added|joined|included|admitted)\b[^.?]{0,25}?\b"
+    r"(?:from|to|in|into)?\s*(?:the\s+)?(?:s&p\s*500|s&p|nasdaq[\s-]*100|dow(?:\s+jones)?|russell"
+    r"\s*\d{3,4})\b", re.I)
+FEE_PROMO_CLAIM: Final = re.compile(
+    r"\b(?P<rate>\d+(?:\.\d+)?)\s*%\s+(?P<side>maker|taker)\s+fee\b[^.?]{0,40}?\b(?:promotion|"
+    r"promo|campaign|program|event|offer)\b|\b(?:zero|no)\s+(?P<side2>maker|taker)\s+fees?\b",
+    re.I)
+
+
+def earnings_day(text: str, symbol: str) -> str | None:
+    """A report the question says happened in the last day, against the earnings calendar: "Since
+    AAPL's earnings call was yesterday and they missed revenue" went unchecked (a hostile review,
+    round 31)."""
+    if EARNINGS_CLAIM.search(text) is None:
+        return None
+    from argus.lui.research.parse import is_us_equity
+
+    if not is_us_equity(symbol):
+        return None
+    ticker = symbol.removesuffix("USDT").removesuffix("STOCK")
+    try:
+        from argus.lui.research.earnings_moves import next_report, reactions
+
+        upcoming = next_report(ticker)
+        past = reactions(ticker, count=1)
+    except Exception:
+        return None
+    today = datetime.now(UTC).date()
+    last = past[0].moved_day if past else None
+    if last is not None and (today - last).days <= 3:
+        return None
+    if upcoming is None:
+        return None
+    when, estimated = upcoming
+    if (when - today).days <= 1:
+        return None
+    return (f"Premise check: {ticker} has not reported in the last few days — its next report is "
+            f"on {when:%d %b %Y}{' (an estimated date)' if estimated else ''}"
+            + (f" and its last was on {last:%d %b %Y}" if last else "")
+            + " (Yahoo Finance's earnings calendar), so there is no new result to read; the "
+              "figures below are as they stand.")
+
+
+def leadership(text: str, symbol: str) -> str | None:
+    """A leadership change the question states, against the 8-K item 5.02 it would require."""
+    if LEADERSHIP_CLAIM.search(text) is None:
+        return None
+    from argus.lui.research.parse import is_us_equity
+
+    if not is_us_equity(symbol):
+        return None
+    ticker = symbol.removesuffix("USDT").removesuffix("STOCK")
+    try:
+        from argus.lui.watchlist import recent_8k
+
+        filed = recent_8k([ticker], datetime.now(UTC) - timedelta(days=14)).get(ticker, [])
+    except Exception:
+        return None
+    if any(re.search(r"\b5\.02\b", f.items) for f in filed):
+        return None
+    return (f"Premise check: {ticker} has filed no 8-K under item 5.02 — the departure of a "
+            f"director or officer — in the last 14 days (SEC EDGAR), and a change at the top is "
+            f"filed within four business days; the change is not on the record, and nothing below "
+            f"assumes it.")
+
+
+def index_membership(text: str, symbol: str) -> str | None:
+    """An index addition or removal the question states: not readable here, so said as unchecked
+    rather than passed over ("Since Coinbase was removed from the S&P 500 this week")."""
+    claim = INDEX_CLAIM.search(text)
+    if claim is None:
+        return None
+    return (f"Premise check: index membership is not something this console reads, so "
+            f"“{claim.group(0).strip()}” is neither confirmed nor assumed here; check the "
+            f"index provider's announcements. The figures below are "
+            f"{symbol.removesuffix('USDT')}'s own, as they stand.")
+
+
+def fee_promotion(text: str, symbol: str) -> str | None:
+    """A fee rate the question says Bitget now charges, against the contract list's own fields."""
+    claim = FEE_PROMO_CLAIM.search(text)
+    if claim is None:
+        return None
+    try:
+        from argus.market.bitget import public_get
+
+        rows = public_get("/api/v2/mix/market/contracts",
+                          {"productType": "USDT-FUTURES", "symbol": symbol}) or []
+        maker = float(rows[0]["makerFeeRate"]) if rows else None
+        taker = float(rows[0]["takerFeeRate"]) if rows else None
+    except Exception:
+        return None
+    if maker is None or taker is None:
+        return None
+    side = (claim.group("side") or claim.group("side2") or "maker").lower()
+    stated = float(claim.group("rate") or 0.0) / 100
+    listed = maker if side == "maker" else taker
+    if abs(listed - stated) < 1e-9:
+        return None
+    return (f"Premise check: Bitget's contract list shows {symbol} at {maker:.2%} maker and "
+            f"{taker:.2%} taker right now, not {stated:.2%} {side}; a promotion would change those "
+            f"fields or be announced by Bitget, and this console reads the fields — the costs "
+            f"below use them.")
+
+
 def exchange(text: str, symbol: str) -> str | None:
     """A stock exchange the question says a company lists on, against its EDGAR record."""
     m = EXCHANGE_CLAIM.search(text)
@@ -166,7 +281,9 @@ def exchange(text: str, symbol: str) -> str | None:
             f"On Bitget it trades as {symbol} either way.")
 
 
-__all__ = ["DIVIDEND_CLAIM", "EXCHANGE_CLAIM", "PAST_LEVEL", "TICKER_CLAIM", "dividend",
-           "exchange", "past_level", "ticker"]
+__all__ = ["DIVIDEND_CLAIM", "EARNINGS_CLAIM", "EXCHANGE_CLAIM", "FEE_PROMO_CLAIM", "INDEX_CLAIM",
+           "LEADERSHIP_CLAIM", "PAST_LEVEL", "PAST_LEVEL_FIRST", "TICKER_CLAIM", "dividend",
+           "earnings_day", "exchange", "fee_promotion", "index_membership", "leadership",
+           "past_level", "ticker"]
 
 trace_module(globals())

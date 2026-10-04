@@ -64,7 +64,8 @@ TWO_BOOKS_Q: Final = re.compile(
 
 
 NUMBERED: Final = re.compile(r"(?:^|[\s,;:])(?:1[).]|\(1\))\s*\S[^?]*?[\s,;](?:and\s+)?"
-                             r"(?:2[).]|\(2\))\s*\S", re.I | re.S)
+                             r"(?:2[).]|\(2\))\s*\S|(?:^|[\s:])\(a\)\s*\S.*?\s\(b\)\s*\S",
+                             re.I | re.S)
 """A message laid out as a numbered list: "1) … 2) …"."""
 MAX_LEVERAGE_Q: Final = re.compile(
     r"\b(?:max(?:imum)?|highest|most|top)\s+(?:allowed\s+)?leverage\b|\bleverage\s+(?:cap|limit|"

@@ -47,6 +47,9 @@ NUM_POS = (r"(?:\d[\d,]*(?:\.\d+)?|\.\d+)(?![\d:])(?:[eE][-+]?\d+)?"
            r"(?:\s?(?:k|K|m|M|bn|mm)(?![A-Za-z]))?")
 NUM = r"[-\u2212]?[$\u20ac\u00a3]?\s?" + NUM_POS
 """A number as a trader types one: ``60k``, ``3,000``, ``1.5e2``, ``-37``, ``$0.0001``."""
+_NOT_LEV = r"(?!\s*(?:x\b|times\b))"
+"""A price is never a leverage multiple: "long 1 BTC at 10x" was read as an entry of 10 (a
+hostile review, round 31)."""
 
 _STOP = (r"(?:at|from|for|of|the|and|entry|each|per|spot|perps?|perpetuals?|futures?|contracts?|"
          r"shares?|lots?|units?|oz|ounces?|barrels?|bbl|short|long|to|now|mark|marked|in|"
@@ -155,43 +158,43 @@ _OPEN = re.compile(
     r"(?:(?:oz|ounces?|barrels?|bbl|shares?|contracts?|lots?|units?)\s+(?:of\s+)?)?"
     rf"(?:(?P<sym>{SYM})\s+)?(?:(?P<venue>spot|perps?|perpetuals?|futures?|contracts?|shares?)"
     r"\s+)?(?:(?P<side2>short|long)\s+)?(?:(?:bought|sold|entered|opened|shorted)\s+)?"
-    rf"(?:at|@|from|for|entry(?:\s+at)?)\s*(?P<px>{NUM})", re.I)
+    rf"(?:at|@|from|for|entry(?:\s+at)?)\s*(?P<px>{NUM}){_NOT_LEV}", re.I)
 _CURRENCY = {"$": "USD", "\u20ac": "EUR", "\u00a3": "GBP"}
 _AMOUNT_OPEN = re.compile(
     rf"(?P<side>long|short|bought|buy|i\s+hold|holding|hold)\s+(?P<cur>[$\u20ac\u00a3])\s?"
     rf"(?P<amt>{NUM_POS})\s+(?:of|in|worth\s+of)\s+(?P<sym>{SYM})\s+(?:at|@|from)\s*"
-    rf"(?P<px>{NUM})(?:\s*(?:EUR|USD|GBP|euros?|dollars?|pounds?))?", re.I)
+    rf"(?P<px>{NUM}){_NOT_LEV}(?:\s*(?:EUR|USD|GBP|euros?|dollars?|pounds?))?", re.I)
 """A leg stated as money: "long \u20ac20,000 of SAP at 200 EUR"."""
 _CLOSE = re.compile(
     r"(?P<verb>sold|sell|selling|covered|cover|covering|closed|close|bought\s+back|buy\s+back|"
     r"exited|exit|took\s+profit\s+on|bought|buy)\s+"
     rf"(?:(?P<qty>{NUM})|(?P<all>the\s+rest|all(?:\s+of\s+it)?|it|everything|half))?\s*"
     rf"(?:(?:of\s+)?(?:the\s+)?(?P<sym>{SYM})\s+)?(?:(?P<venue>spot|perps?)\s+)?"
-    rf"(?:at|@|for)\s*(?P<px>{NUM})", re.I)
+    rf"(?:at|@|for)\s*(?P<px>{NUM}){_NOT_LEV}", re.I)
 _REST = re.compile(rf"(?:and\s+)?(?P<verb>sold|sell|covered|cover|closed|close)?\s*(?:the\s+)?"
                    rf"(?:rest|remainder|remaining)(?:\s+(?P<qty>{NUM_POS}))?(?:\s+(?:shares?|"
-                   rf"units?|coins?|contracts?))?\s+(?:at|@)\s*(?P<px>{NUM})", re.I)
+                   rf"units?|coins?|contracts?))?\s+(?:at|@)\s*(?P<px>{NUM}){_NOT_LEV}", re.I)
 _PLUS = re.compile(rf"(?<![\w.%])\+\s?(?P<qty>{NUM})\s*(?:(?P<sym>{SYM})\s+)?(?:at|@)\s*"
-                   rf"(?P<px>{NUM})", re.I)
-_QTY_FIRST = re.compile(rf"(?<![\w.$%,])(?P<qty>{NUM})\s+(?P<sym>{SYM})\s*(?:at|@)\s*(?P<px>{NUM})",
-                        re.I)
+                   rf"(?P<px>{NUM}){_NOT_LEV}", re.I)
+_QTY_FIRST = re.compile(rf"(?<![\w.$%,])(?P<qty>{NUM})\s+(?P<sym>{SYM})\s*(?:at|@)\s*"
+                        rf"(?P<px>{NUM}){_NOT_LEV}", re.I)
 _SYM_FIRST = re.compile(rf"\b(?P<sym>[A-Z]{{2,6}})[:\s]+(?P<qty>{NUM})\s+(?:shares?\s+)?(?:at|@)\s*"
-                        rf"(?P<px>{NUM})")
+                        rf"(?P<px>{NUM}){_NOT_LEV}")
 _SYM_SIDE_FIRST = re.compile(
     rf"\b(?P<sym>[A-Za-z]{{2,10}})\s+(?P<side>long|short)\s+(?P<qty>{NUM_POS})\s*(?:@|at)\s*"
-    rf"(?P<px>{NUM})", re.I)
+    rf"(?P<px>{NUM}){_NOT_LEV}", re.I)
 """A leg written ticker first: "ETH long 5 @ 2,800"."""
 _QTY_SYM_SIDE = re.compile(
     rf"(?P<qty>{NUM_POS})\s+(?P<sym>{SYM})\s+(?:perps?\s+)?(?P<side>long|short)\b\s*[(,]?\s*"
-    rf"(?:entry|at|from|@|entered\s+at)\s*(?P<px>{NUM})", re.I)
+    rf"(?:entry|at|from|@|entered\s+at)\s*(?P<px>{NUM}){_NOT_LEV}", re.I)
 """A leg written as a holding with its entry: "my 2 BTC long (entry 70k)"."""
 _PRICE_FIRST = re.compile(
-    rf"\bat\s+(?P<px>{NUM}),?\s+i\s+(?P<side>shorted|sold\s+short|bought|went\s+long|went\s+short|"
+    rf"\bat\s+(?P<px>{NUM}){_NOT_LEV},?\s+i\s+(?P<side>shorted|sold\s+short|bought|went\s+long|went\s+short|"
     rf"bought\s+back)\s+(?P<qty>{NUM_POS})\s+(?:shares?\s+(?:of\s+)?)?(?P<sym>{SYM})", re.I)
 """A leg with its price first: "At 250 I shorted 100 TSLA"."""
 _SOLD_BOUGHT = re.compile(
     rf"\b(?:sold|sell)\s+(?P<qty>{NUM_POS})\s+(?:shares?\s+(?:of\s+)?)?(?P<sym>{SYM})\s+(?:at|@|for)\s*"
-    rf"(?P<px>{NUM})\s+(?:that|which)\s+i\s+(?:had\s+)?(?:bought|paid|got)\s+(?:at|for|@)\s*(?P<e>{NUM})",
+    rf"(?P<px>{NUM}){_NOT_LEV}\s+(?:that|which)\s+i\s+(?:had\s+)?(?:bought|paid|got)\s+(?:at|for|@)\s*(?P<e>{NUM})",
     re.I)
 """A sale with its own entry: "Sold 100 AAPL at 170 that I bought at 150"."""
 _RESPECTIVELY = re.compile(rf"\bmarks?\s+(?:are\s+|of\s+)?(?P<list>{NUM}(?:\s*(?:,|and)\s*"
@@ -209,13 +212,13 @@ _SPREAD = re.compile(
     r"\$?(?P<k2>\d[\d.,]*)\s+(?:at|for|@)\s*\$?(?P<p1>\d[\d.,]*)\s*/\s*\$?(?P<p2>\d[\d.,]*)"
     r"(?:[^.;]*?\b(?P<n>\d+)\s+(?:lots?|contracts?|spreads?))?", re.I)
 _EXPIRY = re.compile(
-    rf"(?:at\s+expir\w*|expires?|on\s+expiry|settles?)[^.;]*?(?:is|at|=|closes\s+at)\s+(?P<px>{NUM})|"
+    rf"(?:at\s+expir\w*|expires?|on\s+expiry|settles?)[^.;]*?(?:is|at|=|closes\s+at)\s+(?P<px>{NUM}){_NOT_LEV}|"
     rf"(?P<px2>{NUM})\s+at\s+expir\w*|\bis\s+(?P<px3>{NUM})\s+at\s+expir\w*|"
     rf"\b(?:closes|settles|ends|finishes|expires)\s+(?:at\s+)?(?P<px4>{NUM})\s+(?:on|at)\s+"
     rf"(?:the\s+)?expir\w*", re.I)
 _LEG_MARK = re.compile(
     rf"\s*[,(]?\s*\(?\s*(?:(?:mark(?:ed)?|marked\s+at|mark\s+price|now(?:\s+at)?|currently(?:\s+at)?|"
-    rf"current(?:\s+price)?|last|price\s+now)\s*:?\s*)(?P<px>{NUM})", re.I)
+    rf"current(?:\s+price)?|last|price\s+now)\s*:?\s*)(?P<px>{NUM}){_NOT_LEV}", re.I)
 _STRONG = (r"is\s+now(?:\s+at)?|now\s+trades\s+at|now(?:\s+at)?|goes\s+to|went\s+to|moves?\s+to|"
            r"moved\s+to|rall(?:y|ies|ied)\s+to|drops?\s+to|dropped\s+to|falls?\s+to|fell\s+to|"
            r"rises?\s+to|rose\s+to|climbs?\s+to|climbed\s+to|converges?\s+at|marked\s+at|mark(?:ed)?|"
@@ -223,10 +226,10 @@ _STRONG = (r"is\s+now(?:\s+at)?|now\s+trades\s+at|now(?:\s+at)?|goes\s+to|went\s
            r"(?:the\s+)?index\s+(?:goes\s+|moves\s+|is\s+)?(?:to|at)|currently(?:\s+at)?|ends?\s+at")
 _MARK = re.compile(
     rf"(?:(?P<sym>{SYM})\s+)?(?:(?P<venue>spot|perps?)\s+)?(?P<how>{_STRONG}|to|is\s+at|is|at|=|:)"
-    rf"\s*(?P<px>{NUM})(?!\s*%)(?:\s+(?P<venue2>spot|perps?))?", re.I)
+    rf"\s*(?P<px>{NUM}){_NOT_LEV}(?!\s*%)(?:\s+(?P<venue2>spot|perps?))?", re.I)
 _PRONOUN_MARK = re.compile(
     rf"\b(?:the\s+)?(?:stock|shares?|price|it'?s|it|coin|token|underlying)\s+(?:is\s+)?(?:now\s+)?"
-    rf"(?:at|trades\s+at|is|=|:)?\s*(?P<px>{NUM})(?!\s*%)", re.I)
+    rf"(?:at|trades\s+at|is|=|:)?\s*(?P<px>{NUM}){_NOT_LEV}(?!\s*%)", re.I)
 """A mark that names the holding by a pronoun: "Stock at 44", "the price is now 300"."""
 _BARE_MARK = re.compile(rf"\b(?P<sym>[A-Za-z]{{2,8}})\s+(?P<px>{NUM})(?!\s*(?:%|[A-Za-z]))", re.I)
 _PCT_MARK = re.compile(
@@ -234,11 +237,12 @@ _PCT_MARK = re.compile(
     r"rall(?:y|ies|ied)|climbs?|is\s+up|is\s+down|goes\s+up|goes\s+down|up|down|[+\-\u2212])\s*(?:by\s+)?"
     rf"(?P<pct>\d+(?:\.\d+)?)\s*%(?:\s+from\s+(?P<base>{NUM}))?", re.I)
 _VENUE_MARK = re.compile(
-    rf"\b(?P<venue>spot|perps?)\s+(?:at\s+|is\s+|now\s+|=\s*|:\s*)?(?P<px>{NUM})(?!\s*%)", re.I)
+    rf"\b(?P<venue>spot|perps?)\s+(?:at\s+|is\s+|now\s+|=\s*|:\s*)?(?P<px>{NUM}){_NOT_LEV}"
+    r"(?!\s*%)", re.I)
 _DOWN_WORDS = ("falls", "fall", "fell", "drops", "drop", "dropped", "declines", "decline",
                "is down", "goes down", "down", "-", "\u2212")
 _MORE = re.compile(rf"(?:(?<!\d),\s*|\band\s+|\bthen\s+)(?:another\s+)?(?P<qty>{NUM_POS})\s+"
-                   rf"(?:more\s+)?(?:shares?\s+)?(?:at|@)\s*(?P<px>{NUM})", re.I)
+                   rf"(?:more\s+)?(?:shares?\s+)?(?:at|@)\s*(?P<px>{NUM}){_NOT_LEV}", re.I)
 _FEE_PCT = re.compile(
     rf"(?P<pct>{NUM})\s*%\s*(?:taker\s+|maker\s+|trading\s+|commission\s+)?(?:fees?|commission)"
     r"(?:\s+(?P<each>each\s+(?:side|way)|per\s+side|both\s+(?:ways|sides)|on\s+each\s+\w+|"
@@ -598,10 +602,10 @@ def price_statement(text: str, *, price: Callable[[str], float | None] | None = 
 
 
 _DOUBLE_AT = re.compile(rf"\bdoubl(?:e|ing)\s+(?:my\s+|the\s+)?(?:position|stake|holding|it|"
-                        rf"size)\s+at\s+(?P<px>{NUM})", re.I)
+                        rf"size)\s+at\s+(?P<px>{NUM}){_NOT_LEV}", re.I)
 _ADD_IF = re.compile(rf"\bif\s+i\s+(?:add|buy|average\s+down\s+(?:by\s+buying|with))\s+"
                      rf"(?:another\s+)?(?P<q>{NUM_POS})\s+(?:more\s+)?(?:\w+\s+)?(?:at|@)\s*"
-                     rf"(?P<px>{NUM})", re.I)
+                     rf"(?P<px>{NUM}){_NOT_LEV}", re.I)
 
 
 def _breakeven_line(text: str, events: list[_Event],

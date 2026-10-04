@@ -41,7 +41,8 @@ BINDING_KIND_CONFIDENCE = 0.25
 """The kind model's "refuse" or "record" overrules a research reading the patterns found only at
 or above this confidence. Below it, a pattern reading stands."""
 
-LEVERAGE_WORDS = re.compile(r"\b\d+(?:\.\d+)?\s*x\b|\bleverag\w*|\bliquidat\w*|\bmargin\b|"
+LEVERAGE_WORDS = re.compile(r"\b\d+(?:\.\d+)?\s*x\b|(?<!balance\ssheet\s)(?<!financial\s)"
+                            r"(?<!operating\s)\bleverag\w*|\bliquidat\w*|\bmargin\b|"
                             r"杠杆|爆仓|倍", re.I)
 """What makes a question about leverage: a multiple, the word, liquidation or margin, or the
 Chinese for leverage, liquidation and "times"."""
@@ -337,6 +338,21 @@ def _names_no_subject(text: str) -> bool:
     return bool(words) and all(w in _DAY_QUESTION_WORDS for w in words)
 
 
+_RECORD_INTENTS: frozenset[Intent] = frozenset({
+    Intent.PERFORMANCE, Intent.DECISION_WHY, Intent.DECISION_LIST, Intent.ABSTENTION_WHY,
+    Intent.POSITION, Intent.CALIBRATION, Intent.EVIDENCE})
+"""The intents only the desk's own record answers."""
+_ABOUT_THE_DESK_WORDS = re.compile(
+    r"\b(?:you|your|yours|you'?ve|you'?re|argus|the\s+desk|desk'?s?|we|our|us|the\s+agent|"
+    r"paper\s+(?:desk|trades?|trading|ledger)|ledger|track\s+record|decisions?|abstentions?|"
+    r"abstain\w*|seq\s*\d+|the\s+record|sharpe|calibrat\w*|brier)\b|"
+    r"我们|你们|账本|决策|持仓|仓位|业绩|操作|观望|交易记录", re.I)
+"""Words that make a question about the desk: "how are you doing", "why did we pass on NVDA",
+"what's your Sharpe", "show the decision log"."""
+_BARE_FOLLOW_UP = re.compile(r"^\W*(?:and\s+|so\s+|ok(?:ay)?\s+)?(?:why|how\s+come|what\s+about|"
+                             r"and\s+then|which\s+ones?|since\s+when|how\s+many)\b", re.I)
+
+
 def gate_ledger_reading(question: Question, classified_by: str, text: str, *, prior: list[str],
                         audit: Any, desk_first: bool) -> tuple[Question, str]:
     """The n-gram layer's reading of a ledger question, after two gates.
@@ -358,18 +374,31 @@ def gate_ledger_reading(question: Question, classified_by: str, text: str, *, pr
     kind model's refusal counts once it clears the model's own threshold: since 2026-09-27 the plan
     carries its real probability on the plan's scale (`kindmodel.plan_confidence`), which a
     language model's 0.8 bar would read differently (audit 159)."""
+    # "上周五做了什么" (what was done last Friday) names a day and asks what was done: the
+    # record's own question, declined as off-topic for want of a desk word (2026-09-30).
+    # English names its subject ("the desk", "you") and is read by `in_domain`; "what did
+    # the Lakers do last Friday" must still be declined.
+    day_question = (classified_by == "patterns" and question.intent is Intent.DECISION_LIST
+                    and question.window is not None and (not re.search(r"[A-Za-z]", text)
+                                                         or _names_no_subject(text)))
     if ((classified_by == "ngram" or (classified_by == "patterns" and not prior))
             and not in_domain(text) and question.intent is not Intent.ORDER and not desk_first
-            # "上周五做了什么" (what was done last Friday) names a day and asks what was done: the
-            # record's own question, declined as off-topic for want of a desk word (2026-09-30).
-            # English names its subject ("the desk", "you") and is read by `in_domain`; "what did
-            # the Lakers do last Friday" must still be declined.
-            and not (classified_by == "patterns" and question.intent is Intent.DECISION_LIST
-                     and question.window is not None and (not re.search(r"[A-Za-z]", text)
-                                                          or _names_no_subject(text)))):
+            and not day_question):
         question = replace(question, intent=Intent.UNKNOWN,
                            reason="nothing in the question is about markets or the desk's record")
         classified_by = "declined-off-topic"
+    if (classified_by in ("ngram", "patterns") and question.intent in _RECORD_INTENTS
+            and not desk_first and not day_question and not _ABOUT_THE_DESK_WORDS.search(text)
+            and not (prior and _ABOUT_THE_DESK_WORDS.search(prior[-1])
+                     and _BARE_FOLLOW_UP.match(text))):
+        # A copy-trading question, a stablecoin-depeg scare, "which one wins" between two
+        # portfolios and a mandate that says "no single position over 8%" were each answered
+        # with the desk's own P&L or its open positions — six of thirty first-time-user turns
+        # and four judge turns (round 31), on the words "lose", "return", "position", "hold".
+        # The desk's record answers questions about the desk; anything else is not its to answer.
+        question = replace(question, intent=Intent.UNKNOWN,
+                           reason="a question about something other than the desk's own record")
+        classified_by = "declined-not-the-record"
     view = (audit.get("model") or {}) if isinstance(audit, dict) else {}
     try:
         confidence = float(view.get("confidence") or 0.0)
