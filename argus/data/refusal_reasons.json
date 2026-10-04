@@ -1,16 +1,16 @@
 {
-  "as_of": "2026-10-04T14:22:28.572003+00:00",
-  "refusals": 1054,
-  "refusals_with_a_gradeable_claim": 520,
+  "as_of": "2026-10-04T16:20:06.901295+00:00",
+  "refusals": 1065,
+  "refusals_with_a_gradeable_claim": 531,
   "hours_tolerance": 1.5,
   "round_trip_bps": 12.0,
   "base_clearance_about_2h": {
-    "cleared": 410,
-    "marks": 601
+    "cleared": 411,
+    "marks": 611
   },
   "by_claim": {
     "session_closed": {
-      "consistent": 409,
+      "consistent": 420,
       "contradicted": 0,
       "ungradeable": 0
     },
@@ -20,12 +20,12 @@
       "ungradeable": 0
     },
     "hours_to_discovery": {
-      "consistent": 390,
+      "consistent": 400,
       "contradicted": 0,
       "ungradeable": 0
     },
     "no_hedge": {
-      "consistent": 253,
+      "consistent": 260,
       "contradicted": 0,
       "ungradeable": 52
     },
@@ -36,27 +36,27 @@
     },
     "moves_enough": {
       "consistent": 83,
-      "contradicted": 38,
-      "ungradeable": 47
+      "contradicted": 40,
+      "ungradeable": 46
     },
     "move_too_small": {
       "consistent": 0,
       "contradicted": 2,
-      "ungradeable": 3
+      "ungradeable": 4
     }
   },
   "forward_against_base": {
     "move_too_small": {
       "borne_out": 0,
       "graded": 2,
-      "base_rate": 0.3178,
+      "base_rate": 0.3273,
       "p_one_sided": 1.0
     },
     "moves_enough": {
       "borne_out": 83,
-      "graded": 121,
-      "base_rate": 0.6822,
-      "p_one_sided": 0.5083
+      "graded": 123,
+      "base_rate": 0.6727,
+      "p_one_sided": 0.5226
     }
   },
   "forward_claims": [
@@ -383,8 +383,24 @@
       "stated": "\u2026correct more often than not, and the binding constraint was direction, not size.",
       "recorded": "next move +4.1bps over 2.03h against a 12bps round trip (refusal_marks.jsonl)",
       "verdict": "contradicted"
+    },
+    {
+      "seq": 1058,
+      "symbol": "COINUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026edly stood aside on weekends and the binding constraint was direction, not size.",
+      "recorded": "next move +4.3bps over 1.90h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
+    },
+    {
+      "seq": 1060,
+      "symbol": "QQQUSDT",
+      "claim": "moves_enough",
+      "stated": "\u2026ere all weekend abstentions, and the binding constraint was direction, not size \u2014 nothing in today's evidence resolves that constraint.",
+      "recorded": "next move -7.0bps over 1.90h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
     }
   ],
-  "verdict": "1054 refusal(s) on record; 520 carried at least one reason the record can check. Of 1055 decision-time reason(s) graded, 1055 agreed with the record and 0 contradicted it. `move_too_small` claims were borne out by the next ~2h move 0 of 2 time(s) (0%), against 32% for every ~2h refusal mark (one-sided exact binomial p = 1.00); no evidence the stated reason says more than the base rate does. `moves_enough` claims were borne out by the next ~2h move 83 of 121 time(s) (69%), against 68% for every ~2h refusal mark (one-sided exact binomial p = 0.51); no evidence the stated reason says more than the base rate does.",
+  "verdict": "1065 refusal(s) on record; 531 carried at least one reason the record can check. Of 1083 decision-time reason(s) graded, 1083 agreed with the record and 0 contradicted it. `move_too_small` claims were borne out by the next ~2h move 0 of 2 time(s) (0%), against 33% for every ~2h refusal mark (one-sided exact binomial p = 1.00); no evidence the stated reason says more than the base rate does. `moves_enough` claims were borne out by the next ~2h move 83 of 123 time(s) (67%), against 67% for every ~2h refusal mark (one-sided exact binomial p = 0.52); no evidence the stated reason says more than the base rate does.",
   "method": "Each checkable reason in a no_trade thesis is matched by a fixed pattern and set beside the record: session_phase and hours_to_discovery from the ledger, the desk's own hedge-menu note, the risk ruling, and the next ~2h mark for claims about the size of the coming move. Question and binary verdict from VisualWebArena's llm_ua_match (evaluation_harness/helper_functions.py:610-642, MIT); graded here by the record, not by a model."
 }

@@ -135,6 +135,29 @@ class TestExpressions:
                                    "hold is BTC spot on Bitget (-$40 in carry and fees)")
         assert table["columns"][0] == "Way" and len(table["rows"]) == 3
 
+    def test_a_stock_is_held_on_spot_as_its_rtoken(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui.research import parse
+        from argus.market import bitget, crossasset_feed
+
+        closes = [100.0 * math.exp(0.01 * ((-1) ** i)) for i in range(400)]
+        monkeypatch.setattr(parse, "last_price", lambda s: 100.0)
+        monkeypatch.setattr(parse, "is_us_equity", lambda s: True)
+        monkeypatch.setattr(expressions, "_closes", lambda s, d: closes)
+        monkeypatch.setattr(expressions, "_call", lambda *a: None)
+        monkeypatch.setattr(expressions, "_funding_month", lambda s: (0.0001, 90))
+        # Bitget lists RTSLAUSDT on spot at 0.1% taker (2026-10-04); a stock with no rToken has none
+        monkeypatch.setattr(expressions, "_spot_taker",
+                            lambda s: 0.001 if s == "RTSLAUSDT" else None)
+        monkeypatch.setattr(crossasset_feed, "fetch_taker_bps", lambda s: 6.0)
+        monkeypatch.setattr(bitget, "maintenance_margin_rate", lambda s, n: 0.005)
+        said = expressions.lines("compare spot vs perp for $10,000 of TSLA")
+        assert said is not None
+        assert said[0][1].startswith("rTSLA spot on Bitget: capital $10,000; a month's carry $0; "
+                                     "round-trip fees -$20")
+        other = expressions.lines("compare spot vs perp for $10,000 of PLTR")
+        assert other is not None and other[0][1].startswith("PLTR shares at a broker")
+        assert "Bitget lists no RPLTRUSDT token on spot" in other[0][1]
+
     def test_not_every_or_is_a_comparison(self) -> None:
         assert expressions.lines("is BTC or ETH riskier?") is None
         for asked in ("what is the best way to express a bullish view on NVDA?",

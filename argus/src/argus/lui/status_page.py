@@ -260,6 +260,19 @@ def sweep_lines(data: Path) -> list[tuple[str, str]]:
                            f"inside their 10-90 band (80% is calibrated)" if scored else
                            "none graded yet: the first reopen has not printed")
                         + (f", {weekend['pending']} pending" if weekend.get("pending") else "")))
+        theses = calls.get("theses") or {}
+        if theses.get("recorded"):
+            # Whether a thesis verdict carries information: "supported" claims should come true
+            # more often than "contradicted" ones (`eval/call_record.grade_theses`, build-list 2.4).
+            by = theses.get("by_verdict") or {}
+            parts = [f"{v.lower()} {c['came_true']} of {c['graded']}"
+                     for v, c in by.items() if c.get("graded")]
+            out.append(("Our thesis verdicts, graded",
+                        f"{theses['recorded']} verdicts on \"keeps rising over the next week\" "
+                        f"recorded before the week; "
+                        + (f"came true — {'; '.join(parts)}" if parts else
+                           "none has reached its week yet")
+                        + (f", {theses['pending']} pending" if theses.get("pending") else "")))
     return out
 
 

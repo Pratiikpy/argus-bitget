@@ -1,11 +1,11 @@
 {
   "usable": true,
   "refused": "",
-  "sample": 844,
+  "sample": 855,
   "primary": 0,
   "diagnoses": [],
-  "generated_at": "2026-10-04T13:48:17.971537+00:00",
+  "generated_at": "2026-10-04T15:42:06.755950+00:00",
   "triggered_by": [
-    "12 settlements since the last postmortem"
+    "11 settlements since the last postmortem"
   ]
 }

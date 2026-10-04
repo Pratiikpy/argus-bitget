@@ -18,10 +18,11 @@ that comparison for one name and one size, every figure from a read or a stated 
   how many 30-day windows of the last year fell that far from their first close at some close
   inside them — a count from the record, not a probability.
 
-US stocks have no spot market on Bitget; the first row is then shares at a broker, with the
-broker's fee not read here and said so. Crypto has no option chain read here, so the call row is
-for US stocks only. No row is recommended: the bottom line names the cheapest to hold, the one
-that ties up least capital, and the one whose loss is capped, and the trade-off between them.
+A US stock's spot row is Bitget's rToken for it (``RTSLAUSDT``, the spot list's own taker rate);
+for a stock with no rToken listed, shares at a broker, with the broker's fee not read here and said
+so. Crypto has no option chain read here, so the call row is for US stocks only. No row is
+recommended: the bottom line names the cheapest to hold, the one that ties up least capital, and
+the one whose loss is capped, and the trade-off between them.
 """
 
 from __future__ import annotations
@@ -192,10 +193,21 @@ def compare(symbol: str, notional: float) -> tuple[list[Row], dict[str, Any]] | 
     funding = _funding_month(symbol)
     carry = funding[0] * funding[1] * notional if funding else None
     rows: list[Row] = []
-    if equity:
+    token_fee = _spot_taker(f"R{name}USDT") if equity else None
+    if equity and token_fee is not None:
+        # Bitget lists the stock itself on spot as an rToken (RTSLAUSDT, 0.1% taker on
+        # 2026-10-04): "no spot market on Bitget" was wrong, said to a stranger (a cold test of
+        # the guided task, 2026-10-04)
+        rows.append(Row(way=f"r{name} spot on Bitget", capital=notional, carry=0.0,
+                        fees=2 * token_fee * notional,
+                        up=notional * up_move, down=notional * down_move,
+                        note=f"Bitget's tokenized {name} (R{name}USDT), no funding, no "
+                             f"liquidation; it tracks the share closely but not exactly"))
+    elif equity:
         rows.append(Row(way=f"{name} shares at a broker", capital=notional, carry=0.0, fees=None,
                         up=notional * up_move, down=notional * down_move,
-                        note="no spot market on Bitget; the broker's fee is not read here"))
+                        note=f"Bitget lists no R{name}USDT token on spot; the broker's fee is "
+                             f"not read here"))
     else:
         spot_fee = _spot_taker(symbol)
         rows.append(Row(way=f"{name} spot on Bitget", capital=notional, carry=0.0,
@@ -258,7 +270,7 @@ def lines(text: str, capital: float | None = None,
             f"{cheapest.way} ({_money(-((cheapest.carry or 0.0) + (cheapest.fees or 0.0)))} in "
             f"carry and fees"
             + ("; shares at a broker carry nothing but the broker's fee, not read here"
-               if facts["equity"] else "") + "); "
+               if any("at a broker" in r.way for r in rows) else "") + "); "
             f"the {least.way} ties up least capital (${least.capital:,.0f})"
             + (" and its loss is capped at that" if least is capped else
                f" but is liquidated by a {facts['distance']:.1%} fall"

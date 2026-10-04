@@ -122,6 +122,8 @@ PAGE = """<!doctype html>
   .gbar small { text-transform:none; letter-spacing:0; font-weight:400; color:var(--dim) }
   .gnext { margin-top:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap }
   .gnext button { padding:7px 13px; font-size:13.5px; font-weight:600 }
+  .gnext .gedit { padding:0; border:0; background:none; color:var(--accent); font-weight:500;
+    text-decoration:underline; text-underline-offset:3px }
   .gnext span { color:var(--dim); font-size:12.5px }
   .gsum ol { margin:6px 0 0; padding-left:22px }
   .gsum li { margin:5px 0; overflow-wrap:anywhere }
@@ -407,6 +409,10 @@ const linked = s => esc(s).replace(
   /https?:\\/\\/[^\\s<>"']*[^\\s<>"'.,;:!?)\\]]/g,
   u => `<a href="${u}" rel="noopener noreferrer" target="_blank">` +
     `${u.replace(/^https?:\\/\\/(?:www\\.)?([^\\/?#]+).*$/, '$1')} &#8599;</a>`)
+  // The console's own research page, named by its path: shown as a percent-encoded address
+  // ("/research?q=I%20think%20ETH...") in the thesis answer to a stranger (2026-10-04).
+  .replace(/(^|\\s)(\\/research\\?[^\\s<>"']*[^\\s<>"'.,;:!?)\\]])/g,
+    '$1<a href="$2">the research page &#8599;</a>')
   // "bps" explained where it stands: a newcomer met it in every cost line with no definition
   // anywhere on the page (a first-time-user audit, 2026-09-29).
   .replace(/(\\d)bps\\b/g,
@@ -497,11 +503,11 @@ document.getElementById('f').addEventListener('submit', async ev => {
           `<input type="hidden" name="q" value="${escA(text)}">` +
           `<input type="hidden" name="book" value="${escA(bookEl.value.trim())}">` +
           `<button>Run the full eight-engine research task on this &rarr;</button></form>` : ''}
-        ${a.guide && a.guide.next ? `<div class="gnext"><button type="button" ` +
-          `data-step="${a.guide.next.step}" data-focus="${escA(a.guide.focus)}" ` +
-          `data-ask="${escA(a.guide.next.ask)}">Next: ${esc(a.guide.next.title)} &rarr;</button>` +
-          `<span>puts step ${a.guide.next.step}'s question in the box, to edit or ask</span>` +
-          `</div>` : ''}
+        ${a.guide && a.guide.next ? `<div class="gnext" data-step="${a.guide.next.step}" ` +
+          `data-focus="${escA(a.guide.focus)}" data-ask="${escA(a.guide.next.ask)}">` +
+          `<button type="button" data-go="1">Next: ${esc(a.guide.next.title)} &rarr;</button>` +
+          `<button type="button" class="gedit">edit the question first</button>` +
+          `<span>asks: ${esc(a.guide.next.ask)}</span></div>` : ''}
         ${a.answer_id ? `<div class="fb" data-id="${esc(a.answer_id)}">` +
           `<span>Did this answer your question?</span><button type="button" data-u="1">Yes` +
           `</button><button type="button" data-u="0">No</button></div>` : ''}
@@ -573,12 +579,16 @@ out.addEventListener('click', e => {
     more.textContent = expand ? 'Show fewer lines' : more.dataset.label;
     return;
   }
+  // "Next" asks the step's question at once; "edit the question first" puts it in the box. A
+  // stranger in a cold test had to click Next and then Ask for every step (2026-10-04).
   const next = e.target.closest('.gnext button');
   if (next) {
-    qEl.value = next.dataset.ask; grow();
-    guideNext = {step: Number(next.dataset.step), focus: next.dataset.focus};
-    next.textContent = 'In the box — edit it or press Ask';
-    next.disabled = true;
+    const box = next.parentElement;
+    qEl.value = box.dataset.ask; grow();
+    guideNext = {step: Number(box.dataset.step), focus: box.dataset.focus};
+    box.querySelectorAll('button').forEach(x => { x.disabled = true; });
+    if (next.dataset.go) { document.getElementById('f').requestSubmit(); return; }
+    next.textContent = 'in the box — edit it, then press Ask';
     qEl.focus();
     return;
   }

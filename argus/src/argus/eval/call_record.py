@@ -382,6 +382,106 @@ def grade_weekend(path: Path = WEEKEND_PATH, *,
             "bands": graded}
 
 
+# --- thesis verdicts ------------------------------------------------------------------------------
+
+THESIS_PATH = PACKAGE / "data" / "thesis_calls.jsonl"
+THESIS_CLAIMS: tuple[tuple[str, str], ...] = (
+    ("BTCUSDT", "BTC keeps rising over the next week"),
+    ("ETHUSDT", "ETH keeps rising over the next week"),
+    ("SOLUSDT", "SOL keeps rising over the next week"),
+    ("NVDAUSDT", "NVDA keeps rising over the next week"),
+    ("TSLAUSDT", "TSLA keeps rising over the next week"),
+    ("XAUUSDT", "gold keeps rising over the next week"),
+)
+"""Fixed 2026-10-04 (build-list 2.4): the claim the guided task's second step asks
+(`lui/guide.py`), on the names it most often lands on, over a horizon short enough to grade."""
+THESIS_DAYS = 7
+VERDICTS = ("Supported", "Contradicted", "Not measurable")
+"""The thesis engine's three results (`lui/thesis.Result`), as its lines begin."""
+
+
+def _thesis_verdict(lines: Sequence[str]) -> str | None:
+    for line in lines:
+        for verdict in VERDICTS:
+            if line.strip().startswith(verdict):
+                return verdict
+    return None
+
+
+def _ask_thesis(claim: str) -> list[str]:
+    from argus.lui.server import handle_ask
+
+    return [str(x) for x in handle_ask(f"I think {claim} — test that view", [],
+                                       visitor="call-record").get("lines") or []]
+
+
+def record_theses(now: datetime | None = None, *, path: Path = THESIS_PATH,
+                  ask: Callable[[str], Sequence[str]] = _ask_thesis) -> list[dict[str, Any]]:
+    """Each claim in :data:`THESIS_CLAIMS` put to the thesis engine once a UTC day, its verdict
+    kept, hash-chained like the daily calls. A verdict is a statement about evidence, not a
+    forecast; grading whether "supported" claims came true more often than "contradicted" ones is
+    the test of whether the verdict carries information (Datum and NIGHTWATCHAI grade their own
+    calls the same way, after the fact)."""
+    now = now or datetime.now(UTC)
+    rows = read(path)
+    verify(rows)
+    today = now.date().isoformat()
+    done = {r["claim"] for r in rows if str(r["recorded_at"])[:10] == today}
+    previous = str(rows[-1]["hash"]) if rows else GENESIS
+    added: list[dict[str, Any]] = []
+    for symbol, claim in THESIS_CLAIMS:
+        if claim in done:
+            continue
+        try:
+            verdict = _thesis_verdict(ask(claim))
+        except Exception:
+            continue  # a claim the engine could not answer today is not recorded as a verdict
+        if verdict is None:
+            continue
+        row: dict[str, Any] = {"recorded_at": now.isoformat(timespec="seconds"),
+                               "symbol": symbol, "claim": claim, "verdict": verdict,
+                               "horizon_days": THESIS_DAYS, "prev": previous}
+        row["hash"] = _digest(row)
+        previous = row["hash"]
+        added.append(row)
+    if added:
+        with path.open("a", encoding="utf-8", newline="\n") as handle:
+            for row in added:
+                handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+    return added
+
+
+def grade_theses(path: Path = THESIS_PATH, *, closes: Closes = _default_closes) -> dict[str, Any]:
+    """Each recorded verdict whose week is over: did the name close higher than on the day the
+    claim was tested, and how often that happened under each verdict."""
+    rows = read(path)
+    verify(rows)
+    series: dict[str, list[tuple[date, float]]] = {}
+    graded: list[dict[str, Any]] = []
+    pending = 0
+    for row in rows:
+        symbol = str(row["symbol"])
+        if symbol not in series:
+            try:
+                series[symbol] = sorted(closes(symbol).items())
+            except Exception:
+                series[symbol] = []
+        day = datetime.fromisoformat(str(row["recorded_at"])).date()
+        at = [c for d, c in series[symbol] if d <= day]
+        due = day + timedelta(days=int(row["horizon_days"]))
+        later = [c for d, c in series[symbol] if d >= due]
+        if not at or not later:
+            pending += 1
+            continue
+        graded.append({"claim": row["claim"], "recorded_at": row["recorded_at"],
+                       "verdict": row["verdict"], "came_true": later[0] > at[-1]})
+    by_verdict = {v: {"graded": sum(1 for g in graded if g["verdict"] == v),
+                      "came_true": sum(1 for g in graded if g["verdict"] == v and g["came_true"])}
+                  for v in VERDICTS}
+    return {"recorded": len(rows), "graded": len(graded), "pending": pending,
+            "by_verdict": by_verdict, "calls": graded}
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="record and grade the console's own calls")
     parser.add_argument("--record", action="store_true")
@@ -392,9 +492,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"recorded {len(added)} call(s)")
         weekend = record_weekend()
         print(f"recorded {len(weekend)} weekend band(s)")
+        theses = record_theses()
+        print(f"recorded {len(theses)} thesis verdict(s)")
     if args.grade:
         grades = grade()
         grades["weekend"] = grade_weekend()
+        grades["theses"] = grade_theses()
         GRADES_PATH.write_text(json.dumps(grades, ensure_ascii=False, indent=1) + "\n",
                                encoding="utf-8", newline="\n")
         print(f"{grades['calls']} calls, {grades['risk_graded']} risk-graded, "

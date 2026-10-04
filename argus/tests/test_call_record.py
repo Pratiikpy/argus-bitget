@@ -193,3 +193,41 @@ def test_a_band_is_graded_by_the_open_that_follows_it(tmp_path: Path) -> None:
     crash = cr.grade_weekend(path, days_of=lambda t: _trading_days(400, reopen=-0.2))
     assert crash["covered"] == 0.0
     assert crash["mean_pinball_bps"] > calm["mean_pinball_bps"]
+
+
+class TestThesisVerdicts:
+    """Build-list 2.4: the thesis engine's verdicts kept before the week and graded after it."""
+
+    def test_recorded_once_a_day_and_chained(self, tmp_path: Path) -> None:
+        path = tmp_path / "theses.jsonl"
+        said = {"BTC": "Supported — tape agrees", "ETH": "Contradicted — tape disagrees"}
+
+        def ask(claim: str) -> list[str]:
+            return ["Bottom line: your thesis.", said.get(claim.split()[0], "Not measurable — x")]
+
+        now = datetime(2026, 10, 4, 12, tzinfo=UTC)
+        first = cr.record_theses(now, path=path, ask=ask)
+        assert len(first) == len(cr.THESIS_CLAIMS)
+        assert [r["verdict"] for r in first[:2]] == ["Supported", "Contradicted"]
+        assert cr.record_theses(now, path=path, ask=ask) == []
+        cr.verify(cr.read(path))
+
+    def test_graded_after_the_week(self, tmp_path: Path) -> None:
+        path = tmp_path / "theses.jsonl"
+        verdicts = iter(["Supported", "Contradicted"] + ["Not measurable"] * 10)
+        cr.record_theses(datetime(2026, 10, 1, 12, tzinfo=UTC), path=path,
+                         ask=lambda claim: [next(verdicts)])
+        days = [date(2026, 10, 1) + timedelta(days=i) for i in range(10)]
+
+        def closes(symbol: str) -> dict[date, float]:
+            # BTC rises over the week, ETH falls; the rest rise
+            step = -1.0 if symbol == "ETHUSDT" else 1.0
+            return {d: 100 + step * i for i, d in enumerate(days)}
+
+        got = cr.grade_theses(path, closes=closes)
+        assert got["graded"] == len(cr.THESIS_CLAIMS) and got["pending"] == 0
+        assert got["by_verdict"]["Supported"] == {"graded": 1, "came_true": 1}
+        assert got["by_verdict"]["Contradicted"] == {"graded": 1, "came_true": 0}
+        # a week not yet over is pending, not graded
+        short = {d: 100.0 for d in days[:5]}
+        assert cr.grade_theses(path, closes=lambda s: short)["pending"] == len(cr.THESIS_CLAIMS)
