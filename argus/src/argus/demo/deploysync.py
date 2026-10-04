@@ -104,6 +104,11 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     "research_task_example.json",
     # Read by /status: the console's own calls, recorded and graded (`eval/call_record.py`).
     "call_record.jsonl",
+    # Read by /status's self-audit rows (`lui/status_page.self_audit_lines`, build-list 2.1).
+    "lean_ic.json",
+    "perturbation_robustness.json",
+    "consistency.json",
+    "leakage.json",
     "call_grades.json",
     "weekend_calls.jsonl",
     # Read by execution answers: bgc's own dry-run, confirming the Agent Hub preview.

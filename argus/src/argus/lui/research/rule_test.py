@@ -32,6 +32,7 @@ of settlements for the share of days the rule was in the market.
 
 from __future__ import annotations
 
+import itertools
 import math
 import re
 from collections.abc import Sequence
@@ -245,6 +246,55 @@ def positions(rule: Rule, closes: Sequence[float]) -> list[float]:
     return weights
 
 
+# --- permutation test --------------------------------------------------------------------------
+
+PERMUTATIONS: Final = 200
+FEE: Final = 0.0006
+
+
+def _sharpe(rule: Rule, closes: Sequence[float], yearly: int) -> float | None:
+    """The rule's annualised Sharpe on ``closes``, net of the taker fee on every change of
+    weight — the engine's arithmetic without its bookkeeping, so it can run 200 times a question."""
+    weights = positions(rule, closes)
+    net, before = [], 0.0
+    for i in range(len(closes) - 1):
+        w = weights[i]
+        net.append(w * (closes[i + 1] / closes[i] - 1) - FEE * abs(w - before))
+        before = w
+    if len(net) < 2:
+        return None
+    mean = sum(net) / len(net)
+    spread = math.sqrt(sum((r - mean) ** 2 for r in net) / (len(net) - 1))
+    return mean / spread * math.sqrt(yearly) if spread > 0 else None
+
+
+def permutation_p(rule: Rule, closes: Sequence[float], yearly: int, *,
+                  permutations: int = PERMUTATIONS, seed: int = 2026) -> tuple[float, int] | None:
+    """Masters' Monte Carlo permutation test: the share of histories with the same daily moves in
+    a shuffled order on which the rule does at least as well as on the real one (with the real one
+    counted, so p is never 0). A rule that reads the order of moves — trend, reversal — earns its
+    Sharpe from that order; one that only collects drift does as well on a shuffle. Rules here are
+    not fitted, so there is no in-sample step to permute separately."""
+    import random
+
+    real = _sharpe(rule, closes, yearly)
+    if real is None:
+        return None
+    logs = [math.log(b / a) for a, b in itertools.pairwise(closes)]
+    rng = random.Random(seed)
+    at_least = 1
+    for _ in range(permutations):
+        rng.shuffle(logs)
+        path, price = [closes[0]], closes[0]
+        for r in logs:
+            price *= math.exp(r)
+            path.append(price)
+        got = _sharpe(rule, path, yearly)
+        if got is not None and got >= real:
+            at_least += 1
+    return at_least / (permutations + 1), permutations
+
+
 # --- regimes ----------------------------------------------------------------------------------
 
 def regimes(closes: Sequence[float], days: int = REGIME_DAYS,
@@ -320,7 +370,25 @@ YAHOO_SERIES: Final = {"XAUUSDT": ("GC=F", "gold futures"), "XAGUSDT": ("SI=F", 
 200-day rule on gold met 290 days of Bitget history and made one trade (2026-10-05)."""
 
 
+_CLOSES: dict[str, tuple[float, tuple[list[datetime], list[float], str]]] = {}
+CACHE_SECONDS: Final = 3600.0
+
+
 def _closes(symbol: str) -> tuple[list[datetime], list[float], str]:
+    """Five years of daily closes, kept an hour: Bitget serves them in 24 pages (8.8 s on
+    2026-10-05), and a trader asking a second rule about the same market should not wait again.
+    A daily series gains one close a day, so an hour-old copy is the same series."""
+    import time
+
+    hit = _CLOSES.get(symbol)
+    if hit is not None and time.monotonic() - hit[0] < CACHE_SECONDS:
+        return hit[1]
+    fresh = _read_closes(symbol)
+    _CLOSES[symbol] = (time.monotonic(), fresh)
+    return fresh
+
+
+def _read_closes(symbol: str) -> tuple[list[datetime], list[float], str]:
     from argus.lui.research.parse import is_us_equity
 
     if is_us_equity(symbol) or symbol in YAHOO_SERIES:
@@ -408,6 +476,17 @@ def lines(text: str) -> list[str] | None:
                    f"{result.out_of_sample.total_return:+.0%}, Sharpe "
                    f"{result.out_of_sample.sharpe:.2f}, against {result.in_sample.sharpe:.2f} "
                    f"before it" + (" — the edge decayed" if decayed else "") + ".")
+    shuffled = permutation_p(rule, closes, yearly)
+    if shuffled is not None:
+        p, count = shuffled
+        out.append(f"Permutation test: on {count} histories with {name}'s same daily moves in a "
+                   f"shuffled order, the rule did at least this well {p:.0%} of the time "
+                   f"(p = {p:.3f}) — "
+                   + ("so its result depends on the order of the moves, which is what a timing "
+                      "rule claims to read" if p < 0.05 else
+                      "so a shuffled history does as well: the result is not distinguishable "
+                      "from collecting the drift with this much exposure")
+                   + ".")
     if split:
         out.append("By regime (each day labelled by the trailing 90-day move: bull above +20%, "
                    "bear below -20%, chop between, known on the day): " + "; ".join(

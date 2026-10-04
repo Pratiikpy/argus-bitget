@@ -5663,13 +5663,7 @@
     "reproducibility_proven",
     "no_specialist_capability_superior"
   ],
-  "transitions_this_write": [
-    {
-      "capability": "Volatility-targeted sizing (walk-forward GARCH) against fixed size, after fees",
-      "from": null,
-      "to": "lost"
-    }
-  ],
+  "transitions_this_write": [],
   "transition_log": [
     {
       "capability": "Deliberation priced as a trading cost",

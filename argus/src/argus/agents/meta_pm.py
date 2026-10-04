@@ -99,9 +99,9 @@ import json
 import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
-from typing import Any
+from typing import Any, Final
 
 from argus.agents import rubric as rubric_mod
 from argus.decision.verdicts import (
@@ -807,6 +807,35 @@ class Deliberation:
         return lines
 
 
+MODEL_KNOWLEDGE_BOUND: Final = datetime(2026, 9, 1, tzinfo=UTC)
+"""The earliest moment a market state may be put to the deciding model (build-list 2.2).
+
+A model asked about a dated state its training data already covers can answer from memory of what
+followed, and a grade against that outcome then measures recall, not judgement: parametric
+look-ahead. Qwen's training cutoff is not published (NOT VERIFIED); the recall probe
+(`eval/leakage.py`, `data/leakage.json`) found it recalls companies' 2026 second-half figures, so
+the bound sits after them. Every decision on the record is from 2026-09-12 on, and a replay of an
+older state is refused rather than graded. An audit of every model call site on 2026-10-05 found
+no path that sends an older state; this keeps it that way.
+
+It binds a model that can remember. A client that declares ``recalls_the_past = False`` — a scripted
+answer in a test or a replay seat, which has no training to recall from — is exempt; a client that
+says nothing is assumed to remember, so the guard fails closed."""
+
+
+class KnownPastError(ValueError):
+    """A market state from before :data:`MODEL_KNOWLEDGE_BOUND` was about to reach the model."""
+
+
+def refuse_known_past(as_of: datetime) -> None:
+    """Raise if a state stamped ``as_of`` predates what the model can be assumed not to know."""
+    if as_of < MODEL_KNOWLEDGE_BOUND:
+        raise KnownPastError(
+            f"a market state as of {as_of.isoformat()} predates {MODEL_KNOWLEDGE_BOUND.date()}, "
+            "which the deciding model's training may cover: its answer could be recall of what "
+            "followed, so it is not asked")
+
+
 class MetaPM:
     """The decision-maker. Produces an intent, then responds to being constrained."""
 
@@ -866,6 +895,8 @@ class MetaPM:
     def _ask(
         self, messages: list[dict[str, Any]], frame: MarketFrame | None = None
     ) -> dict[str, Any]:
+        if frame is not None and getattr(self._client, "recalls_the_past", True):
+            refuse_known_past(frame.as_of)
         required: tuple[str, ...] = ("verdict", "side", "quantity", "confidence", "thesis")
         if self.reflection and frame is not None:
             required = (*required, *REFLECTION_FIELDS)

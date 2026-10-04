@@ -1,0 +1,45 @@
+{
+  "generated_at": "2026-10-04T20:50:00+00:00",
+  "horizons": {
+    "about_2h": {
+      "calls": 628,
+      "cycles_with_ic": 58,
+      "hit_rate": 0.551,
+      "pooled_ic": 0.0353,
+      "ic_mean": 0.042,
+      "ic_std": 0.3492,
+      "risk_adjusted_ic": 0.1203,
+      "t_stat": 0.916,
+      "p_value": 0.3636
+    },
+    "4h_to_12h": {
+      "calls": 1,
+      "cycles_with_ic": 0,
+      "hit_rate": 0.0,
+      "pooled_ic": null,
+      "ic_mean": null,
+      "ic_std": null,
+      "risk_adjusted_ic": null,
+      "t_stat": null,
+      "p_value": null
+    },
+    "overnight_12h_plus": {
+      "calls": 206,
+      "cycles_with_ic": 19,
+      "hit_rate": 0.4612,
+      "pooled_ic": -0.0872,
+      "ic_mean": -0.0897,
+      "ic_std": 0.3054,
+      "risk_adjusted_ic": -0.2936,
+      "t_stat": -1.28,
+      "p_value": 0.2169
+    }
+  },
+  "unscored": {
+    "lean_none": 9,
+    "no_confidence": 0,
+    "outside_horizons": 0
+  },
+  "headline_horizon": "about_2h",
+  "min_calls_per_cycle": 4
+}

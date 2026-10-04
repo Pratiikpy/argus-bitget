@@ -155,3 +155,74 @@ def test_sizing_by_volatility_is_compared_over_the_same_days(
     assert "register #52" in line
     plain = rt.lines("backtest the 20/50 sma cross on BTC")
     assert plain is not None and not any(x.startswith("Sized by") for x in plain)
+
+
+class TestPermutation:
+    """Masters' permutation test on the rule backtest (build-list 3.3)."""
+
+    @staticmethod
+    def _series(persistence: float, seed: int, n: int = 1200) -> list[float]:
+        import random
+
+        rng = random.Random(seed)
+        closes, price, last = [100.0], 100.0, 0.0
+        for _ in range(n):
+            last = persistence * last + rng.gauss(0, 0.01)
+            price *= math.exp(last)
+            closes.append(price)
+        return closes
+
+    def test_a_trend_rule_on_trending_returns_reads_their_order(self) -> None:
+        rule = rt.read_rule("backtest the 10/30 sma cross on BTC")
+        assert rule is not None
+        # returns with day-to-day persistence 0.7: a trend rule's Sharpe comes from their order
+        for seed in (1, 2, 3):
+            got = rt.permutation_p(rule, self._series(0.7, seed, 1800), 365, permutations=100)
+            assert got is not None and got[0] < 0.05
+
+    def test_on_returns_with_no_order_it_finds_none(self) -> None:
+        rule = rt.read_rule("backtest the 10/30 sma cross on BTC")
+        assert rule is not None
+        ps = [rt.permutation_p(rule, self._series(0.0, seed), 365, permutations=60)
+              for seed in range(8)]
+        values = [p for p, _ in ps if p is not None] if all(ps) else []
+        assert len(values) == 8
+        assert sum(1 for v in values if v < 0.05) <= 1  # about 5% by chance, not most
+
+    def test_p_is_never_zero(self) -> None:
+        rule = rt.read_rule("backtest the 10/30 sma cross on BTC")
+        assert rule is not None
+        got = rt.permutation_p(rule, self._series(0.5, 3), 365, permutations=50)
+        assert got is not None and got[0] >= 1 / 51
+
+
+class TestAntiLeakPair:
+    """The rubric's AUC (`agents/rubric.py`), the desk's classifier-style evaluation: labels that
+    carry no information must score about 0.5, and a planted cheat must score 1.0 — so a leak in
+    the evaluation would show as a number that cannot happen (build-list 3.3)."""
+
+    def test_shuffled_labels_score_one_half(self) -> None:
+        import random
+
+        from argus.agents.rubric import auc
+
+        rng = random.Random(11)
+        scores = [rng.random() for _ in range(400)]
+        labels = [rng.random() < 0.4 for _ in range(400)]
+        values = []
+        for _ in range(200):
+            rng.shuffle(labels)
+            got = auc(scores, labels)
+            assert got is not None
+            values.append(got)
+        assert sum(values) / len(values) == pytest.approx(0.5, abs=0.01)
+
+    def test_a_planted_cheat_scores_one(self) -> None:
+        from argus.agents.rubric import agreement, auc
+
+        labels = [i % 3 == 0 for i in range(300)]
+        cheat = [1.0 if flag else 0.0 for flag in labels]
+        assert auc(cheat, labels) == 1.0
+        assert auc([-x for x in cheat], labels) == 0.0
+        summary = agreement(cheat, cheat, labels)
+        assert summary["auc"] == 1.0 and summary["auc_p_value"] < 1e-6

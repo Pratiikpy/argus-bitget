@@ -287,6 +287,7 @@ class ScriptedPM:
     client's ``complete_json`` does: a refused answer is fed back and the next one is asked for."""
 
     budget = None
+    recalls_the_past = False  # a script has no training: the fixtures' March frames may be asked
 
     def __init__(self, answers: list[dict[str, Any]]) -> None:
         self.answers = list(answers)

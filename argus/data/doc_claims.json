@@ -13,52 +13,52 @@
       "doc": "readme",
       "line": 55,
       "quoted": [
-        "12,045"
+        "12,063"
       ],
       "live": [
-        12045
+        12063
       ],
       "status": "OK",
-      "excerpt": "12,045 tests collected"
+      "excerpt": "12,063 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 284,
       "quoted": [
-        "12,045"
+        "12,063"
       ],
       "live": [
-        12045
+        12063
       ],
       "status": "OK",
-      "excerpt": "12,045 tests collected"
+      "excerpt": "12,063 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 288,
       "quoted": [
-        "12,045"
+        "12,063"
       ],
       "live": [
-        12045
+        12063
       ],
       "status": "OK",
-      "excerpt": "12,045 tests collected"
+      "excerpt": "12,063 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 308,
       "quoted": [
-        "12,045"
+        "12,063"
       ],
       "live": [
-        12045
+        12063
       ],
       "status": "OK",
-      "excerpt": "12,045 tests collected"
+      "excerpt": "12,063 tests collected"
     },
     {
       "claim": "tests_passing",
@@ -66,7 +66,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        12045
+        12063
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -76,78 +76,78 @@
       "doc": "explained",
       "line": 714,
       "quoted": [
-        "12,045"
+        "12,063"
       ],
       "live": [
-        12045
+        12063
       ],
       "status": "OK",
-      "excerpt": "12,045 tests"
+      "excerpt": "12,063 tests"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 1770,
       "quoted": [
-        "12,045"
+        "12,063"
       ],
       "live": [
-        12045
+        12063
       ],
       "status": "OK",
-      "excerpt": "12,045 tests collected"
+      "excerpt": "12,063 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 2419,
       "quoted": [
-        "12,045"
+        "12,063"
       ],
       "live": [
-        12045
+        12063
       ],
       "status": "OK",
-      "excerpt": "12,045 tests collected"
+      "excerpt": "12,063 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "architecture",
       "line": 13,
       "quoted": [
-        "12,045"
+        "12,063"
       ],
       "live": [
-        12045
+        12063
       ],
       "status": "OK",
-      "excerpt": "12,045 tests collected"
+      "excerpt": "12,063 tests collected"
     },
     {
       "claim": "source_files",
       "doc": "readme",
       "line": 55,
       "quoted": [
-        "620"
+        "621"
       ],
       "live": [
-        620
+        621
       ],
       "status": "OK",
-      "excerpt": "strict clean on 620 source files"
+      "excerpt": "strict clean on 621 source files"
     },
     {
       "claim": "source_files",
       "doc": "public-readme",
       "line": 309,
       "quoted": [
-        "620"
+        "621"
       ],
       "live": [
-        620
+        621
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 620 source files"
+      "excerpt": "strict` clean on 621 source files"
     },
     {
       "claim": "source_files",
@@ -155,7 +155,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        620
+        621
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -165,123 +165,123 @@
       "doc": "explained",
       "line": 1771,
       "quoted": [
-        "620"
+        "621"
       ],
       "live": [
-        620
+        621
       ],
       "status": "OK",
-      "excerpt": "strict` clean on **620 source files"
+      "excerpt": "strict` clean on **621 source files"
     },
     {
       "claim": "source_files",
       "doc": "explained",
       "line": 2416,
       "quoted": [
-        "620"
+        "621"
       ],
       "live": [
-        620
+        621
       ],
       "status": "OK",
-      "excerpt": "strict` clean on 620 source files"
+      "excerpt": "strict` clean on 621 source files"
     },
     {
       "claim": "source_files",
       "doc": "architecture",
       "line": 14,
       "quoted": [
-        "620"
+        "621"
       ],
       "live": [
-        620
+        621
       ],
       "status": "OK",
-      "excerpt": "strict` clean on the 620 files"
+      "excerpt": "strict` clean on the 621 files"
     },
     {
       "claim": "source_tree",
       "doc": "explained",
       "line": 1768,
       "quoted": [
-        "623",
+        "624",
         "20"
       ],
       "live": [
-        623,
+        624,
         20
       ],
       "status": "OK",
-      "excerpt": "623** files across **20 packages"
+      "excerpt": "624** files across **20 packages"
     },
     {
       "claim": "source_tree",
       "doc": "explained",
       "line": 2416,
       "quoted": [
-        "623",
+        "624",
         "20"
       ],
       "live": [
-        623,
+        624,
         20
       ],
       "status": "OK",
-      "excerpt": "623 files, 20 packages"
+      "excerpt": "624 files, 20 packages"
     },
     {
       "claim": "source_tree",
       "doc": "architecture",
       "line": 11,
       "quoted": [
-        "623",
+        "624",
         "20"
       ],
       "live": [
-        623,
+        624,
         20
       ],
       "status": "OK",
-      "excerpt": "623 source files**, 20 packages"
+      "excerpt": "624 source files**, 20 packages"
     },
     {
       "claim": "data_files",
       "doc": "explained",
       "line": 1772,
       "quoted": [
-        "936"
+        "937"
       ],
       "live": [
-        936
+        937
       ],
       "status": "OK",
-      "excerpt": "936** files under `argus/data/`"
+      "excerpt": "937** files under `argus/data/`"
     },
     {
       "claim": "data_files",
       "doc": "explained",
       "line": 2421,
       "quoted": [
-        "936"
+        "937"
       ],
       "live": [
-        936
+        937
       ],
       "status": "OK",
-      "excerpt": "936 files under `argus/data/`"
+      "excerpt": "937 files under `argus/data/`"
     },
     {
       "claim": "data_files",
       "doc": "architecture",
       "line": 15,
       "quoted": [
-        "936"
+        "937"
       ],
       "live": [
-        936
+        937
       ],
       "status": "OK",
-      "excerpt": "936** files under `argus/data/`"
+      "excerpt": "937** files under `argus/data/`"
     },
     {
       "claim": "memory_effect",
