@@ -482,6 +482,112 @@ def grade_theses(path: Path = THESIS_PATH, *, closes: Closes = _default_closes) 
             "by_verdict": by_verdict, "calls": graded}
 
 
+# --- event moves ----------------------------------------------------------------------------------
+
+EVENT_PATH = PACKAGE / "data" / "event_calls.jsonl"
+EVENT_SYMBOLS: tuple[str, ...] = ("BTCUSDT", "ETHUSDT", "NVDAUSDT", "QQQUSDT", "XAUUSDT")
+"""Fixed 2026-10-04 (build-list 2.4): the markets "how does X react on CPI day?" is most asked
+about, one per asset class the console covers."""
+EVENT_LEAD_DAYS = 7
+
+Upcoming = Callable[[], Sequence[Any]]
+EventMoves = Callable[[str, str], tuple[Sequence[Any], float | None]]
+HourMove = Callable[[str, datetime], float | None]
+
+
+def _default_upcoming() -> Sequence[Any]:
+    from argus.market.calendar import upcoming
+
+    return upcoming(days=EVENT_LEAD_DAYS)[0]
+
+
+def _default_event_moves(symbol: str, kind: str) -> tuple[Sequence[Any], float | None]:
+    from argus.lui.research.macro_moves import moves
+
+    return moves(symbol, kind)
+
+
+def _default_hour_move(symbol: str, at: datetime) -> float | None:
+    from argus.lui.research.macro_moves import hour_move
+
+    return hour_move(symbol, at)
+
+
+def record_events(now: datetime | None = None, *, path: Path = EVENT_PATH,
+                  upcoming_of: Upcoming = _default_upcoming,
+                  moves_of: EventMoves = _default_event_moves) -> list[dict[str, Any]]:
+    """For each scheduled CPI release or Fed decision in the next week, the size of move the
+    console states for it (`lui/research/macro_moves.event_move_lines`: the average absolute move
+    in the hour after, over the last year's releases, beside the ordinary move in that hour),
+    kept before the release, hash-chained. Graded by :func:`grade_events` once it has printed."""
+    now = now or datetime.now(UTC)
+    rows = read(path)
+    verify(rows)
+    done = {(r["symbol"], r["kind"], r["at"]) for r in rows}
+    previous = str(rows[-1]["hash"]) if rows else GENESIS
+    added: list[dict[str, Any]] = []
+    for event in upcoming_of():
+        if not now < event.at <= now + timedelta(days=EVENT_LEAD_DAYS):
+            continue
+        at = event.at.isoformat()
+        for symbol in EVENT_SYMBOLS:
+            if (symbol, event.kind, at) in done:
+                continue
+            try:
+                found, ordinary = moves_of(symbol, event.kind)
+            except Exception:
+                continue
+            if len(found) < 5:
+                continue  # the answer gives no average below five releases, so nothing to grade
+            stated = sum(abs(m.hour) for m in found) / len(found)
+            row: dict[str, Any] = {"recorded_at": now.isoformat(timespec="seconds"),
+                                   "symbol": symbol, "kind": event.kind, "at": at,
+                                   "stated_hour": stated, "ordinary_hour": ordinary,
+                                   "releases": len(found), "prev": previous}
+            row["hash"] = _digest(row)
+            previous = row["hash"]
+            added.append(row)
+    if added:
+        with path.open("a", encoding="utf-8", newline="\n") as handle:
+            for row in added:
+                handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+    return added
+
+
+def grade_events(now: datetime | None = None, *, path: Path = EVENT_PATH,
+                 hour_move: HourMove = _default_hour_move) -> dict[str, Any]:
+    """Each recorded event whose hour has printed: the move it made against the size stated,
+    and whether it beat the ordinary hour, as the stated size said it would."""
+    now = now or datetime.now(UTC)
+    rows = read(path)
+    verify(rows)
+    graded: list[dict[str, Any]] = []
+    pending = 0
+    for row in rows:
+        at = datetime.fromisoformat(str(row["at"]))
+        if now < at + timedelta(hours=2):
+            pending += 1
+            continue
+        try:
+            moved = hour_move(str(row["symbol"]), at)
+        except Exception:
+            moved = None
+        if moved is None:
+            graded.append({"symbol": row["symbol"], "kind": row["kind"], "at": row["at"],
+                           "ungraded": "the hour around the release could not be read"})
+            continue
+        ordinary = row.get("ordinary_hour")
+        graded.append({"symbol": row["symbol"], "kind": row["kind"], "at": row["at"],
+                       "stated_hour": row["stated_hour"], "moved": moved,
+                       "error": abs(abs(moved) - float(row["stated_hour"])),
+                       "beat_ordinary": (abs(moved) > float(ordinary)) if ordinary else None})
+    scored = [g for g in graded if "error" in g]
+    beat = [g["beat_ordinary"] for g in scored if g["beat_ordinary"] is not None]
+    return {"recorded": len(rows), "graded": len(scored), "pending": pending,
+            "mean_error": (sum(g["error"] for g in scored) / len(scored)) if scored else None,
+            "beat_ordinary": (sum(beat) / len(beat)) if beat else None, "calls": graded}
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="record and grade the console's own calls")
     parser.add_argument("--record", action="store_true")
@@ -494,10 +600,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"recorded {len(weekend)} weekend band(s)")
         theses = record_theses()
         print(f"recorded {len(theses)} thesis verdict(s)")
+        events = record_events()
+        print(f"recorded {len(events)} event-move call(s)")
     if args.grade:
         grades = grade()
         grades["weekend"] = grade_weekend()
         grades["theses"] = grade_theses()
+        grades["events"] = grade_events()
         GRADES_PATH.write_text(json.dumps(grades, ensure_ascii=False, indent=1) + "\n",
                                encoding="utf-8", newline="\n")
         print(f"{grades['calls']} calls, {grades['risk_graded']} risk-graded, "

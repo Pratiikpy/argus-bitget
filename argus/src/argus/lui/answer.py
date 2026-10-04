@@ -416,7 +416,7 @@ def answer_decision_why(ledger: PaperLedger, question: Question) -> Answer:
           at=entry.decided_at, phase=entry.session_phase),
         t("why.confidence", lang, confidence=entry.stated_confidence,
           hours=entry.hours_to_discovery),
-        t("why.thesis", lang, thesis=entry.thesis),
+        t("why.thesis", lang, thesis=marked_thesis(entry.seq, entry.thesis)),
     ]
     if entry.invalidation:
         lines.append(t("why.invalidation", lang, conditions="; ".join(entry.invalidation)))
@@ -467,6 +467,74 @@ _PROCESS: tuple[tuple[str, str], ...] = (
 """The desk's own checks, in the order it ran them, and the name each is shown under. Each is one
 of the capabilities `/proof` lists: provenance-discounted agreement, graded memory, priced
 deliberation, numeric grounding, the committed protocol."""
+
+
+UNTRACED = " [not in the evidence]"
+"""Set after each figure of a quoted thesis that the desk's own grounding check could not trace to
+anything it was given (`truth/grounding.py`, written to `desk_notes` at decision time)."""
+_UNRESOLVED = re.compile(r"^\[grounding\] \d+ of \d+ figure\(s\) do not resolve to anything the "
+                         r"desk was given: (?P<names>.+)$")
+
+
+def untraced_figures(seq: int) -> tuple[str, ...]:
+    """The figures in decision ``seq``'s thesis that its grounding check could not trace."""
+    try:
+        rows = desk_notes_path().read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return ()
+    for line in reversed(rows):
+        try:
+            row = json.loads(line)
+        except ValueError:
+            continue
+        if row.get("seq") != seq:
+            continue
+        for note in row.get("notes", []):
+            found = _UNRESOLVED.match(str(note))
+            if found:
+                return tuple(n.strip() for n in found.group("names").split(",") if n.strip())
+        return ()
+    return ()
+
+
+def _worked_out(raw: str, thesis: str) -> str | None:
+    """How an untraced percentage could be arithmetic on two figures the same thesis states: "a
+    ~2.2% premium ($163.45 vs $160.01)" is 163.45 / 160.01 - 1 = 2.15%, worked out by the model
+    from two traced prices, not invented. Within the rounding the figure is written to."""
+    from argus.truth.grounding import extract
+
+    figures = extract(thesis)
+    target = next((f for f in figures if f.raw == raw), None)
+    if target is None or target.unit not in ("%", "bps"):
+        return None
+    want = target.value / (100 if target.unit == "%" else 10_000)
+    decimals = len(raw.split(".")[1].rstrip("%bps ").rstrip()) if "." in raw else 0
+    # the rounding the figure is written to, or 3% of it, whichever is wider: the model writes
+    # "~2.2%" for 2.15% (`truth/grounding.TOLERANCE` is 2% for a figure matched to a fact)
+    slack = max(0.5 * 10 ** -decimals / (100 if target.unit == "%" else 10_000),
+                0.03 * abs(want)) + 1e-12
+    levels = [f.value for f in figures if f.unit in ("", "$") and f.value > 0 and f is not target]
+    for high in levels:
+        for low in levels:
+            if high > low and abs((high / low - 1) - abs(want)) <= slack:
+                return f"{high:,.2f} / {low:,.2f} - 1 = {high / low - 1:.2%}"
+    return None
+
+
+def marked_thesis(seq: int, thesis: str) -> str:
+    """The thesis as logged, with every figure its grounding check could not trace marked where it
+    stands (build-list 4.2). The model wrote the thesis; a number in it that resolves to nothing
+    the desk was given was shown to a reader unmarked, while the check that caught it sat in a
+    separate note further down (352 of 1,009 decisions on 2026-10-04). The ledger is unchanged —
+    its rows are hashed — so the mark is the renderer's, every time the thesis is shown."""
+    marked = thesis
+    for raw in untraced_figures(seq):
+        derived = _worked_out(raw, thesis)
+        mark = (f" [not in the evidence; worked out as {derived}]" if derived is not None
+                else UNTRACED)
+        marked = re.sub(rf"(?<![\w.]){re.escape(raw)}(?![\w.%]| \[not in the evidence)",
+                        (raw + mark).replace("\\", "\\\\"), marked)
+    return marked
 
 
 @traced("desk")
@@ -550,7 +618,7 @@ def answer_abstention_why(ledger: PaperLedger, question: Question) -> Answer:
         from argus.lui.research.text import sentence_cut
 
         lines.append(t("abst.row", lang, seq=entry.seq, symbol=entry.symbol,
-                       thesis=sentence_cut(entry.thesis or "", 320)))
+                       thesis=marked_thesis(entry.seq, sentence_cut(entry.thesis or "", 320))))
     settled = [e for e in rows if e.counterfactual_move_bps is not None]
     lines.append(
         t("abst.settled", lang, count=len(settled)) if settled else t("abst.unsettled", lang)
@@ -746,7 +814,7 @@ def answer_evidence(ledger: PaperLedger, question: Question) -> Answer:
     lang = question.language
     lines = [
         t("ev.header", lang, seq=entry.seq, symbol=entry.symbol, at=entry.decided_at),
-        t("ev.thesis", lang, thesis=entry.thesis),
+        t("ev.thesis", lang, thesis=marked_thesis(entry.seq, entry.thesis)),
         *_evidence_lines(entry.seq, lang),
         t("ev.hash", lang, hash=entry.market_state_hash[:16]),
         t("ev.feed", lang),

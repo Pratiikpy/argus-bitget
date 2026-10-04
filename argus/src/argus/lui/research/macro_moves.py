@@ -109,6 +109,25 @@ def event_move_lines(symbol: str, kind: str) -> list[str] | None:
     return lines
 
 
+def hour_move(symbol: str, at: datetime) -> float | None:
+    """One release's move in the hour after it, measured as :func:`moves` measures every past
+    one: from the last hourly close at least 30 minutes before ``at`` to the close an hour later.
+    The daily call record grades the size this module states against it (`eval/call_record`)."""
+    from argus.market.history import fetch_window
+
+    try:
+        candles = fetch_window(symbol, start=at - timedelta(hours=3), end=at + timedelta(hours=3),
+                               interval="1H", pause=0.0)
+    except Exception:
+        return None
+    closes = {c.ts: float(c.close) for c in candles}
+    before = max((t for t in closes if t <= at - timedelta(minutes=30)), default=None)
+    if before is None or closes[before] <= 0:
+        return None
+    after = closes.get(before + timedelta(hours=1))
+    return after / closes[before] - 1 if after is not None else None
+
+
 def _around(symbol: str, at: datetime) -> float | None:
     """The move from the last hourly close before ``at`` to the close 24 hours after it."""
     import time

@@ -338,16 +338,18 @@ for (const id of ['chips-new', 'chips-research', 'chips']) {
 function esc0(s) {
   return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 }
+// Each label names its evidence class first — fact, inference, assumption or unavailable
+// (build-list 4.2; the four classes MirrorLine and VERITY file every claim under).
 const PV = {
-  live: 'read from a source just now',
-  computed: 'worked out for this answer from live data',
-  record: 'a measured past record, with its sample named',
-  desk: "quoted from the desk's own logged decision",
-  assumed: 'a default applied because the question did not say',
-  memory: 'something you told the console earlier, kept in this browser',
-  missing: 'could not be read or checked',
-  explained: 'written into the console to explain a term or a rule; nothing in it is ' +
-    'computed for this answer'};
+  live: 'fact: read from a source just now',
+  computed: 'inference: worked out for this answer from live data',
+  record: 'fact: a measured past record, with its sample named',
+  desk: "fact: quoted from the desk's own logged decision",
+  assumed: 'assumption: a default applied because the question did not say',
+  memory: 'assumption: something you told the console earlier, kept in this browser',
+  missing: 'unavailable: could not be read or checked',
+  explained: 'explanation: written into the console to explain a term or a rule; nothing ' +
+    'in it is computed for this answer'};
 const pv = t => t ? `<span class="pv pv-${t}" title="${PV[t]}">${t}</span>` : '';
 const lineClass = l => /^(Actionable|Bottom line)(?: \\([^)]*\\))?:/.test(l) ? 'line act'
   : l.startsWith('Hedge:') ? 'line hedge'

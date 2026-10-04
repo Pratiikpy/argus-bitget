@@ -273,6 +273,17 @@ def sweep_lines(data: Path) -> list[tuple[str, str]]:
                         + (f"came true — {'; '.join(parts)}" if parts else
                            "none has reached its week yet")
                         + (f", {theses['pending']} pending" if theses.get("pending") else "")))
+        events = calls.get("events") or {}
+        if events.get("recorded"):
+            scored = int(events.get("graded") or 0)
+            out.append(("Our event-move calls, graded",
+                        f"{events['recorded']} stated moves for CPI and Fed hours recorded before "
+                        f"the release; "
+                        + (f"{scored} graded, off by {float(events['mean_error']):.2%} on average"
+                           + (f", {float(events['beat_ordinary']):.0%} bigger than the ordinary "
+                              f"hour" if events.get("beat_ordinary") is not None else "")
+                           if scored else "none has printed yet")
+                        + (f", {events['pending']} pending" if events.get("pending") else "")))
     return out
 
 

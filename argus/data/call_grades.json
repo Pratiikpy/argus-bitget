@@ -1,5 +1,5 @@
 {
- "graded_at": "2026-10-04T16:02:40+00:00",
+ "graded_at": "2026-10-04T16:36:04+00:00",
  "calls": 32,
  "first_call": "2026-09-27T02:28:00+00:00",
  "risk_graded": 0,
@@ -433,6 +433,14 @@
     "came_true": 0
    }
   },
+  "calls": []
+ },
+ "events": {
+  "recorded": 0,
+  "graded": 0,
+  "pending": 0,
+  "mean_error": null,
+  "beat_ordinary": null,
   "calls": []
  }
 }

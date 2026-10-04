@@ -231,3 +231,46 @@ class TestThesisVerdicts:
         # a week not yet over is pending, not graded
         short = {d: 100.0 for d in days[:5]}
         assert cr.grade_theses(path, closes=lambda s: short)["pending"] == len(cr.THESIS_CLAIMS)
+
+
+class TestEventMoves:
+    """Build-list 2.4: the move size stated for a scheduled release, kept before it and graded
+    once its hour has printed."""
+
+    @dataclass
+    class _Event:
+        kind: str
+        at: datetime
+
+    @dataclass
+    class _Move:
+        hour: float
+
+    def test_recorded_inside_the_week_and_graded_after(self, tmp_path: Path) -> None:
+        path = tmp_path / "events.jsonl"
+        release = datetime(2026, 10, 14, 12, 30, tzinfo=UTC)
+        moves = [self._Move(x) for x in (0.01, -0.02, 0.015, -0.005, 0.01)]
+
+        def upcoming() -> list[Any]:
+            return [self._Event("CPI", release)]
+
+        def moves_of(symbol: str, kind: str) -> tuple[list[Any], float | None]:
+            return (moves if symbol != "QQQUSDT" else moves[:3]), 0.004
+
+        # ten days ahead is outside the week; seven days ahead records every market with five
+        # releases or more (QQQ has three here, so its answer gives no average and nothing is kept)
+        assert cr.record_events(release - timedelta(days=10), path=path, upcoming_of=upcoming,
+                                moves_of=moves_of) == []
+        rows = cr.record_events(release - timedelta(days=6), path=path, upcoming_of=upcoming,
+                                moves_of=moves_of)
+        assert len(rows) == len(cr.EVENT_SYMBOLS) - 1
+        assert rows[0]["stated_hour"] == pytest.approx(0.012)  # mean of |moves|
+        assert cr.record_events(release - timedelta(days=5), path=path, upcoming_of=upcoming,
+                                moves_of=moves_of) == []
+        assert cr.grade_events(release + timedelta(hours=1), path=path,
+                               hour_move=lambda s, at: 0.0)["pending"] == len(rows)
+        got = cr.grade_events(release + timedelta(hours=3), path=path,
+                              hour_move=lambda s, at: -0.018)
+        assert got["graded"] == len(rows)
+        assert got["mean_error"] == pytest.approx(0.006)  # |0.018| against the stated 0.012
+        assert got["beat_ordinary"] == 1.0
