@@ -1,8 +1,8 @@
 {
-  "as_of": "2026-10-03T20:16:19.638119+00:00",
+  "as_of": "2026-10-04T14:22:27.008550+00:00",
   "round_trip_bps": 12.0,
   "min_directional_for_a_rate": 30,
-  "total_marks": 802,
+  "total_marks": 813,
   "outside_buckets": 0,
   "horizons": [
     {
@@ -54,27 +54,27 @@
     },
     {
       "horizon": "overnight_12h_plus",
-      "marks": 200,
-      "directional": 195,
-      "correct": 90,
-      "coverage_pct": 97.5,
-      "accuracy_pct": 46.2,
+      "marks": 211,
+      "directional": 206,
+      "correct": 97,
+      "coverage_pct": 97.6,
+      "accuracy_pct": 47.1,
       "accuracy_ci95": [
-        37.2,
-        54.4
+        38.3,
+        55.0
       ],
       "interval_method": "bootstrap over decision cycles",
-      "cycles": 18,
+      "cycles": 19,
       "beats_a_coin": false,
       "naive_lean": "up",
-      "naive_accuracy_pct": 55.4,
+      "naive_accuracy_pct": 56.8,
       "cycles_lean_beat_naive": 5,
-      "cycles_naive_beat_lean": 10,
+      "cycles_naive_beat_lean": 11,
       "cycles_tied": 3,
-      "sign_test_p_vs_naive": 0.3017578125,
+      "sign_test_p_vs_naive": 0.210113525390625,
       "beats_the_naive_call": false,
-      "hurdle_clearance_pct": 85.5,
-      "median_forgone_bps": -19.53,
+      "hurdle_clearance_pct": 84.4,
+      "median_forgone_bps": -16.79,
       "enough_for_a_rate": true
     }
   ],

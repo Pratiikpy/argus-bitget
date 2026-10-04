@@ -53,6 +53,14 @@ class Record:
     kinds: dict[str, str] = field(default_factory=dict)
     """The :class:`~argus.truth.failures.ErrorKind` of each source's first failure."""
     lock: threading.Lock = field(default_factory=threading.Lock)
+    parent: Record | None = None
+    """The recording open when this one started. An engine opens its own recording inside an
+    answer that is already recording (the guided research task wraps the whole answer to say what
+    it read, `lui/guide.py`); without forwarding, every call inside the engine was invisible to
+    the outer count."""
+    model_calls: int = 0
+    """Calls to the language model (Qwen) made while recording: not a data source, so never in
+    ``answered``, but a cost the guided task reports."""
 
     def note(self, source: str, ok: bool, why: str = "", kind: str = "") -> None:
         with self.lock:
@@ -61,6 +69,14 @@ class Record:
                 self.why[source] = why
             if not ok and kind and source not in self.kinds:
                 self.kinds[source] = kind
+        if self.parent is not None:
+            self.parent.note(source, ok, why, kind)
+
+    def note_model_call(self) -> None:
+        with self.lock:
+            self.model_calls += 1
+        if self.parent is not None:
+            self.parent.note_model_call()
 
     @property
     def missing(self) -> list[str]:
@@ -106,7 +122,7 @@ _current: contextvars.ContextVar[Record | None] = contextvars.ContextVar("covera
 
 @contextmanager
 def recording() -> Iterator[Record]:
-    record = Record()
+    record = Record(parent=_current.get())
     token = _current.set(record)
     try:
         yield record
@@ -190,6 +206,8 @@ def _observed(url: Any, *args: Any, **kwargs: Any) -> Any:
         target, body = str(url), args[0] if args and isinstance(args[0], bytes) else \
             kwargs.get("data") if isinstance(kwargs.get("data"), bytes) else None
     name = source_name(target, body)
+    if name == "Qwen":
+        record.note_model_call()
     if name in ("", "Qwen"):
         return _original(url, *args, **kwargs)  # plumbing or the planner, not a data source
     try:

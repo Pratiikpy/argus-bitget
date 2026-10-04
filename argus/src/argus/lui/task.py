@@ -34,7 +34,7 @@ import contextlib
 import re
 import time
 from collections.abc import Callable
-from concurrent.futures import Future, ThreadPoolExecutor, as_completed
+from concurrent.futures import Future, as_completed
 from concurrent.futures import TimeoutError as FuturesTimeout
 from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
@@ -57,6 +57,7 @@ from argus.lui.research import (
 from argus.lui.thesis import Tested
 from argus.lui.weigh import Weighing, weigh
 from argus.market.universe import contracts, is_equity
+from argus.truth.coverage import ContextPool
 from argus.truth.paths import DATA_DIR
 
 DEFAULT_NAME = "TSLA"
@@ -478,7 +479,9 @@ def research_task(name: str = DEFAULT_NAME, size_pct: float = DEFAULT_SIZE_PCT,
     # deadline exists to cut. A step still running is abandoned; its thread ends on its own.
     stated = thesis.reasons(asked) if asked.strip() else ()
     kinds = {r.kind for r in stated}
-    pool = ThreadPoolExecutor(max_workers=len(STEPS) + 4)
+    # A context pool, so each engine's network reads are counted by the answer's recording
+    # (`truth/coverage.py`): a plain pool dropped every one of them from the count.
+    pool = ContextPool(max_workers=len(STEPS) + 4)
     try:
         path = pool.submit(_price_path, symbol)
         # The reads only a stated reason needs run beside the engines, not after them.

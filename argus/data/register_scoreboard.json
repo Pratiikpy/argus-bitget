@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-10-03T20:16:17.445496+00:00",
-  "registered": 431,
-  "resolved": 250,
-  "pending": 179,
+  "generated_at": "2026-10-04T14:22:25.071106+00:00",
+  "registered": 436,
+  "resolved": 254,
+  "pending": 180,
   "unresolvable": 2,
   "claimants": [
     {
       "claimant": "argus",
-      "resolved": 250,
-      "correct": 172,
-      "hit_rate": 0.688,
-      "brier": 0.22232,
-      "mean_confidence": 0.5912
+      "resolved": 254,
+      "correct": 175,
+      "hit_rate": 0.689,
+      "brier": 0.22213,
+      "mean_confidence": 0.5913
     }
   ],
   "wall": [
@@ -626,6 +626,15 @@
       "observed_shown": "|18.28| = 18.28",
       "resolved_at": "2026-10-03T20:16:13.565193+00:00",
       "hash": "5160ec33062362b45efafe18de6e5de8aa4b78e9deab011a3679dac807651152"
+    },
+    {
+      "claim": "\u2717 COINUSDT abs_move_above_bps 532.67 by 2026-10-04T14:16 (p=0.60) [8ca188dceeeb]",
+      "claimant": "argus",
+      "confidence": 0.6,
+      "observed": "-404.0404040404040404040404040",
+      "observed_shown": "|-404.04| = 404.04",
+      "resolved_at": "2026-10-04T14:22:18.525272+00:00",
+      "hash": "8ca188dceeeb9116a0c1942f96b87287e27c3bf2a5be72419adaa742ce16470a"
     },
     {
       "claim": "\u2717 NVDAUSDT return_over_below_bps 0 by 2026-09-15T09:21 (p=0.50) [7ffe510f62d0]",

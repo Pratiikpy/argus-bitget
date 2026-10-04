@@ -22,6 +22,7 @@ returns it; the server keeps no session state.
 
 from __future__ import annotations
 
+import contextlib
 import contextvars
 import itertools
 import json
@@ -112,8 +113,21 @@ PAGE = """<!doctype html>
   .refused .q { color:var(--warn) }
   .line { margin:3px 0; white-space:pre-wrap; overflow-wrap:anywhere }
   .tblw { margin:10px 0 2px; overflow-x:auto }
+  .guide { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:0 0 18px;
+    padding:12px 14px; border:1px solid var(--accent); border-radius:10px; background:var(--panel) }
+  .guide button { padding:8px 14px; font-size:14px; font-weight:600 }
+  .guide span { color:var(--dim); font-size:13px }
+  .gbar { font:600 11.5px/1.4 var(--mono); letter-spacing:.06em; text-transform:uppercase;
+    color:var(--accent); margin-bottom:6px }
+  .gbar small { text-transform:none; letter-spacing:0; font-weight:400; color:var(--dim) }
+  .gnext { margin-top:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap }
+  .gnext button { padding:7px 13px; font-size:13.5px; font-weight:600 }
+  .gnext span { color:var(--dim); font-size:12.5px }
+  .gsum ol { margin:6px 0 0; padding-left:22px }
+  .gsum li { margin:5px 0; overflow-wrap:anywhere }
   .tbl { border-collapse:collapse; font:13px/1.5 var(--mono) }
-  .tbl th, .tbl td { border:1px solid var(--line); padding:5px 10px; text-align:right }
+  .tbl th, .tbl td { border:1px solid var(--line); padding:5px 10px; text-align:right;
+    white-space:nowrap }
   .tbl th:first-child, .tbl td:first-child { text-align:left }
   .tbl th { color:var(--dim); font-weight:600; background:var(--bg) }
   .tbl caption { caption-side:bottom; text-align:left; color:var(--dim); font-size:11.5px;
@@ -197,6 +211,9 @@ touches your money.</p>
   <span class="saved" id="saved"></span>
 </div>
 <div class="mem" id="mem" hidden></div>
+<div class="guide"><button type="button" id="guide-go">Guided research &middot; 5 steps</button>
+<span>briefing on your book &rarr; a view &rarr; the research &rarr; how to act &rarr; a stress
+test, each step one question you can edit</span></div>
 <p class="group">New to trading</p>
 <div class="chips" id="chips-new">__CHIPS_NEW__</div>
 <p class="group">Research</p>
@@ -236,6 +253,11 @@ qEl.addEventListener('keydown', e => {
 });
 const bookEl = document.getElementById('book'), savedEl = document.getElementById('saved');
 let turns = [], first = true, askSeq = 0;
+// The guided task (`lui/guide.py`): the step the next question answers, and each step's bottom
+// line, listed after the fifth as the task's insight.
+let guideNext = null, guideTrail = [];
+const GUIDE_FIRST = "Brief me on my book: what moved each holding, and what's in the news?";
+const GUIDE_BOOK = '40% BTC, 30% ETH, 30% NVDA';
 // Our own visits are marked so the usage count (`lui/usage.py`) is of other people: opening the
 // console once with ?internal=1 sets the flag in this browser.
 let internal = '';
@@ -299,6 +321,7 @@ for (const id of ['chips-new', 'chips-research', 'chips']) {
   const el = document.getElementById(id);
   el.addEventListener('click', e => {
     if (!e.target.classList.contains('chip')) return;
+    guideNext = null;
     if (e.target.textContent === REVIEW_CHIP) {
       qEl.value = REVIEW_EXAMPLE; grow(); qEl.focus(); return;
     }
@@ -430,8 +453,10 @@ document.getElementById('f').addEventListener('submit', async ev => {
     if (tick) tick.textContent = String(Math.round((Date.now() - t0) / 1000));
   }, 1000);
   try {
+    const g = guideNext; guideNext = null;
     const r = await post('ask', {q: text, turns: JSON.stringify(turns),
-      book: bookEl.value.trim(), memory: JSON.stringify(memory)}, ctl.signal);
+      book: bookEl.value.trim(), memory: JSON.stringify(memory),
+      guide: g ? String(g.step) : '', focus: g ? g.focus : ''}, ctl.signal);
     if (!r.ok) throw new Error(`http ${r.status}`);
     const a = await r.json();
     turns = a.turns || turns;
@@ -440,6 +465,8 @@ document.getElementById('f').addEventListener('submit', async ev => {
     // answer "OVER BUDGET" in the warning colour read as a failure (audit, 2026-09-26).
     placed = place(`
       <div class="card ${a.refused ? 'refused' : ''}">
+        ${a.guide ? `<div class="gbar">Step ${a.guide.step} of ${a.guide.of} &middot; ` +
+          `${esc(a.guide.title)} <small>&mdash; ${esc(a.guide.what)}</small></div>` : ''}
         <div class="q">${esc(text)}</div>
         <div class="meta">
           <span class="tag">answered in ${(a.elapsed_ms / 1000).toFixed(1)} s</span>
@@ -470,10 +497,27 @@ document.getElementById('f').addEventListener('submit', async ev => {
           `<input type="hidden" name="q" value="${escA(text)}">` +
           `<input type="hidden" name="book" value="${escA(bookEl.value.trim())}">` +
           `<button>Run the full eight-engine research task on this &rarr;</button></form>` : ''}
+        ${a.guide && a.guide.next ? `<div class="gnext"><button type="button" ` +
+          `data-step="${a.guide.next.step}" data-focus="${escA(a.guide.focus)}" ` +
+          `data-ask="${escA(a.guide.next.ask)}">Next: ${esc(a.guide.next.title)} &rarr;</button>` +
+          `<span>puts step ${a.guide.next.step}'s question in the box, to edit or ask</span>` +
+          `</div>` : ''}
         ${a.answer_id ? `<div class="fb" data-id="${esc(a.answer_id)}">` +
           `<span>Did this answer your question?</span><button type="button" data-u="1">Yes` +
           `</button><button type="button" data-u="0">No</button></div>` : ''}
       </div>`);
+    if (a.guide) {
+      guideTrail = guideTrail.filter(t => t.step < a.guide.step);
+      guideTrail.push({step: a.guide.step, title: a.guide.title,
+        line: a.guide.takeaway || String(a.lines[0] || '').replace(/^Bottom line: /, '')});
+      if (!a.guide.next && guideTrail.length === a.guide.of) {
+        // The insight is the five bottom lines in order: what the book is doing, whether the view
+        // holds, what the research measured, what acting costs each way, what the worst month does.
+        placed.insertAdjacentHTML('beforebegin', `<div class="card gsum"><div class="gbar">` +
+          `Your research, in ${a.guide.of} lines</div><ol>` + guideTrail.map(t =>
+            `<li><b>${esc(t.title)}:</b> ${linked(t.line)}</li>`).join('') + `</ol></div>`);
+      }
+    }
     if (a.translate) {
       // English first, then the reader's language: every figure in the translation was checked
       // against the English by the server before it was sent (`lui/translate.py`).
@@ -529,11 +573,27 @@ out.addEventListener('click', e => {
     more.textContent = expand ? 'Show fewer lines' : more.dataset.label;
     return;
   }
+  const next = e.target.closest('.gnext button');
+  if (next) {
+    qEl.value = next.dataset.ask; grow();
+    guideNext = {step: Number(next.dataset.step), focus: next.dataset.focus};
+    next.textContent = 'In the box — edit it or press Ask';
+    next.disabled = true;
+    qEl.focus();
+    return;
+  }
   const b = e.target.closest('.fb button'); if (!b) return;
   const box = b.parentElement;
   post('feedback', {id: box.dataset.id, useful: b.dataset.u}).catch(() => {});
   box.textContent = b.dataset.u === '1' ? 'Thanks \u2014 noted as answered.'
     : 'Thanks \u2014 noted as not answered. Rephrasing, or naming the ticker, often helps.';
+});
+// Guided research starts from the saved book; with none, an example book fills the field for this
+// visit, said in the box's own hint, and is not saved unless the visitor edits it.
+document.getElementById('guide-go').addEventListener('click', () => {
+  if (!bookEl.value.trim()) { bookEl.value = GUIDE_BOOK; savedEl.textContent = 'example book'; }
+  guideTrail = []; guideNext = {step: 1, focus: ''};
+  qEl.value = GUIDE_FIRST; document.getElementById('f').requestSubmit();
 });
 // A link can carry a question (and a book) so it demonstrates an engine in one click: /proof
 // links every capability the console runs this way. The book fills the field for this visit
@@ -3577,6 +3637,32 @@ def _round27_follow_up(text: str, prior: list[str], *, now: datetime | None, vis
     rumour = _venue_rumour_lines(text)
     if rumour is not None:
         return engine_payload_like(rumour, prior, text, by="research")
+    from argus.lui import guide
+
+    if guide.BRIEF_ASKED.search(text):
+        # step one of the guided task (`lui/guide.py`, build-list 4.3), and a question in its own
+        # right: "brief me on my book" was answered as a risk report with one name's news
+        from argus.lui.research import parse_book
+
+        brief_book = parse_book(text) or parse_book(book)
+        if brief_book:
+            briefed = guide.briefing(dict(brief_book))
+            if briefed is not None:
+                brief_payload = engine_payload_like(briefed[0], prior, text, by="research")
+                # one receipt row per source: each holding's news engine names the same feeds
+                brief_payload["sources"] = list({json.dumps(s.as_dict(), sort_keys=True):
+                                                 s.as_dict() for s in briefed[1]}.values())
+                brief_payload["focus"] = briefed[2]
+                return brief_payload
+    from argus.lui.research import expressions as _expressions
+    from argus.lui.research.sizing import stated_capital as _stated_capital
+
+    expressed = _expressions.lines(text, _stated_capital(text))
+    if expressed is not None:
+        ways_payload = engine_payload_like(expressed[0], prior, text, by="research")
+        if expressed[1]:
+            ways_payload["table"] = expressed[1]
+        return ways_payload
     if re.search(r"\btrue\b|\bright\b|\bcorrect\b|\baccurate\b|\breally\b|\bis\s+that\b|"
                  r"\bcheck\b", text, re.I):
         from argus.lui import claims as _claims
@@ -5088,6 +5174,22 @@ PICTOGRAPHS = re.compile("[🀀-🫿☀-➿⬀-⯿️‍]+")
 
 
 def handle_ask(
+    text: str, prior: list[str], *, now: datetime | None = None, visitor: str = "local",
+    book: str = "", memory: str = "",
+) -> dict[str, Any]:
+    """:func:`_handle_ask`, timed: an answer built by a route that sets no ``elapsed_ms`` (every
+    one assembled by ``engine_payload_like``) showed "answered in NaN s" on the page (the guided
+    task's screenshots, 2026-10-04)."""
+    import time as _time
+
+    started = _time.perf_counter()
+    payload = _handle_ask(text, prior, now=now, visitor=visitor, book=book, memory=memory)
+    if not isinstance(payload.get("elapsed_ms"), (int, float)):
+        payload["elapsed_ms"] = (_time.perf_counter() - started) * 1000
+    return payload
+
+
+def _handle_ask(
     text: str, prior: list[str], *, now: datetime | None = None, visitor: str = "local",
     book: str = "", memory: str = "",
 ) -> dict[str, Any]:
@@ -12830,22 +12932,23 @@ class Handler(BaseHTTPRequestHandler):
             # parse() keeps MAX_FACTS; a cut mid-JSON would drop them all (was 12,000 characters,
             # under what 40 facts with their replaced-text history can take).
             memory_text = first("memory")[:64000]
-            if _traced():
-                # Where each line comes from — live, computed, record, desk, assumed, missing —
-                # decided by the engine step that produced it (`lui/trace.py`); a line no step
-                # declares keeps the wording label (`lui/provenance.py`). Measured on the 680
-                # held-out questions: 83.6% of lines labelled against 75.8% by wording alone, and
-                # the two agree on all 601 lines both label.
-                from argus.lui import trace
+            from argus.lui import guide as _guide
+            from argus.truth import coverage as _coverage
 
-                payload = trace.answered(
-                    text, lambda: handle_ask(text, prior, visitor=visitor, book=book,
-                                             memory=memory_text),
-                    lambda p: offer_translation(p, text))
-            else:
-                payload = handle_ask(text, prior, visitor=visitor, book=book, memory=memory_text)
-                offer_translation(payload, text)
-                payload["line_labels"] = provenance_labels(payload.get("lines") or [])
+            step = int(first("guide")) if first("guide").isdigit() else 0
+            step = step if 1 <= step <= len(_guide.STEPS) else 0
+            # A guided step is recorded whole, so its closing line can say every source the answer
+            # read and what it cost (`lui/guide.py`, build-list 4.3).
+            reading = _coverage.recording() if step else contextlib.nullcontext()
+            with reading as record:
+                payload = self._ask_payload(text, prior, visitor, book, memory_text)
+            if step:
+                focus = first("focus")[:20] or str(payload.get("focus") or "")
+                payload["guide"] = _guide.envelope(step, focus or None,
+                                                   lines=list(payload.get("lines") or []))
+                said = _guide.cost_line(record) if record is not None else None
+                if said:
+                    payload["lines"] = [*payload.get("lines", []), said]
             payload["answer_id"] = usage.answer_id()
             usage.ask_event(payload, answer=payload["answer_id"], visitor=seen_as, client=client,
                             internal=internal)
@@ -12857,6 +12960,33 @@ class Handler(BaseHTTPRequestHandler):
             self._send(b'{"ok": true}' if event else b'{"error": "unknown answer id"}',
                        "application/json", 200 if event else 400)
             return
+        self._translate_route(params, visitor)
+
+    def _ask_payload(self, text: str, prior: list[str], visitor: str, book: str,
+                     memory_text: str) -> dict[str, Any]:
+        """One question answered, with each line's source label."""
+        if _traced():
+            # Where each line comes from — live, computed, record, desk, assumed, missing —
+            # decided by the engine step that produced it (`lui/trace.py`); a line no step
+            # declares keeps the wording label (`lui/provenance.py`). Measured on the 680
+            # held-out questions: 83.6% of lines labelled against 75.8% by wording alone, and
+            # the two agree on all 601 lines both label.
+            from argus.lui import trace
+
+            traced: dict[str, Any] = trace.answered(
+                text, lambda: handle_ask(text, prior, visitor=visitor, book=book,
+                                         memory=memory_text),
+                lambda p: offer_translation(p, text))
+            return traced
+        payload = handle_ask(text, prior, visitor=visitor, book=book, memory=memory_text)
+        offer_translation(payload, text)
+        payload["line_labels"] = provenance_labels(payload.get("lines") or [])
+        return payload
+
+    def _translate_route(self, params: dict[str, list[str]], visitor: str) -> None:
+        def first(name: str, default: str = "") -> str:
+            return (params.get(name) or [default])[0]
+
         # /translate — the second half of a non-English answer: the page shows the English at
         # once and asks here for the translation, signed by this server so only its own answers
         # are translated (`lui/translate.py`).

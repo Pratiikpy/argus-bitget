@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-03T20:16:18.746334+00:00",
-  "log": "cycle_2026-10-04_0100.log",
+  "generated_at": "2026-10-04T14:22:26.231452+00:00",
+  "log": "cycle_2026-10-04_1900.log",
   "sound": false,
   "saw_price_discovery": false,
   "proposed_exposure": 0,
@@ -14,27 +14,27 @@
     {
       "check": "symbols_decided",
       "status": "FAIL",
-      "detail": "11 of 12 symbols produced a decision"
+      "detail": "10 of 12 symbols produced a decision"
     },
     {
       "check": "ran_to_completion",
       "status": "FAIL",
-      "detail": "stopped after 11 of 12 symbol(s): 18559 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them."
+      "detail": "stopped after 10 of 12 symbol(s): 11717 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them."
     },
     {
       "check": "token_budget",
       "status": "PASS",
-      "detail": "311,441 of 330,000 spent (94%)"
+      "detail": "318,283 of 330,000 spent (96%)"
     },
     {
       "check": "cumulative_tokens",
       "status": "PASS",
-      "detail": "24,391,013 token(s) across 83 recorded cycle(s), 293,868 per cycle \u2014 roughly 1,175,471/day at four cycles. The key's remaining balance is not observable from here; this is the burn rate, not a runway"
+      "detail": "24,709,296 token(s) across 84 recorded cycle(s), 294,158 per cycle \u2014 roughly 1,176,633/day at four cycles. The key's remaining balance is not observable from here; this is the burn rate, not a runway"
     },
     {
       "check": "budget_not_exhausted",
       "status": "FAIL",
-      "detail": "the budget ended the cycle before the guard had to \u2014 stopped after 11 of 12 symbol(s): 18559 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them."
+      "detail": "the budget ended the cycle before the guard had to \u2014 stopped after 10 of 12 symbol(s): 11717 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them."
     },
     {
       "check": "chain_intact",
@@ -44,12 +44,12 @@
     {
       "check": "leans_recorded",
       "status": "PASS",
-      "detail": "11 of 11 row(s) carry a lean and a lean_confidence"
+      "detail": "10 of 10 row(s) carry a lean and a lean_confidence"
     },
     {
       "check": "leans_gradeable",
       "status": "PASS",
-      "detail": "11 of 11 decision(s) state a direction (9 up, 2 down, 0 none)"
+      "detail": "10 of 10 decision(s) state a direction (9 up, 1 down, 0 none)"
     },
     {
       "check": "verdicts_parsed",
@@ -62,5 +62,5 @@
       "detail": "session phase(s) seen: weekend  (anchor market shut)"
     }
   ],
-  "verdict": "8/11 checks passed. FAILED \u2014 symbols_decided: 11 of 12 symbols produced a decision; ran_to_completion: stopped after 11 of 12 symbol(s): 18559 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them.; budget_not_exhausted: the budget ended the cycle before the guard had to \u2014 stopped after 11 of 12 symbol(s): 18559 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them.. The cycle ran with the anchor market shut, so it says nothing about whether this desk trades"
+  "verdict": "8/11 checks passed. FAILED \u2014 symbols_decided: 10 of 12 symbols produced a decision; ran_to_completion: stopped after 10 of 12 symbol(s): 11717 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them.; budget_not_exhausted: the budget ended the cycle before the guard had to \u2014 stopped after 10 of 12 symbol(s): 11717 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them.. The cycle ran with the anchor market shut, so it says nothing about whether this desk trades"
 }

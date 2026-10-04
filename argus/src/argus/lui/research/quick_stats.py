@@ -93,6 +93,12 @@ def _realised(symbol: str, days: int) -> float | None:
     return math.sqrt(var) * math.sqrt(365)
 
 
+def realised_volatility(symbol: str, days: int) -> float | None:
+    """Annualised volatility of the last ``days`` daily closes on Bitget; None when fewer than
+    ten closes load. The guided task's stress step reads it (`lui/guide.py`)."""
+    return _realised(symbol, days)
+
+
 MOVE_VS_VOL: Final = re.compile(
     r"\b(?:bigger|larger|smaller|more|less|unusual|normal|abnormal|outsized)\b[^?]{0,60}\b(?:typical|"
     r"usual|normal|average)\s+(?:daily\s+|weekly\s+)?(?:volatility|vol|moves?|swings?|range)\b|"
