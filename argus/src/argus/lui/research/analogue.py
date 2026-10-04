@@ -681,7 +681,8 @@ _ALL_IN_Q = re.compile(
     r"\ball\s+(?:of\s+)?my\s+(?:savings|money|retirement|pension|net\s+worth|cash)|"
     r"\b(?:life|entire)\s+savings|\bretirement\s+(?:fund|money|savings|account)|"
     r"\b(?:put|invest|move)\s+every(?:thing|\s+penny)|\bmortgage\s+(?:my|the)\s+house|"
-    r"\bi\s*(?:'m|am)\s+\d{2}\b", re.I)
+    # an age, not "I'm 40/60 BTC/ETH" or "I'm 30% in cash" (a live re-ask, round 34)
+    r"\bi\s*(?:'m|am)\s+\d{2}\b(?!\s*(?:/|%|x\b|percent))", re.I)
 
 
 def _scope_lead(raw: str, symbol: str,

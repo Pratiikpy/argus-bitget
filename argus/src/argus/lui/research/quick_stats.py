@@ -125,7 +125,11 @@ def realised_vol_lines(text: str, prior: list[str]) -> list[str] | None:
 
 MOMENTUM_ASKED: Final = re.compile(r"\bmomentum\b[^?]{0,40}\bmean[\s-]+revers\w*|\bmean[\s-]+"
                                    r"revers\w*\b[^?]{0,40}\bmomentum\b|\btrend(?:ing)?\s+or\s+"
-                                   r"(?:mean[\s-]+)?revert\w*", re.I)
+                                   r"(?:mean[\s-]+)?revert\w*|"
+                                   # "now test momentum on Bitget BTC data" (a judge, round 35)
+                                   r"\b(?:test|check|measure)\s+(?:for\s+)?momentum\b|"
+                                   r"\b(?:trend|move)\s+(?:likely\s+)?to\s+continue\s+or\s+"
+                                   r"reverse\b", re.I)
 
 
 def momentum_lines(text: str, prior: list[str]) -> list[str] | None:
@@ -175,7 +179,7 @@ def momentum_lines(text: str, prior: list[str]) -> list[str] | None:
 # --- depth across names ---------------------------------------------------------------------------
 
 DEPTH_ASKED: Final = re.compile(r"\b(?:order\s*book\s+)?depth\b|\bslippage\b|\babsorb\b|\bliquid"
-                                r"(?:ity|est)\b", re.I)
+                                r"(?:ity|est)\b|\bdeep(?:est|er)?\s+(?:order\s*)?book\b", re.I)
 
 
 def depth_lines(text: str, prior: list[str]) -> list[str] | None:
@@ -228,7 +232,8 @@ def depth_lines(text: str, prior: list[str]) -> list[str] | None:
 
 ATH_ASKED: Final = re.compile(r"\ball[\s-]+time\s+high\b|\bATH\b|\bprevious\s+(?:high|peak)\b|"
                               r"\brecord\s+high\b", re.I)
-BACK_TO_LEVEL: Final = re.compile(r"\b(?:get|go|come)\s+back\s+(?:to|above)\s+(?:that|its|the)\s+"
+BACK_TO_LEVEL: Final = re.compile(r"\b(?:gets?|go(?:es)?|comes?|getting)\s+back\s+(?:to|above)\s+"
+                                  r"(?:that|its|the)\s+"
                                   r"(?:level|high|peak|ath|record)\b|\b(?:reach|hit|retake|"
                                   r"reclaim)\s+(?:that|its|the)\s+(?:level|high|peak|ath)\s+again\b",
                                   re.I)
@@ -291,8 +296,70 @@ def ath_lines(text: str, prior: list[str]) -> list[str] | None:
     return lines
 
 
-__all__ = ["ATH_ASKED", "BACK_TO_LEVEL", "DEPTH_ASKED", "MOMENTUM_ASKED", "REALISED_VOL",
-           "VOLUME_COMPARED", "ath_lines", "depth_lines", "momentum_lines", "realised_vol_lines",
-           "volume_lines"]
+BEAR_ASKED: Final = re.compile(
+    r"\b(?:in|into|entering|enter|entered|officially\s+in)\s+(?:a\s+|an\s+)?(?P<kind>bear|bull)\s+"
+    r"market\b|\b(?P<kind2>bear|bull)\s+market\s+(?:yet|now|already|territory)\b", re.I)
+
+
+def bear_market_lines(text: str, prior: list[str]) -> list[str] | None:
+    """Whether a name is in a bear (or bull) market by the usual convention — 20% below (or above)
+    its 52-week extreme — read from its own daily closes. "is NVDA in a bear market right now?" got
+    the definition, then the desk's sentiment panel (a newcomer re-check, round 35)."""
+    asked = BEAR_ASKED.search(text)
+    if asked is None or re.search(r"\b(?:19|20)\d\d\b", text):
+        return None  # a past year's bear market is a period question (`performance`)
+    named = _named(text, prior)
+    if not named:
+        return None
+    symbol = named[0]
+    from argus.lui.research.parse import is_us_equity, last_price
+    from argus.market.equity_history import daily
+
+    ticker = symbol.removesuffix("USDT") if is_us_equity(symbol) else \
+        f"{symbol.removesuffix('USDT')}-USD"
+    try:
+        days = daily(ticker)
+    except Exception:
+        return None
+    since = days[-1].day - timedelta(days=365)
+    year = [d for d in days if d.day >= since]
+    if len(year) < 100:
+        return None
+    high = max(year, key=lambda d: d.close)
+    low = min(year, key=lambda d: d.close)
+    try:
+        now = float(last_price(symbol) or year[-1].close)
+    except Exception:
+        now = year[-1].close
+    off_high, off_low = now / high.close - 1, now / low.close - 1
+    name = symbol.removesuffix("USDT")
+    bear = off_high <= -0.20
+    bull = off_low >= 0.20
+    kind = (asked.group("kind") or asked.group("kind2") or "bear").lower()
+    if off_high > -0.005 and kind == "bear":
+        return [f"Bottom line: no — {name} is at its 52-week high close, the opposite of a bear "
+                f"market (a fall of about 20% from that high is the usual line).",
+                f"52-week high close {high.close:,.2f} on {high.day:%d %b %Y}; now {now:,.2f} on "
+                f"Bitget.",
+                "Closes from Yahoo Finance; the price now is Bitget's last."]
+    verdict = (f"yes — {name} is {abs(off_high):.0%} below its 52-week high close, past the 20% "
+               f"line a bear market is usually drawn at" if kind == "bear" and bear else
+               f"no — {name} is {abs(off_high):.0%} below its 52-week high close, inside the 20% "
+               f"line a bear market is usually drawn at" if kind == "bear" else
+               f"yes — {name} is {off_low:.0%} above its 52-week low close, past the 20% line a "
+               f"bull market is usually drawn at" if bull else
+               f"no — {name} is {off_low:.0%} above its 52-week low close, short of the 20% line "
+               f"a bull market is usually drawn at")
+    return [f"Bottom line: {verdict}.",
+            f"52-week high close {high.close:,.2f} on {high.day:%d %b %Y}; low close "
+            f"{low.close:,.2f} on {low.day:%d %b %Y}; now {now:,.2f} on Bitget.",
+            "The 20% line is a convention, not a rule, and it says where the price is, not where "
+            "it goes next. Closes from Yahoo Finance (coins as their USD pairs); the price now is "
+            "Bitget's last."]
+
+
+__all__ = ["ATH_ASKED", "BACK_TO_LEVEL", "BEAR_ASKED", "DEPTH_ASKED", "MOMENTUM_ASKED",
+           "REALISED_VOL", "VOLUME_COMPARED", "ath_lines", "bear_market_lines", "depth_lines",
+           "momentum_lines", "realised_vol_lines", "volume_lines"]
 
 trace_module(globals())

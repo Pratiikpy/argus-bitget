@@ -1491,6 +1491,229 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
         "because of leverage in the system.",
         "That is a pattern from the recessions crypto has actually lived through, not a law — "
         "there is no guarantee the next one plays out the same way.")),
+    # Round 35, a first-time user: an emotional loss message, a bear market, stop-loss and
+    # take-profit together, a Bitget-vs-Google price mismatch and its follow-up, reading the 24h
+    # change, a bare "fees?", a Hinglish leverage question, a friend's all-in tip, Earn vs
+    # Futures, explaining bitcoin plainly, funding rate "for me", taking profit on a 50% pump,
+    # sell regret, and Bitget vs a wallet — each refused or answered a different question.
+    # "i lost half my savings on a trade last week i feel sick rn ngl" was refused outright, the
+    # most serious miss in that run (a first-time user, round 35)
+    (re.compile(r"\b(?:lost|lose|down)\b[^?]{0,60}\b(?:savings|money|my\s+(?:whole|entire)?\s*"
+                r"(?:savings|money|account|portfolio))\b[^?]{0,80}\b(?:feel\s+sick|feel\s+"
+                r"(?:terrible|awful|horrible)|panick\w*|can'?t\s+sleep|freaking\s+out|feel\s+"
+                r"like\s+(?:crying|dying)|feel\s+so\s+(?:stupid|dumb))\b", re.I), (
+        "Bottom line: that is a real loss, and feeling sick about it is a normal reaction, not "
+        "a weakness — the most useful thing right now is to stop trading, not to fix it "
+        "tonight.",
+        "Don't try to win it back straight away: trading bigger, right after a big loss, is how "
+        "a bad week turns into a bad year.",
+        "Step away from the screen and talk to someone you trust about it. Only look again at "
+        "what happened — the size, the leverage, what the plan was — once you're calm, not "
+        "while you still feel like this.")),
+    # "wats a bear market and how long do they usually last" was refused — a textbook glossary
+    # question (a first-time user, round 35)
+    # only the definition: "how did BTC do in the 2022 bear market?" and "is NVDA in a bear
+    # market right now?" are measured questions, and got this definition (round 35 re-check)
+    (re.compile(r"\b(?:what(?:'?s|\s+is|s)?|wat(?:'?s|s)?|wats|define|meaning\s+of|explain)\s+"
+                r"(?:a\s+|an\s+|the\s+)?bear\s+markets?\b|\bbear\s+markets?\b[^?]{0,30}\bhow\s+"
+                r"long\b|\bhow\s+long\s+(?:do|does|will|did)\s+(?:a\s+)?bear\s+markets?\b", re.I), (
+        "Bottom line: a bear market is a sustained fall in prices, commonly defined as about a "
+        "20% drop from a recent high. How long they usually last varies, but crypto bear "
+        "markets have historically run roughly a year or more before recovering, sometimes "
+        "longer.",
+        "The 20% figure is a common convention, not an official rule. Its opposite, a bull "
+        "market, is a sustained rise; no length is guaranteed, and not everything that falls "
+        "comes all the way back.")),
+    # "wat is a stop loss and take profit in simple words" was refused — the single most basic
+    # order-type question a newcomer can ask (a first-time user, round 35)
+    (re.compile(r"(?=.*\bstop[\s-]*loss(?:es)?\b)(?=.*\btake[\s-]*profits?\b)", re.I), (
+        "Bottom line: a stop-loss automatically closes your position if the price falls to a "
+        "level you choose, to cap a loss; a take-profit automatically closes it if the price "
+        "rises to a level you choose, to lock in a gain. Both just sit there until the price "
+        "reaches them.",
+        "In general terms: you set the stop-loss below what you paid, by however much you are "
+        "willing to lose, and the take-profit above it, by however much gain you would be "
+        "happy to walk away with.",
+        "The exact screen and labels for setting one can change — check Bitget's help centre, "
+        "or the order form itself, for the current steps.")),
+    # "what if price gaps past my stop loss overnight while im asleep does it still protect me"
+    # was answered with an unrelated hedge-sizing pitch (a first-time user, round 35)
+    (re.compile(r"\b(?:gaps?|jumps?)\s+past\s+(?:my\s+)?stop[\s-]*loss\b|\bstop[\s-]*loss\b"
+                r"[^?]{0,40}\b(?:gap(?:s|ped)?|overnight|while\s+(?:i'?m\s+)?asleep)\b|\bdoes\s+"
+                r"(?:a\s+|my\s+)?stop[\s-]*loss\s+(?:still\s+)?(?:protect|guarantee)\b", re.I), (
+        "Bottom line: not always — a stop-loss triggers an order once the price reaches your "
+        "level, but it does not guarantee the fill happens at exactly that price. If the price "
+        "gaps (jumps) past it with no trading in between, such as overnight, the order can fill "
+        "lower than you set it.",
+        "Crypto trades 24/7 so there is no close like a stock market has, but big news can "
+        "still move the price fast enough to jump past a level while you are asleep.",
+        "A stop-loss limits the damage; it does not eliminate it. Check Bitget's help centre "
+        "for whether a guaranteed-stop option exists on the contract you are using.")),
+    # "why is the btc price on bitget diff from wat google shows me rn" read "google" as the
+    # stock ticker GOOGL and quoted Alphabet's share price next to BTC's (a first-time user,
+    # round 35) — answered here before any ticker lookup runs, so it holds even when a ticker is
+    # also detected in the text (named=True)
+    (re.compile(r"\b(?:price|btc|bitcoin|eth|ethereum)\b[^?]{0,60}\bgoogle\b(?!\s+(?:stock|"
+                r"shares?|inc\b))[^?]{0,40}\b(?:shows?|says?)\b|\bgoogle\b(?!\s+(?:stock|"
+                r"shares?|inc\b))[^?]{0,40}\b(?:shows?|says?)\b[^?]{0,40}\b(?:price|btc|"
+                r"bitcoin|eth|ethereum)\b|\bwhy\s+is\s+(?:the\s+)?(?:btc|bitcoin|eth|ethereum)"
+                r"\s+price\b[^?]{0,60}\bgoogle\b(?!\s+(?:stock|shares?|inc\b))", re.I), (
+        "Bottom line: Bitget and Google are not quoting the same thing. Google shows a price "
+        "from its own data partner, on its own small delay; Bitget shows its own live order "
+        "book. Different source, different instant in time — a small gap is normal, not a bug.",
+        "Two more differences to watch for: USD vs USDT (Bitget's crypto pairs usually quote in "
+        "USDT, a dollar-pegged stablecoin that tracks $1 but is not literally a dollar) and "
+        "spot vs perpetual (a perpetual futures contract can trade a little above or below the "
+        "spot price, especially when one side is crowded).",
+        "None of this makes one price \"wrong\" — each is correct for what it is quoting.")),
+    # "ok so which one is the real price then" was read as an unknown ticker symbol, dropping a
+    # natural follow-up to a price-mismatch question (a first-time user, round 35) — answered
+    # here before any ticker lookup runs, so it holds even when named=True
+    (re.compile(r"\bwhich\s+(?:one\s+)?(?:is|'?s)\s+(?:the\s+)?real\s+price\b|\bwhats?\s+the\s+"
+                r"(?:actual|real)\s+price\s+then\b|\bso\s+which\s+(?:price|one)\s+is\s+right"
+                r"\b", re.I), (
+        "Bottom line: there is no single \"real\" price — each venue's own price is real for "
+        "trading on that venue. If you are buying or selling on Bitget, the price that matters "
+        "is Bitget's own live order book, because that is what you would actually pay or "
+        "receive there.",
+        "A number shown elsewhere, such as on a search engine, is a useful rough check, not an "
+        "authority — it is sourced and delayed differently.",
+        "Ask \"what is the BTC price now\" here for Bitget's own live bid, ask and spread.")),
+    # "how do i even read the 24h change number on the app" was read as an unknown ticker symbol
+    # — a basic UI-literacy question, never answered (a first-time user, round 35)
+    (re.compile(r"\b24\s*[-\s]?h(?:our)?\s+change\b|\b24-?hour\s+change\b", re.I), (
+        "Bottom line: the 24h change is how much the price has moved over the last 24 hours, "
+        "shown as a percentage. A plus number (often shown in green) means it is higher now "
+        "than 24 hours ago; a minus number (often red) means it is lower.",
+        "It is a rolling window, not a fixed calendar day — it always compares right now to "
+        "exactly 24 hours before, so it updates continuously rather than resetting at midnight.",
+        "It says nothing about what happens next: a coin up a lot in the last 24h can keep "
+        "rising or reverse. It measures the past, not a signal for the future.")),
+    # "fees?" — the same one-word format as "ath?" one turn later in a different conversation,
+    # refused (a first-time user, round 35)
+    (re.compile(r"^\W*fees?\W*$", re.I), (
+        "Bottom line: Bitget's standard spot trading fee is 0.10% a side (about 0.20% to buy "
+        "and later sell); perpetual futures are about 0.02% for an order that waits on the "
+        "book (maker) and 0.06% for one that fills at once (taker), plus funding every few "
+        "hours while the position stays open.",
+        "On top of that: the spread (the small gap between the buy and sell price) on every "
+        "market order, and a withdrawal fee that depends on the coin and network.",
+        "This console itself is free. Ask \"what does it cost to buy $500 of BTC\" for the "
+        "exact fee on a live order.")),
+    # "bhai ye leverage wala cheez kitna risky hai seriously batao" got no "Read as:" line at "
+    # all and fell through to the generic refusal, while the identical question in plain English
+    # was answered two conversations earlier (a first-time user, round 35) — matched directly on
+    # the Hinglish, with no translation needed
+    (re.compile(r"\bleverage\b[^?]{0,60}\bkitna\s+(?:risky|risk)\b|\bkitna\s+(?:risky|risk)\b"
+                r"[^?]{0,60}\bleverage\b", re.I), (
+        "Bottom line: leverage is risky — it multiplies both gains and losses, so the higher "
+        "the number, the smaller the price move needed to wipe out your margin.",
+        "Roughly, the move to liquidation is about 1 divided by the leverage: 2x can take "
+        "about a 50% move against you, 5x about 20%, 10x about 10%, 20x about 5%. A beginner "
+        "is usually safer on low leverage (2x-3x) or none at all (spot), where the most you "
+        "can lose is what you put in.",
+        "Start small, and only use money you could fully lose without it hurting.")),
+    # the run-on "...should i just trust him and go all in" latched onto only the slang word
+    # "moon" and dropped the far more important ask: all his savings, one coin, a friend's tip,
+    # leverage on top (a first-time user, round 35)
+    (re.compile(r"\b(?:friend|bro|mate|cousin|brother|sister)\b[^?]{0,120}\b(?:all\s+(?:my\s+)?"
+                r"(?:savings|money)|go\s+all\s*-?\s*in|all\s+in\b)|\btrust\s+(?:him|her|them)"
+                r"\b[^?]{0,40}\b(?:go\s+all\s*-?\s*in|all\s+in)\b", re.I), (
+        "Bottom line: no — do not put all your savings into one coin on a friend's confidence, "
+        "and do not add leverage on top of that. \"He seems confident\" is not evidence a coin "
+        "will rise, and leverage only makes a wrong call more expensive, faster.",
+        "Putting everything into one thing means one bad week can take all of it — most "
+        "promised big moves do not happen, and coins chasing \"moon\" talk usually fall hard "
+        "afterward too.",
+        "If you try it at all, use a small amount you could lose completely without it "
+        "mattering, with no leverage, and pick the size yourself rather than matching his "
+        "confidence.")),
+    # "whats the diff between the Earn tab and the Futures tab on bitget" was refused — a basic
+    # product-navigation question (a first-time user, round 35)
+    (re.compile(r"\bearn\s+tab\b[^?]{0,40}\bfutures\s+tab\b|\bfutures\s+tab\b[^?]{0,40}\bearn"
+                r"\s+tab\b|\bdiff\w*\b[^?]{0,20}\bearn\b[^?]{0,20}\bfutures\b", re.I), (
+        "Bottom line: Earn is for putting coins you already hold to work for a yield (lending "
+        "them out or staking), with little price risk beyond the coin's own; Futures is for "
+        "trading a contract on a coin's price, with optional leverage, where you can lose more "
+        "than you put in if you use it.",
+        "Earn pays you over time while the coin mostly just sits there — locked for a fixed "
+        "term, or free to redeem, depending on the product. Futures changes value with every "
+        "price move and can be closed (liquidated) by the exchange if a leveraged loss gets "
+        "too large.",
+        "A beginner typically starts with neither, and buys spot first — owning the coin "
+        "outright. Check Bitget's help centre for what each product on Earn currently offers.")),
+    # "can u explain bitcoin to me like im explaining to my grandma" got a good plain definition
+    # with live bid/ask spread and funding-rate figures tacked on — exactly the jargon a
+    # grandma-level explanation should omit (a first-time user, round 35)
+    (re.compile(r"\bexplain\s+bitcoin\b[^?]{0,40}\bgrandma\b|\bgrandma\b[^?]{0,40}\bbitcoin\b|"
+                r"\bbitcoin\b[^?]{0,40}\blike\s+(?:i'?m|i\s+am)\s+(?:explaining\s+to\s+)?"
+                r"(?:my\s+)?grandma\b", re.I), (
+        "Bottom line: Bitcoin is digital money that is not controlled by any bank, company or "
+        "government — it runs on a shared public record (the blockchain) that thousands of "
+        "computers around the world keep copies of and agree on together, instead of one "
+        "company's database.",
+        "Only 21 million bitcoins will ever exist, fixed by the software and unchangeable — "
+        "unlike ordinary money, where a central bank can print more.",
+        "You can send it to anyone in the world without a bank in the middle, but its price "
+        "moves a lot — it has risen or fallen by half or more within a single year more than "
+        "once, so it is not something to treat like a savings account.")),
+    # "wats funding rate mean like if im holding a long position" was answered well, but the
+    # plainer "what does funding rate mean for me" form is asked just as often (a first-time
+    # user, round 35)
+    (re.compile(r"\bfunding\s+rate\b[^?]{0,40}\bmeans?\s+for\s+me\b|\bwhat(?:'?s|\s+is)\s+"
+                r"(?:the\s+)?funding\s+rate\b[^?]{0,40}\bmean\b", re.I), (
+        "Bottom line: the funding rate is a small payment made every few hours (every 8 hours "
+        "on most Bitget perpetuals) between everyone long and everyone short a perpetual "
+        "contract — it keeps the contract's price close to the real spot price; Bitget does "
+        "not keep it.",
+        "What it means for you: if the rate is positive, longs pay shorts, so holding a long "
+        "costs you a little each interval; if it is negative, shorts pay longs. It only "
+        "applies while you hold an open perpetual — spot holdings never pay or receive it.",
+        "Ask \"what is the funding on BTC\" here to see which side is paying right now on a "
+        "real contract.")),
+    # "my coin pumped 50% today should i take profit now" silently substituted BTC for the
+    # user's own coin and never disclosed it (a first-time user, round 35)
+    (re.compile(r"\b(?:pumped|is\s+up|went\s+up|rose|gained|up)\s+\d{1,4}\s*%[^?]{0,80}\btake"
+                r"\s+profits?\b|\btake\s+profits?\b[^?]{0,80}\b(?:pumped|up|rose|gained)\s+"
+                r"\d{1,4}\s*%", re.I), (
+        "Bottom line: no call here on whether to sell — but this is how people usually decide: "
+        "before a big move happens, set a plan (sell a third at +50%, another third at +100%, "
+        "keep the rest, say), so the decision is not made in the heat of the moment.",
+        "A common middle path is taking some profit, not all: selling part locks in a real "
+        "gain while leaving the rest open if it keeps rising, so you are not fully out and not "
+        "fully exposed either.",
+        "Another approach is a trailing stop — a stop-loss that moves up as the price rises, "
+        "so a pullback locks in most of the gain automatically instead of you watching and "
+        "deciding in real time.",
+        "What it should not be based on: hope that it keeps going, or regret about selling "
+        "\"too early\" — those are feelings, not a plan.")),
+    # "but what if it keeps going up after i sell ill feel so dumb" was read as an unknown
+    # ticker symbol, dropping the emotional profit-taking framing entirely (a first-time user,
+    # round 35)
+    (re.compile(r"\bwhat\s+if\s+it\s+keeps?\s+(?:going\s+up|rising|climbing)\s+after\s+i\s+"
+                r"sell\b|\bi'?ll\s+feel\s+(?:so\s+)?(?:dumb|stupid)\s+(?:if|after)\b.{0,40}"
+                r"\bsell\b|\bafraid\s+i'?ll\s+regret\s+selling\b", re.I), (
+        "Bottom line: it might keep going up after you sell, and that is fine — the point of "
+        "taking profit is locking in a real gain, not catching the exact top, which nobody "
+        "does reliably.",
+        "Selling part instead of all of it is the usual fix for this exact feeling: you still "
+        "benefit if it keeps rising, and you have already banked something if it does not.",
+        "Regret either way is normal — selling early feels dumb if it keeps rising, holding "
+        "too long feels dumb if it falls. Judge the decision by the plan you had, not by what "
+        "the price does afterward.")),
+    # "Was ist der Unterschied zwischen Bitget und einer Wallet?" translated correctly, but the
+    # underlying concept question still got the generic refusal (a first-time user, round 35)
+    (re.compile(r"\bdifference\s+between\s+bitget\s+and\s+(?:a\s+)?wallet\b|\bbitget\s+(?:vs\.?"
+                r"|versus)\s+(?:a\s+)?wallet\b|\bwallet\s+(?:vs\.?|versus)\s+bitget\b", re.I), (
+        "Bottom line: Bitget is an exchange — it holds coins for you, the way a bank holds "
+        "cash, and you log in with a password (plus 2FA) to buy, sell and trade. A wallet is "
+        "software or a physical device that holds the keys to coins directly on the "
+        "blockchain, under your own control, with no company in between.",
+        "On Bitget, Bitget can help recover your account if you lose access, through its own "
+        "verification process; in a self-custody wallet nobody can — lose the seed phrase and "
+        "the coins are gone for good.",
+        "Most beginners start on an exchange like Bitget because it is simpler, and move some "
+        "coins to their own wallet later, once they want more control.")),
 )
 
 

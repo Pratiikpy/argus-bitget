@@ -143,3 +143,40 @@ class TestRoutes:
                                                          "declined"},
                                    now=None, visitor="local", book="")
         assert got is None
+
+
+class TestLiveReAskRound34:
+    def test_an_age_is_not_a_weight(self) -> None:
+        from argus.lui.research.analogue import _ALL_IN_Q
+
+        assert _ALL_IN_Q.search("I'm 58, planning to retire")
+        assert not _ALL_IN_Q.search("I'm 40/60 BTC/ETH - how did this book do on CPI days?")
+
+    def test_the_second_tax_lot_is_read(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui import position_math
+
+        monkeypatch.setattr(position_math, "_last",
+                            lambda s: {"BTCUSDT": 85_000.0, "ETHUSDT": 2_700.0}[s])
+        said = account_math.lines("I bought 1 ETH at $3,500 and 1 BTC at $70,000 - which lot "
+                                  "should I sell for tax-loss harvesting?")
+        assert said is not None and "ETH:" in said[0] and "BTC:" in said[0]
+
+    def test_deepest_book(self) -> None:
+        assert quick_stats.DEPTH_ASKED.search("which has the deepest book for a $1M buy: BNB, "
+                                              "ADA or AVAX?")
+
+    def test_gets_back_to_that_level(self) -> None:
+        assert quick_stats.BACK_TO_LEVEL.search("what are the odds it gets back to that level?")
+
+    def test_higher_on_another_exchange(self) -> None:
+        assert venue_compare.ASKED.search("does BTC trade higher on Coinbase than on Bitget?")
+
+    def test_a_trade_update_starts_from_the_units_said_before(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui.research import parse
+
+        monkeypatch.setattr(parse, "saved_book_lines", lambda text: ["Bottom line: priced."])
+        got = server._round27_follow_up("i just sold 2 ETH and picked up 20 SOL, whats my book "
+                                        "now?", ["my holdings: 1 BTC and 5 ETH"], now=None,
+                                        visitor="local", book="")
+        assert got is not None and "1 BTC, 3 ETH, 20 SOL" in got["lines"][0]

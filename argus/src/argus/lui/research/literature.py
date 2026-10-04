@@ -61,6 +61,19 @@ def _words(text: str) -> set[str]:
             if w not in ("the", "and", "for", "with", "from", "into", "are", "does")}
 
 
+_GENERIC: Final = frozenset({"asset", "return", "factor", "market", "price", "stock", "financ",
+                             "invest", "effect", "eviden", "analys", "studie", "study", "model",
+                             "empiri", "data", "test", "testin", "perfor"})
+"""Six-letter stems that most finance titles carry: "The Impact of ESG Factors on Asset Returns"
+came first for "the momentum factor in asset returns" (a judge, round 35) on three of them, while
+the one word that names the subject, "momentum", is worth more than all three."""
+
+
+def _match(wanted: set[str], text: str) -> float:
+    """How much of the subject a title carries: a distinctive word 1, a generic finance word 0.3."""
+    return sum(0.3 if w in _GENERIC else 1.0 for w in wanted & _words(text))
+
+
 def search(subject: str, *, fetch: Any = None, limit: int = 5) -> list[dict[str, Any]]:
     """The works on ``subject`` that match it best, with their metadata.
 
@@ -71,15 +84,23 @@ def search(subject: str, *, fetch: Any = None, limit: int = 5) -> list[dict[str,
     shown once, as the published one."""
     from argus.truth import http
 
-    query = urllib.parse.urlencode({
-        "search": subject, "per-page": "25",
-        "filter": "type:article|preprint|review",
-        "select": "display_name,publication_year,cited_by_count,doi,primary_location,"
-                  "abstract_inverted_index,authorships",
-    })
-    payload = (fetch or http.fetch_json)(f"{OPENALEX}?{query}", timeout=12.0)
+    fields = {"search": subject, "per-page": "25", "filter": "type:article|preprint|review",
+              "select": "display_name,publication_year,cited_by_count,doi,primary_location,"
+                        "abstract_inverted_index,authorships"}
+    payload = (fetch or http.fetch_json)(f"{OPENALEX}?{urllib.parse.urlencode(fields)}",
+                                         timeout=12.0)
+    works = list((payload or {}).get("results") or [])
+    try:
+        # the most-cited works on the same search: relevance alone never reached the canon
+        # ("Momentum in Asset Returns" sat below an ESG paper; a judge, round 35)
+        cited = (fetch or http.fetch_json)(
+            f"{OPENALEX}?{urllib.parse.urlencode({**fields, 'sort': 'cited_by_count:desc'})}",
+            timeout=12.0)
+        works += list((cited or {}).get("results") or [])
+    except Exception:
+        pass  # the relevance list stands on its own
     found = []
-    for work in (payload or {}).get("results") or []:
+    for work in works:
         source = ((work.get("primary_location") or {}).get("source") or {})
         venue = str(source.get("display_name") or "")
         authors = [str((a.get("author") or {}).get("display_name") or "")
@@ -101,8 +122,13 @@ def search(subject: str, *, fetch: Any = None, limit: int = 5) -> list[dict[str,
         held = seen.get(key)
         if held is None or (held["preprint"] and not row["preprint"]):
             seen[key] = row
-    ranked = sorted(seen.values(), key=lambda r: (len(wanted & _words(r["title"])),
-                                                  math.log10(1 + r["cited"])), reverse=True)
+    # the subject in the title first, its opening sentence after, and citations on a log scale
+    # beside them, so a famous paper on the wrong subject does not win and the canon on the right
+    # one does
+    ranked = sorted(seen.values(), key=lambda r: (_match(wanted, r["title"])
+                                                  + 0.5 * _match(wanted, r["opening"])
+                                                  + 0.35 * math.log10(1 + r["cited"])),
+                    reverse=True)
     found_total = int(((payload or {}).get("meta") or {}).get("count") or 0)
     for row in ranked:
         row["total"] = found_total

@@ -334,11 +334,67 @@ def spot_leverage_line(text: str) -> str | None:
             f"perpetual, the product that has a liquidation price.")
 
 
+_VERSUS_CONSENSUS = re.compile(
+    r"\b(?:whisper(?:\s+number)?|estimate|eps|earnings|number)\b[^.?]{0,60}?\$?\s?(?P<x>\d{1,3}"
+    r"(?:\.\d{1,3})?)\s*(?:eps|a\s+share|per\s+share)?\b[^.?]{0,40}?\b(?P<dir>(?:way\s+|well\s+|"
+    r"far\s+)?(?:above|over|higher\s+than|beat\w*|ahead\s+of|below|under|lower\s+than|miss\w*|"
+    r"short\s+of))\s+(?:the\s+)?(?:consensus|estimates?|street|analysts?)\b", re.I)
+
+
+def consensus_line(text: str, symbols: tuple[str, ...]) -> str | None:
+    """An EPS figure said to sit above or below the consensus, set against the consensus itself.
+
+    "NVDA's whisper number for next quarter is $1.20 EPS, way above consensus" was answered with
+    the right consensus and the right last EPS, and never a word that $1.20 is half the consensus,
+    not above it (a judge, round 35). Yahoo Finance's ``earningsTrend``: the quarter to be
+    reported next (``0q``), or the one after when the text says so."""
+    said = _VERSUS_CONSENSUS.search(text)
+    if said is None:
+        return None
+    from argus.lui.research.parse import is_us_equity
+
+    stocks = [s for s in symbols if is_us_equity(s)]
+    if not stocks:
+        return None
+    ticker = stocks[0].removesuffix("USDT")
+    from argus.market.estimates import EstimatesSource
+
+    try:
+        trend = (EstimatesSource().summary(ticker, "earningsTrend").get("earningsTrend")
+                 or {}).get("trend") or []
+    except Exception:
+        return None
+    period = "+1q" if re.search(r"\bquarter\s+after\s+next\b", text, re.I) else "0q"
+    row = next((r for r in trend if r.get("period") == period), None)
+    estimate = ((row or {}).get("earningsEstimate") or {}).get("avg")
+    value = estimate.get("raw") if isinstance(estimate, dict) else estimate
+    if value in (None, 0):
+        return None
+    consensus, stated = float(value), float(said.group("x"))
+    claims_above = re.search(r"above|over|higher|beat|ahead", said.group("dir"), re.I) is not None
+    actually_above = stated > consensus
+    gap = stated / consensus - 1
+    ending = str((row or {}).get("endDate") or "")
+    analysts = (((row or {}).get("earningsEstimate") or {}).get("numberOfAnalysts") or {})
+    count = analysts.get("raw") if isinstance(analysts, dict) else analysts
+    basis = (f"{ticker}'s consensus EPS for the quarter ending {ending}" if ending else
+             f"{ticker}'s consensus EPS for the quarter it reports next") + (
+        f" is {consensus:.2f} ({count} analysts, Yahoo Finance)" if count else
+        f" is {consensus:.2f} (Yahoo Finance)")
+    if claims_above != actually_above and abs(gap) >= 0.005:
+        return (f"Premise check: {basis}; {stated:.2f} is {abs(gap):.0%} "
+                f"{'above' if actually_above else 'below'} it, not "
+                f"{'above' if claims_above else 'below'} — the reading that follows from the "
+                f"premise runs the other way.")
+    return f"Premise check: {basis}; {stated:.2f} is {gap:+.0%} against it, as you said."
+
+
 def lines(text: str, symbols: tuple[str, ...]) -> list[str]:
     """Each premise line that applies, in order; empty when the question claims nothing here."""
     said = [halving_line(text), founder_line(text, symbols), usdt_line(text), spot_line(text),
             ceo_line(text), share_class_line(text), weekend_close_line(text, symbols),
-            corporate_event_line(text, symbols), spot_leverage_line(text)]
+            corporate_event_line(text, symbols), spot_leverage_line(text),
+            consensus_line(text, symbols)]
     out = [x for x in said if x]
     if not out:
         unchecked = unchecked_line(text)

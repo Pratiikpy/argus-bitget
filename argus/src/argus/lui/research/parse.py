@@ -1376,8 +1376,10 @@ _UNITS_BEFORE = re.compile(r"([A-Za-z][A-Za-z.]{0,11}|[\u4e00-\u9fff]{2,5})\s*[:
 """"AAPL 200 shares", "苹果200股"."""
 
 
-_COIN_UNITS = re.compile(r"(\d+(?:\.\d+)?)\s*(btc|eth|sol|bitcoin|比特币|以太坊)\b", re.I)
-""""2 BTC", "0.5 eth"."""
+_COIN_UNITS = re.compile(r"(?<![$\d,.])(\d+(?:\.\d+)?)\s*(btc|eth|sol|bitcoin|比特币|以太坊)\b",
+                         re.I)
+""""2 BTC", "0.5 eth"; not "$30000 BTC", a dollar value read as 30,000 coins (a judge, round
+35)."""
 
 
 _USD_IN = re.compile(r"(?:\$\s?(\d[\d,]*(?:\.\d+)?)\s*(k|m)?|(\d[\d,]*(?:\.\d+)?)\s*(k|m)\b)"
@@ -2502,6 +2504,10 @@ def _unit_notional(raw: str, symbol: str) -> tuple[Decimal, str] | None:
     for pattern, group, name_group in ((_UNITS_AFTER, 1, 2), (_UNITS_BEFORE, 2, 1),
                                        (_COIN_UNITS, 1, 2)):
         for match in pattern.finditer(raw):
+            # "$10,000 BTC" is ten thousand dollars of BTC, not ten thousand coins: it was priced
+            # at $850m and a $12m round trip (a hostile review, round 35)
+            if raw[:match.start(group)].rstrip().endswith("$"):
+                continue
             if _resolve_any(match.group(name_group)) == symbol:
                 amount = _number(match.group(group))
                 break
@@ -2509,7 +2515,8 @@ def _unit_notional(raw: str, symbol: str) -> tuple[Decimal, str] | None:
             break
     if not amount:
         # "50 NVDAUSDT" names the contract itself (a hostile review, round 21)
-        own = re.search(rf"(\d[\d,]*(?:\.\d+)?)\s*{re.escape(base)}(?:USDT)?\b", raw, re.I)
+        own = re.search(rf"(?<![$\d,.])(?<!\$\s)(\d[\d,]*(?:\.\d+)?)\s*{re.escape(base)}"
+                        r"(?:USDT)?\b", raw, re.I)
         amount = _number(own.group(1)) if own else None
     if not amount or amount <= 0:
         return None
@@ -4348,6 +4355,20 @@ def with_book(request: ResearchRequest | None, book_text: str,
     if request.kind is ResearchKind.IMPACT:
         candidate = request.symbols[0]
         others = [s for s in book if s != candidate]
+        valued = priced_book(book_text) if request.notional and not request.size_stated else None
+        if valued is not None and valued.value > 0 and request.target is None:
+            # "I want to add $18,000 of SOL" on a saved book of $100,000 was sized at the 20%
+            # default, "$18,000 was stated but not what the whole book is worth" (a judge, round
+            # 35): the saved book's dollars are what it is worth
+            added = float(request.notional or 0)
+            held = book.get(candidate, 0.0) * valued.value
+            share = (held + added) / (valued.value + added)
+            kept = tuple(n for n in kept if "not what the whole book is worth" not in n)
+            kept = (*kept, f"${added:,.0f} added to the book's ${valued.value:,.0f} makes "
+                           f"{_t(candidate)} {share:.0%} of the ${valued.value + added:,.0f} "
+                           f"total")
+            return replace(request, book=book, symbols=(candidate, *others), notes=(*kept, note),
+                           size=round(share, 4), size_stated=True)
         return replace(request, book=book, symbols=(candidate, *others), notes=(*kept, note))
     if request.kind in (ResearchKind.STRESS, ResearchKind.BOOK):
         valued = priced_book(book_text)

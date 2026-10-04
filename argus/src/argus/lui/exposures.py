@@ -267,11 +267,41 @@ def _is_rwa(symbol: str) -> bool | None:
     return None if contract is None else contract.rwa
 
 
+UNLISTED = "YAHOO:"
+"""The prefix of a US stock Bitget does not list, read from its own listing on Yahoo: "$25000 PFE"
+in a book was dropped from the sector answer without a word (a judge, round 35)."""
+_UNLISTED_ROWS: dict[str, dict[str, Any]] = {}
+
+
+def unlisted_row(ticker: str) -> dict[str, Any] | None:
+    """The sector-map row of a US stock Bitget does not list, from Yahoo's quoteSummary, cached for
+    the process; None when Yahoo has no US equity or fund by that ticker."""
+    ticker = ticker.upper()
+    if ticker in _UNLISTED_ROWS:
+        return _UNLISTED_ROWS[ticker] or None
+    from argus.market.estimates import EstimatesSource
+
+    try:
+        summary = EstimatesSource().summary(ticker, "assetProfile,price,quoteType,fundProfile,"
+                                                    "topHoldings")
+        row = row_from_summary(summary, ticker=ticker, bitget_last=None)
+    except Exception:
+        row = {}
+    if row and (row.get("kind") not in ("stock", "etf") or row.get("currency") != "USD"):
+        row = {}
+    _UNLISTED_ROWS[ticker] = row
+    return row or None
+
+
 def classify(symbol: str, rows: Mapping[str, Any] | None = None) -> Classification:
     """One contract's sector or asset-class buckets, from the frozen map or the venue's flags."""
     from argus.market.universe import NOT_EQUITY
 
     rows = sector_map()["rows"] if rows is None else rows
+    if symbol.startswith(UNLISTED):
+        found = unlisted_row(symbol.removeprefix(UNLISTED))
+        if found is not None:
+            rows = {**rows, symbol: found}
     if symbol in GOLD:
         return Classification(symbol, "gold", {"Gold": 1.0}, name="gold")
     if symbol in INDEX_LOOK_THROUGH and INDEX_LOOK_THROUGH[symbol] in rows:
@@ -690,7 +720,7 @@ def _correlation(xs: Mapping[date, float], ys: Mapping[date, float]) -> tuple[fl
 
 
 def _t(symbol: str) -> str:
-    base = symbol.removesuffix("USDT")
+    base = symbol.removeprefix(UNLISTED).removesuffix("USDT")
     return base.removesuffix("STOCK") if base.endswith("STOCK") and len(base) > 5 else base
 
 
@@ -1049,6 +1079,36 @@ DEFAULT_ADD = 0.20
 """The target weight of a name the question adds without a size, as `research.DEFAULT_SIZE`."""
 
 
+_UNLISTED_USD = re.compile(r"\$\s?(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\s+(?:of\s+|in\s+)?([A-Z]{1,5})\b")
+_UNLISTED_PCT = re.compile(r"(\d{1,3}(?:\.\d+)?)\s*%\s+(?:in\s+)?([A-Z]{1,5})\b|"
+                           r"\b([A-Z]{1,5})\s*[:=]?\s*(\d{1,3}(?:\.\d+)?)\s*%")
+
+
+def _unlisted_amounts(text: str) -> list[tuple[str, float, str]]:
+    """US stocks in the book that Bitget does not list, as (ticker, amount, "usd" or "pct"), each
+    one confirmed on Yahoo as a US equity or fund before it is kept."""
+    from argus.lui import research
+
+    out: list[tuple[str, float, str]] = []
+    for m in _UNLISTED_USD.finditer(text):
+        value = float(m.group(1).replace(",", "")) * (
+            1_000 if (m.group(2) or "").lower() == "k" else
+            1_000_000 if (m.group(2) or "").lower() == "m" else 1)
+        out.append((m.group(3), value, "usd"))
+    for m in _UNLISTED_PCT.finditer(text):
+        ticker = m.group(2) or m.group(3)
+        weight = float(m.group(1) or m.group(4)) / 100
+        out.append((ticker, weight, "pct"))
+    kept: list[tuple[str, float, str]] = []
+    for ticker, amount, kind in out:
+        if (research.parse.resolve_name(ticker, trust_case=True) is not None
+                or any(k[0] == ticker for k in kept) or len(ticker) < 2):
+            continue
+        if unlisted_row(ticker) is not None:
+            kept.append((ticker, amount, kind))
+    return kept
+
+
 def parse(text: str, book_text: str = "") -> tuple[dict[str, float], dict[str, float],
                                                   list[str]]:
     """(book, proposed, notes) from a question and the saved book.
@@ -1071,6 +1131,24 @@ def parse(text: str, book_text: str = "") -> tuple[dict[str, float], dict[str, f
             book[symbol] = book.get(symbol, 0.0) + weight
         else:
             proposed[symbol] = -abs(weight) if shorting else abs(weight)
+    unlisted = _unlisted_amounts(text[:cut])
+    if not book:
+        # "$25000 AAPL, $25000 JPM, $25000 XOM, $25000 PFE" was read as equal weight, "no weights
+        # were stated" (a judge, round 35): dollar values are weights once priced
+        priced = research.parse.priced_book(text[:cut])
+        if priced is not None and priced.weights:
+            listed_usd = priced.value * (1.0 - priced.cash)
+            dollars = {s: w * listed_usd for s, w in priced.weights.items()}
+            dollars.update({f"{UNLISTED}{t}": v for t, v, kind in unlisted if kind == "usd"})
+            total = sum(abs(v) for v in dollars.values())
+            if total > 0:
+                book = {s: v / total for s, v in dollars.items()}
+                notes.append("the dollar amounts were read as weights: " + ", ".join(
+                    f"{_t(s)} {_pct(w)}" for s, w in book.items()))
+                unlisted = [u for u in unlisted if u[2] != "usd"]
+    for ticker, weight, kind in unlisted:
+        if kind == "pct" and book:
+            book[f"{UNLISTED}{ticker}"] = weight
     if verb is not None and not proposed:
         named, _ = research.research_symbols(text[verb.end():])
         for symbol in named[:1]:
@@ -1085,6 +1163,14 @@ def parse(text: str, book_text: str = "") -> tuple[dict[str, float], dict[str, f
             book = {s: w / total for s, w in book.items()}
     elif book_text.strip():
         saved = research.parse_book(book_text)
+        extra = [(t, w) for t, w, kind in _unlisted_amounts(book_text) if kind == "pct"]
+        if saved and extra:
+            # "25% AAPL, 25% JPM, 25% XOM, 25% PFE" passed to the MCP tool came back "used your
+            # saved book (33% AAPL, 33% JPM, 33% XOM)" (a judge, round 35)
+            listed = 1.0 - sum(w for _, w in extra)
+            if listed > 0:
+                saved = {**{s: w * listed for s, w in saved.items()},
+                         **{f"{UNLISTED}{t}": w for t, w in extra}}
         if saved:
             book = dict(saved)
             notes.append("used your saved book (" + ", ".join(f"{_pct(w)} {_t(s)}"
@@ -1096,6 +1182,13 @@ def parse(text: str, book_text: str = "") -> tuple[dict[str, float], dict[str, f
         if named:
             book = {s: 1.0 / len(named) for s in named}
             notes.append("no weights were stated, so the names are read as equal weight")
+    outside = [_t(s) for s in book if s.startswith(UNLISTED)]
+    if outside:
+        one = len(outside) == 1
+        notes.append(f"{_and(outside)} {'is not a contract' if one else 'are not contracts'}"
+                     f" Bitget lists; {'its' if one else 'their'} sector and daily "
+                     f"closes are read from {'its' if one else 'their'} US listing "
+                     f"on Yahoo")
     if proposed and verb is not None:
         for symbol, target in proposed.items():
             if symbol not in book and not any("no size" in n for n in notes):

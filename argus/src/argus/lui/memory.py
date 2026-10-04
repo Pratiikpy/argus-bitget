@@ -38,10 +38,13 @@ MAX_FACTS = 40
 MAX_TEXT = 200
 
 KINDS = ("budget", "max_loss", "loss_usd", "horizon", "style", "capital", "thesis", "avoid",
-         "check", "goal", "book", "trade_risk", "cap", "tripwire")
+         "check", "goal", "book", "trade_risk", "cap", "tripwire", "cap_usd")
 """``trade_risk`` is the share of the account the trader risks on one trade ("I won't risk more
 than 2% per trade"), and ``cap`` the largest weight one position may have ("no single position
 above 30% of the book"). Both were lost or misread as a risk budget (a judge, round 21)."""
+"""``cap_usd`` is the largest new position in dollars ("I cannot add any new position larger than
+$10,000 without checking with you first"): it was not kept, and a later "I want to add $18,000 of
+SOL" was answered without it (a judge, round 35)."""
 """``check`` is one line of the checklist a review of the trader's own trades wrote
 (`lui/journal.py`): its subject is the habit's key, its text the check. It is kept so the check is
 run again on a later entry (:func:`after`), which the review promised and nothing did until
@@ -94,6 +97,16 @@ _CAP = re.compile(
     r"\b(?:never|not|no)\s+more\s+than\s+(?P<d>\d{1,2}(?:\.\d+)?)\s*%\s+(?:of\s+(?:my\s+|the\s+)?"
     r"(?:book|portfolio|account)\s+)?(?:in|on)\s+(?:any\s+|a\s+single\s+|a\s+)?(?:one\s+)?(?:name|"
     r"position|holding|stock|coin|asset)\b", re.I)
+_CAP_USD = re.compile(
+    r"\b(?:can'?t|cannot|can\s+not|won'?t|will\s+not|never|don'?t|do\s+not|not\s+allowed\s+to)\s+"
+    r"(?:add|open|put\s+on|take\s+on|take|buy|start)\s+(?:any\s+|a\s+)?(?:new\s+|single\s+|one\s+)?"
+    r"(?:position|trade|holding|bet|purchase)s?\s+(?:larger|bigger|greater|more|over|above|of\s+"
+    r"more)\s+(?:than\s+)?\$\s?(?P<a>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k\b)?|"
+    r"\bno\s+(?:new\s+|single\s+)?(?:position|trade|holding)\s+(?:may\s+|can\s+|should\s+)?(?:be\s+)?"
+    r"(?:larger|bigger|greater|more|over|above)\s+(?:than\s+)?\$\s?(?P<b>\d[\d,]*(?:\.\d+)?)\s*"
+    r"(?P<k2>k\b)?|"
+    r"\bmax(?:imum)?\s+(?:new\s+)?position\s+(?:size\s+)?(?:is\s+|of\s+|=\s*)?\$\s?"
+    r"(?P<c>\d[\d,]*(?:\.\d+)?)\s*(?P<k3>k\b)?", re.I)
 _MAX_LOSS = re.compile(
     r"\b(?:i\s+)?(?:can'?t|cannot|can\s+not|don'?t\s+want\s+to|won'?t|never)\s+(?:afford\s+to\s+)?"
     r"lose\s+"
@@ -130,8 +143,10 @@ _HORIZON = re.compile(
 _HOLDS = re.compile(
     r"\b(?:i\s+(?:currently\s+|now\s+|already\s+|still\s+)?(?:hold|own|have)|i(?:'?m|\s+am)\s+"
     r"(?:holding|long|in)|"
-    r"my\s+(?:current\s+)?(?:book|portfolio|holdings?|allocation)\s+(?:is|are|reads|looks\s+like|:)"
-    r")\b[^.?!;\n]*", re.I)
+    r"my\s+(?:current\s+)?(?:book|portfolio|holdings?|allocation)\s+(?:is|are|reads|looks\s+like)"
+    r")\b[^.?!;\n]*|"
+    # "Here is my book: $40,000 BTC, ..." was not kept (a judge, round 35): no space before ":"
+    r"\bmy\s+(?:current\s+)?(?:book|portfolio|holdings?|allocation)\s*:[^.?!;\n]*", re.I)
 """Holdings said in a sentence: "I hold 40% NVDA, 30% MSFT, 30% AAPL". Kept as the book, so a later
 "what are my exposures if I add 10% XOM" is asked of it (a judge, round 13, 2026-09-30: the book
 was said once in chat, and the next answer read "your book is 100% Energy")."""
@@ -286,6 +301,10 @@ def extract(question: str, now: datetime | None = None,
     if (m := last(_CAP)) is not None:
         add("cap", "", str(float(m.group("a") or m.group("b") or m.group("c")
                                        or m.group("d")) / 100), m.group(0))
+    if (m := last(_CAP_USD)) is not None:
+        size = float((m.group("a") or m.group("b") or m.group("c")).replace(",", "")) * (
+            1000 if (m.group("k") or m.group("k2") or m.group("k3")) else 1)
+        add("cap_usd", "", f"{size:.0f}", m.group(0))
     if (m := last(_MAX_LOSS)) is not None:
         add("max_loss", "", str(float(m.group(1) or m.group(2) or m.group(3) or m.group(4)
                                       or m.group(5) or m.group(6) or m.group(7))
@@ -404,9 +423,22 @@ def extract(question: str, now: datetime | None = None,
         from argus.lui.research.parse import holding_pairs
 
         pairs = holding_pairs(m.group(0))
+        if not pairs and ":" in m.group(0):
+            # "my holdings: 3 BTC and 20 ETH" is the same statement as "I hold 3 BTC and 20 ETH",
+            # which the amount reader keys on (a round 35 re-check)
+            pairs = holding_pairs("I hold " + m.group(0).split(":", 1)[1])
         if pairs and sum(w for _, _, w in pairs) <= 1.0001:
             add("book", "", str(len(pairs)), m.group(0))
             continue
+        if re.search(r"\$\s?\d", m.group(0)):
+            # a book in dollars, "$40,000 BTC, $25,000 ETH" (a judge, round 35), is kept as said;
+            # the book reader prices it
+            from argus.lui.research.parse import parse_book
+
+            dollar_book = parse_book(m.group(0))
+            if len(dollar_book) >= 2:
+                add("book", "", str(len(dollar_book)), m.group(0))
+                continue
         # "i already own some apple stock on bitget like 2 shares" was declined (a first-time
         # user, round 28): a count of one named holding is a book of that holding, kept as "2
         # AAPL" so the book reader prices it
@@ -461,7 +493,7 @@ def merge_checks(old: list[Fact], checks: list[Fact]) -> list[Fact]:
 _RANGES: dict[str, tuple[float, float]] = {
     "horizon": (1, 24 * 365 * 30), "max_loss": (0.0001, 1.0), "budget": (0.0001, 1.0),
     "trade_risk": (0.0001, 1.0), "cap": (0.0001, 1.0), "capital": (1, 1e12),
-    "loss_usd": (0.01, 1e12)}
+    "loss_usd": (0.01, 1e12), "cap_usd": (1, 1e12)}
 """What each numeric fact can mean: hours from one to thirty years, fractions above zero up to
 all of it, money above zero."""
 _INSTRUCTION = re.compile(
@@ -1136,6 +1168,30 @@ def after(lines: list[str], request: Any, facts: list[Fact],
                 avoid, f"{bare_symbol(symbol)} is a name you said you stay out of"))
     extra.extend(checklist_lines(request, facts, tester=tester))
     return extra
+
+
+def size_limit_line(request: Any, facts: list[Fact]) -> str | None:
+    """A new position set against the dollar limit the trader asked to be held to: "I cannot add
+    any new position larger than $10,000 without checking with you first", then "I want to add
+    $18,000 of SOL", was answered as a plain sizing with the limit never named (a judge, round
+    35)."""
+    limit = get(facts, "cap_usd")
+    notional = getattr(request, "notional", None)
+    if limit is None or notional is None or getattr(request, "target", None) == 0.0:
+        return None
+    try:
+        size, cap = float(notional), float(limit.value)
+    except (TypeError, ValueError):
+        return None
+    if size <= 0 or cap <= 0:
+        return None
+    if size > cap:
+        return (f"Against your own limit: you said “{limit.text}” on {limit.at} — ${size:,.0f} "
+                f"is ${size - cap:,.0f} over your ${cap:,.0f}, so this is the check you asked "
+                f"for. A position inside it would be ${cap:,.0f} or less; what follows prices "
+                f"the ${size:,.0f} as asked.")
+    return (f"Inside your own limit: ${size:,.0f} is within the ${cap:,.0f} you said you add "
+            f"without checking first (“{limit.text}”).")
 
 
 def against_view(request: Any, facts: list[Fact]) -> str | None:

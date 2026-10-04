@@ -153,7 +153,10 @@ LEADERSHIP_CLAIM: Final = re.compile(
 INDEX_CLAIM: Final = re.compile(
     r"\b(?:removed|dropped|kicked\s+out|deleted|added|joined|included|admitted)\b[^.?]{0,25}?\b"
     r"(?:from|to|in|into)?\s*(?:the\s+)?(?:s&p\s*500|s&p|nasdaq[\s-]*100|dow(?:\s+jones)?|russell"
-    r"\s*\d{3,4})\b", re.I)
+    r"\s*\d{3,4})\b|"
+    # "the Nasdaq-100 is adding MSTR this Friday, replacing INTC" (a hostile review, round 35)
+    r"\b(?:s&p\s*500|s&p|nasdaq[\s-]*100|dow(?:\s+jones)?|russell\s*\d{3,4})\b[^.?]{0,30}?\b(?:is\s+)?"
+    r"(?:adding|removing|dropping|including|replacing|rebalanc\w*)\b", re.I)
 FEE_PROMO_CLAIM: Final = re.compile(
     r"\b(?P<rate>\d+(?:\.\d+)?)\s*%\s+(?P<side>maker|taker)\s+fee\b[^.?]{0,40}?\b(?:promotion|"
     r"promo|campaign|program|event|offer)\b|\b(?:zero|no)\s+(?P<side2>maker|taker)\s+fees?\b",

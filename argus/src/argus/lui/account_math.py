@@ -422,8 +422,8 @@ def var_check_lines(text: str) -> list[str] | None:
             "historical figure."]
 
 
-_LOT: Final = re.compile(rf"\bbought\s+(?P<q>{_NUM})\s+(?P<s>[A-Za-z]{{2,10}})\s+(?:at|@)\s+\$?"
-                         rf"(?P<p>{_NUM})\s*(?P<u>{_UNIT})?", re.I)
+_LOT: Final = re.compile(rf"\b(?:bought|and|plus)\s+(?P<q>{_NUM})\s+(?P<s>[A-Za-z]{{2,10}})\s+"
+                         rf"(?:at|@)\s+\$?(?P<p>{_NUM})\s*(?P<u>{_UNIT})?", re.I)
 
 
 def tax_lot_lines(text: str) -> list[str] | None:
@@ -504,10 +504,106 @@ def cost_of_lines(text: str) -> list[str] | None:
             "lands."]
 
 
+_BPS_AS_PCT: Final = re.compile(r"\b(?P<b>\d+(?:\.\d+)?)\s*(?:bps|basis\s+points?)\b[^?]{0,60}?"
+                                r"\b(?P<p>\d+(?:\.\d+)?)\s*%", re.I)
+
+
+def bps_lines(text: str) -> list[str] | None:
+    """Basis points read as percent: "a 40bps spread means I'm paying 40% in costs, right?" had
+    its live cost computed and the misreading never corrected (a hostile review, round 35)."""
+    m = _BPS_AS_PCT.search(text)
+    if m is None or not re.search(r"\bright\b|\bmeans?\b|\bcorrect\b|\bso\b", text, re.I):
+        return None
+    bps, pct = float(m.group("b")), float(m.group("p"))
+    if abs(bps / 100 - pct) < 1e-9:
+        return None
+    sized = re.search(rf"\$\s?(?P<a>{_NUM})\s*(?P<u>{_UNIT})?", text)
+    on = _amount(sized.group("a"), sized.group("u")) if sized else None
+    return [f"Bottom line: no — {bps:g}bps is {bps / 100:g}%, not {pct:g}%: a basis point is a "
+            f"hundredth of a percent"
+            + (f", so {bps:g}bps on {_money(on)} is {_money(on * bps / 10_000)}" if on else "")
+            + ".",
+            "Ask \"what does a round trip cost on BTC\" for the live spread and fees on Bitget."]
+
+
+_SHARPE_SAID: Final = re.compile(r"\breturn\w*\s+(?:of\s+)?(?P<r>-?\d+(?:\.\d+)?)\s*%[^?]{0,60}?"
+                                 r"\b(?P<v>\d+(?:\.\d+)?)\s*%\s+(?:annual\w*\s+)?"
+                                 r"vol(?:atility)?\b", re.I)
+
+
+def sharpe_lines(text: str) -> list[str] | None:
+    """A Sharpe ratio from a return and a volatility the trader states. "5% last month with
+    exactly 0% volatility — what is my Sharpe?" got the desk's own track record (a hostile
+    review, round 35)."""
+    if not re.search(r"\bsharpe\b", text, re.I):
+        return None
+    m = _SHARPE_SAID.search(text)
+    if m is None:
+        return None
+    ret, vol = float(m.group("r")) / 100, float(m.group("v")) / 100
+    if vol == 0:
+        return ["Bottom line: it is undefined — the Sharpe ratio divides the return above the "
+                "risk-free rate by the volatility, and a volatility of zero makes that a division "
+                "by zero (\"infinite\" if the return is positive).",
+                "No traded strategy has zero volatility over daily returns; a figure of exactly 0% "
+                "usually means returns were smoothed, marked by the holder, or the period is too "
+                "short — the pattern behind several frauds. Check the daily returns themselves."]
+    monthly = re.search(r"\bmonth\b", text, re.I) is not None
+    annual_ret = ret * 12 if monthly else ret
+    return [f"Bottom line: about {annual_ret / vol:.2f} before the risk-free rate — "
+            f"{annual_ret:.1%} a year{' (the month times 12)' if monthly else ''} divided by "
+            f"{vol:.0%} volatility; subtract the T-bill rate from the return first for the "
+            f"textbook Sharpe.",
+            "A Sharpe from one short period is mostly noise; a year of daily returns is the "
+            "usual minimum to read it."]
+
+
+_SATS: Final = re.compile(rf"\b(?P<n>{_NUM})\s*(?P<u>k)?\s*(?:sats|satoshis?)\b", re.I)
+_GWEI: Final = re.compile(r"\b(?P<g>\d+(?:\.\d+)?)\s*gwei\b", re.I)
+SWAP_GAS: Final = 150_000
+"""Gas units a typical decentralised-exchange swap uses (a Uniswap swap is commonly 120,000 to
+180,000); a plain ETH transfer is 21,000."""
+
+
+def sats_lines(text: str) -> list[str] | None:
+    """Sats converted to ETH at Bitget's prices, and a stated gas price as a swap's fee.
+
+    "I have 50000 sats and gas is 30 gwei — if I convert my sats to ETH, how much will I pay in
+    gwei fees for a swap, and what's that in USD?" got ETH's current gas alone, the sats never
+    mentioned (a hostile review, round 35)."""
+    m = _SATS.search(text)
+    if m is None:
+        return None
+    from argus.lui.position_math import _last
+
+    sats = _amount(m.group("n"), m.group("u"))
+    btc_price, eth_price = _last("BTCUSDT"), _last("ETHUSDT")
+    if btc_price is None:
+        return None
+    btc = sats / 1e8
+    usd = btc * float(btc_price)
+    lines = [f"Bottom line: {sats:,.0f} sats is {btc:.8g} BTC, about {_money(usd)} at Bitget's "
+             f"last price of {float(btc_price):,.2f}"
+             + (f", which converts to about {usd / float(eth_price):.6g} ETH at "
+                f"{float(eth_price):,.2f}" if eth_price else "") + "."]
+    gwei = _GWEI.search(text)
+    if gwei is not None and eth_price is not None:
+        g = float(gwei.group("g"))
+        fee_eth = SWAP_GAS * g / 1e9
+        lines.append(f"At {g:g} gwei a swap of about {SWAP_GAS:,} gas costs {SWAP_GAS * g:,.0f} "
+                     f"gwei = {fee_eth:.6g} ETH, about {_money(fee_eth * float(eth_price))} — "
+                     f"{fee_eth * float(eth_price) / usd:.1%} of what you are converting"
+                     + (", more than the swap is worth" if fee_eth * float(eth_price) > usd
+                        else "") + ". Gas is priced per unit of work, not per dollar moved.")
+    lines.append("On Bitget itself, converting BTC to ETH is an exchange trade (0.10% a side on "
+                 "spot), with no gas; gas applies only on-chain.")
+    return lines
+
+
 def lines(text: str) -> list[str] | None:
     for rule in (liquidation_move_lines, compounded_lines, margin_lines, equity_lines,
                  rate_change_lines, funding_lines, var_check_lines, tax_lot_lines,
-                 cost_of_lines):
+                 cost_of_lines, bps_lines, sharpe_lines, sats_lines):
         found = rule(text)
         if found is not None:
             return found

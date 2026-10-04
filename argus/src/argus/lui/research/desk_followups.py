@@ -290,6 +290,10 @@ def ratio_lines(text: str, now: datetime | None = None) -> list[str] | None:
     from argus.market import history
 
     pair = re.search(r"\b(?P<a>[A-Za-z]{2,6})\s*/\s*(?P<b>[A-Za-z]{2,6})\b", text)
+    if re.search(r"\b(?:cpi|fed|fomc|inflation)\b|\d+\s*/\s*\d+", text, re.I):
+        # "I'm 40/60 BTC/ETH — how did this book do on CPI days?" is a book, not the ratio of
+        # the two (a live re-ask, round 34)
+        return None
     if pair is None or pair.group("b").upper() in ("USD", "USDT"):
         return None
     a, b = _names(pair.group("a")), _names(pair.group("b"))

@@ -130,7 +130,11 @@ def asked_period(text: str, now: datetime | None = None) -> Period | None:
                                       f"{(last if last < today else today):%d %b %Y}")
     if year_said is not None and int(year_said.group("y")) < today.year and re.search(
             rf"\b(?:in|during|for|over)\s+{year_said.group('y')}\b|\b{year_said.group('y')}\s+"
-            r"(?:as\s+a\s+whole|full\s+year)", text, re.I) and not re.search(
+            r"(?:as\s+a\s+whole|full\s+year)|"
+            # "how did BTC do in the 2022 bear market?" (a newcomer re-ask, round 35)
+            rf"\b(?:in|during|through)\s+the\s+{year_said.group('y')}\s+(?:bear|bull)\s+market\b|"
+            rf"\b(?:in|during|through)\s+the\s+{year_said.group('y')}\s+(?:crash|sell[\s-]?off|"
+            r"rally)\b", text, re.I) and not re.search(
             r"\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+"
             + year_said.group("y"), text, re.I):
         year = int(year_said.group("y"))
