@@ -26,6 +26,7 @@ rate for the position's size (``market.bitget.maintenance_margin_rate``), each n
 
 from __future__ import annotations
 
+import math
 import re
 from typing import Final
 
@@ -358,9 +359,155 @@ def rate_change_lines(text: str) -> list[str] | None:
             f"BTCUSDT); ask \"what is BTC funding\" for the live rate."]
 
 
+_COINS_HELD: Final = re.compile(rf"\b(?P<q>{_NUM})\s+(?P<s>[A-Za-z]{{2,10}})\b(?!\s*%)", re.I)
+_VOL_SAID: Final = re.compile(r"\b(?P<s>[A-Za-z]{2,10})\s+(?:vol(?:atility)?)\s+(?:at|of|=|is)?\s*"
+                              r"(?P<v>\d+(?:\.\d+)?)\s*%", re.I)
+_CORR_SAID: Final = re.compile(r"\bcorrelation\s+(?:of\s+|at\s+|=\s*)?(?P<c>-?0?\.\d+|-?1(?:\.0+)?)"
+                               r"|(?P<c2>-?0?\.\d+)\s+correlation\b", re.I)
+_VAR_SAID: Final = re.compile(rf"\bVaR\b[^?.]{{0,40}}?\$\s?(?P<v>{_NUM})\s*(?P<u>{_UNIT})?\b",
+                              re.I)
+
+
+def var_check_lines(text: str) -> list[str] | None:
+    """A parametric VaR the trader computed, recomputed from their own inputs and Bitget's prices.
+
+    "My 3 BTC and 20 ETH has a 1-day 95% VaR of $9,400 with BTC vol 55%, ETH vol 70%, correlation
+    0.85 — did I do that right?" was fed to the mandate builder as a limit (a judge, round 34).
+    The VaR is z x sigma_book x value, with sigma_book from the two vols and the correlation,
+    scaled to one day by sqrt(365) (crypto trades every day) and, for comparison, sqrt(252)."""
+    claimed = _VAR_SAID.search(text)
+    if claimed is None or not re.search(r"\bright\b|\bcorrect\b|\bcheck\b|\bdid\s+i\b", text,
+                                        re.I):
+        return None
+    from argus.lui.position_math import _last
+    from argus.lui.research import research_symbols
+
+    held: dict[str, float] = {}
+    for m in _COINS_HELD.finditer(text):
+        named = research_symbols(m.group("s"))[0]
+        if named and named[0] not in held:
+            held[named[0]] = float(m.group("q").replace(",", ""))
+    vols = {research_symbols(m.group("s"))[0][0]: float(m.group("v")) / 100
+            for m in _VOL_SAID.finditer(text) if research_symbols(m.group("s"))[0]}
+    corr_m = _CORR_SAID.search(text)
+    if len(held) != 2 or set(held) != set(vols) or corr_m is None:
+        return None
+    rho = float(corr_m.group("c") or corr_m.group("c2"))
+    prices = {s: _last(s) for s in held}
+    if any(p is None for p in prices.values()):
+        return None
+    value = {s: held[s] * float(prices[s] or 0) for s in held}
+    (a, b) = list(held)
+    total = value[a] + value[b]
+    var_year = math.sqrt((value[a] * vols[a]) ** 2 + (value[b] * vols[b]) ** 2
+                         + 2 * rho * value[a] * vols[a] * value[b] * vols[b])
+    z = 1.645
+    var365, var252 = z * var_year / math.sqrt(365), z * var_year / math.sqrt(252)
+    said = _amount(claimed.group("v"), claimed.group("u"))
+    close = abs(said - var365) / var365 <= 0.05 or abs(said - var252) / var252 <= 0.05
+    na, nb = a.removesuffix("USDT"), b.removesuffix("USDT")
+    return [f"Bottom line: {'yes' if close else 'no'} — on your own inputs the 1-day 95% VaR is "
+            f"about {_money(var365)} (dividing the annual vol by sqrt(365), as crypto trades every "
+            f"day) or {_money(var252)} (by sqrt(252)), "
+            + ("so your $" + f"{said:,.0f} matches." if close else
+               f"not ${said:,.0f} — yours is {abs(said / var365 - 1):.0%} "
+               f"{'below' if said < var365 else 'above'} the first."),
+            f"The math: {held[a]:g} {na} = {_money(value[a])} and {held[b]:g} {nb} = "
+            f"{_money(value[b])} at Bitget's last prices ({_money(total)} in all); the book's "
+            f"annual dollar volatility is sqrt(({_money(value[a])} x {vols[a]:.0%})^2 + "
+            f"({_money(value[b])} x {vols[b]:.0%})^2 + 2 x {rho:g} x both) = {_money(var_year)}; "
+            f"times 1.645 for 95% one-sided, divided by sqrt(365) = {_money(var365)}.",
+            "A parametric VaR assumes normal returns; crypto's fat tails make the real 1-in-20 "
+            "day worse than this. Ask \"what's my VaR at 95%\" with the book saved for the "
+            "historical figure."]
+
+
+_LOT: Final = re.compile(rf"\bbought\s+(?P<q>{_NUM})\s+(?P<s>[A-Za-z]{{2,10}})\s+(?:at|@)\s+\$?"
+                         rf"(?P<p>{_NUM})\s*(?P<u>{_UNIT})?", re.I)
+
+
+def tax_lot_lines(text: str) -> list[str] | None:
+    """Each lot's unrealised gain or loss at Bitget's price, and what harvesting the losers does.
+
+    "Bought 2 BTC at $98,000 each, now down; bought 50 ETH at $2,200 each, now up — walk me
+    through tax-loss harvesting" was read as a $98,000 and a $2,200 book and answered with
+    boilerplate (a judge, round 34)."""
+    if not re.search(r"\btax[\s-]*loss\b|\bharvest\w*\b|\boffset\b[^?]{0,20}\bgains?\b", text,
+                     re.I):
+        return None
+    from argus.lui.position_math import _last
+    from argus.lui.research import research_symbols
+
+    lots = []
+    for m in _LOT.finditer(text):
+        named = research_symbols(m.group("s"))[0]
+        if not named:
+            continue
+        price = _last(named[0])
+        if price is None:
+            continue
+        qty, cost = float(m.group("q").replace(",", "")), _amount(m.group("p"), m.group("u"))
+        lots.append((named[0].removesuffix("USDT"), qty, cost, float(price),
+                     qty * (float(price) - cost)))
+    if not lots:
+        return None
+    losses = [lot for lot in lots if lot[4] < 0]
+    gains = [lot for lot in lots if lot[4] > 0]
+    loss, gain = sum(lot[4] for lot in losses), sum(lot[4] for lot in gains)
+    lines = ["Bottom line: " + "; ".join(
+        f"{n}: {q:g} bought at {_money(c)}, now {_money(p)} — "
+        f"{'unrealised loss' if pnl < 0 else 'unrealised gain'} of {_money(abs(pnl))}"
+        for n, q, c, p, pnl in lots) + "."]
+    if losses:
+        lines.append(f"Harvesting means selling the losing lot ({', '.join(n for n, *_ in losses)})"
+                     f" to realise {_money(abs(loss))} of loss, which in many tax systems offsets "
+                     f"realised gains"
+                     + (f" — selling the winners would realise {_money(gain)}, so the loss could "
+                        f"cancel {min(abs(loss), gain) / gain:.0%} of it" if gains else "")
+                     + ". Rebuying soon after keeps the exposure; in the US the wash-sale rule "
+                       "has applied to securities, not to crypto held directly, but rules change "
+                       "and differ by country — check yours before relying on it.")
+    else:
+        lines.append("No lot is at a loss, so there is nothing to harvest today.")
+    lines.append("Not tax advice; the figures are your lots at Bitget's last price, before fees.")
+    return lines
+
+
+_COST_OF: Final = re.compile(rf"\b(?:cost\s+of\s+(?:buying\s+)?|buy(?:ing)?\s+|price\s+of\s+)"
+                             rf"(?P<q>{_NUM})\s+(?P<s>[A-Za-z]{{2,10}})\b", re.I)
+
+
+def cost_of_lines(text: str) -> list[str] | None:
+    """The dollar cost of a stated number of coins at Bitget's last price ("using that exact
+    number, calculate the total USD cost of buying 3 ETH" was dropped, a hostile review, round
+    34)."""
+    m = _COST_OF.search(text)
+    if m is None or not re.search(r"\b(?:cost|calculate|total|how\s+much)\b", text, re.I):
+        return None
+    from argus.lui.position_math import _last
+    from argus.lui.research import research_symbols
+
+    named = research_symbols(m.group("s"))[0]
+    if not named:
+        return None
+    price = _last(named[0])
+    if price is None:
+        return None
+    qty = float(m.group("q").replace(",", ""))
+    fee = 0.001
+    total = qty * float(price)
+    name = named[0].removesuffix("USDT")
+    return [f"Bottom line: {qty:g} {name} at Bitget's last price of {float(price):,.2f} is "
+            f"{_money(total)} ({qty:g} x {float(price):,.2f}), plus about {_money(total * fee)} "
+            f"of spot taker fee (0.10%), {_money(total * (1 + fee))} in all.",
+            "The fill can differ by the spread and by how far the price moves before the order "
+            "lands."]
+
+
 def lines(text: str) -> list[str] | None:
     for rule in (liquidation_move_lines, compounded_lines, margin_lines, equity_lines,
-                 rate_change_lines, funding_lines):
+                 rate_change_lines, funding_lines, var_check_lines, tax_lot_lines,
+                 cost_of_lines):
         found = rule(text)
         if found is not None:
             return found

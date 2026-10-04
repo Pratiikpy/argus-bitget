@@ -147,6 +147,7 @@ class TestBookOnReleases:
 
         monkeypatch.setattr(event_reactions, "fomc_decisions", lambda: times)
         monkeypatch.setattr(macro_moves, "_around", lambda symbol, at: moves[(symbol, at)])
+        monkeypatch.setattr(macro_moves, "_surprises", lambda ts: {})
         said = macro_moves.book_event_lines([("AUSDT", 0.5), ("BUSDT", 0.5)], "FOMC")
         assert said is not None
         assert f"its worst was -6.0% after {times[1]:%d %b %Y}" in said[0]

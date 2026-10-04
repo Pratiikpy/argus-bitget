@@ -306,7 +306,11 @@ def market_cap_ratio_lines(text: str, prior: Sequence[str]) -> list[str] | None:
                     f"match it." if caps[a] < caps[b] else ".")]
     else:
         (a, cap), = caps.items()
-        lines = [f"Bottom line: {a} is worth about ${cap / 1e9:,.1f}bn."]
+        price = float((data.get(_GECKO_IDS[a]) or {}).get("usd") or 0)
+        # "What's Ethereum's current price and market cap?" got the cap alone (a judge, round 34)
+        lines = [f"Bottom line: {a} is worth about ${cap / 1e9:,.1f}bn"
+                 + (f" at ${price:,.2f} a coin" if price > 0 and re.search(r"\bprice\b", text,
+                                                                           re.I) else "") + "."]
     lines.append("Source: CoinGecko's market capitalisation (price x circulating supply), read "
                  "now.")
     return lines

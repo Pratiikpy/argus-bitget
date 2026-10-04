@@ -258,10 +258,87 @@ def weekend_close_line(text: str, symbols: tuple[str, ...]) -> str | None:
             f"trade at weekends, and any weekend figure below is the perpetual's, not the stock's.")
 
 
+_CORPORATE_EVENT: Final = re.compile(
+    r"\b(?:merged?|merging|acquired|bought\s+out|filed\s+for\s+bankruptcy|went\s+bankrupt|"
+    r"bankrupt\w*|chapter\s+11|delisted|de-listed|got\s+delisted|taken\s+private|spun\s+off)\b",
+    re.I)
+_PERP_DELISTED: Final = re.compile(
+    r"\b(?:delist\w*|removed?|stopped\s+(?:trading|listing))\b[^?.]{0,40}?\b(?P<name>[A-Za-z]{2,10})"
+    r"\s*(?:usdt\s*)?(?:perp\w*|futures?|contract)\b|\b(?P<name2>[A-Za-z]{2,10})\s*(?:usdt\s*)?"
+    r"(?:perp\w*|futures?|contract)\b[^?.]{0,30}\b(?:delisted|removed)\b", re.I)
+
+
+def corporate_event_line(text: str, symbols: tuple[str, ...]) -> str | None:
+    """A merger, bankruptcy or delisting the question states about a listed name or contract.
+
+    "Tesla merged with Twitter to form X Motors", "Coinbase filed for bankruptcy and got
+    delisted from Nasdaq" and "did Bitget delist the ETH perpetual last week?" were each answered
+    with performance figures and no word on the claim (a hostile review, round 34). A contract
+    said to be delisted is checked against Bitget's own contract list; a corporate event is
+    checked where Bitget's live listing answers it, and otherwise said to be unchecked."""
+    perp = _PERP_DELISTED.search(text)
+    if perp is not None:
+        from argus.lui.research import research_symbols
+        from argus.market.bitget import public_get
+
+        named = research_symbols(perp.group("name") or perp.group("name2") or "")[0]
+        if named:
+            try:
+                rows = public_get("/api/v2/mix/market/contracts",
+                                  {"productType": "USDT-FUTURES", "symbol": named[0]},
+                                  timeout=10.0)
+            except Exception:
+                rows = None
+            status = str((rows or [{}])[0].get("symbolStatus") or "") if rows else ""
+            if status:
+                return (f"Premise check: {named[0]} is "
+                        + ("still listed and trading" if status == "normal"
+                           else f"listed with status \"{status}\"")
+                        + " in Bitget's contract list read just now"
+                        + (", so it has not been delisted." if status == "normal" else "."))
+    event = _CORPORATE_EVENT.search(text)
+    if event is None or not symbols:
+        return None
+    from argus.lui.research.parse import is_us_equity, last_price
+
+    stock = next((s for s in symbols if is_us_equity(s)), None)
+    if stock is None:
+        return None
+    name = stock.removesuffix("USDT")
+    try:
+        live = last_price(stock)
+    except Exception:
+        live = None
+    trading = (f"Bitget's {name} perpetual is trading normally at {float(live):,.2f}, which "
+               f"tracks the listed stock; " if live else "")
+    return (f"Premise check: \"{event.group(0)}\" is not confirmed here — {trading}a merger, "
+            f"bankruptcy or delisting of {name} would be filed with the SEC on an 8-K, and this "
+            f"answer does not assume it happened.")
+
+
+_SPOT_LEVERAGE: Final = re.compile(
+    r"\bspot\b[^?.]{0,50}?\b(?P<x>\d+(?:\.\d+)?)\s*x\b|\b(?P<x2>\d+(?:\.\d+)?)\s*x\b[^?.]{0,50}?"
+    r"\bspot\s+market\b", re.I)
+
+
+def spot_leverage_line(text: str) -> str | None:
+    """Leverage asked on the spot market ("buy 1 BTC on the Bitget spot market using 20x — my
+    liquidation price?" was priced as a perpetual without a word, a hostile review, round 34)."""
+    m = _SPOT_LEVERAGE.search(text)
+    if m is None or float(m.group("x") or m.group("x2")) <= 1:
+        return None
+    lev = m.group("x") or m.group("x2")
+    return (f"Premise check: a spot buy has no leverage — you pay for the whole coin and it cannot "
+            f"be liquidated. {lev}x is a futures (perpetual) setting, or a separate margin "
+            f"product with its own limits on Bitget; the figures below are for a {lev}x "
+            f"perpetual, the product that has a liquidation price.")
+
+
 def lines(text: str, symbols: tuple[str, ...]) -> list[str]:
     """Each premise line that applies, in order; empty when the question claims nothing here."""
     said = [halving_line(text), founder_line(text, symbols), usdt_line(text), spot_line(text),
-            ceo_line(text), share_class_line(text), weekend_close_line(text, symbols)]
+            ceo_line(text), share_class_line(text), weekend_close_line(text, symbols),
+            corporate_event_line(text, symbols), spot_leverage_line(text)]
     out = [x for x in said if x]
     if not out:
         unchecked = unchecked_line(text)

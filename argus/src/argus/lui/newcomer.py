@@ -379,9 +379,13 @@ explains(*_TRUST_A)
 # explainer.
 _SPECULATION = re.compile(
     r"\b(?:is|are)\s+(?:it|this|that|crypto|trading|all\s+this|meme\s*coins?|memecoins?|alt\s*"
-    r"coins?|shit\s*coins?|these\s+coins|those\s+coins|altcoins?)\s+(?:just\s+|basically\s+|"
-    r"really\s+|kinda\s+|like\s+|all\s+)?(?:gambling|a\s+casino|casinos|a\s+scam|scams|a\s+ponzi|"
-    r"lottery|a\s+lottery\s+ticket)\b|\bno\s+(?:real\s+)?(?:use|utility|purpose)\b|"
+    r"coins?|shit\s*coins?|these\s+coins|those\s+coins|altcoins?)\s+"
+    # "is crypto basically just gambling then" chained two qualifiers where only one was
+    # allowed, so the whole match failed and the prior turn got repeated instead (a first-time
+    # user, round 34)
+    r"(?:(?:just|basically|really|kinda|like|all)\s+){0,3}(?:gambling|a\s+casino|casinos|a\s+"
+    r"scam|scams|a\s+ponzi|lottery|a\s+lottery\s+ticket)\b|\bno\s+(?:real\s+)?(?:use|utility|"
+    r"purpose)\b|"
     r"\bwhy\s+(?:would|do|does|did)\s+(?:a\s+|these\s+|those\s+)?(?:coins?|tokens?|memes?|"
     r"memecoins?)\b[^?]{0,40}\b(?:go|went)\s+up\b|\b(?:dog|meme|joke|shit|frog)\s*coins?\b[^?]{0,40}"
     r"\b(?:still\s+a\s+thing|worth\s+it|legit|real|a\s+thing)\b|\bmade\s+bank\b", re.I)
@@ -489,6 +493,9 @@ SLANG: dict[str, str] = {
     "moon": "a very large price rise (\"to the moon\")",
     "bagholder": "someone still holding a coin that has fallen a long way",
     "bag holder": "someone still holding a coin that has fallen a long way",
+    # "my frend says diamond hands lol wdym by that" went undefined (a first-time user, round 34)
+    "diamond hands": "holding through a big drop without selling it — a compliment when the "
+                      "coin recovers, a joke when it doesn't",
     "whale": "an account big enough that its trades move the price",
     "shill": "promoting a coin, often because the promoter owns it",
     "rug pull": "the people behind a coin take the money and disappear; the price goes to near "
@@ -512,6 +519,13 @@ SLANG_Q: Final = re.compile(
 def slang_lines(text: str) -> list[str] | None:
     """Every slang term the question asks about, in plain words."""
     asked = [m.group("t").lower() for m in SLANG_Q.finditer(text)]
+    if asked:
+        # "what does rekt mean and also fomo" matched only REKT via the "what does" trigger;
+        # a second term named after "and" or "and also" without repeating that trigger was
+        # still being asked about, and went undefined (a first-time user, round 34)
+        tail = re.split(r"\band\s+(?:also\s+)?", text, maxsplit=1)[-1]
+        asked += [k for k in SLANG if k not in asked
+                  and re.search(rf"\b{re.escape(k)}\b", tail, re.I)]
     if not asked and len(re.findall(r"[a-z']+", text.lower())) <= 3 and (
             text.strip().endswith("?")
             or re.match(r"^\W*(?:and|or|what\s+about|how\s+about)\b", text, re.I)):
@@ -519,8 +533,10 @@ def slang_lines(text: str) -> list[str] | None:
         asked = [k for k in SLANG if re.search(rf"\b{re.escape(k)}\b", text, re.I)]
     if not asked:
         found = [k for k in SLANG if re.search(rf"\b{re.escape(k)}\b", text, re.I)]
+        # "wdym by that" (what do you mean) named "diamond hands" with no "what does" prefix
+        # at all (a first-time user, round 34)
         asked = found if found and re.search(r"\b(?:mean|stand\s+for|means|meaning|no\s+clue|"
-                                             r"don'?t\s+(?:get|know))\b", text, re.I) else []
+                                             r"wdym|don'?t\s+(?:get|know))\b", text, re.I) else []
     if not asked:
         # "wen moon" has no "?" and no "mean" keyword, but both words are slang on their own
         # (a first-time user, round 33)
@@ -1269,6 +1285,212 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
         "registered shareholder, so there is no vote.",
         "What you hold is exposure to the price; whether an rToken pays dividends or can be "
         "redeemed is set by Bitget's rToken terms, which this console has not verified.",)),
+    # Round 34, a first-time user: a DM airdrop-claim link, "is airdrops real", finding legit
+    # ones, a 20% stablecoin APY, Bitget convert vs trade, checking a coin before buying,
+    # presale risk, slang follow-ups, a conceptual gambling question, a third-person age
+    # question, NFTs and a recession — each refused or answered a different question entirely.
+    # "someone DMed me a link to claim an airdrop should i connect my wallet to it" was refused
+    # outright — the single most dangerous miss in the run (a first-time user, round 34)
+    (re.compile(r"\b(?:dm'?d|dmed|dm\w*)\b[^?]{0,40}\blink\b[^?]{0,40}\bairdrop\b|\bairdrop\b"
+                r"[^?]{0,40}\blink\b[^?]{0,40}\b(?:dm'?d|dmed|dm\w*)\b|\bconnect\s+(?:my\s+)?"
+                r"wallet\b[^?]{0,60}\bairdrop\b|\bairdrop\b[^?]{0,60}\bconnect\s+(?:my\s+)?"
+                r"wallet\b", re.I), (
+        "Bottom line: no — never connect your wallet or sign anything from a link in a DM, "
+        "even one about a real-sounding airdrop. That is how a \"wallet drainer\" works: the "
+        "site has you connect, then sign something that looks routine, and that signature is "
+        "what hands it permission to move everything in the wallet — no seed phrase needed.",
+        "A claim link sent to you in a DM is close to always this scam, on every platform — "
+        "Telegram, Discord, X, Instagram, it makes no difference — because a real airdrop "
+        "never has to find you first. It is announced on the project's own site and its own "
+        "verified account, which you can go check yourself, without the link.",
+        "To check a real one: go to the project's own official channel directly, not through "
+        "the message, and claim with a wallet that holds little or nothing — never your main "
+        "one.")),
+    # "yo is airdrops real?... sounds like a scam ngl" was refused (a first-time user, round 34)
+    (re.compile(r"\bis\s+(?:an?\s+)?airdrops?\s+(?:even\s+|actually\s+)?real\b|\bare\s+"
+                r"airdrops?\s+(?:even\s+|actually\s+)?real\b|\bairdrops?\b[^?]{0,30}\b(?:sounds?"
+                r"\s+like\s+a\s+scam|a\s+scam)\b", re.I), (
+        "Bottom line: yes, real airdrops exist — a project sends free tokens to wallets that "
+        "meet some rule (held a coin, used an app, were on a list) to spread ownership and get "
+        "attention. \"Is this real\" and \"is this specific one real\" are different "
+        "questions, though: the space is also full of fake ones.",
+        "The tell for a fake one: it asks you to connect a wallet to an unknown site, sign "
+        "something, or pay a \"gas fee\" upfront to claim — a real airdrop never needs money "
+        "or a wallet signature from you to hand over free tokens.",
+        "This console cannot tell you whether one specific airdrop is real; it has no list of "
+        "them. What it can say is which checks catch the fake ones.")),
+    # "ok so if its real how do i find legit ones without getting scammed" was refused (a
+    # first-time user, round 34)
+    (re.compile(r"\bairdrops?\b[^?]{0,80}\b(?:find|spot|tell)\s+legit\s+ones\b[^?]{0,30}"
+                r"\bscamm?ed\b|\b(?:find|spot|tell)\s+legit\s+airdrops?\b[^?]{0,30}"
+                r"\bscamm?ed\b", re.I), (
+        "Bottom line: go straight to the project's own official site and its own verified "
+        "account for the announcement — never through a link someone sent you — and treat "
+        "anything that disagrees with that as fake.",
+        "A legit airdrop never asks for a fee, for you to send crypto first, or to connect a "
+        "wallet holding real money just to \"qualify\" — those three asks are the scam, every "
+        "time, and no real one ever needs your seed phrase or private key.",
+        "Claim with a wallet that holds little or nothing, and treat a coin trending only on "
+        "social media, with nothing on a major exchange, as unverified.")),
+    # "whats a stablecoin yield and why do some apps offer 20% apy on usdt is that legit" and
+    # "how do i tell if an apy is too good to be true" were both refused (a first-time user,
+    # round 34)
+    (re.compile(r"\bstable\s*coin\s+yield\b|\bapy\s+(?:too\s+good\s+to\s+be\s+true|legit)\b|"
+                r"\bhow\s+do\s+i\s+tell\s+if\s+(?:an?\s+)?apy\s+is\s+too\s+good\s+to\s+be\s+"
+                r"true\b|\b\d{1,3}\s*%\s*apy\b[^?]{0,30}\b(?:legit|real|safe|catch)\b", re.I), (
+        "Bottom line: a stablecoin yield pays you for lending your USDT or USDC to borrowers, "
+        "or for supplying it to a trading pool — real yield comes from real borrowing demand "
+        "or trading fees, usually low single digits up to around 8-10% on reputable platforms. "
+        "A steady 20% APY, every month, whatever the market does, is not normal.",
+        "Where a number that high usually comes from: a separate token the platform prints to "
+        "attract deposits (which that token's own price then has to support), or the platform "
+        "simply not having the money to pay withdrawals later — both can look real for months "
+        "before they stop.",
+        "Before trusting any yield: can you withdraw a small amount back out right now, not "
+        "just watch a balance grow; are the platform's reserves public; would the yield "
+        "survive no new deposits tomorrow. A guaranteed, fixed return is the red flag on its "
+        "own.")),
+    # "whats the difference between convert and trade on the bitget app im confused" was
+    # refused (a first-time user, round 34)
+    (re.compile(r"\bdifference\s+between\s+convert\s+and\s+trade\b|\bconvert\s+(?:vs\.?|"
+                r"versus|or)\s+trade\b|\btrade\s+(?:vs\.?|versus|or)\s+convert\b", re.I), (
+        "Bottom line: on Bitget, Convert is a quick swap — you're shown a price for swapping "
+        "one coin for another right now and you take it or leave it, with no order book and "
+        "no choice of order type; Trade is the full market, with an order book and your "
+        "choice of a market or limit order.",
+        "Convert suits a small, one-off swap because nothing needs setting up first, but its "
+        "quoted rate can sit a little worse than what the order book actually shows, since "
+        "that convenience is priced in.",
+        "A limit order (set your own price; it may not fill) versus a market order (fills now "
+        "at the best price on offer) is a Trade-only choice, and it shows the live spread and "
+        "depth that Convert hides. For the exact fee gap, check Bitget's own help pages.")),
+    # "how do i even know if a coin is legit before buying it" was refused — distinct from
+    # checking a service or a promised return (a first-time user, round 34)
+    (re.compile(r"\bhow\s+do\s+i\s+(?:even\s+|actually\s+)?know\s+if\s+(?:a\s+|the\s+)?coin\s+"
+                r"is\s+legit\b|\bis\s+(?:this|that)\s+coin\s+legit\b|\bhow\s+(?:can|do)\s+i\s+"
+                r"(?:know|tell)\s+(?:if\s+)?a\s+coin\s+is(?:n'?t)?\s+a\s+scam\b", re.I), (
+        "Bottom line: no single check proves a coin is legit, but these narrow it down fast: "
+        "a real, named team with a track record (not anonymous); an independent smart-contract "
+        "audit from a known firm; real trading volume (not a thin order book one trade can "
+        "move); and whether a handful of wallets hold most of the supply, which a blockchain "
+        "explorer shows for free.",
+        "Also check: is it actually listed on a major exchange such as Bitget, Binance or "
+        "Coinbase (each sets its own listing bar — not a guarantee, but a filter), and is a "
+        "large token unlock for the team or early investors due soon, since that can put a "
+        "lot of new supply on the market at once.",
+        "Red flags on their own: a promised or guaranteed return, pressure to buy now or "
+        "recruit others, and a contract whose owner can change fees or block selling (a "
+        "honeypot). None of this is a buy signal either way — it only rules out the obvious "
+        "scams.")),
+    # "my friend made bank on a new coin presale launch should i join presales too" got the
+    # generic shitcoin answer, missing what makes a presale distinct (a first-time user, round
+    # 34)
+    (re.compile(r"\b(?:new\s+)?(?:coin\s+)?presales?\b[^?]{0,40}\b(?:join|do|get\s+in|buy\s+"
+                r"(?:into|in))\b|\bshould\s+i\s+(?:join|do|get\s+into)\s+presales?\b", re.I), (
+        "Bottom line: a presale is riskier than buying an already-listed coin — there is no "
+        "token trading yet, no price chart, and no way to sell if you change your mind. You "
+        "hand over money on a promise, before there is anything to check.",
+        "What makes it different from an ordinary risky coin: the team can vanish with the "
+        "money before any token or liquidity exists at all (an \"exit scam\"), and even a real "
+        "team usually vests (locks) its own and early buyers' tokens, so buyers at listing can "
+        "be selling into that unlock for months.",
+        "A friend making money on one presale is one data point, not a pattern — most "
+        "presales list far below the presale price, or never list at all. If you try one "
+        "anyway, use only money you could lose entirely.")),
+    # "wait so if i fomo into a coin and it dumps is that the same as getting rekt or
+    # different" was refused despite REKT having just been defined in-thread (a first-time
+    # user, round 34)
+    (re.compile(r"(?=.*\bfomo\w*\b)(?=.*\brekt\b)(?=.*\b(?:same\s+as|or\s+different|different"
+                r"\s+(?:from|than))\b)", re.I), (
+        "Bottom line: related, not identical. FOMO is the decision — buying because a price is "
+        "rising and you don't want to miss it; getting rekt is the outcome — a large loss. "
+        "FOMOing into a coin that then dumps is one of the most common ways to get rekt, but "
+        "not the only one.",
+        "You can also get rekt with no FOMO at all (a leveraged position liquidated by an "
+        "ordinary move), and you can FOMO in and get lucky. Think of FOMO as a cause and rekt "
+        "as one possible effect, not two words for the same thing.")),
+    # "ok so if i get rekt from fomoing into a coin can i like get my money bak somehow or its
+    # gone forever lol" was refused, same boilerplate (a first-time user, round 34)
+    (re.compile(r"(?=.*\brekt\b)(?=.*\b(?:get\s+(?:my\s+)?money\s+(?:bak|back)|money\s+back|"
+                r"gone\s+forever)\b)", re.I), (
+        "Bottom line: gone — once a coin is sold at a loss, or a leveraged position is "
+        "liquidated, there is no chargeback, no customer-service reversal, and no \"undo\" "
+        "the way a bank transfer sometimes has. Crypto transactions do not get reversed.",
+        "The one exception: if you are still holding — not sold, not liquidated — and the "
+        "coin recovers, the loss was only on paper and can shrink or disappear. Once it is "
+        "sold, or you are liquidated, that outcome is locked in.",
+        "There is no legitimate way to \"recover\" crypto lost this way — anyone who offers to "
+        "get it back for a fee is a second scam stacked on the first.")),
+    # "is there a way to trade without it basically being gambling" got an unsolicited $100k
+    # hedge pitch the user never asked for (a first-time user, round 34)
+    (re.compile(r"\bway\s+to\s+trade\s+without\s+it\s+(?:basically\s+)?being\s+gambling\b|"
+                r"\btrade\s+without\s+(?:it\s+(?:basically\s+)?being\s+|being\s+)?gambling\b|"
+                r"\b(?:not\s+(?:make|turn)|avoid\s+(?:making|turning))\s+(?:it|trading)\s+"
+                r"(?:into\s+)?(?:basically\s+)?gambling\b", re.I), (
+        "Bottom line: yes — what separates trading from gambling is a reason to enter that has "
+        "worked before (not a hunch), a plan for being wrong decided before you enter, and a "
+        "size small enough that one bad trade doesn't end the account. Gambling is a bet on "
+        "pure chance with no edge and no plan.",
+        "A coin flip and buying because a chart looks exciting are both gambling either way. "
+        "Checking what actually followed similar past moments (ask \"has BTC been here "
+        "before\" for a real base rate), knowing the cost (fees eat any edge — a Bitget "
+        "perpetual round trip is about 0.12%), and sizing for survival is what keeps it "
+        "analysis rather than a bet.",
+        "This console will not size a position or pitch a hedge unless you give it a real "
+        "position to size — a plain question like this gets a plain answer, not a trade.")),
+    # "should a 16 year old be trading this stuff" repeated the whale definition verbatim
+    # instead (a first-time user, round 34)
+    (re.compile(r"\b(?:should|can|could)\s+a\s+1[0-7][\s-]?year[\s-]?old\s+(?:be\s+)?trad(?:e|"
+                r"ing)\b|\bis\s+(?:it\s+)?(?:ok|okay|fine|legal)\s+for\s+a\s+1[0-7][\s-]?year"
+                r"[\s-]?old\s+to\s+trade\b", re.I), (
+        "Bottom line: not with an account of their own — Bitget's terms require anyone using "
+        "it to be at least 18 (section 2.2), so a 16-year-old cannot open a Bitget account, "
+        "with any amount.",
+        "Whether Bitget offers any custodial or parental option for a minor is worth checking "
+        "on its own help centre; this console has not verified that either way.",
+        "Learning costs nothing at any age: ask this console anything, e.g. \"how much could "
+        "I lose on BTC in a bad week\" — the money can wait until they can decide for "
+        "themselves, without leverage.")),
+    # "what is an nft and should i buy one" was hit by the hourly quota wall with zero plain-
+    # English fallback (a first-time user, round 34)
+    (re.compile(r"\bwhat\s+(?:is|are)\s+(?:an?\s+)?nfts?\b|\bwhats?\s+(?:is|are)?\s*(?:an?\s+)?"
+                r"nfts?\b", re.I), (
+        "Bottom line: an NFT (non-fungible token) is a token on a blockchain that stands for "
+        "ownership of one specific, unique thing — art, a collectible, an in-game item. Unlike "
+        "a coin, no two NFTs are interchangeable; each one is its own record.",
+        "Whether to buy one isn't this console's call, but the facts: most NFTs are worth far "
+        "less than at their 2021 peak, many trade with little or no active market at all (hard "
+        "to sell quickly even if you want to), and the price is driven by hype and scarcity, "
+        "not any earnings behind it.",
+        "If you buy one, treat it like a collectible you would be fine owning even if its "
+        "price never recovers — not something you are counting on to sell higher later.")),
+    # "if nfts crash too then whats even the point of buying one" was hit by the same quota
+    # wall (a first-time user, round 34)
+    (re.compile(r"\bnfts?\b[^?]{0,60}\bpoint\s+(?:of|in)\s+buying\s+(?:an?\s+nfts?\b|one\b)|"
+                r"\bwhats?\s+(?:even\s+)?the\s+point\s+(?:of|in)\s+buying\s+(?:an?\s+)?nfts?\b|"
+                r"\bpoint\s+(?:of|in)\s+buying\s+(?:an?\s+)?nfts?\b", re.I), (
+        "Bottom line: for most buyers the honest point is not profit — it's owning something "
+        "you actually like, a community or access that comes with holding it, or a piece of "
+        "digital art — the same reason someone buys a print that might never be worth more "
+        "than they paid.",
+        "As an investment specifically it's a hard case: on top of the price risk, many NFTs "
+        "have little to no active market, so wanting to sell doesn't mean you can, at any "
+        "price.",
+        "Treat \"it might go up\" as a bonus, not the reason — if resale hope is the only "
+        "reason to buy, that is the same gamble as any other speculative asset, with worse "
+        "liquidity.")),
+    # "what happens to crypto if theres a recession does it crash too" was hit by the same
+    # quota wall (a first-time user, round 34)
+    (re.compile(r"\bcrypto\b[^?]{0,40}\brecession\b|\brecession\b[^?]{0,40}\bcrypto\b", re.I), (
+        "Bottom line: crypto has mostly moved with the stock market, not against it — in the "
+        "2022 downturn (rising interest rates, recession fears) BTC fell about 65% from its "
+        "high, roughly in step with high-growth tech stocks, not acting as a safe haven.",
+        "The \"uncorrelated\" or \"digital gold\" story gets tested in exactly these moments, "
+        "and it has not held up consistently so far: when investors get cautious and sell risk "
+        "assets broadly, crypto has usually been sold alongside them, often more sharply "
+        "because of leverage in the system.",
+        "That is a pattern from the recessions crypto has actually lived through, not a law — "
+        "there is no guarantee the next one plays out the same way.")),
 )
 
 

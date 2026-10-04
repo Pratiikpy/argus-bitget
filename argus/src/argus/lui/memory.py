@@ -576,6 +576,62 @@ def apply_sales(facts: list[Fact], text: str, now: datetime | None = None) -> li
     return [updated, *(f for f in facts if f is not book)]
 
 
+_TRADE_SOLD = re.compile(
+    r"\bsold\s+(?:off\s+)?(?:all\s+(?:of\s+)?)?(?:my\s+)?(?:(?P<q>\d[\d,]*(?:\.\d+)?)\s+)?"
+    r"(?:of\s+(?:my\s+)?)?(?P<name>[A-Za-z][A-Za-z.]{1,11})\b", re.I)
+_TRADE_BOUGHT = re.compile(
+    r"\b(?:bought|buy|added|picked\s+up|swapped\s+(?:it\s+)?(?:in)?to)\s+(?P<q>\d[\d,]*(?:\.\d+)?)"
+    r"\s*(?P<name>[A-Za-z][A-Za-z.]{1,11})\b", re.I)
+_UNITS_HELD = re.compile(r"(?<![\w.%$])(?P<q>\d[\d,]*(?:\.\d+)?)\s*"
+                         r"(?P<name>[A-Za-z][A-Za-z.]{1,11})\b(?!\s*%)", re.I)
+
+
+def apply_trades(facts: list[Fact], text: str, now: datetime | None = None) -> list[Fact]:
+    """A book remembered in units, updated by the trades a message reports.
+
+    "I hold 2 BTC and 10 ETH", then "I sold all 10 ETH and bought 50 SOL instead — confirm my new
+    holdings", kept the old book; the next answer valued 50 SOL alone and called the book 100% ETH
+    and 86/14 BTC/ETH in one breath (a hostile review, round 34). Units sold come off, units bought
+    are added, and the old book is kept as what was replaced. A book in weights is left to
+    :func:`apply_sales`, since a count cannot be added to a percentage."""
+    from argus.lui.research import research_symbols
+
+    book = get(facts, "book")
+    if book is None:
+        return facts
+    units: dict[str, float] = {}
+    for m in _UNITS_HELD.finditer(book.text):
+        named = research_symbols(m.group("name"))[0]
+        if named:
+            units[named[0]] = units.get(named[0], 0.0) + float(m.group("q").replace(",", ""))
+    if not units:
+        return facts
+    changed = False
+    for m in _TRADE_SOLD.finditer(text):
+        named = research_symbols(m.group("name"))[0]
+        if not named or named[0] not in units:
+            continue
+        qty = float(m.group("q").replace(",", "")) if m.group("q") else units[named[0]]
+        units[named[0]] = max(0.0, units[named[0]] - qty)
+        changed = True
+    for m in _TRADE_BOUGHT.finditer(text):
+        named = research_symbols(m.group("name"))[0]
+        if not named:
+            continue
+        units[named[0]] = units.get(named[0], 0.0) + float(m.group("q").replace(",", ""))
+        changed = True
+    if not changed:
+        return facts
+    left = {s: q for s, q in units.items() if q > 0}
+    day = (now or datetime.now(UTC)).date().isoformat()
+    if not left:
+        return [f for f in facts if f is not book]
+    words = "I hold " + ", ".join(f"{q:g} {s.removesuffix('USDT')}" for s, q in left.items())
+    updated = Fact(kind="book", subject="", value=str(len(left)), text=words, at=day,
+                   replaces=f"“{book.text[:120]}” ({book.at})")
+    return [updated, *(f for f in facts if f is not book)]
+
+
 _CORRECTED = re.compile(
     r"\b(?:actually|correction|sorry|i\s+meant|make\s+that|rather)\b[^.?!]{0,40}?"
     r"\b(?:it'?s|it\s+is|i\s+hold|i\s+have|make\s+it|that'?s)\s+(?P<pct>\d+(?:\.\d+)?)\s*%\s+"

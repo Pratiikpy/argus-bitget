@@ -1,5 +1,6 @@
-"""Two single figures a judge asked for and did not get (round 33): a 24-hour volume compared with
-another name's, and realised volatility over a stated window.
+"""Single measured figures a judge asked for and did not get (rounds 33-34): a 24-hour volume
+compared with another name's, realised volatility over a stated window, momentum or mean reversion
+in the recent days, one order walked on several books, and the distance to an all-time high.
 
 * "What about its 24h volume compared to ETH?", after a BTC question, gave ETH's volume alone.
 * "Just tell me BTC's realized volatility over the last 30 days, annualized" got a positioning
@@ -120,6 +121,178 @@ def realised_vol_lines(text: str, prior: list[str]) -> list[str] | None:
     return lines
 
 
-__all__ = ["REALISED_VOL", "VOLUME_COMPARED", "realised_vol_lines", "volume_lines"]
+# --- momentum or mean reversion -------------------------------------------------------------------
+
+MOMENTUM_ASKED: Final = re.compile(r"\bmomentum\b[^?]{0,40}\bmean[\s-]+revers\w*|\bmean[\s-]+"
+                                   r"revers\w*\b[^?]{0,40}\bmomentum\b|\btrend(?:ing)?\s+or\s+"
+                                   r"(?:mean[\s-]+)?revert\w*", re.I)
+
+
+def momentum_lines(text: str, prior: list[str]) -> list[str] | None:
+    """Whether a name's recent days have followed through or reversed: the lag-1 and lag-5
+    autocorrelation of daily returns over the window, and the variance ratio of 5-day to 1-day
+    moves. "Test that on Bitget's own BTC data — momentum or mean reversion over 90 days?" got a
+    90-day return and a drawdown (a judge, round 34)."""
+    if MOMENTUM_ASKED.search(text) is None:
+        return None
+    named = _named(text, prior) or ["BTCUSDT"]
+    days = _window(text) if re.search(r"\b(?:last|past)\s+\d+", text) else 90
+    from argus.market.history import fetch_window
+
+    try:
+        bars = fetch_window(named[0], start=datetime.now(UTC) - timedelta(days=days + 3),
+                            interval="1Dutc", pause=0.05)
+    except Exception:
+        return None
+    closes = [float(b.close) for b in bars if float(b.close) > 0][-(days + 1):]
+    if len(closes) < 40:
+        return None
+    rets = [math.log(b / a) for a, b in pairwise(closes)]
+    n, mean = len(rets), sum(rets) / len(rets)
+    var = sum((r - mean) ** 2 for r in rets) / n
+
+    def autocorr(lag: int) -> float:
+        return sum((rets[i] - mean) * (rets[i - lag] - mean) for i in range(lag, n)) / (n * var)
+
+    one, five = autocorr(1), autocorr(5)
+    weekly = [sum(rets[i:i + 5]) for i in range(0, n - 4)]
+    vr = (sum((w - 5 * mean) ** 2 for w in weekly) / len(weekly)) / (5 * var) if var else 1.0
+    band = 2 / math.sqrt(n)
+    verdict = ("momentum — up days have tended to follow up days" if one > band else
+               "mean reversion — moves have tended to reverse the next day" if one < -band else
+               "neither — the day-to-day pattern is inside what chance alone gives")
+    name = named[0].removesuffix("USDT")
+    return [f"Bottom line: {name} over the last {n} days shows {verdict}: lag-1 autocorrelation "
+            f"of daily returns {one:+.2f}, against a chance band of ±{band:.2f}.",
+            f"Over a week: lag-5 autocorrelation {five:+.2f}; the variance ratio of 5-day to "
+            f"1-day moves is {vr:.2f} (above 1 leans momentum, below 1 mean reversion, 1 is a "
+            f"random walk).",
+            "Method: Bitget daily closes (00:00 UTC), log returns; the band is two standard "
+            "errors (2/sqrt(n)). A short window says how the recent past behaved, not how the "
+            "next weeks will."]
+
+
+# --- depth across names ---------------------------------------------------------------------------
+
+DEPTH_ASKED: Final = re.compile(r"\b(?:order\s*book\s+)?depth\b|\bslippage\b|\babsorb\b|\bliquid"
+                                r"(?:ity|est)\b", re.I)
+
+
+def depth_lines(text: str, prior: list[str]) -> list[str] | None:
+    """The same order walked on each named book, cheapest first. "Compare the order book depth
+    for SOL, XRP and DOGE — which can absorb that size with the least slippage?" got a plan for
+    SOL alone (a judge, round 34)."""
+    if DEPTH_ASKED.search(text) is None:
+        return None
+    from argus.lui.research import research_symbols
+
+    named = list(dict.fromkeys(research_symbols(text)[0]))
+    if len(named) < 2:
+        return None
+    sized = re.search(r"\$\s?(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\b", " ".join([*prior[-3:], text]),
+                      re.I)
+    notional = (float(sized.group(1).replace(",", "")) * {"k": 1e3, "m": 1e6}.get(
+        (sized.group(2) or "").lower(), 1.0) if sized else 100_000.0)
+    from decimal import Decimal
+
+    from argus.market.depth import fetch_orderbook
+
+    side = "SELL" if re.search(r"\bsell\w*|\bexit\w*|\bdump\w*", " ".join([*prior[-2:], text]),
+                               re.I) else "BUY"
+    rows = []
+    for symbol in named[:5]:
+        try:
+            walked = fetch_orderbook(symbol, limit=50).sweep(Decimal(str(notional)),
+                                                             direction=side)
+        except Exception:
+            continue
+        rows.append((symbol.removesuffix("USDT"), float(walked.slippage_bps),
+                     bool(walked.complete)))
+    if len(rows) < 2:
+        return None
+    rows.sort(key=lambda r: (not r[2], r[1]))
+    best = rows[0]
+    lines = [f"Bottom line: {best[0]} absorbs a ${notional:,.0f} market {side.lower()} with the "
+             f"least slippage — {best[1]:.1f}bps walking Bitget's book"
+             + ("" if best[2] else ", and even it runs past the 50 visible levels") + "; "
+             + "; ".join(f"{n} {s:.1f}bps" + ("" if c else " (past the visible book)")
+                         for n, s, c in rows[1:]) + "."]
+    lines.append(f"Each book read just now, 50 levels a side, the same ${notional:,.0f} "
+                 + ("(the size said earlier)" if sized else "(no size was said, so $100,000)")
+                 + "; taker fees (about 6bps on a perpetual) come on top. Ask how to split it for "
+                   "the schedule on the name you choose.")
+    return lines
+
+
+# --- all-time high ------------------------------------------------------------------------------
+
+ATH_ASKED: Final = re.compile(r"\ball[\s-]+time\s+high\b|\bATH\b|\bprevious\s+(?:high|peak)\b|"
+                              r"\brecord\s+high\b", re.I)
+BACK_TO_LEVEL: Final = re.compile(r"\b(?:get|go|come)\s+back\s+(?:to|above)\s+(?:that|its|the)\s+"
+                                  r"(?:level|high|peak|ath|record)\b|\b(?:reach|hit|retake|"
+                                  r"reclaim)\s+(?:that|its|the)\s+(?:level|high|peak|ath)\s+again\b",
+                                  re.I)
+
+
+def ath_lines(text: str, prior: list[str]) -> list[str] | None:
+    """A name's all-time high, how far below it the price is, and — asked whether it gets back —
+    how often a rise that large has happened within a year on the record.
+
+    "How does that compare to its all-time high?" got a risk profile, and "is it likely to get
+    back to that level this cycle?" revenge-trading advice (a judge, round 34)."""
+    back = BACK_TO_LEVEL.search(text) is not None and any(ATH_ASKED.search(q)
+                                                         for q in prior[-3:])
+    if ATH_ASKED.search(text) is None and not back:
+        return None
+    from argus.lui.research import research_symbols
+
+    named = _named(text, prior) or next((list(research_symbols(q)[0])
+                                         for q in reversed(prior[-3:])
+                                         if research_symbols(q)[0]), [])
+    if not named:
+        return None
+    symbol = named[0]
+    from argus.lui.research.parse import is_us_equity
+    from argus.market.equity_history import daily
+
+    ticker = symbol.removesuffix("USDT") if is_us_equity(symbol) else \
+        f"{symbol.removesuffix('USDT')}-USD"
+    try:
+        days = daily(ticker)
+    except Exception:
+        return None
+    top = max(days, key=lambda d: d.close)
+    from argus.lui.research.parse import last_price
+
+    try:
+        now = float(last_price(symbol) or days[-1].close)
+    except Exception:
+        now = days[-1].close
+    below = now / top.close - 1
+    need = top.close / now - 1
+    name = symbol.removesuffix("USDT")
+    lines = [f"Bottom line: {name}'s all-time high close is {top.close:,.2f} on "
+             f"{top.day:%d %b %Y}; at {now:,.2f} on Bitget it is {below:+.1%} from it, so getting "
+             f"back needs {need:+.1%}."]
+    if back:
+        from argus.lui.research.dispatch import span_moves
+
+        spans = span_moves(symbol, 365)
+        if spans:
+            hit = sum(1 for m in spans[0] if m >= need)
+            lines.insert(0, f"Bottom line: no one can say whether it gets back this cycle — what "
+                            f"the record shows is that a rise of {need:+.0%} within a year "
+                            f"happened in {hit} of {len(spans[0])} one-year windows on Bitget's "
+                            f"daily closes ({hit / len(spans[0]):.0%}), overlapping windows "
+                            f"from about three years.")
+            lines[1] = lines[1].replace("Bottom line: ", "")
+    lines.append("All-time high from Yahoo Finance daily closes since the first price on record; "
+                 "the price now is Bitget's last.")
+    return lines
+
+
+__all__ = ["ATH_ASKED", "BACK_TO_LEVEL", "DEPTH_ASKED", "MOMENTUM_ASKED", "REALISED_VOL",
+           "VOLUME_COMPARED", "ath_lines", "depth_lines", "momentum_lines", "realised_vol_lines",
+           "volume_lines"]
 
 trace_module(globals())

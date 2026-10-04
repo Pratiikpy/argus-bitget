@@ -135,11 +135,47 @@ def _around(symbol: str, at: datetime) -> float | None:
     return after / closes[before] - 1 if after is not None else None
 
 
+def _surprises(times: list[datetime]) -> dict[datetime, float]:
+    """The 2-year Treasury yield's change on each release day, in basis points (FRED DGS2): the
+    market's own read of whether the release came in hotter (yields up) or cooler (down) than it
+    expected. No consensus forecasts are read here, so the bond market's reaction stands in."""
+    from argus.lui.research.macro import _fred
+
+    try:
+        rows = dict(_fred("DGS2", 420))
+    except Exception:
+        return {}
+    days = sorted(rows)
+    out: dict[datetime, float] = {}
+    for at in times:
+        day = at.date().isoformat()
+        before = [d for d in days if d < day]
+        if day in rows and before:
+            out[at] = (rows[day] - rows[before[-1]]) * 100
+    return out
+
+
+def _surprise_line(moves: dict[datetime, float], surprise: dict[datetime, float],
+                   kind: str) -> str | None:
+    """The book's average move after the hotter releases and after the cooler ones."""
+    hot = [moves[t] for t, bp in surprise.items() if bp >= 3]
+    cool = [moves[t] for t, bp in surprise.items() if bp <= -3]
+    if not hot or not cool:
+        return None
+    word = ("hotter", "cooler") if kind == "CPI" else ("more hawkish", "more dovish")
+    return (f"Split by the bond market's read of each release (the 2-year yield rising 3bp or "
+            f"more on the day = {word[0]} than expected, falling 3bp or more = {word[1]}): after "
+            f"the {len(hot)} {word[0]} ones the book averaged {sum(hot) / len(hot):+.1%} over 24 "
+            f"hours, after the {len(cool)} {word[1]} ones {sum(cool) / len(cool):+.1%} — few "
+            f"releases, so the split is a description, not a rule.")
+
+
 def book_event_lines(weights: list[tuple[str, float]], kind: str) -> list[str] | None:
     """What each past release did to a stated book: the weighted 24-hour move of the names held,
-    release by release, its worst and its average size. A "hawkish surprise" is not labelled on
-    the record, so the worst decision day stands in for it and the answer says so; a name with
-    no hourly history around the releases is left out and named."""
+    release by release, its worst and its average size, and — where the 2-year yield's move on
+    the day sorts them — after the hotter and after the cooler releases (:func:`_surprises`).
+    Without that split the worst day stands in for a bad surprise, and the answer says so; a
+    name with no hourly history around the releases is left out and named."""
     from concurrent.futures import ThreadPoolExecutor
 
     from argus.research.event_reactions import cpi_releases, fomc_decisions
@@ -170,6 +206,7 @@ def book_event_lines(weights: list[tuple[str, float]], kind: str) -> list[str] |
     if len(complete) < 2:
         return None
     label = "CPI release" if kind == "CPI" else "Fed decision"
+    surprise = _surprises(list(complete))
     worst_at = min(complete, key=lambda at: complete[at])
     best_at = max(complete, key=lambda at: complete[at])
     size = sum(abs(v) for v in complete.values()) / len(complete)
@@ -178,9 +215,10 @@ def book_event_lines(weights: list[tuple[str, float]], kind: str) -> list[str] |
              f"{size:.1%} either way over the next 24 hours on average; its worst was "
              f"{complete[worst_at]:+.1%} after {worst_at:%d %b %Y} and its best "
              f"{complete[best_at]:+.1%} after {best_at:%d %b %Y}.",
-             f"A hawkish surprise is not labelled on the record, so the worst of these is the "
-             f"closest measured stand-in: a move like {complete[worst_at]:+.1%} on the whole book, "
-             f"before any leverage multiplies it.",
+             _surprise_line(complete, surprise, kind)
+             or f"A surprise is not labelled on the record, so the worst of these is the closest "
+                f"measured stand-in: a move like {complete[worst_at]:+.1%} on the whole book, "
+                f"before any leverage multiplies it.",
              "Each release: " + "; ".join(f"{at:%d %b %Y} {move:+.1%}"
                                           for at, move in sorted(complete.items(),
                                                                  reverse=True)[:6]) + "."]

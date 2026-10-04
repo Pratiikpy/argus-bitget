@@ -1498,6 +1498,15 @@ def _fundamentals_focus(lines: list[str], question: str, ticker: str) -> list[st
                                             and "bitcoin" in line.lower())
                     for p in starts)
              and (topic != "dividend" or "dividend" in line.lower())), None)
+        if hit is None and topic != "dividend":
+            # "the data source holds no insider filings figure for MSTR" led an answer whose next
+            # lines gave eight Form 4 filings (a judge, round 34): a line that names the topic
+            # under another heading answers it before the answer says none exists
+            words = {"insider": ("form 4", "insider", "open-market"),
+                     "ownership": ("holders", "owned by", "institution")}.get(
+                topic.split()[0], (topic.split()[0],))
+            hit = next((i for i, line in enumerate(plain)
+                        if any(w in line.lower() for w in words)), None)
         if hit is None and topic == "dividend":
             # the 10-Q a dividend question's own answer cited carried the figure the answer said
             # was missing (a hostile review, round 30): the declared dividend is read from XBRL
