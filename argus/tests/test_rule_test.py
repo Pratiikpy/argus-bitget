@@ -51,6 +51,9 @@ class TestReading:
     def test_a_question_with_no_rule_is_not_a_backtest(self) -> None:
         assert rt.lines("is NVDA overbought?") is None
         assert rt.lines("how has BTC done this year?") is None
+        assert rt.lines("how did BTC do this year?") is None
+        assert rt.ASKED.search("how did a 20/100 EMA crossover do on gold?")
+        assert rt.read_rule("how did a 20/100 EMA crossover do on gold?") is not None
 
 
 class TestNoLookAhead:

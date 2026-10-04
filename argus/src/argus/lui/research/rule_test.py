@@ -42,7 +42,7 @@ from typing import Final
 
 ASKED: Final = re.compile(
     r"\b(?:backtest\w*|back[\s-]test\w*|test\s+(?:a|this|my|the)\s+(?:strategy|rule|system)|"
-    r"how\s+(?:would|did|does|has)\b[^?]{0,60}\b(?:have\s+)?(?:done|performed|worked|fared)|"
+    r"how\s+(?:would|did|does|has)\b[^?]{0,60}\b(?:have\s+)?(?:done|do|performed|perform|worked|work|fared)|"
     r"does\s+(?:buying|selling|shorting|a|the)\b[^?]{0,80}\bwork|would\s+(?:have\s+)?made\s+money|"
     r"(?:strategy|rule)\s*:)", re.I)
 _RSI: Final = re.compile(r"\brsi\s*(?:\(\s*(?P<n>\d{1,3})\s*\))?[^.;]{0,40}?\b(?:below|under|<|"
