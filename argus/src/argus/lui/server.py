@@ -3181,6 +3181,13 @@ def _personal_thesis_lines(text: str, book: str, prior: list[str], *, now: datet
     parts = (("A market fall", "what does a 10% market drop do to my book"),
              ("Where the risk sits", "what is my risk"),
              ("What is coming", "what should I keep an eye on this week"))
+    from argus.lui.research.parse import parse_book as _held_weights
+
+    shown = _held_weights(held)
+    if shown:
+        # "the worry in this book (I own 70% BTC and 30% gold, and I'll need the money for my
+        # daughter's college in 3 years)" restated the whole sentence (a live re-ask, round 35)
+        held = ", ".join(f"{w:.0%} {s.removesuffix('USDT')}" for s, w in shown.items())
     lines = [f"Bottom line: what to worry about in this book ({held}), from three engines on live "
              f"data — each part below is that engine's own finding, a measured risk rather than a "
              f"forecast:"]

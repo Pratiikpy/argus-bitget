@@ -105,6 +105,11 @@ _CAP_USD = re.compile(
     r"\bno\s+(?:new\s+|single\s+)?(?:position|trade|holding)\s+(?:may\s+|can\s+|should\s+)?(?:be\s+)?"
     r"(?:larger|bigger|greater|more|over|above)\s+(?:than\s+)?\$\s?(?P<b>\d[\d,]*(?:\.\d+)?)\s*"
     r"(?P<k2>k\b)?|"
+    # "Don't let me open any single position bigger than $15k without flagging it" (a live
+    # re-ask, round 35)
+    r"\b(?:don'?t|do\s+not|never)\s+let\s+me\s+(?:open|add|put\s+on|take|buy|start)\s+(?:any\s+|a\s+)?"
+    r"(?:new\s+|single\s+|one\s+)?(?:position|trade|holding|bet)s?\s+(?:larger|bigger|greater|"
+    r"more|over|above)\s+(?:than\s+)?\$\s?(?P<d>\d[\d,]*(?:\.\d+)?)\s*(?P<k4>k\b)?|"
     r"\bmax(?:imum)?\s+(?:new\s+)?position\s+(?:size\s+)?(?:is\s+|of\s+|=\s*)?\$\s?"
     r"(?P<c>\d[\d,]*(?:\.\d+)?)\s*(?P<k3>k\b)?", re.I)
 _MAX_LOSS = re.compile(
@@ -302,8 +307,9 @@ def extract(question: str, now: datetime | None = None,
         add("cap", "", str(float(m.group("a") or m.group("b") or m.group("c")
                                        or m.group("d")) / 100), m.group(0))
     if (m := last(_CAP_USD)) is not None:
-        size = float((m.group("a") or m.group("b") or m.group("c")).replace(",", "")) * (
-            1000 if (m.group("k") or m.group("k2") or m.group("k3")) else 1)
+        size = float((m.group("a") or m.group("b") or m.group("c") or m.group("d"))
+                     .replace(",", "")) * (
+            1000 if (m.group("k") or m.group("k2") or m.group("k3") or m.group("k4")) else 1)
         add("cap_usd", "", f"{size:.0f}", m.group(0))
     if (m := last(_MAX_LOSS)) is not None:
         add("max_loss", "", str(float(m.group(1) or m.group(2) or m.group(3) or m.group(4)

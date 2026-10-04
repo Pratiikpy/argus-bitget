@@ -1581,7 +1581,11 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
         "Ask \"what is the BTC price now\" here for Bitget's own live bid, ask and spread.")),
     # "how do i even read the 24h change number on the app" was read as an unknown ticker symbol
     # — a basic UI-literacy question, never answered (a first-time user, round 35)
-    (re.compile(r"\b24\s*[-\s]?h(?:our)?\s+change\b|\b24-?hour\s+change\b", re.I), (
+    # only how to read it: "SOL, XRP and DOGE: last price and 24h change, as a table" asks for
+    # the figures and got this explainer (a live re-ask, round 35)
+    (re.compile(r"\b(?:read|mean|means|meaning|understand|what\s+(?:is|does|'s)\s+(?:the|that|"
+                r"this)?)\b[^?]{0,40}\b24\s*[-\s]?h(?:our)?\s+change\b|\b24\s*[-\s]?h(?:our)?\s+"
+                r"change\b[^?]{0,30}\b(?:mean|means|meaning|tell\s+me)\b", re.I), (
         "Bottom line: the 24h change is how much the price has moved over the last 24 hours, "
         "shown as a percentage. A plus number (often shown in green) means it is higher now "
         "than 24 hours ago; a minus number (often red) means it is lower.",

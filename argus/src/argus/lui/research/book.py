@@ -80,8 +80,17 @@ def _risk_free(start: Any, end: Any) -> float | None:
     try:
         rows = fred_series("DGS3MO", days=(datetime.now(UTC).date() - start).days + 10)
     except Exception:
-        return None
+        rows = []
     inside = [v for d, v in rows if start <= d <= end]
+    if not inside:
+        # FRED did not answer on the hosted console (a live re-ask, round 35): the 13-week bill's
+        # yield as Yahoo carries it (^IRX), the same rate to within a few basis points
+        from argus.market.equity_history import daily
+
+        try:
+            inside = [d.close for d in daily("^IRX") if start <= d.day <= end]
+        except Exception:
+            inside = []
     return sum(inside) / len(inside) / 100 if inside else None
 
 
@@ -148,7 +157,8 @@ def _book_history_lines(book: Mapping[str, float], cash: float,
             + "; ".join(figures[k] for k in order)
             + f"; volatility {vol:.0%} a year.")
     note = (("The Sharpe ratio takes the average 3-month T-bill yield over the window (FRED "
-             "DGS3MO) off the annualised mean daily return, over the annualised volatility"
+             "DGS3MO, or Yahoo's ^IRX when FRED does not answer) off the annualised mean daily "
+             "return, over the annualised volatility"
              if excess is not None else
              "The Sharpe ratio here is return over volatility with no risk-free rate taken off — "
              "FRED's T-bill series did not answer")

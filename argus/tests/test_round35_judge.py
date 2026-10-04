@@ -247,3 +247,34 @@ class TestHoldingsSaid:
             {s: 1 / len(held["holdings_units"]) for s in held["holdings_units"]}, []))
         held = memory.get(memory.extract("my holdings: 3 BTC and 20 ETH"), "book")
         assert held is not None and held.text == "my holdings: 3 BTC and 20 ETH"
+
+
+class TestLiveReAskRound35:
+    def test_dont_let_me_open_is_a_limit(self) -> None:
+        facts = memory.extract("My portfolio: $60k BTC, $30k ETH, $10k AAPL. Don't let me open "
+                               "any single position bigger than $15k without flagging it.")
+        cap = memory.get(facts, "cap_usd")
+        assert cap is not None and cap.value == "15000"
+
+    def test_a_price_table_is_not_the_24h_explainer(self) -> None:
+        from argus.lui import newcomer
+
+        assert newcomer.reply("SOL, XRP and DOGE: last price and 24h change, as a table",
+                              named=True) is None
+        assert newcomer.reply("how do i even read the 24h change number on the app") is not None
+
+    def test_the_t_bill_falls_back_to_yahoo(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui.research import book as book_engine
+        from argus.market import equity_history, skill_mirror
+
+        def no_fred(*a: Any, **k: Any) -> Any:
+            raise OSError("FRED did not answer")
+
+        class Day:
+            def __init__(self, day: date, close: float) -> None:
+                self.day, self.close = day, close
+
+        monkeypatch.setattr(skill_mirror, "fred_series", no_fred)
+        monkeypatch.setattr(equity_history, "daily",
+                            lambda t: [Day(date(2026, 1, 2), 4.0), Day(date(2026, 1, 5), 3.0)])
+        assert book_engine._risk_free(date(2026, 1, 1), date(2026, 2, 1)) == pytest.approx(0.035)
