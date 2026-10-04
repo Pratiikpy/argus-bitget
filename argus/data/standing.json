@@ -5586,13 +5586,7 @@
     "reproducibility_proven",
     "no_specialist_capability_superior"
   ],
-  "transitions_this_write": [
-    {
-      "capability": "Backtest critic, eight checks with quoted lines, vs. backtest-truth's static linter",
-      "from": null,
-      "to": "tied"
-    }
-  ],
+  "transitions_this_write": [],
   "transition_log": [
     {
       "capability": "Deliberation priced as a trading cost",

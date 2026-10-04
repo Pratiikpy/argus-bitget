@@ -175,6 +175,10 @@ class TestTheAskEndpoint:
         # "why did you do nothing all weekend" until 2026-09-27; that answer moves back at most
         # eight weekends to find a decision, so it failed CI on a Saturday morning and would have
         # failed on every clone once the shipped record was two months old (audit, 2026-09-26).
+        # The budget is the steady-state latency. The first question a fresh server answers also
+        # pays one-time loading (the ledger, the routers), which overran the budget twice under
+        # a loaded machine (2026-10-04, 2026-10-05) while passing alone: warm once, then measure.
+        _ask(base_url, "how many decisions are on record")
         payload = _ask(base_url, "how many decisions are on record")
         assert payload["refused"] is False
         assert payload["lines"]

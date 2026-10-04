@@ -5281,6 +5281,13 @@ def _handle_ask(
     # identifiers as tickers (build-list 3.2): "LEAKY and BT are not listed on Bitget" was the
     # answer to a pasted backtest until it ran first
     critique = backtest_critic.lines(text)
+    if critique is None:
+        # "backtest buying BTC when RSI drops below 30" got today's RSI (2026-10-05), and on the
+        # live console the planner read "backtest it" as a premise to check: a rule in plain words
+        # is run as a backtest, with fees, out of sample and by regime, before either reads it
+        from argus.lui.research import rule_test
+
+        critique = rule_test.lines(text)
     if critique is not None:
         critic_payload = engine_payload_like(critique, prior, text[:500], by="research")
         critic_payload["memory"] = memory
