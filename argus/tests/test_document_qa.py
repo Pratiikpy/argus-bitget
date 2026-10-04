@@ -244,8 +244,12 @@ def test_lines_and_sources_number_cited_passages_and_keep_retrieved_apart() -> N
     out = dq.enforce("q", f"Gross margin was 75.0% ({a.id}).", [a, b])
     assert out.lines == ["Gross margin was 75.0%.[1]"]
     assert all(isinstance(s, Source) and s.kind == "evidence" for s in out.sources)
-    assert out.sources[0].ref.endswith(f"#{a.id}") and out.sources[0].detail.startswith("[1]")
-    assert [s.ref for s in out.retrieved_sources] == [f"{b.doc.url}#{b.id}"]
+    # the link opens the filing at the passage (a text fragment); the id stays in the detail
+    fragment = dq.text_fragment(a.text)
+    assert out.sources[0].ref == f"{a.doc.url}#{fragment or a.id}"
+    assert a.id in out.sources[0].detail and out.sources[0].detail.startswith("[1]")
+    assert [s.ref for s in out.retrieved_sources] == [
+        f"{b.doc.url}#{dq.text_fragment(b.text) or b.id}"]
     blob = out.as_dict()
     assert blob["cited"] == [a.id] and blob["merely_retrieved"] == [b.id]
 
@@ -383,3 +387,10 @@ def test_full_eval_runs_on_the_frozen_corpus_with_a_scripted_model(tmp_path: Pat
     assert enforced["uncited"] == 0
     assert report["audit_model"]["paper-qa rule"]["uncited"] >= 1
     assert set(report["retrieval"]) == {f"k={k},lambda={lam}" for k in ev.KS for lam in ev.LAMBDAS}
+
+
+def test_a_text_fragment_names_a_plain_run_of_the_passage() -> None:
+    said = dq.text_fragment("Apple Inc. (the Company) today announced financial results for its "
+                            "fiscal 2026 third quarter ended June 27, 2026.")
+    assert said == ":~:text=today%20announced%20financial%20results%20for%20its%20fiscal"
+    assert dq.text_fragment("$94.0 | 12.3 | 45.6") is None

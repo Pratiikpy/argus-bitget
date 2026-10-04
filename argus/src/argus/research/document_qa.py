@@ -93,6 +93,7 @@ from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass, field
 from datetime import date
 from typing import Any
+from urllib.parse import quote
 
 from argus.llm.base import ChatModel
 from argus.llm.qwen import Thinking
@@ -717,10 +718,27 @@ class DocumentAnswer:
         }
 
 
+def text_fragment(text: str, words: int = 8) -> str | None:
+    """A URL text fragment (``:~:text=``) for the first plain run of words in ``text``, so the
+    link opens the filing scrolled to the cited passage and highlighted (Chrome, Edge, Safari;
+    other browsers open the document at the top). The chunk's ``dqa-`` id is ARGUS's own and is not
+    an anchor in the SEC's HTML: a link ending ``#dqa-dca27fd2`` opened the filing at its top,
+    the passage nowhere in sight (a citation check of the live console, 2026-10-04). The run is
+    taken from inside one sentence and away from table figures, which a page may lay out with
+    different spacing than the extracted text."""
+    flat = re.sub(r"\s+", " ", text)
+    run = re.search(r"[A-Za-z][A-Za-z,'\u2019 ]{30,}", flat)
+    if run is None:
+        return None
+    picked = " ".join(run.group(0).replace(",", " ").split()[:words])
+    return f":~:text={quote(picked, safe='')}" if len(picked.split()) >= 4 else None
+
+
 def _source(c: Chunk, n: int, *, cited: bool) -> Source:
     snippet = re.sub(r"\s+", " ", c.text)[:160]
     marker = f"[{n}] " if cited else "retrieved, not cited · "
-    return Source(kind="evidence", ref=f"{c.doc.url}#{c.id}",
+    fragment = text_fragment(c.text)
+    return Source(kind="evidence", ref=f"{c.doc.url}#{fragment or c.id}",
                   detail=f"{marker}{c.doc.label} · {c.id} · “{snippet}…”")
 
 

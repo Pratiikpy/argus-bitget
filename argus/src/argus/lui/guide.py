@@ -138,8 +138,7 @@ def briefing(book: dict[str, float]) -> tuple[list[str], list[Any], str | None] 
            if own is not None else
            f"it moved most ({move:+.2f}%)" if move is not None else "it is the largest holding")
     lead = (f"Bottom line: the thread to pull in your book today is {_t(focus)} — {why}. Each "
-            f"holding's move, the news on it and where the risk sits are below; step 2 tests a "
-            f"view on {_t(focus)}.")
+            f"holding's move, the news on it and where the risk sits are below.")
     out = [lead, *rows]
     if sits:
         out.append(sits)

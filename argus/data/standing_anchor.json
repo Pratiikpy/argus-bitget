@@ -283,5 +283,24 @@
       "owned": 6
     },
     "verify": "drop transitions_this_write and transition_log from data/standing.json, hash the rest as canonical JSON (sorted keys, no whitespace) with SHA-256, and check the .ots proofs in data/anchors/ with the OpenTimestamps client"
+  },
+  {
+    "digest": "6634380f8b1c3ac80f1b5ab11a62731e2eb00fff08b77a9cc451a5301b8fd9c8",
+    "at": "2026-10-04T18:30:11+00:00",
+    "anchored": true,
+    "calendars": [
+      "https://a.pool.opentimestamps.org",
+      "https://b.pool.opentimestamps.org",
+      "https://alice.btc.calendar.opentimestamps.org",
+      "https://finney.calendar.eternitywall.com"
+    ],
+    "failures": [],
+    "by_state": {
+      "lost": 7,
+      "tied": 35,
+      "implemented": 0,
+      "owned": 6
+    },
+    "verify": "drop transitions_this_write and transition_log from data/standing.json, hash the rest as canonical JSON (sorted keys, no whitespace) with SHA-256, and check the .ots proofs in data/anchors/ with the OpenTimestamps client"
   }
 ]

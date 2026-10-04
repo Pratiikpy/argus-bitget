@@ -5211,11 +5211,90 @@
         "reproducibility_proven"
       ],
       "conditions_unproven": []
+    },
+    {
+      "name": "Backtest critic, eight checks with quoted lines, vs. backtest-truth's static linter",
+      "subtheme": "t1-validation",
+      "module": "argus/research/backtest_critic.py,argus/eval/backtest_critic_comparison.py,argus/lui/server.py",
+      "state": "tied",
+      "baseline": "MrMaca11an/backtest-truth (MIT), its static AST checks (backtest_truth/ast_checks.py check_source) run from its clone on identical code",
+      "conditions_met": [
+        "best_implementation_studied",
+        "implementation_complete",
+        "same_input_comparison",
+        "failure_cases_documented"
+      ],
+      "conditions_missing": [
+        "best_method_studied",
+        "statistically_valid_evaluation",
+        "costs_included",
+        "out_of_sample_test",
+        "ablation",
+        "adversarial_test",
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [
+        {
+          "condition": "best_implementation_studied",
+          "how": "backtest-truth read at source: backtest_truth/ast_checks.py:40-95 (the rules taken), rules.py:59 (BT006 listed, not implemented); freqtrade optimize/analysis/lookahead.py read for the dynamic method",
+          "artefact": "data/backtest_critic_comparison.json",
+          "test": ""
+        },
+        {
+          "condition": "baseline_reproduced",
+          "how": "backtest-truth's check_source run from its clone on every fixture and independent script",
+          "artefact": "data/backtest_critic_comparison.json",
+          "test": ""
+        },
+        {
+          "condition": "same_input_comparison",
+          "how": "both tools on the same 21 fixtures (17 planted bugs, 4 clean) and the same 16 independent scripts, each independent flag scored by reading the line",
+          "artefact": "data/backtest_critic_comparison.json",
+          "test": ""
+        },
+        {
+          "condition": "implementation_complete",
+          "how": "the console reads a pasted strategy first, before its lines are flattened",
+          "artefact": "",
+          "test": "test_backtest_critic.py::test_the_console_reads_a_pasted_backtest_first"
+        },
+        {
+          "condition": "failure_cases_documented",
+          "how": "the five false alarms found on independent code (counts, chart resamples, a today end date, a ta library read as Pine, a constant comparison) each kept as a test",
+          "artefact": "",
+          "test": "test_backtest_critic.py::TestRealCodeFalseAlarms::test_a_count_is_not_a_level"
+        },
+        {
+          "condition": "reproducibility_proven",
+          "how": "python -m argus.eval.backtest_critic_comparison regenerates the artefact from the clones",
+          "artefact": "data/backtest_critic_comparison.json",
+          "test": ""
+        }
+      ],
+      "blockers": [
+        "TIED on the kinds both tools cover. backtest-truth has static rules for look-ahead and (in its catalogue only) same-bar fills; on the eight planted look-ahead and fill bugs ARGUS names 8 and backtest-truth 5, and on four clean files backtest-truth raises one false alarm and ARGUS none: four discordant cases, all ARGUS's way, p = 0.125 on an exact sign test. The other nine planted bugs are kinds backtest-truth has no static rule for, so they are coverage, not a head-to-head.",
+        "The 21 fixtures were written by the author of the critic, knowing its rules. The independent check is marketcalls' 16 vectorbt scripts: ARGUS raised 13 flags, all real back-fills read by hand; backtest-truth raised 23, all counts or summary statistics. Flags within a file are not independent trials, so no p-value is claimed for it.",
+        "Static only. A dynamic test \u2014 signals on the full series against a truncated one, freqtrade's lookahead-analysis (GPL, method) \u2014 catches leaks no pattern names, and needs the code run; the hosted console does not run pasted code."
+      ],
+      "note": "",
+      "measured_outcomes": [],
+      "conditions_claimed": [
+        "best_implementation_studied",
+        "baseline_reproduced",
+        "implementation_complete",
+        "same_input_comparison",
+        "failure_cases_documented",
+        "reproducibility_proven"
+      ],
+      "conditions_unproven": [
+        "baseline_reproduced",
+        "reproducibility_proven"
+      ]
     }
   ],
   "by_state": {
     "lost": 7,
-    "tied": 34,
+    "tied": 35,
     "implemented": 0,
     "owned": 6
   },
@@ -5479,6 +5558,16 @@
       "capability": "Trader memory across sessions (what the trader says about themselves) vs. mem0",
       "problem": "out_of_sample_test is claimed but not evidenced",
       "detail": "no groupwise check has run on its artefacts: data/memory_comparison.json: not in the audit"
+    },
+    {
+      "capability": "Backtest critic, eight checks with quoted lines, vs. backtest-truth's static linter",
+      "problem": "baseline_reproduced is claimed but not evidenced",
+      "detail": "data/backtest_critic_comparison.json records nothing about baseline_reproduced: no key among baseline, reference, parity, agreement, expected, divergence..."
+    },
+    {
+      "capability": "Backtest critic, eight checks with quoted lines, vs. backtest-truth's static linter",
+      "problem": "reproducibility_proven is claimed but not evidenced",
+      "detail": "data/backtest_critic_comparison.json records nothing about reproducibility_proven: no key among reproducibility, reproducible, deterministic, identical, seed, seeds..."
     }
   ],
   "clean": false,
@@ -5497,7 +5586,13 @@
     "reproducibility_proven",
     "no_specialist_capability_superior"
   ],
-  "transitions_this_write": [],
+  "transitions_this_write": [
+    {
+      "capability": "Backtest critic, eight checks with quoted lines, vs. backtest-truth's static linter",
+      "from": null,
+      "to": "tied"
+    }
+  ],
   "transition_log": [
     {
       "capability": "Deliberation priced as a trading cost",
@@ -5834,6 +5929,12 @@
       "from": null,
       "to": "tied",
       "at": "2026-10-04T10:10:28+00:00"
+    },
+    {
+      "capability": "Backtest critic, eight checks with quoted lines, vs. backtest-truth's static linter",
+      "from": null,
+      "to": "tied",
+      "at": "2026-10-04T18:30:02+00:00"
     }
   ]
 }

@@ -65,7 +65,9 @@ HELP = (
     "/book — show them · /memory — what you told the desk · /clear — forget this chat's "
     "history, book, memory and watches\n"
     "/watch NVDA below 170 · /watch BTC above 100000 · /watch MSTR funding 0.05% — a message "
-    "when it trades there · /watches — list them · /unwatch 1 — remove one"
+    "when it trades there · /watches — list them · /unwatch 1 — remove one\n"
+    "/brief — a briefing on your saved book now · /brief daily — before the US open and after "
+    "the close, every weekday · /brief off"
 )
 
 
@@ -237,7 +239,7 @@ def format_answer(payload: dict[str, Any], question: str, book: str,
 
 def handle_update(update: dict[str, Any], states: dict[int, ChatState], *,
                   ask: Ask = _default_ask, now: float | None = None,
-                  watches: Any = None) -> list[tuple[int, str]]:
+                  watches: Any = None, briefs: Any = None) -> list[tuple[int, str]]:
     """Replies for one update, as (chat_id, html_text) pairs. Updates that are not a text message
     from a chat (edits, joins, stickers) get no reply. ``watches`` is the always-on bot's
     `lui/watch.WatchStore`; the webhook passes none, because nothing there outlives a call."""
@@ -268,7 +270,14 @@ def handle_update(update: dict[str, Any], states: dict[int, ChatState], *,
                               f"in this chat now use it.")]
         return [(chat_id, f"Your saved book: {html.escape(state.book)}." if state.book else
                  "No book saved. Send, for example: /book 40% NVDA, 30% MSFT, 30% AAPL")]
-    if command == "/memory":
+    if command == "/brief":
+        # `lui/briefs.py`, build-list 4.9: "/brief" asks for the briefing now; "/brief daily"
+        # subscribes this chat to it before the open and after the close
+        said = _brief_command(rest, chat_id, state, briefs)
+        if said is not None:
+            return [(chat_id, said)]
+        text = BRIEF_QUESTION
+    elif command == "/memory":
         from argus.lui import memory as mem
 
         facts = mem.parse(state.memory)
@@ -276,9 +285,10 @@ def handle_update(update: dict[str, Any], states: dict[int, ChatState], *,
             f"\u201c{html.escape(f.text)}\u201d ({f.at})" for f in facts) + ". /clear forgets it."
             if facts else "Nothing remembered yet. Tell me, for example: I can't lose more "
                           "than 10%, or I'm a swing trader.")]
-    if command.startswith("/"):
+    if command.startswith("/") and command != "/brief":
         return [(chat_id, "I only know /start, /help, /book, /memory, /watch, /watches, "
-                          "/unwatch and /clear — anything else, just ask it as a question.")]
+                          "/unwatch, /brief and /clear — anything else, just ask it as a "
+                          "question.")]
     state.asked_at = [t for t in state.asked_at if clock - t < 3600.0]
     if len(state.asked_at) >= HOURLY_LIMIT:
         return [(chat_id, f"That is {HOURLY_LIMIT} questions this hour from this chat, the same "
@@ -297,6 +307,59 @@ def handle_update(update: dict[str, Any], states: dict[int, ChatState], *,
     if payload.get("translate"):
         PENDING[chat_id] = (payload, text[:500], state.book)
     return [(chat_id, part) for part in split_message(format_answer(payload, text, state.book))]
+
+
+BRIEF_QUESTION = "Brief me on my book: what moved each holding, and what's in the news?"
+
+
+def _brief_command(rest: str, chat_id: int, state: ChatState, briefs: Any) -> str | None:
+    """The reply to /brief with an argument; None for a bare /brief, which is asked as the
+    briefing question itself."""
+    from argus.lui import briefs as schedule
+
+    if not rest.strip():
+        if not state.book:
+            return ("A brief is about your saved book, and none is saved yet. Send, for example: "
+                    "/book 40% NVDA, 30% MSFT, 30% AAPL — then /brief.")
+        return None
+    if briefs is None:
+        return ("Scheduled briefs need the always-on bot: this one answers through short-lived "
+                "calls that keep nothing between messages, so a schedule set here could never "
+                "send. /brief on its own gives you the briefing now.")
+    if rest.strip().lower() in ("off", "stop", "unsubscribe", "cancel"):
+        return ("Scheduled briefs stopped." if briefs.unsubscribe(chat_id) else
+                "No scheduled brief was set. /brief daily sets one.")
+    slots = schedule.parse_slots(rest)
+    if slots is None:
+        return "Say /brief daily, /brief premarket, /brief close or /brief off."
+    sub = briefs.subscribe(chat_id, slots)
+    return (f"Briefs on your saved book will come at {schedule.describe(sub)}, on US weekdays. "
+            + ("" if state.book else "Save a book first with /book, or the brief will ask for "
+                                     "one. ")
+            + "/brief off stops them.")
+
+
+def _send_briefs(token: str, briefs: Any, states: dict[int, ChatState], chats: Any,
+                 ask: Ask) -> None:  # pragma: no cover - network
+    """One pass of `lui/briefs.send_due`: each due brief asked through the console and sent."""
+    from datetime import UTC, datetime
+
+    from argus.lui import briefs as schedule
+
+    def book_of(chat_id: int) -> str:
+        hydrate(states, chat_id, chats)
+        return (states.get(chat_id) or ChatState()).book
+
+    def brief_of(chat_id: int, book: str, label: str) -> str:
+        payload = ask(BRIEF_QUESTION, [], visitor=f"tg-{chat_id}", book=book)
+        return f"<b>{label}</b>\n" + format_answer(payload, BRIEF_QUESTION, book)
+
+    def deliver(chat_id: int, text: str) -> None:
+        for part in split_message(text):
+            send(token, chat_id, part)
+
+    schedule.send_due(briefs, datetime.now(UTC), book_of=book_of, brief_of=brief_of,
+                      deliver=deliver)
 
 
 def _watch_command(command: str, rest: str, chat_id: int, watches: Any) -> str:
@@ -543,6 +606,7 @@ def poll(token: str, *, ask: Ask = _default_ask) -> None:  # pragma: no cover - 
     holds for a human to the registered reviewers and records their taps. A half-configured setup,
     or one without ``ARGUS_PAUSE_REVIEWERS``, refuses to start rather than run open."""
     from argus.decision.pause import PauseStore
+    from argus.lui.briefs import BriefStore
     from argus.lui.chat_store import from_env
     from argus.lui.pause_bot import Approvals
     from argus.lui.watch import SWEEP_SECONDS, WatchStore
@@ -553,6 +617,7 @@ def poll(token: str, *, ask: Ask = _default_ask) -> None:  # pragma: no cover - 
     _call(token, "deleteWebhook", {"drop_pending_updates": False})
     states: dict[int, ChatState] = {}
     store = WatchStore()
+    briefs = BriefStore()
     chats = from_env(remote=False)
     swept = 0.0
     offset = 0
@@ -560,6 +625,7 @@ def poll(token: str, *, ask: Ask = _default_ask) -> None:  # pragma: no cover - 
         if time.monotonic() - swept >= SWEEP_SECONDS:
             swept = time.monotonic()
             _sweep_watches(token, store)
+            _send_briefs(token, briefs, states, chats, ask)
         if approvals and pauses:
             announce_pauses(token, pauses, approvals)
         try:
@@ -579,7 +645,7 @@ def poll(token: str, *, ask: Ask = _default_ask) -> None:  # pragma: no cover - 
             if isinstance(chat, int):
                 hydrate(states, chat, chats)
                 recall_book(token, chat, states)
-            replies = handle_update(update, states, ask=ask, watches=store)
+            replies = handle_update(update, states, ask=ask, watches=store, briefs=briefs)
             if isinstance(chat, int):
                 persist(states, chat, chats)
             for chat_id, text in replies:

@@ -1,0 +1,71 @@
+name = "Backtest critic, eight checks with quoted lines, vs. backtest-truth's static linter"
+subtheme = "t1-validation"
+modules = [
+    "argus/research/backtest_critic.py",
+    "argus/eval/backtest_critic_comparison.py",
+    "argus/lui/server.py",
+]
+# Added 2026-10-04 (build list item 3.2). backtest-truth was read first and its look-ahead rules
+# taken (MIT); the critic adds same-bar fills, costs, survivorship, repainting (Python and Pine),
+# parameter fitting without a split, regime coverage and data alignment. Run on the same 21
+# fixtures and on 16 independent vectorbt scripts; five false alarms of its own were found on the
+# independent scripts and fixed before the numbers below were taken.
+state = "tied"
+baseline = """\
+    MrMaca11an/backtest-truth (MIT), its static AST checks (backtest_truth/ast_checks.py \
+    check_source) run from its clone on identical code"""
+blockers = [
+    """\
+        TIED on the kinds both tools cover. backtest-truth has static rules for look-ahead and \
+        (in its catalogue only) same-bar fills; on the eight planted look-ahead and fill bugs \
+        ARGUS names 8 and backtest-truth 5, and on four clean files backtest-truth raises one \
+        false alarm and ARGUS none: four discordant cases, all ARGUS's way, p = 0.125 on an \
+        exact sign test. The other nine planted bugs are kinds backtest-truth has no static rule \
+        for, so they are coverage, not a head-to-head.""",
+    """\
+        The 21 fixtures were written by the author of the critic, knowing its rules. The \
+        independent check is marketcalls' 16 vectorbt scripts: ARGUS raised 13 flags, all real \
+        back-fills read by hand; backtest-truth raised 23, all counts or summary statistics. \
+        Flags within a file are not independent trials, so no p-value is claimed for it.""",
+    """\
+        Static only. A dynamic test — signals on the full series against a truncated one, \
+        freqtrade's lookahead-analysis (GPL, method) — catches leaks no pattern names, and needs \
+        the code run; the hosted console does not run pasted code.""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    backtest-truth read at source: backtest_truth/ast_checks.py:40-95 (the rules taken), \
+    rules.py:59 (BT006 listed, not implemented); freqtrade optimize/analysis/lookahead.py read \
+    for the dynamic method"""
+artefact = "data/backtest_critic_comparison.json"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = "backtest-truth's check_source run from its clone on every fixture and independent script"
+artefact = "data/backtest_critic_comparison.json"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = """\
+    both tools on the same 21 fixtures (17 planted bugs, 4 clean) and the same 16 independent \
+    scripts, each independent flag scored by reading the line"""
+artefact = "data/backtest_critic_comparison.json"
+
+[[proofs]]
+condition = "implementation_complete"
+how = "the console reads a pasted strategy first, before its lines are flattened"
+test = "test_backtest_critic.py::test_the_console_reads_a_pasted_backtest_first"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    the five false alarms found on independent code (counts, chart resamples, a today end date, a \
+    ta library read as Pine, a constant comparison) each kept as a test"""
+test = "test_backtest_critic.py::TestRealCodeFalseAlarms::test_a_count_is_not_a_level"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = "python -m argus.eval.backtest_critic_comparison regenerates the artefact from the clones"
+artefact = "data/backtest_critic_comparison.json"

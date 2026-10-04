@@ -48,3 +48,20 @@ def test_each_untraced_figure_is_marked_where_it_stands(notes: Path) -> None:
 
 def test_a_figure_inside_a_longer_number_is_not_marked(notes: Path) -> None:
     assert answer.marked_thesis(7, "a 12.2% move and 137bps") == "a 12.2% move and 137bps"
+
+
+def test_a_scaled_figure_is_marked_after_its_scale(notes: Path) -> None:
+    path = notes
+    path.write_text(json.dumps({"seq": 9, "notes": [
+        "[grounding] 1 of 3 figure(s) do not resolve to anything the desk was given: 85"]}) + "\n",
+        encoding="utf-8")
+    assert answer.marked_thesis(9, "BTC above $85k on the proposal") == (
+        "BTC above $85k [not in the evidence] on the proposal")
+
+
+def test_evidence_behind_a_decision_is_the_desks_record() -> None:
+    from argus.lui import server
+
+    got = server.handle_ask("show me the evidence behind the latest MSTR decision", [])
+    assert got["classified_by"] != "research-task"
+    assert str(got["lines"][0]).startswith("Evidence behind seq")

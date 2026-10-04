@@ -1,12 +1,12 @@
 {
   "what": "Every distinct evidence item the live ARGUS desk has ever withheld, hand-audited.",
-  "how_recovered": "data/desk_notes.jsonl carries the quarantine note for every desk run; as of the 2026-09-20 audit, 16 of them reported a withholding naming 6 distinct evidence ids. The notes do not carry the item text, so each id was re-fetched from its own source on 2026-09-20 with the same CLIs market/evidence.py uses (`twitter tweet <id> --json`, `rdt read <id> --json`) and the claim string rebuilt exactly as TwitterSource/RedditSource build it (twitter: text[:280]; reddit: f'{title} \u2014 {selftext}' [:280]).",
+  "how_recovered": "data/desk_notes.jsonl carries the quarantine note for every desk run; as of the 2026-09-20 audit, 16 of them reported a withholding naming 6 distinct evidence ids. The notes do not carry the item text, so each id was re-fetched from its own source on 2026-09-20 with the same CLIs market/evidence.py uses (`twitter tweet <id> --json`, `rdt read <id> --json`) and the claim string rebuilt exactly as TwitterSource/RedditSource build it (twitter: text[:280]; reddit: f'{title} — {selftext}' [:280]).",
   "audited_by": "argus.eval.quarantine_comparison, 2026-09-20",
-  "verdict_summary": "6 of 6 are false positives. Withholding precision on the production record was 0.00.",
+  "verdict_summary": "7 of 7 are false positives.",
   "items": [
     {
       "id": "twitter-1519849720247513089",
-      "claim": "Yup, \u2066@elonmusk\u2069 has been selling  https://t.co/od67bHiOgA",
+      "claim": "Yup, ⁦@elonmusk⁩ has been selling  https://t.co/od67bHiOgA",
       "source": "social",
       "author": "wholemars",
       "subreddit": null,
@@ -18,7 +18,7 @@
     },
     {
       "id": "twitter-1669359921123700738",
-      "claim": "\ud83d\udd0a#Monsterra $MSTR Staking Competition Is LIVE\ud83d\udd25\n\n\ud83d\udc81\u200d\u2640\ufe0fStake $MSTR to win $7000 reward pool. It's your time $MSTR holders, stakers &amp; potentail owners.\n\n\u2705Venue: https://t.co/PIJrezuDxu\n\n\u23f0 15:00 UTC June.15th - July.6th\n\n\ud83d\udcccFull details: https://t.co/vbYAftlQ4M \n\nLike &amp; RT to WI",
+      "claim": "🔊#Monsterra $MSTR Staking Competition Is LIVE🔥\n\n💁‍♀️Stake $MSTR to win $7000 reward pool. It's your time $MSTR holders, stakers &amp; potentail owners.\n\n✅Venue: https://t.co/PIJrezuDxu\n\n⏰ 15:00 UTC June.15th - July.6th\n\n📌Full details: https://t.co/vbYAftlQ4M \n\nLike &amp; RT to WI",
       "source": "social",
       "author": "Monsterra_P2E",
       "subreddit": null,
@@ -30,7 +30,7 @@
     },
     {
       "id": "twitter-2100576431012991215",
-      "claim": "$QQQ IS GOING TO BE A BIG WIN, I WILL SPTP INTO THE POP! \ud83d\udc26\u200d\u2b1b",
+      "claim": "$QQQ IS GOING TO BE A BIG WIN, I WILL SPTP INTO THE POP! 🐦‍⬛",
       "source": "social",
       "author": "TheMarketRaven",
       "subreddit": null,
@@ -42,7 +42,7 @@
     },
     {
       "id": "twitter-1959968483552247870",
-      "claim": "No Gas Tokens\n\nOn most blockchains, you need to buy the native token just to pay fees (ETH, SOL, etc.). That\u2019s a huge friction point.\n\n-> XION uses Fee Abstraction so you can pay in any token (like USDC) or not pay at all \u2014 apps can cover your fees.\n\n-> Behind the scenes, XION co",
+      "claim": "No Gas Tokens\n\nOn most blockchains, you need to buy the native token just to pay fees (ETH, SOL, etc.). That’s a huge friction point.\n\n-> XION uses Fee Abstraction so you can pay in any token (like USDC) or not pay at all — apps can cover your fees.\n\n-> Behind the scenes, XION co",
       "source": "social",
       "author": "Pranshu_rana_",
       "subreddit": null,
@@ -66,7 +66,7 @@
     },
     {
       "id": "reddit-1wg69dq",
-      "claim": "is now a good time to buy TQQQ? \u2014 10% down this past month  \nBuy now or is it still a falling knife?",
+      "claim": "is now a good time to buy TQQQ? — 10% down this past month  \nBuy now or is it still a falling knife?",
       "source": "social",
       "author": "MetalSubstantial8224",
       "subreddit": "TQQQ",
@@ -75,7 +75,19 @@
       "withholding_desk_runs": 9,
       "verdict": "false_positive",
       "audit_reason": "Organic r/TQQQ question, score 15. 'Buy now or is it still a falling knife?' is the poster asking, not instructing."
+    },
+    {
+      "id": "twitter-2105697286496088284",
+      "claim": "📢 𝐉𝐔𝐒𝐓 𝐈𝐍: OpenAI Fires Three Safety Researchers For Data Breach - WSJ - $MSFT $NVDA $AMZN $META $GOOGL",
+      "source": "social",
+      "author": "",
+      "subreddit": null,
+      "created": "2026-10-01T16:32:09+00:00",
+      "withheld_as": "confusable_characters",
+      "withholding_desk_runs": 1,
+      "verdict": "false_positive",
+      "audit_reason": "'JUST IN' written in Unicode mathematical bold (U+1D409 and neighbours), the emphasis idiom of news accounts on X, before an ordinary headline (OpenAI safety researchers, WSJ). Styling, not a disguised word: NFKC folds each letter to its ASCII form. The confusable rule now skips styled letters and judges the folded text instead (2026-10-04); the author is not carried in the desk note."
     }
   ],
-  "denominator_note": "`desk_runs_total` and `withholding_notes` used to live here as a hand-typed snapshot, and it drifted three times in three days as the desk kept running (385 on 2026-09-20's audit, bumped to 433, then 445, then caught stale again at 481 by test_the_audit_file_agrees_with_the_desk_record_it_claims_to_summarise) \u2014 never because a new evidence item needed auditing, only because more ordinary runs had happened. Fixed 2026-09-22: argus.eval.quarantine_comparison.load_production_withholdings() now computes both fields live from data/desk_notes.jsonl on every call and raises if it finds a withheld evidence id not in `items` below, rather than silently folding an unaudited item into a bigger denominator. This file no longer stores either number \u2014 read them from the function's return value, not from here. The six items below remain exactly as hand-audited on 2026-09-20 and re-checked as still-complete on 2026-09-22 (481 runs, still 16 withholding notes, still these same 6 ids, still these same per-id counts)."
+  "denominator_note": "`desk_runs_total` and `withholding_notes` used to live here as a hand-typed snapshot, and it drifted three times in three days as the desk kept running (385 on 2026-09-20's audit, bumped to 433, then 445, then caught stale again at 481 by test_the_audit_file_agrees_with_the_desk_record_it_claims_to_summarise) — never because a new evidence item needed auditing, only because more ordinary runs had happened. Fixed 2026-09-22: argus.eval.quarantine_comparison.load_production_withholdings() now computes both fields live from data/desk_notes.jsonl on every call and raises if it finds a withheld evidence id not in `items` below, rather than silently folding an unaudited item into a bigger denominator. This file no longer stores either number — read them from the function's return value, not from here. The six items below remain exactly as hand-audited on 2026-09-20 and re-checked as still-complete on 2026-09-22 (481 runs, still 16 withholding notes, still these same 6 ids, still these same per-id counts)."
 }

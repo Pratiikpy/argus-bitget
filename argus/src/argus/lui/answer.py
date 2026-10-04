@@ -532,8 +532,13 @@ def marked_thesis(seq: int, thesis: str) -> str:
         derived = _worked_out(raw, thesis)
         mark = (f" [not in the evidence; worked out as {derived}]" if derived is not None
                 else UNTRACED)
-        marked = re.sub(rf"(?<![\w.]){re.escape(raw)}(?![\w.%]| \[not in the evidence)",
-                        (raw + mark).replace("\\", "\\\\"), marked)
+        # "$85k" is the figure "85" with its scale: the mark goes after the scale letter
+        pattern = rf"(?<![\w.]){re.escape(raw)}(?:[kKmMbB]n?)?(?![\w.%]| \[not in the evidence)"
+
+        def add(found: re.Match[str], mark: str = mark) -> str:
+            return found.group(0) + mark
+
+        marked = re.sub(pattern, add, marked)
     return marked
 
 

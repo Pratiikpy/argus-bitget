@@ -1,16 +1,16 @@
 {
-  "as_of": "2026-10-04T16:20:06.901295+00:00",
-  "refusals": 1065,
-  "refusals_with_a_gradeable_claim": 531,
+  "as_of": "2026-10-04T18:14:25.015266+00:00",
+  "refusals": 1075,
+  "refusals_with_a_gradeable_claim": 541,
   "hours_tolerance": 1.5,
   "round_trip_bps": 12.0,
   "base_clearance_about_2h": {
-    "cleared": 411,
-    "marks": 611
+    "cleared": 413,
+    "marks": 622
   },
   "by_claim": {
     "session_closed": {
-      "consistent": 420,
+      "consistent": 429,
       "contradicted": 0,
       "ungradeable": 0
     },
@@ -20,12 +20,12 @@
       "ungradeable": 0
     },
     "hours_to_discovery": {
-      "consistent": 400,
+      "consistent": 409,
       "contradicted": 0,
       "ungradeable": 0
     },
     "no_hedge": {
-      "consistent": 260,
+      "consistent": 265,
       "contradicted": 0,
       "ungradeable": 52
     },
@@ -35,28 +35,28 @@
       "ungradeable": 0
     },
     "moves_enough": {
-      "consistent": 83,
+      "consistent": 84,
       "contradicted": 40,
-      "ungradeable": 46
+      "ungradeable": 47
     },
     "move_too_small": {
       "consistent": 0,
-      "contradicted": 2,
-      "ungradeable": 4
+      "contradicted": 3,
+      "ungradeable": 3
     }
   },
   "forward_against_base": {
     "move_too_small": {
       "borne_out": 0,
-      "graded": 2,
-      "base_rate": 0.3273,
+      "graded": 3,
+      "base_rate": 0.336,
       "p_one_sided": 1.0
     },
     "moves_enough": {
-      "borne_out": 83,
-      "graded": 123,
-      "base_rate": 0.6727,
-      "p_one_sided": 0.5226
+      "borne_out": 84,
+      "graded": 124,
+      "base_rate": 0.664,
+      "p_one_sided": 0.4162
     }
   },
   "forward_claims": [
@@ -399,8 +399,16 @@
       "stated": "\u2026ere all weekend abstentions, and the binding constraint was direction, not size \u2014 nothing in today's evidence resolves that constraint.",
       "recorded": "next move -7.0bps over 1.90h against a 12bps round trip (refusal_marks.jsonl)",
       "verdict": "contradicted"
+    },
+    {
+      "seq": 1069,
+      "symbol": "MSTRUSDT",
+      "claim": "move_too_small",
+      "stated": "\u2026g long exposure over the weekend, but the premium itself is not large enough to clear the 18.8bps total hurdle on a short (the premium is 215bps\u2026",
+      "recorded": "next move -56.3bps over 1.99h against a 12bps round trip (refusal_marks.jsonl)",
+      "verdict": "contradicted"
     }
   ],
-  "verdict": "1065 refusal(s) on record; 531 carried at least one reason the record can check. Of 1083 decision-time reason(s) graded, 1083 agreed with the record and 0 contradicted it. `move_too_small` claims were borne out by the next ~2h move 0 of 2 time(s) (0%), against 33% for every ~2h refusal mark (one-sided exact binomial p = 1.00); no evidence the stated reason says more than the base rate does. `moves_enough` claims were borne out by the next ~2h move 83 of 123 time(s) (67%), against 67% for every ~2h refusal mark (one-sided exact binomial p = 0.52); no evidence the stated reason says more than the base rate does.",
+  "verdict": "1075 refusal(s) on record; 541 carried at least one reason the record can check. Of 1106 decision-time reason(s) graded, 1106 agreed with the record and 0 contradicted it. `move_too_small` claims were borne out by the next ~2h move 0 of 3 time(s) (0%), against 34% for every ~2h refusal mark (one-sided exact binomial p = 1.00); no evidence the stated reason says more than the base rate does. `moves_enough` claims were borne out by the next ~2h move 84 of 124 time(s) (68%), against 66% for every ~2h refusal mark (one-sided exact binomial p = 0.42); no evidence the stated reason says more than the base rate does.",
   "method": "Each checkable reason in a no_trade thesis is matched by a fixed pattern and set beside the record: session_phase and hours_to_discovery from the ledger, the desk's own hedge-menu note, the risk ruling, and the next ~2h mark for claims about the size of the coming move. Question and binary verdict from VisualWebArena's llm_ua_match (evaluation_harness/helper_functions.py:610-642, MIT); graded here by the record, not by a model."
 }

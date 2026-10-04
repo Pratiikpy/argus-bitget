@@ -1,41 +1,41 @@
 {
   "symbol": "MSTRUSDT",
   "phase": "weekend",
-  "started_at": "2026-10-04T15:30:05.856579+00:00",
+  "started_at": "2026-10-04T17:30:11.169406+00:00",
   "window_seconds": 90,
   "samples": 68,
-  "prints_seen": 29,
-  "rpi_share": 0.1379,
+  "prints_seen": 22,
+  "rpi_share": 0.0909,
   "maker_bps": 2.0,
   "markouts": [
     {
       "horizon_seconds": 5,
-      "prints": 27,
-      "median_bps": 0.0,
-      "mean_bps": -0.0906,
-      "worst_bps": -1.2232
+      "prints": 22,
+      "median_bps": -0.0,
+      "mean_bps": 0.0418,
+      "worst_bps": -3.0657
     },
     {
       "horizon_seconds": 15,
-      "prints": 19,
-      "median_bps": 0.3058,
-      "mean_bps": 0.3058,
-      "worst_bps": -2.4464
+      "prints": 21,
+      "median_bps": -0.0,
+      "mean_bps": -0.3358,
+      "worst_bps": -5.5183
     },
     {
       "horizon_seconds": 30,
-      "prints": 8,
-      "median_bps": -0.4587,
-      "mean_bps": -0.4204,
-      "worst_bps": -1.2231
+      "prints": 13,
+      "median_bps": 6.131,
+      "mean_bps": 2.9947,
+      "worst_bps": -6.131
     },
     {
       "horizon_seconds": 60,
-      "prints": 0,
-      "median_bps": 0.0,
-      "mean_bps": 0.0,
-      "worst_bps": 0.0
+      "prints": 2,
+      "median_bps": 0.9198,
+      "mean_bps": 0.9198,
+      "worst_bps": -0.6132
     }
   ],
-  "verdict": "Over 5s the passive side of 27 print(s) gained a median +0.00bps on MSTRUSDT (weekend). No measurable adverse selection in this window \u2014 which is a statement about 90 seconds, not about the instrument"
+  "verdict": "Over 15s the passive side of 21 print(s) gained a median -0.00bps on MSTRUSDT (weekend). No measurable adverse selection in this window \u2014 which is a statement about 90 seconds, not about the instrument"
 }

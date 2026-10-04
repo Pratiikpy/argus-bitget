@@ -183,3 +183,5 @@ class TestConsole:
     def test_the_page_carries_the_guide(self) -> None:
         assert 'id="guide-go"' in server.PAGE and "gnext" in server.PAGE
         assert "Your research, in" in server.PAGE
+        # build-list 4.8: an answer can be pinned and is asked again on every visit
+        assert "argus.pins" in server.PAGE and 'class="pinb"' in server.PAGE

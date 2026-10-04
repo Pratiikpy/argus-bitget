@@ -1,0 +1,609 @@
+{
+ "fixtures": 21,
+ "planted": 17,
+ "clean": 4,
+ "argus_caught": 17,
+ "argus_false_alarm_fixtures": 0,
+ "rival_caught": 5,
+ "rival_kinds_covered": [
+  "fills",
+  "look-ahead"
+ ],
+ "rival_caught_on_kinds_it_covers": "5 of 8",
+ "argus_caught_on_same": "8 of 8",
+ "rival_false_alarm_fixtures": 1,
+ "rows": [
+  {
+   "fixture": "negative shift",
+   "planted": "look-ahead",
+   "argus_flags": [
+    "look-ahead"
+   ],
+   "argus_caught": true,
+   "argus_false_alarms": [],
+   "rival_flags": [
+    "look-ahead"
+   ],
+   "rival_covers": true,
+   "rival_caught": true,
+   "rival_false_alarms": []
+  },
+  {
+   "fixture": "centred window",
+   "planted": "look-ahead",
+   "argus_flags": [
+    "look-ahead"
+   ],
+   "argus_caught": true,
+   "argus_false_alarms": [],
+   "rival_flags": [
+    "look-ahead"
+   ],
+   "rival_covers": true,
+   "rival_caught": true,
+   "rival_false_alarms": []
+  },
+  {
+   "fixture": "whole-series threshold",
+   "planted": "look-ahead",
+   "argus_flags": [
+    "look-ahead"
+   ],
+   "argus_caught": true,
+   "argus_false_alarms": [],
+   "rival_flags": [
+    "look-ahead"
+   ],
+   "rival_covers": true,
+   "rival_caught": true,
+   "rival_false_alarms": []
+  },
+  {
+   "fixture": "back-fill",
+   "planted": "look-ahead",
+   "argus_flags": [
+    "look-ahead"
+   ],
+   "argus_caught": true,
+   "argus_false_alarms": [],
+   "rival_flags": [],
+   "rival_covers": true,
+   "rival_caught": false,
+   "rival_false_alarms": []
+  },
+  {
+   "fixture": "shuffled split",
+   "planted": "look-ahead",
+   "argus_flags": [
+    "look-ahead"
+   ],
+   "argus_caught": true,
+   "argus_false_alarms": [],
+   "rival_flags": [
+    "look-ahead"
+   ],
+   "rival_covers": true,
+   "rival_caught": true,
+   "rival_false_alarms": []
+  },
+  {
+   "fixture": "future index",
+   "planted": "look-ahead",
+   "argus_flags": [
+    "look-ahead"
+   ],
+   "argus_caught": true,
+   "argus_false_alarms": [],
+   "rival_flags": [
+    "look-ahead"
+   ],
+   "rival_covers": true,
+   "rival_caught": true,
+   "rival_false_alarms": []
+  },
+  {
+   "fixture": "survivorship",
+   "planted": "survivorship",
+   "argus_flags": [
+    "survivorship"
+   ],
+   "argus_caught": true,
+   "argus_false_alarms": [],
+   "rival_flags": [],
+   "rival_covers": false,
+   "rival_caught": false,
+   "rival_false_alarms": []
+  },
+  {
+   "fixture": "resampled join",
+   "planted": "repainting",
+   "argus_flags": [
+    "repainting"
+   ],
+   "argus_caught": true,
+   "argus_false_alarms": [],
+   "rival_flags": [],
+   "rival_covers": false,
+   "rival_caught": false,
+   "rival_false_alarms": []
+  },
+  {
+   "fixture": "no costs",
+   "planted": "costs",
+   "argus_flags": [
+    "costs"
+   ],
+   "argus_caught": true,
+   "argus_false_alarms": [],
+   "rival_flags": [],
+   "rival_covers": false,
+   "rival_caught": false,
+   "rival_false_alarms": []
+  },
+  {
+   "fixture": "same-bar fill",
+   "planted": "fills",
+   "argus_flags": [
+    "fills"
+   ],
+   "argus_caught": true,
+   "argus_false_alarms": [],
+   "rival_flags": [],
+   "rival_covers": true,
+   "rival_caught": false,
+   "rival_false_alarms": []
+  },
+  {
+   "fixture": "trade on close",
+   "planted": "fills",
+   "argus_flags": [
+    "fills"
+   ],
+   "argus_caught": true,
+   "argus_false_alarms": [],
+   "rival_flags": [],
+   "rival_covers": true,
+   "rival_caught": false,
+   "rival_false_alarms": []
+  },
+  {
+   "fixture": "grid search, no split",
+   "planted": "parameter fitting",
+   "argus_flags": [
+    "parameter fitting"
+   ],
+   "argus_caught": true,
+   "argus_false_alarms": [],
+   "rival_flags": [
+    "look-ahead"
+   ],
+   "rival_covers": false,
+   "rival_caught": false,
+   "rival_false_alarms": []
+  },
+  {
+   "fixture": "one bull year",
+   "planted": "regime coverage",
+   "argus_flags": [
+    "regime coverage"
+   ],
+   "argus_caught": true,
+   "argus_false_alarms": [],
+   "rival_flags": [],
+   "rival_covers": false,
+   "rival_caught": false,
+   "rival_false_alarms": []
+  },
+  {
+   "fixture": "forward as-of join",
+   "planted": "data alignment",
+   "argus_flags": [
+    "data alignment"
+   ],
+   "argus_caught": true,
+   "argus_false_alarms": [],
+   "rival_flags": [],
+   "rival_covers": false,
+   "rival_caught": false,
+   "rival_false_alarms": []
+  },
+  {
+   "fixture": "pine lookahead_on",
+   "planted": "repainting",
+   "argus_flags": [
+    "repainting"
+   ],
+   "argus_caught": true,
+   "argus_false_alarms": [],
+   "rival_flags": "not run (not Python)",
+   "rival_covers": false,
+   "rival_caught": null,
+   "rival_false_alarms": []
+  },
+  {
+   "fixture": "pine no commission",
+   "planted": "costs",
+   "argus_flags": [
+    "costs"
+   ],
+   "argus_caught": true,
+   "argus_false_alarms": [],
+   "rival_flags": "not run (not Python)",
+   "rival_covers": false,
+   "rival_caught": null,
+   "rival_false_alarms": []
+  },
+  {
+   "fixture": "pine fill on close",
+   "planted": "fills",
+   "argus_flags": [
+    "fills"
+   ],
+   "argus_caught": true,
+   "argus_false_alarms": [],
+   "rival_flags": "not run (not Python)",
+   "rival_covers": true,
+   "rival_caught": null,
+   "rival_false_alarms": []
+  },
+  {
+   "fixture": "clean: lagged inside a function",
+   "planted": null,
+   "argus_flags": [],
+   "argus_caught": null,
+   "argus_false_alarms": [],
+   "rival_flags": [
+    "look-ahead"
+   ],
+   "rival_covers": null,
+   "rival_caught": null,
+   "rival_false_alarms": [
+    "look-ahead"
+   ]
+  },
+  {
+   "fixture": "clean: time-ordered split",
+   "planted": null,
+   "argus_flags": [],
+   "argus_caught": null,
+   "argus_false_alarms": [],
+   "rival_flags": [
+    "look-ahead"
+   ],
+   "rival_covers": null,
+   "rival_caught": null,
+   "rival_false_alarms": []
+  },
+  {
+   "fixture": "clean: backward as-of join, walk-forward search",
+   "planted": null,
+   "argus_flags": [],
+   "argus_caught": null,
+   "argus_false_alarms": [],
+   "rival_flags": [],
+   "rival_covers": null,
+   "rival_caught": null,
+   "rival_false_alarms": []
+  },
+  {
+   "fixture": "clean: pine",
+   "planted": null,
+   "argus_flags": [],
+   "argus_caught": null,
+   "argus_false_alarms": [],
+   "rival_flags": "not run (not Python)",
+   "rival_covers": null,
+   "rival_caught": null,
+   "rival_false_alarms": []
+  }
+ ],
+ "checks": [
+  "look-ahead",
+  "survivorship",
+  "repainting",
+  "costs",
+  "fills",
+  "parameter fitting",
+  "regime coverage",
+  "data alignment"
+ ],
+ "independent": {
+  "files": 16,
+  "argus": {
+   "true": 13,
+   "false": 0,
+   "unread": 0
+  },
+  "rival": {
+   "true": 0,
+   "false": 23,
+   "unread": 0
+  },
+  "rows": [
+   {
+    "file": ".claude/skills/vectorbt-expert/rules/assets/buy_hold/backtest.py",
+    "argus": [
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/buy_hold/backtest.py",
+      101,
+      "true: a price series back-filled from later values"
+     ]
+    ],
+    "rival": []
+   },
+   {
+    "file": ".claude/skills/vectorbt-expert/rules/assets/donchian/backtest.py",
+    "argus": [
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/donchian/backtest.py",
+      110,
+      "true: a price series back-filled from later values"
+     ]
+    ],
+    "rival": [
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/donchian/backtest.py",
+      78,
+      "false: a count or summary statistic, deciding nothing"
+     ]
+    ]
+   },
+   {
+    "file": ".claude/skills/vectorbt-expert/rules/assets/dual_momentum/backtest.py",
+    "argus": [
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/dual_momentum/backtest.py",
+      66,
+      "true: a price series back-filled from later values"
+     ],
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/dual_momentum/backtest.py",
+      117,
+      "true: a price series back-filled from later values"
+     ]
+    ],
+    "rival": [
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/dual_momentum/backtest.py",
+      165,
+      "false: a count or summary statistic, deciding nothing"
+     ]
+    ]
+   },
+   {
+    "file": ".claude/skills/vectorbt-expert/rules/assets/ema_crossover/backtest.py",
+    "argus": [
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/ema_crossover/backtest.py",
+      106,
+      "true: a price series back-filled from later values"
+     ]
+    ],
+    "rival": [
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/ema_crossover/backtest.py",
+      74,
+      "false: a count or summary statistic, deciding nothing"
+     ]
+    ]
+   },
+   {
+    "file": ".claude/skills/vectorbt-expert/rules/assets/macd/backtest.py",
+    "argus": [
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/macd/backtest.py",
+      123,
+      "true: a price series back-filled from later values"
+     ]
+    ],
+    "rival": [
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/macd/backtest.py",
+      91,
+      "false: a count or summary statistic, deciding nothing"
+     ]
+    ]
+   },
+   {
+    "file": ".claude/skills/vectorbt-expert/rules/assets/momentum/backtest.py",
+    "argus": [
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/momentum/backtest.py",
+      103,
+      "true: a price series back-filled from later values"
+     ]
+    ],
+    "rival": []
+   },
+   {
+    "file": ".claude/skills/vectorbt-expert/rules/assets/realistic_costs/template.py",
+    "argus": [
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/realistic_costs/template.py",
+      114,
+      "true: a price series back-filled from later values"
+     ]
+    ],
+    "rival": [
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/realistic_costs/template.py",
+      142,
+      "false: a count or summary statistic, deciding nothing"
+     ]
+    ]
+   },
+   {
+    "file": ".claude/skills/vectorbt-expert/rules/assets/rsi/backtest.py",
+    "argus": [
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/rsi/backtest.py",
+      106,
+      "true: a price series back-filled from later values"
+     ]
+    ],
+    "rival": [
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/rsi/backtest.py",
+      74,
+      "false: a count or summary statistic, deciding nothing"
+     ]
+    ]
+   },
+   {
+    "file": ".claude/skills/vectorbt-expert/rules/assets/rsi_accumulation/backtest.py",
+    "argus": [],
+    "rival": [
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/rsi_accumulation/backtest.py",
+      120,
+      "false: a count or summary statistic, deciding nothing"
+     ],
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/rsi_accumulation/backtest.py",
+      143,
+      "false: a count or summary statistic, deciding nothing"
+     ],
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/rsi_accumulation/backtest.py",
+      144,
+      "false: a count or summary statistic, deciding nothing"
+     ],
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/rsi_accumulation/backtest.py",
+      145,
+      "false: a count or summary statistic, deciding nothing"
+     ]
+    ]
+   },
+   {
+    "file": ".claude/skills/vectorbt-expert/rules/assets/sda2/backtest.py",
+    "argus": [
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/sda2/backtest.py",
+      100,
+      "true: a price series back-filled from later values"
+     ]
+    ],
+    "rival": []
+   },
+   {
+    "file": ".claude/skills/vectorbt-expert/rules/assets/supertrend/backtest.py",
+    "argus": [],
+    "rival": [
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/supertrend/backtest.py",
+      85,
+      "false: a count or summary statistic, deciding nothing"
+     ]
+    ]
+   },
+   {
+    "file": ".claude/skills/vectorbt-expert/rules/assets/walk_forward/template.py",
+    "argus": [],
+    "rival": [
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/walk_forward/template.py",
+      168,
+      "false: a count or summary statistic, deciding nothing"
+     ],
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/walk_forward/template.py",
+      170,
+      "false: a count or summary statistic, deciding nothing"
+     ],
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/walk_forward/template.py",
+      192,
+      "false: a count or summary statistic, deciding nothing"
+     ],
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/walk_forward/template.py",
+      193,
+      "false: a count or summary statistic, deciding nothing"
+     ],
+     [
+      ".claude/skills/vectorbt-expert/rules/assets/walk_forward/template.py",
+      194,
+      "false: a count or summary statistic, deciding nothing"
+     ]
+    ]
+   },
+   {
+    "file": "backtesting/buy_hold_75_25_backtest.py",
+    "argus": [
+     [
+      "backtesting/buy_hold_75_25_backtest.py",
+      109,
+      "true: a price series back-filled from later values"
+     ]
+    ],
+    "rival": [
+     [
+      "backtesting/buy_hold_75_25_backtest.py",
+      289,
+      "false: a count or summary statistic, deciding nothing"
+     ]
+    ]
+   },
+   {
+    "file": "backtesting/dual_momentum_backtest.py",
+    "argus": [
+     [
+      "backtesting/dual_momentum_backtest.py",
+      57,
+      "true: a price series back-filled from later values"
+     ],
+     [
+      "backtesting/dual_momentum_backtest.py",
+      155,
+      "true: a price series back-filled from later values"
+     ]
+    ],
+    "rival": [
+     [
+      "backtesting/dual_momentum_backtest.py",
+      104,
+      "false: a count or summary statistic, deciding nothing"
+     ]
+    ]
+   },
+   {
+    "file": "backtesting/niftybees_rsi_accumulation_backtest.py",
+    "argus": [],
+    "rival": [
+     [
+      "backtesting/niftybees_rsi_accumulation_backtest.py",
+      121,
+      "false: a count or summary statistic, deciding nothing"
+     ],
+     [
+      "backtesting/niftybees_rsi_accumulation_backtest.py",
+      150,
+      "false: a count or summary statistic, deciding nothing"
+     ],
+     [
+      "backtesting/niftybees_rsi_accumulation_backtest.py",
+      151,
+      "false: a count or summary statistic, deciding nothing"
+     ],
+     [
+      "backtesting/niftybees_rsi_accumulation_backtest.py",
+      152,
+      "false: a count or summary statistic, deciding nothing"
+     ]
+    ]
+   },
+   {
+    "file": "backtesting/SBIN_ema_crossover_backtest.py",
+    "argus": [],
+    "rival": [
+     [
+      "backtesting/SBIN_ema_crossover_backtest.py",
+      63,
+      "false: a count or summary statistic, deciding nothing"
+     ]
+    ]
+   }
+  ]
+ }
+}

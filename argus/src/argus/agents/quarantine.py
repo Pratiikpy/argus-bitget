@@ -450,6 +450,13 @@ Turkish dotless i and the long s. A word that carries one is not a disguised tic
 _TOKEN_RUN = re.compile(r"[^\W\d_]+", re.UNICODE)
 
 
+def _styled(char: str) -> bool:
+    """A styled form of an ASCII letter or digit: mathematical alphanumerics and fullwidth forms,
+    which NFKC folds back to the plain character. Cyrillic and Greek lookalikes do not fold."""
+    folded = unicodedata.normalize("NFKC", char)
+    return folded != char and folded.isascii() and folded.isalnum()
+
+
 def _confusable_tokens(text: str) -> list[str]:
     """Words written in lookalike letters inside otherwise Latin text: a word that mixes ASCII
     letters with confusables ("NVDA" with a Greek capital alpha, U+0391), or a capitalised word
@@ -467,7 +474,12 @@ def _confusable_tokens(text: str) -> list[str]:
     found: list[str] = []
     for match in _TOKEN_RUN.finditer(text):
         word = match.group(0)
-        lookalike = [c for c in word if c in table]
+        # styled letters — mathematical bold or italic, fullwidth — fold to the same ASCII letter
+        # under NFKC and read as that letter to a person and a model alike: "JUST IN" in
+        # mathematical bold, the X emphasis idiom, was withheld as a homoglyph on the live desk
+        # (twitter-2105697286496088284, 2026-10-01). They are judged folded, in `inspect`, where a
+        # styled "ignore previous instructions" is still an override.
+        lookalike = [c for c in word if c in table and not _styled(c)]
         if not lookalike:
             continue
         plain = [c for c in word if c.isascii()]
@@ -864,7 +876,8 @@ def inspect(text: str) -> list[Detection]:
     if disguised:
         found.append(Detection(Pattern.CONFUSABLE, ", ".join(disguised)[:120]))
     seen: set[Pattern] = {d.pattern for d in found}
-    for candidate in (text, stripped):
+    folded = unicodedata.normalize("NFKC", stripped)
+    for candidate in (text, stripped, *((folded,) if folded != stripped else ())):
         for pattern, rule in _RULES:
             if pattern in seen:
                 continue

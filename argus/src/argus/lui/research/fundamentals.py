@@ -289,8 +289,11 @@ def _versus_estimates(ticker: str) -> tuple[str, Source] | None:
             + (f", by {gap:+.1%}" if gap is not None and verdict != "in line with" else "")
             + " (Yahoo Finance's earnings history; adjusted EPS is the analysts' basis, and the "
               "SEC filing's GAAP diluted EPS differs)." + oneoff,
-            Source(kind="venue", ref="https://query2.finance.yahoo.com/v10/finance/quoteSummary",
-                   detail=f"{ticker} earningsHistory"))
+            # cited as the page a reader can open: the API address it is read from answers a
+            # person with a 404 (a citation check of the live console, 2026-10-04)
+            Source(kind="venue", ref=f"https://finance.yahoo.com/quote/{ticker}/analysis",
+                   detail=f"{ticker} earnings history (Yahoo Finance quoteSummary "
+                          f"earningsHistory)"))
 
 
 _VALUATION = re.compile(

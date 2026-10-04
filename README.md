@@ -55,7 +55,7 @@ kept; the full table, rival by rival, is on [`/proof`](https://deploy-topaz-seve
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/proof-dark.png">
-  <img alt="The /proof page: 47 capabilities measured against a named rival — 6 OWNED, 34 TIED, 0 IMPLEMENTED, 7 LOST — each linked to its evidence." src="docs/img/proof-light.png" width="720">
+  <img alt="The /proof page: 47 capabilities measured against a named rival — 6 OWNED, 35 TIED, 0 IMPLEMENTED, 7 LOST — each linked to its evidence." src="docs/img/proof-light.png" width="720">
 </picture>
 
 ---
@@ -216,7 +216,7 @@ OWNED only after that rival has been run on the same input and beaten. OWNED nee
 conditions: the rival's best implementation read and reproduced, a same-input comparison with
 costs, out-of-sample, ablation, an adversarial test, documented failure cases and reproducibility.
 
-**6 of 47 capabilities are OWNED, 34 are TIED, 0 are IMPLEMENTED, and 7 are LOST.**
+**6 of 48 capabilities are OWNED, 35 are TIED, 0 are IMPLEMENTED, and 7 are LOST.**
 
 | OWNED | Against |
 |---|---|
@@ -281,11 +281,11 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 11,977 tests collected
+pytest -q                       # 12,018 tests collected
 ```
 
 Nothing above needs a credential. On 2026-10-03, with every outbound connection refused, 11,012
-passed, 75 skipped and 0 failed of the 11,977 tests collected; the other 238 read a live
+passed, 75 skipped and 0 failed of the 12,018 tests collected; the other 238 read a live
 venue, feed or model and run apart
 (`pytest -m network`). Tests that need a rival's source cloned beside the repository skip
 and say which. `ARGUS_BLOCK_NETWORK=1` refuses every outbound connection, so
@@ -305,12 +305,12 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **11,977 tests collected** — `pytest -q` |
-| Types | **`mypy --strict` clean on 614 source files** |
+| Tests | **12,018 tests collected** — `pytest -q` |
+| Types | **`mypy --strict` clean on 617 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |
-| Sub-themes | **18/18 sub-themes** each resolve to an importable module and a test file (`python -m argus.status`). That is coverage, not a claim to lead them: 6 of 47 capabilities are OWNED against a named rival, and `/proof` says which |
-| Register self-check | **Not clean, and said so**: `data/standing.json` lists 52 conditions claimed but not evidenced, every one on a TIED (41) or LOST (11) row; none on the 6 OWNED rows, which is what OWNED requires (`python -m argus.eval.standing`) |
+| Sub-themes | **18/18 sub-themes** each resolve to an importable module and a test file (`python -m argus.status`). That is coverage, not a claim to lead them: 6 of 48 capabilities are OWNED against a named rival, and `/proof` says which |
+| Register self-check | **Not clean, and said so**: `data/standing.json` lists 54 conditions claimed but not evidenced, every one on a TIED (41) or LOST (11) row; none on the 6 OWNED rows, which is what OWNED requires (`python -m argus.eval.standing`) |
 | Understanding | **81.7%** of 240 questions in 12 languages, written blind by an agent that never saw this repository and scored once, were read correctly by the console with no language model (52.1% before the 2026-09-25 fixes); with Qwen reading first, as on the live site, 85.0% — `data/lui_final_heldout_report.json`. Which engine each question reaches is re-scored on every change by `eval/kind_routing.py` |
 | Quoted figures | Every figure these documents quote is re-checked against its artefact by `python -m argus.eval.docclaims --tests`, which fails if one has drifted |
 
@@ -341,8 +341,8 @@ a test that reaches the network shows itself.
   refused. Every other decision on its ledger is a refusal. Two settled trades are not a
   sample, so its Sharpe and drawdown are undefined and printed as such, and its win rate of 0%
   says nothing yet. Each refusal carried a direction, hashed before the
-  outcome existed: at about two hours, **336 of 608 directional calls were right**, which clears a
-  coin flip and does not beat calling "up" every time. The median refusal **forgave -9.11bps of
+  outcome existed: at about two hours, **339 of 619 directional calls were right**, which clears a
+  coin flip and does not beat calling "up" every time. The median refusal **forgave -9.37bps of
   net edge** after the 12bps round trip — the trades it passed
   on were mostly unprofitable. This workbench does not trade; trading is the separate Track 2
   project's job.
@@ -357,7 +357,7 @@ a test that reaches the network shows itself.
 
 ARGUS 是面向 Bitget 美股代币（rToken）的研究工作台（Track 3 · AI Trading Desk）。用自然语言提问，
 八个引擎基于 Bitget 行情、SEC 文件、FRED 与新闻实时计算，每个数字都注明来源；语言模型只理解问题，
-从不编写数字。全部 47 项能力均已与各子赛道领先的专业系统在相同输入上对比：6 项领先（OWNED）、34 项
+从不编写数字。全部 48 项能力均已与各子赛道领先的专业系统在相同输入上对比：6 项领先（OWNED）、35 项
 持平、0 项已实现、7 项落后。落后的七项：
 
 - 人群情绪分类：在 TweetEval 上不及 RoB-RT；

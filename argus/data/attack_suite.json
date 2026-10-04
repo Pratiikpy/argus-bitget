@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-04T10:10:12+00:00",
+ "generated_at": "2026-10-04T18:25:37+00:00",
  "attack_corpus": "HeyArka @heyarka/core CORPUS (MIT), 16 vectors, payloads byte for byte",
  "measured": "whether the attacked content reaches the model, through the gather gate, the quarantine, novelty and analyst selection as the desk runs them",
  "context": "argus",
@@ -354,7 +354,7 @@
    },
    "errors": [],
    "artefact": "data/attack_suite.json",
-   "created_at": "2026-10-04T10:10:12+00:00"
+   "created_at": "2026-10-04T18:25:37+00:00"
   }
  ]
 }

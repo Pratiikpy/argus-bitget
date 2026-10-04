@@ -126,6 +126,12 @@ PAGE = """<!doctype html>
     text-decoration:underline; text-underline-offset:3px }
   .gnext span { color:var(--dim); font-size:12.5px }
   .gsum ol { margin:6px 0 0; padding-left:22px }
+  .pins { margin:0 0 18px }
+  .pin { border:1px solid var(--line); border-radius:10px; background:var(--panel);
+    padding:10px 12px; margin-bottom:8px }
+  .pin .pq { font-weight:600; display:flex; gap:10px; align-items:baseline; flex-wrap:wrap }
+  .pin .pq span { flex:1 1 220px }
+  .pin button, .pinb { padding:2px 9px; font-size:12px; font-weight:500 }
   .gsum li { margin:5px 0; overflow-wrap:anywhere }
   .tbl { border-collapse:collapse; font:13px/1.5 var(--mono) }
   .tbl th, .tbl td { border:1px solid var(--line); padding:5px 10px; text-align:right;
@@ -216,6 +222,8 @@ touches your money.</p>
 <div class="guide"><button type="button" id="guide-go">Guided research &middot; 5 steps</button>
 <span>briefing on your book &rarr; a view &rarr; the research &rarr; how to act &rarr; a stress
 test, each step one question you can edit</span></div>
+<div class="pins" id="pins" hidden><p class="group">Pinned &middot; asked again each visit</p>
+<div id="pinlist"></div></div>
 <p class="group">New to trading</p>
 <div class="chips" id="chips-new">__CHIPS_NEW__</div>
 <p class="group">Research</p>
@@ -479,6 +487,8 @@ document.getElementById('f').addEventListener('submit', async ev => {
         <div class="meta">
           <span class="tag">answered in ${(a.elapsed_ms / 1000).toFixed(1)} s</span>
           ${a.refused ? '<span class="tag over">refused</span>' : ''}
+          ${a.refused ? '' : `<button type="button" class="pinb" data-q="${escA(text)}" ` +
+            `title="keep this question at the top; it is asked again on every visit">pin</button>`}
           ${a.model_left !== undefined && a.model_left <= 10 ? `<span class="tag" title="` +
             `Counted per network address on each server instance. ` +
             `After these, the console's own readers answer, in ` +
@@ -594,12 +604,62 @@ out.addEventListener('click', e => {
     qEl.focus();
     return;
   }
+  const pinb = e.target.closest('.pinb');
+  if (pinb) {
+    addPin(pinb.dataset.q); pinb.textContent = 'pinned'; pinb.disabled = true;
+    return;
+  }
   const b = e.target.closest('.fb button'); if (!b) return;
   const box = b.parentElement;
   post('feedback', {id: box.dataset.id, useful: b.dataset.u}).catch(() => {});
   box.textContent = b.dataset.u === '1' ? 'Thanks \u2014 noted as answered.'
     : 'Thanks \u2014 noted as not answered. Rephrasing, or naming the ticker, often helps.';
 });
+// Pinned answers (build-list 4.8, OpenBB's pinned widgets): a question kept in this browser and
+// asked again on every visit, so the figures under it are today's, with the time it was refreshed.
+// At most five; each one is a real question to the desk, not a stored copy of an old answer.
+const PIN_LIMIT = 5;
+let pins = [];
+try { pins = JSON.parse(localStorage.getItem('argus.pins') || '[]'); } catch (e) { pins = []; }
+const savePins = () => { try { localStorage.setItem('argus.pins', JSON.stringify(pins)); }
+  catch (e) {} };
+async function loadPin(i) {
+  const el = document.getElementById('pin-' + i);
+  if (!el || !pins[i]) return;
+  el.innerHTML = '<div class="line fine">asking again…</div>';
+  try {
+    const r = await post('ask', {q: pins[i].q, turns: '[]', book: pins[i].book || '',
+      memory: JSON.stringify(memory)});
+    if (!r.ok) throw new Error(`http ${r.status}`);
+    const a = await r.json();
+    el.innerHTML = (a.lines || []).slice(0, 3).map((l, k) =>
+      `<div class="${lineClass(l)}">${pv((a.line_labels || [])[k])}${linked(l)}</div>`).join('') +
+      `<div class="line fine">refreshed ${new Date().toLocaleTimeString()}</div>`;
+  } catch (e) {
+    el.innerHTML = '<div class="line fine">the desk did not answer just now; refresh to try ' +
+      'again</div>';
+  }
+}
+function showPins() {
+  const box = document.getElementById('pins');
+  box.hidden = !pins.length;
+  document.getElementById('pinlist').innerHTML = pins.map((p, i) =>
+    `<div class="pin"><div class="pq"><span>${esc(p.q)}</span>` +
+    `<button type="button" class="repin" data-i="${i}">refresh</button>` +
+    `<button type="button" class="unpin" data-i="${i}" aria-label="unpin: ${escA(p.q)}">` +
+    `unpin</button></div><div id="pin-${i}"></div></div>`).join('');
+  pins.forEach((_, i) => loadPin(i));
+}
+function addPin(q) {
+  pins = [{q, book: bookEl.value.trim()}, ...pins.filter(p => p.q !== q)].slice(0, PIN_LIMIT);
+  savePins(); showPins();
+}
+document.getElementById('pinlist').addEventListener('click', e => {
+  const i = Number((e.target.dataset || {}).i);
+  if (e.target.classList.contains('repin')) loadPin(i);
+  if (e.target.classList.contains('unpin')) { pins.splice(i, 1); savePins(); showPins(); }
+});
+showPins();
 // Guided research starts from the saved book; with none, an example book fills the field for this
 // visit, said in the box's own hint, and is not saved unless the visitor edits it.
 document.getElementById('guide-go').addEventListener('click', () => {
@@ -4375,7 +4435,11 @@ def _round27_follow_up(text: str, prior: list[str], *, now: datetime | None, vis
     case_asked = _RESEARCH_CASE.search(text)
     case_names = symbols_in(text)[0] or (named_before() if case_asked and _CASE_FOLLOW.search(
         text) else ())
-    if case_asked and case_names and not text.startswith("should I go "):
+    # "show me the evidence behind the latest MSTR decision" is about the desk's logged decision,
+    # not a new research case (a live re-ask, 2026-10-04)
+    about_desk = re.search(r"\b(?:decision|decided|the\s+desk|your\s+(?:call|trade|pass)|seq\s*"
+                           r"\d+|abstention|stood\s+aside)\b", text, re.I) is not None
+    if case_asked and case_names and not about_desk and not text.startswith("should I go "):
         # "What's the research case right now for going long SOLUSDT — give me the actual
         # evidence" got a fundamentals refusal for a coin, and "what hard data backs that" the
         # same (a judge, round 30): a case asked for is the research task, every engine run
@@ -5211,6 +5275,16 @@ def _handle_ask(
     message that only tells the console something ("I can't lose more than 10%") is answered
     with what was noted."""
     from argus.lui import memory as mem
+    from argus.research import backtest_critic
+
+    # a pasted strategy is read as code, before anything below flattens its lines or reads its
+    # identifiers as tickers (build-list 3.2): "LEAKY and BT are not listed on Bitget" was the
+    # answer to a pasted backtest until it ran first
+    critique = backtest_critic.lines(text)
+    if critique is not None:
+        critic_payload = engine_payload_like(critique, prior, text[:500], by="research")
+        critic_payload["memory"] = memory
+        return critic_payload
 
     # "What is the current price of NVDA on Bitget?", typed in fullwidth letters, reached the desk's
     # decision on NVDA, not its price (a hostile review, round 30): compatibility forms are read
