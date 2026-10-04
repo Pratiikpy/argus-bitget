@@ -66,6 +66,10 @@ _BREAKOUT: Final = re.compile(r"\b(?P<n>\d{1,3})[\s-]*day\s+(?:high|highs|breako
                               r"\b(?P<m>\d{1,3})[\s-]*day\s+low)?", re.I)
 _SHORT: Final = re.compile(r"\bshort\s+(?:when|if|it|on)|\blong[\s/-]*short\b|\bboth\s+sides\b",
                            re.I)
+VOL_SIZED: Final = re.compile(r"\b(?:vol(?:atility)?[\s-]*(?:target\w*|sized?|sizing|scaled?|"
+                              r"adjusted)|siz\w+\s+(?:it\s+)?by\s+vol\w*|garch|risk[\s-]*parity)\b",
+                              re.I)
+"""Asked to size the rule by its volatility, as well as to test it."""
 DEFAULT_HOLD: Final = 5
 DAYS_BACK: Final = 1825
 REGIME_DAYS: Final = 90
@@ -369,7 +373,7 @@ def lines(text: str) -> list[str] | None:
         return [f"Bottom line: {name} has {len(closes)} days of history here and the rule needs "
                 f"{warmup} of them to start, leaving too few to test on — a year is the least "
                 f"this console tests."]
-    from argus.backtest.engine import Bar, extract_trades, run
+    from argus.backtest.engine import BacktestResult, Bar, extract_trades, run
     from argus.backtest.proportion import rate_phrase, stability_phrase
     from argus.cost.model import CostModel
 
@@ -409,6 +413,35 @@ def lines(text: str) -> list[str] | None:
                    "bear below -20%, chop between, known on the day): " + "; ".join(
                        f"{r.regime} {r.days} days, rule {r.rule:+.0%} vs hold {r.hold:+.0%}"
                        for r in split) + ".")
+    if VOL_SIZED.search(text) and len(closes) > 560:
+        # build-list 1.6: the same rule sized by a walk-forward GARCH forecast, both after fees
+        from argus.backtest import vol_target
+
+        multipliers, target = vol_target.sizes(closes, yearly)
+        first = next(k for k, m in enumerate(multipliers) if m is not None)
+        # both arms over the same days: the sized arm has no forecast for its first 500, which
+        # held the 2022 bear, and a comparison across different days measures the days
+        span = bars[first:]
+        fixed_w, sized_w = weights[first:], [w * (m or 0.0) for w, m in
+                                             zip(weights[first:], multipliers[first:],
+                                                 strict=True)]
+        def arm(name: str, held: list[float]) -> BacktestResult:
+            return run(name, symbol, span, lambda _bars, i: held[i],
+                       cost=CostModel.bitget_perp(), periods_per_year=yearly,
+                       max_weight=vol_target.MAX_SIZE)
+
+        arms = [arm("fixed", fixed_w), arm("sized by volatility", sized_w)]
+        fx, vt = arms[0].net, arms[1].net
+        out.append(f"Sized by forecast volatility (GARCH(1,1) walk-forward, aiming at "
+                   f"{target:.0f}% a year, sizes 0.25x to 2x), compared from "
+                   f"{stamps[first]:%d %b %Y} when its first forecast exists: Sharpe "
+                   f"{vt.sharpe:.2f} against {fx.sharpe:.2f} at fixed size, worst drawdown "
+                   f"{vt.max_drawdown:.0%} against {fx.max_drawdown:.0%}, fees "
+                   f"{arms[1].total_cost_bps:.0f}bps against {arms[0].total_cost_bps:.0f}bps — "
+                   + ("better risk-adjusted here" if vt.sharpe > fx.sharpe else
+                      "no better risk-adjusted here")
+                   + ". On the console's own test (an EMA crossover on BTC, ETH and SOL) it lost "
+                     "to fixed size after fees: register #52.")
     if result.cost_destroyed_the_edge:
         out.append(f"Fees turned it from a gain ({result.gross.total_return:+.0%} before them) "
                    f"into a loss.")

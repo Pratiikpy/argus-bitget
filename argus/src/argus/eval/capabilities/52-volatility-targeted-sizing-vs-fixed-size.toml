@@ -1,0 +1,66 @@
+name = "Volatility-targeted sizing (walk-forward GARCH) against fixed size, after fees"
+subtheme = "t2-riskcontrol"
+modules = [
+    "argus/backtest/vol_target.py",
+    "argus/eval/vol_target_comparison.py",
+]
+# Added 2026-10-05 (build list item 1.6). The forecast reproduces garchmethod's own walk-forward
+# (MIT, run from its clone with `arch`): correlation 0.985 to 0.995 on BTC, ETH and SOL. The
+# question the item asks — does sizing by it help — came back no, so it is published as a loss
+# and not adopted in run 3's kernel.
+state = "lost"
+baseline = """\
+    Fixed size on the same signal (garchmethod's own demo, an EMA 9/21 crossover long/flat), \
+    against milesdeutscher/garchmethod's target / forecast sizing clipped to [0.25, 2.0], both \
+    through backtest/engine.py with Bitget's taker fee on every change of weight"""
+blockers = [
+    """\
+        LOST to fixed size on the measure sizing exists for. At the same average exposure, the \
+        GARCH-targeted arm's worst drawdown was deeper on all three coins (BTC 29.5% against \
+        27.0%, ETH 54.1% against 51.4%, SOL 57.8% against 52.7%), its Sharpe higher on ETH only \
+        (0.80 against 0.70; BTC 1.09 against 1.14, SOL 1.07 against 1.11), and its fees higher \
+        on all three, because a size that moves every day trades every day. The reference's \
+        compare.py charges no fee, which is where its advantage would have come from.""",
+    """\
+        One signal, three coins, about 1,320 days each from 2023-02-18: a result about this \
+        signal on these coins, not about volatility targeting everywhere. No significance test \
+        is claimed; it is a loss on its own terms, and that is enough not to adopt it.""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    garchmethod read at source: scripts/garch_forecast.py walkforward_garch (500-day burn-in, \
+    refit every 21 days, Student-t GARCH(1,1) via arch), scripts/vol_target.py size_from_vol \
+    (clip 0.25 to 2.0), scripts/compare.py (fixed against targeted, no fees)"""
+artefact = "data/vol_target_comparison.json"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = """\
+    the reference's walkforward_garch run from its clone on the same Bitget closes; the \
+    pure-Python Student-t fit correlates 0.985 to 0.995 with it, median gap under 1.1 vol \
+    points, sizes differing by over 0.1 on at most 0.9% of days"""
+artefact = "data/vol_target_comparison.json"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = "fixed, targeted and exposure-matched targeted arms on the same signal and closes"
+artefact = "data/vol_target_comparison.json"
+
+[[proofs]]
+condition = "costs_included"
+how = "every arm through backtest/engine.py, which refuses to run without Bitget's fee"
+artefact = "data/vol_target_comparison.json"
+
+[[proofs]]
+condition = "failure_cases_documented"
+how = """\
+    the Gaussian fit tried first and rejected (persistence 0.79 against 0.92 on bitcoin's \
+    tails, correlation 0.80 with the reference) is recorded in the module docstring"""
+test = "test_vol_target.py::test_the_student_t_fit_finds_heavy_tails"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = "python -m argus.eval.vol_target_comparison regenerates the artefact"
+artefact = "data/vol_target_comparison.json"

@@ -1,0 +1,179 @@
+{
+ "generated_at": "2026-10-04T20:13:57+00:00",
+ "symbols": {
+  "BTCUSDT": {
+   "closes": 1824,
+   "reference_match": {
+    "days_compared": 1323,
+    "correlation": 0.9938,
+    "median_abs_gap_vol_points": 0.63,
+    "share_of_days_size_differs_by_over_0_1": 0.001,
+    "mean_ours": 54.9,
+    "mean_reference": 55.2
+   },
+   "sizing": {
+    "from": "2023-02-18",
+    "days": 1324,
+    "target_vol_pct": 62.7,
+    "fixed": {
+     "net": {
+      "periods": 1323,
+      "total_return_pct": 224.269,
+      "sharpe": 1.139,
+      "sortino": 1.857,
+      "max_drawdown_pct": 26.987,
+      "turnover": 56.0,
+      "win_rate_pct": 49.74,
+      "trades": 766
+     },
+     "cost_bps": 342.0,
+     "average_weight_when_in": 1.0
+    },
+    "vol_targeted": {
+     "net": {
+      "periods": 1323,
+      "total_return_pct": 251.726,
+      "sharpe": 1.092,
+      "sortino": 1.778,
+      "max_drawdown_pct": 34.411,
+      "turnover": 92.164,
+      "win_rate_pct": 49.74,
+      "trades": 766
+     },
+     "cost_bps": 557.7,
+     "average_weight_when_in": 1.191
+    },
+    "vol_targeted_same_exposure": {
+     "net": {
+      "periods": 1323,
+      "total_return_pct": 197.731,
+      "sharpe": 1.092,
+      "sortino": 1.778,
+      "max_drawdown_pct": 29.476,
+      "turnover": 77.349,
+      "win_rate_pct": 49.74,
+      "trades": 766
+     },
+     "cost_bps": 468.1,
+     "average_weight_when_in": 1.0
+    }
+   }
+  },
+  "ETHUSDT": {
+   "closes": 1824,
+   "reference_match": {
+    "days_compared": 1323,
+    "correlation": 0.9851,
+    "median_abs_gap_vol_points": 1.02,
+    "share_of_days_size_differs_by_over_0_1": 0.009,
+    "mean_ours": 68.5,
+    "mean_reference": 68.5
+   },
+   "sizing": {
+    "from": "2023-02-18",
+    "days": 1324,
+    "target_vol_pct": 82.1,
+    "fixed": {
+     "net": {
+      "periods": 1323,
+      "total_return_pct": 116.052,
+      "sharpe": 0.702,
+      "sortino": 1.146,
+      "max_drawdown_pct": 51.402,
+      "turnover": 52.0,
+      "win_rate_pct": 49.13,
+      "trades": 690
+     },
+     "cost_bps": 318.0,
+     "average_weight_when_in": 1.0
+    },
+    "vol_targeted": {
+     "net": {
+      "periods": 1323,
+      "total_return_pct": 193.116,
+      "sharpe": 0.803,
+      "sortino": 1.359,
+      "max_drawdown_pct": 62.727,
+      "turnover": 92.592,
+      "win_rate_pct": 49.13,
+      "trades": 690
+     },
+     "cost_bps": 561.9,
+     "average_weight_when_in": 1.25
+    },
+    "vol_targeted_same_exposure": {
+     "net": {
+      "periods": 1323,
+      "total_return_pct": 156.923,
+      "sharpe": 0.803,
+      "sortino": 1.359,
+      "max_drawdown_pct": 54.144,
+      "turnover": 74.062,
+      "win_rate_pct": 49.13,
+      "trades": 690
+     },
+     "cost_bps": 449.5,
+     "average_weight_when_in": 1.0
+    }
+   }
+  },
+  "SOLUSDT": {
+   "closes": 1824,
+   "reference_match": {
+    "days_compared": 1323,
+    "correlation": 0.9952,
+    "median_abs_gap_vol_points": 0.47,
+    "share_of_days_size_differs_by_over_0_1": 0.0,
+    "mean_ours": 92.0,
+    "mean_reference": 92.5
+   },
+   "sizing": {
+    "from": "2023-02-18",
+    "days": 1324,
+    "target_vol_pct": 127.1,
+    "fixed": {
+     "net": {
+      "periods": 1323,
+      "total_return_pct": 481.53,
+      "sharpe": 1.11,
+      "sortino": 1.872,
+      "max_drawdown_pct": 52.657,
+      "turnover": 54.0,
+      "win_rate_pct": 48.01,
+      "trades": 702
+     },
+     "cost_bps": 330.0,
+     "average_weight_when_in": 1.0
+    },
+    "vol_targeted": {
+     "net": {
+      "periods": 1323,
+      "total_return_pct": 632.338,
+      "sharpe": 1.072,
+      "sortino": 1.802,
+      "max_drawdown_pct": 71.906,
+      "turnover": 119.172,
+      "win_rate_pct": 48.01,
+      "trades": 702
+     },
+     "cost_bps": 722.6,
+     "average_weight_when_in": 1.423
+    },
+    "vol_targeted_same_exposure": {
+     "net": {
+      "periods": 1323,
+      "total_return_pct": 412.721,
+      "sharpe": 1.072,
+      "sortino": 1.802,
+      "max_drawdown_pct": 57.817,
+      "turnover": 83.711,
+      "win_rate_pct": 48.01,
+      "trades": 702
+     },
+     "cost_bps": 507.6,
+     "average_weight_when_in": 0.999
+    }
+   }
+  }
+ }
+}

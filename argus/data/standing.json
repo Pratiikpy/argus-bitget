@@ -5290,10 +5290,87 @@
         "baseline_reproduced",
         "reproducibility_proven"
       ]
+    },
+    {
+      "name": "Volatility-targeted sizing (walk-forward GARCH) against fixed size, after fees",
+      "subtheme": "t2-riskcontrol",
+      "module": "argus/backtest/vol_target.py,argus/eval/vol_target_comparison.py",
+      "state": "lost",
+      "baseline": "Fixed size on the same signal (garchmethod's own demo, an EMA 9/21 crossover long/flat), against milesdeutscher/garchmethod's target / forecast sizing clipped to [0.25, 2.0], both through backtest/engine.py with Bitget's taker fee on every change of weight",
+      "conditions_met": [
+        "best_implementation_studied",
+        "baseline_reproduced",
+        "same_input_comparison",
+        "costs_included",
+        "failure_cases_documented",
+        "reproducibility_proven"
+      ],
+      "conditions_missing": [
+        "best_method_studied",
+        "implementation_complete",
+        "statistically_valid_evaluation",
+        "out_of_sample_test",
+        "ablation",
+        "adversarial_test",
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [
+        {
+          "condition": "best_implementation_studied",
+          "how": "garchmethod read at source: scripts/garch_forecast.py walkforward_garch (500-day burn-in, refit every 21 days, Student-t GARCH(1,1) via arch), scripts/vol_target.py size_from_vol (clip 0.25 to 2.0), scripts/compare.py (fixed against targeted, no fees)",
+          "artefact": "data/vol_target_comparison.json",
+          "test": ""
+        },
+        {
+          "condition": "baseline_reproduced",
+          "how": "the reference's walkforward_garch run from its clone on the same Bitget closes; the pure-Python Student-t fit correlates 0.985 to 0.995 with it, median gap under 1.1 vol points, sizes differing by over 0.1 on at most 0.9% of days",
+          "artefact": "data/vol_target_comparison.json",
+          "test": ""
+        },
+        {
+          "condition": "same_input_comparison",
+          "how": "fixed, targeted and exposure-matched targeted arms on the same signal and closes",
+          "artefact": "data/vol_target_comparison.json",
+          "test": ""
+        },
+        {
+          "condition": "costs_included",
+          "how": "every arm through backtest/engine.py, which refuses to run without Bitget's fee",
+          "artefact": "data/vol_target_comparison.json",
+          "test": ""
+        },
+        {
+          "condition": "failure_cases_documented",
+          "how": "the Gaussian fit tried first and rejected (persistence 0.79 against 0.92 on bitcoin's tails, correlation 0.80 with the reference) is recorded in the module docstring",
+          "artefact": "",
+          "test": "test_vol_target.py::test_the_student_t_fit_finds_heavy_tails"
+        },
+        {
+          "condition": "reproducibility_proven",
+          "how": "python -m argus.eval.vol_target_comparison regenerates the artefact",
+          "artefact": "data/vol_target_comparison.json",
+          "test": ""
+        }
+      ],
+      "blockers": [
+        "LOST to fixed size on the measure sizing exists for. At the same average exposure, the GARCH-targeted arm's worst drawdown was deeper on all three coins (BTC 29.5% against 27.0%, ETH 54.1% against 51.4%, SOL 57.8% against 52.7%), its Sharpe higher on ETH only (0.80 against 0.70; BTC 1.09 against 1.14, SOL 1.07 against 1.11), and its fees higher on all three, because a size that moves every day trades every day. The reference's compare.py charges no fee, which is where its advantage would have come from.",
+        "One signal, three coins, about 1,320 days each from 2023-02-18: a result about this signal on these coins, not about volatility targeting everywhere. No significance test is claimed; it is a loss on its own terms, and that is enough not to adopt it."
+      ],
+      "note": "",
+      "measured_outcomes": [],
+      "conditions_claimed": [
+        "best_implementation_studied",
+        "baseline_reproduced",
+        "same_input_comparison",
+        "costs_included",
+        "failure_cases_documented",
+        "reproducibility_proven"
+      ],
+      "conditions_unproven": []
     }
   ],
   "by_state": {
-    "lost": 7,
+    "lost": 8,
     "tied": 35,
     "implemented": 0,
     "owned": 6
@@ -5586,7 +5663,13 @@
     "reproducibility_proven",
     "no_specialist_capability_superior"
   ],
-  "transitions_this_write": [],
+  "transitions_this_write": [
+    {
+      "capability": "Volatility-targeted sizing (walk-forward GARCH) against fixed size, after fees",
+      "from": null,
+      "to": "lost"
+    }
+  ],
   "transition_log": [
     {
       "capability": "Deliberation priced as a trading cost",
@@ -5929,6 +6012,12 @@
       "from": null,
       "to": "tied",
       "at": "2026-10-04T18:30:02+00:00"
+    },
+    {
+      "capability": "Volatility-targeted sizing (walk-forward GARCH) against fixed size, after fees",
+      "from": null,
+      "to": "lost",
+      "at": "2026-10-04T20:18:22+00:00"
     }
   ]
 }

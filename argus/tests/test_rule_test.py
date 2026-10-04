@@ -137,3 +137,21 @@ def test_too_little_history_beyond_the_lookback_is_said(monkeypatch: pytest.Monk
     monkeypatch.setattr(rt, "_closes", lambda s: (stamps, closes, "Bitget's daily closes"))
     said = rt.lines("backtest holding gold only above its 200-day average")
     assert said is not None and "leaving too few to test on" in said[0]
+
+
+def test_sizing_by_volatility_is_compared_over_the_same_days(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    closes = _wave(900)
+    stamps = [datetime(2022, 1, 1, tzinfo=UTC) + timedelta(days=i) for i in range(900)]
+    monkeypatch.setattr(rt, "_closes", lambda s: (stamps, closes, "Bitget's daily closes"))
+    from argus.market import crossasset_feed
+
+    monkeypatch.setattr(crossasset_feed, "fetch_funding", lambda s: [])
+    said = rt.lines("backtest the 20/50 sma cross on BTC, sized by volatility")
+    assert said is not None
+    line = next(x for x in said if x.startswith("Sized by forecast volatility"))
+    # the first forecast needs 500 returns: both arms start there
+    assert f"compared from {stamps[500]:%d %b %Y}" in line
+    assert "register #52" in line
+    plain = rt.lines("backtest the 20/50 sma cross on BTC")
+    assert plain is not None and not any(x.startswith("Sized by") for x in plain)
