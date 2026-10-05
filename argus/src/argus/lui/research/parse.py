@@ -2253,6 +2253,16 @@ def _price_book(text: str) -> PricedBook | None:
         if gross > 1.05 * total:
             lines.append(f"the holdings as read come to ${gross:,.0f}, more than the "
                          f"${total:,.0f} book stated — restate the sizes if that is wrong")
+        elif not cash_usd and gross < 0.95 * total:
+            # "my 1m book is 200k AAPL and 100k BTC, rest cash" was stressed as a $300,000 book
+            # (round 42 live re-ask): what the holdings leave of a stated book is its cash
+            cash_usd = total - gross
+            said = ("as stated" if re.search(r"\b(?:rest|remainder|balance)\b[^.?]{0,15}\bcash\b|"
+                                             r"\bcash\b[^.?]{0,10}\b(?:rest|remainder)\b",
+                                             original, re.I)
+                    else "since no other holding is named")
+            lines.append(f"the ${cash_usd:,.0f} the holdings leave of the ${total:,.0f} book is "
+                         f"read as cash, {said}")
     account = gross + cash_usd
     if cash_usd:
         lines.append(f"${cash_usd:,.0f} cash")

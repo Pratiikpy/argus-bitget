@@ -479,3 +479,25 @@ class TestLivePlannerRoutes:
                                   "names": ["TSLA", "XAU"]}))
         assert request is not None and request.kind is parse.ResearchKind.STRESS
         assert request.book == pytest.approx({"TSLAUSDT": 0.1, "XAUUSDT": 0.6})
+
+
+class TestBookSizeWords:
+    def test_a_million_book_is_not_a_month(self) -> None:
+        import re as _re
+
+        from argus.lui.research.parse import stated_total
+
+        text = _re.sub(r"(\d+)m(?= book)", lambda m: f"${int(m.group(1)) * 1_000_000:,}",
+                       "my 1m book is 200k AAPL")
+        assert stated_total(text) == 1_000_000
+
+    def test_the_rest_of_a_stated_book_is_cash(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui.research import parse
+
+        # 200k AAPL as shares would be $66m, past the whole book, so the 200k is dollars
+        monkeypatch.setattr(parse, "_last_prices", lambda: {"AAPLUSDT": 333.0,
+                                                            "BTCUSDT": 85_000.0})
+        priced = parse.priced_book("my $1,000,000 book is 200k AAPL and 100k BTC, rest cash")
+        assert priced is not None and priced.value == pytest.approx(1_000_000)
+        assert priced.cash == pytest.approx(0.7)
+        assert any("read as cash, as stated" in line for line in priced.lines)

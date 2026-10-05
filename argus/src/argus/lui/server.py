@@ -7181,8 +7181,10 @@ def handle_ask(
         text, converted = in_us_dollars(text)
     # "add 1.5m worth of TSLA" was filed as capital and answered with a book summary (round 40
     # hostile, C4): a bare-suffixed sum before "worth"/"of" is dollars, written out as such
+    # "my 1m book is 200k AAPL" was read as one month (round 42 live re-ask): a suffixed sum
+    # before "book", "portfolio" or "account" is the book's size
     text = re.sub(r"(?<![$\w.,])(\d+(?:\.\d+)?)\s*(k|m|mm|mn|bn)\b(?:\s+worth)?(?=\s+(?:of|in|"
-                  r"dollars?|usd)\b)",
+                  r"dollars?|usd|book|portfolio|account)\b)",
                   lambda m: "${:,.0f}".format(float(m.group(1)) * {"k": 1e3, "bn": 1e9}.get(
                       m.group(2).lower(), 1e6)),
                   text, flags=re.I)

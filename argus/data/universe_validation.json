@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-05T17:35:55.283879+00:00",
+  "generated_at": "2026-10-05T19:35:45.409483+00:00",
   "threshold": 2.5,
   "shipped": [
     "NVDAUSDT",
@@ -33,109 +33,109 @@
   "evidence": {
     "NVDAUSDT": {
       "symbol": "NVDAUSDT",
-      "last_index": 236.8982,
-      "rth_bps_per_hour": 31.33,
+      "last_index": 239.3868,
+      "rth_bps_per_hour": 31.41,
       "weekend_bps_per_hour": 4.12,
-      "attenuation": 7.6,
+      "attenuation": 7.62,
       "has_anchor": true,
       "observations": 2159
     },
     "TSLAUSDT": {
       "symbol": "TSLAUSDT",
-      "last_index": 378.614,
-      "rth_bps_per_hour": 34.47,
+      "last_index": 380.9883,
+      "rth_bps_per_hour": 34.45,
       "weekend_bps_per_hour": 5.08,
-      "attenuation": 6.79,
+      "attenuation": 6.78,
       "has_anchor": true,
       "observations": 2159
     },
     "AAPLUSDT": {
       "symbol": "AAPLUSDT",
-      "last_index": 334.6574,
-      "rth_bps_per_hour": 22.21,
+      "last_index": 333.7275,
+      "rth_bps_per_hour": 22.28,
       "weekend_bps_per_hour": 3.46,
-      "attenuation": 6.41,
+      "attenuation": 6.43,
       "has_anchor": true,
       "observations": 2159
     },
     "MSFTUSDT": {
       "symbol": "MSFTUSDT",
-      "last_index": 525.8992,
-      "rth_bps_per_hour": 25.07,
+      "last_index": 527.4067,
+      "rth_bps_per_hour": 25.04,
       "weekend_bps_per_hour": 3.55,
-      "attenuation": 7.06,
+      "attenuation": 7.05,
       "has_anchor": true,
       "observations": 2159
     },
     "METAUSDT": {
       "symbol": "METAUSDT",
-      "last_index": 744.5921,
-      "rth_bps_per_hour": 36.25,
+      "last_index": 742.8881,
+      "rth_bps_per_hour": 36.11,
       "weekend_bps_per_hour": 4.94,
-      "attenuation": 7.34,
+      "attenuation": 7.32,
       "has_anchor": true,
       "observations": 2159
     },
     "GOOGLUSDT": {
       "symbol": "GOOGLUSDT",
-      "last_index": 345.3776,
-      "rth_bps_per_hour": 24.51,
+      "last_index": 347.4272,
+      "rth_bps_per_hour": 24.36,
       "weekend_bps_per_hour": 4.99,
-      "attenuation": 4.91,
+      "attenuation": 4.88,
       "has_anchor": true,
       "observations": 2159
     },
     "AMZNUSDT": {
       "symbol": "AMZNUSDT",
-      "last_index": 252.3535,
-      "rth_bps_per_hour": 23.65,
+      "last_index": 253.6949,
+      "rth_bps_per_hour": 23.71,
       "weekend_bps_per_hour": 3.71,
-      "attenuation": 6.37,
+      "attenuation": 6.39,
       "has_anchor": true,
       "observations": 2159
     },
     "COINUSDT": {
       "symbol": "COINUSDT",
-      "last_index": 185.5392,
-      "rth_bps_per_hour": 59.94,
+      "last_index": 187.2757,
+      "rth_bps_per_hour": 60.11,
       "weekend_bps_per_hour": 11.08,
-      "attenuation": 5.41,
+      "attenuation": 5.42,
       "has_anchor": true,
       "observations": 2159
     },
     "MSTRUSDT": {
       "symbol": "MSTRUSDT",
-      "last_index": 160.7057,
-      "rth_bps_per_hour": 59.13,
+      "last_index": 164.4213,
+      "rth_bps_per_hour": 60.29,
       "weekend_bps_per_hour": 15.22,
-      "attenuation": 3.88,
+      "attenuation": 3.96,
       "has_anchor": true,
       "observations": 2159
     },
     "QQQUSDT": {
       "symbol": "QQQUSDT",
-      "last_index": 754.0817,
-      "rth_bps_per_hour": 13.91,
+      "last_index": 755.7205,
+      "rth_bps_per_hour": 13.96,
       "weekend_bps_per_hour": 3.04,
-      "attenuation": 4.57,
+      "attenuation": 4.59,
       "has_anchor": true,
       "observations": 2159
     },
     "TQQQUSDT": {
       "symbol": "TQQQUSDT",
-      "last_index": 82.4385,
-      "rth_bps_per_hour": 42.25,
+      "last_index": 82.9856,
+      "rth_bps_per_hour": 42.3,
       "weekend_bps_per_hour": 7.19,
-      "attenuation": 5.88,
+      "attenuation": 5.89,
       "has_anchor": true,
       "observations": 2159
     },
     "SQQQUSDT": {
       "symbol": "SQQQUSDT",
-      "last_index": 32.5573,
-      "rth_bps_per_hour": 42.56,
+      "last_index": 32.3232,
+      "rth_bps_per_hour": 42.92,
       "weekend_bps_per_hour": 6.06,
-      "attenuation": 7.02,
+      "attenuation": 7.08,
       "has_anchor": true,
       "observations": 2159
     }

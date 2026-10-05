@@ -1,0 +1,159 @@
+﻿=== ARGUS paper cycle 2026-10-06_0100 ===
+disk_free_gb=39.6
+sampling MSTRUSDT for 90s (rth)...
+
+MARKOUT ΓÇö MSTRUSDT, 90s of rth, 70 book sample(s), 99 print(s), 14% flagged RPI
+
+   horizon  prints    median      mean     worst
+        5s      99    +0.605    -0.196    -8.783
+       15s      59    -7.268    -3.249    -8.783
+       30s      35    -7.874    -3.054   -15.760
+       60s       0    +0.000    +0.000    +0.000
+
+  Resting on MSTRUSDT (rth) cost a median 7.87bps of adverse selection over 30s across 35 print(s), worst 15.76bps. That exceeds the 2bps maker fee it would save, so passive execution is not free money here and `cost/model.py`'s refusal to credit the maker side stands
+
+written to argus\data\markout.json
+markout_exit=0
+EXECUTABLE COST ΓÇö bps. 'quoted' is the full bid-ask spread; the size columns are
+slippage against mid, taking the ask (a size inside the touch reads half 'quoted').
+
+symbol         quoted      $1000      $5000     $25000    $100000
+-----------------------------------------------------------------
+NVDAUSDT         0.42       0.42       1.19       2.21       2.97
+TSLAUSDT         1.32       0.92       1.79       2.50       4.71
+AAPLUSDT         0.30       0.69       2.10       4.82          ΓÇö
+MSFTUSDT         1.89       2.39       3.50       3.82       4.36
+METAUSDT         1.07       1.90       2.94       3.76      10.49
+GOOGLUSDT        0.86       1.97       2.13       2.39       4.83
+AMZNUSDT         1.18       2.11       2.47       3.44       5.75
+COINUSDT         3.71       2.25       3.53       4.91      11.96
+MSTRUSDT         1.82       1.87       2.80       4.32       6.74
+QQQUSDT          0.13       0.46       0.57       1.00       1.94
+TQQQUSDT         1.20       1.62       1.76       3.35      12.03
+SQQQUSDT         6.21       4.28       5.82      10.88      25.60
+
+12 book(s) written to argus\data\depth.json
+depth_exit=0
+recorded 12 snapshot(s) to argus\data\book_tape.jsonl
+
+  1152 snapshots over 512.614h: a near-touch level holds a median 3.035 contracts. **Change is reported per horizon, not pooled** ΓÇö a level moves a very different share of itself over 30 seconds than over an hour, and one median over both is a number about the sampling schedule rather than about the book. The shortest horizon with at least 100 observations is `under_30s`, where a level moves a median 24.0% of itself ΓÇö that is the figure the simulator should take, being nearest the per-event timescale it models. The attribution rule ΓÇö which side of a resting order a decrease came from ΓÇö is not in this data and cannot be, so it stays a swept assumption rather than a measurement.
+
+written to argus\data\book_calibration.json
+bookcalib_exit=0
+  NVDAUSDT: extended=14.1 overnight=10.8 rth=31.4 weekend=4.4 | reopen=51.6 (1.6x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 21.7bps per bar against a 31.4bps regular-hours bar; no reduction, and this layer may not size up
+  TSLAUSDT: extended=14.2 overnight=11.5 rth=34.1 weekend=5.2 | reopen=74.7 (2.2x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 25.4bps per bar against a 34.1bps regular-hours bar; no reduction, and this layer may not size up
+  AAPLUSDT: extended=9.5 overnight=6.9 rth=22.4 weekend=4.5 | reopen=36.2 (1.6x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 15.2bps per bar against a 22.4bps regular-hours bar; no reduction, and this layer may not size up
+  MSFTUSDT: extended=12.4 overnight=8.7 rth=25.3 weekend=4.7 | reopen=39.6 (1.6x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 17.5bps per bar against a 25.3bps regular-hours bar; no reduction, and this layer may not size up
+  METAUSDT: extended=15.6 overnight=9.4 rth=35.1 weekend=5.9 | reopen=57.7 (1.6x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 23.8bps per bar against a 35.1bps regular-hours bar; no reduction, and this layer may not size up
+  GOOGLUSDT: extended=13.3 overnight=8.4 rth=23.6 weekend=5.3 | reopen=44.1 (1.9x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 17.6bps per bar against a 23.6bps regular-hours bar; no reduction, and this layer may not size up
+  AMZNUSDT: extended=11.9 overnight=7.2 rth=22.8 weekend=4.5 | reopen=36.2 (1.6x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 16.0bps per bar against a 22.8bps regular-hours bar; no reduction, and this layer may not size up
+  COINUSDT: extended=26.7 overnight=18.8 rth=60.7 weekend=12.6 | reopen=95.7 (1.6x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 41.1bps per bar against a 60.7bps regular-hours bar; no reduction, and this layer may not size up
+  MSTRUSDT: extended=34.9 overnight=28.4 rth=61.3 weekend=16.0 | reopen=107.2 (1.7x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 46.3bps per bar against a 61.3bps regular-hours bar; no reduction, and this layer may not size up
+  QQQUSDT: extended=9.1 overnight=8.9 rth=13.8 weekend=3.3 | reopen=25.8 (1.9x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 11.5bps per bar against a 13.8bps regular-hours bar; no reduction, and this layer may not size up
+  TQQQUSDT: extended=26.5 overnight=27.0 rth=41.2 weekend=8.4 | reopen=75.6 (1.8x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 34.2bps per bar against a 41.2bps regular-hours bar; no reduction, and this layer may not size up
+  SQQQUSDT: extended=26.3 overnight=27.9 rth=41.2 weekend=7.9 | reopen=71.3 (1.7x rth, n=63)
+      throttle now x1 ΓÇö the next 24 bar(s) are expected to move 34.0bps per bar against a 41.2bps regular-hours bar; no reduction, and this layer may not size up
+
+12 profile(s) written to argus\data\session_risk.json
+session_risk_exit=0
+symbol        RTH bps/h  wknd bps/h  attenuation  anchor
+NVDAUSDT          31.41        4.12         7.62  OK
+TSLAUSDT          34.45        5.08         6.78  OK
+AAPLUSDT          22.28        3.46         6.43  OK
+MSFTUSDT          25.04        3.55         7.05  OK
+METAUSDT          36.11        4.94         7.32  OK
+GOOGLUSDT         24.36        4.99         4.88  OK
+AMZNUSDT          23.71        3.71         6.39  OK
+COINUSDT          60.11       11.08         5.42  OK
+MSTRUSDT          60.29       15.22         3.96  OK
+QQQUSDT           13.96        3.04         4.59  OK
+TQQQUSDT          42.30        7.19         5.89  OK
+SQQQUSDT          42.92        6.06         7.08  OK
+
+  all 12 shipped instruments still attenuate past 2.5x when the anchor market shuts
+
+written to argus\data\universe_validation.json
+universe_exit=0
+CPI dates: 13, FOMC decisions: 57 -> argus\data\event_calendar.json
+  Wed 14 Oct 12:30 UTC  US CPI release
+  Wed 28 Oct 18:00 UTC  FOMC rate decision
+  Tue 10 Nov 13:30 UTC  US CPI release
+calendar_exit=0
+event_reactions.json is under 20h old; not refreshed
+event_reactions_exit=0
+16815 macro readings written
+macro_exit=0
+  NVDAUSDT hedged with NVDA index (all): r=+0.986 [95% low +0.984], optimal ratio 0.977 removes 97.2% of variance, one-for-one removes 97.1%, n=1438
+  NVDAUSDT hedged with NVDA index (extended): r=+0.998 [95% low +0.998], optimal ratio 0.989 removes 99.7% of variance, one-for-one removes 99.7%, n=409
+  NVDAUSDT hedged with NVDA index (overnight): r=+0.993 [95% low +0.991], optimal ratio 0.980 removes 98.5% of variance, one-for-one removes 98.5%, n=327
+  NVDAUSDT hedged with NVDA index (rth): r=+0.999 [95% low +0.999], optimal ratio 0.984 removes 99.8% of variance, one-for-one removes 99.8%, n=244
+  NVDAUSDT hedged with NVDA index (weekend): r=+0.995 [95% low +0.994], optimal ratio 1.002 removes 99.1% of variance, one-for-one removes 99.1%, n=431
+  TSLAUSDT hedged with TSLA index (all): r=+0.988 [95% low +0.987], optimal ratio 0.988 removes 97.7% of variance, one-for-one removes 97.7%, n=1438
+  TSLAUSDT hedged with TSLA index (extended): r=+0.999 [95% low +0.998], optimal ratio 0.995 removes 99.7% of variance, one-for-one removes 99.7%, n=409
+  TSLAUSDT hedged with TSLA index (overnight): r=+0.996 [95% low +0.995], optimal ratio 0.997 removes 99.2% of variance, one-for-one removes 99.2%, n=327
+  TSLAUSDT hedged with TSLA index (rth): r=+0.999 [95% low +0.999], optimal ratio 0.994 removes 99.9% of variance, one-for-one removes 99.9%, n=244
+  TSLAUSDT hedged with TSLA index (weekend): r=+0.984 [95% low +0.981], optimal ratio 0.993 removes 96.9% of variance, one-for-one removes 96.9%, n=431
+  AAPLUSDT hedged with AAPL index (all): r=+0.985 [95% low +0.983], optimal ratio 0.978 removes 97.0% of variance, one-for-one removes 97.0%, n=1438
+  AAPLUSDT hedged with AAPL index (extended): r=+0.996 [95% low +0.995], optimal ratio 0.981 removes 99.3% of variance, one-for-one removes 99.2%, n=409
+  AAPLUSDT hedged with AAPL index (overnight): r=+0.994 [95% low +0.992], optimal ratio 1.000 removes 98.8% of variance, one-for-one removes 98.8%, n=327
+  AAPLUSDT hedged with AAPL index (rth): r=+0.998 [95% low +0.998], optimal ratio 0.980 removes 99.7% of variance, one-for-one removes 99.7%, n=244
+  AAPLUSDT hedged with AAPL index (weekend): r=+0.993 [95% low +0.992], optimal ratio 1.000 removes 98.7% of variance, one-for-one removes 98.7%, n=431
+  MSFTUSDT hedged with MSFT index (all): r=+0.982 [95% low +0.980], optimal ratio 0.998 removes 96.4% of variance, one-for-one removes 96.4%, n=1438
+  MSFTUSDT hedged with MSFT index (extended): r=+0.996 [95% low +0.995], optimal ratio 0.993 removes 99.1% of variance, one-for-one removes 99.1%, n=409
+  MSFTUSDT hedged with MSFT index (overnight): r=+0.991 [95% low +0.989], optimal ratio 0.990 removes 98.2% of variance, one-for-one removes 98.2%, n=327
+  MSFTUSDT hedged with MSFT index (rth): r=+0.997 [95% low +0.996], optimal ratio 1.002 removes 99.3% of variance, one-for-one removes 99.3%, n=244
+  MSFTUSDT hedged with MSFT index (weekend): r=+0.994 [95% low +0.993], optimal ratio 1.005 removes 98.8% of variance, one-for-one removes 98.8%, n=431
+  METAUSDT hedged with META index (all): r=+0.989 [95% low +0.988], optimal ratio 0.988 removes 97.8% of variance, one-for-one removes 97.8%, n=1438
+  METAUSDT hedged with META index (extended): r=+0.998 [95% low +0.998], optimal ratio 0.986 removes 99.7% of variance, one-for-one removes 99.6%, n=409
+  METAUSDT hedged with META index (overnight): r=+0.996 [95% low +0.995], optimal ratio 0.998 removes 99.2% of variance, one-for-one removes 99.2%, n=327
+  METAUSDT hedged with META index (rth): r=+0.999 [95% low +0.999], optimal ratio 0.994 removes 99.8% of variance, one-for-one removes 99.8%, n=244
+  METAUSDT hedged with META index (weekend): r=+0.996 [95% low +0.995], optimal ratio 1.004 removes 99.2% of variance, one-for-one removes 99.2%, n=431
+  GOOGLUSDT hedged with GOOGL index (all): r=+0.976 [95% low +0.974], optimal ratio 0.980 removes 95.3% of variance, one-for-one removes 95.3%, n=1438
+  GOOGLUSDT hedged with GOOGL index (extended): r=+0.997 [95% low +0.996], optimal ratio 0.990 removes 99.3% of variance, one-for-one removes 99.3%, n=409
+  GOOGLUSDT hedged with GOOGL index (overnight): r=+0.993 [95% low +0.991], optimal ratio 1.000 removes 98.6% of variance, one-for-one removes 98.6%, n=327
+  GOOGLUSDT hedged with GOOGL index (rth): r=+0.998 [95% low +0.998], optimal ratio 0.988 removes 99.6% of variance, one-for-one removes 99.6%, n=244
+  GOOGLUSDT hedged with GOOGL index (weekend): r=+0.987 [95% low +0.985], optimal ratio 1.008 removes 97.5% of variance, one-for-one removes 97.5%, n=431
+  AMZNUSDT hedged with AMZN index (all): r=+0.979 [95% low +0.976], optimal ratio 0.993 removes 95.7% of variance, one-for-one removes 95.7%, n=1438
+  AMZNUSDT hedged with AMZN index (extended): r=+0.995 [95% low +0.994], optimal ratio 1.007 removes 99.1% of variance, one-for-one removes 99.1%, n=409
+  AMZNUSDT hedged with AMZN index (overnight): r=+0.995 [95% low +0.993], optimal ratio 1.002 removes 98.9% of variance, one-for-one removes 98.9%, n=327
+  AMZNUSDT hedged with AMZN index (rth): r=+0.996 [95% low +0.995], optimal ratio 1.007 removes 99.2% of variance, one-for-one removes 99.2%, n=244
+  AMZNUSDT hedged with AMZN index (weekend): r=+0.990 [95% low +0.988], optimal ratio 1.001 removes 98.0% of variance, one-for-one removes 98.0%, n=431
+  COINUSDT hedged with COIN index (all): r=+0.985 [95% low +0.983], optimal ratio 0.991 removes 97.0% of variance, one-for-one removes 97.0%, n=1438
+  COINUSDT hedged with COIN index (extended): r=+0.998 [95% low +0.998], optimal ratio 0.993 removes 99.6% of variance, one-for-one removes 99.6%, n=409
+  COINUSDT hedged with COIN index (overnight): r=+0.994 [95% low +0.993], optimal ratio 0.997 removes 98.9% of variance, one-for-one removes 98.9%, n=327
+  COINUSDT hedged with COIN index (rth): r=+0.999 [95% low +0.999], optimal ratio 0.996 removes 99.9% of variance, one-for-one removes 99.9%, n=244
+  COINUSDT hedged with COIN index (weekend): r=+0.997 [95% low +0.996], optimal ratio 0.997 removes 99.3% of variance, one-for-one removes 99.3%, n=431
+  MSTRUSDT hedged with MSTR index (all): r=+0.981 [95% low +0.979], optimal ratio 0.992 removes 96.3% of variance, one-for-one removes 96.3%, n=1438
+  MSTRUSDT hedged with MSTR index (extended): r=+0.999 [95% low +0.999], optimal ratio 0.994 removes 99.8% of variance, one-for-one removes 99.8%, n=409
+  MSTRUSDT hedged with MSTR index (overnight): r=+0.992 [95% low +0.991], optimal ratio 0.993 removes 98.5% of variance, one-for-one removes 98.5%, n=327
+  MSTRUSDT hedged with MSTR index (rth): r=+1.000 [95% low +1.000], optimal ratio 0.995 removes 99.9% of variance, one-for-one removes 99.9%, n=244
+  MSTRUSDT hedged with MSTR index (weekend): r=+0.996 [95% low +0.995], optimal ratio 0.999 removes 99.1% of variance, one-for-one removes 99.1%, n=431
+  QQQUSDT hedged with QQQ index (all): r=+0.960 [95% low +0.955], optimal ratio 0.973 removes 92.1% of variance, one-for-one removes 92.0%, n=1438
+  QQQUSDT hedged with QQQ index (extended): r=+0.996 [95% low +0.995], optimal ratio 0.990 removes 99.2% of variance, one-for-one removes 99.2%, n=409
+  QQQUSDT hedged with QQQ index (overnight): r=+0.982 [95% low +0.977], optimal ratio 0.995 removes 96.4% of variance, one-for-one removes 96.4%, n=327
+  QQQUSDT hedged with QQQ index (rth): r=+0.998 [95% low +0.997], optimal ratio 0.992 removes 99.5% of variance, one-for-one removes 99.5%, n=244
+  QQQUSDT hedged with QQQ index (weekend): r=+0.982 [95% low +0.979], optimal ratio 1.011 removes 96.5% of variance, one-for-one removes 96.5%, n=431
+  TQQQUSDT hedged with TQQQ index (all): r=+0.968 [95% low +0.965], optimal ratio 0.981 removes 93.7% of variance, one-for-one removes 93.7%, n=1438
+  TQQQUSDT hedged with TQQQ index (extended): r=+0.998 [95% low +0.997], optimal ratio 0.989 removes 99.6% of variance, one-for-one removes 99.5%, n=409
+  TQQQUSDT hedged with TQQQ index (overnight): r=+0.980 [95% low +0.975], optimal ratio 0.989 removes 96.0% of variance, one-for-one removes 95.9%, n=327
+  TQQQUSDT hedged with TQQQ index (rth): r=+0.998 [95% low +0.998], optimal ratio 0.987 removes 99.7% of variance, one-for-one removes 99.6%, n=244
+  TQQQUSDT hedged with TQQQ index (weekend): r=+0.985 [95% low +0.982], optimal ratio 1.019 removes 97.0% of variance, one-for-one removes 97.0%, n=431
+  SQQQUSDT hedged with SQQQ index (all): r=+0.961 [95% low +0.957], optimal ratio 0.982 removes 92.3% of variance, one-for-one removes 92.3%, n=1438
+  SQQQUSDT hedged with SQQQ index (extended): r=+0.995 [95% low +0.993], optimal ratio 0.982 removes 98.9% of variance, one-for-one removes 98.9%, n=409
+  SQQQUSDT hedged with SQQQ index (overnight): r=+0.977 [95% low +0.972], optimal ratio 0.987 removes 95.5% of variance, one-for-one removes 95.5%, n=327
+  SQQQUSDT hedged with SQQQ index (rth): r=+0.995 [95% low +0.994], optimal ratio 1.002 removes 99.1% of variance, one-for-one removes 99.1%, n=244
+  SQQQUSDT hedged with SQQQ index (weekend): r=+0.987 [95% low +0.985], optimal ratio 1.022 removes 97.5% of variance, one-for-one removes 97.5%, n=431
+
+60 measurement(s) written to argus\data\hedge_effectiveness.json
+effectiveness_exit=0

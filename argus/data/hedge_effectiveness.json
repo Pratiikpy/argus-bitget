@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-05T17:41:05.806302+00:00",
+  "generated_at": "2026-10-05T19:40:25.520171+00:00",
   "window_days": 60,
   "measurements": [
     {
@@ -7,12 +7,12 @@
       "hedge": "NVDA index",
       "phase": "all",
       "observations": 1438,
-      "correlation": 0.98566,
-      "correlation_low": 0.98411,
-      "hedge_ratio": 0.976568,
-      "r_squared": 0.971526,
-      "unit_ratio_effectiveness": 0.970967,
-      "measured_at": "2026-10-05T17:36:41.475869+00:00",
+      "correlation": 0.985711,
+      "correlation_low": 0.984165,
+      "hedge_ratio": 0.976838,
+      "r_squared": 0.971626,
+      "unit_ratio_effectiveness": 0.971079,
+      "measured_at": "2026-10-05T19:36:38.817416+00:00",
       "window_days": 60
     },
     {
@@ -25,7 +25,7 @@
       "hedge_ratio": 0.989306,
       "r_squared": 0.996808,
       "unit_ratio_effectiveness": 0.996692,
-      "measured_at": "2026-10-05T17:36:41.476866+00:00",
+      "measured_at": "2026-10-05T19:36:38.818920+00:00",
       "window_days": 60
     },
     {
@@ -38,7 +38,7 @@
       "hedge_ratio": 0.980438,
       "r_squared": 0.985329,
       "unit_ratio_effectiveness": 0.984937,
-      "measured_at": "2026-10-05T17:36:41.476866+00:00",
+      "measured_at": "2026-10-05T19:36:38.818920+00:00",
       "window_days": 60
     },
     {
@@ -46,12 +46,12 @@
       "hedge": "NVDA index",
       "phase": "rth",
       "observations": 244,
-      "correlation": 0.998962,
-      "correlation_low": 0.998665,
-      "hedge_ratio": 0.983942,
-      "r_squared": 0.997926,
-      "unit_ratio_effectiveness": 0.99766,
-      "measured_at": "2026-10-05T17:36:41.476866+00:00",
+      "correlation": 0.998945,
+      "correlation_low": 0.998642,
+      "hedge_ratio": 0.984201,
+      "r_squared": 0.99789,
+      "unit_ratio_effectiveness": 0.997633,
+      "measured_at": "2026-10-05T19:36:38.819924+00:00",
       "window_days": 60
     },
     {
@@ -64,7 +64,7 @@
       "hedge_ratio": 1.002131,
       "r_squared": 0.990867,
       "unit_ratio_effectiveness": 0.990863,
-      "measured_at": "2026-10-05T17:36:41.477868+00:00",
+      "measured_at": "2026-10-05T19:36:38.819924+00:00",
       "window_days": 60
     },
     {
@@ -72,12 +72,12 @@
       "hedge": "TSLA index",
       "phase": "all",
       "observations": 1438,
-      "correlation": 0.988435,
-      "correlation_low": 0.987182,
-      "hedge_ratio": 0.987922,
-      "r_squared": 0.977004,
-      "unit_ratio_effectiveness": 0.976858,
-      "measured_at": "2026-10-05T17:37:03.509118+00:00",
+      "correlation": 0.988443,
+      "correlation_low": 0.987191,
+      "hedge_ratio": 0.987947,
+      "r_squared": 0.97702,
+      "unit_ratio_effectiveness": 0.976874,
+      "measured_at": "2026-10-05T19:36:59.357487+00:00",
       "window_days": 60
     },
     {
@@ -90,7 +90,7 @@
       "hedge_ratio": 0.995287,
       "r_squared": 0.997458,
       "unit_ratio_effectiveness": 0.997435,
-      "measured_at": "2026-10-05T17:37:03.509118+00:00",
+      "measured_at": "2026-10-05T19:36:59.357487+00:00",
       "window_days": 60
     },
     {
@@ -103,7 +103,7 @@
       "hedge_ratio": 0.997244,
       "r_squared": 0.991961,
       "unit_ratio_effectiveness": 0.991953,
-      "measured_at": "2026-10-05T17:37:03.510115+00:00",
+      "measured_at": "2026-10-05T19:36:59.357487+00:00",
       "window_days": 60
     },
     {
@@ -111,12 +111,12 @@
       "hedge": "TSLA index",
       "phase": "rth",
       "observations": 244,
-      "correlation": 0.999446,
-      "correlation_low": 0.999287,
-      "hedge_ratio": 0.994058,
-      "r_squared": 0.998892,
-      "unit_ratio_effectiveness": 0.998856,
-      "measured_at": "2026-10-05T17:37:03.510620+00:00",
+      "correlation": 0.999427,
+      "correlation_low": 0.999263,
+      "hedge_ratio": 0.994182,
+      "r_squared": 0.998855,
+      "unit_ratio_effectiveness": 0.998821,
+      "measured_at": "2026-10-05T19:36:59.358991+00:00",
       "window_days": 60
     },
     {
@@ -129,7 +129,7 @@
       "hedge_ratio": 0.992881,
       "r_squared": 0.969014,
       "unit_ratio_effectiveness": 0.968964,
-      "measured_at": "2026-10-05T17:37:03.511152+00:00",
+      "measured_at": "2026-10-05T19:36:59.359549+00:00",
       "window_days": 60
     },
     {
@@ -137,12 +137,12 @@
       "hedge": "AAPL index",
       "phase": "all",
       "observations": 1438,
-      "correlation": 0.984842,
-      "correlation_low": 0.983204,
-      "hedge_ratio": 0.978595,
-      "r_squared": 0.969915,
-      "unit_ratio_effectiveness": 0.969451,
-      "measured_at": "2026-10-05T17:37:26.349923+00:00",
+      "correlation": 0.984935,
+      "correlation_low": 0.983306,
+      "hedge_ratio": 0.978085,
+      "r_squared": 0.970097,
+      "unit_ratio_effectiveness": 0.96961,
+      "measured_at": "2026-10-05T19:37:19.968811+00:00",
       "window_days": 60
     },
     {
@@ -155,7 +155,7 @@
       "hedge_ratio": 0.981421,
       "r_squared": 0.992555,
       "unit_ratio_effectiveness": 0.992199,
-      "measured_at": "2026-10-05T17:37:26.350924+00:00",
+      "measured_at": "2026-10-05T19:37:19.969810+00:00",
       "window_days": 60
     },
     {
@@ -168,7 +168,7 @@
       "hedge_ratio": 1.000338,
       "r_squared": 0.987634,
       "unit_ratio_effectiveness": 0.987634,
-      "measured_at": "2026-10-05T17:37:26.350924+00:00",
+      "measured_at": "2026-10-05T19:37:19.970810+00:00",
       "window_days": 60
     },
     {
@@ -176,12 +176,12 @@
       "hedge": "AAPL index",
       "phase": "rth",
       "observations": 244,
-      "correlation": 0.998395,
-      "correlation_low": 0.997935,
-      "hedge_ratio": 0.97934,
-      "r_squared": 0.996793,
-      "unit_ratio_effectiveness": 0.996349,
-      "measured_at": "2026-10-05T17:37:26.350924+00:00",
+      "correlation": 0.998464,
+      "correlation_low": 0.998024,
+      "hedge_ratio": 0.979718,
+      "r_squared": 0.996931,
+      "unit_ratio_effectiveness": 0.996504,
+      "measured_at": "2026-10-05T19:37:19.970810+00:00",
       "window_days": 60
     },
     {
@@ -194,7 +194,7 @@
       "hedge_ratio": 0.999715,
       "r_squared": 0.986742,
       "unit_ratio_effectiveness": 0.986742,
-      "measured_at": "2026-10-05T17:37:26.352431+00:00",
+      "measured_at": "2026-10-05T19:37:19.971810+00:00",
       "window_days": 60
     },
     {
@@ -202,12 +202,12 @@
       "hedge": "MSFT index",
       "phase": "all",
       "observations": 1438,
-      "correlation": 0.981628,
-      "correlation_low": 0.979646,
-      "hedge_ratio": 0.998768,
-      "r_squared": 0.963594,
-      "unit_ratio_effectiveness": 0.963593,
-      "measured_at": "2026-10-05T17:37:49.158013+00:00",
+      "correlation": 0.981637,
+      "correlation_low": 0.979655,
+      "hedge_ratio": 0.998007,
+      "r_squared": 0.963611,
+      "unit_ratio_effectiveness": 0.963607,
+      "measured_at": "2026-10-05T19:37:40.356963+00:00",
       "window_days": 60
     },
     {
@@ -220,7 +220,7 @@
       "hedge_ratio": 0.992565,
       "r_squared": 0.991459,
       "unit_ratio_effectiveness": 0.991403,
-      "measured_at": "2026-10-05T17:37:49.159519+00:00",
+      "measured_at": "2026-10-05T19:37:40.357964+00:00",
       "window_days": 60
     },
     {
@@ -233,7 +233,7 @@
       "hedge_ratio": 0.989833,
       "r_squared": 0.982327,
       "unit_ratio_effectiveness": 0.982223,
-      "measured_at": "2026-10-05T17:37:49.159519+00:00",
+      "measured_at": "2026-10-05T19:37:40.357964+00:00",
       "window_days": 60
     },
     {
@@ -241,12 +241,12 @@
       "hedge": "MSFT index",
       "phase": "rth",
       "observations": 244,
-      "correlation": 0.996702,
-      "correlation_low": 0.995756,
-      "hedge_ratio": 1.001769,
-      "r_squared": 0.993414,
-      "unit_ratio_effectiveness": 0.993411,
-      "measured_at": "2026-10-05T17:37:49.159519+00:00",
+      "correlation": 0.996703,
+      "correlation_low": 0.995758,
+      "hedge_ratio": 1.001667,
+      "r_squared": 0.993417,
+      "unit_ratio_effectiveness": 0.993414,
+      "measured_at": "2026-10-05T19:37:40.358963+00:00",
       "window_days": 60
     },
     {
@@ -259,7 +259,7 @@
       "hedge_ratio": 1.005415,
       "r_squared": 0.988363,
       "unit_ratio_effectiveness": 0.988335,
-      "measured_at": "2026-10-05T17:37:49.161039+00:00",
+      "measured_at": "2026-10-05T19:37:40.358963+00:00",
       "window_days": 60
     },
     {
@@ -267,12 +267,12 @@
       "hedge": "META index",
       "phase": "all",
       "observations": 1438,
-      "correlation": 0.988858,
-      "correlation_low": 0.987651,
-      "hedge_ratio": 0.988529,
-      "r_squared": 0.977841,
-      "unit_ratio_effectiveness": 0.977709,
-      "measured_at": "2026-10-05T17:38:10.744881+00:00",
+      "correlation": 0.988862,
+      "correlation_low": 0.987655,
+      "hedge_ratio": 0.98849,
+      "r_squared": 0.977848,
+      "unit_ratio_effectiveness": 0.977716,
+      "measured_at": "2026-10-05T19:38:01.081144+00:00",
       "window_days": 60
     },
     {
@@ -285,7 +285,7 @@
       "hedge_ratio": 0.98638,
       "r_squared": 0.996685,
       "unit_ratio_effectiveness": 0.996495,
-      "measured_at": "2026-10-05T17:38:10.744881+00:00",
+      "measured_at": "2026-10-05T19:38:01.081144+00:00",
       "window_days": 60
     },
     {
@@ -298,7 +298,7 @@
       "hedge_ratio": 0.998466,
       "r_squared": 0.992425,
       "unit_ratio_effectiveness": 0.992422,
-      "measured_at": "2026-10-05T17:38:10.744881+00:00",
+      "measured_at": "2026-10-05T19:38:01.082144+00:00",
       "window_days": 60
     },
     {
@@ -306,12 +306,12 @@
       "hedge": "META index",
       "phase": "rth",
       "observations": 244,
-      "correlation": 0.998931,
-      "correlation_low": 0.998624,
-      "hedge_ratio": 0.994077,
-      "r_squared": 0.997863,
-      "unit_ratio_effectiveness": 0.997828,
-      "measured_at": "2026-10-05T17:38:10.745887+00:00",
+      "correlation": 0.998926,
+      "correlation_low": 0.998617,
+      "hedge_ratio": 0.994139,
+      "r_squared": 0.997852,
+      "unit_ratio_effectiveness": 0.997818,
+      "measured_at": "2026-10-05T19:38:01.082652+00:00",
       "window_days": 60
     },
     {
@@ -324,7 +324,7 @@
       "hedge_ratio": 1.004413,
       "r_squared": 0.991758,
       "unit_ratio_effectiveness": 0.991739,
-      "measured_at": "2026-10-05T17:38:10.746392+00:00",
+      "measured_at": "2026-10-05T19:38:01.082652+00:00",
       "window_days": 60
     },
     {
@@ -332,12 +332,12 @@
       "hedge": "GOOGL index",
       "phase": "all",
       "observations": 1438,
-      "correlation": 0.976197,
-      "correlation_low": 0.973636,
-      "hedge_ratio": 0.980374,
-      "r_squared": 0.952961,
-      "unit_ratio_effectiveness": 0.952579,
-      "measured_at": "2026-10-05T17:38:54.011580+00:00",
+      "correlation": 0.976262,
+      "correlation_low": 0.973708,
+      "hedge_ratio": 0.980211,
+      "r_squared": 0.953088,
+      "unit_ratio_effectiveness": 0.952699,
+      "measured_at": "2026-10-05T19:38:21.778786+00:00",
       "window_days": 60
     },
     {
@@ -350,7 +350,7 @@
       "hedge_ratio": 0.989964,
       "r_squared": 0.993077,
       "unit_ratio_effectiveness": 0.992975,
-      "measured_at": "2026-10-05T17:38:54.011580+00:00",
+      "measured_at": "2026-10-05T19:38:21.778786+00:00",
       "window_days": 60
     },
     {
@@ -363,7 +363,7 @@
       "hedge_ratio": 1.000384,
       "r_squared": 0.986022,
       "unit_ratio_effectiveness": 0.986022,
-      "measured_at": "2026-10-05T17:38:54.012587+00:00",
+      "measured_at": "2026-10-05T19:38:21.779786+00:00",
       "window_days": 60
     },
     {
@@ -371,12 +371,12 @@
       "hedge": "GOOGL index",
       "phase": "rth",
       "observations": 244,
-      "correlation": 0.998091,
-      "correlation_low": 0.997544,
-      "hedge_ratio": 0.989543,
-      "r_squared": 0.996186,
-      "unit_ratio_effectiveness": 0.996075,
-      "measured_at": "2026-10-05T17:38:54.012587+00:00",
+      "correlation": 0.998195,
+      "correlation_low": 0.997677,
+      "hedge_ratio": 0.988484,
+      "r_squared": 0.996393,
+      "unit_ratio_effectiveness": 0.996257,
+      "measured_at": "2026-10-05T19:38:21.779786+00:00",
       "window_days": 60
     },
     {
@@ -389,7 +389,7 @@
       "hedge_ratio": 1.007759,
       "r_squared": 0.974716,
       "unit_ratio_effectiveness": 0.974658,
-      "measured_at": "2026-10-05T17:38:54.013586+00:00",
+      "measured_at": "2026-10-05T19:38:21.779786+00:00",
       "window_days": 60
     },
     {
@@ -397,12 +397,12 @@
       "hedge": "AMZN index",
       "phase": "all",
       "observations": 1438,
-      "correlation": 0.978328,
-      "correlation_low": 0.975993,
-      "hedge_ratio": 0.993825,
-      "r_squared": 0.957125,
-      "unit_ratio_effectiveness": 0.957088,
-      "measured_at": "2026-10-05T17:39:16.092110+00:00",
+      "correlation": 0.978515,
+      "correlation_low": 0.976201,
+      "hedge_ratio": 0.993376,
+      "r_squared": 0.957492,
+      "unit_ratio_effectiveness": 0.957449,
+      "measured_at": "2026-10-05T19:38:42.175442+00:00",
       "window_days": 60
     },
     {
@@ -415,7 +415,7 @@
       "hedge_ratio": 1.006768,
       "r_squared": 0.990808,
       "unit_ratio_effectiveness": 0.990763,
-      "measured_at": "2026-10-05T17:39:16.092110+00:00",
+      "measured_at": "2026-10-05T19:38:42.176442+00:00",
       "window_days": 60
     },
     {
@@ -428,7 +428,7 @@
       "hedge_ratio": 1.001743,
       "r_squared": 0.989318,
       "unit_ratio_effectiveness": 0.989315,
-      "measured_at": "2026-10-05T17:39:16.092110+00:00",
+      "measured_at": "2026-10-05T19:38:42.176442+00:00",
       "window_days": 60
     },
     {
@@ -436,12 +436,12 @@
       "hedge": "AMZN index",
       "phase": "rth",
       "observations": 244,
-      "correlation": 0.996103,
-      "correlation_low": 0.994986,
-      "hedge_ratio": 1.0053,
-      "r_squared": 0.992221,
-      "unit_ratio_effectiveness": 0.992193,
-      "measured_at": "2026-10-05T17:39:16.093110+00:00",
+      "correlation": 0.996085,
+      "correlation_low": 0.994964,
+      "hedge_ratio": 1.006603,
+      "r_squared": 0.992186,
+      "unit_ratio_effectiveness": 0.992143,
+      "measured_at": "2026-10-05T19:38:42.176442+00:00",
       "window_days": 60
     },
     {
@@ -454,7 +454,7 @@
       "hedge_ratio": 1.001237,
       "r_squared": 0.980445,
       "unit_ratio_effectiveness": 0.980443,
-      "measured_at": "2026-10-05T17:39:16.093110+00:00",
+      "measured_at": "2026-10-05T19:38:42.177945+00:00",
       "window_days": 60
     },
     {
@@ -462,12 +462,12 @@
       "hedge": "COIN index",
       "phase": "all",
       "observations": 1438,
-      "correlation": 0.985096,
-      "correlation_low": 0.983485,
-      "hedge_ratio": 0.99129,
-      "r_squared": 0.970415,
-      "unit_ratio_effectiveness": 0.97034,
-      "measured_at": "2026-10-05T17:39:38.350869+00:00",
+      "correlation": 0.9851,
+      "correlation_low": 0.983489,
+      "hedge_ratio": 0.991402,
+      "r_squared": 0.970422,
+      "unit_ratio_effectiveness": 0.970349,
+      "measured_at": "2026-10-05T19:39:02.808330+00:00",
       "window_days": 60
     },
     {
@@ -480,7 +480,7 @@
       "hedge_ratio": 0.992611,
       "r_squared": 0.995887,
       "unit_ratio_effectiveness": 0.995832,
-      "measured_at": "2026-10-05T17:39:38.350869+00:00",
+      "measured_at": "2026-10-05T19:39:02.809330+00:00",
       "window_days": 60
     },
     {
@@ -493,7 +493,7 @@
       "hedge_ratio": 0.996855,
       "r_squared": 0.988666,
       "unit_ratio_effectiveness": 0.988656,
-      "measured_at": "2026-10-05T17:39:38.352382+00:00",
+      "measured_at": "2026-10-05T19:39:02.809834+00:00",
       "window_days": 60
     },
     {
@@ -501,12 +501,12 @@
       "hedge": "COIN index",
       "phase": "rth",
       "observations": 244,
-      "correlation": 0.999501,
-      "correlation_low": 0.999358,
-      "hedge_ratio": 0.995017,
-      "r_squared": 0.999003,
-      "unit_ratio_effectiveness": 0.998978,
-      "measured_at": "2026-10-05T17:39:38.352382+00:00",
+      "correlation": 0.999498,
+      "correlation_low": 0.999354,
+      "hedge_ratio": 0.995779,
+      "r_squared": 0.998997,
+      "unit_ratio_effectiveness": 0.998979,
+      "measured_at": "2026-10-05T19:39:02.809834+00:00",
       "window_days": 60
     },
     {
@@ -519,7 +519,7 @@
       "hedge_ratio": 0.997264,
       "r_squared": 0.993087,
       "unit_ratio_effectiveness": 0.993079,
-      "measured_at": "2026-10-05T17:39:38.352382+00:00",
+      "measured_at": "2026-10-05T19:39:02.810837+00:00",
       "window_days": 60
     },
     {
@@ -527,12 +527,12 @@
       "hedge": "MSTR index",
       "phase": "all",
       "observations": 1438,
-      "correlation": 0.981223,
-      "correlation_low": 0.979197,
-      "hedge_ratio": 0.992395,
-      "r_squared": 0.962798,
-      "unit_ratio_effectiveness": 0.962742,
-      "measured_at": "2026-10-05T17:39:59.891334+00:00",
+      "correlation": 0.981253,
+      "correlation_low": 0.97923,
+      "hedge_ratio": 0.992345,
+      "r_squared": 0.962857,
+      "unit_ratio_effectiveness": 0.962799,
+      "measured_at": "2026-10-05T19:39:23.392247+00:00",
       "window_days": 60
     },
     {
@@ -545,7 +545,7 @@
       "hedge_ratio": 0.994353,
       "r_squared": 0.998109,
       "unit_ratio_effectiveness": 0.998077,
-      "measured_at": "2026-10-05T17:39:59.891334+00:00",
+      "measured_at": "2026-10-05T19:39:23.393247+00:00",
       "window_days": 60
     },
     {
@@ -558,7 +558,7 @@
       "hedge_ratio": 0.992833,
       "r_squared": 0.984779,
       "unit_ratio_effectiveness": 0.984728,
-      "measured_at": "2026-10-05T17:39:59.892332+00:00",
+      "measured_at": "2026-10-05T19:39:23.393247+00:00",
       "window_days": 60
     },
     {
@@ -566,12 +566,12 @@
       "hedge": "MSTR index",
       "phase": "rth",
       "observations": 244,
-      "correlation": 0.999726,
-      "correlation_low": 0.999647,
-      "hedge_ratio": 0.99445,
-      "r_squared": 0.999451,
-      "unit_ratio_effectiveness": 0.99942,
-      "measured_at": "2026-10-05T17:39:59.892332+00:00",
+      "correlation": 0.999722,
+      "correlation_low": 0.999642,
+      "hedge_ratio": 0.994564,
+      "r_squared": 0.999443,
+      "unit_ratio_effectiveness": 0.999413,
+      "measured_at": "2026-10-05T19:39:23.393247+00:00",
       "window_days": 60
     },
     {
@@ -584,7 +584,7 @@
       "hedge_ratio": 0.998778,
       "r_squared": 0.991496,
       "unit_ratio_effectiveness": 0.991495,
-      "measured_at": "2026-10-05T17:39:59.893334+00:00",
+      "measured_at": "2026-10-05T19:39:23.394248+00:00",
       "window_days": 60
     },
     {
@@ -592,12 +592,12 @@
       "hedge": "QQQ index",
       "phase": "all",
       "observations": 1438,
-      "correlation": 0.959529,
-      "correlation_low": 0.955215,
-      "hedge_ratio": 0.973035,
-      "r_squared": 0.920695,
-      "unit_ratio_effectiveness": 0.919988,
-      "measured_at": "2026-10-05T17:40:22.221350+00:00",
+      "correlation": 0.959549,
+      "correlation_low": 0.955237,
+      "hedge_ratio": 0.972987,
+      "r_squared": 0.920734,
+      "unit_ratio_effectiveness": 0.920024,
+      "measured_at": "2026-10-05T19:39:44.032626+00:00",
       "window_days": 60
     },
     {
@@ -610,7 +610,7 @@
       "hedge_ratio": 0.990337,
       "r_squared": 0.991734,
       "unit_ratio_effectiveness": 0.991639,
-      "measured_at": "2026-10-05T17:40:22.222352+00:00",
+      "measured_at": "2026-10-05T19:39:44.033631+00:00",
       "window_days": 60
     },
     {
@@ -623,7 +623,7 @@
       "hedge_ratio": 0.994955,
       "r_squared": 0.963638,
       "unit_ratio_effectiveness": 0.963613,
-      "measured_at": "2026-10-05T17:40:22.222352+00:00",
+      "measured_at": "2026-10-05T19:39:44.033631+00:00",
       "window_days": 60
     },
     {
@@ -631,12 +631,12 @@
       "hedge": "QQQ index",
       "phase": "rth",
       "observations": 244,
-      "correlation": 0.997609,
-      "correlation_low": 0.996923,
-      "hedge_ratio": 0.991618,
-      "r_squared": 0.995224,
-      "unit_ratio_effectiveness": 0.995153,
-      "measured_at": "2026-10-05T17:40:22.223353+00:00",
+      "correlation": 0.997581,
+      "correlation_low": 0.996888,
+      "hedge_ratio": 0.992067,
+      "r_squared": 0.995169,
+      "unit_ratio_effectiveness": 0.995105,
+      "measured_at": "2026-10-05T19:39:44.034630+00:00",
       "window_days": 60
     },
     {
@@ -649,7 +649,7 @@
       "hedge_ratio": 1.010815,
       "r_squared": 0.964892,
       "unit_ratio_effectiveness": 0.964781,
-      "measured_at": "2026-10-05T17:40:22.223858+00:00",
+      "measured_at": "2026-10-05T19:39:44.035134+00:00",
       "window_days": 60
     },
     {
@@ -657,12 +657,12 @@
       "hedge": "TQQQ index",
       "phase": "all",
       "observations": 1438,
-      "correlation": 0.968082,
-      "correlation_low": 0.964664,
-      "hedge_ratio": 0.981222,
-      "r_squared": 0.937183,
-      "unit_ratio_effectiveness": 0.93684,
-      "measured_at": "2026-10-05T17:40:44.221865+00:00",
+      "correlation": 0.968101,
+      "correlation_low": 0.964685,
+      "hedge_ratio": 0.981219,
+      "r_squared": 0.937219,
+      "unit_ratio_effectiveness": 0.936876,
+      "measured_at": "2026-10-05T19:40:04.631857+00:00",
       "window_days": 60
     },
     {
@@ -675,7 +675,7 @@
       "hedge_ratio": 0.988804,
       "r_squared": 0.995602,
       "unit_ratio_effectiveness": 0.995474,
-      "measured_at": "2026-10-05T17:40:44.221865+00:00",
+      "measured_at": "2026-10-05T19:40:04.632365+00:00",
       "window_days": 60
     },
     {
@@ -688,7 +688,7 @@
       "hedge_ratio": 0.98883,
       "r_squared": 0.959574,
       "unit_ratio_effectiveness": 0.959451,
-      "measured_at": "2026-10-05T17:40:44.221865+00:00",
+      "measured_at": "2026-10-05T19:40:04.632365+00:00",
       "window_days": 60
     },
     {
@@ -696,12 +696,12 @@
       "hedge": "TQQQ index",
       "phase": "rth",
       "observations": 244,
-      "correlation": 0.998339,
-      "correlation_low": 0.997863,
-      "hedge_ratio": 0.986107,
-      "r_squared": 0.996681,
-      "unit_ratio_effectiveness": 0.996483,
-      "measured_at": "2026-10-05T17:40:44.221865+00:00",
+      "correlation": 0.998324,
+      "correlation_low": 0.997843,
+      "hedge_ratio": 0.986577,
+      "r_squared": 0.99665,
+      "unit_ratio_effectiveness": 0.996466,
+      "measured_at": "2026-10-05T19:40:04.633367+00:00",
       "window_days": 60
     },
     {
@@ -714,7 +714,7 @@
       "hedge_ratio": 1.018532,
       "r_squared": 0.970062,
       "unit_ratio_effectiveness": 0.969741,
-      "measured_at": "2026-10-05T17:40:44.223401+00:00",
+      "measured_at": "2026-10-05T19:40:04.634369+00:00",
       "window_days": 60
     },
     {
@@ -722,12 +722,12 @@
       "hedge": "SQQQ index",
       "phase": "all",
       "observations": 1438,
-      "correlation": 0.960926,
-      "correlation_low": 0.956758,
-      "hedge_ratio": 0.98256,
-      "r_squared": 0.923379,
-      "unit_ratio_effectiveness": 0.923088,
-      "measured_at": "2026-10-05T17:41:05.804224+00:00",
+      "correlation": 0.960835,
+      "correlation_low": 0.956657,
+      "hedge_ratio": 0.982204,
+      "r_squared": 0.923203,
+      "unit_ratio_effectiveness": 0.9229,
+      "measured_at": "2026-10-05T19:40:25.517627+00:00",
       "window_days": 60
     },
     {
@@ -740,7 +740,7 @@
       "hedge_ratio": 0.982104,
       "r_squared": 0.989078,
       "unit_ratio_effectiveness": 0.988749,
-      "measured_at": "2026-10-05T17:41:05.804729+00:00",
+      "measured_at": "2026-10-05T19:40:25.518167+00:00",
       "window_days": 60
     },
     {
@@ -753,7 +753,7 @@
       "hedge_ratio": 0.987132,
       "r_squared": 0.955466,
       "unit_ratio_effectiveness": 0.955304,
-      "measured_at": "2026-10-05T17:41:05.805296+00:00",
+      "measured_at": "2026-10-05T19:40:25.518167+00:00",
       "window_days": 60
     },
     {
@@ -761,12 +761,12 @@
       "hedge": "SQQQ index",
       "phase": "rth",
       "observations": 244,
-      "correlation": 0.995523,
-      "correlation_low": 0.99424,
-      "hedge_ratio": 1.003102,
-      "r_squared": 0.991065,
-      "unit_ratio_effectiveness": 0.991056,
-      "measured_at": "2026-10-05T17:41:05.805296+00:00",
+      "correlation": 0.995359,
+      "correlation_low": 0.994029,
+      "hedge_ratio": 1.002169,
+      "r_squared": 0.990739,
+      "unit_ratio_effectiveness": 0.990734,
+      "measured_at": "2026-10-05T19:40:25.519172+00:00",
       "window_days": 60
     },
     {
@@ -779,7 +779,7 @@
       "hedge_ratio": 1.021939,
       "r_squared": 0.9751,
       "unit_ratio_effectiveness": 0.974651,
-      "measured_at": "2026-10-05T17:41:05.805296+00:00",
+      "measured_at": "2026-10-05T19:40:25.520171+00:00",
       "window_days": 60
     }
   ]
