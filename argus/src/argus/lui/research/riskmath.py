@@ -357,6 +357,14 @@ FRED_SERIES: dict[str, str] = {
 }
 
 
+FRED_HISTORY: dict[str, int] = {
+    "DGS3MO": 400, "T10Y2Y": 1900, "T10Y3M": 60, "DFII10": 400, "DFEDTARU": 9000,
+}
+"""Series the round-41 readers use (Circle's T-bill, the curve, real yields, the Fed's target
+history), with the days each needs. They ship in the snapshot because the hosted console
+reaches FRED only sometimes: Circle's T-bill line vanished from a live answer when it did not."""
+
+
 FRED_MONTHLY: dict[str, str] = {
     "CPIAUCSL": "CPI", "CPILFESL": "core CPI", "PCEPI": "PCE price index",
     "PCEPILFE": "core PCE price index",

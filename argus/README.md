@@ -52,9 +52,9 @@ Product requirements: [`../ARGUS-MASTER-PRD.md`](../ARGUS-MASTER-PRD.md)
 ## Status, measured on 2026-09-29
 
 ```
-12,304 tests collected   ruff clean   mypy --strict clean on 661 source files
+12,306 tests collected   ruff clean   mypy --strict clean on 661 source files
 152/152 modules importable           18/18 sub-themes resolve to a symbol and a test file
-1106 decisions in the paper ledger (as of 2026-10-01)  chain verifies, head anchor agrees, no truncation
+1110 decisions in the paper ledger (as of 2026-10-01)  chain verifies, head anchor agrees, no truncation
 4 settled trades, none open; 2 rows VOID (see above)   960 of 962 non-void decisions abstained
 ```
 
@@ -219,7 +219,7 @@ that was read. None of them is claimed as *proven better* — see "The honest pa
 
 ## The honest part
 
-- **Two positions have settled, both at a loss.** Of 1106 ledger entries, seq 797,
+- **Two positions have settled, both at a loss.** Of 1110 ledger entries, seq 797,
   BUY 1 NVDAUSDT at 232.45, opened 2026-09-28 13:47 UTC, settled 2026-09-29 at 230.96 for a net
   loss of 1.78 USDT; seq 884, SELL 1 METAUSDT at 728.17, opened 2026-09-30 13:41 UTC, settled
   2026-10-01 at 731.55 for a net loss of 4.45 USDT. Net across both: -6.22 USDT, 0 of 2 right.
@@ -233,7 +233,7 @@ that was read. None of them is claimed as *proven better* — see "The honest pa
   right 3.8% of the time against a base rate of up-moves of exactly 3.8% — a schema being filled in,
   not a view. So the desk now states a **lean** on every decision including the ones it refuses,
   covered by the chain through the intent hash and graded against the move that followed
-  (`eval/shadow.py`). **935 decisions carry a lean** in the shadow record, UP and DOWN at differing
+  (`eval/shadow.py`). **939 decisions carry a lean** in the shadow record, UP and DOWN at differing
   confidences where `side` never varied, and they are now graded: 297 of 535 settled directional calls were right at the ~2h
   horizon (`data/refusal_alpha.json`, above).
 - The abstentions are correct rather than broken: the log begins on a weekend with the anchor market

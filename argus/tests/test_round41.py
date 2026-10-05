@@ -616,3 +616,14 @@ class TestLiveReask:
         assert _stated_move("What happens to Circle if rates drop 50bp?") == 0.5
         assert _stated_move("Circle if bill yields rise 0.5%") == -0.5
         assert _stated_move("market cap of Circle") is None
+
+    def test_the_round41_fred_series_ship_in_the_snapshot(self) -> None:
+        from argus.lui.research.riskmath import FRED_HISTORY
+
+        assert {"DGS3MO", "T10Y2Y", "T10Y3M", "DFII10", "DFEDTARU"} <= set(FRED_HISTORY)
+
+    def test_basis_points_on_bill_rates_are_read(self) -> None:
+        from argus.lui.research.stablecoin_issuer import _stated_move
+
+        assert _stated_move("How much would Circle lose a year if Treasury bill rates dropped "
+                            "75 basis points?") == 0.75

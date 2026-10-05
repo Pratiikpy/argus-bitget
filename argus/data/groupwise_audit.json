@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-05T16:01:28+00:00",
+  "generated_at": "2026-10-05T16:34:15+00:00",
   "method": "Mind2Web metric.py:236-259 (MIT): per-group mean and count, macro average, 0/1/2/3/>3 histogram; read by argus.eval.groupwise into four flags (carried_by_one_group, single_group, macro_disagrees, flips_across_halves)",
   "register_artefacts": [
     "data/abstention_comparison.json",
@@ -4020,7 +4020,7 @@
     "data/desk_notes.jsonl": {
       "status": "no_rows",
       "reason": "free-text notes per live cycle; the feedlist harness reduces them to one distinct-source count and no per-cycle value is recorded",
-      "sha256": "74f93fcee290afe967c6b7a43b2e0f1fd2b77bd294302b5129bcef32d9a86372",
+      "sha256": "cda6ffa15e2a88b5f7e2617da1cba4f279d7e4d915d3da800aa9c644c7c1b6e3",
       "flagged": false,
       "headlines": []
     },
@@ -16791,7 +16791,7 @@
     "data/paper_ledger.jsonl": {
       "status": "checked",
       "reason": "one row per graded abstention on the live paper ledger",
-      "sha256": "a44ce41408ec7f28f35d1884910e5e210c6f178c3b05d1d6be33613b12a55b1a",
+      "sha256": "cb196ce518e3863f1318288966fc2fd3fdd15a16dcc0ff3fab7f5f6789e9911d",
       "flagged": true,
       "headlines": [
         {

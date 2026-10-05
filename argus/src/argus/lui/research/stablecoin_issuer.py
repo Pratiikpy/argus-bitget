@@ -25,7 +25,7 @@ figure before what Circle pays its distribution partners, which its filings desc
 from __future__ import annotations
 
 import re
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any, Final
 
 _ASKED: Final = re.compile(r"\bcircle\b|\bcrcl\b", re.I)
@@ -45,10 +45,12 @@ def _cap() -> tuple[float, float | None] | None:
 
 
 def _bill() -> tuple[float, Any] | None:
-    from argus.market.skill_mirror import fred_series
+    from argus.lui.research.macro import _fred
 
-    rows = fred_series("DGS3MO", days=14)
-    return (rows[-1][1], rows[-1][0]) if rows else None
+    # the console's FRED reader, which falls back to the shipped snapshot when FRED does not
+    # answer the host (round 41 live re-ask: the line vanished)
+    rows = _fred("DGS3MO", 14)
+    return (rows[-1][1], date.fromisoformat(rows[-1][0])) if rows else None
 
 
 def _usdc() -> float | None:
