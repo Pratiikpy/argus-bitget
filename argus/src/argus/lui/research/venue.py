@@ -181,13 +181,15 @@ def _venue(symbol: str, is_open: Any, spot: str | None = None
 
 
 def _leverage(symbol: str, multiple: float, side: str, *, closure: str | None = None,
-              notional: float | None = None) -> tuple[list[str], list[Source], dict[str, Any]]:
+              notional: float | None = None, entry: float | None = None,
+              ) -> tuple[list[str], list[Source], dict[str, Any]]:
     """How a ``multiple``-times position on ``side`` in ``symbol`` fares against the last 30 days of
     hourly highs and lows: the liquidation distance, how often a day's adverse move reached it, the
     worst adverse day and the largest multiple that survives it, and funding at that multiple."""
     from argus.market.bitget import fetch_tickers
     from argus.market.history import CandleType, fetch
 
+    stated_entry = entry  # the loop below reuses the name for each hour's close
     try:
         with _FETCH_SLOTS:
             bars = fetch(symbol, interval="1H", candle_type=CandleType.MARKET, recent=True,
@@ -270,13 +272,24 @@ def _leverage(symbol: str, multiple: float, side: str, *, closure: str | None = 
     if ticker_row is not None and float(ticker_row.last) > 0:
         # The price itself: "where is my liquidation price on a 10x BTC long?" was answered with
         # a distance only (2026-09-25 audit, round 2). Isolated margin, opened at the last price.
-        entry_price = float(ticker_row.last)
+        last = float(ticker_row.last)
+        # "a 10x isolated long on BTC at $62,000 entry" was liquidated at the live price's line,
+        # a different position from the one asked about (round 38 judge, C-1): the stated entry
+        # is the entry
+        entry_price = stated_entry if stated_entry and stated_entry > 0 else last
         liq = entry_price * (1 - distance if side == "long" else 1 + distance)
-        lines.append(f"Liquidation price: a {multiple:g}x {side} opened at the last price, "
+        opened = ("at your stated entry" if stated_entry else "at the last price")
+        lines.append(f"Liquidation price: a {multiple:g}x {side} opened {opened}, "
                      f"{entry_price:,.6g}, is liquidated near {liq:,.6g} on isolated margin, "
                      f"{distance:.1%} ({abs(entry_price - liq):,.6g} in price) "
                      f"{'below' if side == 'long' else 'above'} entry; cross "
-                     f"margin moves it by whatever else the account holds.")
+                     f"margin moves it by whatever else the account holds."
+                     + (f" {ticker} last traded at {last:,.6g}, "
+                        f"{abs(last / liq - 1):.1%} {'above' if last > liq else 'below'} that "
+                        f"line" + (" — already past it, so this position would have been "
+                                   "liquidated" if (side == 'long' and last <= liq) or
+                                   (side == 'short' and last >= liq) else "") + "."
+                        if stated_entry else ""))
         payload_liq: float | None = liq
     else:
         payload_liq = None

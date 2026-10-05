@@ -166,6 +166,12 @@ def parts(question: str, book: str = "") -> list[Part] | None:
         if joined and (refers_back or _HOLDINGS_ONLY.match(piece)
                        or _HOLDINGS_ONLY.match(joined[-1])
                        or _ELABORATES.match(piece)
+                       # "…best risk-adjusted mix, and how often should I rebalance?" is the same
+                       # book's question; split off, it was refused for want of a book (round 38
+                       # judge, C-3)
+                       or re.match(r"\s*(?:and\s+)?(?:how\s+often|should\s+i|when\s+should\s+i|"
+                                   r"do\s+i\s+(?:need|have)\s+to)\b[^?]*\brebalanc", piece,
+                                   re.I)
                        or (_WORST_CASE.match(piece)
                            and re.search(r"\bliquidat|\b\d+(?:\.\d+)?\s*x\b|\bleverage",
                                          joined[-1], re.I))):

@@ -114,8 +114,8 @@ _CAP_USD = re.compile(
     r"(?P<c>\d[\d,]*(?:\.\d+)?)\s*(?P<k3>k\b)?", re.I)
 _MAX_LOSS = re.compile(
     r"\b(?:i\s+)?(?:can'?t|cannot|can\s+not|don'?t\s+want\s+to|won'?t|never)\s+(?:afford\s+to\s+)?"
-    r"lose\s+"
-    r"(?:more\s+than\s+)?(\d{1,2}(?:\.\d+)?)\s*%|\bmax(?:imum)?\s+(?:loss|drawdown)\s+(?:limit\s+|tolerance\s+)?(?:is\s+|of\s+)?"
+    r"(?:lose|tolerate|stomach|handle|take|accept)\s+"
+    r"(?:more\s+than\s+)?(?:an?\s+)?(\d{1,2}(?:\.\d+)?)\s*%(?:\s+(?:drawdown|loss|fall|drop))?|\bmax(?:imum)?\s+(?:loss|drawdown)\s+(?:limit\s+|tolerance\s+)?(?:is\s+|of\s+)?"
     r"(\d{1,2}(?:\.\d+)?)\s*%|\b(?:my\s+)?(?:loss|drawdown)\s+limit\s+(?:is\s+|of\s+)?"
     r"(\d{1,2}(?:\.\d+)?)\s*%|"
     # "my max loss should probably be around 10%" (the mem0 comparison, round 12)
@@ -1381,7 +1381,11 @@ def earlier_lines(question: str, prior: list[str], facts: list[Fact]) -> list[st
     return lines
 
 
-_WHAT_KEPT = (r"(?P<what>(?:max(?:imum)?\s+)?loss(?:\s+limit)?|drawdown(?:\s+limit)?|"
+_WHAT_KEPT = (r"(?P<what>(?:stated\s+|max(?:imum)?\s+)?loss(?:\s+(?:limit|tolerance))?|"
+              # "Remind me — what was my stated drawdown tolerance?" was refused while the fact
+              # sat in memory (round 38 judge, C-4)
+              r"(?:stated\s+|max(?:imum)?\s+)?drawdown(?:\s+(?:limit|tolerance))?|"
+              r"(?:risk\s+)?tolerance|"
               # "remind me what i said my budget was" (a first-time user, round 27)
               r"risk\s+budget|budget|money|horizon|(?:trading\s+)?style|account(?:\s+size)?|"
               r"capital|goal)")
@@ -1408,7 +1412,7 @@ _RECALL_KINDS = {"loss": ("loss_usd", "max_loss"), "drawdown": ("max_loss", "los
                  "trading": ("style",), "account": ("capital", "book"), "capital": ("capital",),
                  "goal": ("goal",), "budget": ("capital", "loss_usd"),
                  "money": ("capital", "loss_usd"), "max": ("loss_usd", "max_loss"),
-                 "maximum": ("loss_usd", "max_loss")}
+                 "maximum": ("loss_usd", "max_loss"), "tolerance": ("max_loss", "loss_usd")}
 
 
 _SCENARIO_STATED = re.compile(r"\b(?:if|when|should)\b[^?]*?\d+(?:\.\d+)?\s*(?:%|percent\b|"
@@ -1501,7 +1505,9 @@ def recall_one(question: str, facts: list[Fact]) -> list[str] | None:
     m = _recall_match(question)
     if m is None:
         return None
-    word = m.group("what").split()[0].lower()
+    # "stated drawdown tolerance": the first word that names a kind (round 38 judge, C-4)
+    word = next((w for w in m.group("what").lower().split() if w in _RECALL_KINDS),
+                m.group("what").split()[0].lower())
     kinds = _RECALL_KINDS.get(word, ())
     held = [f for k in kinds for f in facts if f.kind == k and not f.subject]
     label = m.group("what").strip().lower()

@@ -825,6 +825,35 @@ _PREDICTION_KINDS = frozenset({ResearchKind.FUNDAMENTALS, ResearchKind.NEWS,
 whether it will be higher — are the ones a prediction market prices beside."""
 
 
+MAX_SHOCK_UP = 300.0
+"""The largest one-shock rise a stress test takes: bitcoin's best 30 days on record is under
++200% and the Nasdaq-100's best year under +100%, so +300% already sits outside every history the
+betas are read from."""
+
+
+_ENTRY_SAID = re.compile(
+    r"\b(?:at|@)\s*\$?\s*(?P<p>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k)?\s*(?:entry|entry\s+price|avg|average"
+    r"|as\s+(?:my|the)\s+entry)\b|\b(?:entry|entered|opened|open(?:ed)?\s+it|avg|average\s+entry)"
+    r"(?:\s+price)?\s*(?:is|was|of|at|@|=|:)?\s*\$?\s*(?P<p2>\d[\d,]*(?:\.\d+)?)\s*(?P<k2>k)?\b|"
+    r"\b(?:open|opened|enter|entered)\s+(?:a|an|my)?\s*[^?.]{0,40}?\bat\s+\$?\s*"
+    r"(?P<p3>\d[\d,]*(?:\.\d+)?)\s*(?P<k3>k)?\b(?!\s*(?:%|x\b))|"
+    # "I'm 20x long ETH from 3,100" (a round-38 re-ask)
+    r"\b(?:long|short)\b[^?.]{0,25}?\bfrom\s+\$?\s*(?P<p4>\d[\d,]*(?:\.\d+)?)\s*(?P<k4>k)?\b"
+    r"(?!\s*(?:%|x\b))", re.I)
+"""An entry price a leverage question states: "a 10x long on BTC at $62,000 entry"."""
+
+
+def stated_entry(text: str) -> float | None:
+    found = _ENTRY_SAID.search(text)
+    if found is None:
+        return None
+    for p, k in (("p", "k"), ("p2", "k2"), ("p3", "k3"), ("p4", "k4")):
+        if found.group(p):
+            value = float(found.group(p).replace(",", "")) * (1000 if found.group(k) else 1)
+            return value if value > 0 else None
+    return None
+
+
 def _add_prediction_markets(answer: Answer, symbol: str, asked: str = "") -> None:
     """Polymarket's busiest informative markets on the name (`market/prediction.py`), placed
     before the closing "Data:" line. Nothing is added when none is open and liquid."""
@@ -1407,6 +1436,17 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             lines=[f"A {request.shock_pct:g}% move is not possible: a price can fall at most 100%, "
                    "to zero, and a long position then loses all of it and no more. Ask for a fall "
                    "under 100% (\"what if the Nasdaq falls 50%\")."])
+    if (request.kind is ResearchKind.STRESS and request.shock_pct is not None
+            and request.shock_pct > MAX_SHOCK_UP):
+        # +1,000,000% on the Nasdaq-100 was "computed" into a +798,527% book move (round 38
+        # hostile, defect 4): the downside was capped and the upside was not
+        return Answer(
+            question=question, refused=True,
+            reason="a shock beyond any market's history",
+            lines=[f"A {request.shock_pct:+g}% move in one shock is beyond anything these markets "
+                   f"have done: a beta read from ordinary days says nothing about it, so the "
+                   f"figure would be arithmetic, not a stress test. Ask for a rise up to "
+                   f"{MAX_SHOCK_UP:g}% (\"what if BTC rises 50%\")."])
     if not request.symbols:
         return Answer(
             question=question, refused=True,
@@ -1708,6 +1748,11 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                     + ", ".join(f"{_t(s)} ${total * equal[s]:,.0f}"
                                 for s in sorted(equal, key=lambda s: -equal[s]))
                     + f", against ${total / len(equal):,.0f} each split evenly.")
+            from argus.lui.research import rebalance
+
+            cadence = (rebalance.answer(raw_text, equal, float(request.notional)
+                                        if request.notional else None)
+                       if rebalance.ASKED.search(raw_text) else None) or []
             limited: dict[str, Any] | None = None
             if cap is not None or count is not None or risk_cap is not None:
                 fitted = _within_limits(equal, columns, cap, count, risk_cap)
@@ -1724,6 +1769,8 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                             budget=1.0)
             book_lines, extra, book_payload = _book_report(built, data, is_open)
             lines = [headline, *([limited["limits_line"]] if limited else []),
+                     *(["On rebalancing: " + cadence[0].removeprefix("Bottom line: "),
+                        *cadence[1:]] if cadence else []),
                      *[line for line in book_lines if not bool(LEAD.match(line))]]
             sources.extend(extra)
             payload["construct"] = {"weights": weights, **book_payload}
@@ -1731,12 +1778,24 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                 payload["construct"]["limits"] = {k: v for k, v in limited.items()
                                                   if k not in ("headline", "limits_line")}
 
+        elif request.kind is ResearchKind.LEVERAGE and re.search(
+                r"(?<![\d.])0+(?:\.0+)?\s*x\b|\bzero\s+leverage\b", raw_text, re.I):
+            # "0x leverage and $10,000 margin" was read as no leverage stated and assessed at 10x
+            # (round 38 hostile, defect 8)
+            return Answer(question=question, refused=True, reason="leverage of zero",
+                          lines=["Bottom line: 0x leverage is no position — the position is the "
+                                 "margin times the leverage, so $0 is bought and nothing can be "
+                                 "liquidated. The least Bitget takes is 1x, where the position "
+                                 "equals the margin.",
+                                 "Ask with the multiple you would use, e.g. \"where is my "
+                                 "liquidation price on a 3x BTC long with $10,000 margin\"."])
         elif request.kind is ResearchKind.LEVERAGE:
             lines, extra, lever_payload = _leverage(
                 request.symbols[0], request.leverage or 10.0, request.side,
                 closure=("weekend" if request.weekend else "overnight"
                          if request.horizon_hours else None),
-                notional=float(request.notional) if request.notional else None)
+                notional=float(request.notional) if request.notional else None,
+                entry=stated_entry(raw_text))
             sources.extend(extra)
             if re.search(r"\bliq\w*\s+(?:price|level)|\bliquidat\w*\s+(?:price|level|at)\b|"
                          r"\bprice\b[^?.]{0,20}\bliquidat|\bget\s+liquidated\s+at\b",
@@ -2661,7 +2720,7 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                 float(own_sigma) / 100 * math.sqrt(252 if is_us_equity(symbol) else 365)
                 if own_sigma is not None else 0.0)
             lines = [
-                f"A ${request.notional:,.0f} order is {plan.participation_rate:.2%} of "
+                f"A ${request.notional:,.0f} order is {plan.participation_rate:.3%} of "
                 f"{symbol.removesuffix('USDT')}'s 24h volume (${adv:,.0f}); the fees come to "
                 f"about {fees:.1f}bps, and the square-root impact law — calibrated on Bitget's "
                 f"own books"

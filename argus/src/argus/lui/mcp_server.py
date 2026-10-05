@@ -454,6 +454,12 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
             # -500 was stressed as a -556% loss on a long book (a hostile review, round 22)
             raise ToolError("shock_percent must be above -100: a price cannot fall by more than "
                             "all of it")
+        from argus.lui.research.dispatch import MAX_SHOCK_UP
+
+        if shock_value is not None and (shock_value > MAX_SHOCK_UP or shock_value != shock_value):
+            # +1,000,000 was stressed into a +798,527% book move (round 38 hostile, defect 4)
+            raise ToolError(f"shock_percent must be at most {MAX_SHOCK_UP:g}: a larger rise is "
+                            f"beyond every history the betas are read from")
         note: tuple[str, ...] = ()
         leverage, cash = None, 0.0
         if stated_gross > 1.0 + 1e-9:
@@ -512,6 +518,12 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
         if not holdings:
             raise ToolError("book is required, e.g. '50% NVDA, 50% AAPL'")
         add = str(args.get("add") or "").strip()
+        sized = [float(x) for x in re.findall(r"(\d+(?:\.\d+)?)\s*%", f"{holdings} {add}")]
+        if any(x > 1000 for x in sized):
+            # "NVDA 1000000%" ran through the regression into a market beta of 10411 (round 38
+            # hostile, defect 5)
+            raise ToolError("a weight above 1000% of the book is not a position; give weights as "
+                            "percent of the book, e.g. book '50% NVDA, 50% AAPL', add 'TSLA 10%'")
         signed = re.match(r"^\s*(?:short\s+)?(?P<name>[A-Za-z][\w.]{0,11})\s*"
                           r"(?P<pct>-\s?\d+(?:\.\d+)?)\s*%\s*$|^\s*"
                           r"(?P<pct2>-\s?\d+(?:\.\d+)?)\s*%\s*(?P<name2>[A-Za-z][\w.]{0,11})"

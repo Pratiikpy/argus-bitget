@@ -161,9 +161,34 @@ def lines(text: str, prior: list[str], names: tuple[str, ...]) -> list[str] | No
                          f"inside that leaves the trade under water." if need else
                          "with funding not positive now, there is nothing earned to set against "
                          "the fees."))
+    if _RISK_FREE.search(text):
+        # "does shorting the perp against it lock in that carry risk-free?" got the earlier
+        # answer again, word for word (round 38 judge, M-3)
+        r = next((x for x in rows if x["name"] in text.upper()), best)
+        from argus.market.bitget import maintenance_margin_rate
+
+        mmr = maintenance_margin_rate(f"{r['name']}USDT", 10_000.0) or 0.0
+        negative = 1 - r["positive"] if r["positive"] is not None else None
+        out[0] = out[0].replace("Bottom line: ", "Rates now: ", 1)
+        out.insert(0, f"Bottom line: no — it removes the price risk, not the trade's risks: "
+                      f"funding is set every {r['hours']}h and can turn"
+                      + (f" (it was negative in {negative:.0%} of the last 90 days' settlements, "
+                         f"when the short leg pays)" if negative is not None else "")
+                      + f"; the short perpetual can be liquidated by a rise even while the spot "
+                        f"gains — at 1x on isolated margin a rise of about {1 - mmr:.0%} wipes "
+                        f"its margin, at 3x about {1 / 3 - mmr:.0%} — unless margin is added in "
+                        f"time; and both legs sit on one exchange, so its custody risk is not "
+                        f"hedged.")
+        out.insert(1, "What it does lock in: the move in the price itself, for as long as both "
+                      "legs stay open and the same size. Run it with the short leg's margin well "
+                      "above the minimum, and count the fees below against what funding pays.")
     out.append("Each yearly figure is a window's average carried forward, not a forecast; Bitget's "
                "funding history and live rates, read just now.")
     return out
+
+
+_RISK_FREE = re.compile(r"\brisk[\s-]*free\b|\briskless\b|\bguaranteed?\b|\block(?:s|ed)?\s+in\b|"
+                        r"\bno\s+risk\b|\bsafe\s+(?:yield|return|money)\b", re.I)
 
 
 def execution_lines(symbol: str, notional: float | None = None) -> list[str] | None:

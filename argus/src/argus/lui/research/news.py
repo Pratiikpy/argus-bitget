@@ -202,7 +202,11 @@ def _news(symbol: str, is_open: Any,
             market_part = symbol_beta * float(bench.change_24h) * 100
             own = change - market_part
             split = (f" QQQ moved {float(bench.change_24h) * 100:+.2f}%, which at {ticker}'s "
-                     f"beta of {symbol_beta:.2f} explains {market_part:+.2f}%; the other "
+                     # labelled with its benchmark and window: a 1.24 here beside a 0.31
+                     # to the S&P on daily closes elsewhere on the page read as a contradiction
+                     # (round 38 judge, M-7)
+                     f"beta of {symbol_beta:.2f} (to QQQ, hourly, last 30 days) explains "
+                     f"{market_part:+.2f}%; the other "
                      f"{own:+.2f}% is {ticker}'s own.")
     events = [f for f in filings if f.is_event]
     if change is not None:

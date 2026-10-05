@@ -309,6 +309,24 @@ def _contents(wins: list[Win], themes: dict[str, list[str]]) -> str:
             f"<details><summary>By track and sub-theme</summary><ul>{tracks}</ul></details></nav>")
 
 
+_PATH_SAID = re.compile(
+    r"(?<![\w/.])(?:argus/|src/argus/)?(?P<p>(?:research|eval|lui|desk|market|backtest|agents|"
+    r"truth|paper|cost|demo)/[\w/]+\.py|data/[\w.-]+\.jsonl?|tests/test_[\w]+\.py)\b")
+"""A file a row's text names: "research/eventstudy.py" was printed unlinked and, copied onto the
+repository, 404'd — the file lives at argus/src/argus/research/eventstudy.py (round 38 judge,
+M-8)."""
+
+
+def _linked(escaped: str) -> str:
+    """``escaped`` with each file it names linked to where the repository keeps it."""
+    def link(m: re.Match[str]) -> str:
+        path = m.group("p")
+        where = path if path.startswith(("data/", "tests/")) else f"src/argus/{path}"
+        return f"<a href='{REPOSITORY}{where}'>{m.group(0)}</a>"
+
+    return _PATH_SAID.sub(link, escaped)
+
+
 def _card(win: Win) -> str:
     esc = html.escape
     links: list[str] = []
@@ -325,10 +343,10 @@ def _card(win: Win) -> str:
                  for a in win.artefacts[:2])
     links.extend(f"<a href='{REPOSITORY}tests/{esc(t)}'>{esc(t)}</a>" for t in win.tests[:1])
     rerun = f"<code class='cmd'>{esc(win.rerun)}</code>" if win.rerun else ""
-    proofs = "".join(f"<li><b>{esc(c.replace('_', ' '))}</b> — {esc(h)}</li>"
+    proofs = "".join(f"<li><b>{esc(c.replace('_', ' '))}</b> — {_linked(esc(h))}</li>"
                      for c, h in win.proofs)
     note = f"<p class='note'>{esc(win.note)}</p>" if win.note else ""
-    tested = (f"<p><span class='lbl'>Same-input test</span>{esc(win.tested)}</p>"
+    tested = (f"<p><span class='lbl'>Same-input test</span>{_linked(esc(win.tested))}</p>"
               if win.tested else "")
     if win.measured:
         tested += ("<p><span class='lbl'>Measured</span></p><ul class='measured'>"
@@ -337,7 +355,8 @@ def _card(win: Win) -> str:
         reason = win.blockers[0]
         if len(reason) > 900:
             reason = reason[:900].rsplit(" ", 1)[0] + "…"
-        tested += (f"<p class='why'><span class='lbl'>Why not OWNED</span>{esc(reason)}</p>")
+        tested += (f"<p class='why'><span class='lbl'>Why not OWNED</span>"
+                   f"{_linked(esc(reason))}</p>")
     return (
         f"<article class='w {esc(win.state)}' id='{_anchor(win.name)}'>"
         f"<div class='head'><span class='st {esc(win.state)}'>{esc(win.state.upper())}</span>"

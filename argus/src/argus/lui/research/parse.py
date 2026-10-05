@@ -602,6 +602,14 @@ _VENUE_CUE = re.compile(
 """Words that ask about the way Bitget offers a market, which the venue explainer answers."""
 
 
+_ALLOCATE = re.compile(
+    r"\b(?:split|divide|allocate|spread|distribute)\b[^?.]{0,50}\b(?:mix|allocation|weights?|"
+    r"between|across|among|portfolio|each)\b|\b(?:risk[\s-]*adjusted|best|optimal|right)\s+"
+    r"(?:mix|allocation|weights?|weighting|split)\b|\bhow\s+much\s+(?:of\s+it\s+)?(?:in|into|to|"
+    r"for)\s+each\b", re.I)
+"""Money spread across several named markets: a portfolio to build, not an order to split."""
+
+
 _CONSTRUCT = re.compile(
     r"\b(?:build|construct|design|create|make|suggest|give\s+me|"
     r"put\s+together)\s+(?:me\s+)?(?:an?\s+)?"
@@ -3440,6 +3448,14 @@ def read_request(text: str) -> ResearchRequest | None:
     if ORDER_CJK.search(raw):
         return None  # an instruction to trade, in Chinese; refused as an order, never researched
     symbols, _ = research_symbols(raw)
+    if (len(symbols) >= 2 and _ALLOCATE.search(raw) and not about_the_record(raw)
+            and not is_an_order(raw)):
+        # "I want to put $100,000 into NVDA, MSFT, gold and BTC. How should I split it to get the
+        # best risk-adjusted mix" was read as splitting one NVDA order (round 38 judge, C-3): a
+        # sum spread across named markets is a portfolio to build
+        spread_sum = parse_notional(raw)
+        return ResearchRequest(kind=ResearchKind.CONSTRUCT, symbols=symbols,
+                               notional=spread_sum)
     if (len(symbols) == 2 and AFFECTS.search(raw) and not is_an_order(raw)
             and not about_the_record(raw)):
         # "What's WTI crude oil doing and does it matter for BTC?" was answered with oil's

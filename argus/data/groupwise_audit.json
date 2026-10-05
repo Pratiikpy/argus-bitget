@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-04T23:41:22+00:00",
+  "generated_at": "2026-10-05T04:51:04+00:00",
   "method": "Mind2Web metric.py:236-259 (MIT): per-group mean and count, macro average, 0/1/2/3/>3 histogram; read by argus.eval.groupwise into four flags (carried_by_one_group, single_group, macro_disagrees, flips_across_halves)",
   "register_artefacts": [
     "data/abstention_comparison.json",
@@ -23669,7 +23669,7 @@
     "data/skill_matrix.json": {
       "status": "checked",
       "reason": "one row per tool",
-      "sha256": "493c442af352fd00c61e1cf4c7eb3df983930a7e524db3f26332e2038a83aed8",
+      "sha256": "ad90b8c3f3716568cb706e7781daf5bbcaa5066ac36c4fae7e49337ccc653661",
       "flagged": true,
       "headlines": [
         {

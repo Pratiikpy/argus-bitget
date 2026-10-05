@@ -1621,6 +1621,272 @@ PRICE_PREMISE_TOLERANCE = 0.05
 figure a trader rounded or read an hour ago, narrow enough to catch a stale one."""
 
 
+MAX_QUESTION = 4000
+"""The longest question read: a pasted strategy runs to a couple of thousand characters, and
+nothing longer has carried more question than its first page."""
+
+
+_SCIENTIFIC = re.compile(r"(?<![\w.])\d+(?:\.\d+)?[eE][+-]?\d{1,3}(?![\w.])")
+"""A number in scientific notation: "5e4", "1.2E6", "1e308"."""
+
+
+def _near_miss_ticker(text: str) -> list[str] | None:
+    """A ticker one letter or a digit away from a listed one, said to be unlisted rather than
+    quietly answered as the listed one: "What's the price of NVDAA?" got NVDA's quote and "XAU2"
+    gold's, while "BTCC" was refused (round 38 hostile, defect 7)."""
+    from argus.lui.question import resolve_symbol
+
+    for m in re.finditer(r"(?<![\w$])([A-Z]{2,6}\d{0,2})(?![\w%])", text):
+        token = m.group(1)
+        if len(token) < 4 or resolve_symbol(token) is not None or token in _NOT_TICKERS:
+            continue
+        if research_symbols(token)[0]:
+            continue
+        guesses = {token.rstrip("0123456789"), token[:-1]} - {token}
+        listed = next((found[0] for g in sorted(guesses, key=len, reverse=True)
+                       if len(g) >= 2 and (found := (research_symbols(g)[0] or
+                                                     ((resolve_symbol(g),) if resolve_symbol(g)
+                                                      else ())))), None)
+        if listed is None:
+            continue
+        name = str(listed).removesuffix("USDT")
+        return [f"Bottom line: {token} is not listed on Bitget, so there is no price for it. "
+                f"{name} is — if that is what you meant, ask \"where is {name} trading\".",
+                "A ticker one character off can be a different instrument entirely, so it is "
+                "not quietly read as the nearest one."]
+    return None
+
+
+_NOT_TICKERS = frozenset({"USDT", "USDC", "HODL", "FOMO", "NYSE", "NASDAQ", "FOMC", "SPAC",
+                          "EBITDA", "TWAP", "VWAP", "MACD", "CAGR", "APY", "APR", "KYC", "ROI",
+                          "ETFS", "IPOS", "BTCS", "ETHS"})
+
+
+_SINCE_FILING = re.compile(
+    r"\b(?:since|after)\s+(?:that|the|this|its|their|the\s+latest|the\s+last)\s+(?:filing|10-?q|"
+    r"10-?k|8-?k|quarterly\s+report|annual\s+report|report|earnings\s+report)\b", re.I)
+
+
+def _since_filing_lines(text: str, prior: list[str]) -> list[str] | None:
+    """The stock's move since the filing a conversation is about, against the market's: "Did the
+    stock's move since that filing match what the filing said?" got the desk's calibration (round
+    38 judge, C-5)."""
+    if not _SINCE_FILING.search(text):
+        return None
+    from argus.lui.research import research_symbols
+    from argus.lui.research.parse import is_us_equity
+
+    source = next((q for q in [text, *reversed(prior[-3:])] if research_symbols(q)[0]), None)
+    if source is None:
+        return None
+    symbol = research_symbols(source)[0][0]
+    if not is_us_equity(symbol):
+        return None
+    ticker = symbol.removesuffix("USDT")
+    said_form = re.search(r"\b(10-?q|10-?k|8-?k)\b", " ".join([text, *prior[-3:]]), re.I)
+    form = (said_form.group(1).upper().replace("Q", "-Q").replace("K", "-K").replace("--", "-")
+            if said_form else "10-Q")
+    from argus.market import equity_history
+    from argus.market.evidence import EdgarSource
+
+    try:
+        filed = next((f for f in EdgarSource().filings(
+            ticker, since=datetime.now(UTC) - timedelta(days=400), limit=40)
+            if f.form == form), None)
+        days = equity_history.daily(ticker)
+        market = equity_history.daily("QQQ")
+    except Exception:
+        return None
+    if filed is None or not days or not market:
+        return None
+    on = filed.filed.date()
+    start = next((d for d in days if d.day >= on), None)
+    start_m = next((d for d in market if d.day >= on), None)
+    if start is None or start_m is None:
+        return None
+    move = days[-1].close / start.close - 1
+    index = market[-1].close / start_m.close - 1
+    edge = move - index
+    return [f"Bottom line: {ticker} is {move:+.1%} since its {form} was filed on "
+            f"{on:%d %b %Y} ({start.close:,.2f} at that day's close to {days[-1].close:,.2f} on "
+            f"{days[-1].day:%d %b}), against {index:+.1%} for the Nasdaq-100 (QQQ) over the same "
+            f"days — {abs(edge) * 100:.1f} points {'better' if edge > 0 else 'worse'} than the "
+            f"market.",
+            "Whether the move matches what the filing said cannot be read from the price alone: "
+            "it carries everything else that happened since — the market, rates, other news. "
+            f"Ask \"what did {ticker}'s latest {form} say\" for the filing's own words and figures "
+            f"side by side with this.",
+            f"Data: SEC EDGAR filing date (accession {filed.accession}); Yahoo Finance daily "
+            f"closes, split-adjusted."]
+
+
+def _episode_for(text: str, prior: list[str], book: str, memory: str) -> list[str] | None:
+    """A book through a named crypto episode (`lui/research/book_episode.py`), or, asked "what would
+    break that conclusion?" right after one, that answer with what would change it first."""
+    from argus.lui import memory as mem
+    from argus.lui.research import book_episode as episodes
+
+    asked = text
+    breaking = bool(prior and episodes.BREAK_ASKED.search(text)
+                    and episodes.episode_named(prior[-1]))
+    if breaking:
+        asked = prior[-1]
+    elif episodes.episode_named(text) is None:
+        return None
+    facts = mem.parse(memory)
+    weights = _weights_said(asked) or _weights_said(book)
+    if not weights:
+        saved = mem.remembered_book(facts)
+        weights = _weights_said(saved.text) if saved is not None else {}
+    added = re.search(r"\badd(?:ing)?\s+(?P<p>\d+(?:\.\d+)?)\s*%\s*(?:of\s+)?(?P<n>[A-Za-z]{2,10})",
+                      " ".join(prior[-2:]), re.I)
+    if weights and added and re.search(r"\bif\s+i\s+do\b|\bwith\s+(?:that|it|the)\s+add", asked,
+                                       re.I):
+        # "If I do" after "should I add 20% gold?": the book with the addition
+        from argus.lui.research import research_symbols
+
+        named = research_symbols(added.group("n"))[0]
+        if named:
+            share = float(added.group("p")) / 100
+            weights = {s: w * (1 - share) for s, w in weights.items()}
+            weights[named[0]] = weights.get(named[0], 0.0) + share
+    if not weights:
+        return None
+    limit_fact = mem.get(facts, "max_loss")
+    limit = float(limit_fact.value) if limit_fact is not None else None
+    from argus.lui.research.rule_test import daily_closes as _closes
+
+    closes: dict[str, tuple[list[datetime], list[float]]] = {}
+    for symbol in weights:
+        try:
+            stamps, values, _source = _closes(symbol)
+        except Exception:
+            return None
+        closes[symbol] = (stamps, values)
+    said = episodes.lines(asked, weights, limit, closes)
+    if said and breaking:
+        change = next((x for x in said if x.startswith("What would change it:")), None)
+        if change is not None:
+            said = ["Bottom line: " + change.removeprefix("What would change it: "),
+                    *(x.replace("Bottom line: ", "The conclusion it changes: ", 1)
+                      for x in said if x is not change)]
+    return said
+
+
+def _weights_said(said: str) -> dict[str, float]:
+    """The weights a text states, as fractions of one; empty when it states none."""
+    from argus.lui.research.parse import holding_pairs
+
+    out: dict[str, float] = {}
+    for _at, symbol, weight in holding_pairs(said or ""):
+        out[symbol] = out.get(symbol, 0.0) + abs(weight)
+    total = sum(out.values())
+    return {s: w / total for s, w in out.items()} if total > 0 else {}
+
+
+_CAN_BUY = re.compile(r"\bcan\s+(?:i|you|we)\s+(?:actually\s+|even\s+)?(?:buy|get|own|trade)\s+"
+                      r"(?P<n>[A-Za-z][\w.&' ]{1,24}?)\s+(?:stock|shares?|stocks)\b", re.I)
+
+
+def _can_buy_lines(text: str) -> list[str] | None:
+    """Whether a named US stock can be bought on Bitget, and how: "so can i buy apple stock with
+    that" after "what is a stock token" got Apple's worst 24 hours (round 38 newcomer)."""
+    found = _CAN_BUY.search(text)
+    if found is None:
+        return None
+    from argus.lui.research import research_symbols
+    from argus.market.bitget import public_get
+
+    named = research_symbols(found.group("n"))[0]
+    if not named:
+        return [f"Bottom line: {found.group('n').strip()} is not a stock Bitget lists, as far as "
+                f"its contract list shows — so there is no token or perpetual for it there.",
+                "Ask \"what is NVDA\" or \"where is AAPL trading\" for one that is."]
+    ticker = named[0].removesuffix("USDT")
+    try:
+        token = public_get("/api/v2/spot/public/symbols", {"symbol": f"R{ticker}USDT"}) or []
+    except Exception:
+        token = []
+    ways = ([f"its rToken R{ticker}USDT on spot (you hold a token that tracks one share, no "
+             f"leverage)"] if token else [])
+    ways.append(f"its perpetual {ticker}USDT (a contract on the price, with leverage and funding)")
+    return [f"Bottom line: yes, in effect — on Bitget you can buy {' or '.join(ways)}. Neither is "
+            f"the share itself: no vote, and dividends and redemption follow Bitget's terms.",
+            f"You can buy a slice rather than a whole share: ask \"what does it cost to buy "
+            f"$100 of "
+            f"{ticker}\" for the fee and the minimum on a real order.",
+            "Read just now from Bitget's spot symbol list and its contract list."]
+
+
+_WHERE_TO_START = re.compile(r"\b(?:where|how)\s+to\s+start\b|\bwhere\s+(?:do\s+i|should\s+i)\s+"
+                             r"start\b|\bno\s+idea\b|\bspecial\s+account\b|\bnew\s+to\b|"
+                             r"\bdon'?t\s+(?:even\s+)?know\s+(?:where|how|what)\b", re.I)
+
+
+def _ramble_lines(text: str, now: datetime | None) -> list[str] | None:
+    """A long message from someone new, with a sum in it, answered as the questions it carries:
+    what that sum has been through, whether an account is needed, what this site does."""
+    if len(text.split()) < 40 or not _WHERE_TO_START.search(text):
+        return None
+    from argus.lui.research import starter
+
+    amount = starter.amount_of(text)
+    if amount is None:
+        said_sum = re.search(r"\$\s?(\d[\d,]*)|(\d[\d,]*)\s*(?:dollars|bucks|usd)", text, re.I)
+        if said_sum is not None:
+            amount = float((said_sum.group(1) or said_sum.group(2)).replace(",", ""))
+    lines: list[str] = ["Bottom line: you do not have to decide anything today — start by "
+                        "seeing what the money would go through, with a small part of it, and "
+                        "keep the rest where it is."]
+    if amount is not None:
+        try:
+            said, _sources, _data = starter.answer(f"I have ${amount:,.0f}, where should I start?",
+                                                   today=(now or datetime.now(UTC)).date())
+        except Exception:
+            said = []
+        lines += [unlead(str(x)) for x in said[:4]]
+    lines += ["An account: yes — to buy anything you need an exchange account (on Bitget, with "
+              "identity verification). This site needs none.",
+              "What this site does: it measures — what a buy would cost, what it could lose in a "
+              "bad week, what a sum went through — and never trades or holds money; the decision "
+              "stays yours."]
+    return lines
+
+
+def _rebalance_for(text: str, book: str, memory: str) -> list[str] | None:
+    """The rebalancing answer on the book the question states, else the saved one."""
+    from argus.lui import memory as mem
+    from argus.lui.research import rebalance
+    from argus.lui.research.parse import holding_pairs, parse_notional
+
+    def weights_of(said: str) -> dict[str, float]:
+        out: dict[str, float] = {}
+        for _name, symbol, weight in holding_pairs(said):
+            out[symbol] = out.get(symbol, 0.0) + abs(weight)
+        total = sum(out.values())
+        return {s: w / total for s, w in out.items()} if total > 0 else {}
+
+    weights = weights_of(text)
+    if len(weights) < 2 and book.strip():
+        weights = weights_of(book)
+    if len(weights) < 2:
+        saved = mem.remembered_book(mem.parse(memory))
+        weights = weights_of(saved.text) if saved is not None else {}
+    if len(weights) < 2:
+        return None
+    capital = parse_notional(text)
+    return rebalance.answer(text, weights, float(capital) if capital else None)
+
+
+def _with_entry(rewritten: str, text: str) -> str:
+    """A liquidation question read into the engine's words, keeping the entry the trader stated:
+    "at $62,000 entry" was dropped in the rewrite and the live price used (round 38 judge, C-1)."""
+    from argus.lui.research.dispatch import stated_entry
+
+    stated = stated_entry(text)
+    return f"{rewritten} at {stated:g} entry" if stated else rewritten
+
+
 def _price_premise(text: str) -> str | None:
     """The correction for a stated price that is not the present one, or None."""
     # "I bought TSLA at 300" is the trader's entry, not a claim about today's price (a round-23
@@ -1635,7 +1901,12 @@ def _price_premise(text: str) -> str | None:
                           r"alert|liquidation|entry|tp|sl)\b[^.?!]{0,20}$",
                           text[max(0, m.start() - 30):m.start()], re.I)), None)
     if claim is None or re.match(r"\s*(?:each|notional|of\s+(?:notional|exposure)|worth|in\s+"
-                                 r"(?:notional|size))\b", text[claim.end():], re.I):
+                                 r"(?:notional|size)|entry|avg|average)\b", text[claim.end():],
+                                 re.I) or re.search(
+            # "If I open a 10x isolated long on BTC at $62,000 entry" states a position's entry,
+            # and was corrected to the live price (round 38 judge, C-1)
+            r"\b(?:open|opened|enter|entered|opening)\b[^.?!]{0,50}$",
+            text[max(0, claim.start() - 60):claim.start()], re.I):
         # "keep AAPL and AMZN at $50,000 each" is a position's size, and was called a wrong
         # price for AMZN (a judge, round 32)
         return None
@@ -4346,8 +4617,8 @@ def _round27_follow_up(text: str, prior: list[str], *, now: datetime | None, vis
         # review, round 30): the liquidation reader on the side and leverage said
         side = side_said.group(1).lower()
         name = liq_names[0].removesuffix("USDT")
-        again = re_asked(f"where is my liquidation price on a {lev_said.group('x')}x {side} on "
-                         f"{name}", fresh=True)
+        again = re_asked(_with_entry(f"where is my liquidation price on a "
+                                     f"{lev_said.group('x')}x {side} on {name}", text), fresh=True)
         if again is not None:
             data = (again.get("data") or {}).get("leverage") or {}
             liq = data.get("liquidation_price")
@@ -5344,6 +5615,10 @@ def _handle_ask(
         # are read with the backtest before them (round 37 judge, C-1 and M-1)
         critique = (rule_test.followup(text, prior) if prior else None) or rule_test.lines(text)
     configured = _config_refused(text, prior)
+    near = None if configured is not None else _near_miss_ticker(text)
+    if near is not None:
+        configured = engine_payload_like(near, prior, text, by="patterns")
+        configured.update(refused=True, reason="not listed on Bitget")
     if configured is not None:
         configured["memory"] = memory
         return configured
@@ -5358,6 +5633,44 @@ def _handle_ask(
         # "is the desk's lean actually predictive?" was refused as a forecast on the live console,
         # where the planner reads first (2026-10-05): the graded record answers it before that
         critique = _lean_record_lines()
+    if critique is None and re.search(r"\bp\s*&\s*l\b|\bpnl\b|\bprofit\b|\bhow\s+much\s+(?:am\s+i|"
+                                      r"have\s+i|did\s+i)\s+(?:up|down|made|make|lost)\b",
+                                      text, re.I):
+        # "Now that gold hit $10,000/oz overnight, what's my P&L on 5 oz bought at $2,600?" went
+        # to the price-target reader, which rejected the premise and never gave the P&L (round
+        # 38 hostile, defect 11): a stated position's P&L is read first, its premise checked there
+        from argus.lui.journal import _LEG, position_and_pnl
+
+        if _LEG.search(text):
+            held_first = position_and_pnl(text, now=now or datetime.now(UTC), price=_price_now)
+            if held_first is not None:
+                pnl_payload = engine_payload_like(list(held_first[0]), prior, text,
+                                                  by="position-pnl")
+                pnl_payload["sources"] = [x.as_dict() for x in held_first[1]]
+                pnl_payload["data"] = held_first[2]
+                pnl_payload["memory"] = memory
+                return pnl_payload
+    if critique is None:
+        from argus.lui.research import rebalance as _rebalance
+
+        if _rebalance.ASKED.search(text):
+            # "If BTC drops 15% from here, how much rebalancing would I need to get back to my
+            # target weights?" got the revenge-trading warning (round 38 judge, M-4)
+            critique = _rebalance_for(text, book, memory)
+    if critique is None:
+        critique = _episode_for(text, prior, book, memory)
+    if critique is None:
+        critique = _since_filing_lines(text, prior)
+    if critique is None:
+        critique = _ramble_lines(text, now)
+    if critique is None:
+        critique = _can_buy_lines(text)
+    if critique is None:
+        # deposits, religion, legality, market hours: no market engine's question, taken before
+        # any of them reads it (round 38 re-asks went to account access and sentiment)
+        from argus.lui.newcomer import first_reply
+
+        critique = first_reply(text)
     if critique is None and prior:
         # "wait so is that only in futures" after "can i lose more than i put in" was declined,
         # and "does that apply here on bitget" after impermanent loss repeated the definition
@@ -5381,6 +5694,21 @@ def _handle_ask(
     # Bidirectional controls make "\u202eHTE\u202c" display as "ETH": they are dropped, so the
     # question is read as typed rather than refused as an instruction (round 37, defect 13)
     text = re.sub(r"[\u200e\u200f\u202a-\u202e\u2066-\u2069]", "", text)
+    # "1e308 BTC" was read as 308 BTC with a confident P&L (round 38 hostile, defect 3): a figure
+    # in scientific notation is written out, and one no position could be is refused as such
+    huge = next((m for m in _SCIENTIFIC.finditer(text)
+                 if float(m.group(0)) > 1e12), None)
+    if huge is not None:
+        absurd = engine_payload_like([
+            f"Bottom line: {huge.group(0)} is {float(huge.group(0)):.3g} \u2014 no holding, "
+            f"order or price is that large (all the bitcoin there will ever be is 21 million), so "
+            f"there is nothing real to compute.",
+            "Say the size as you would trade it, for example \"I bought 0.5 BTC at $80,000\"."],
+            prior, text[:200], by="arithmetic")
+        absurd.update(refused=True, reason="an impossible figure")
+        absurd["memory"] = memory
+        return absurd
+    text = _SCIENTIFIC.sub(lambda m: f"{float(m.group(0)):.10g}", text)
     if any("\uff01" <= c <= "\uff5e" for c in text):
         text = "".join(chr(ord(c) - 0xFEE0) if "\uff01" <= c <= "\uff5e" else c
                        for c in text)
@@ -5412,6 +5740,25 @@ def _handle_ask(
         english, _why = _read_in_english(text, _model_for(visitor, count=False))
         if english is not None and english.strip().lower() != text.strip().lower():
             read_as, text = text, english
+    unread_latin = (not read_as and _translate.target_language(text) in RESTATED_LATIN
+                    and not re.search(r"\b(?:pre[cç]o|precio|prix|preis|kurs|cours|gi[aá]|"
+                                      r"cotiza\w*|cota[cç][aã]o)\b", text, re.I))
+    if unread_latin:
+        # "O que a Tesla disse no seu último relatório de resultados sobre as margens de
+        # produção?" was answered with Treasury yields when the model could not restate it
+        # (round 38 judge, M-5): without the restatement, only a price ask is read by pattern
+        from argus.lui.translate import PAUSED
+
+        code = _translate.target_language(text)
+        minutes = max(1, allowance_back_in(visitor)) if visitor != "local" else 60
+        said = (PAUSED[code][1].format(minutes=minutes) if code in PAUSED else
+                "Without the language model this question could not be read; ask it in English.")
+        return {**EMPTY_QUESTION, "refused": True, "reason": "unread language",
+                "classified_by": "declined-language",
+                "lines": [said, "Without the language model, a question in this language is read "
+                                "only when it asks a price; everything else is answered in "
+                                "English — e.g. \"what did TSLA's latest earnings report say\"."],
+                "memory": memory, "remembered": [], "turns": [*prior, text][-12:]}
     if UNREAD_SCRIPT.search(text):
         english, why = _read_in_english(text)
         if english is None:
@@ -5918,9 +6265,15 @@ def _handle_ask(
                     # (a judge, round 19, row 659)
                     and (by in ("patterns", "ngram") or by.startswith(("router", "ngram"))))):
         noted = {f.key() for f in new}
-        payload.update(lines=mem.acknowledgement([f for f in facts if f.key() in noted]),
-                       refused=False, reason="",
-                       classified_by="memory", sources=[])
+        acknowledged = mem.acknowledgement([f for f in facts if f.key() in noted])
+        rambled = _ramble_lines(text, now)
+        if rambled is not None:
+            # a 105-word message about savings, fear and not knowing where to start was answered
+            # with one saved fact (round 38 newcomer): the questions in it are answered, and what
+            # was noted is said after them
+            acknowledged = [*rambled, acknowledged[0].replace("Bottom line: ", "Also ", 1)]
+        payload.update(lines=acknowledged, refused=False, reason="",
+                       classified_by="memory" if rambled is None else "newcomer", sources=[])
     lead = str((payload.get("lines") or [""])[0])
     # the wall comes back as a refusal of a desk-record question on the live console ("total
     # newbie here, should i get some eth now", round 27 live re-ask), and is replaced the same way
@@ -6012,8 +6365,14 @@ def _handle_ask(
         # so a worse reading is never mistaken for the console's best (a judge's audit, 2026-09-29).
         # under the lead, not after a page of figures: a judge found it "a buried final line"
         # (round 31)
-        payload["lines"] = [*payload["lines"][:1], allowance_note(visitor),
-                            *payload["lines"][1:]]
+        note = allowance_note(visitor)
+        if read_as:
+            # the restatement above it did use the model, and the two lines contradicted each
+            # other (round 38 judge, m-3)
+            note = note.replace("This answer was read without the language model:",
+                                "The question was restated in English by the language model, "
+                                "but the answer itself was read without it:", 1)
+        payload["lines"] = [*payload["lines"][:1], note, *payload["lines"][1:]]
         payload["model_paused"] = True
         payload["model_back_in"] = allowance_back_in(visitor)
         from argus.lui.translate import PAUSED, target_language
@@ -9634,7 +9993,8 @@ def _restated(text: str, prior: list[str], book: str = "") -> tuple[str, str | N
         # one-day odds study (a first-time user, round 24)
         coin = research_symbols(text)[0][0].removesuffix("USDT")
         side = "short" if re.search(r"\bshort\b", text, re.I) else "long"
-        return f"where is my liquidation price on a {lev_said.group('x')}x {coin} {side}", None
+        return _with_entry(f"where is my liquidation price on a {lev_said.group('x')}x {coin} "
+                           f"{side}", text), None
     name_moved = re.search(r"(?:^|[.!;]\s+|,\s+)(?P<n>[A-Z]{2,6})"
                            r"(?:\s+is)?\s+(?:(?P<word>down|up)\s+|"
                            r"(?P<sign>[+-])\s*)(?P<pct>\d+(?:\.\d+)?)\s*%(?=\s*(?:[.?!,;]|$))",
@@ -13298,7 +13658,10 @@ class Handler(BaseHTTPRequestHandler):
         client = usage.client_class(self.headers.get("User-Agent") or "")
         internal = first("internal") == "1"
         if path == "/ask":
-            text = repair_mojibake(first("q"))
+            asked_whole = repair_mojibake(first("q"))
+            # 43,500 characters took a minute to read for one sentence repeated (round 38
+            # hostile, defect 12): a question is read up to MAX_QUESTION characters, and says so
+            text = asked_whole[:MAX_QUESTION]
             try:
                 prior = [str(t) for t in json.loads(first("turns", "[]"))][-12:]
             except (ValueError, TypeError):
@@ -13309,7 +13672,8 @@ class Handler(BaseHTTPRequestHandler):
                 # 2026-09-29: a bare {"error": ...} was the one reply without them).
                 self._send(json.dumps(EMPTY_QUESTION).encode(), "application/json", 400)
                 return
-            book = repair_mojibake(first("book"))[:300]
+            whole_book = repair_mojibake(first("book"))
+            book = whole_book[:300]
             # parse() keeps MAX_FACTS; a cut mid-JSON would drop them all (was 12,000 characters,
             # under what 40 facts with their replaced-text history can take).
             memory_text = first("memory")[:64000]
@@ -13323,6 +13687,17 @@ class Handler(BaseHTTPRequestHandler):
             reading = _coverage.recording() if step else contextlib.nullcontext()
             with reading as record:
                 payload = self._ask_payload(text, prior, visitor, book, memory_text)
+            if len(asked_whole) > MAX_QUESTION and payload.get("lines"):
+                payload["lines"] = [*payload["lines"],
+                                    f"Assumed: only the first {MAX_QUESTION:,} of the question's "
+                                    f"{len(asked_whole):,} characters were read."]
+            if len(whole_book.strip()) > 300 and payload.get("lines"):
+                # a 7,200-character book was cut to its first 300 with no word about it, and the
+                # answer said "330%" for what was typed as 8,000% (round 38 hostile, defect 10)
+                payload["lines"] = [*payload["lines"],
+                                    f"Assumed: My book is read up to 300 characters; yours is "
+                                    f"{len(whole_book.strip()):,}, so the holdings after "
+                                    f"“{book.strip()[-40:]}” were not read."]
             if step:
                 focus = first("focus")[:20] or str(payload.get("focus") or "")
                 payload["guide"] = _guide.envelope(step, focus or None,

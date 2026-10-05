@@ -994,7 +994,8 @@ def exposures_answer(
                  for p, d in itertools.pairwise(sorted(other))}, series)
             if pair is not None:
                 lines.append(f"{_t(symbol)}'s daily correlation {pair[0]:+.2f} with the rest of "
-                             f"the book over {pair[1]} shared days: "
+                             f"the book over {pair[1]} shared days (daily closes, about a year — "
+                             f"not the hourly 30-day figure the risk answers quote): "
                              + ("it moves with what you hold, so it adds to the same risk."
                                 if pair[0] >= 0.6 else
                                 "it moves partly apart from what you hold." if pair[0] >= 0.2

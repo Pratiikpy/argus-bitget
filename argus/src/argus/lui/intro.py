@@ -48,7 +48,9 @@ paragraph as "what is this" (a first-time user, round 18, row 632)."""
 
 
 NO_NAME_BUY_Q = re.compile(
-    r"^\W*(?:(?:ok(?:ay)?|so|well|hmm|right|alright)\W+)*(?:what\s+should\s+i\s+(?:buy|invest\s+in|"
+    r"^\W*(?:(?:ok(?:ay)?|so|well|hmm|right|alright)\W+)*(?:what\s+(?:coin|crypto|token|stock|"
+    # "ok so what coin should i buy then" (round 38 newcomer)
+    r"one)\s+should\s+i\s+(?:buy|get|pick)|what\s+should\s+i\s+(?:buy|invest\s+in|"
     r"get|trade|put\s+(?:my\s+)?money\s+in)|what\s+(?:do\s+you\s+recommend|would\s+you\s+buy)|"
     r"what'?s\s+a\s+good\s+(?:buy|investment|trade)|"
     # "whats a good thing to buy rn" was declined (a first-time user, round 21)
@@ -81,6 +83,8 @@ THAT_NUMBER_Q = re.compile(
     r"(?:simpler|more\s+simply|simply|in\s+simple\s+(?:terms|words))\b[^?]{0,30}[?.!]*\s*$|"
     r"\b(?:thoda\s+)?(?:simple|aasan|asaan)\s+(?:mein|me|main|bhasha\s+mein)\s+samjha\w*|"
     r"^\W*(?:yaar\s+|bhai\s+)?samjhao\W*$|"
+    # "mujhe thoda bhi samajh nahi aaya, simple bolo" (round 38 newcomer)
+    r"\bsamajh\s+(?:nahi|nahin|na)\s+aa?ya\b|\bsimple\s+(?:bolo|batao|me\s+batao|mein\s+batao)\b|"
     # "explain like im 5" with no "that" printed a desk decision (a first-time user, round 24)
     r"^\W*(?:pls\s+|please\s+|can\s+you\s+)?explain\s+(?:it\s+|that\s+|this\s+)?(?:to\s+me\s+)?like\s+"
     r"i'?m\s+(?:5|five|a\s+kid|new|a\s+beginner|dumb|stupid)\W*(?:pls|please)?\W*$|\beli5\b|"

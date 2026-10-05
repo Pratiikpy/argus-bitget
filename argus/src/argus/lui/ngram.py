@@ -446,7 +446,13 @@ def reclassify(question: Any, *, path: Path | None = None) -> tuple[Any, str]:
             or not available(path)
             # A list of decisions over a window the patterns resolved: "what did the desk do last
             # Friday" was relabelled into one decision's evidence (a hostile review, 2026-09-30).
-            or (str(reached) == "decision_list" and getattr(question, "window", None) is not None)):
+            or (str(reached) == "decision_list" and getattr(question, "window", None) is not None)
+            # "What is ARGUS's own Sharpe ratio on its paper-trading desk?" was relabelled into
+            # an abstention list at 0.17 (round 38 hostile, defect 6): a performance figure named
+            # outright is the record's performance, whatever the model leans to
+            or (str(reached) == "performance" and re.search(
+                r"\b(?:sharpe|sortino|calmar|draw\s*down|drawdown|win\s*rate|hit\s+rate|p\s*&\s*l|"
+                r"pnl|profit\s+factor|track\s+record)\b", question.raw, re.I))):
         return question, "patterns"
     if str(reached) in _GAVE_UP and str(reached) not in MODEL_MAY_RESCUE:
         # AMBIGUOUS: the patterns understood the question and found a referent missing. See

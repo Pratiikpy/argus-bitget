@@ -570,6 +570,12 @@ def _closes(symbol: str) -> tuple[list[datetime], list[float], str]:
     return fresh
 
 
+def daily_closes(symbol: str) -> tuple[list[datetime], list[float], str]:
+    """Five years of daily closes, cached an hour: :func:`_closes` for other packages, resolved
+    at call time so a test that replaces ``_closes`` replaces this too."""
+    return _closes(symbol)
+
+
 def _read_closes(symbol: str) -> tuple[list[datetime], list[float], str]:
     from argus.lui.research.parse import is_us_equity
 

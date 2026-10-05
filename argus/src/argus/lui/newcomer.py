@@ -82,7 +82,8 @@ _FREE = re.compile(
     r"(?:console|tool|app|site|service))\s+(?:cost|to\s+use)\b|\bany\s+(?:fees?|charges?|"
     r"subscription)\s+(?:to\s+use|for\s+using)\b|"
     # "whats the catch with this site, do u take a cut" (a first-time user, round 23)
-    r"\bwhat'?s\s+the\s+catch\b|\b(?:do|does)\s+(?:u|you|it|argus)\s+take\s+a\s+cut\b|"
+    r"\bwhat'?s\s+the\s+catch\b(?![^?]{0,20}\bindia\b)|\b(?:do|does)\s+(?:u|you|it|argus)\s+"
+    r"take\s+a\s+cut\b|"
     r"\bhow\s+do\s+(?:you|u|they)\s+make\s+money\b|\b(?:do|does)\s+(?:u|you|it)\s+charge\b",
     re.I)
 """Whether using the console costs anything: "is this free?" was declined (round 17)."""
@@ -601,6 +602,68 @@ _FOLLOW_UPS: Final[tuple[tuple[re.Pattern[str], re.Pattern[str], tuple[str, ...]
         "What applies on Bitget instead: on spot, the price itself and the fee (0.10% a side); on "
         "perpetuals, also funding every few hours and, with leverage, liquidation.",
         "Ask \"what does $500 of BTC cost me\" for the fee on a real order.")),
+    # "is that different from a stock token on here", after "whats an etf" (round 38 newcomer)
+    (re.compile(r"\b(?:different|difference|same)\b[^?]{0,40}\b(?:stock\s+token|rtoken|token)\b",
+                re.I),
+     re.compile(r"\betf\b|\bexchange[\s-]traded\s+fund\b", re.I), (
+        "Bottom line: yes — an ETF is a fund you own shares of, run by a fund manager under "
+        "securities law; a stock token on Bitget (an rToken) is a token that tracks one share's "
+        "price, issued under Bitget's terms.",
+        "An ETF holds many companies (or bitcoin itself) and trades only in stock-market hours; "
+        "an rToken tracks one company and trades around the clock on Bitget.",
+        "Neither makes you a shareholder with a vote; the ETF's protections are the fund's and "
+        "the regulator's, the rToken's are Bitget's.")),
+    # "how is that different from just buying right now", after "whats a limit order"
+    (re.compile(r"\b(?:different|difference|better|worse)\b[^?]{0,40}\b(?:buying|selling|"
+                r"buy|sell)\b[^?]{0,20}\b(?:right\s+now|now|straight\s+away|immediately)\b|"
+                r"\bwhy\s+not\s+just\s+buy\b", re.I),
+     re.compile(r"\blimit\s+orders?\b", re.I), (
+        "Bottom line: buying right now is a market order — it fills at once at the best price on "
+        "offer and pays the taker fee; a limit order waits for your price, may never fill, and "
+        "pays the lower maker fee if it does.",
+        "For a small order in a liquid coin the gap is tiny; it matters when the price is moving "
+        "fast or the order is large, where a market order can fill worse than the screen showed.",
+        "Ask \"what does it cost to buy $500 of BTC right now\" for the market order's real "
+        "cost.")),
+    # "is that safe to do", after "whats staking"
+    (re.compile(r"\b(?:is|are)\s+(?:that|it|this|staking)\s+(?:safe|risky|dangerous|worth\s+it)\b",
+                re.I),
+     re.compile(r"\bstak\w*|\bearn\b|\byield\b", re.I), (
+        "Bottom line: not risk-free — the coin can fall while it is locked (a 5% yield on a coin "
+        "that falls 30% is still a loss), you cannot sell during the lock, and the coins sit "
+        "with the exchange or protocol doing the staking.",
+        "Safer in practice: a flexible product you can leave at any time, on a coin you would "
+        "hold anyway, with an amount you could lose.",
+        "Ask \"how much could I lose on ETH in a bad month\" to see the price risk the yield sits "
+        "on.")),
+    # "ok then why does the news keep saying its banned there", after India's legality
+    (re.compile(r"\b(?:banned|ban|illegal)\b", re.I),
+     re.compile(r"\bindia\b", re.I), (
+        "Bottom line: because it was close to banned, twice, and headlines lag — in 2018 the RBI "
+        "barred banks from dealing with crypto firms (struck down by the Supreme Court in March "
+        "2020), and in 2021 a bill to ban private cryptocurrencies was listed but never passed.",
+        "Since then the government taxes it (30% on gains, 1% TDS) rather than banning it, and "
+        "regulates exchanges through FIU-IND registration.",
+        "Not legal advice — check the current position before you put money in.")),
+    # "so can bitget actually operate in india or not"
+    (re.compile(r"\b(?:bitget|exchange)\b[^?]{0,40}\b(?:operate|work|available|allowed|legal)\b",
+                re.I),
+     re.compile(r"\bindia\b", re.I), (
+        "Bottom line: that depends on its registration with India's Financial Intelligence Unit "
+        "(FIU-IND), which offshore exchanges serving Indian users must hold — this console has "
+        "not verified Bitget's current status.",
+        "FIU-IND publishes the list of registered exchanges; check it, and Bitget's own help "
+        "pages for India, before depositing.",
+        "Not legal advice.")),
+    # "whats the catch then if its legal"
+    (re.compile(r"\bcatch\b", re.I),
+     re.compile(r"\bindia\b", re.I), (
+        "Bottom line: the tax — gains are taxed at a flat 30% with no deduction but the cost of "
+        "buying, a loss on one coin cannot be set against a gain on another, and 1% TDS is "
+        "deducted on each transfer.",
+        "So a trade has to clear the fees and the tax to leave you anything; frequent trading is "
+        "hit hardest.",
+        "Not tax advice — check the current rules or a tax adviser.")),
     # "Then why should I listen to it at all?", after the desk's lean was shown to have no skill,
     # was refused (round 37 judge, M-8)
     (re.compile(r"\bwhy\s+(?:should|would|do)\s+(?:i|anyone|we)\s+(?:even\s+)?(?:listen\s+to|trust|"
@@ -654,7 +717,9 @@ _WHAT_NOW = re.compile(
     r"what\s+now|now\s+what|"
     # "ok thank you, what i do first step today" got the thanks alone (a first-time user, round 30)
     r"what\s+(?:do\s+|should\s+)?i\s+do\s+(?:as\s+)?(?:a\s+|the\s+|my\s+)?first(?:\s+step)?(?:\s+today)?|"
-    r"(?:what(?:'?s|\s+is)\s+)?(?:the|my)\s+first\s+step(?:\s+today)?|"
+    r"(?:what(?:'?s|\s+is)\s+)?(?:the|my|a\s+good)\s+first\s+step(?:\s+today)?"
+    # "ok so whats a good first step for someone like me" (round 38 newcomer)
+    r"(?:\s+for\s+(?:someone|people|a\s+beginner|beginners|me)(?:\s+like\s+me)?)?|"
     r"what\s+would\s+you\s+pick|just\s+tell\s+me\s+what\s+to\s+(?:buy|do))\W*$", re.I)
 """A follow-up asking for the pick the last answer did not give: "so what should i do" and "so
 which one should i pick" were declined (a first-time user, round 23)."""
@@ -670,7 +735,154 @@ _WHAT_NOW_A = (
 )
 
 
+_FIRST: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
+    # Round 38, a first-time user (most while the language model was paused): each was declined
+    # or answered with something else.
+    (re.compile(r"\b(?:get|put|move|send|transfer|deposit|add|load)\s+(?:my\s+)?(?:money|cash|"
+                r"funds|dollars|rupees|euros)\s+(?:on(?:to)?|in(?:to)?|to)\s+(?:bitget|the\s+"
+                r"exchange|(?:my\s+)?(?:bitget\s+)?account)\b|\bhow\s+(?:do\s+i|to|can\s+i)\s+"
+                r"(?:deposit|fund\s+my|"
+                r"top\s+up)\b", re.I), (
+        "Bottom line: on Bitget itself, not here — this console never holds or moves money. "
+        "In Bitget's app or site you either deposit crypto you already hold from another wallet, "
+        "or buy crypto with local money through its buy-crypto options (card, bank transfer or "
+        "peer-to-peer, depending on your country), after identity verification.",
+        "Start small: a first deposit you could lose in full while you learn how fees and swings "
+        "feel. Ask \"what does it cost to buy $100 of BTC\" for the fee on a real order.",
+        "Which payment methods your country gets is Bitget's to say; this console has not "
+        "checked them for you.")),
+    (re.compile(r"\b(?:lose|losing)\s+(?:my\s+)?(?:house|home|car|savings|everything\s+i\s+own)\b|"
+                r"\bgo\s+(?:into|in)\s+debt\b|\bend\s+up\s+owing\b", re.I), (
+        "Bottom line: not from trading on Bitget itself — on spot the most you can lose is what "
+        "you put in, and with leverage the exchange closes the position before your account "
+        "goes below zero. What costs people their house is borrowing to trade, or putting in "
+        "money they need.",
+        "So the rules that keep a house safe: never borrow to trade, never use leverage you do "
+        "not understand, and only put in what you could lose in full.",
+        "Ask \"can I lose more than I put in\" for how leverage and liquidation work.")),
+    (re.compile(r"\b(?:good|best|safe|safest|recommended)\s+(?:app|exchange|platform|site|wallet)"
+                r"\s+(?:for|to)\s+(?:crypto|bitcoin|trading|buy\w*|start\w*)\b|\bwhich\s+"
+                r"(?:app|exchange|platform)\s+should\s+i\s+use\b", re.I), (
+        "Bottom line: this console will not rank apps — it is built on Bitget's data, so it is "
+        "not a neutral judge of exchanges.",
+        "What to check in any of them: that it is allowed to serve your country, that it "
+        "publishes proof of reserves, what it charges per trade and per withdrawal, and that you "
+        "can withdraw to your own wallet.",
+        "Ask \"what does it cost to buy $500 of BTC on Bitget\" to see Bitget's side of that.")),
+    (re.compile(r"\b(?:sell|selling|sold|share|sharing)\s+(?:my|our|your\s+users'?)\s+"
+                r"(?:data|info\w*|questions)\b|\bwhat\s+do\s+you\s+do\s+with\s+my\s+"
+                r"(?:data|questions)\b|\b(?:is|are)\s+(?:my\s+)?(?:data|questions)\s+"
+                r"(?:stored|saved|kept|private)\b", re.I), (
+        "Bottom line: no — nothing you type is sold or kept: the console keeps one anonymous line "
+        "per answered question (which engine answered, how long it took, never the words), "
+        "counted by a daily hash that cannot be traced back to you.",
+        "Your book and what you tell it stay in your own browser. One thing leaves the page: an "
+        "oddly phrased question is read by a language model (Qwen, through Bitget's hackathon "
+        "service) to pick the engine that answers it.",
+        "It makes no money from you either — no fees, no ads, no account.")),
+    (re.compile(r"\b(?:make|making|earn)\s+money\s+(?:off|from|out\s+of)\s+(?:me|us|users|"
+                r"people)\b|\bbusiness\s+model\b", re.I), (
+        "Bottom line: it makes no money from you — no fees, no ads, no account, and nothing to "
+        "sell: it is a hackathon project, free to use.",
+        "What it keeps of your data: one anonymous line per answered question (which engine "
+        "answered, how long it took — never the words you typed), counted by a daily hash that "
+        "cannot be traced back to you. Your book and what you tell it stay in your own browser.",
+        "One thing leaves the page: an oddly phrased question is read by a language model "
+        "(Qwen, through Bitget's hackathon service) to pick the engine that answers it.")),
+    (re.compile(r"\b(?:i\s+)?(?:don'?t|dont|do\s+not|never)\s+(?:really\s+)?trust\s+(?:ai|bots?|"
+                r"this|you|chatbots?|robots?)\b|\bwhy\s+should\s+i\s+trust\s+(?:your|the|these|"
+                r"those)\s+(?:numbers|figures|answers|data)\b", re.I), _TRUST_A),
+    (re.compile(r"\bhalal\b|\bharam\b|\bshariah?\b|\bislamic(?:ally)?\b|\b(?:allowed|permitted|"
+                r"permissible|ok(?:ay)?|forbidden)\s+in\s+islam\b|\bislam\s+(?:allow|permit)s?\b",
+                re.I), (
+        "Bottom line: that is a religious ruling, and this console cannot make it — scholars "
+        "disagree, so ask a scholar you trust.",
+        "The facts they usually weigh, as they apply on Bitget: buying a coin or an rToken on "
+        "spot is owning it, with no interest; perpetual futures charge or pay a funding fee "
+        "every few hours and are often used with borrowed leverage; and many coins have no "
+        "business behind them, which some treat as excessive uncertainty (gharar).",
+        "Bitget's own terms say whether it offers an Islamic or swap-free account; this console "
+        "has not checked.")),
+    (re.compile(r"\bis\s+(?:crypto|bitcoin|trading\s+crypto|bitget)\s+(?:even\s+|actually\s+)?"
+                r"(?:legal|allowed|banned|illegal)\s+in\s+india\b|\bcrypto\s+(?:ban|legal\w*)\s+"
+                r"(?:in\s+)?india\b", re.I), (
+        "Bottom line: yes — owning and trading crypto is legal in India, and taxed: the Supreme "
+        "Court struck down the RBI's 2018 banking ban in March 2020, and since 2022 gains are "
+        "taxed at 30% with 1% TDS on each transfer.",
+        "There is still no law that regulates crypto as such, and exchanges serving Indian users "
+        "have to register with India's Financial Intelligence Unit (FIU-IND). Whether a given "
+        "exchange is registered is on FIU-IND's list; this console has not checked Bitget's "
+        "status.",
+        "Not legal or tax advice — the rules change; check the current position before you "
+        "put money in.")),
+    (re.compile(r"\bwhat\s+time\s+does\s+(?:the\s+)?(?:us\s+|american\s+)?stock\s+market\s+"
+                r"(?:open|close)\b|\bwhen\s+does\s+(?:the\s+)?(?:us\s+)?stock\s+market\s+"
+                r"(?:open|close)\b|\bstock\s+market\s+hours\b|"
+                # "what hours is the NYSE open" read NYSE as a ticker (a round-38 re-ask)
+                r"\bwhat\s+(?:hours|time)\s+(?:is|does|are)\s+(?:the\s+)?(?:nyse|nasdaq|us\s+"
+                r"market|stock\s+market|wall\s+street)\b|\b(?:nyse|nasdaq)\s+(?:trading\s+)?"
+                r"hours\b|\bwhen\s+(?:is|does)\s+(?:the\s+)?(?:nyse|nasdaq)\s+(?:open|close)\b",
+                re.I), (
+        "Bottom line: the US stock market (NYSE and Nasdaq) opens at 9:30 and closes at 16:00 New "
+        "York time, Monday to Friday, except market holidays — 13:30 to 20:00 UTC in summer, "
+        "14:30 to 21:00 UTC in winter.",
+        "On Bitget the stock perpetuals and rTokens trade around the clock, so their price moves "
+        "while the stock market is shut and jumps toward the stock at the open.",
+        "Ask \"is the US market open right now\" for today's session and any holiday.")),
+    (re.compile(r"^\W*(?:hi\W+|hey\W+)?(?:i'?m|im|i\s+am)\s+(?:completely\s+|totally\s+|really\s+|"
+                r"very\s+|super\s+)?new\s+(?:to\s+(?:all\s+)?(?:this|trading|crypto|investing)|"
+                r"here)\W*$", re.I), (
+        "Bottom line: welcome — this console answers questions about Bitget's markets in plain "
+        "words, shows where every number comes from, and never trades or touches money.",
+        "Good first questions: \"I have $100, where should I start?\", \"how much could I lose "
+        "on BTC in a bad week\", \"what is a stop loss and do I need one\" — or click one of the "
+        "\"New to trading\" suggestions under the box.",
+        "Nothing you ask here can cost you anything, so there is no wrong question.")),
+    (re.compile(r"\bwhat\s+should\s+i\s+(?:actually\s+)?(?:click|press|do)\s+(?:on\s+)?(?:on\s+)?"
+                r"(?:this|the)\s+(?:site|page|website|console)\b|\bhow\s+do\s+i\s+use\s+this\s+"
+                r"(?:site|page|website)\b", re.I), (
+        "Bottom line: type a question in the box at the top and press Ask — in your own words — "
+        "or click one of the suggestions under \"New to trading\".",
+        "\"Guided research\" walks through five questions about a book you hold; the menu at the "
+        "top has the pages that show the console's record (Status) and what it got wrong.",
+        "Nothing on this site places an order or touches money.")),
+    (re.compile(r"\b(?:mess|screw)\s+(?:something|it|anything)\s+up\b|\bcan\s+i\s+undo\b|"
+                r"\bbreak\s+something\b", re.I), (
+        "Bottom line: nothing here can be messed up — the console places no orders and holds no "
+        "money, so every question is safe to ask and can be asked again.",
+        "What you tell it (your book, your limits) stays in your own browser, and you can forget "
+        "any of it from the list under My book; pinned questions can be unpinned.",
+        "On Bitget itself it is different: a filled order cannot be undone, only closed with "
+        "another order, at the price then.")),
+    # a presale has its own answer (round 34), so it is left to it
+    (re.compile(r"^(?!.*\bpre[\s-]?sales?\b).*?"
+                r"\b(?:friend|cousin|brother|sister|mate|colleague|buddy)\b[^?.]{0,40}\b(?:made|"
+                r"got|turned)\b[^?.]{0,30}\b(?:\d+\s*x|\d{2,}\s*%|rich|a\s+lot|so\s+much|bank)\b"
+                r"[^?]{0,60}\b(?:should|can|do)\s+i\b", re.I), (
+        "Bottom line: their gain says nothing about yours — a coin that made 5x has already "
+        "moved, and you would be buying after the move, at the higher price.",
+        "For every friend who made 5x on a meme coin there are many who bought late and lost "
+        "most of it; you hear from the winners. Meme coins have no business behind them, so "
+        "their price runs on attention, which can leave as fast as it came.",
+        "If you still want some: only an amount you could lose in full, no leverage — and ask "
+        "\"how much could I lose on DOGE in a bad week\" first to see what that means.")),
+    (re.compile(r"\bis\s+\$?\s?(?P<amt>\d[\d,]*)\s*(?:dollars?|bucks|usd|\$)?\s+enough\s+to\s+"
+                r"(?:learn|start|begin|trade|invest|try)\b", re.I), (
+        "Bottom line: yes, to learn — Bitget's smallest spot order is about $1 for bitcoin, so "
+        "$100 can buy real coins, and what you learn is how fees, swings and your own nerves "
+        "feel with real money.",
+        "Keep it spot, without leverage, so the most you can lose is the $100; a 0.1% fee on each "
+        "side means each round trip costs about 20 cents on $100.",
+        "Ask \"I have $100, where should I start?\" for what that sum has been through in three "
+        "broad markets.")),
+)
+"""Questions no market engine should take, asked before any of them reads the question: a
+deposit question went to the account-access refusal and "is crypto allowed in islam" to the
+sentiment reader (round 38 re-asks)."""
+
+
 _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
+    *_FIRST,
     # Round 37, a first-time user: each of these was declined as unrecognised.
     # "so you dont actually buy anything for me right" (A2) is the trust question asked as a check
     (re.compile(r"\b(?:you|u|it|this|argus)\s+(?:do\s*n'?o?t|dont|don't|never|can'?t|cannot|"
@@ -2018,6 +2230,14 @@ def _lead_by_question(text: str, answer: tuple[str, ...]) -> tuple[str, ...]:
 
 _ALSO: Final = re.compile(r"[,.;]?\s*\b(?:and\s+)?also\b|,\s*and\s+(?=(?:is|are|can|should|"
                           r"what|how|do|does)\b)", re.I)
+
+
+def first_reply(text: str) -> list[str] | None:
+    """The answer to one of :data:`_FIRST`, or None."""
+    for asked, answer in _FIRST:
+        if asked.search(text):
+            return list(_lead_by_question(text, answer))
+    return None
 
 
 def reply(text: str, *, named: bool = False) -> Reply | None:

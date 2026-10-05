@@ -350,8 +350,15 @@ def _quote_extras(raw_text: str, quoted: list[tuple[str, Any]],
             worth = float(share.group(1)) / 100 * book_value
             how = f"{float(share.group(1)):g}% of ${book_value:,.0f} is ${worth:,.0f}, and "
         else:
-            size = parse_notional(raw_text)
+            # "I have ¥1,000,000. How many BTC can I buy?" was told to name the amount (round 38
+            # hostile, defect 2): a euro, pound or yen sum is the amount, at Bitget's FX perpetual
+            from argus.lui.research.parse import in_us_dollars
+
+            in_dollars, converted = in_us_dollars(raw_text)
+            size = parse_notional(in_dollars)
             worth = float(size) if size else None
+            if worth and converted:
+                how = converted[0].rstrip(".") + "; "
         if not worth:
             # "I have 20 grand. How many shares of AAPL can I buy?" was told to name the amount
             # (a hostile review, round 21): the money said in the question is the amount
@@ -814,7 +821,13 @@ def _implied_open_line(symbol: str, perp_last: Decimal,
     implied = stock * (1.0 + move)
     text = (f"Implied open: {_t(symbol)}'s perpetual has moved {move * 100:+.2f}% since the "
             f"{close.astimezone(UTC):%a %H:%M} UTC close, which puts the stock near "
-            f"{implied:,.2f} at the next open (last close {stock:g}).")
+            f"{implied:,.2f} at the next open (last close {stock:g})"
+            # "the live price already sits above the implied open" read as a contradiction (round
+            # 38 judge, M-6): the gap is the premium the perpetual held over the stock at the close
+            + (f"; the perpetual itself, at {float(perp_last):,.2f}, also carries the "
+               f"{(perp_close / stock - 1) * 1e4:+.1f}bps premium it held over the stock at that "
+               f"close, which this leaves out" if abs(perp_close / stock - 1) >= 0.0002 else "")
+            + ".")
     record = _overnight_record(symbol)
     if record:
         tie = "" if record["separable"] else " (a difference too small to call)"

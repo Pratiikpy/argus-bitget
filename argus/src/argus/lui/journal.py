@@ -279,7 +279,8 @@ _DATE_D_MON = re.compile(
 _DATE_SLASH = re.compile(r"(?<![\d/.])(\d{1,2})/(\d{1,2})(?![\d/])")
 
 _QTY = re.compile(
-    rf"{_NUM}\s*(k)?\s*(?:shares?|sh\b|units?|contracts?|lots?\b|股|个|手|张|枚)", re.I)
+    rf"{_NUM}\s*(k)?\s*(?:shares?|sh\b|units?|contracts?|lots?\b|oz\b|(?:troy\s+)?ounces?|"
+    rf"barrels?|bbls?\b|股|个|手|张|枚)", re.I)
 _QTY_COIN = re.compile(rf"{_NUM}\s*(btc|eth|sol|bitcoin|比特币|以太坊)\b", re.I)
 _PRICE_AT = re.compile(
     rf"(?:\bat\b|@|\bfor\b|\baround\b|\bnear\b|~|\bprice\s*(?:of\s+)?|\bavg\b|\baverage\b|"
@@ -565,6 +566,17 @@ def parse_text(text: str, *, now: date | None = None) -> tuple[list[Leg], list[s
     notes: set[str] = set()
     legs: list[Leg] = []
     text = text[:MAX_TEXT]
+    # "bought 1e308 BTC" was read as 308 BTC (round 38 hostile, defect 3): scientific notation is
+    # written out, and a figure no trade could be is dropped with a note instead of misread
+    def written(m: re.Match[str]) -> str:
+        value = float(m.group(0))
+        if value > 1e12:
+            notes.add(f"{m.group(0)} ({value:.3g}) is larger than any real trade, so it was not "
+                      f"read as a size or a price")
+            return " "
+        return f"{value:.10g}"
+
+    text = re.sub(r"(?<![\w.])\d+(?:\.\d+)?[eE][+-]?\d{1,3}(?![\w.])", written, text)
     # whole round trips written as one phrase first, then blanked so their verbs are not re-read
     for m in _ROUND_TRIP.finditer(text):
         symbol = None
@@ -1908,7 +1920,11 @@ def _legs_pnl(text: str, price: Callable[[str], float] | None,
 
 _NOW_CLAIM = re.compile(
     rf"\b(?P<name>[A-Za-z]{{2,6}})(?:'s)?\s+(?:is\s+(?:now\s+|currently\s+)?(?:at|trading\s+at)|"
-    rf"is\s+now|now\s+at|currently\s+(?:at\s+)?|trades\s+at|is\s+trading\s+at)\s+\$?"
+    rf"is\s+now|now\s+at|currently\s+(?:at\s+)?|trades\s+at|is\s+trading\s+at|"
+    # "Now that gold hit $10,000/oz overnight" (round 38 hostile, defect 11)
+    rf"(?:just\s+)?(?:hit|reached|touched|crashed\s+to|fell\s+to|dropped\s+to|jumped\s+to|"
+    rf"spiked\s+to|rallied\s+to|went\s+to)(?=[^.?!]{{0,40}}\b(?:overnight|today|now|this\s+morning|"
+    rf"just|yesterday)\b))\s+\$?"
     rf"(?P<p>{_AMOUNT})\s*(?P<k>k\b)?(?!\s*%)", re.I)
 """A price asserted as today's, not a scenario: "BTC is at $3 right now after the flash crash"."""
 _PREMISE_GAP = 0.5
@@ -1976,6 +1992,13 @@ def position_and_pnl(text: str, *, now: datetime | None = None,
         head = lines[0].removeprefix("Bottom line: ")
         lines = [f"Bottom line: {premise}. At that price: {head}", *lines[1:]]
         data = {**data, "premise": premise}
+        # the P&L the trader actually has, at the live price, beside the scenario: a rejected
+        # premise left the real figure unsaid (round 38 hostile, defect 11)
+        real = _position_and_pnl(_NOW_CLAIM.sub(lambda m: f" {m.group('name')} ", _thousands(text)),
+                                now=now, price=price)
+        if real is not None and real[0]:
+            lines.insert(1, "At Bitget's live price instead: "
+                         + real[0][0].removeprefix("Bottom line: "))
     return lines, sources, data
 
 

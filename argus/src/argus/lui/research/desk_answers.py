@@ -327,8 +327,19 @@ def correlation_lines(text: str, prior: Sequence[str], now: datetime | None = No
     from argus.lui.research.performance import asked_period
     from argus.market import history
 
+    # "比特币和黄金过去90天的相关性是多少?" got a performance comparison while the English question
+    # got the coefficient (round 38 judge, C-2): the Chinese words and periods are read too
+    def english(said: str) -> str:
+        said = re.sub(r"(?:过去|最近|近)\s*(\d+)\s*(天|日)", r" over the last \1 days ", said)
+        said = re.sub(r"(?:过去|最近|近)\s*(\d+)\s*(?:个)?月", r" over the last \1 months ", said)
+        said = re.sub(r"(?:过去|最近|近)\s*(\d+)\s*年", r" over the last \1 years ", said)
+        return re.sub(r"相关性|相关系数|相关度|联动性?", " correlation ", said)
+
+    text = english(text)
+    prior = [english(q) for q in prior]
     asked = re.search(r"\bcorrelat\w*|\bmove\s+together\b", text, re.I)
-    follow = re.match(r"^\W*(?:and|what\s+about|how\s+about)\s+(?:with\s+)?", text, re.I) and any(
+    follow = (re.match(r"^\W*(?:and|what\s+about|how\s+about)\s+(?:with\s+)?", text, re.I)
+              or re.search(r"如果|只看|呢|有变化", text)) and any(
         re.search(r"\bcorrelat\w*", q, re.I) for q in prior[-2:])
     if asked is None and not follow:
         return None
@@ -340,7 +351,9 @@ def correlation_lines(text: str, prior: Sequence[str], now: datetime | None = No
         before = next((list(research_symbols(re.sub(r"\bnasdaq(?:\s*-?\s*100)?\b", "QQQ", q,
                                                      flags=re.I))[0])
                        for q in reversed(prior[-2:]) if research_symbols(q)[0]), [])
-        named = [*before[:1], *[n for n in named if n not in before[:1]]]
+        # a follow-up naming nothing new ("and over just the last 30 days?") keeps both names
+        named = (before[:2] if not named else
+                 [*before[:1], *[n for n in named if n not in before[:1]]])
     if len(named) < 2 or period is None:
         return None
     a, b = named[0], named[1]

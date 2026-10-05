@@ -662,22 +662,56 @@ def funding_cost_lines(text: str) -> list[str] | None:
         hours = int(got.get("fundingRateInterval") or 8)
     except Exception:
         return None
+    # "If the funding rate is 5 bps every 8 hours…" states the rate to use; it was replaced by
+    # Bitget's live rate, about 80 times smaller (round 38 hostile, defect 1)
+    stated = re.search(r"(?P<r>-?\d+(?:\.\d+)?)\s*(?:bps|bp|basis\s+points?)\b"
+                       r"(?:[^.?]{0,20}?\b(?:every|per|each|a)\s+(?P<h>\d+)?\s*(?:h|hrs?|hours?)\b)?",
+                       text, re.I)
+    live = rate
+    if stated is not None:
+        rate = float(stated.group("r")) / 10_000
+        hours = int(stated.group("h") or hours)
     size = float(notional)
+    whose = "your stated" if stated is not None else "Bitget's current"
     per = size * rate
     daily = per * 24 / hours
     short = re.search(r"\bshort\b", text, re.I) is not None
     pays = (rate >= 0) != short
     name = symbol.removesuffix("USDT")
-    return [f"Bottom line: about ${abs(daily):,.2f} a day on ${size:,.0f} of {name} — "
-            f"{'paid' if pays else 'received'} by a {'short' if short else 'long'} at Bitget's "
-            f"current rate of {rate:+.4%} every {hours} hours (${abs(per):,.2f} a settlement).",
-            f"Over a 30-day month at this rate that is about ${abs(daily) * 30:,.0f}; the rate is "
-            f"reset at every settlement, so this is today's pace, not a forecast. Read just now "
-            f"from Bitget's current-fund-rate endpoint."]
+    yearly = re.search(r"\bannual\w*|\byear\w*|\bper\s+annum\b|\bapr\b", text, re.I)
+    span = (f"${abs(daily) * 365:,.0f} a year ({abs(daily) * 365 / size:.1%})" if yearly else
+            f"${abs(daily):,.2f} a day")
+    return [f"Bottom line: about {span} on ${size:,.0f} of {name} — "
+            f"{'paid' if pays else 'received'} by a {'short' if short else 'long'} at "
+            f"{whose} "
+            f"rate of {rate:+.4%} every {hours} hours (${abs(per):,.2f} a settlement).",
+            f"Over a 30-day month at this rate that is about ${abs(daily) * 30:,.0f}, and over a "
+            f"year ${abs(daily) * 365:,.0f} ({abs(daily) * 365 / size:.1%} of the position); the "
+            f"rate is reset at every settlement, so this is a pace, not a forecast."
+            + (f" Your stated rate is used; Bitget's live rate is {live:+.4%} every {hours} hours."
+               if stated is not None else
+               " Read just now from Bitget's current-fund-rate endpoint.")]
+
+
+_CENTS = re.compile(r"(?P<n>-?\d[\d,]*(?:\.\d+)?)\s*(?:cents?|¢)\b", re.I)
+
+
+def cents_lines(text: str) -> list[str] | None:
+    """Cents in dollars: "If I have 100 cents, how many dollars is that?" was refused (round 38
+    hostile, defect 9)."""
+    found = _CENTS.search(text)
+    if found is None or not re.search(r"\bdollars?\b|\$|\busd\b", text, re.I):
+        return None
+    cents = float(found.group("n").replace(",", ""))
+    dollars = cents / 100
+    sign = "-" if dollars < 0 else ""
+    return [f"Bottom line: {found.group('n')} cents is {sign}${abs(dollars):,.2f} — a hundred "
+            f"cents make a dollar."]
 
 
 def lines(text: str) -> list[str] | None:
-    for rule in (position_pnl_lines, funding_cost_lines, liquidation_move_lines, compounded_lines,
+    for rule in (cents_lines, position_pnl_lines, funding_cost_lines, liquidation_move_lines,
+                 compounded_lines,
                  margin_lines, equity_lines, rate_change_lines, funding_lines, var_check_lines,
                  tax_lot_lines, cost_of_lines, bps_lines, sharpe_lines, sats_lines):
         found = rule(text)

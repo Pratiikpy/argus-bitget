@@ -1194,6 +1194,10 @@ def _not_a_question(text: str) -> str | None:
     question the console had missed, so a newcomer could not tell "that was gibberish" from "we do
     not handle that yet" (round 37 newcomer, J)."""
     flat = text.strip()
+    if flat and not re.search(r"[^\W_]", flat):
+        # "📈🚀💰" got the line a reasonable missed question gets (round 38 newcomer)
+        return ("That is only symbols or emoji, so there is nothing to answer — type a question "
+                "in words, for example \"where is BTC trading\".")
     if re.fullmatch(r"[\d\s.+\-*/x×()=?]+", flat) and re.search(r"\d\s*[-+*/x×]\s*\d",  # noqa: RUF001
                                                                      flat):
         return ("That is arithmetic rather than a market question; this console works out "
