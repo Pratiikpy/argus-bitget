@@ -1071,7 +1071,10 @@ def after(lines: list[str], request: Any, facts: list[Fact],
                     f"costs more — the ceiling for this leg alone, before what your other "
                     f"holdings do beside it")))
     shock = next((m for line in lines
-                  for m in [re.match(r"Bottom line: If (\S+) moves (-?\d+(?:\.\d+)?)%: your "
+                  # the scenario line may follow another lead ("QQQ alone loses 7.20% of the
+                  # book"), and the limit was then set against the -12% shock itself rather than
+                  # the book's move (a round-37 live re-ask)
+                  for m in [re.match(r"(?:Bottom line: )?If (\S+) moves (-?\d+(?:\.\d+)?)%: your "
                                      r"book moves about (-\d+(?:\.\d+)?)%", line)] if m), None)
     if limit is not None and shock is not None:
         # "How much of my drawdown budget would a 10% NVDA drop use?" got the book's move and no
