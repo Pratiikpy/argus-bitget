@@ -80,6 +80,9 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     # BTC and ETH 30-day 25-delta skew, one row a day rebuilt from Deribit's trades
     # (`market/skew_history.py`): the "versus its 90-day average" half of a skew question.
     "crypto_skew_history.json",
+    # Five years of 8-hour funding settlements for the funding-rule backtest
+    # (`market/funding_history.py`): Binance answers HTTP 451 to the US host.
+    "funding_history.json",
     # Does every figure a question states reach the analysis (`eval/figurecheck.py`), for /status.
     "figurecheck.json",
     "skill_reliability.json",
@@ -306,6 +309,12 @@ def sync(*, dry_run: bool = False, data_only: bool = False) -> SyncResult:
             from argus.market import skew_history
 
             skew_history.update()
+        except Exception:
+            pass
+        try:
+            from argus.market import funding_history
+
+            funding_history.update()
         except Exception:
             pass
     result.ledger_before = _count_lines(DEPLOY_DATA / "paper_ledger.jsonl")

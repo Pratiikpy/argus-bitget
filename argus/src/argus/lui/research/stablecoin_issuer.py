@@ -90,13 +90,37 @@ def _try(fn: Any) -> Any:
         return None
 
 
+_MOVE: Final = re.compile(
+    r"\b(?:yields?|rates?|t-?bills?|bills?)\b[^?]{0,30}?\b(?P<dir>fall|falls|fell|drop|drops|"
+    r"dropped|decline\w*|cut|cuts|lower|go(?:es)?\s+down|rise|rises|rose|climb\w*|go(?:es)?\s+up|"
+    r"higher)\b[^?]{0,20}?(?:by\s+)?(?P<n>a|one|half\s+a|\d+(?:\.\d+)?)\s*(?P<u>points?|"
+    r"percentage\s+points?|%|bps?|basis\s+points?)", re.I)
+
+
+def _stated_move(text: str) -> float | None:
+    """The yield move a question states, in percentage points, signed: positive for a fall
+    (it cuts income). "If T-bill yields fall a point" was answered with the 0.25-point figure
+    under a market-cap lead on the live console (round 41 live re-ask)."""
+    m = _MOVE.search(text)
+    if m is None:
+        return None
+    raw = m.group("n").lower()
+    size = {"a": 1.0, "one": 1.0}.get(raw, 0.5 if raw.startswith("half") else None)
+    if size is None:
+        size = float(raw)
+    if m.group("u").lower().startswith(("bp", "basis")):
+        size /= 100
+    falling = re.match(r"fall|fell|drop|declin|cut|lower|go(?:es)?\s+down", m.group("dir"), re.I)
+    return size if falling else -size
+
+
 def _bn(x: float) -> str:
     return f"${x / 1e9:,.2f}bn" if x >= 1e9 else f"${x / 1e6:,.0f}m"
 
 
 def lines(text: str) -> list[str] | None:
     """The answer, or None when the question is not about Circle as a business."""
-    if not (_ASKED.search(text) and _ABOUT.search(text)):
+    if not (_ASKED.search(text) and (_ABOUT.search(text) or _stated_move(text) is not None)):
         return None
     cap, bill, usdc, reported = _try(_cap), _try(_bill), _try(_usdc), _try(_reported)
     out: list[str] = []
@@ -110,12 +134,17 @@ def lines(text: str) -> list[str] | None:
         out.append(f"The 3-month US Treasury bill yields {bill[0]:.2f}% (FRED DGS3MO, "
                    f"{bill[1]:%d %b %Y}) — the rate USDC's reserves, held mostly in short "
                    "Treasuries and repo, earn.")
+    move = _stated_move(text)
     if bill and usdc:
         gross = usdc * bill[0] / 100
+        step = move if move is not None else 0.25
+        word = "cut" if step > 0 else "rise"
         out.append(f"USDC in circulation: {_bn(usdc)} (DeFiLlama); at {bill[0]:.2f}% that float "
-                   f"earns about {_bn(gross)} a year gross, and each 0.25-point cut in bill "
-                   f"yields takes about {_bn(usdc * 0.0025)} off it — before what Circle pays "
-                   "distribution partners such as Coinbase.")
+                   f"earns about {_bn(gross)} a year gross, and a {abs(step):g}-point {word} in "
+                   f"bill yields {'takes' if step > 0 else 'adds'} about "
+                   f"{_bn(usdc * abs(step) / 100)} a year {'off' if step > 0 else 'to'} it"
+                   + (f" — {abs(step) / bill[0]:.0%} of that income" if step > 0 else "")
+                   + ", before what Circle pays distribution partners such as Coinbase.")
     if reported:
         end = datetime.fromisoformat(reported["end"])
         quarter = f"the quarter to {end:%d %b %Y}"
@@ -128,7 +157,8 @@ def lines(text: str) -> list[str] | None:
         out.append(f"So the market values Circle at about {cap[0] / (reported['income'] * 4):.1f}"
                    "x a year of reserve income at the current pace — which is why its share "
                    "price moves with rate-cut expectations and with USDC's supply.")
-    if re.search(r"\brate\s+cuts?\b|\bcuts?\b|\bfed\b|\bearn\w*\b|\bincome\b", text, re.I) and not (
+    if (move is not None or re.search(r"\brate\s+cuts?\b|\bcuts?\b|\bfed\b|\bearn\w*\b|"
+                                      r"\bincome\b", text, re.I)) and not (
             re.search(r"\bmarket\s*cap\w*|\bvaluation\b|\bworth\b", text, re.I)):
         # "how do rate cuts hit Circle earnings?" leads with the float arithmetic it asked about
         first = [x for x in out if x.startswith("USDC in circulation")]

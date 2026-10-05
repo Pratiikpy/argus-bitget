@@ -272,7 +272,8 @@ class TestSignalBacktests:
         monkeypatch.setattr(rule_test, "daily_closes", lambda s: (stamps, closes, "test closes"))
         settled = [(start + timedelta(days=i, hours=8), -0.0001 if 30 <= i < 60 else 0.0001)
                    for i in range(-2, 121)]
-        monkeypatch.setattr(signal_test, "funding_history", lambda s, since: settled)
+        monkeypatch.setattr(signal_test, "funding_history",
+                            lambda s, since: (settled, "test record"))
         said = signal_test.funding_lines("buy BTC when the funding rate is negative, sell when "
                                          "it turns positive", "BTCUSDT")
         assert said[0].startswith("Bottom line: buying BTC when funding turned negative")
@@ -585,3 +586,33 @@ class TestLivePrecheck:
 
         assert lines("what did NVDA's latest 10-Q say drove data center revenue?",
                      "NVDAUSDT") is None
+
+
+class TestLiveReask:
+    """The two misses of the round-41 live re-ask."""
+
+    def test_funding_falls_back_to_the_snapshot_and_bitget(self, monkeypatch: pytest.MonkeyPatch
+                                                           ) -> None:
+        from argus.market import funding_history as record
+
+        def refused(symbol: str, since: datetime) -> Any:
+            raise RuntimeError("HTTP 451")
+
+        old = datetime(2025, 1, 1, tzinfo=UTC)
+        monkeypatch.setattr(record, "binance", refused)
+        monkeypatch.setattr(record, "bitget", lambda s: [(old + timedelta(days=400), 0.0001),
+                                                         (old + timedelta(days=1), 0.5)])
+        snap = {"series": {"BTCUSDT": [[int(old.timestamp() * 1000), -0.0002],
+                                       [int((old + timedelta(days=2)).timestamp() * 1000),
+                                        0.0001]]}}
+        rows, said = record.history("BTCUSDT", old - timedelta(days=1), snapshot=snap)
+        assert [r[1] for r in rows] == [-0.0002, 0.0001, 0.0001]  # Bitget only past the snapshot
+        assert "then Bitget's own settlements" in said and "does not answer this host" in said
+
+    def test_a_stated_yield_move_is_sized_and_signed(self) -> None:
+        from argus.lui.research.stablecoin_issuer import _stated_move
+
+        assert _stated_move("If T-bill yields fall a point, what happens to Circle?") == 1.0
+        assert _stated_move("What happens to Circle if rates drop 50bp?") == 0.5
+        assert _stated_move("Circle if bill yields rise 0.5%") == -0.5
+        assert _stated_move("market cap of Circle") is None

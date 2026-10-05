@@ -57,7 +57,6 @@ _YEARS: Final = re.compile(r"\b(?:last|past|previous|over\s+the\s+last)\s+(?P<n>
 _WORDS: Final = {"a": 1, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5}
 MIN_TRADES: Final = 10
 """Below this many trades no edge is claimed or ruled out by a t-statistic."""
-BINANCE_FUNDING: Final = "https://fapi.binance.com/fapi/v1/fundingRate"
 CNN_FG: Final = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata/{start}"
 CRYPTO_FG: Final = "https://api.alternative.me/fng/"
 _BROWSER: Final = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -82,21 +81,15 @@ def _hold_days(text: str) -> int | None:
     return n * 5 if unit.startswith("week") else n * 21 if unit.startswith("month") else n
 
 
-def funding_history(symbol: str, since: datetime) -> list[tuple[datetime, float]]:
-    """Every 8-hour funding settlement since ``since``: (settlement time, rate as a fraction)."""
-    out: list[tuple[datetime, float]] = []
-    start = int(since.timestamp() * 1000)
-    for _ in range(20):
-        rows = http.fetch_json(BINANCE_FUNDING, params={"symbol": symbol, "startTime": start,
-                                                        "limit": 1000}, timeout=30.0)
-        if not rows:
-            break
-        out += [(datetime.fromtimestamp(int(r["fundingTime"]) / 1000, UTC),
-                 float(r["fundingRate"])) for r in rows]
-        if len(rows) < 1000:
-            break
-        start = int(rows[-1]["fundingTime"]) + 1
-    return out
+def funding_history(symbol: str, since: datetime) -> tuple[list[tuple[datetime, float]], str]:
+    """Every 8-hour settlement since ``since`` and the record it came from: Binance live, else
+    the desk's snapshot topped up with Bitget's own settlements (`market/funding_history.py`;
+    Binance answers HTTP 451 to the US host the console runs on, round 41 live re-ask)."""
+    from argus.lui.answer import desk_notes_path
+    from argus.market import funding_history as record
+
+    snapshot = record.load(desk_notes_path().parent / "funding_history.json")
+    return record.history(symbol, since, snapshot=snapshot)
 
 
 def fear_greed(crypto: bool) -> dict[date, float]:
@@ -147,10 +140,20 @@ def funding_lines(text: str, symbol: str) -> list[str]:
         return [f"Bottom line: there are only {len(closes)} daily closes for {symbol} in that "
                 "span — too few to test the rule."]
     try:
-        settled = funding_history(symbol, stamps[0] - timedelta(days=2))
+        settled, record = funding_history(symbol, stamps[0] - timedelta(days=2))
     except Exception:
-        return ["Bottom line: the funding history (Binance's settlement record) did not answer "
-                "just now, so the rule cannot be run; ask again in a minute."]
+        settled, record = [], ""
+    if not settled:
+        return [f"Bottom line: no funding settlement record for {symbol} could be read just now "
+                "(Binance, the desk's snapshot and Bitget's own history all came back empty), so "
+                "the rule cannot be run."]
+    if settled[0][0] > stamps[0] + timedelta(days=3):
+        # the record starts inside the span asked: run on what is covered, and say so
+        first = next((i for i, t in enumerate(stamps) if t >= settled[0][0]), len(stamps))
+        stamps, closes = stamps[first:], closes[first:]
+        if len(closes) < 60:
+            return [f"Bottom line: {symbol}'s funding record here starts "
+                    f"{settled[0][0]:%d %b %Y}, too late in the span to test the rule."]
     times = [t for t, _ in settled]
     rates = [r for _, r in settled]
     # a daily bar is stamped at its open; its close is a day later
@@ -212,8 +215,7 @@ def funding_lines(text: str, symbol: str) -> list[str]:
            f"Funding while held: {'paid' if paid > 0 else 'received'} {abs(paid):.2%} of the "
            "position in all — funding is negative only when shorts crowd the market, so the rule "
            "is long in the sell-offs that produce it.",
-           f"Data: {said} for the price; funding from Binance's {symbol} settlement record (every "
-           "8 hours), because Bitget's own history keeps about 90 days; each day's position set by "
+           f"Data: {said} for the price; funding from {record}; each day's position set by "
            f"the last rate settled at or before that close. Taker fee {FEE:.2%} a side. A past "
            "test, not a forecast; not advice."]
     return out
