@@ -450,3 +450,32 @@ class TestStrangerPreCheck:
         from argus.lui.research import macro_indicators
 
         assert macro_indicators.lines("why did the desk sit out the CPI print") is None
+
+
+class TestLivePlannerRoutes:
+    """The live console plans with the model first; these drive that path with a fixed reply."""
+
+    @staticmethod
+    def _client(reply: dict[str, Any]) -> Any:
+        return SimpleNamespace(complete_json=lambda *a, **k: reply)
+
+    def test_one_short_position_is_its_own_risk(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui.research import parse
+
+        monkeypatch.setattr(parse, "_last_prices", lambda: {"NVDAUSDT": 240.0})
+        request, _ = parse._plan_with_model(
+            "Short 100 shares of NVDA, what's my risk on a bad day?",
+            self._client({"kind": "stress", "confidence": 0.9, "names": ["NVDA"]}))
+        assert request is not None and request.kind is parse.ResearchKind.IMPACT
+        assert request.notional == 24000
+
+    def test_amounts_are_the_book_in_a_stress(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui.research import parse
+
+        monkeypatch.setattr(parse, "_last_prices", lambda: {"TSLAUSDT": 400.0, "XAUUSDT": 4000.0})
+        request, _ = parse._plan_with_model(
+            "Run a stress test on my 500k USD portfolio holding 50k TSLA and a 300k position in "
+            "gold", self._client({"kind": "stress", "confidence": 0.9,
+                                  "names": ["TSLA", "XAU"]}))
+        assert request is not None and request.kind is parse.ResearchKind.STRESS
+        assert request.book == pytest.approx({"TSLAUSDT": 0.1, "XAUUSDT": 0.6})

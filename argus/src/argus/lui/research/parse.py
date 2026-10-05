@@ -5423,7 +5423,15 @@ def _plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, di
         # filled from the visitor's saved book.
         subject = shock_subject(text, set(book)) if _NAMED_SHOCK.search(text) else None
         priced = None if book else priced_book(text)
-        if priced is not None and priced.weights and priced.value:
+        if (priced is not None and len(priced.weights) == 1 and shock is None and priced.value
+                and not _STRESS.search(text)):
+            # "Short -100 shares of NVDA, what's my risk on a bad day?" was planned live as a
+            # QQQ stress with no dollar figure (round 42 live re-ask): one position and no shock
+            # is that position's own risk, sized on what it is worth
+            request = ResearchRequest(kind=ResearchKind.IMPACT, symbols=tuple(priced.weights),
+                                      notional=Decimal(str(round(priced.value, 2))),
+                                      parsed_by="model", notes=(*notes, *priced.lines))
+        elif priced is not None and priced.weights and priced.value:
             # "my 500k USD portfolio holding 50k TSLA and a 300k position in gold" was stressed
             # as half TSLA, half gold (round 42 stranger pre-check): the sums are the book
             request = ResearchRequest(
