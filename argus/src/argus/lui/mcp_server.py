@@ -349,6 +349,11 @@ def _book(raw: Any) -> dict[str, float]:
     gross = sum(abs(w) for w in weights.values())
     if gross == 0:
         raise ToolError("book has no weight")
+    if any(w < 0 for w in weights.values()):
+        # a book with shorts is weights of equity, leverage included: {NVDA: -50, AAPL: 150} is
+        # 2x gross and 100% net, and scaling it to 100% gross made it another book (round 40
+        # hostile, C1)
+        return weights
     return {s: w / gross for s, w in weights.items()}
 
 
@@ -424,8 +429,9 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
             size_stated=size is not None)
         result = _run(request, f"add {size or 20}% {add}")
         text = _answer_text(result)
-        stated = sum(abs(float(v)) for v in (args.get("book") or {}).values())
-        if book and abs(stated - 100.0) > 0.5:
+        given = [float(v) for v in (args.get("book") or {}).values()]
+        stated = sum(given)
+        if book and all(v > 0 for v in given) and abs(stated - 100.0) > 0.5:
             # {NVDA: 50, AAPL: 70} was rescaled to 100% with no word, where the console says so
             # (a hostile review, round 29)
             text = (f"Note: the book's weights add up to {stated:g}%, so each was scaled in "
@@ -514,12 +520,12 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
         days = args.get("days")
         if days is not None and not (isinstance(days, int) and 1 <= days <= 14):
             raise ToolError("days must be a whole number from 1 to 14")
-        given = str(args.get("book") or "")[:300]
-        lines, sources, _ = watchlist("what should I watch this week", given, days=days)
+        book_given = str(args.get("book") or "")[:300]
+        lines, sources, _ = watchlist("what should I watch this week", book_given, days=days)
         # a stateless call remembers nothing: the book is the one passed in this call, and a set
         # of weights that does not add to 100% is said to have been scaled (round 39 judge, m-1:
         # "100% gold, 100% oil" came back as "Remembered: your saved book — 50% XAU, 50% CL")
-        stated = sum(float(x) for x in re.findall(r"(\d+(?:\.\d+)?)\s*%", given))
+        stated = sum(float(x) for x in re.findall(r"(\d+(?:\.\d+)?)\s*%", book_given))
         scaled = (f" (the weights given add to {stated:g}%, so they were scaled to 100%)"
                   if stated and abs(stated - 100) > 0.5 else "")
         lines = [re.sub(r"^Remembered: your saved book — (.*?)\.?$",
@@ -570,7 +576,16 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
         found = exposures(asked, holdings[:300])
         if found is None:  # pragma: no cover - the question above always asks for exposures
             raise ToolError("the exposures engine did not recognise the request")
-        return _engine_text(found.lines, found.sources), found.refused
+        text = _engine_text(found.lines, found.sources)
+        weights = [float(x) for x in re.findall(r"(-?\d+(?:\.\d+)?)\s*%", holdings)]
+        if weights and all(w > 0 for w in weights) and abs(sum(weights) - 100) > 0.5 \
+                and not re.search(r"\bcash\b", holdings, re.I):
+            # "60% NVDA, 70% AAPL" was read as 46/54 under "used your saved book", the 130% never
+            # said (round 40 hostile, M2) — the same note the impact tool gives
+            text = (f"Note: the book's weights add up to {sum(weights):g}%, so each was scaled in "
+                    f"proportion to make 100% — give weights that sum to 100% (cash included) to "
+                    f"have them read as stated.\n{text}")
+        return text, found.refused
     if name == "argus_review_trades":
         from argus.lui.journal import review_trades
 

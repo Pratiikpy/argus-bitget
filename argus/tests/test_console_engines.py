@@ -245,7 +245,9 @@ def _falling(symbol: str, drop: float) -> dict[str, dict[datetime, float]]:
 def test_two_mandates_disagree_on_the_identical_trade() -> None:
     raw = _falling("COINUSDT", -0.10)
     lines = research.parse._mandate_lines("COINUSDT", 0.10, raw, "I'm an aggressive trader")
-    assert lines[0].startswith("Bottom line: for your mandate (aggressive event trader")
+    # a preset read from a word is said to be one, not the trader's own limits (round 40
+    # newcomer, #28); stated numbers make it "your mandate"
+    assert lines[0].startswith("Bottom line: for ARGUS's standard aggressive event trader preset")
     assert "yes to a 10% ($10,000) COIN position" in lines[0]
     assert lines[1].startswith("The same trade under a conservative income mandate: no")
     assert "the mandate, not the model, decides" in lines[1]

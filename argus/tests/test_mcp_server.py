@@ -77,8 +77,9 @@ def test_unknown_tool_and_unknown_method_are_json_rpc_errors() -> None:
 def test_a_book_is_validated_and_normalised() -> None:
     assert mcp._book({"NVDA": 60, "AAPL": 20}) == pytest.approx(
         {"NVDAUSDT": 0.75, "AAPLUSDT": 0.25})
-    # a negative weight is a short, as in the console (a hostile review, round 21); zero is not
-    assert mcp._book({"NVDA": -5}) == {"NVDAUSDT": -1.0}
+    # a negative weight is a short, as in the console (a hostile review, round 21), and a book
+    # with shorts is read as weights of equity, not scaled (round 40 hostile, C1); zero is not
+    assert mcp._book({"NVDA": -5}) == {"NVDAUSDT": -0.05}
     with pytest.raises(mcp.ToolError):
         mcp._book({"NVDA": 0})
     with pytest.raises(mcp.ToolError):

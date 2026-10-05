@@ -252,3 +252,9 @@ def lines_for(symbol: str, *, search: Any = None, now: datetime | None = None,
                      f"{m.yes_price:.0%}{move} — ${m.volume:,.0f} traded, closes {m.ends}.")
     return lines
 
+
+
+search_events = _search
+"""The public name of :func:`_search`: Polymarket's event search, cached, for a reader that needs
+events outside :func:`markets_for`'s symbol terms (an all-time-high market,
+`lui/research/ath_odds`)."""

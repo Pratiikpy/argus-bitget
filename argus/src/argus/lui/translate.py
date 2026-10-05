@@ -33,7 +33,8 @@ from argus.truth.bounded import BoundedDict
 
 LANGUAGES: dict[str, str] = {
     "zh": "Simplified Chinese", "es": "Spanish", "pt": "Portuguese", "fr": "French",
-    "de": "German", "ja": "Japanese", "ko": "Korean", "vi": "Vietnamese", "zh-Hant":
+    "de": "German", "ja": "Japanese", "ko": "Korean", "vi": "Vietnamese", "hi": "Hindi",
+    "ar": "Arabic", "ru": "Russian", "th": "Thai", "zh-Hant":
     "Traditional Chinese",
 }
 MAX_CHARS = 8000
@@ -112,12 +113,23 @@ _TRADITIONAL = re.compile(
 """Characters written only in Traditional Chinese, common in trading questions."""
 _HAN = re.compile(r"[一-鿿]")
 
+# Hindi in Devanagari, Arabic, Russian and Thai were restated and answered in English with no
+# translation offered (round 40 judge, Q25): each script decides its language as kana does.
+_DEVANAGARI = re.compile(r"[\u0900-\u097f]")
+_ARABIC = re.compile(r"[\u0600-\u06ff]")
+_CYRILLIC = re.compile(r"[\u0400-\u04ff]")
+_THAI = re.compile(r"[\u0e00-\u0e7f]")
+
 
 def target_language(text: str) -> str | None:
     """The language to answer in, or None for English. Only scripts and languages the console
     already notes are detected; anything else is answered in English as before."""
     if _KANA.search(text):
         return "ja"
+    for script, code in ((_DEVANAGARI, "hi"), (_ARABIC, "ar"), (_CYRILLIC, "ru"),
+                         (_THAI, "th")):
+        if script.search(text):
+            return code
     if _HANGUL.search(text):
         return "ko"
     if _HAN.search(text):

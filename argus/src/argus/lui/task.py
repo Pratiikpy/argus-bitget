@@ -190,7 +190,9 @@ def read_question(text: str, saved_book: str = "") -> Reading | str:
 
 
 _CLAUSE = re.compile(r",\s*(?:and\s+)?(?=(?:is|are|should|can|could|what|how|which|does|do)\s)|"
-                     r"\?\s+(?=\S)", re.I)
+                     r"\?\s+(?=\S)|"
+                     # "also, X, and also Y, and also Z" is three questions (round 40 hostile, C2)
+                     r",?\s*(?:and\s+)?\balso\b,?\s*", re.I)
 
 
 _FULL_RESEARCH = re.compile(

@@ -96,6 +96,10 @@ _CAP = re.compile(
     # "never more than 20% in one name" (a judge, round 24)
     r"\b(?:never|not|no)\s+more\s+than\s+(?P<d>\d{1,2}(?:\.\d+)?)\s*%\s+(?:of\s+(?:my\s+|the\s+)?"
     r"(?:book|portfolio|account)\s+)?(?:in|on)\s+(?:any\s+|a\s+single\s+|a\s+)?(?:one\s+)?(?:name|"
+    r"position|holding|stock|coin|asset)\b|"
+    # "never suggest I add more than 10% of my book to any single position" (round 40 hostile, M3)
+    r"\b(?:more\s+than|over|above)\s+(?P<e>\d{1,2}(?:\.\d+)?)\s*%\s+of\s+(?:my\s+|the\s+)?(?:book|"
+    r"portfolio|account)\s+(?:to|in|on|into)\s+(?:any\s+|a\s+)?(?:single\s+|one\s+)?(?:name|"
     r"position|holding|stock|coin|asset)\b", re.I)
 _CAP_USD = re.compile(
     r"\b(?:can'?t|cannot|can\s+not|won'?t|will\s+not|never|don'?t|do\s+not|not\s+allowed\s+to)\s+"
@@ -286,6 +290,9 @@ def extract(question: str, now: datetime | None = None,
     # European figures and spelled percentages first: "My account is 25.000 USD" was not kept
     # (a hostile review, round 20, row 696)
     text = spelled_out(question.strip()[:600])
+    # "my max loss is 8%, got it?" states a fact and asks only for the nod (round 40 hostile, M3)
+    text = re.sub(r"[\s,.;]*(?:got\s+it|understood|ok(?:ay)?|right|clear|noted)\s*\?+\s*$", ".",
+                  text, flags=re.I)
     facts: list[Fact] = []
     # Questions state nothing about the trader, but the sentence after one can: "What is my risk
     # tolerance? I think I can handle it but my max loss should probably be around 10%" kept
@@ -322,7 +329,7 @@ def extract(question: str, now: datetime | None = None,
             m.group(0))
     if (m := last(_CAP)) is not None:
         add("cap", "", str(float(m.group("a") or m.group("b") or m.group("c")
-                                       or m.group("d")) / 100), m.group(0))
+                                       or m.group("d") or m.group("e")) / 100), m.group(0))
     if (m := last(_CAP_USD)) is not None:
         size = float((m.group("a") or m.group("b") or m.group("c") or m.group("d"))
                      .replace(",", "")) * (

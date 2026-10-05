@@ -587,6 +587,17 @@ _HOUSE_CASH: Final = (
     "two years it is a far smaller risk than a market fall.")
 
 _FOLLOW_UPS: Final[tuple[tuple[re.Pattern[str], re.Pattern[str], tuple[str, ...]], ...]] = (
+    # "ngmi fr fr is this normal", after "WHY IS EVERYTHING RED TODAY" (round 40 newcomer, #22)
+    (re.compile(r"\b(?:is\s+(?:this|that|it)\s+normal|normal\s+(?:for\s+crypto|right)|happens?\s+"
+                r"a\s+lot)\b", re.I),
+     re.compile(r"\bred\b|\bdown\b|\bcrash\w*|\bdump\w*|\bfall\w*|\bdropp?\w*|"
+                r"\bbleed\w*|📉", re.I), (
+        "Bottom line: yes — red days are normal in crypto: Bitcoin falls 3% or more in a day many "
+        "times in a typical year, and smaller coins swing more than it does.",
+        "A red day says little about the next one; what decides how it feels is how much you "
+        "hold. If one bad day hurts, the position is bigger than it should be.",
+        "Ask \"how much could I lose on BTC in a bad week with $X\" with your own amount to see "
+        "what a normal bad stretch means in dollars.")),
     # Round 39 newcomer: "so do i need one to use this site" after "whats a wallet" was declined,
     # though "whats a wallet and do i need one to use this site" in one sentence was answered
     (re.compile(r"\b(?:do|would|will)\s+i\s+(?:even\s+|really\s+|actually\s+)?need\s+(?:one|it|"
@@ -772,6 +783,219 @@ _WHAT_NOW_A = (
 
 
 _FIRST: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
+    # "Is now a 100% safe time to go all-in on NVDA call options with my entire savings?" was
+    # answered as a plain NVDA holding (round 40 hostile, N2): an option can expire at zero
+    (re.compile(r"\ball[\s-]?in\b[^?]{0,60}\b(?:call|put)\s+options?\b|\b(?:call|put)\s+options?\b"
+                r"[^?]{0,60}\b(?:all\s+my|entire|whole)\s+(?:savings|money|account|portfolio)\b",
+                re.I), (
+        "Bottom line: no — nothing is 100% safe, and options are the riskiest way to do this: a "
+        "call bought with your entire savings goes to zero if the stock is below the strike at "
+        "expiry, even when the stock itself only dipped a little.",
+        "Options also lose value every day just from time passing (time decay), and their price "
+        "jumps with implied volatility, so you can be right about the direction and still lose "
+        "if the move is too small or too late.",
+        "Savings are money you need back; if you want exposure, a small amount in the shares or "
+        "the perpetual without leverage caps the loss at what you put in. Ask \"how much could I "
+        "lose on NVDA in a bad week with $X\" with an amount you could lose in full.")),
+    # Round 40, a first-time user, second half (round40_newcomer.md #9, #24, #31-#36, #39)
+    (re.compile(r"\b(?:got|been|was|just\s+got)\s+liquidated\b|\bliquidated\b[^?]{0,80}\b(?:lost|"
+                r"what\s+(?:even\s+)?happened|everything)\b", re.I), (
+        "Bottom line: liquidation is the exchange closing a leveraged position for you once the "
+        "loss has eaten the margin behind it — at 10x, a move of about 10% against you is "
+        "enough, and the margin is gone with it.",
+        "It happens fast because leverage multiplies the move: borrowed money lets a small "
+        "deposit hold a big position, and the exchange closes it before the loss can exceed what "
+        "you put in. On isolated margin that position's margin is lost; on cross margin the "
+        "whole futures balance can be drawn on first.",
+        "Stop for today. Before any next trade: lower leverage (or none), a smaller size, and a "
+        "stop you set in advance. Ask \"where is my liquidation price on a 3x BTC long\" to see "
+        "how far the line sits.")),
+    (re.compile(r"\b(?:avoid|prevent|stop)\s+(?:that|this|it|getting\s+liquidated|liquidation)\s+"
+                r"(?:from\s+happening\s+)?(?:again|next\s+time)\b|\bnot\s+get\s+liquidated\b",
+                re.I), (
+        "Bottom line: three levers, in order — use less leverage (at 2x a move of about 50% is "
+        "needed to liquidate you, at 20x about 5%), trade a smaller size, and set your exit "
+        "before you enter.",
+        "Isolated margin caps what one position can take to its own margin; a stop-loss closes "
+        "it at a level you chose instead of the exchange's liquidation line.",
+        "Ask \"where is my liquidation price on a 3x BTC long\" or \"what leverage would have "
+        "survived BTC's worst day\" — both are worked from Bitget's own prices.")),
+    (re.compile(r"\b(?:is\s+it\s+)?normal\s+to\s+feel\b|\bfeel\w*\s+(?:so\s+)?(?:messed\s+up|"
+                r"sick|terrible|awful|devastated|depressed)\b[^?]{0,60}\b(?:los\w+|money)\b",
+                re.I), (
+        "Bottom line: yes — feeling awful after losing money is normal, and it is a sign to "
+        "step away from trading for now, not a sign that you are bad at this.",
+        "The feeling pushes people to win it back fast, with more size or leverage; that is the "
+        "move that turns a bad loss into a worse one. No trades today.",
+        "Talk to someone you trust. If it is affecting your sleep or work, or you cannot stop "
+        "thinking about trading, free confidential help exists — in the US, the National Problem "
+        "Gambling Helpline at 1-800-GAMBLER.")),
+    (re.compile(r"\b(?:quit|leave)\s+my\s+(?:job|work)\b[^?]{0,60}\b(?:trad\w+|day[\s-]?trad\w*)\b|"
+                r"\bday[\s-]?trad\w*\s+(?:full[\s-]?time|for\s+a\s+living)\b", re.I), (
+        "Bottom line: for almost everyone, no — the evidence on people who day trade for a "
+        "living is that nearly all lose money after costs, so a job is the safer income while "
+        "you test whether you have an edge.",
+        "A study of Brazil's index-futures day traders (Chague, De-Losso and Giovannetti, 2019) "
+        "found 97% of those who kept going for 300 days or more lost money, and only about 1% "
+        "earned more than Brazil's minimum wage from it.",
+        "If you want to try, do it part-time with a fixed amount you can lose, keep a record of "
+        "every trade with its fees, and judge it after a hundred trades, not a lucky week.")),
+    (re.compile(r"\b(?:do|does)\s+most\s+(?:day\s+)?traders?\s+(?:even\s+)?(?:come\s+out\s+ahead|"
+                r"make\s+money|profit|win|lose)\b|\bhow\s+many\s+(?:day\s+)?traders?\s+(?:actually\s+)?"
+                r"(?:make\s+money|profit|lose)\b", re.I), (
+        "Bottom line: no — in the large studies of real trading accounts, most day traders lose "
+        "money once fees are counted.",
+        "Brazil's index-futures day traders: 97% of those who kept at it for 300 days or more "
+        "lost money (Chague, De-Losso and Giovannetti, 2019). The pattern is the same across "
+        "markets: costs are certain, an edge is rare.",
+        "This console holds no dataset of other people's accounts; its own measured fact is the "
+        "cost side — ask \"what does a round trip in BTC cost\" for the fee every trade pays.")),
+    (re.compile(r"(?:\$\s?(?:10|20|25|30|50)\b|\b(?:10|20|25|30|50)\s*(?:bucks|dollars|usd)\b)"
+                r"[^?]{0,60}\b(?:point|worth\s+it|enough|bother)\b", re.I), (
+        "Bottom line: yes, as a way to learn — with $50 the lessons are real and the most you "
+        "can lose is $50, as long as it stays on spot without leverage.",
+        "The cost to watch is fees: about 0.1% a side on Bitget spot, so a $50 buy and sale "
+        "costs about $0.10 — small, but trading often eats into a small balance quickly.",
+        "Spot is the safer place for a small balance: you own the coin and cannot lose more "
+        "than you paid; futures with leverage can wipe out the whole $50 on one move.")),
+    (re.compile(r"\bis\s+spot\s+(?:trading\s+)?safer\b|\bspot\b[^?]{0,40}\bsafer\b", re.I), (
+        "Bottom line: yes — on spot you buy the coin outright, so the most you can lose is what "
+        "you paid; there is no leverage and nothing to liquidate.",
+        "That does not make the price safe: a coin can still fall 50% or more, so the size is "
+        "what protects you.",
+        "Futures (perpetuals) add leverage, funding payments and liquidation; leave them until "
+        "you have traded spot for a while.")),
+    (re.compile(r"\bstop[\s-]?loss\b[^?]{0,80}\b(?:not|doesn'?t|didn'?t|fail\w*)\s+(?:work|fill|"
+                r"trigger|protect)\w*\b", re.I), (
+        "Bottom line: a stop-loss is an order that sells once the price falls to a level you "
+        "set — and in a fast drop it can fill well below that level, because it becomes an "
+        "order to sell at the next price available.",
+        "That gap between your stop and the fill is slippage; a stop-limit order avoids selling "
+        "below your floor, but in a crash it may not fill at all.",
+        "So a stop limits a loss rather than guaranteeing a price: size the position so that "
+        "even a fill past the stop is a loss you can take.")),
+    (re.compile(r"\btax\w*\b[^?]{0,60}\b(?:us|usa|united\s+states|america|irs)\b[^?]{0,60}"
+                r"\bstocks?\b|\b(?:us|usa|irs)\b[^?]{0,40}\btax\w*\b[^?]{0,60}\bdifferent\b",
+                re.I), (
+        "Bottom line: in the US, crypto is taxed much like stocks — gains on what you held over "
+        "a year get the lower long-term rates (0%, 15% or 20%), and a year or less is taxed as "
+        "ordinary income — but the IRS treats it as property, not a security.",
+        "The difference that catches people: spending crypto or swapping one coin for another "
+        "is a taxable sale too, not only selling for dollars; each one needs its own gain or "
+        "loss worked out.",
+        "Losses offset gains, as with stocks. Not tax advice — check the IRS guidance or a tax "
+        "professional for your own case.")),
+    # Round 40, a first-time user: each was declined, or answered with a desk log, a ticker
+    # refusal, a coin definition or the wrong scam.
+    (re.compile(r"\bexplain\s+(?:the\s+)?fees\b|\bfees?\b[^?]{0,40}\b(?:simple|plain|actually\s+"
+                r"pay\w*|what\s+am\s+i\s+paying)\b|\bwhat\s+(?:fees|am\s+i\s+(?:actually\s+)?"
+                r"paying)\b", re.I), (
+        "Bottom line: on Bitget you pay a small cut of each trade — about 0.1% of the amount on "
+        "spot, so $1.00 on a $1,000 buy and $1.00 again on the sale.",
+        "On futures (perpetuals) it is 0.02% when your order waits in the book and 0.06% when it "
+        "takes a price straight away, plus funding: a small payment between longs and shorts "
+        "every 8 hours, which you pay or receive while the position is open.",
+        "Two costs are not on the fee table: the spread (the gap between the buy and sell price, "
+        "tiny on BTC, wider on small coins) and the network fee when you withdraw coins. Ask "
+        "\"what does it cost to buy $100 of BTC\" for the exact figure on a real order.")),
+    (re.compile(r"\bwhat(?:'?s|\s+is|\s+does)\s+(?:a\s+|the\s+)?spot(?:\s+(?:trading|market|"
+                r"buying))?(?:\s+mean)?\b|\bspot\s+(?:trading|market)\s+(?:mean|means)\b", re.I), (
+        "Bottom line: spot means buying the coin itself, paid in full, right now — you own it, "
+        "and the most you can lose is what you paid.",
+        "It is called spot because the trade settles \"on the spot\": the coin lands in your "
+        "account straight away.",
+        "The other kind is futures (perpetuals): a contract on the price, often with borrowed "
+        "money (leverage), where you never hold the coin and a loss can wipe out what you put "
+        "in. Beginners usually start on spot.")),
+    # an overnight gap keeps its own answer below (round 35); this is a fast move through a stop
+    (re.compile(r"^(?!.*\b(?:overnight|asleep|weekend)\b).*?(?:\bgaps?\b[^?]{0,60}\bstop[\s-]?loss\b|"
+                r"\bstop[\s-]?loss\b[^?]{0,60}\b(?:gap\w*|skip\w*|jump\w*\s+past|slip\w*)\b)",
+                re.I), (
+        "Bottom line: not always at your price — it still triggers, but a stop-loss becomes an "
+        "order to sell at the next price available, so after a fast gap it fills lower than the "
+        "stop (that difference is called slippage).",
+        "A stop-limit order avoids selling too low by setting a floor, but in a fast fall it may "
+        "not fill at all, leaving you holding the position.",
+        "Crypto trades around the clock, so gaps are rarer than in stocks overnight, but a crash "
+        "can still jump past levels in seconds; size the position so the gap you fear is a loss "
+        "you can take.")),
+    (re.compile(r"\bwhat(?:'?s|\s+is|\s+are)\s+(?:an?\s+)?airdrops?\b|\bairdrops?\b[^?]{0,40}"
+                r"\bfree\s+(?:money|coins?|crypto)\b|"
+                # "Airdrop là gì" (Vietnamese) while the model that translates was paused
+                # (round 40 newcomer, #26)
+                r"\bairdrops?\s+(?:là\s+gì|qué\s+es|c'est\s+quoi|was\s+ist)\b", re.I), (
+        "Bottom line: an airdrop is a project handing out its new token for free, usually to "
+        "people who used its app early — a marketing move to spread ownership, not free money "
+        "on demand.",
+        "The real ones are announced on the project's own site and verified accounts, and "
+        "often reward past use, so you cannot simply sign up for them afterwards; many tokens "
+        "fall sharply once people sell what they were given.",
+        "The fake ones come to you: a DM or a link asking you to connect a wallet or pay a fee "
+        "to claim. Never connect your main wallet to a claim link — that is how wallets are "
+        "drained.")),
+    # "what is an nft" keeps its own definition below (round 34); this is whether they are over
+    (re.compile(r"\bnfts?\b[^?]{0,40}\b(?:still\s+a\s+thing|dead|die\w*|over|done)\b", re.I), (
+        "Bottom line: NFTs still exist but the boom is over — trading fell steeply from its "
+        "2021-22 peak, and many collections bought then now sell for a fraction of what was "
+        "paid, if they sell at all.",
+        "An NFT is a unique token on a blockchain that records ownership of something, usually "
+        "a digital image; owning one does not mean owning the copyright to the picture.",
+        "They are not something Bitget's markets or this console price, and they are hard to "
+        "sell quickly, so treat any money put in one as money you may not get back.")),
+    (re.compile(r"\b(?:recover|get\s+back|retrieve)\b[^?]{0,40}\b(?:losses|lost\s+(?:money|"
+                r"crypto|funds)|my\s+(?:money|crypto|funds))\b[^?]{0,80}\b(?:send|pay|fee|"
+                r"deposit)\b|\b(?:telegram|discord|whatsapp|instagram|dm\w*)\b[^?]{0,60}"
+                r"\brecover\w*\b", re.I), (
+        "Bottom line: that is a scam — a \"recovery\" scam, aimed at people who have already "
+        "lost money. Nobody can reverse a crypto transfer for a fee, and paying them only adds "
+        "to the loss.",
+        "Regulators warn about exactly this, including the US Federal Trade Commission: real "
+        "help never asks for money up front, and never contacts you first.",
+        "Do not send anything or share your wallet or login details. Block and report the "
+        "account, and if you were defrauded, report it to the police and your country's fraud "
+        "reporting service.")),
+    (re.compile(r"\b(?:guaranteed|sure[\s-]?fire|100%)\b[^?]{0,40}\bsignals?\b|\bsignals?\s+"
+                r"(?:group|channel|service)\b[^?]{0,60}\b(?:fee|pay\w*|subscri\w*|monthly|"
+                r"legit|worth|scam)\b", re.I), (
+        "Bottom line: a \"guaranteed\" signal group is a red flag on its own — no one can "
+        "guarantee trading results, and a seller who could would trade the signals instead of "
+        "selling them.",
+        "Common patterns: screenshots of wins with the losses left out, groups that pump a "
+        "small coin onto their own subscribers, and an upsell to a \"VIP\" tier or a managed "
+        "account.",
+        "If you want to judge any strategy, ask for its full record with every trade and the "
+        "fees, or test the rule yourself here: \"backtest buying BTC when RSI drops below 30\".")),
+    (re.compile(r"\bhow\s+long\s+(?:should|do|would|can)\s+(?:i|you|people)\s+(?:actually\s+|"
+                r"usually\s+|normally\s+)?hold\b|\bhow\s+long\s+(?:is\s+)?(?:normal|usual)\s+to\s+"
+                r"hold\b", re.I), (
+        "Bottom line: there is no normal — it depends on why you bought. A trade on a short-term "
+        "move can last hours; a bet that a coin grows over years is held through falls of 50% "
+        "or more.",
+        "Decide the reason and the exit before you buy: what would make you sell (a price, a "
+        "date, or the reason no longer being true), so the market does not decide it for you.",
+        "Holding longer usually costs less in fees, and in some countries (the US, for one) "
+        "gains on what you held over a year are taxed at a lower rate.")),
+    (re.compile(r"\bhow\s+(?:do|can|would)\s+(?:you|i|people)\s+(?:actually\s+)?(?:know|tell|"
+                r"judge|check)\s+(?:if|whether)\s+(?:a\s+)?(?:trading\s+)?strateg\w+\s+(?:is\s+)?"
+                r"(?:good|works?|any\s+good)\b", re.I), (
+        "Bottom line: test it on data it was not built on, after fees, over enough trades — a "
+        "strategy that only looks good on the period it was designed on usually fails next.",
+        "The checks that matter: dozens of trades, not a handful; results after fees and "
+        "slippage; the worst losing stretch (drawdown), not only the return; and a comparison "
+        "with simply buying and holding.",
+        "This console runs those checks on a rule in plain words: ask \"backtest buying BTC when "
+        "RSI drops below 30\" and it reports the out-of-sample result, the fees and the worst "
+        "stretch.")),
+    (re.compile(r"\bindia\w*\b.{0,60}\btax\w*\b|\btax\w*\b.{0,60}\bindia\w*\b", re.I),
+     (
+        "Bottom line: India taxes crypto gains at a flat 30% (plus cess), with no deduction "
+        "other than what you paid for the coin, and 1% TDS is withheld on each sale above the "
+        "threshold.",
+        "A loss on one coin cannot be set against a gain on another, or carried forward, which "
+        "is why it is called harsh: frequent trading has to clear fees and tax before anything "
+        "is left.",
+        "Not tax advice — rules change each budget, so check the current Income Tax Department "
+        "guidance or a chartered accountant.")),
     # Round 39, a first-time user: each of these was declined, or answered with a definition, a
     # rates briefing or the desk's own record instead of what was asked.
     (re.compile(r"\b(?:lost|down)\s+(?:like\s+|about\s+|almost\s+|over\s+)?(?:half|most|a\s+lot|"

@@ -23,30 +23,42 @@ from argus.desk.portfolio import beta, correlation
 from argus.lui.research.parse import research_symbols
 
 _LEG: Final = re.compile(
-    r"(?P<sign>[-\u2212])?\s*(?P<mult>\d+(?:\.\d+)?)\s*x\s+(?P<side>long|short|inverse)?\s*"
-    r"(?:on\s+|in\s+|of\s+)?(?P<name>[A-Za-z$]{2,12})|"
-    r"(?P<side2>long|short)\s+(?P<mult2>\d+(?:\.\d+)?)\s*x\s+(?:on\s+|in\s+|of\s+)?"
-    r"(?P<name2>[A-Za-z$]{2,12})", re.I)
-ASKED: Final = re.compile(r"\bnet\s+(?:crypto\s+|market\s+|real\s+)?(?:beta|exposure|delta)\b|"
+    r"(?P<side0>long|short)?\s*(?P<sign>[-\u2212])?\s*(?P<mult>\d+(?:\.\d+)?)\s*(?P<unit>x|%)\s+"
+    r"(?P<side>long|short|inverse)?\s*(?:on\s+|in\s+|of\s+)?(?P<name>[A-Za-z$]{2,12})", re.I)
+"""A leg: "2x long BTC", "-1x inverse ETH", "long 3x SOL", and in percent of equity with the side
+said, "short 30% BTC" or "long 130% BTC" (round 40 hostile, C6: the same coin held both ways was
+read as net short). A bare "40% NVDA" is an ordinary holding and is left to the book parser."""
+ASKED: Final = re.compile(r"\bnet\s+(?:\w+\s+){0,2}(?:beta|exposure|delta|position)\b|"
                           r"\b(?:real|true|actual)\s+(?:net\s+)?(?:beta|exposure)\b|"
                           r"\bgross\s+exposure\b", re.I)
 _HEDGE_WITH: Final = re.compile(r"\bhedge\b[^?]{0,40}\bwith\s+(?P<name>[A-Za-z$]{2,12})", re.I)
 
 
-def legs(text: str) -> dict[str, float]:
-    """Each named contract's signed multiple of equity: "2x long BTC" is +2, "-1x inverse ETH"
-    and "1x short ETH" are -1. Empty when fewer than two legs are stated."""
-    found: dict[str, float] = {}
+def stated_legs(text: str) -> list[tuple[str, float]]:
+    """Every leg as stated, in order: (contract, signed multiple of equity)."""
+    out: list[tuple[str, float]] = []
     for m in _LEG.finditer(text):
-        name = m.group("name") or m.group("name2") or ""
-        symbols = research_symbols(name)[0]
-        if not symbols:
+        symbols = research_symbols(m.group("name"))[0]
+        side = (m.group("side") or m.group("side0") or "").lower()
+        if not symbols or (m.group("unit") == "%" and not side and not m.group("sign")):
             continue
-        mult = float(m.group("mult") or m.group("mult2"))
-        side = (m.group("side") or m.group("side2") or "").lower()
+        mult = float(m.group("mult")) / (100.0 if m.group("unit") == "%" else 1.0)
         short = bool(m.group("sign")) or side in ("short", "inverse")
-        found[symbols[0]] = found.get(symbols[0], 0.0) + (-mult if short else mult)
-    return found if len(found) >= 2 else {}
+        out.append((symbols[0], -mult if short else mult))
+    return out
+
+
+def legs(text: str) -> dict[str, float]:
+    """Each named contract's signed multiple of equity, summed per contract: "2x long BTC" is
+    +2, "-1x inverse ETH" and "1x short ETH" are -1, and "short 30% BTC ... long 130% BTC" is
+    +1.0 BTC. Empty when fewer than two legs are stated."""
+    listed = stated_legs(text)
+    if len(listed) < 2:
+        return {}
+    found: dict[str, float] = {}
+    for symbol, mult in listed:
+        found[symbol] = found.get(symbol, 0.0) + mult
+    return found
 
 
 def _t(symbol: str) -> str:
@@ -79,13 +91,14 @@ def lines(text: str) -> list[str] | None:
     col = {s: [series[s][h] for h in hours] for s in names}
     btc = col["BTCUSDT"]
     book_r = [sum(w * col[s][i] for s, w in book.items()) for i in range(len(hours))]
-    gross = sum(abs(w) for w in book.values())
+    listed = stated_legs(text)
+    gross = sum(abs(m) for _, m in listed)
     net = sum(book.values())
     leg_beta = {s: (1.0 if s == "BTCUSDT" else beta(col[s], btc)) for s in book}
     if any(b is None for b in leg_beta.values()):
         return None
     total = sum(w * (leg_beta[s] or 0.0) for s, w in book.items())
-    stated = " and ".join(f"{w:+g}x {_t(s)}" for s, w in book.items())
+    stated = " and ".join(f"{m:+g}x {_t(s)}" for s, m in listed)
     out = [f"Bottom line: your book's beta to Bitcoin is {total:+.2f} — each 1% move in BTC moves "
            f"your equity about {abs(total):.2f}% the same way"
            + (" (the opposite way)" if total < 0 else "")
@@ -99,6 +112,14 @@ def lines(text: str) -> list[str] | None:
                    + (" — a short in a coin that moves more than BTC offsets more than its size."
                       if w < 0 and b > 1 else "."))
     corr_btc = correlation(book_r, btc) or 0.0
+    if len(book) == 1:
+        only = _t(next(iter(book)))
+        out.append(f"Every leg is {only}, so they net to one position, {net:+.0%} of equity in "
+                   f"{only}; the {gross:.0%} gross matters for margin, not market risk — each "
+                   f"account's leg is liquidated on its own margin, so ask for the liquidation "
+                   f"price of each leg separately.")
+        out.append(f"Data: {data.provenance}. Analysis, not advice.")
+        return out
     out.append(f"Net is not the whole risk: with {gross:.0%} gross, the legs can move apart — "
                f"BTC explains {corr_btc * corr_btc:.0%} of this book's hourly moves, and the rest "
                f"is the gap between the coins, which no BTC hedge removes.")

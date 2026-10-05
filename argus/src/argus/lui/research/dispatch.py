@@ -267,9 +267,11 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
         # (round 39 judge, M-2). The substitution is said first, before anything reads as the
         # answer to what was asked.
         name = _t(request.symbols[0])
+        said = unlead(answer.lines[0])
+        # a ticker keeps its capitals: "eTH's worst 24 hours" (round 40 re-ask)
+        said = said if said[1:2].isupper() else said[:1].lower() + said[1:]
         answer.lines[0] = (f"Bottom line: I could not match your question to an analysis I run, "
-                           f"so this is {name}'s risk profile, not an answer to it — "
-                           f"{unlead(answer.lines[0])[:1].lower()}{unlead(answer.lines[0])[1:]}")
+                           f"so this is {name}'s risk profile, not an answer to it — {said}")
         answer.lines.insert(1, f"Ask it as one of these for a direct answer: "
                                f"\"{name} technicals\", \"{name} news\", "
                                f"\"how volatile is {name}\", or "

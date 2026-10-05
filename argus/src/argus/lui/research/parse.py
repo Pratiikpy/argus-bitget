@@ -2350,7 +2350,13 @@ def _with_leverage_exposure(request: ResearchRequest | None,
         return request
     if request.target is not None or request.resize_by is not None:
         return request
-    found = _ADD_MULTIPLE.search(text)
+    # only the clause that names the added name: "add 15% TSLA? ... also should I use 20x on
+    # BTC?" read the 20x into the TSLA add and sized it at the whole book (round 40 hostile, C2)
+    name = _t(request.symbols[0]) if request.symbols else ""
+    clauses = re.split(r"[.?!;]\s+|\balso\b|,\s*and\s+", text, flags=re.I)
+    own = next((c for c in clauses if name and re.search(rf"\b{re.escape(name)}\b", c, re.I)),
+               text)
+    found = _ADD_MULTIPLE.search(own)
     if found is None:
         return request
     multiple = float(found.group(1))
@@ -2376,9 +2382,11 @@ def _normalise(book: dict[str, float], notes: list[str]) -> dict[str, float]:
         notes.append(f"read as short: {shorts} — a negative weight, which offsets the longs in "
                      f"every figure")
         if abs(gross - 1.0) > 0.02:
-            notes.append(f"your positions add up to {gross:.0%} gross, so they were scaled to "
-                         f"100% gross before any risk figure was computed")
-            return {s: w / gross for s, w in book.items()}
+            # -50% NVDA and +150% AAPL is a 2x book, 100% net: scaling it to 100% gross halved
+            # every risk figure and turned it into a different book (round 40 hostile, C1). A
+            # book with shorts is weights of equity, and is read as stated.
+            notes.append(f"your positions are {gross:.0%} of equity gross and "
+                         f"{sum(book.values()):+.0%} net — leverage, read as stated")
         return book
     total = sum(book.values())
     if not book or total <= 0:
@@ -2826,7 +2834,14 @@ def _mandate_lines(symbol: str, size: float, raw_series: Mapping[str, Mapping[da
               + (f", excludes {', '.join(_t(x) for x in profile.excluded_symbols)}"
                  if profile.excluded_symbols else ""))
     named = "" if profile.name == "your mandate" else f"{profile.name}: "
-    lines = [f"Bottom line: for your mandate ({named}{limits}), {said(mine)} — "
+    # "im retired and thinking about putting some of my pension into bitcoin" was judged "for
+    # your mandate (conservative income: 5% per name, 3% loss tolerance ...)" — limits the trader
+    # never gave (round 40 newcomer, #28): a preset read from a word is said to be one
+    preset = bool(named) and not re.search(r"\d", raw_text)
+    whose = (f"ARGUS's standard {profile.name} preset ({limits} — the usual limits for how you "
+             f"described yourself; say your own and they replace these)" if preset else
+             f"your mandate ({named}{limits})")
+    lines = [f"Bottom line: for {whose}, {said(mine)} — "
              f"{why(mine)}. The bad case is {_t(symbol)}'s own worst 24 hours in the history "
              f"loaded here" + ("" if horizon else ", and the trade is read as a day long — say "
                                                  "how long you would hold it to change that")
