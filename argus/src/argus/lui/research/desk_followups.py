@@ -722,11 +722,12 @@ def unread_lines(text: str, prior: Sequence[str] = ()) -> list[str] | None:
     if (company and re.search(r"\bhow\s+(?:many|much)\s+(?:btc|bitcoins?)\b[^?]*\b(?:hold|own|"
                               r"have|got)\b", text, re.I)) or re.search(r"\b(?:mstr|strategy|"
                  r"microstrategy)\b[^?]*\b(?:bitcoin|btc)\s+(?:holdings?|count)\b", text, re.I):
-        return ["Bottom line: this console does not read Strategy's (MSTR) bitcoin count, so it "
-                "will not give one. Strategy publishes it in its SEC filings (8-K, Item 8.01, "
-                "usually each Monday it buys) and on its own site; read the latest figure there.",
-                "What it can measure is how MSTR has traded against BTC — ask \"MSTR beta to "
-                "BTC\"."]
+        # the count is read from Strategy's own 8-K now (`treasury.py`, round 40 judge, Q13)
+        from argus.lui.research import treasury
+
+        return treasury.lines(f"MSTR bitcoin holdings and unrealized P&L — {text}") or [
+            "Bottom line: Strategy's latest bitcoin holdings could not be read from its 8-Ks "
+            "just now; strategy.com publishes the same figures."]
     if re.search(r"\bstaking\s+(?:yield|rate|apr|apy)\b|\bsavings?\s+(?:rate|apr|apy|yield)\b",
                  text, re.I):
         return ["Bottom line: this console reads neither staking yields nor Bitget's savings "

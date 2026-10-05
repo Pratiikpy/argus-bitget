@@ -18,9 +18,9 @@ from datetime import UTC, datetime, timedelta
 from typing import Final
 
 ASKED: Final = re.compile(
-    r"\b(?:mstr|microstrategy|strategy\s+inc|saylor)\b[^?]{0,120}\b(?:btc|bitcoin)\b[^?]{0,60}"
-    r"\b(?:holdings?|holds?|cost\s+basis|average\s+(?:cost|price)|unreali[sz]ed|p&?l|profit|"
-    r"how\s+many)\b|\b(?:how\s+many\s+(?:btc|bitcoins?)|bitcoin\s+holdings?)\b[^?]{0,60}"
+    r"\b(?:mstr|microstrategy|strategy|saylor)\b[^?]{0,120}\b(?:btc|bitcoin)\b[^?]{0,60}"
+    r"\b(?:holdings?|holds?|owns?|cost\s+basis|average\s+(?:cost|price)|unreali[sz]ed|p&?l|profit|"
+    r"how\s+many)\b|\b(?:how\s+(?:many|much)\s+(?:btc|bitcoins?)|bitcoin\s+holdings?)\b[^?]{0,60}"
     r"\b(?:mstr|microstrategy|strategy)\b", re.I)
 _UPDATE: Final = re.compile(r"BTC Update.*?As of (?P<asof>[A-Z][a-z]+ \d{1,2}, \d{4}).*?"
                             r"Average Purchase Price.*?Average Purchase Price[^\n]*\n"

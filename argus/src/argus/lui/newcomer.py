@@ -801,8 +801,8 @@ _FIRST: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
     (re.compile(r"\b(?:got|been|was|just\s+got)\s+liquidated\b|\bliquidated\b[^?]{0,80}\b(?:lost|"
                 r"what\s+(?:even\s+)?happened|everything)\b", re.I), (
         "Bottom line: liquidation is the exchange closing a leveraged position for you once the "
-        "loss has eaten the margin behind it — at 10x, a move of about 10% against you is "
-        "enough, and the margin is gone with it.",
+        "loss has eaten the margin behind it — at 10x a move of about 10% against you is "
+        "enough, at 20x about 5%, and the margin is gone with it.",
         "It happens fast because leverage multiplies the move: borrowed money lets a small "
         "deposit hold a big position, and the exchange closes it before the loss can exceed what "
         "you put in. On isolated margin that position's margin is lost; on cross margin the "

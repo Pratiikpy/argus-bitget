@@ -42,9 +42,16 @@ class TestRoutesFireOnTheirOwnAsk:
         assert thesis_answer.FALSIFY.search("what data would prove it wrong")
         assert not thesis_answer.FALSIFY.search("what evidence is there for it?")
 
-    def test_unread_figures_are_declined_by_name(self) -> None:
+    def test_unread_figures_are_declined_by_name(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        # Strategy's count is now read from its 8-K (round 40 judge, Q13), not declined
+        from argus.lui.research import treasury
+        from argus.market import bitget
+
+        monkeypatch.setattr(treasury, "_holdings", lambda: (
+            "September 27, 2026", 847_666.0, 63.95e9, 75_437.0, "0001193125-26-403417"))
+        monkeypatch.setattr(bitget, "fetch_tickers", lambda: {})
         mstr = desk_followups.unread_lines("how many BTC does MSTR hold?")
-        assert mstr is not None and "does not read" in mstr[0] and "8-K" in mstr[0]
+        assert mstr is not None and "847,666 BTC" in mstr[0] and "8-K" in mstr[0]
         rates = desk_followups.unread_lines("ETH staking yield vs the USDT savings rate?")
         assert rates is not None and "Earn page" in rates[0]
         assert desk_followups.unread_lines("what's the ETH price?") is None

@@ -80,7 +80,11 @@ def _split_lines(text: str) -> list[str]:
              a.get("price")) for a in assets if a.get("pegType") == "peggedUSD"]
     rows.sort(key=lambda r: -r[1])
     total = sum(r[1] for r in rows)
-    by = {r[0]: r for r in rows}
+    # several tokens share a symbol (a bridged "USDC" beside Circle's): the largest is the one
+    # meant, and a later, smaller one overwrote it (round 40 live re-ask: USDC read as $66.7bn)
+    by: dict[str, tuple[str, float, float, Any]] = {}
+    for r in rows:
+        by.setdefault(r[0], r)
     usdt, usdc = by.get("USDT"), by.get("USDC")
     if not usdt or not usdc or total <= 0:
         return ["Bottom line: DeFiLlama did not return USDT and USDC supply just now."]
