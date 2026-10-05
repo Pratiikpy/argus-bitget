@@ -28,7 +28,9 @@ INTRO_Q = re.compile(
     rf"crypto|investing)))?\W+|first\s+time\s+here\W+)?"
     rf"(?:so\s+)?(?:what\s+(?:even\s+)?(?:is|'s)\s+{_SUBJECT}(?:\s+even)?|what\s+does\s+"
     rf"{_SUBJECT}\s+do|who\s+(?:is|'s)\s+(?:{_SUBJECT}|it)\s+for|who\s+(?:made|built)\s+{_SUBJECT}|"
-    rf"what\s+can\s+(?:you|argus|this(?:\s+\w+)?)\s+do(?:\s+for\s+me)?|what\s+(?:can|should)\s+i\s+"
+    rf"what\s+(?:exactly\s+)?can\s+(?:you|argus|this(?:\s+\w+)?)\s+(?:actually\s+|really\s+)?do"
+    # "hi what can you do exactly" was declined on the one extra word (round 37 newcomer, A1)
+    rf"(?:\s+for\s+me)?(?:\s+(?:exactly|actually|really|here|then|tho|though|lol|bro))?|what\s+(?:can|should)\s+i\s+"
     rf"ask(?:\s+(?:you|it|argus|here))?|how\s+do\s+i\s+use\s+{_SUBJECT}|what\s+am\s+i\s+looking\s+at|"
     rf"help|getting\s+started|where\s+do\s+i\s+start|who\s+are\s+you)"
     rf"(?:\s*(?:,|and)\s*(?:who\s+(?:is|'s)\s+(?:{_SUBJECT}|it)\s+for|what\s+(?:does\s+{_SUBJECT}\s+do|"
@@ -260,8 +262,14 @@ VS_Q = re.compile(
     r"claude|gemini|a\s+chatbot|an?\s+(?:ai|llm))\s+(?:can(?:'?t|not)|doesn'?t|does\s+not)|"
     r"how\s+(?:are|is)\s+(?:you|this|argus|it)\s+(?:different|better)\s+(?:from|than)\s+"
     r"(?:chat\s*gpt|gpt|claude|gemini|a\s+chatbot|just\s+asking\s+an?\s+(?:ai|llm))|"
-    r"why\s+(?:use|not\s+just\s+use)\s+(?:you|this|argus)\s+(?:instead\s+of|over|rather\s+than)\s+"
-    r"(?:chat\s*gpt|gpt|claude|gemini|a\s+chatbot))\b", re.I)
+    r"why\s+(?:should\s+i\s+)?(?:use|not\s+just\s+use)\s+(?:you|this|argus)\s+(?:instead\s+of|over|"
+    r"rather\s+than)\s+(?:just\s+)?(?:asking\s+|using\s+)?(?:chat\s*gpt|gpt|claude|gemini|a\s+chatbot)|"
+    # "whats the difference between this and chatgpt" matched none of the three shapes above
+    # (round 37 newcomer, F)
+    r"(?:what(?:'?s|\s+is)\s+the\s+)?difference\s+between\s+(?:you|this|argus|it)\s+and\s+"
+    r"(?:chat\s*gpt|gpt|claude|gemini|a\s+chatbot|an?\s+(?:ai|llm))|"
+    r"(?:is|are)\s+(?:you|this|argus|it)\s+(?:just\s+)?(?:like\s+|the\s+same\s+as\s+)?"
+    r"(?:chat\s*gpt|gpt|claude|gemini|a\s+chatbot)\b)\b", re.I)
 """The product against a general chatbot: "what can you do that ChatGPT cannot" was declined with
 "that has nothing to refer to" (round 17)."""
 

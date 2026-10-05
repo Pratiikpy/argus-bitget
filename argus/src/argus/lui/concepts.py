@@ -414,6 +414,25 @@ CONCEPTS: tuple[Concept, ...] = (
             "recent high.",
             "The labels describe what has happened, not what will; rallies inside bear markets are "
             "common and sharp."),
+    # "whats bullish and bearish mean" had no answer anywhere (round 37 newcomer, H1)
+    Concept("bullish and bearish", r"bullish|bearish|bulls?\s+(?:and|or|vs\.?)\s+bears?",
+            "Bullish means expecting a price to rise; bearish means expecting it to fall. A bull "
+            "is someone betting on a rise, a bear someone betting on a fall.",
+            "They describe a view, not a fact: \"analysts are bullish\" says what people expect, "
+            "and expectations are often wrong. Ask \"what is the sentiment on BTC\" for how the "
+            "crowd is leaning right now, measured."),
+    # "whats impermanent loss" and "does that apply here on bitget" were declined (round 37
+    # newcomer, K)
+    Concept("impermanent loss", r"impermanent\s+loss(?:es)?|\bdivergence\s+loss",
+            "Impermanent loss is what a liquidity provider gives up by depositing two tokens into "
+            "an automated pool (an AMM such as Uniswap) instead of just holding them: when one "
+            "token's price moves against the other, the pool rebalances and you end up with more "
+            "of the one that fell. For a 2x move in one token it is about 5.7% versus holding.",
+            "It only applies to providing liquidity to a pool. Buying spot or trading perpetuals "
+            "on Bitget has no impermanent loss; there the risks are the price itself, fees, "
+            "funding and, with leverage, liquidation.",
+            cited="the constant-product formula: value against holding = 2*sqrt(r)/(1+r) - 1, "
+                  "r = the price ratio change (r = 2 gives -5.72%)"),
     Concept("spot and futures", r"spot\s+(?:and|vs\.?|versus|or)\s+(?:futures|perps?|perpetuals?)|"
             r"(?:futures|perps?|perpetuals?)\s+(?:and|vs\.?|versus|or)\s+spot",
             "Spot is buying the asset itself: you own the coin or rToken, pay for all of it, and "
@@ -606,7 +625,9 @@ def answer(concept: Concept, symbol: str | None, also: Concept | None = None
     sources = [Source(kind="computation", ref="argus.lui.concepts",
                       detail=f"definition of {concept.name}, written text")]
     if concept.cited:
-        sources.append(Source(kind="venue", ref="Bitget", detail=concept.cited))
+        sources.append(Source(kind="venue", ref="Bitget", detail=concept.cited)
+                       if "Bitget" in concept.cited else
+                       Source(kind="computation", ref="formula", detail=concept.cited))
     example = ""
     if concept.kind and concept.marker:
         from argus.lui.research import ResearchKind, ResearchRequest, run

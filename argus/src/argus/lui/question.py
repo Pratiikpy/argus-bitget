@@ -538,8 +538,9 @@ _WORD = re.compile(r"[A-Za-z]{2,12}")
 _TICKER_SHAPED = re.compile(r"(?<![A-Za-z])[A-Z]{2,5}(?![A-Za-z])")
 _NAMED_CONTRACT = re.compile(
     r"(?<![A-Za-z])([A-Z]|[A-Z]{6,10})(?=\s+(?:perps?|perpetuals?|futures|coins?|tokens?|"
-    r"stocks?|shares|contracts?|positions?|holdings?)\b)|\b(?:on|for|of)\s+([A-Z]|[A-Z]{6,10})"
-    r"(?![A-Za-z])")
+    r"stocks?|shares|contracts?|positions?|holdings?)\b)|\b(?:on|for|of)\s+([A-Z]|"
+    # trailing digits belong to the name: "FARTCOINX9" was refused as "FARTCOINX" (round 37)
+    r"[A-Z]{6,10}[0-9]{0,3})(?![A-Za-z0-9])")
 """A one-letter or long all-capitals name that the question marks as a contract: "the funding rate
 on X perpetuals" was answered "No open positions" (a judge's audit, 2026-09-29), because a single
 capital and a six-letter one are not ticker-shaped on their own. Taken only beside a market noun
@@ -1275,7 +1276,9 @@ _VAGUE_REFERENCE = re.compile(
     # because the nouns are open-ended and the function words are not.
     r"\bthat\b(?!\s+(?:the|a|an|we|you|i|he|she|they|it|"
     r"was|were|is|are|had|have|has|did|do|does|would|will|could|should)\b)|"
-    r"\b(?:those|it|the same|this one)\b",
+    # "are you the same thing as the bitget app" names what "the same" refers to (round 37
+    # newcomer, A3)
+    r"\b(?:those|it|the same(?![^?.]{0,25}\bas\b)|this one)\b",
     re.I,
 )
 

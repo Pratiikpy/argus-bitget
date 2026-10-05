@@ -112,12 +112,18 @@ def _answer_the_state_asked(question: str, symbol: str, lines: list[str]) -> lis
     wants_oversold = word == "oversold" or any(t in question for t in (
         "超卖", "과매도", "売られすぎ", "sobreventa", "sobrevendid"))
     rsi = float(reading.group(1))
+    # the timeframe the reading was taken on, said in the verdict: "RSI 69.8, not overbought" was
+    # the 4-hour reading beside a daily 63.4 the same session (round 37 hostile audit, defect 18)
+    frame = re.search(r"RSI\(\d+,\s*(\w+)\)", reading.string)
+    on = f" on the {frame.group(1)} chart" if frame else ""
     if wants_oversold:
-        verdict = (f"Yes — {_t(symbol)} is oversold: RSI {rsi:.1f}, under 30." if rsi <= 30 else
-                   f"No — {_t(symbol)} is not oversold: RSI {rsi:.1f}, above the 30 line.")
+        verdict = (f"Yes — {_t(symbol)} is oversold: RSI {rsi:.1f}{on}, under 30." if rsi <= 30
+                   else f"No — {_t(symbol)} is not oversold: RSI {rsi:.1f}{on}, above the 30 "
+                   f"line.")
     else:
-        verdict = (f"Yes — {_t(symbol)} is overbought: RSI {rsi:.1f}, over 70." if rsi >= 70 else
-                   f"No — {_t(symbol)} is not overbought: RSI {rsi:.1f}, below the 70 line.")
+        verdict = (f"Yes — {_t(symbol)} is overbought: RSI {rsi:.1f}{on}, over 70." if rsi >= 70
+                   else f"No — {_t(symbol)} is not overbought: RSI {rsi:.1f}{on}, below the 70 "
+                   f"line.")
     lead = next((i for i, line in enumerate(lines) if LEAD.match(line)), None)
     if lead is None:
         return [f"Bottom line: {verdict}", *lines]

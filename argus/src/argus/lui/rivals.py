@@ -134,6 +134,11 @@ def scoreboard(text: str) -> tuple[list[str], list[Source], dict[str, Any]]:
         "rival_rows": [{"name": c.name, "state": c.state.value} for c in lost]}
 
 
+_COMMON = frozenset({"did", "does", "do", "you", "your", "beat", "against", "versus", "and", "or",
+                     "yes", "the", "how", "what", "which", "who", "is", "are", "have", "has",
+                     "compare", "compared", "better", "than", "rival", "rivals", "tell", "show"})
+
+
 def answer(text: str) -> tuple[list[str], list[Source], dict[str, Any]]:
     rows = rows_naming(text)
     hits = {w for w in rival_tokens(text)
@@ -158,6 +163,20 @@ def answer(text: str) -> tuple[list[str], list[Source], dict[str, Any]]:
                      + (f": {why}" if why else ".") + mixed)
     if len(rows) > 6:
         lines.append(f"{len(rows) - 6} more on the proof page (/proof).")
+    # every rival the question names is answered: "TradingAgents and FinRobot" listed the first
+    # alone (round 37 hostile audit, defect 17)
+    asked = {m.group(0) for m in re.finditer(r"\b[A-Z][A-Za-z0-9]*[A-Z][A-Za-z0-9-]*\b|"
+                                             r"\b[A-Z][a-z]{3,}[A-Z]?\w*\b", text)}
+    candidates = set(rival_tokens(text))
+    stray = sorted(n for n in asked if n.lower() not in named.lower()
+                   and n.lower() in candidates and n.lower() not in _COMMON)
+    if stray:
+        lines.insert(1, f"{', '.join(stray)}: no row in the register measures ARGUS against "
+                        f"{'it' if len(stray) == 1 else 'them'}, so there is no result to give.")
+    if re.search(r"\byes\s+or\s+no\b", text, re.I):
+        lines[0] = ("Bottom line: " + ("yes, on " + str(counts["owned"]) + " row(s)"
+                                       if counts["owned"] else "not outright: no row is OWNED")
+                    + " — " + lines[0].removeprefix("Bottom line: "))
     return lines, [Source(kind="computation", ref="argus.eval.standing register",
                           detail=f"rows whose named rival matches {named}")], {
         "rival_rows": [{"name": c.name, "state": c.state.value} for c in rows]}

@@ -548,9 +548,14 @@ def factor_returns(factor_closes: Mapping[str, Closes]
 
 
 def fit_holding(closes: Closes, factor_closes: Mapping[str, Closes], *,
-                window: int = WINDOW_DAYS) -> Fit | None:
+                window: int = WINDOW_DAYS, itself: str | None = None) -> Fit | None:
     """One holding's loadings on the last ``window`` dates it shares with every factor, or None
-    when a factor series is missing: a fit on fewer factors is a different model."""
+    when a factor series is missing: a fit on fewer factors is a different model.
+
+    ``itself`` names the factor the holding is: BTC regressed on a set that includes BTC put all
+    of it on the crypto factor and printed "BTC 0.00" on the market with |t| up to 11, against the
+    console's own 0.80 to the Nasdaq-100 (round 37 judge, M-6). It is fitted on the other factors,
+    and its loading on itself is 1 by construction, said as such."""
     if any(k not in factor_closes for k in FACTOR_SERIES):
         return None
     days = sorted(set(closes).intersection(*(set(factor_closes[k]) for k in FACTOR_SERIES))
@@ -560,13 +565,16 @@ def fit_holding(closes: Closes, factor_closes: Mapping[str, Closes], *,
     sub = {k: {d: v[d] for d in days} for k, v in factor_closes.items()}
     _, factors = factor_returns(sub)
     y = [closes[b] / closes[a] - 1.0 for a, b in itertools.pairwise(days)]
-    fitted = ols(y, [factors[f] for f in FACTORS])
+    used = [f for f in FACTORS if f != itself]
+    fitted = ols(y, [factors[f] for f in used])
     if fitted is None:
         return None
     coef, ses, r2 = fitted
-    loadings = {f: coef[i + 1] for i, f in enumerate(FACTORS)}
+    loadings = {f: coef[i + 1] for i, f in enumerate(used)}
     t_stats = {f: coef[i + 1] / ses[i + 1] if ses[i + 1] > 0 else 0.0
-               for i, f in enumerate(FACTORS)}
+               for i, f in enumerate(used)}
+    if itself is not None:
+        loadings[itself], t_stats[itself] = 1.0, math.inf
     return Fit(loadings, t_stats, r2, len(y), days[1], days[-1])
 
 
@@ -726,6 +734,8 @@ def _t(symbol: str) -> str:
 
 def _tstat(value: float) -> str:
     """A t-statistic as read: a holding that is the factor itself (BTC on BTC) has no residual."""
+    if math.isinf(value):
+        return "n/a, it is the factor"
     return f"{value:+.1f}" if abs(value) < 100 else ("above +99" if value > 0 else "below -99")
 
 
@@ -806,7 +816,8 @@ def exposures_answer(
     fits: dict[str, Fit | None] = {}
     for symbol in names:
         series = inputs.closes.get(symbol)
-        fits[symbol] = None if series is None else fit_holding(series, inputs.factors)
+        fits[symbol] = None if series is None else fit_holding(
+            series, inputs.factors, itself="crypto" if symbol == "BTCUSDT" else None)
     load_b, cover_b = book_loadings(before, fits)
     load_a, cover_a = book_loadings(after, fits) if after is not None else ({}, 0.0)
     sec_b = sector_weights(before, rows)
@@ -1009,7 +1020,10 @@ def exposures_answer(
         + ("; ".join(origins) if origins else "no series that could be read") + ".")
     lines.append(f"Method: one least-squares regression per holding of its daily returns on "
                  f"{METHOD_WORDS} together; the book's loading is the weight-sum of its "
-                 f"holdings' (argus.lui.exposures).")
+                 f"holdings' (argus.lui.exposures)."
+                 + (" BTC is the crypto factor itself, so it is fitted on the other factors "
+                    "alone: its market beta is its own, and its crypto loading is 1 by "
+                    "construction." if "BTCUSDT" in names else ""))
 
     sources = [
         Source(kind="computation", ref="argus.lui.exposures.exposures_answer",

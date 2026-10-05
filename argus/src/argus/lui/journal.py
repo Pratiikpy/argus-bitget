@@ -389,7 +389,10 @@ _HYPOTHETICAL = re.compile(r"\b(?:if|should|would|could|shall|will|gonna|going\s
                            r"planning|plan\s+to|thinking\s+of)\b|如果|要是|假如|想要|打算|应该|要不要",
                            re.I)
 _CJK = re.compile(r"[一-鿿]")
-_CLAUSE_SPLIT = re.compile(r"[,，;；。\n]+|\s+(?:then|and\s+then|after\s+that|later)\s+|"  # noqa: RUF001
+# A comma between digits groups thousands and is not a clause break: "2 BTC bought at 80,000" was
+# split at the comma and read as a cost of $80 (round 37 hostile audit, defect 1).
+_CLAUSE_SPLIT = re.compile(r"(?<!\d),(?!\d)|(?<=\d),(?!\d{3}(?!\d))|(?<!\d),(?=\d)|"
+                           r"[，;；。\n]+|\s+(?:then|and\s+then|after\s+that|later)\s+|"  # noqa: RUF001
                            # "bought 100 AAPL at 150 and 50 more at 160": an "and" before a size
                            # starts the next fill (a judge's audit, 2026-09-29)
                            r"\s+and\s+(?=\d)|然后|之后|"
@@ -1903,9 +1906,82 @@ def _legs_pnl(text: str, price: Callable[[str], float] | None,
             {"position": data})
 
 
+_NOW_CLAIM = re.compile(
+    rf"\b(?P<name>[A-Za-z]{{2,6}})(?:'s)?\s+(?:is\s+(?:now\s+|currently\s+)?(?:at|trading\s+at)|"
+    rf"is\s+now|now\s+at|currently\s+(?:at\s+)?|trades\s+at|is\s+trading\s+at)\s+\$?"
+    rf"(?P<p>{_AMOUNT})\s*(?P<k>k\b)?(?!\s*%)", re.I)
+"""A price asserted as today's, not a scenario: "BTC is at $3 right now after the flash crash"."""
+_PREMISE_GAP = 0.5
+
+
+def _premise(text: str, price: Callable[[str], float] | None) -> str | None:
+    """The trader's "it is at X now" set against Bitget's live price, when they are more than half
+    apart. A scenario ("if it goes to 66,000") is the trader's to pose and is left alone; an
+    assertion about today was adopted silently ("BTC is at $3 right now" gave a precise -$59,997,
+    round 37 hostile audit, defect 2)."""
+    if price is None:
+        return None
+    for m in _NOW_CLAIM.finditer(text):
+        if re.search(r"\b(?:if|what\s+if|suppose|imagine|say|when)\b[^.?!]{0,20}$",
+                     text[:m.start()], re.I):
+            continue
+        symbol = _resolve_word(m.group("name"))
+        if symbol is None:
+            continue
+        stated = _number(m.group("p"), m.group("k"))
+        try:
+            live = float(price(symbol))
+        except Exception:
+            continue
+        if live > 0 and abs(stated / live - 1) > _PREMISE_GAP:
+            name = symbol.removesuffix("USDT")
+            return (f"Bitget's live {name} is {live:,.2f}, not {stated:,.2f} "
+                    f"({stated / live - 1:+.0%} from it). The figures below use the price you "
+                    f"gave, so they describe that scenario, not your position today")
+    return None
+
+
 def position_and_pnl(text: str, *, now: datetime | None = None,
                      price: Callable[[str], float] | None = None,
                      ) -> tuple[list[str], list[Source], dict[str, Any]] | None:
+    """:func:`_position_and_pnl`, with a price the trader asserts as today's checked against the
+    live one first (:func:`_premise`)."""
+    got = _position_and_pnl(text, now=now, price=price)
+    if got is None:
+        return None
+    today = (now or datetime.now(UTC)).date()
+    legs = parse_text(_thousands(text), now=today)[0]
+    later = [leg for leg in legs if leg.day is not None and leg.day > today]
+    by_symbol: dict[str, list[Leg]] = {}
+    for leg in legs:
+        if leg.symbol and leg.day is not None:
+            by_symbol.setdefault(leg.symbol, []).append(leg)
+    backwards = []
+    for symbol, own in by_symbol.items():
+        bought = [leg.day for leg in own if leg.action == "buy" and leg.day is not None]
+        sold = [leg.day for leg in own if leg.action == "sell" and leg.day is not None]
+        if bought and sold and max(sold) < min(bought):
+            backwards.append(symbol)
+    if later or backwards:
+        why = (f"a fill is dated {later[0].day:%d %b %Y}, after today" if later else
+               f"the {backwards[0].removesuffix('USDT')} sale is dated before the buy")
+        return ([f"Bottom line: no profit to give — {why}, so these are not fills that happened. "
+                 f"Check the dates and ask again."],
+                [Source("computation", "argus.lui.journal:position_and_pnl",
+                        "fill dates checked against today")],
+                {"position": {"refused": "impossible dates"}})
+    lines, sources, data = got
+    premise = _premise(_thousands(text), price)
+    if premise is not None and lines:
+        head = lines[0].removeprefix("Bottom line: ")
+        lines = [f"Bottom line: {premise}. At that price: {head}", *lines[1:]]
+        data = {**data, "premise": premise}
+    return lines, sources, data
+
+
+def _position_and_pnl(text: str, *, now: datetime | None = None,
+                      price: Callable[[str], float] | None = None,
+                      ) -> tuple[list[str], list[Source], dict[str, Any]] | None:
     """The position and profit a trader's typed fills leave, or None when the message is not that.
 
     "I bought 200 TSLA at 245, 100 at 260, then sold 150 at 255, what's my current position and
@@ -1928,6 +2004,14 @@ def position_and_pnl(text: str, *, now: datetime | None = None,
         return every_leg
     clock = now or datetime.now(UTC)
     legs, _notes = parse_text(text, now=clock.date())
+    for leg in legs:
+        # "bought 10 NVDA at 180, sold at 190" names no size for the sale: it is the whole
+        # holding, said in the answer — it was dropped and the 10 reported as still held
+        if (leg.action == "sell" and leg.symbol and leg.price and not leg.qty
+                and _fraction_of(leg) is None
+                and any(b.action == "buy" and b.symbol == leg.symbol and b.qty for b in legs)):
+            leg.flags.add("fraction=1")
+            leg.flags.add("size not stated: the whole holding")
     fills = [leg for leg in legs if leg.symbol and leg.price and leg.action in ("buy", "sell")
              and (leg.qty or _fraction_of(leg) is not None)]
     if not fills:
@@ -2016,7 +2100,9 @@ def position_and_pnl(text: str, *, now: datetime | None = None,
         leads.append(lead)
         lines.append(f"{name} fills read: " + "; ".join(
             f"{leg.action} {float(leg.qty or 0):g} at {float(leg.price or 0):g}" for leg in own)
-            + ".")
+            + "." + (" The sale named no size, so it was read as the whole holding — say the "
+                     "size if it was less." if any("size not stated: the whole holding" in
+                                                   leg.flags for leg in own) else ""))
         if held > 1e-9 and abs(fifo_average - average) > 1e-9:
             lines.append(f"{name} first in, first out: the {held:g} left cost ${fifo_average:,.2f} "
                          f"each (the oldest lots were sold first), against ${average:,.2f} at "
@@ -2051,6 +2137,22 @@ def position_and_pnl(text: str, *, now: datetime | None = None,
     return lines, sources, {"position": data}
 
 
+def impossible_reason(trade: Trade, today: date) -> str:
+    """Why ``trade`` cannot have happened, or ``""`` when it can."""
+    if trade.opened is not None and trade.opened > today:
+        return f"it opens on {trade.opened:%d %b %Y}, after today"
+    if trade.closed is not None and trade.closed > today:
+        return f"it closes on {trade.closed:%d %b %Y}, after today"
+    if trade.opened is not None and trade.closed is not None and trade.closed < trade.opened:
+        return (f"it closes on {trade.closed:%d %b %Y}, before it opened on "
+                f"{trade.opened:%d %b %Y}")
+    return ""
+
+
+def impossible_trades(trades: Sequence[Trade], today: date) -> list[Trade]:
+    return [t for t in trades if impossible_reason(t, today)]
+
+
 def review_trades(text: str, *, now: datetime | None = None, explicit: bool = False,
                   history: Callable[[str], History] | None = daily_history,
                   releases: Callable[[str, date], Releases] | None = earnings_releases,
@@ -2076,10 +2178,28 @@ def review_trades(text: str, *, now: datetime | None = None, explicit: bool = Fa
         ], [Source("computation", "argus.lui.journal:review_trades", "no trades in the message")],
             {"journal": {"trades": [], "refused": "no trades pasted"}})
     trades, still_open, dropped = pair(journal.legs)
+    impossible = impossible_trades(trades, clock.date())
+    if impossible:
+        # A trade dated after today, or closed before it opened, was graded as a +4,900% winner
+        # (round 37 hostile audit, defect 3). It is named, not scored.
+        trades = [t for t in trades if t not in impossible]
+        if not trades:
+            why = impossible_reason(impossible[0], clock.date())
+            return ([f"Bottom line: nothing to review — {why}, so this is not a trade that "
+                     f"happened. Check the dates and paste it again.",
+                     *(f"Not read as a trade: {_short(t.symbol)} {t.side} {t.entry:g} to "
+                       f"{t.exit:g} ({impossible_reason(t, clock.date())})."
+                       for t in impossible[1:4])],
+                    [Source("computation", "argus.lui.journal:review_trades",
+                            "dates checked against today")],
+                    {"journal": {"trades": [], "refused": "impossible dates"}})
     lines: list[str] = []
     sources: list[Source] = [Source(
         "computation", "argus.lui.journal:review_trades",
         f"{len(trades)} round trip(s) read from {journal.parsed_from}")]
+    for t in impossible:
+        lines.append(f"Not read as a trade: {_short(t.symbol)} {t.side} {t.entry:g} to "
+                     f"{t.exit:g} ({impossible_reason(t, clock.date())}).")
     if not trades:
         lines.append("Missing: the fills pasted do not close any position, so there is no "
                      "finished trade to review yet"

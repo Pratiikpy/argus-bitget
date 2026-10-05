@@ -575,6 +575,62 @@ explains(*_LOOKAHEAD_A, *_OVERFIT_A, *_SURVIVOR_A, *_COSTS_A, *_NOT_ADVICE, *_BU
          *_LOSS_HAPPENS_A, *_BEGINNER_SAFE_A,
          *_GOING_WRONG, *_NO_GUARANTEE, *_SAFE, *_WITHDRAWING, *_PLACING, *_FREE_TO_USE)
 
+_FOLLOW_UPS: Final[tuple[tuple[re.Pattern[str], re.Pattern[str], tuple[str, ...]], ...]] = (
+    # "wait so is that only in futures", after "can i lose more money than i put in" (round 37
+    # newcomer, L2)
+    (re.compile(r"\b(?:only|just)\s+(?:in|on|with|for)\s+(?:futures|perps?|perpetuals?|leverage|"
+                r"margin)\b|\b(?:futures|perps?|perpetuals?)\s+only\b|\bwhat\s+about\s+spot\b|"
+                r"\b(?:does|is)\s+(?:that|it|this)\s+(?:also\s+)?(?:apply|happen|true)\s+(?:to|on|in|"
+                r"for)\s+(?:spot|futures)\b", re.I),
+     re.compile(r"\blose\s+more\b|\bliquidat\w*|\bleverage\b|\bnegative\s+balance\b|"
+                r"\bmargin\b", re.I), (
+        "Bottom line: yes, in practice — losing more than you put in can only happen where you "
+        "borrow: futures (Bitget's perpetuals) and margin trading. Buying on spot with your own "
+        "money, the most you can lose is what you paid.",
+        "On futures, isolated margin caps the loss at the margin behind that one position; cross "
+        "margin lets it draw on your whole futures balance before it is liquidated.",
+        "Ask \"spot vs futures\" for the difference in full, or \"where is my liquidation price "
+        "on a 3x BTC long\" for the exact line.")),
+    # "does that apply here on bitget", after "whats impermanent loss" (round 37 newcomer, K2)
+    (re.compile(r"\b(?:does|do|would|can|could)\s+(?:that|it|this)\s+(?:also\s+)?(?:apply|happen|"
+                r"matter|affect\s+me)\b|\b(?:is|does)\s+(?:that|it|this)\s+(?:a\s+thing|exist)\b",
+                re.I),
+     re.compile(r"\bimpermanent\s+loss\b", re.I), (
+        "Bottom line: no — impermanent loss only happens when you deposit two tokens into a "
+        "liquidity pool. Buying spot or trading perpetuals on Bitget has none.",
+        "What applies on Bitget instead: on spot, the price itself and the fee (0.10% a side); on "
+        "perpetuals, also funding every few hours and, with leverage, liquidation.",
+        "Ask \"what does $500 of BTC cost me\" for the fee on a real order.")),
+    # "Then why should I listen to it at all?", after the desk's lean was shown to have no skill,
+    # was refused (round 37 judge, M-8)
+    (re.compile(r"\bwhy\s+(?:should|would|do)\s+(?:i|anyone|we)\s+(?:even\s+)?(?:listen\s+to|trust|"
+                r"use|believe|care\s+about|bother\s+with)\b|\bwhat(?:'?s|\s+is)\s+(?:the\s+)?point\b",
+                re.I),
+     re.compile(r"\blean\b|\bpredictive\b|\bskill\b|\bcalibrat\w*|\bconfidence\b", re.I), (
+        "Bottom line: not for the lean — it is published as a test it has not passed, and the "
+        "console says so rather than dressing it up. Its own calls are not the product.",
+        "What is: the research engines. Every figure is computed when you ask, from Bitget's live "
+        "data, SEC filings or FRED, and names its source — a price and what a trade costs, how "
+        "far a position can fall, a rule backtested after fees with a permutation test, a book "
+        "under a shock, an earnings date and its usual move.",
+        "Those you can check yourself, line by line; the lean you can watch fail or improve on "
+        "/status, graded the same way every day.")),
+)
+"""A follow-up that only makes sense after the question before it: the first pattern is the
+follow-up, the second must be in the previous turns, and the lines are the answer."""
+
+
+def followup_lines(text: str, prior: list[str]) -> list[str] | None:
+    """The answer to a short follow-up of a newcomer answer, read with the turns before it."""
+    if len(text.split()) > 14:
+        return None
+    before = " ".join(prior[-2:])
+    for asked, earlier, answer in _FOLLOW_UPS:
+        if asked.search(text) and earlier.search(before):
+            return list(answer)
+    return None
+
+
 _LOAN = re.compile(
     r"\b(?:take|get|taking|getting)\s+(?:out\s+)?a\s+loan\b|\bborrow\w*\s+(?:money\s+)?to\s+"
     r"(?:buy|invest|trade)\b|\bloan\s+to\s+(?:buy|invest|trade)\b", re.I)
@@ -615,6 +671,89 @@ _WHAT_NOW_A = (
 
 
 _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
+    # Round 37, a first-time user: each of these was declined as unrecognised.
+    # "so you dont actually buy anything for me right" (A2) is the trust question asked as a check
+    (re.compile(r"\b(?:you|u|it|this|argus)\s+(?:do\s*n'?o?t|dont|don't|never|can'?t|cannot|"
+                r"won'?t)\s+(?:actually\s+|really\s+|ever\s+)?(?:buy|sell|trade|place|touch|move|"
+                r"invest)\b[^?]{0,40}\b(?:right|correct|yeah|yes|do\s+you|for\s+me|my\s+money|"
+                r"orders?)\b|\b(?:do|will|can|could)\s+(?:you|u|it|this|argus)\s+(?:ever\s+|"
+                r"actually\s+)?(?:place|make|execute)\s+(?:any\s+|an?\s+)?(?:orders?|trades?)\b",
+                re.I), _TRADING_FOR_YOU),
+    # "are you the same thing as the bitget app itself" (A3) was told "the same" referred to nothing
+    (re.compile(r"\b(?:are|is)\s+(?:you|u|this|argus|it)\s+(?:the\s+same\s+(?:thing\s+)?as|part\s+of|"
+                r"made\s+by|run\s+by|owned\s+by|from|affiliated\s+with|(?:the\s+|an?\s+)?"
+                r"official\w*)\b[^?]{0,30}"
+                r"\bbitget\b|\b(?:are|is)\s+(?:you|u|this|argus|it)\s+(?:the\s+)?bitget(?:'?s)?\s+"
+                r"(?:app|own|official|exchange|website|site)\b", re.I), (
+        "Bottom line: no — ARGUS is a separate research console, a Bitget AI hackathon entry, not "
+        "the Bitget app and not run by Bitget. It reads Bitget's public market data and Bitget's "
+        "own AI tools; it cannot see or touch your Bitget account.",
+        "The Bitget app is where you hold money and place trades. This console only answers "
+        "questions — what a market is doing, what a trade would cost, what it could lose — and "
+        "every figure names its source.",
+        "So trades, deposits and withdrawals happen in the Bitget app, never here.")),
+    # "can you watch nvda for me and tell me when it dips" (E)
+    (re.compile(r"\b(?:can|could|will|would)\s+(?:you|u|it|this)\s+(?:please\s+)?(?:watch|monitor|"
+                r"track|keep\s+an\s+eye\s+on|alert\s+me|notify\s+me|ping\s+me|tell\s+me\s+when)\b|"
+                r"\b(?:set|create|make)\s+(?:me\s+)?(?:an?\s+)?(?:price\s+)?alerts?\b|\bprice\s+alerts?\b",
+                re.I), (
+        "Bottom line: this web page cannot watch a price and tell you when it dips or jumps — it "
+        "answers when you ask and keeps nothing running between visits.",
+        "Alerts exist in ARGUS's Telegram bot when it runs on an always-on machine: \"/watch NVDA "
+        "below 170\" messages you once the price trades there (pip install the project, then "
+        "\"argus-bot setup\" with your own BotFather token). The hosted bot, @argusbitgetbot, "
+        "answers questions but runs as short calls, so it cannot keep a watch.",
+        "To check yourself here: ask \"where is NVDA trading\" any time, or pin that answer (the "
+        "pin button under it) and it is asked again, live, every time you open this page.")),
+    # "ok so how do i check it myself then", after the alert answer (E, turn 2)
+    (re.compile(r"\bhow\s+(?:do|can|would)\s+i\s+(?:check|see|watch|track|follow|look\s+up)\s+"
+                r"(?:it|that|this|the\s+price|prices?|them)\s+(?:my\s*self|on\s+my\s+own|myself)\b",
+                re.I), (
+        "Bottom line: ask \"where is NVDA trading\" (or any name) here — the price is read live "
+        "from Bitget every time you ask.",
+        "Pin that answer with the pin button under it and it is asked again, live, every time you "
+        "open this page, so the check is one visit.",
+        "For a message when a level trades, run ARGUS's Telegram bot on your own machine and use "
+        "\"/watch NVDA below 170\".")),
+    # "i lost 30% of my money this week what now" (D1) — a loss stated, and nothing asked but help
+    (re.compile(r"(?:\b(?:i(?:'?ve)?|just)\s+(?:just\s+)?lost|\b(?:i'?m|i\s+am|im|i'?ve\s+been|"
+                r"been)?\s*down)\s+(?:like\s+|about\s+|almost\s+|over\s+)?"
+                r"(?:\$?\d[\d,.]*\s*(?:%|k\b|dollars?|bucks|usd\w*)?|half|most|a\s+lot|everything|"
+                r"all)[^?]{0,60}\b(?:what\s+(?:now|do\s+i\s+do|should\s+i\s+do|next)|help|now\s+what|"
+                r"what\s+(?:can|should)\s+i)\b", re.I), (
+        "Bottom line: first, stop adding money or leverage while it still hurts — the most common "
+        "way a big loss becomes a far bigger one is trading bigger to win it back quickly.",
+        "Then look at what is left with the numbers, not the feeling: what you hold now, whether "
+        "any of it is leveraged (a leveraged position can still be liquidated), and how much more "
+        "it could fall in a bad week — ask \"how much could I lose on BTC in a bad week with "
+        "$700\" with your own name and sum.",
+        "Whether to hold or sell is your call, and a loss already taken is not a reason either "
+        "way; the question is whether you would buy what you hold today, at today's price, with "
+        "money you could afford to lose.")),
+    # "should i put more money in to average it out" (D2): averaging down
+    (re.compile(r"\baverag\w*\s+(?:it\s+|my\s+\w+\s+|the\s+\w+\s+)?(?:out|down)\b|\bput\s+(?:more|"
+                r"extra)\s+(?:money\s+)?in\b[^?]{0,40}\b(?:averag\w*|lower|bring\s+down|recover|"
+                r"make\s+(?:it\s+)?back)\b|\bbuy\s+more\s+to\s+(?:lower|average|bring\s+down)\b",
+                re.I), (
+        "Bottom line: averaging down lowers your average price but raises how much you have on the "
+        "same bet — if it keeps falling, the loss grows faster, not slower.",
+        "It helps only if the reason you bought is still true and the extra money is money you "
+        "could lose in full; it never makes the earlier loss smaller, it just needs a smaller "
+        "rebound to break even on a bigger stake.",
+        "Never add with leverage or with money you need: ask \"how much could I lose on BTC in a "
+        "bad week with $1,000\" with the total you would have in, before adding.")),
+    # "ok so how much should i actually risk then" (G2)
+    (re.compile(r"^\W*(?:(?:ok(?:ay)?|so|then|alright|but)\W+){0,3}how\s+much\s+(?:money\s+)?"
+                # "how much should i invest" keeps its own answer, the starting-sum one
+                r"(?:should|can|do)\s+i\s+(?:actually\s+|really\s+)?(?:risk|bet)\b"
+                r"(?:\s+(?:then|tho|though|at\s+most|max|per\s+trade))?\W*$", re.I), (
+        "Bottom line: only money you could lose in full without it changing your life — never "
+        "rent, bills or an emergency fund — and on any one trade, a common rule is to lose no "
+        "more than 1 to 2% of your trading money if it goes wrong.",
+        "That 1 to 2% is the loss, not the position: with $1,000 and a stop 5% below your entry, a "
+        "1% risk ($10) means a $200 position.",
+        "Ask \"size a trade: $1,000 account, 1% risk, stop 5% below entry\" with your own numbers "
+        "and the console works it out, fees included.")),
     # "omg i think i lost access to my 2fa app how do i get back into my bitget account" was
     # answered with revenge-trading advice, because "get back into" matched the only answer
     # that mentions getting money "back" (a first-time user, round 33)
@@ -1296,14 +1435,16 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
         "terms (dividends, redemption) are Bitget's to set.",
         "Ask \"what does it cost to buy $100 of NVDA\" for the fee on a real order.")),
     # Round 25, a first-time user: each of these got a desk log, a decline or a sentiment line
-    (re.compile(r"\bi(?:'?m|\s+am)\s+(?:only\s+)?(?:1[0-7]|thirteen|fourteen|fifteen|sixteen|"
-                r"seventeen)\b(?!\s*(?:%|x\b|k\b|thousand|years?\s+(?:into|of\s+trading)))",
-                re.I), (
+    # "explain RSI like im 12 years old" is the explain-it-simply idiom, not an age: it got this
+    # refusal, which also said "16" whatever age was typed (round 37 newcomer, C1)
+    (re.compile(r"(?<!like\s)(?<!if\s)(?<!pretend\s)(?<!imagine\s)\bi(?:'?m|\s+am)\s+(?:only\s+)?"
+                r"(?:1[0-7]|thirteen|fourteen|fifteen|sixteen|seventeen)\b(?!\s*(?:%|x\b|k\b|"
+                r"thousand|years?\s+(?:into|of\s+trading)))", re.I), (
         "Bottom line: Bitget's terms require anyone using it to be at least 18 (section 2.2 of its "
-        "terms of use), so at 16 you cannot open an account there, with $200 or any amount.",
+        "terms of use), so under 18 you cannot open an account there, with any amount.",
         "Learning costs nothing: ask this console anything — \"how much could I lose on BTC "
-        "in a bad week with $200\" shows what that money would have been through — and keep "
-        "the $200 until you can decide for yourself, without leverage.",)),
+        "in a bad week with $200\" shows what a sum would have been through — and keep the "
+        "money until you can decide for yourself, without leverage.",)),
     # "is BTC a safe place to park cash until then" got this block, about USDT (a judge, round 31)
     (re.compile(r"\b(?:just\s+)?(?:hold(?:ing)?|keep(?:ing)?|stay(?:ing)?\s+in)\s+(?:it\s+in\s+)?"
                 r"(?:usdt|usdc|stable\s*coins?|cash)\b(?![^?]{0,30}\b(?:is|are)\s+(?:btc|eth|"

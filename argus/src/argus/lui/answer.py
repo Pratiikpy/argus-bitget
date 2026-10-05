@@ -28,6 +28,7 @@ answerer's declaration. Outside a recording the decorator only reads one context
 
 from __future__ import annotations
 
+import itertools
 import json
 import os
 import re
@@ -1108,7 +1109,10 @@ def answer(ledger: PaperLedger, question: Question) -> Answer:
     if question.intent is Intent.UNSUPPORTED:
         return _refuse(
             question, question.reason,
-            suggestion="ARGUS decides on: " + ", ".join(TRADED_SYMBOLS) + ".",
+            # the desk's list answers "which names do you decide on", not a name Bitget does not
+            # list (round 37: it was appended to a refused crypto backtest)
+            suggestion="" if "not listed" in question.reason else
+            "ARGUS decides on: " + ", ".join(TRADED_SYMBOLS) + ".",
         )
     if question.intent is Intent.AMBIGUOUS:
         return _refuse(question, question.reason,
@@ -1151,7 +1155,8 @@ def answer(ledger: PaperLedger, question: Question) -> Answer:
     if handler is None:
         return _refuse(
             question,
-            "I did not recognise that question well enough to answer it from the record.",
+            _not_a_question(question.raw)
+            or "I did not recognise that question well enough to answer it from the record.",
             suggestion=(
                 "Answerable today, for any contract Bitget lists — stocks, ETFs, gold, oil, "
                 "crypto. Research: its price and trading cost, its technicals, its earnings "
@@ -1167,6 +1172,42 @@ def answer(ledger: PaperLedger, question: Question) -> Answer:
     if moved is not None and not result.refused:
         result.lines.insert(0, moved[1])
     return result
+
+
+_ROWS = ("qwertyuiop", "asdfghjkl", "zxcvbnm")
+
+
+def _keyboard_run(word: str) -> bool:
+    """Most of the word's letter pairs are neighbours on one keyboard row: "qwertyuiopasdfgh" has
+    vowels enough to pass for a word and is a hand dragged across the keys (round 37 re-ask)."""
+    pairs = list(itertools.pairwise(word))
+    near = sum(1 for a, b in pairs
+               if any(a in row and b in row and abs(row.index(a) - row.index(b)) == 1
+                      for row in _ROWS))
+    return len(pairs) >= 6 and near / len(pairs) >= 0.6
+
+
+def _not_a_question(text: str) -> str | None:
+    """Why a message is not a market question, when that is plain from the message itself.
+
+    "asdkjfhaskjdfh", "2+2" and "whats the weather today lol" got the same line as a reasonable
+    question the console had missed, so a newcomer could not tell "that was gibberish" from "we do
+    not handle that yet" (round 37 newcomer, J)."""
+    flat = text.strip()
+    if re.fullmatch(r"[\d\s.+\-*/x×()=?]+", flat) and re.search(r"\d\s*[-+*/x×]\s*\d",  # noqa: RUF001
+                                                                     flat):
+        return ("That is arithmetic rather than a market question; this console works out "
+                "figures about Bitget's markets, not sums.")
+    words = re.findall(r"[a-z]+", flat.lower())
+    if len(words) == 1 and len(words[0]) >= 7 and (
+            re.search(r"[bcdfghjklmnpqrstvwxz]{6}", words[0]) or _keyboard_run(words[0])):
+        return ("That does not look like words, so there is nothing to answer — type a question "
+                "in plain language.")
+    if re.search(r"\b(?:weather|rain|recipe|movie|film|song|lyrics|joke|football|cricket|soccer|"
+                 r"homework|girlfriend|boyfriend|dinner|pizza|horoscope)\b", flat, re.I):
+        return ("That is outside what this console covers: it answers questions about Bitget's "
+                "markets — prices, costs, risk, technicals, earnings — and its own trading record.")
+    return None
 
 
 __all__ = ["Answer", "Source", "answer"]

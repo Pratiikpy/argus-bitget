@@ -130,3 +130,20 @@ def _no_live_prediction_markets(monkeypatch: pytest.MonkeyPatch) -> None:
     from argus.market import prediction
 
     monkeypatch.setattr(prediction, "_search", lambda term, **_: [])
+
+
+@pytest.fixture(autouse=True)
+def _no_live_second_daily_bar(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The backtester's second daily bar (Bitget's 16:00 UTC close) is never read by the offline
+    suite: a test that stubs the UTC closes would otherwise reach Bitget for the other ones.
+    `tests/test_round37.py` passes its own series where it tests the closing-hour line."""
+    from argus.lui.research import rule_test
+
+    def offline(symbol: str) -> tuple[list[Any], list[float]]:
+        raise RuntimeError(f"the second daily bar for {symbol} is not read offline")
+
+    monkeypatch.setattr(rule_test, "_asia_closes", offline)
+    # and Deribit's option book, which the guided task's ways-to-hold step reads for BTC and ETH
+    from argus.lui.research import expressions
+
+    monkeypatch.setattr(expressions, "_crypto_call", lambda *_a, **_k: None)

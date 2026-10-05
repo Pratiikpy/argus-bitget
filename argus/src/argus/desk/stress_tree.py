@@ -204,6 +204,12 @@ class StressInputs:
     horizon_bars: int = WINDOW_BARS
     assumed: bool = False
     """True when the question named no size, so the shock is the console's own -10%."""
+    horizon_days: int = 0
+    """The span the question gives the shock ("over a month"), when it gives one."""
+    daily_closes: tuple[tuple[datetime, float], ...] = ()
+    """The shocked instrument's daily closes, for a shock stated over days: the 30 days of hourly
+    returns hold no 30-day window, and a 20% month was checked against 24-hour windows and called
+    "beyond everything in this history" (round 37 judge, M-4)."""
 
     @property
     def word(self) -> str:
@@ -240,6 +246,8 @@ def prepare(
     shocked_label: str | None = None,
     horizon_bars: int = WINDOW_BARS,
     assumed: bool = False,
+    horizon_days: int = 0,
+    daily_closes: Sequence[tuple[datetime, float]] = (),
 ) -> StressInputs:
     """Align the loaded returns once and fix the inputs every node reads.
 
@@ -262,7 +270,7 @@ def prepare(
         stamps=tuple(stamps), columns={k: tuple(v) for k, v in columns.items()},
         open_rows=tuple(i for i, t in enumerate(stamps) if is_open(t)),
         shocked_series=tuple(sorted(raw[shocked].items())), horizon_bars=horizon_bars,
-        assumed=assumed,
+        assumed=assumed, horizon_days=horizon_days, daily_closes=tuple(daily_closes),
     )
 
 
@@ -598,6 +606,8 @@ def _shut_shock(inputs: StressInputs, probe: Probe) -> tuple[str, Figures]:
 
 
 def _shock_frequency(inputs: StressInputs, probe: Probe) -> tuple[str, Figures]:
+    if inputs.horizon_days and len(inputs.daily_closes) > inputs.horizon_days * 3:
+        return _daily_shock_frequency(inputs)
     closes = closes_from_returns(inputs.shocked_series)
     moves = horizon_moves(closes, bars=inputs.horizon_bars)
     try:
@@ -620,6 +630,30 @@ def _shock_frequency(inputs: StressInputs, probe: Probe) -> tuple[str, Figures]:
                         "extreme_pct": float(read.extreme_pct)}
 
 
+def _daily_shock_frequency(inputs: StressInputs) -> tuple[str, Figures]:
+    """The stated shock against every ``horizon_days`` window of the daily closes."""
+    closes = [(t, Decimal(str(c))) for t, c in inputs.daily_closes]
+    moves = horizon_moves(closes, bars=inputs.horizon_days)
+    try:
+        read = shock_frequency(moves, shock_pct=Decimal(str(inputs.shock_pct)),
+                               horizon_bars=inputs.horizon_days)
+    except StressError as exc:
+        raise _Empty(str(exc)) from exc
+    years = (closes[-1][0] - closes[0][0]).days / 365.25
+    worse = "worse" if inputs.shock_pct < 0 else "more"
+    text = (f"History check: {inputs.shocked_label} moved {inputs.shock_pct:+g}% or {worse} over "
+            f"{inputs.horizon_days} days in {read.occurrences} of {read.observations} windows of "
+            f"the last {years:.1f} years of daily closes (its most extreme: "
+            f"{_pct(float(read.extreme_pct))})")
+    if read.beyond_history:
+        text += f" — the {inputs.word} shock is beyond everything in this history"
+    elif read.last_seen is not None:
+        text += f", most recently {read.last_seen:%d %b %Y}"
+    return text + ".", {"occurrences": float(read.occurrences),
+                        "observations": float(read.observations),
+                        "extreme_pct": float(read.extreme_pct)}
+
+
 def _shock_frequency_children(inputs: StressInputs, probe: Probe, figures: Figures
                               ) -> list[Probe]:
     extreme = figures["extreme_pct"]
@@ -633,7 +667,9 @@ def _history_shock(inputs: StressInputs, probe: Probe) -> tuple[str, Figures]:
     cols = inputs.session_columns(open_session=True)
     at_extreme, _ = _shock_move(inputs, cols, extreme, "worst observed")
     stated, _ = _shock_move(inputs, cols, inputs.shock_pct, "stated")
-    text = (f"At the most extreme {inputs.horizon_bars}-hour move {inputs.shocked_label} actually "
+    span = (f"{inputs.horizon_days}-day" if inputs.horizon_days and inputs.daily_closes
+            else f"{inputs.horizon_bars}-hour")
+    text = (f"At the most extreme {span} move {inputs.shocked_label} actually "
             f"made in this history ({_pct(extreme)}), the book moves {_pct(at_extreme)} through "
             f"beta — against {_pct(stated)} at the {inputs.word} {inputs.shock_pct:+g}%.")
     return text, {"extreme_pct": extreme, "book_move_at_extreme_pct": at_extreme,
@@ -910,6 +946,8 @@ def research_lines(
     cash: float = 0.0,
     shocked_label: str | None = None,
     provenance: str = "",
+    horizon_days: int = 0,
+    daily_closes: Sequence[tuple[datetime, float]] = (),
 ) -> tuple[list[str], list[Any], dict[str, Any]]:
     """The console's call: the tree for a stress question, as answer lines, sources and payload.
 
@@ -926,7 +964,7 @@ def research_lines(
     try:
         inputs = prepare(raw, is_open=is_open, weights=book, shocked=shocked,
                          shock_pct=float(stated), cash=cash, shocked_label=shocked_label,
-                         assumed=assumed)
+                         assumed=assumed, horizon_days=horizon_days, daily_closes=daily_closes)
     except StressTreeError as exc:
         return [], [], {"grown": False, "reason": str(exc)}
     tree = grow(inputs)

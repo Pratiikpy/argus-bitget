@@ -247,7 +247,7 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
                 _point_in_time(answer, as_of)
             elif symbol and (request.kind in _PREDICTION_KINDS or (
                     request.kind is ResearchKind.ANALOGUE and request.horizon_hours is not None)):
-                _add_prediction_markets(answer, symbol)
+                _add_prediction_markets(answer, symbol, raw_text)
     # A sentence said twice is noise: "Funding means longs pay shorts every 8h" appeared three
     # times in one funding answer (answer audit, round 3). A line whose whole text already sits
     # inside an earlier line is dropped.
@@ -825,12 +825,12 @@ _PREDICTION_KINDS = frozenset({ResearchKind.FUNDAMENTALS, ResearchKind.NEWS,
 whether it will be higher — are the ones a prediction market prices beside."""
 
 
-def _add_prediction_markets(answer: Answer, symbol: str) -> None:
+def _add_prediction_markets(answer: Answer, symbol: str, asked: str = "") -> None:
     """Polymarket's busiest informative markets on the name (`market/prediction.py`), placed
     before the closing "Data:" line. Nothing is added when none is open and liquid."""
     from argus.market import prediction
 
-    lines = prediction.lines_for(symbol, name=_t(symbol))
+    lines = prediction.lines_for(symbol, name=_t(symbol), asked=asked)
     if not lines:
         return
     at = next((i for i, line in enumerate(answer.lines) if line.startswith("Data:")),
@@ -2166,10 +2166,32 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             # on 61 live stress questions: 10 scenario angles against 3, 0 errors in 1,300
             # recomputed figures, +187ms. It carries the realised worst window itself, so the
             # one-pass line is used only when the tree could not be grown.
+            # a shock stated over weeks ("falls 20% over a month") is checked against windows of
+            # that length in the daily history, not against 24-hour windows (round 37, M-4)
+            span_said = re.search(r"\b(?:over|in|within|across)\s+(?:a|one|the\s+next|"
+                                  r"(?P<n>\d{1,3}))?\s*(?P<unit>months?|weeks?|days?)\b",
+                                  raw_text, re.I)
+            horizon_days = 0
+            daily_rows: list[tuple[datetime, float]] = []
+            if span_said is not None:
+                count = int(span_said.group("n") or 1)
+                unit = span_said.group("unit").lower()
+                horizon_days = count * (30 if unit.startswith("month") else
+                                        7 if unit.startswith("week") else 1)
+                if horizon_days >= 5:
+                    try:
+                        from argus.lui.research.rule_test import _closes as daily_closes
+
+                        stamps, closes, _src = daily_closes(shocked)
+                        daily_rows = list(zip(stamps, closes, strict=True))
+                    except Exception:
+                        daily_rows = []
+                else:
+                    horizon_days = 0
             tree_lines, tree_sources, tree_payload = stress_tree.research_lines(
                 raw=data.raw, is_open=is_open, book=request.book, shocked=shocked,
                 shock_pct=request.shock_pct, cash=request.cash, shocked_label=shocked_name,
-                provenance=data.provenance)
+                provenance=data.provenance, horizon_days=horizon_days, daily_closes=daily_rows)
             if tree_lines:
                 lines.extend(tree_lines)
                 sources.extend(tree_sources)
@@ -2227,8 +2249,14 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
             else:
                 rho = correlation(columns.get(a, []), columns.get(b, []))
             if rho is not None:
-                read = ("mostly the same bet" if abs(rho) >= 0.7 else
-                        "a genuinely different bet" if abs(rho) <= 0.3 else "partly the same bet")
+                # -0.34 was called "partly the same bet" (round 37 judge, m-2): a negative
+                # correlation is an opposite bet, in part or mostly
+                read = ("a genuinely different bet" if abs(rho) <= 0.3 else
+                        ("mostly the same bet" if abs(rho) >= 0.7 else "partly the same bet")
+                        if rho > 0 else
+                        ("mostly opposite bets — one tends to rise when the other falls"
+                         if rho <= -0.7 else
+                         "partly opposite bets — one tends to rise when the other falls"))
                 when = ("over every hour of the last 30 days" if round_clock else
                         "in the open session")
                 lines.insert(0, f"{a.removesuffix('USDT')} and {b.removesuffix('USDT')} move "

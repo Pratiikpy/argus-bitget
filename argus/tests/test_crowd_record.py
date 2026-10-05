@@ -152,7 +152,7 @@ def test_the_rung_nearest_an_unlisted_level_leads(monkeypatch: pytest.MonkeyPatc
         return prediction.Market(question=question, yes_price=price, change_24h=None,
                                  volume=50_000.0, ends="2026-11-01", url="", token="")
 
-    monkeypatch.setattr(prediction, "markets_for", lambda symbol: [
+    monkeypatch.setattr(prediction, "markets_for", lambda symbol, **_: [
         market("Will Ethereum dip to $2,100 in October?", 0.12),
         market("Will Ethereum reach $3,600 in October?", 0.05),
         market("Will Ethereum reach $3,000 in October?", 0.40)])

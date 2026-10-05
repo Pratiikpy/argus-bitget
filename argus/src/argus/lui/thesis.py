@@ -1023,6 +1023,52 @@ def _activity(reason: Reason, activity: Mapping[str, Any] | None, name: str) -> 
                   evidence=evidence)
 
 
+_LONG_VIEW = re.compile(r"\b(?:month|months|weeks|quarter|year|long[\s-]term|next\s+few\s+weeks|"
+                        r"rest\s+of\s+the\s+year|30\s*days?|\d{2,3}\s*days)\b", re.I)
+"""A view over weeks or longer: a 4-hour MACD said "supported" to "BTC keeps rising over the next
+month" while the same guided task's base rate said no edge (round 37 judge, M-3)."""
+
+
+def _daily_momentum(reason: Reason, name: str, down_claim: bool) -> Tested | None:
+    """A view over weeks, read on the daily closes at that scale: the last 20 days' move and where
+    the price sits against its 50-day average. Both must point the claim's way to support it; a
+    4-hour indicator says nothing about a month."""
+    symbol = name if name.endswith("USDT") else f"{name}USDT"
+    try:
+        rows = _closes(symbol)
+    except Exception:
+        return None
+    closes = [r[2] for r in rows]
+    if len(closes) < 51:
+        return None
+    month = closes[-1] / closes[-21] - 1
+    average = sum(closes[-50:]) / 50
+    above = closes[-1] > average
+    rising = month > 0 and above
+    falling = month < 0 and not above
+    agrees = falling if down_claim else rising
+    mixed = not (rising or falling)
+    # "keeps rising over the next month" is a claim about the month ahead: a trend that agrees
+    # today is consistent with it, not evidence for it, and "supported" read as the opposite of
+    # the base rate's "no measured edge" two steps later (round 37 judge, M-3)
+    ahead = re.search(r"\b(?:keeps?|will|going\s+to|gonna|continue\w*|next|ahead|from\s+here)\b",
+                      reason.text, re.I) is not None
+    result = (Result.NOT_MEASURABLE if mixed or (agrees and ahead) else
+              Result.SUPPORTED if agrees else Result.CONTRADICTED)
+    lead = ("The daily trend is mixed" if mixed else
+            "The daily trend agrees, which is consistent with the view but no evidence for the "
+            "month ahead" if agrees and ahead else
+            "The daily trend agrees" if agrees else "The daily trend disagrees")
+    return Tested(reason.text, reason.kind, result,
+                  f"{lead}: {month:+.1%} over the last 20 trading days, and the price is "
+                  f"{'above' if above else 'below'} its 50-day average ({average:,.2f}) — read on "
+                  f"daily closes because the view is about weeks, where a 4-hour indicator says "
+                  f"nothing. A trend that agrees is not an edge: whether such states were "
+                  f"followed by more of the same is the base rate in the research step.",
+                  evidence=(Finding(f"{symbol.removesuffix('USDT')} 20-day move {month:+.1%}, "
+                                    f"50-day average {average:,.2f}", "Bitget daily candles"),))
+
+
 def _momentum(reason: Reason, tech: Mapping[str, Any], name: str) -> Tested:
     hist = tech.get("macd_histogram")
     if hist is None:
@@ -1034,6 +1080,10 @@ def _momentum(reason: Reason, tech: Mapping[str, Any], name: str) -> Tested:
                                 r"stall|los(?:e|es|ing)\s+steam|roll(?:s|ing)?\s+over|"
                                 r"exhaust|peter", reason.text, re.I))
     agrees = (float(hist) < 0) == down_claim
+    if _LONG_VIEW.search(reason.text):
+        daily = _daily_momentum(reason, name, down_claim)
+        if daily is not None:
+            return daily
     return Tested(reason.text, reason.kind,
                   Result.SUPPORTED if agrees else Result.CONTRADICTED,
                   f"The tape {'agrees' if agrees else 'disagrees'}: MACD histogram "

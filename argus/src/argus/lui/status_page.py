@@ -433,6 +433,8 @@ def render(status: dict[str, Any], checks: list[Check], checked_at: float,
     stale = status.get("stale")
     checked = time.strftime("%d %b %Y %H:%M UTC", time.gmtime(checked_at))
     chain = "intact" if status.get("chain_intact") else "BROKEN"
+    chain_plain = ("none has" if status.get("chain_intact")
+                   else "the check FAILED, so one may have")
     age_text = "—" if age is None else f"{age:.1f}h"
     stale_text = " — stale" if stale else ""
     due = str(status.get("next_cycle_at") or "")
@@ -451,6 +453,7 @@ def render(status: dict[str, Any], checks: list[Check], checked_at: float,
  body {{ margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 system-ui,sans-serif }}
  h2 {{ font-size:15px; margin:26px 0 8px }}
  .sub {{ margin:0 0 16px }}
+ .plain {{ margin:0 0 16px; padding:10px 12px; border-left:3px solid var(--line); max-width:760px }}
  .cards {{ display:flex; gap:10px; flex-wrap:wrap }}
  .card {{ background:var(--panel); border:1px solid var(--line);
    padding:12px 14px; flex:1 1 150px }}
@@ -479,6 +482,11 @@ def render(status: dict[str, Any], checks: list[Check], checked_at: float,
 this console answers from are answering right now. Live checks ran {esc(checked)}; the slow
 sweeps say when they ran. <a href="/">Console</a> · <a href="/research">Research task</a> ·
 <a href="/wrong">What we got wrong</a> · <a href="/status?format=json">JSON</a></p>
+<p class="plain"><b>In plain words:</b> ARGUS runs a practice trading desk with no real money.
+This page shows how many decisions it has written down, whether any of them has been changed
+since (the "hash chain" — {chain_plain}),
+and whether Bitget's data is reaching the console right now. The tables are for checking the work;
+you do not need them to use the console.</p>
 <div class="cards">
  <div class="card"><b>{status.get("entries")}</b><span>decisions on record</span></div>
  <div class="card"><b>{chain}</b><span>hash chain</span></div>

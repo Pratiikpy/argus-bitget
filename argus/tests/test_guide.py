@@ -56,7 +56,7 @@ class TestSteps:
         # two standard deviations of a 50% year over 30 days: 1 - exp(-2 x 0.5 x sqrt(30/365))
         fall = (1 - math.exp(-2 * 0.5 * math.sqrt(30 / 365))) * 100
         assert guide.envelope(4, "BTCUSDT")["next"]["ask"] == (
-            f"Stress test my book if BTC falls {fall:.0f}%")
+            f"Stress test my book if BTC falls {fall:.0f}% over a month")
         assert guide.envelope(5, "BTCUSDT")["next"] is None
         assert guide.envelope(1, None)["next"] is None
 

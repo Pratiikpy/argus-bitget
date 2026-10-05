@@ -168,8 +168,8 @@ def next_question(step: int, focus: str, *, size: float | None = None) -> str | 
         return (f"Compare spot, perpetual and options for ${size or DEFAULT_SIZE:,.0f} of {name}")
     if step == 5:
         fall = two_sigma_month(focus)
-        return (f"Stress test my book if {name} falls {fall:.0f}%" if fall is not None
-                else f"Stress test my book if {name} falls 20%")
+        return (f"Stress test my book if {name} falls {fall:.0f}% over a month" if fall is not None
+                else f"Stress test my book if {name} falls 20% over a month")
     return None
 
 

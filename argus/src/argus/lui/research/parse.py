@@ -679,6 +679,59 @@ _HORIZON_NUMBER = re.compile(
     r"(h|hrs?|hours?|d|days?|w|wks?|weeks?|months?)\b", re.I)
 
 
+_MONTHS = ("january", "february", "march", "april", "may", "june", "july", "august",
+           "september", "october", "november", "december")
+_DATE = re.compile(
+    r"\b(?:on|by|before|at|until|through|as\s+of)\s+(?:the\s+)?(?:(?P<end>end|close)\s+of\s+"
+    r"(?:the\s+)?)?(?P<month>jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|"
+    r"aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\.?\s*"
+    r"(?P<day>\d{1,2})?(?:st|nd|rd|th)?\b(?:,?\s*(?P<year>20\d\d))?|"
+    r"\b(?:by|before|at|until)\s+(?:the\s+)?(?:end\s+of\s+(?:the\s+|this\s+)?year|year[\s-]?end|"
+    r"end\s+of\s+(?P<y2>20\d\d))\b|"
+    # "Does BTC finish the year above $100k?" (a round-37 re-ask)
+    r"\b(?:finish|finishes|end|ends|close|closes)\s+(?:the|this)\s+year\b|\bthis\s+year\b", re.I)
+"""A stated date: "will BTC be above $100,000 on December 31?" was read as the next 24 hours and
+answered "0% of the time" for an 87-day question (round 37 judge, C-3); "ETH above $3,000 at the
+end of October" the same."""
+
+
+def _dated_horizon(text: str, now: datetime | None = None) -> tuple[int, bool, str | None] | None:
+    """The hours from now to a date the question states, to the end of that day (UTC)."""
+    found = _DATE.search(text)
+    if found is None:
+        return None
+    clock = now or datetime.now(UTC)
+    if found.group("month"):
+        month = next(i for i, m in enumerate(_MONTHS, 1)
+                     if m.startswith(found.group("month").lower()[:3]))
+        year = int(found.group("year") or clock.year)
+        if found.group("day"):
+            day = int(found.group("day"))
+        else:
+            # "at the end of October", or a month named alone: its last day
+            following = datetime(year + month // 12, month % 12 + 1, 1, tzinfo=UTC)
+            day = (following - timedelta(days=1)).day
+        try:
+            target = datetime(year, month, day, tzinfo=UTC) + timedelta(days=1)
+        except ValueError:
+            return None
+        if target <= clock and not found.group("year"):
+            target = target.replace(year=target.year + 1)
+    else:
+        year = int(found.group("y2") or clock.year)
+        target = datetime(year + 1, 1, 1, tzinfo=UTC)
+    hours = round((target - clock).total_seconds() / 3600)
+    if hours < 1:
+        return None
+    if hours > 72:
+        # "after 2110 hours" read as a machine wrote it: past three days, whole days
+        hours = round(hours / 24) * 24
+    cap = 24 * 90
+    note = (f"the date stated is {hours / 24:.0f} days away; the record is read at 90 days, the "
+            f"longest horizon it measures" if hours > cap else None)
+    return min(hours, cap), False, note
+
+
 def _horizon(text: str) -> tuple[int, bool, str | None]:
     """(hours, weekend, note) for a directional question; the note says what was assumed."""
     if re.search(r"\bweekend\b|\bover\s+(?:sat|sun)", text, re.I):
@@ -703,6 +756,9 @@ def _horizon(text: str) -> tuple[int, bool, str | None]:
         if close <= now:
             close += timedelta(days=7)
         return max(1, round((close - now).total_seconds() / 3600)), False, None
+    dated = _dated_horizon(text)
+    if dated is not None:
+        return dated
     for pattern, hours in ((r"\b(?:tonight|overnight|today|by\s+the\s+close|eod)\b", 12),
                            (r"\b(?:tomorrow|next\s+day|24\s*h)\b", 24),
                            (r"\b(?:this|next|in\s+a|the|a)\s+week\b|\bweekly\b", 168),
@@ -1827,8 +1883,14 @@ _CASH_REST = re.compile(
 
 
 _CASH_PCT = re.compile(
-    rf"(\d+(?:\.\d+)?)\s*%\s*(?:in\s+|as\s+)?{_CASH_WORD}\b|\b{_CASH_WORD}\s*(?:at|=|:|-)?\s*"
-    rf"(\d+(?:\.\d+)?)\s*%", re.I)
+    # a minus sign before the number is a borrow, not a separator: "USDT -50%" was read as 50%
+    # cash (round 37 hostile audit, defect 9) — see _BORROW
+    rf"(?<![-\d.])(\d+(?:\.\d+)?)\s*%\s*(?:in\s+|as\s+)?{_CASH_WORD}\b|\b{_CASH_WORD}\s*"
+    rf"(?:at|=|:|-(?=\s))?\s*(?<!-)(\d+(?:\.\d+)?)\s*%", re.I)
+_BORROW = re.compile(
+    rf"-\s*(\d+(?:\.\d+)?)\s*%\s*(?:in\s+)?{_CASH_WORD}\b|\b{_CASH_WORD}\s*(?:at|=|:)?\s*"
+    rf"-\s*(\d+(?:\.\d+)?)\s*%", re.I)
+"""A negative stablecoin or cash weight: money borrowed to hold more than the account."""
 
 
 _BOOK_CASH_USD = re.compile(
@@ -2200,6 +2262,19 @@ def _with_stated_cash(request: ResearchRequest | None, text: str) -> ResearchReq
     (`eval/figurecheck.py`, 2026-09-25). The book's weights are rescaled to sum to one less the
     cash, and ``cash`` carries the rest, which every risk figure then dilutes by."""
     if request is None or request.cash:
+        return request
+    borrowed = _BORROW.search(text)
+    if borrowed is not None and request.book:
+        # the borrow funds the positions and carries no market risk itself; what it changes is
+        # the leverage, which the per-100% figures below do not show on their own
+        owed = float(borrowed.group(1) or borrowed.group(2))
+        gross = sum(abs(w) for _, _, w in holding_pairs(text)) * 100
+        note = (f"the {owed:g}% negative stablecoin is borrowing, not cash: the positions add up "
+                f"to {gross:.0f}% of your money gross, so the book is levered about "
+                f"{gross / 100:.1f}x — the figures are per 100% gross, so multiply any loss by "
+                f"{gross / 100:.1f} for your account")
+        if not any(n.startswith("the ") and "borrowing" in n for n in request.notes):
+            return replace(request, notes=(*request.notes, note))
         return request
     if not request.book:
         # "im 100% cash rn, whats my risk" states an all-cash book; the early all-cash answer
@@ -4364,9 +4439,25 @@ def with_book(request: ResearchRequest | None, book_text: str,
                    "check the ticker")
     if cash and not request.cash:
         request = replace(request, cash=cash)
-    borrowed = re.search(r"\bcash\s*:?\s*-\s*(\d+(?:\.\d+)?)\s*%|-\s*(\d+(?:\.\d+)?)\s*%\s*"
-                         r"(?:in\s+)?cash\b|\bborrow(?:ed|ing)?\s+(\d+(?:\.\d+)?)\s*%|\bmargin\s+"
-                         r"(?:loan|debt)\s+(?:of\s+)?(\d+(?:\.\d+)?)\s*%", book_text, re.I)
+    borrowed = _BORROW.search(book_text) or re.search(
+        r"\bborrow(?:ed|ing)?\s+(\d+(?:\.\d+)?)\s*%|\bmargin\s+"
+        r"(?:loan|debt)\s+(?:of\s+)?(\d+(?:\.\d+)?)\s*%", book_text, re.I)
+    gross_stated = sum(abs(w) for _, _, w in holding_pairs(book_text))
+    if borrowed is not None and gross_stated > 1.0 and stated_total <= 1.0 and \
+            request.leverage is None:
+        # "BTC 120%, ETH -20%, USDT -50%": a long/short book on borrowed stablecoin nets to 100%
+        # and is levered gross; it was halved and the borrow read as 50% cash (round 37 hostile
+        # audit, defect 9)
+        # the reader already scales a long/short book to 100% gross
+        note = ("used your saved book ("
+                + ", ".join(f"{w * gross_stated:+.0%} {_t(s)}" for s, w in book.items())
+                + f", stablecoin borrowed); the positions are {gross_stated:g}x your own money "
+                  f"gross, so the figures below are per 100% gross — multiply a loss by "
+                  f"{gross_stated:g} for your account")
+        request = replace(request, leverage=round(gross_stated, 4), cash=0.0)
+        return replace(request, book=book, symbols=tuple(dict.fromkeys(
+            (*request.symbols, *book))) if request.kind is ResearchKind.IMPACT else tuple(book),
+                       notes=(*request.notes, note))
     if borrowed is not None and stated_total > 1.0 and request.leverage is None:
         # "NVDA 120%, cash -20%": the holdings are 1.2x the trader's money, not a typo to scale
         # away, and the -20% is a loan, not cash held (a hostile review, round 24)

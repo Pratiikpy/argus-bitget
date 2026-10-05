@@ -267,7 +267,64 @@ def stablecoin_lines(text: str) -> list[str] | None:
     return lines
 
 
-__all__ = ["CORRELATION_THEN", "RECOVERY", "ROTATION", "STABLECOINS", "correlation_lines",
-           "recovery_lines", "rotation_lines", "stablecoin_lines"]
+STABLE_CLAIM = re.compile(
+    r"\b(?P<coin>usdc|usdt|tether)\b[^?.]{0,30}?\b(?:just\s+|has\s+|have\s+)?(?:crash\w*|fell|"
+    r"dropp?\w*|lost|plung\w*|collaps\w*|de-?pegg?\w*|tank\w*)\b[^?.]{0,20}?(?P<pct>\d{1,3}(?:\.\d+)?)"
+    r"\s*%", re.I)
+"""A stablecoin crash stated as news: "USDC just crashed 90% this morning"."""
+
+
+def stablecoin_claim_lines(text: str) -> list[str] | None:
+    """A stated stablecoin crash checked against Bitget's live price, and the loss asked for worked
+    out under the claim and under the market. "USDC just crashed 90%" was answered with general
+    peg history and read as $0.90, while Bitget had it at 1.0001 (round 37 hostile audit,
+    defect 8)."""
+    claim = STABLE_CLAIM.search(text)
+    if claim is None:
+        return None
+    coin = claim.group("coin").upper().replace("TETHER", "USDT")
+    pct = float(claim.group("pct")) / 100
+    from argus.market.bitget import public_get
+
+    try:
+        rows = public_get("/api/v2/spot/market/tickers", {"symbol": "USDCUSDT"}, timeout=10.0)
+        quoted = float((rows or [{}])[0].get("lastPr") or 0) or None
+    except Exception:
+        quoted = None
+    # Bitget quotes USDC in USDT, so one number speaks for the pair: near 1, neither has broken
+    held = re.search(r"(?P<n>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k\b)?\s*(?:usdc|usdt|tether)\b", text,
+                     re.I)
+    amount = (float(held.group("n").replace(",", "")) * (1000 if held.group("k") else 1)
+              if held else None)
+    out: list[str] = []
+    if quoted is not None and abs(quoted - 1) < 0.02:
+        out.append(f"Bottom line: Bitget quotes USDC at {quoted:.4f} USDT right now — neither "
+                   f"coin has crashed {pct:.0%}; the two are {abs(quoted - 1):.2%} apart. Check "
+                   f"the price on the exchange before acting on a headline.")
+    elif quoted is not None:
+        out.append(f"Bottom line: Bitget quotes USDC at {quoted:.4f} USDT right now, "
+                   f"{quoted - 1:+.2%} from the peg — a real gap, though not the {pct:.0%} "
+                   f"stated." if abs(quoted - 1) < pct / 2 else
+                   f"Bottom line: Bitget quotes USDC at {quoted:.4f} USDT right now.")
+    else:
+        out.append(f"Bottom line: Bitget's USDC price did not answer just now, so the "
+                   f"{pct:.0%} crash cannot be checked here — look at the exchange before "
+                   f"acting on it.")
+    if amount is not None:
+        claimed = amount * (1 - pct)
+        line = (f"On your {amount:,.0f} {coin}: if it had fallen {pct:.0%}, it would be worth "
+                f"${claimed:,.0f}, a ${amount - claimed:,.0f} loss")
+        if quoted is not None and coin == "USDC":
+            line += f"; at Bitget's price now it is worth about ${amount * quoted:,.0f}"
+        out.append(line + ".")
+    out.append("No call here on whether to sell: a stablecoin below $1 is a bet on its issuer "
+               "paying out, and each issuer publishes its reserves (circle.com/transparency, "
+               "tether.to/transparency).")
+    return out
+
+
+__all__ = ["CORRELATION_THEN", "RECOVERY", "ROTATION", "STABLECOINS", "STABLE_CLAIM",
+           "correlation_lines", "recovery_lines", "rotation_lines", "stablecoin_claim_lines",
+           "stablecoin_lines"]
 
 trace_module(globals())

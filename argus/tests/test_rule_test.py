@@ -261,3 +261,49 @@ class TestAntiLeakPair:
         assert auc([-x for x in cheat], labels) == 0.0
         summary = agreement(cheat, cheat, labels)
         assert summary["auc"] == 1.0 and summary["auc_p_value"] < 1e-6
+
+
+class TestRound37Hostile:
+    """A rule the backtester cannot run as asked is answered plainly, never swapped for another
+    rule's result (round 37 hostile audit, defects 4-7)."""
+
+    def test_a_rule_that_cannot_fire_returns_zero_trades(self) -> None:
+        got = rt.lines("Backtest on BTC: buy when RSI(14) is below 30 and above 70 at the same "
+                       "time, sell after 5 days. What was the return over the last year?")
+        assert got is not None and "can never fire" in got[0] and "0%" in got[0]
+
+    def test_a_signal_on_another_name_is_not_run_as_this_names_rule(self) -> None:
+        got = rt.lines("buy BTC when ETH's RSI(14) goes below 30, sell BTC when ETH's RSI goes "
+                       "above 70, last year. What would I have made on $10,000?")
+        assert got is not None and "one rule on one name" in got[0]
+
+    @pytest.mark.parametrize(("text", "said"), [
+        ("Backtest ETH: buy when RSI(0) crosses below 20, sell above 80", "at least 2"),
+        ("Would a 20/50 SMA crossover on BTC have made money next year (2027)? Give me the "
+         "exact return.", "only read the past"),
+        ("backtest buying BTC when it falls 120% in a day", "never fires"),
+    ])
+    def test_an_undefined_or_future_rule_is_refused_with_the_reason(self, text: str,
+                                                                    said: str) -> None:
+        got = rt.lines(text)
+        assert got is not None and said in got[0]
+
+    def test_a_rule_that_never_fires_and_an_average_longer_than_the_history(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        stamps = [datetime(2021, 1, 1, tzinfo=UTC) + timedelta(days=i) for i in range(900)]
+        monkeypatch.setattr(rt, "_closes", lambda symbol: (stamps, _wave(900), "saved closes"))
+        never = rt.lines("backtest buying SOL when it rises 500% in a day, hold 3 days")
+        assert never is not None and "never fired" in never[0]
+        long = rt.lines("backtest BTC above its 5000-day moving average")
+        assert long is not None and "needs 5000 days" in long[0]
+
+    def test_the_span_asked_for_and_the_stake_are_used(self,
+                                                       monkeypatch: pytest.MonkeyPatch) -> None:
+        stamps = [datetime(2021, 1, 1, tzinfo=UTC) + timedelta(days=i) for i in range(900)]
+        monkeypatch.setattr(rt, "_closes", lambda symbol: (stamps, _wave(900), "saved closes"))
+        monkeypatch.setattr(rt, "permutation_p", lambda *a, **k: None)
+        got = rt.lines("backtest buying BTC when RSI drops below 30, sell after 5 days, over "
+                       "the last year, on $10,000")
+        assert got is not None
+        assert "over 1.0 years" in got[0] and "out after 5 days" in got[0]
+        assert any(line.startswith("On $10,000:") for line in got)

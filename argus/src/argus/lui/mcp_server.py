@@ -519,7 +519,23 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
         if signed is not None:
             # "TSLA -15%" is a 15% short (a hostile review, round 23: it was added long)
             size = (signed.group("pct") or signed.group("pct2") or "").replace(" ", "").lstrip("-")
-            add_words = f"short {size}% {signed.group('name') or signed.group('name2')}"
+            ticker = signed.group("name") or signed.group("name2")
+            add_words = f"short {size}% {ticker}"
+            held = re.search(rf"(?<![\w.])(\d+(?:\.\d+)?)\s*%\s*{re.escape(ticker)}\b|"
+                             rf"\b{re.escape(ticker)}\s*(\d+(?:\.\d+)?)\s*%", holdings, re.I)
+            if held is not None:
+                # an add is added to what is held: "NVDA -100%" on a 100% NVDA book is flat, and
+                # it was reported as a -100% book (round 37 hostile audit, defect 15)
+                was = float(held.group(1) or held.group(2))
+                net = was - float(size)
+                if abs(net) < 1e-9:
+                    return (f"Adding -{size}% {ticker} to a book that holds {was:g}% {ticker} "
+                            f"closes the position: the book is flat, so every sector weight and "
+                            f"factor loading is zero. Nothing else was held to measure."
+                            if abs(was - 100) < 1e-9 else
+                            f"Adding -{size}% {ticker} to the {was:g}% held closes {ticker}; ask "
+                            f"for the book without it to see the rest's exposures."), False
+                add_words = (f"add {net:g}% {ticker}" if net > 0 else f"short {-net:g}% {ticker}")
         else:
             add_words = f"add {add}" if add else ""
         asked = "what are my sector and factor exposures" + (

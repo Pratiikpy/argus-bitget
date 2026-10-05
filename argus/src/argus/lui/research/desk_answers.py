@@ -411,7 +411,11 @@ def volume_lines(text: str, prior: Sequence[str]) -> list[str] | None:
     """"volume on Bitget?" after a BTC price gave the perp-versus-rToken text (round 26)."""
     from argus.lui.research import research_symbols
 
-    if not re.search(r"\b(?:24\s*h(?:our)?\s+)?(?:trading\s+)?volume\b", text, re.I) or re.search(
+    # "how many dollars of BTC perpetuals changed hands over the last day?" got a price move
+    # (round 37 hostile audit, defect 10)
+    if not re.search(r"\b(?:24\s*h(?:our)?\s+)?(?:trading\s+)?volume\b|changed\s+hands|"
+                     r"\bturnover\b|\b(?:dollars?|usd|usdt)\s+(?:worth\s+)?of\s+\w+[^?]{0,30}"
+                     r"\btraded\b", text, re.I) or re.search(
             r"\bvolatil", text, re.I):
         return None
     named = research_symbols(text)[0] or next((research_symbols(q)[0] for q in reversed(prior[-2:])

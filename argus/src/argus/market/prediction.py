@@ -181,7 +181,7 @@ def relevant(events: list[dict[str, Any]], terms: tuple[str, ...], *,
 
 
 def markets_for(symbol: str, *, search: Any = None, now: datetime | None = None,
-                floor: float = VOLUME_FLOOR) -> list[Market]:
+                floor: float = VOLUME_FLOOR, level: float | None = None) -> list[Market]:
     """The liquid open markets about the name behind a Bitget symbol.
 
     ``search`` defaults to :func:`_search`, looked up when called: as a default argument it was
@@ -194,16 +194,55 @@ def markets_for(symbol: str, *, search: Any = None, now: datetime | None = None,
     events: list[dict[str, Any]] = []
     for term in terms[:2]:
         events.extend(search(term))
+    if level is not None and level >= 100:
+        # Polymarket's search returns eight events: "bitcoin" alone did not reach "Will Bitcoin
+        # reach $100,000 by December 31, 2026?" ($3.7M traded), "bitcoin 100000" does (round 37
+        # judge, C-3 and C-4)
+        events.extend(search(f"{terms[0]} {level:.0f}"))
     return relevant(events, terms, now=now, floor=floor)
 
 
+def asked_level(asked: str) -> float | None:
+    """The price level a question names: its largest figure, "100k" read as 100,000."""
+    flat = asked.replace(",", "").replace("$", "")
+    levels = [float(m.group(1)) * (1000 if m.group(2) else 1)
+              for m in re.finditer(r"\b(\d+(?:\.\d+)?)\s*(k)?\b", flat, re.I)]
+    return max(levels) if levels and max(levels) >= 100 else None
+
+
+def asked_first(markets: list[Market], asked: str) -> list[Market]:
+    """``markets`` with the ones naming the question's level and its month first.
+
+    "Will BTC be above $100,000 on December 31?" cited three other BTC markets and not "Will
+    Bitcoin reach $100,000 by December 31, 2026?" at 39.5% (round 37 judge, C-3): the busiest-first
+    order is kept only among markets that match the question equally well."""
+    # the largest figure is the level: "on December 31" also carries a number
+    value = asked_level(asked)
+    words: tuple[str, ...] = ((f"{value:,.0f}", f"{value / 1e3:g}k", f"{value:.0f}")
+                              if value is not None else ())
+    month = re.search(r"\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\b|"
+                      r"\b(?:year[\s-]?end|end\s+of\s+(?:the\s+)?year)\b", asked, re.I)
+    wanted = ("dec" if month and not month.group(1) else
+              month.group(1).lower() if month else None)
+
+    def score(m: Market) -> tuple[bool, bool]:
+        text = m.question.replace("$", "")
+        return (not (words and any(w in text for w in words)),
+                not (wanted and re.search(rf"\b{wanted}[a-z]*\b", text, re.I)))
+
+    return sorted(markets, key=score)
+
+
 def lines_for(symbol: str, *, search: Any = None, now: datetime | None = None,
-              name: str | None = None) -> list[str]:
-    """Up to three lines naming what the busiest relevant markets price, or nothing."""
+              name: str | None = None, asked: str = "") -> list[str]:
+    """Up to three lines naming what the busiest relevant markets price, or nothing; the ones
+    naming the question's level and date first when ``asked`` gives them."""
     try:
-        markets = markets_for(symbol, search=search, now=now)
+        markets = markets_for(symbol, search=search, now=now, level=asked_level(asked))
     except PredictionError:
         return []
+    if asked:
+        markets = asked_first(markets, asked)
     label = name or symbol.removesuffix("USDT")
     lines = []
     for m in markets[:MAX_LINES]:
