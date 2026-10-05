@@ -255,6 +255,11 @@ REVISE = re.compile(
     r"\b(?:scratch|drop|remove|forget|ignore|leave\s+out|take\s+out|set\s+aside)\b.{0,40}"
     r"\b(?:point|reason|argument|part|one)\b|\bassume\b.{0,80}\binstead\b|\bdoes\s+(?:that|this)"
     r"\s+change\s+(?:your|the|my)\s+(?:view|verdict|answer|read|sizing|size|position)|"
+    # "assume spot ETF inflows have actually reversed negative … Does your verdict on my thesis
+    # change?" recited today's inflows (round 39 judge, C-1)
+    r"\bdoes\s+(?:your|the|my)\s+(?:verdict|view|grade|answer|read|call)\b[^?]{0,40}\bchange\b|"
+    r"\bassume\b.{0,80}\b(?:reversed|wrong|opposite|negative|not\s+true|false|isn'?t\s+true)\b|"
+    r"\bsuppose\b.{0,80}\b(?:reversed|wrong|opposite|not\s+true|false)\b|"
     r"\bmy\s+(?:real|only|main|actual)\s+reason\b|\bi\s+was\s+wrong\s+about\b", re.I)
 """A follow-up that changes the reasons of the thesis tested earlier in the conversation."""
 
@@ -375,6 +380,44 @@ _EXPLICIT_REVISION = re.compile(
     r"\bi\s+was\s+wrong\s+about\b|\bmy\s+(?:real|only|main|actual)\s+reason\b|"
     r"\b(?:scratch|drop|forget|ignore|set\s+aside)\b.{0,40}\b(?:point|reason|argument)\b", re.I)
 """Wording that can only mean a reason in a thesis is being changed."""
+
+
+RECALL = re.compile(
+    r"\b(?:what|which)\s+(?:were|was|are|is)\s+my\s+(?:original\s+|first\s+)?(?:\w+\s+)?"
+    r"(?:reasons?|points?|arguments?)\b|\breason\s+(?P<n>\d)\b[^?]{0,30}\b(?:again|was|is)\b|"
+    r"\b(?:remind|tell)\s+me\b[^?]{0,30}\b(?:my\s+)?(?:reasons?|thesis)\b", re.I)
+"""Asking back for the thesis's reasons: "Remind me: what were my original three reasons for
+this thesis?" was refused while the thesis sat two turns up (round 39 judge, C-2)."""
+
+
+def recall(text: str, prior: list[str]) -> tuple[list[str], list[Source], dict[str, Any]] | None:
+    """The thesis stated earlier in the conversation, its reasons as tested, and which are set
+    aside since."""
+    if not RECALL.search(text):
+        return None
+    current = _standing(list(prior))
+    if current is None:
+        return None
+    earlier, stated, _kept, dropped = current
+    # the claim itself comes before "because"; the reasons are what follow it
+    head = re.split(r"\bbecause\b", earlier, maxsplit=1, flags=re.I)[0]
+    reasons = ([r for r in stated if r.kind.name != "DIRECTION" and r.text not in head]
+               or list(stated))
+    asked_n = RECALL.search(text)
+    n = int(asked_n.group("n")) if asked_n is not None and asked_n.group("n") else None
+    if n is not None and 1 <= n <= len(reasons):
+        one = reasons[n - 1]
+        return ([f"Bottom line: reason {n} was \u201c{one.text}\u201d"
+                 + (" — set aside since" if one in dropped else "") + "."],
+                [], {"thesis_recall": [r.text for r in reasons]})
+    listed = "; ".join(f"{i}. \u201c{r.text}\u201d" + (" (set aside since)" if r in dropped
+                                                          else "")
+                       for i, r in enumerate(reasons, 1))
+    return ([f"Bottom line: your thesis was \u201c{earlier.strip()[:160]}\u201d, with "
+             f"{len(reasons)} reason{'s' if len(reasons) != 1 else ''}: {listed}.",
+             "Each was tested when you stated it; ask \"which is strongest\" or set one aside "
+             "(\"assume the second is wrong\") to see the verdict move."],
+            [], {"thesis_recall": [r.text for r in reasons]})
 
 
 def nothing_to_revise(text: str, prior: list[str]

@@ -259,6 +259,21 @@ def run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answe
             continue
         kept_lines.append(line)
     answer.lines[:] = kept_lines
+    if (not answer.refused and request.symbols and answer.lines
+            and any(n.startswith("no specific research question was recognised")
+                    for n in request.notes)):
+        # The same ETH risk profile answered a 4-hour technical read and an Arabic question on
+        # expected return, word for word, with the mismatch said only in an "Assumed" footnote
+        # (round 39 judge, M-2). The substitution is said first, before anything reads as the
+        # answer to what was asked.
+        name = _t(request.symbols[0])
+        answer.lines[0] = (f"Bottom line: I could not match your question to an analysis I run, "
+                           f"so this is {name}'s risk profile, not an answer to it — "
+                           f"{unlead(answer.lines[0])[:1].lower()}{unlead(answer.lines[0])[1:]}")
+        answer.lines.insert(1, f"Ask it as one of these for a direct answer: "
+                               f"\"{name} technicals\", \"{name} news\", "
+                               f"\"how volatile is {name}\", or "
+                               f"\"what does $10,000 of {name} do to my book\".")
     unread = unread_holdings(raw_text) if request.kind in (
         ResearchKind.IMPACT, ResearchKind.STRESS, ResearchKind.BOOK, ResearchKind.COMPARE,
         ResearchKind.HEDGE) else []
@@ -1044,7 +1059,10 @@ _ASKS_FOR_DRY_RUN = re.compile(r"\bdry[\s-]*run\b|\bagent\s+hub\b|\bbgc\b", re.I
 
 _WHEN_REPORTS = re.compile(
     r"\bwhen\b.{0,40}\b(?:reports?|earnings|results)\b|\bnext\s+(?:earnings|report|results)\b|"
-    r"\b(?:earnings|report)\s+date\b", re.I | re.S)
+    r"\b(?:earnings|report)\s+date\b|"
+    # "英伟达下一次财报日期是什么时候" (round 39 judge, C-6)
+    r"(?:下一次|下次|下个)\s*(?:财报|业绩)|财报\s*(?:日期|时间)|(?:财报|业绩).{0,6}什么时候",
+    re.I | re.S)
 """A question asking the date of the next report, not only how big the move around it is."""
 
 
@@ -2455,6 +2473,17 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                     f"({fee:.0f}bps taker fees + the {ticker.spread_bps:.1f}bps spread) — a trade "
                     f"needs a move bigger than that just to break even."
                 ))
+                if re.search(r"\b(?:past|last)\s+24\s*(?:hours?|h)\b|\b24\s*h(?:ours?)?\s+"
+                             r"(?:change|move)\b|\bup\s+or\s+down\b", raw_text, re.I):
+                    # "Is BTC up or down over the past 24 hours, and by what percent?" led with the
+                    # round-trip cost (round 39 hostile, defect 1): the move asked leads
+                    day_move = float(ticker.change_24h) * 100.0
+                    way = "up" if day_move >= 0 else "down"
+                    lines.insert(0, f"Bottom line: {_t(symbol)} is {way} "
+                                    f"{abs(day_move):.2f}% over the last 24 hours on Bitget, at "
+                                    f"{ticker.last} (24h range {ticker.low_24h} to "
+                                    f"{ticker.high_24h}).")
+                    lines[1] = lines[1].replace("Bottom line: ", "", 1)
                 if request.notional and _ROUND_TRIP.search(raw_text) and len(quoted) == 1:
                     sized_line = _sized_round_trip(symbol, Decimal(str(request.notional)), fee)
                     if sized_line is not None:

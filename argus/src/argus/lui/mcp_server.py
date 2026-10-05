@@ -66,7 +66,7 @@ import json
 import math
 import re
 from collections.abc import Callable, Mapping, Sequence
-from typing import Any
+from typing import Any, Final
 
 from argus.lui.plural import resolve_plurals
 
@@ -456,6 +456,12 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
                             "all of it")
         from argus.lui.research.dispatch import MAX_SHOCK_UP
 
+        if shock_value == 0:
+            # 0 gave a +0.00% headline and then a tree grown from an "assumed" -10% (round 39
+            # hostile, defect 7)
+            raise ToolError("shock_percent of 0 moves nothing; give the move to test, e.g. -10, "
+                            "or leave it out for the standard -5% and -10%")
+
         if shock_value is not None and (shock_value > MAX_SHOCK_UP or shock_value != shock_value):
             # +1,000,000 was stressed into a +798,527% book move (round 38 hostile, defect 4)
             raise ToolError(f"shock_percent must be at most {MAX_SHOCK_UP:g}: a larger rise is "
@@ -508,8 +514,17 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
         days = args.get("days")
         if days is not None and not (isinstance(days, int) and 1 <= days <= 14):
             raise ToolError("days must be a whole number from 1 to 14")
-        lines, sources, _ = watchlist("what should I watch this week",
-                                      str(args.get("book") or "")[:300], days=days)
+        given = str(args.get("book") or "")[:300]
+        lines, sources, _ = watchlist("what should I watch this week", given, days=days)
+        # a stateless call remembers nothing: the book is the one passed in this call, and a set
+        # of weights that does not add to 100% is said to have been scaled (round 39 judge, m-1:
+        # "100% gold, 100% oil" came back as "Remembered: your saved book — 50% XAU, 50% CL")
+        stated = sum(float(x) for x in re.findall(r"(\d+(?:\.\d+)?)\s*%", given))
+        scaled = (f" (the weights given add to {stated:g}%, so they were scaled to 100%)"
+                  if stated and abs(stated - 100) > 0.5 else "")
+        lines = [re.sub(r"^Remembered: your saved book — (.*?)\.?$",
+                        lambda m: f"The book passed in this call — {m.group(1)}{scaled}.",
+                        str(line)) for line in lines]
         return _engine_text(lines, sources), False
     if name == "argus_exposures":
         from argus.lui.exposures import answer as exposures
@@ -580,6 +595,12 @@ def _engine_text(lines: Sequence[str], sources: Sequence[Any]) -> str:
                                      for s in sources]})
 
 
+_POINTS_BACK: Final = re.compile(r"\b(?:my|the)\s+(?:position|book|holding|portfolio|trade)\b|"
+                                 r"\b(?:it|that|this|the\s+rest)\b", re.I)
+_CLAUSE_HEAD: Final = re.compile(r"[\u2014\u2013]|,\s*(?:and\s+)?"
+                                 r"(?=(?:is|are|should|can|could|what|how|which|does|do)\s)", re.I)
+
+
 def _research_task(question: str, book: str) -> tuple[str, bool]:
     """The research task as text: what was read, the verdict, each engine's action, each step."""
     from argus.lui.task import read_question, research_task
@@ -587,11 +608,25 @@ def _research_task(question: str, book: str) -> tuple[str, bool]:
     question = question.strip()
     if not question:
         raise ToolError("question is required")
+    from argus.lui.research import option_shock, signed_book
+
+    # a book of leveraged longs and shorts, or an option position under a volatility move, is one
+    # question about the whole position: the add-a-name template read "2x long BTC and -1x
+    # inverse ETH" as 100% BTC, and a covered call's vol spike as a sentiment read (round 39
+    # judge, C-8 and the leveraged book)
+    whole = signed_book.lines(question[:500]) or option_shock.lines(question[:500])
+    if whole:
+        return "\n".join(["Read as: one question about the whole position, answered by the "
+                          "engine for it", "", *whole]), False
     reading = read_question(question[:500], book[:300])
     if isinstance(reading, str):
         return reading, True
     task = research_task(reading=reading, asked=question[:500])
-    out = [f"Read as: {reading.summary}", *(f"  ({n})" for n in reading.notes)]
+    # the further questions are answered here, one by one, by the console itself: "and should I
+    # hedge the rest with gold?" was declined with "ask it in the console on its own" (round 39
+    # judge, M-4), on the surface that cannot open the console
+    out = [f"Read as: {reading.summary}",
+           *(f"  ({n})" for n in reading.notes if not n.startswith("not run on this page"))]
     if task.verdict is not None:
         out += ["", f"Verdict: {task.verdict.call}", *task.verdict.lines]
     if task.conclusion:
@@ -601,6 +636,26 @@ def _research_task(question: str, book: str) -> tuple[str, bool]:
         state = "not applicable" if not step.applicable else (
             "did not answer" if step.refused else f"{step.seconds:.1f}s")
         out += ["", f"{step.title} ({step.engine}; {state})", *step.lines[:6]]
+    if reading.rest:
+        from argus.lui import server
+
+        held = ", ".join(f"{w:.0%} {s.removesuffix('USDT')}" for s, w in reading.book.items())
+        for clause in reading.rest:
+            # "what happens to my position" means nothing alone: a clause that points back at
+            # the message is asked with the sentence it points to
+            asked = re.sub(r"\bit\b", reading.name.removesuffix("USDT"), clause) \
+                if reading.name else clause
+            if _POINTS_BACK.search(asked):
+                asked = f"{_CLAUSE_HEAD.split(question[:500], maxsplit=1)[0].strip()} — {asked}"
+            try:
+                said = server.handle_ask(asked, [question[:500]], visitor="mcp", book=held)
+            except Exception as exc:  # the task above stands without this part
+                out += ["", f"Also asked — “{clause}”: could not run just now "
+                            f"({type(exc).__name__})."]
+                continue
+            lines = [str(x) for x in said.get("lines") or []]
+            out += ["", f"Also asked — “{clause}” ({said.get('classified_by', 'console')}):",
+                    *lines[:6]]
     return "\n".join(out), False
 
 

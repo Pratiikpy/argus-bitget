@@ -538,7 +538,10 @@ def _trim_to_budget(symbol: str, weights: Mapping[str, float],
 _EVENT_TYPES = (
     ("CPI", re.compile(r"\b(?:cpi|inflation|consumer\s+price)", re.I)),
     ("FOMC", re.compile(r"\b(?:fomc|fed|federal\s+reserve|rate\s+decisions?|powell)\b", re.I)),
-    ("earnings", re.compile(r"\b(?:earnings|results|report(?:s|ed)?|quarterly)\b", re.I)),
+    # "英伟达下一次财报…财报公布后股价怎么走" went to the CPI study, CPI being the default (round 39
+    # judge, C-6)
+    ("earnings", re.compile(r"\b(?:earnings|results|report(?:s|ed)?|quarterly)\b|财报|业绩|季报|"
+                            r"決算|실적", re.I)),
 )
 
 

@@ -679,8 +679,23 @@ def funding_cost_lines(text: str) -> list[str] | None:
     pays = (rate >= 0) != short
     name = symbol.removesuffix("USDT")
     yearly = re.search(r"\bannual\w*|\byear\w*|\bper\s+annum\b|\bapr\b", text, re.I)
-    span = (f"${abs(daily) * 365:,.0f} a year ({abs(daily) * 365 / size:.1%})" if yearly else
-            f"${abs(daily):,.2f} a day")
+    held = re.search(r"\bfor\s+(?P<n>\d+(?:\.\d+)?)\s*(?P<u>h|hrs?|hours?|d|days?|w|weeks?)\b",
+                     text, re.I)
+    if held is not None:
+        # "If I hold $10,000 of BTC perpetual for 8 hours, how much funding do I pay?" led with a
+        # day (round 39 hostile, defect 8): the period asked leads, in whole settlements
+        unit = held.group("u").lower()
+        hours_held = float(held.group("n")) * (1 if unit.startswith("h") else
+                                               24 if unit.startswith("d") else 168)
+        settlements = max(0, int(hours_held // hours))
+        span = (f"${abs(per) * settlements:,.2f} for {held.group(0).removeprefix('for ')} "
+                f"({settlements} settlement{'s' if settlements != 1 else ''}, ${abs(daily):,.2f} "
+                f"a day)" if settlements else
+                f"nothing for {held.group(0).removeprefix('for ')} if no settlement falls inside "
+                f"it (one every {hours} hours; ${abs(daily):,.2f} a day)")
+    else:
+        span = (f"${abs(daily) * 365:,.0f} a year ({abs(daily) * 365 / size:.1%})" if yearly else
+                f"${abs(daily):,.2f} a day")
     return [f"Bottom line: about {span} on ${size:,.0f} of {name} — "
             f"{'paid' if pays else 'received'} by a {'short' if short else 'long'} at "
             f"{whose} "

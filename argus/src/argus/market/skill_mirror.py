@@ -345,9 +345,18 @@ def tvl_rank(args: Mapping[str, Any]) -> dict[str, Any]:
     ranked = sorted((r for r in rows if isinstance(r.get("tvl"), int | float)
                      and r.get("category") != "CEX"),
                     key=lambda r: -float(r["tvl"]))[:limit]
+    # the week's biggest movers among protocols over $1bn: "which protocol is seeing the biggest
+    # net inflows this week?" got the size ranking with daily changes (round 39 judge, M-1)
+    large = [r for r in rows if isinstance(r.get("tvl"), int | float) and r.get("category") != "CEX"
+             and float(r["tvl"]) >= 1e9 and isinstance(r.get("change_7d"), int | float)]
+    movers = sorted(large, key=lambda r: -float(r["change_7d"]))[:5]
     return {"protocols": [{"name": r.get("name"), "category": r.get("category"),
                            "symbol": r.get("symbol"), "tvl_usd": round(float(r["tvl"])),
-                           "change_1d_pct": r.get("change_1d")} for r in ranked]}
+                           "change_1d_pct": r.get("change_1d"),
+                           "change_7d_pct": r.get("change_7d")} for r in ranked],
+            "movers_7d": [{"name": r.get("name"), "category": r.get("category"),
+                           "tvl_usd": round(float(r["tvl"])),
+                           "change_7d_pct": r.get("change_7d")} for r in movers]}
 
 
 ETH_RPC = "https://eth.drpc.org"

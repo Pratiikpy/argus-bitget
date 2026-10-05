@@ -576,9 +576,21 @@ def price_statement(text: str, *, price: Callable[[str], float | None] | None = 
     odd = []
     if any(e.kind == "open" and e.qty == 0 for e in resolved):
         odd.append("a quantity of 0 holds nothing, so that leg adds nothing")
-    if any(e.kind == "open" and e.price < 0 for e in resolved):
-        odd.append("a negative price was read as written; only a few futures (WTI in April "
-                   "2020) have ever traded below zero, so check it")
+    negative = [e for e in resolved if e.kind == "open" and e.price < 0]
+    if negative:
+        name = str(negative[0].symbol or "").removesuffix("USDT")
+        commodity = name in ("CL", "BZ", "NATGAS", "WTI", "BRENT")
+        if commodity:
+            odd.append("a negative price was read as written; WTI futures did trade below zero "
+                       "in April 2020, so it can happen there, but check it")
+        else:
+            # "bought 1 BTC at -50000" was answered with a +$135,819 gain and a WTI footnote
+            # (round 39 hostile, defect 10): a coin or a share cannot trade below zero
+            lead = (f"Bottom line: a price of {negative[0].price:,.0f} is impossible"
+                    + (f" for {name}" if name else "")
+                    + " — a coin or a share cannot trade below zero, so the entry is a typo. "
+                      "Say the price you paid; the figure below takes it as written: "
+                    + lead.removeprefix("Bottom line: "))
     if any(e.said.lower().startswith("long -") for e in resolved):
         odd.append("\"long -N\" was read as a short of N")
     out = [lead, *lines_out, *(f"Note: {o}." for o in odd)]

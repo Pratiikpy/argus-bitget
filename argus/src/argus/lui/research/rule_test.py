@@ -751,6 +751,22 @@ def lines(text: str, *, on: str | None = None) -> list[str] | None:
     if len(closes) < 250:
         return [f"Bottom line: only {len(closes)} days of {name} history are available, too few "
                 f"to test a rule on — a year is the least this console tests."]
+    years_said = [int(y) for y in re.findall(r"\b(19\d\d|20\d\d)\b", text)]
+    if years_said and stamps and max(years_said) < stamps[0].year:
+        # "from 1 January 1990 to 1 January 1995" on BTC was run on the last five years with no
+        # word (round 39 hostile, defect 6): a span wholly before the history is refused
+        return [f"Bottom line: {name}'s history here starts {stamps[0]:%d %b %Y}, so a test over "
+                f"{min(years_said)} to {max(years_said)} cannot be run — nothing in that span "
+                f"exists in the data"
+                + (" (and bitcoin itself only began in 2009)" if name == "BTC"
+                   and max(years_said) < 2009 else "")
+                + ". Ask without the dates for the last five years, or with a span after "
+                  f"{stamps[0]:%Y}."]
+    if years_said and stamps and min(years_said) < stamps[0].year:
+        early_note = (f"the span asked starts in {min(years_said)}, before {name}'s history here "
+                      f"({stamps[0]:%d %b %Y}), so the test covers what exists")
+    else:
+        early_note = ""
     if rule.kind == "move" and "Yahoo" in source:
         # a week on a market that shuts is five sessions, not seven rows (2026-10-05)
         rule = replace(rule, params={**rule.params, "days": rule.params["sessions"]},
@@ -816,6 +832,8 @@ def lines(text: str, *, on: str | None = None) -> list[str] | None:
                    f"the end after fees, against ${amount * (1 + hold):,.0f} for holding.")
     if short_note:
         out.append(f"Span: {short_note}, so the test covers what exists.")
+    elif early_note:
+        out.append(f"Span: {early_note}.")
     out.append(f"The rule: Sharpe {net.sharpe:.2f}, worst drawdown {net.max_drawdown:.0%}, in the "
                f"market {in_market:.0%} of days, {len(trades)} trades; trades that made money: "
                + (rate_phrase(sum(won), len(won), noun="trades") if trades else "none") + ".")

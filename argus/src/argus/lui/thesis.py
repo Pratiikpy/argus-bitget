@@ -149,7 +149,10 @@ _SPLIT = re.compile(
     r"\s*(?:,(?!\d{3}(?!\d))|[;?]|(?<=[a-z%)])\.\s+(?=[A-Za-z])|\bbecause\b|\bsince\b|\bas\b|"
     # a dash between clauses: "AI capex is still accelerating — I want to go long NVDA for the
     # next 3 months" was one "reason" (a judge, round 19)
-    r"\s[\u2014\u2013-]\s|\band\b|\bgiven\b|\bplus\b)\s*", re.I)
+    r"\s[\u2014\u2013-]\s|\band\b|\bgiven\b|\bplus\b|"
+    # "because 1) ETF inflows are accelerating 2) the Fed is cutting 3) ..." was one reason
+    # (round 39 judge, C-2): a number in brackets or with a dot opens a reason
+    r"(?<![\w.$])\(?\d\)\s|(?:^|\s)\d\.\s(?=[A-Za-z]))\s*", re.I)
 _OPENER = re.compile(r"^i\s+(?:think|believe|reckon|expect|feel)\s+(?:that\s+)?", re.I)
 _PRICE_STATEMENT = re.compile(r"(?:[$€£]\s*\d|\d\s*(?:k|usd|dollars?|euros?)\b)", re.I)
 """A fragment that only states a price ("Bitcoin is at $200,000 right now"): the premise check
@@ -208,6 +211,8 @@ _ASK_WORDS = re.compile(
     r"\s*[-\u2013\u2014:,.]?\s*(?:please\s+|can\s+you\s+)?(?:test|check|challenge|"
     r"stress[\s-]*test|pressure[\s-]*test|poke\s+holes\s+in|kill|critique|evaluate|assess|validate)\s+"
     r"(?:(?:my|this|the|that)\s+(?:thesis|idea|view|take|theory|call|argument)|it|this|that)\b"
+    # "Test this thesis against the data." was kept as a fourth reason (round 39 judge)
+    r"(?:\s+(?:against|with|on)\s+(?:the\s+)?(?:data|numbers|facts|record))?"
     r"[\s?.!]*$|\s*[.?!]?\s*help\s+me\s+(?:test|check|verify|validate|stress[\s-]*test)\s+"
     r"(?:it|this|that)(?:\s+(?:thesis|argument|idea))?\b[\s?.!]*$|"
     # a closing question about the thesis: "... Is that thesis right?", "am I wrong?" (round 11)

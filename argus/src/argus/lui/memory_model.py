@@ -125,6 +125,10 @@ def _valid(kind: str, value: str, subject: str, quote: str, context: str = ""
             # trade_risk; stored as a max loss too, every book stress was held against 1% (a
             # judge, round 22)
             return None
+        if kind == "max_loss" and re.search(r"\d\s*x\b", quote, re.I) and "%" not in quote:
+            # "my limit is 5x" is a leverage cap, kept by its own reader; it was stored as a 5%
+            # loss limit (round 39 hostile, defect 4)
+            return None
         if kind == "max_loss" and re.search(r"\bstop\b", quote, re.I) and not re.search(
                 r"\blos[es]|\bloss\b|\bdrawdown\b", quote, re.I):
             # "stop 3% above entry" is a stop distance, not a loss limit (round 20, row 696)

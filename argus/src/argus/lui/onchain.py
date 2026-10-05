@@ -24,14 +24,17 @@ from __future__ import annotations
 
 import re
 from collections.abc import Callable, Mapping
-from typing import Any
+from typing import Any, Final
 
 from argus.lui.answer import Source
 
 _TVL = re.compile(r"\b(?:tvl|total\s+value\s+locked|top\s+defi|defi\s+(?:protocols?|ranking|"
                   r"leaders|rankings)|biggest\s+defi)\b", re.I)
 _GAS = re.compile(r"\b(?:gas\s+(?:fees?|prices?|now|today|right\s+now|cost)|eth(?:ereum)?\s+gas|"
-                  r"gwei|how\s+(?:much|expensive)\s+is\s+(?:eth\s+)?gas)\b", re.I)
+                  r"gwei|how\s+(?:much|expensive)\s+is\s+(?:eth\s+)?gas|"
+                  # "is now a cheap time to bridge ETH?" is a gas question (round 39 judge, M-1)
+                  r"(?:cheap|expensive|good)\s+(?:time\s+)?to\s+bridge|bridg\w*\s+(?:cost|fees?))\b",
+                  re.I)
 
 TRANSFER_GAS = 21_000
 """Gas a plain ETH transfer uses: the intrinsic cost of a transaction (Ethereum yellow paper,
@@ -124,6 +127,25 @@ def tvl(text: str, *, route: Route | None = None,
                     f"{top.get('name')} the most at ${float(top.get('tvl_usd') or 0) / 1e9:,.1f}"
                     f"bn; {len(tradable)} of them have a token under the same ticker on Bitget's "
                     f"perpetual board" + (f" ({', '.join(tradable)})." if tradable else "."))
+    if re.search(r"\bweek\w*|\b7[\s-]?days?\b|\binflows?\b|\boutflows?\b|\bgrowing\b",
+                 text, re.I):
+        movers = (payload or {}).get("movers_7d")
+        if not movers:
+            try:
+                movers = tvl_rank(args).get("movers_7d")
+            except Exception:
+                movers = None
+        if movers:
+            best = movers[0]
+            lines.insert(0, f"Bottom line: over the last 7 days {best['name']} grew most among "
+                            f"protocols over $1bn — TVL {float(best['change_7d_pct']):+.1f}% to "
+                            f"${float(best['tvl_usd']) / 1e9:,.1f}bn; then "
+                            + ", ".join(f"{m['name']} {float(m['change_7d_pct']):+.1f}%"
+                                        for m in movers[1:4])
+                            + ". TVL also moves with token prices, so a rise is not all new "
+                              "deposits.")
+            rest = lines[1].replace("Bottom line: ", "", 1)
+            lines[1] = rest[:1].upper() + rest[1:]
     lines.append("Assumed: centralised exchanges are left out of the ranking, as DeFiLlama's own "
                  "DeFi view does; a ticker match is by symbol only, so check the contract before "
                  "trading it.")
@@ -133,6 +155,11 @@ def tvl(text: str, *, route: Route | None = None,
                               detail="USDT perpetual board, 24h change"))
     lines.append("Data: " + ", ".join(s.ref for s in sources) + ". Analysis, not advice.")
     return lines, sources, {"protocols": rows, "tradable": tradable, "via": routed.via}
+
+
+# a canonical-bridge deposit, an estimate: deposits into rollup bridges commonly run 100k-200k gas
+BRIDGE_GAS: Final = 150_000
+_VERDICT: Final = re.compile(r"\b(?:bridg\w*|cheap\w*|good time|worth|expensive)\b", re.I)
 
 
 def gas(text: str, *, route: Route | None = None,
@@ -175,6 +202,13 @@ def gas(text: str, *, route: Route | None = None,
         lines.append(f"Blocks are {mean:.0%} full on average over the last {len(fullness)}: "
                      + ("above the 50% target, so the base fee is rising." if mean > 0.5 else
                         "below the 50% target, so the base fee is falling."))
+    if eth is not None and _VERDICT.search(text):
+        bridge = per_gas_eth * BRIDGE_GAS * float(eth.last)
+        word = ("cheap" if bridge < 1.0 else "reasonable" if bridge < 5.0 else "expensive")
+        lines.insert(1, f"Verdict: {word} right now — a bridge deposit (about {BRIDGE_GAS:,} gas, "
+                        f"an estimate; the bridge's own contract sets the real figure) costs about "
+                        f"${bridge:,.2f}. Under $1 is cheap, under $5 reasonable, above that "
+                        f"worth waiting for a quieter hour.")
     sources = [s for s in (credit,) if s is not None]
     if eth is not None:
         sources.append(Source(kind="venue", ref="bitget /api/v2/mix/market/tickers",

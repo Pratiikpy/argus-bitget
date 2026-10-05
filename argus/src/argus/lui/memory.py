@@ -38,7 +38,7 @@ MAX_FACTS = 40
 MAX_TEXT = 200
 
 KINDS = ("budget", "max_loss", "loss_usd", "horizon", "style", "capital", "thesis", "avoid",
-         "check", "goal", "book", "trade_risk", "cap", "tripwire", "cap_usd")
+         "check", "goal", "book", "trade_risk", "cap", "tripwire", "cap_usd", "max_leverage")
 """``trade_risk`` is the share of the account the trader risks on one trade ("I won't risk more
 than 2% per trade"), and ``cap`` the largest weight one position may have ("no single position
 above 30% of the book"). Both were lost or misread as a risk budget (a judge, round 21)."""
@@ -112,6 +112,16 @@ _CAP_USD = re.compile(
     r"more|over|above)\s+(?:than\s+)?\$\s?(?P<d>\d[\d,]*(?:\.\d+)?)\s*(?P<k4>k\b)?|"
     r"\bmax(?:imum)?\s+(?:new\s+)?position\s+(?:size\s+)?(?:is\s+|of\s+|=\s*)?\$\s?"
     r"(?P<c>\d[\d,]*(?:\.\d+)?)\s*(?P<k3>k\b)?", re.I)
+_MAX_LEVERAGE = re.compile(
+    r"\b(?:max(?:imum)?\s+)?leverage\s+(?:limit|cap)\s+(?:is\s+|of\s+)?(?P<x>\d+(?:\.\d+)?)\s*x\b|"
+    r"\bmy\s+(?:max(?:imum)?\s+)?(?:leverage\s+)?(?:limit|cap|max)\s+is\s+(?P<x2>\d+(?:\.\d+)?)"
+    r"\s*x\b|\b(?:never|won'?t|don'?t)\s+(?:use|go\s+(?:above|over|past|beyond)|trade\s+(?:above|"
+    r"over))\s+(?:more\s+than\s+)?(?P<x3>\d+(?:\.\d+)?)\s*x\b|"
+    r"\bmy\s+max(?:imum)?\s+leverage\s+is\s+(?P<x4>\d+(?:\.\d+)?)\s*x\b", re.I)
+"""A leverage cap the trader states: "my limit is 5x" was filed as a 5% loss limit and never
+set against the 15x asked next (round 39 hostile, defect 4)."""
+
+
 _MAX_LOSS = re.compile(
     r"\b(?:i\s+)?(?:can'?t|cannot|can\s+not|don'?t\s+want\s+to|won'?t|never)\s+(?:afford\s+to\s+)?"
     r"(?:lose|tolerate|stomach|handle|take|accept)\s+"
@@ -318,6 +328,9 @@ def extract(question: str, now: datetime | None = None,
                      .replace(",", "")) * (
             1000 if (m.group("k") or m.group("k2") or m.group("k3") or m.group("k4")) else 1)
         add("cap_usd", "", f"{size:.0f}", m.group(0))
+    if (m := last(_MAX_LEVERAGE)) is not None:
+        cap = m.group("x") or m.group("x2") or m.group("x3") or m.group("x4")
+        add("max_leverage", "", f"{float(cap):g}", m.group(0))
     if (m := last(_MAX_LOSS)) is not None:
         add("max_loss", "", str(float(m.group(1) or m.group(2) or m.group(3) or m.group(4)
                                       or m.group(5) or m.group(6) or m.group(7))
@@ -506,7 +519,7 @@ def merge_checks(old: list[Fact], checks: list[Fact]) -> list[Fact]:
 _RANGES: dict[str, tuple[float, float]] = {
     "horizon": (1, 24 * 365 * 30), "max_loss": (0.0001, 1.0), "budget": (0.0001, 1.0),
     "trade_risk": (0.0001, 1.0), "cap": (0.0001, 1.0), "capital": (1, 1e12),
-    "loss_usd": (0.01, 1e12), "cap_usd": (1, 1e12)}
+    "loss_usd": (0.01, 1e12), "cap_usd": (1, 1e12), "max_leverage": (1, 500)}
 """What each numeric fact can mean: hours from one to thirty years, fractions above zero up to
 all of it, money above zero."""
 _INSTRUCTION = re.compile(
@@ -984,6 +997,14 @@ def after(lines: list[str], request: Any, facts: list[Fact],
     from argus.lui.research.kinds import bare_symbol
 
     extra: list[str] = []
+    lever_cap = get(facts, "max_leverage")
+    asked_lever = getattr(request, "leverage", None)
+    if lever_cap is not None and asked_lever:
+        cap_x = float(lever_cap.value)
+        extra.append(remembered_line(lever_cap, (
+            f"this is {float(asked_lever):g}x, {float(asked_lever) / cap_x:.1f} times your "
+            f"{cap_x:g}x limit — over it" if float(asked_lever) > cap_x else
+            f"this is {float(asked_lever):g}x, inside your {cap_x:g}x limit")))
     limit = get(facts, "max_loss")
     capital = get(facts, "capital")
     if limit is not None and capital is None:

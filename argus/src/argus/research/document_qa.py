@@ -202,6 +202,26 @@ class EdgarDocuments:
                 return f"https://www.sec.gov{href}" if href.startswith("/") else href
         return None
 
+    def event_text(self, ticker: str, accession: str) -> tuple[str, str | None] | None:
+        """One 8-K by accession: its body as text, and its EX-99.1 as text when it has one.
+
+        `latest` reads only the newest filing of a form, so the 8-K a news line names — matched by
+        accession — could be one it never reaches (Apple's 5.02 behind its earnings 8-K).
+        """
+        cik = self._edgar.cik_for(ticker)
+        if cik is None:
+            return None
+        rf = self._edgar._get(self._edgar.SUBMISSIONS_URL.format(cik=cik)).get(
+            "filings", {}).get("recent", {})
+        numbers = rf.get("accessionNumber", [])
+        if accession not in numbers:
+            return None
+        i = numbers.index(accession)
+        url = ARCHIVE.format(cik=cik, folder=accession.replace("-", "")) + rf["primaryDocument"][i]
+        exhibit = self._exhibit(cik, accession, "EX-99.1")
+        return (html_to_text(_fetch(url)),
+                html_to_text(_fetch(exhibit)) if exhibit is not None else None)
+
     def latest(self, ticker: str, forms: Sequence[str] = FORMS, *,
                with_exhibit: bool = True) -> list[Document]:
         """The newest filing of each form in ``forms``; for an 8-K, its EX-99.1 too."""

@@ -6,7 +6,7 @@ import json
 import re
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from typing import Any
+from typing import Any, Final
 
 from argus.lui.answer import Source, plural, unlead
 from argus.lui.question import (
@@ -354,11 +354,15 @@ def _quote_extras(raw_text: str, quoted: list[tuple[str, Any]],
             # hostile, defect 2): a euro, pound or yen sum is the amount, at Bitget's FX perpetual
             from argus.lui.research.parse import in_us_dollars
 
-            in_dollars, converted = in_us_dollars(raw_text)
-            size = parse_notional(in_dollars)
-            worth = float(size) if size else None
-            if worth and converted:
-                how = converted[0].rstrip(".") + "; "
+            other = other_currency(raw_text)
+            if other is not None:
+                worth, how = other
+            else:
+                in_dollars, converted = in_us_dollars(raw_text)
+                size = parse_notional(in_dollars)
+                worth = float(size) if size else None
+                if worth and converted:
+                    how = converted[0].rstrip(".") + "; "
         if not worth:
             # "I have 20 grand. How many shares of AAPL can I buy?" was told to name the amount
             # (a hostile review, round 21): the money said in the question is the amount
@@ -790,6 +794,53 @@ def open_while_open_line(symbol: str, now: datetime | None = None) -> str | None
                  f"gloaming, an S2 overnight desk, and {record['zero']:.0f}bps for assuming no "
                  f"gap")
     return text + "."
+
+
+_OTHER_MONEY: Final = (
+    (re.compile(r"\bR\$\s?(?P<n>\d[\d.,]*)|(?P<n2>\d[\d.,]*)\s*(?:brl|reais|reals?)\b", re.I),
+     "BRL", "R$"),
+    (re.compile(r"(?:₹|\brs\.?\s?|\binr\s?)(?P<n>\d[\d,]*(?:\.\d+)?)|(?P<n2>\d[\d,]*(?:\.\d+)?)\s*"
+                r"(?:inr|rupees?)\b", re.I), "INR", "₹"),
+    (re.compile(r"₩\s?(?P<n>\d[\d,]*)|(?P<n2>\d[\d,]*)\s*(?:krw|won)\b", re.I), "KRW", "₩"),
+    (re.compile(r"\bCHF\s?(?P<n>\d[\d,']*(?:\.\d+)?)|(?P<n2>\d[\d,']*(?:\.\d+)?)\s*(?:chf|swiss\s+"
+                r"francs?)\b", re.I), "CHF", "CHF "),
+    (re.compile(r"\bC\$\s?(?P<n>\d[\d,]*(?:\.\d+)?)|(?P<n2>\d[\d,]*(?:\.\d+)?)\s*(?:cad|canadian\s+"
+                r"dollars?)\b", re.I), "CAD", "C$"),
+    (re.compile(r"\bA\$\s?(?P<n>\d[\d,]*(?:\.\d+)?)|(?P<n2>\d[\d,]*(?:\.\d+)?)\s*(?:aud|australian"
+                r"\s+dollars?)\b", re.I), "AUD", "A$"),
+)
+"""Money in currencies Bitget has no market for: "I have R$100,000" was read as $100,000 because
+the symbol carries a dollar sign, and "₹10,00,000" (lakh grouping) was dropped (round 39 hostile,
+defects 5 and 9)."""
+
+
+def other_currency(text: str) -> tuple[float, str] | None:
+    """(US dollars, the line that says the conversion) for a sum in one of :data:`_OTHER_MONEY`,
+    at Yahoo Finance's latest close for that currency against the dollar."""
+    for pattern, code, sign in _OTHER_MONEY:
+        found = pattern.search(text)
+        if found is None:
+            continue
+        said = found.group("n") or found.group("n2") or ""
+        if code == "BRL" and re.search(r"\.\d{3}", said) and "," not in said[-3:]:
+            said = said.replace(".", "")  # "R$100.000" is Brazilian grouping
+        amount = float(said.replace(",", "").replace("'", "") or 0)
+        if amount <= 0:
+            return None
+        from argus.market.equity_history import daily
+
+        try:
+            days = daily(f"{code}=X")
+        except Exception:
+            return None
+        if not days or days[-1].close <= 0:
+            return None
+        per_dollar = float(days[-1].close)
+        usd = amount / per_dollar
+        return usd, (f"{sign}{amount:,.0f} = about ${usd:,.0f} at Yahoo Finance's latest "
+                     f"{code}/USD close ({per_dollar:,.2f} to the dollar; Bitget lists no {code} "
+                     f"market); ")
+    return None
 
 
 def _implied_open_line(symbol: str, perp_last: Decimal,

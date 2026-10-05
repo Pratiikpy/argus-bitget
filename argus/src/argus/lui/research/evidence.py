@@ -327,6 +327,9 @@ def _skill_btc_line(job: Any, perp: Any) -> tuple[str, Source] | None:
         return None
     if spot <= 0 or last <= 0:
         return None
+    from argus.truth.coverage import noted
+
+    noted("bitget-signal crypto_derivatives", True)
     basis = (last / spot - 1.0) * 1e4
     verdict = ("the Skill and Bitget's own ticker agree" if abs(basis) <= BASIS_AGREE_BPS
                else "a gap that size is not a basis — one of the two readings is stale")

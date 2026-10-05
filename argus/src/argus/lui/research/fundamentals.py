@@ -7,7 +7,7 @@ import itertools
 import re
 from collections.abc import Callable, Mapping, Sequence
 from datetime import UTC, date, datetime, timedelta
-from typing import Any
+from typing import Any, Final
 
 from argus.lui.answer import LEAD, Source, plural, unlead
 from argus.lui.question import (
@@ -851,6 +851,31 @@ def _ownership_flow(ticker: str, positions: Any) -> tuple[list[str], list[Source
     return lines, sources
 
 
+_YEAR: Final = re.compile(r"\b(?:in|of|for|during|from|back\s+in)\s+(19[5-9]\d|20[0-4]\d)\b",
+                          re.I)
+
+
+def _past_year(text: str, this_year: int) -> int | None:
+    """A calendar year the question asks about, when it is before last year; else None."""
+    found = _YEAR.search(text)
+    return int(found.group(1)) if found and int(found.group(1)) < this_year - 1 else None
+
+
+def _first_trade(ticker: str) -> date | None:
+    """The day ``ticker``'s shares first traded, from Yahoo's chart metadata, or None."""
+    from argus.truth import http
+
+    try:
+        body = http.fetch_json(f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}",
+                               params={"interval": "1d", "range": "5d"},
+                               headers={"User-Agent": "Mozilla/5.0 argus-research"}, timeout=15)
+        stamp = body["chart"]["result"][0]["meta"]["firstTradeDate"]
+    except Exception:
+        return None
+    return datetime.fromtimestamp(int(stamp), UTC).date() if isinstance(stamp, int | float) \
+        else None
+
+
 def _fundamentals(symbol: str, raw_text: str = "", *,
                   found: dict[str, Any] | None = None) -> tuple[list[str], list[Source]]:
     """The earnings calendar, analysts' targets and consensus, and the last surprise.
@@ -885,6 +910,19 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
     lines: list[str] = []
     sources: list[Source] = []
     today = datetime.now(UTC).date()
+    year_said = _past_year(raw_text, today.year)
+    if year_said is not None:
+        listed_on = _first_trade(ticker)
+        if listed_on is not None and year_said < listed_on.year:
+            # "NVDA's 13F holdings in 1995" was answered with today's filings, the year dropped
+            # (round 39 hostile, M4): NVDA first traded on 22 Jan 1999, so no filing of any kind
+            # could report on it in 1995
+            return ([f"Bottom line: {ticker} was not a public company in {year_said} — its "
+                     f"shares first traded on {listed_on:%d %b %Y} — so no 13F holding, earnings "
+                     f"report or analyst estimate for {ticker} exists from {year_said}.",
+                     f"Ask for any year from {listed_on.year} on, or for {ticker}'s filings now."],
+                    [Source(kind="evidence", ref="https://query1.finance.yahoo.com/v8/finance/"
+                            f"chart/{ticker}", detail="first trade date")])
 
     # Five independent lookups, run side by side: one after another they took ~6s. Each gets its
     # own client, because the data server is a stateful JSON-RPC session and sharing one across
@@ -1312,7 +1350,15 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
                             f"({float(live.change_24h) * 100:+.2f}% over 24h).")
             sources.append(Source(kind="venue", ref="Bitget v2 tickers",
                                   detail=f"{symbol} last price, live"))
-    return _compound_lead(_fundamentals_focus(lines, raw_text, ticker), raw_text, ticker), sources
+    led = _compound_lead(_fundamentals_focus(lines, raw_text, ticker), raw_text, ticker)
+    if year_said is not None and led:
+        # a past year the company did exist in: these sources hold the latest filings and
+        # estimates only, and the answer says so before it gives them
+        led = [f"Bottom line: the sources read here hold {ticker}'s latest filings, estimates "
+               f"and holdings, not {year_said}'s — so what follows is the latest, not {year_said}; "
+               f"SEC EDGAR's full-text archive holds the older filings.",
+               *(unlead(x) if i == 0 else x for i, x in enumerate(led))]
+    return led, sources
 
 
 _ASKS_DATE = re.compile(r"\b(?:reports?|earnings)\b", re.I)

@@ -655,7 +655,9 @@ def _theme(text: str) -> tuple[str, tuple[str, ...]] | None:
 
 _PAST_DIRECTION = re.compile(
     r"^(?!.*\b(?:will|would|could|gonna|going\s+to|next|tomorrow|tonight|forecast|predict\w*)\b)"
-    r".*\b(?:(?:over|in|during|for|across)\s+the\s+(?:last|past)\s+(?:\d+\s+)?(?:days?|weeks?|months?)"
+    # "over the past 24 hours" was answered as a forecast one day ahead (round 39 hostile, 1)
+    r".*\b(?:(?:over|in|during|for|across)\s+the\s+(?:last|past)\s+(?:\d+\s+)?"
+    r"(?:days?|weeks?|months?|hours?|24\s*h)"
     r"|(?:this|last|past)\s+(?:week|month)(?:\s+so\s+far)?)\b", re.I | re.S)
 """A direction asked of a period that is already over: "is TSLA up or down over the last 30 days"
 was answered as a forecast one day ahead (round 17) — it is a move over a past window."""
@@ -3514,6 +3516,12 @@ def read_request(text: str) -> ResearchRequest | None:
                                notes=("the risks were asked, so this is the name's risk profile — "
                                       "its worst day, how it moves with the market, and what that "
                                       "does to a book",))
+    if (len(symbols) == 1 and re.search(r"\btechnical\s+(?:analysis|read|view|picture|take|look)\b|"
+                                        r"\bta\s+(?:read|on|for)\b|\bchart\s+read\b", raw, re.I)
+            and not is_an_order(raw)):
+        # "Give me a technical analysis read on ETH's 4-hour chart" got the risk profile, a "take"
+        # (round 39 judge, C-3): a technical read is the technicals engine's
+        return ResearchRequest(kind=ResearchKind.TECHNICALS, symbols=symbols)
     if (len(symbols) == 1 and TAKE_ON.search(raw) and not is_an_order(raw)
             and not price_forecast_asked(raw)):
         # "Give me a quick take on ETH" was refused: the hosted model read an open-ended view as
@@ -3951,6 +3959,12 @@ def read_request(text: str) -> ResearchRequest | None:
             notes=(*((assumed,) if assumed else ()),
                    "a stop was asked for; the line that answers it is how far against the "
                    "position ordinary movement went in past windows of this length"))
+    if (symbols and not pairs and _PAST_DIRECTION.search(raw)
+            and re.search(r"\b(?:\d+\s*)?(?:hours?|24\s*h)\b", raw, re.I)
+            and re.search(r"\bup\b|\bdown\b|\bchange\w*\b|\bmov\w+\b|%|\bpercent\b", raw, re.I)):
+        # "Is BTC up or down over the past 24 hours, and by what percent?" got a forecast (round
+        # 39 hostile, defect 1): the last 24 hours are the quote's own change
+        return ResearchRequest(kind=ResearchKind.QUOTE, symbols=symbols[:1])
     if (symbols and not pairs and _DIRECTIONAL.search(raw) and not PRICE_FORECAST.search(raw)
             and not _PAST_DIRECTION.search(raw)
             and not _STRESS.search(raw) and not is_an_order(raw)):

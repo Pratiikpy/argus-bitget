@@ -1987,6 +1987,31 @@ def position_and_pnl(text: str, *, now: datetime | None = None,
                         "fill dates checked against today")],
                 {"position": {"refused": "impossible dates"}})
     lines, sources, data = got
+    # "and for ETH?" after "bought 1 BTC at 80000" carried the 80,000 onto ETH and reported a
+    # $77k loss on a position nobody described (round 39 hostile, defect 2): a fill 5x or more
+    # away from the market's own price is said before any figure built on it
+    if price is not None:
+        for leg in legs:
+            if leg.symbol is None or leg.price is None or leg.price <= 0:
+                continue
+            bare = re.escape(leg.symbol.removesuffix("USDT"))
+            if re.search(rf"\b{bare}\b[^.;]{{0,20}}\b(?:now|is\s+(?:at|now)|trad\w+\s+at)\s+\$?\d|"
+                         r"\bmark(?:ed)?\s+(?:is|at|price\s+is)\s+\$?\d", text, re.I):
+                continue  # the trader marked it: the figures run on their mark, not the live one
+            try:
+                live = price(leg.symbol)
+            except Exception:
+                continue
+            ratio = leg.price / live if live else 1.0
+            if ratio >= 5 or ratio <= 0.2:
+                name = leg.symbol.removesuffix("USDT")
+                lines = [f"Bottom line: check the price — {leg.price:,.2f} for {name} is "
+                         f"{ratio:.1f} times its live price ({live:,.2f})"
+                         + (", which looks like another coin's price" if ratio >= 5 else "")
+                         + "; the figures below take it as written. Say the price you paid for "
+                           f"{name} and they are worked again.",
+                         *(x.replace("Bottom line: ", "As written: ", 1) for x in lines)]
+                break
     premise = _premise(_thousands(text), price)
     if premise is not None and lines:
         head = lines[0].removeprefix("Bottom line: ")

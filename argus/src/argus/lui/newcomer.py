@@ -576,7 +576,43 @@ explains(*_LOOKAHEAD_A, *_OVERFIT_A, *_SURVIVOR_A, *_COSTS_A, *_NOT_ADVICE, *_BU
          *_LOSS_HAPPENS_A, *_BEGINNER_SAFE_A,
          *_GOING_WRONG, *_NO_GUARANTEE, *_SAFE, *_WITHDRAWING, *_PLACING, *_FREE_TO_USE)
 
+_DATED_MONEY: Final = re.compile(r"\bdown\s*payment\b|\bdeposit\b|\bhouse\b|\bhome\b|\bin\s+"
+                                 r"(?:like\s+)?\d+\s+years?\b|\bdate\s+on\s+it\b|\bsafer\b", re.I)
+"""The turn before a "what's safer" or "keep it in a bank" follow-up: money with a date on it."""
+_HOUSE_CASH: Final = (
+    "Savings accounts, fixed-term deposits and short-term government bills all pay a little "
+    "interest; one that matures before the purchase date cannot be caught by a bad month.",
+    "In the US, bank deposits are insured by the FDIC up to $250,000 per depositor, per bank; "
+    "other countries have their own schemes and limits. Inflation still nibbles at cash, but over "
+    "two years it is a far smaller risk than a market fall.")
+
 _FOLLOW_UPS: Final[tuple[tuple[re.Pattern[str], re.Pattern[str], tuple[str, ...]], ...]] = (
+    # Round 39 newcomer: "so do i need one to use this site" after "whats a wallet" was declined,
+    # though "whats a wallet and do i need one to use this site" in one sentence was answered
+    (re.compile(r"\b(?:do|would|will)\s+i\s+(?:even\s+|really\s+|actually\s+)?need\s+(?:one|it|"
+                r"a\s+wallet)\b", re.I),
+     re.compile(r"\bwallet\b", re.I), (
+        "Bottom line: no — you do not need a wallet to use Bitget or this console. A Bitget "
+        "account holds your coins for you, the way a bank holds cash.",
+        "A wallet of your own becomes useful later, for coins you plan to keep for a long time: "
+        "coins there do not depend on any exchange staying healthy, and the recovery phrase "
+        "becomes your job to keep safe.")),
+    # "whats safer than crypto for this", "if i just keep it in a bank is that better", after a
+    # house-deposit question (round 39 newcomer, X2 and X3)
+    (re.compile(r"\bsafer\s+than\s+(?:crypto|that|this|bitcoin)\b|\bwhat(?:'?s|\s+is)\s+safer\b",
+                re.I),
+     _DATED_MONEY, (
+        "Bottom line: for money you need on a set date, the usual places are an insured bank "
+        "savings account, a fixed-term deposit (a CD in the US) that matures before you buy, or "
+        "short-term government bills — none of them can fall the way a coin can.",
+        *_HOUSE_CASH[1:])),
+    (re.compile(r"\b(?:keep|put|leave)\s+it\s+in\s+(?:a|the)\s+(?:bank|savings)\b|\bbank\b[^?]{0,30}"
+                r"\b(?:better|safer|instead)\b", re.I),
+     _DATED_MONEY, (
+        "Bottom line: yes — for money you need on a date a couple of years away, an insured bank "
+        "savings account is the better fit: it cannot fall, and crypto can drop a third or more "
+        "in a few weeks.",
+        *_HOUSE_CASH)),
     # "wait so is that only in futures", after "can i lose more money than i put in" (round 37
     # newcomer, L2)
     (re.compile(r"\b(?:only|just)\s+(?:in|on|with|for)\s+(?:futures|perps?|perpetuals?|leverage|"
@@ -736,8 +772,255 @@ _WHAT_NOW_A = (
 
 
 _FIRST: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
-    # Round 38, a first-time user (most while the language model was paused): each was declined
-    # or answered with something else.
+    # Round 39, a first-time user: each of these was declined, or answered with a definition, a
+    # rates briefing or the desk's own record instead of what was asked.
+    (re.compile(r"\b(?:lost|down)\s+(?:like\s+|about\s+|almost\s+|over\s+)?(?:half|most|a\s+lot|"
+                r"\d+\s*%)\b[^?]{0,80}\b(?:freak\w*|panick?\w*|scared|terrified|don'?t\s+know\s+"
+                r"what\s+to\s+do|dont\s+know\s+what\s+to\s+do|can'?t\s+(?:sleep|breathe|think))\b|"
+                r"\b(?:freak\w*\s+out|panick?ing)\b[^?]{0,60}\b(?:lost|savings|money)\b", re.I), (
+        "Bottom line: stop for today — make no trade while you feel like this, because the move "
+        "that turns a big loss into a bigger one is trading fast to win it back.",
+        "What you lost is real, but what is left is still yours: if any of it is in futures or "
+        "leverage, that part can still be liquidated, so check that first; coins bought on spot "
+        "cannot fall below zero.",
+        "Tomorrow, with a clear head, ask \"how much could I lose on BTC in a bad week with $X\" "
+        "using what you hold now — that number is the one to decide on, not the loss.",
+        "If the worry is taking over, tell someone you trust today; if the urge to trade it "
+        "back will not stop, the US National Problem Gambling Helpline (1-800-GAMBLER) is free, "
+        "confidential and open around the clock.")),
+    (re.compile(r"\b(?:can'?t|cant|cannot|couldn'?t)\s+sleep\b|\bsell\s+(?:it\s+)?(?:all|"
+                r"everything)\s+(?:right\s+)?now\b", re.I), (
+        "Bottom line: no call from here on selling — but losing sleep over a position is the "
+        "clearest sign it is bigger than you can carry, whatever the price does next.",
+        "Selling all of it makes the loss final; holding all of it keeps the worry. Many traders "
+        "cut to a size they can sleep with — selling part — so the decision is not all or "
+        "nothing.",
+        "Before deciding, ask \"how much could I lose on BTC in a bad week with $X\" with what "
+        "you hold: if that number would hurt, the position is too large for you.")),
+    (re.compile(r"\b(?:wife|husband|partner|girlfriend|boyfriend|parents?|family)\s+(?:doesn'?t|"
+                r"doesnt|don'?t|dont|does\s+not|do\s+not)\s+know\b", re.I), (
+        "Bottom line: this console cannot judge your relationship, but people who have been "
+        "through it say the same thing: hiding a money loss tends to grow — both the secret and "
+        "the trading done to fix it before anyone finds out.",
+        "Telling them with the numbers in hand — what went in, what is left, and that you have "
+        "stopped adding — is usually easier than the conversation after a bigger loss.",
+        "If you feel pulled to keep trading to undo it, the National Problem Gambling Helpline "
+        "(1-800-GAMBLER in the US) is free and confidential, and it helps partners too.")),
+    # "ill feel so dumb if it keeps going up after i sell" is a worry about selling, not this
+    (re.compile(r"(?<!\bill\s)(?<!i'll\s)(?<!will\s)(?<!would\s)(?<!gonna\s)"
+                r"\b(?:feel|felt|am|i'?m|im)\s+(?:so\s+|really\s+|very\s+|such\s+an?\s+)?"
+                r"(?:stupid|dumb|idiot|an\s+idiot|ashamed|embarrassed)\b", re.I), (
+        "Bottom line: losing money on a first trade is common, not stupid — most people who "
+        "start trading lose early, and the ones who keep going learn the most from exactly this.",
+        "What turns it into a lesson: write down what you bought, how much, why, and what you "
+        "would do differently (smaller size, no leverage, a planned exit).",
+        "Then ask \"how much could I lose on BTC in a bad week with $X\" before the next trade, "
+        "so the size is decided in advance, not in the moment.")),
+    (re.compile(r"\b(?:i\s+)?(?:bought|buy)\s+(?:some\s+)?\$?[\w$]{2,10}\s+(?:and|but|then)\s+"
+                r"(?:it|the\s+price)\s+(?:went|go(?:es)?|dropped|fell|crashed|tanked)\b[^?]{0,40}"
+                r"\b(?:what\s+(?:do|should|now)|now\s+what|help)\b|\b(?:bought|buy)\b[^?]{0,30}"
+                r"\b(?:went|goes|go)\s+down\s+(?:right\s+)?(?:after|straight\s+away|"
+                r"immediately)\b", re.I), (
+        "Bottom line: a fall right after buying happens to almost everyone — prices move both "
+        "ways all day, so the first hours after a buy say little about the trade.",
+        "The question that matters is whether your reason for buying is still true. If it is, a "
+        "dip is noise; if you bought because it was rising, that reason has already gone.",
+        "Two rules that save beginners the most: do not add more or use leverage to \"fix\" it, "
+        "and know in advance how far you would let it fall — ask \"how much could I lose on BTC "
+        "in a bad week with $X\" with what you hold.")),
+    (re.compile(r"\bwhat(?:'?s|\s+is|\s+even\s+is)\s+(?:a\s+)?usdt\b|\busdt\b[^?]{0,40}\b(?:mean|"
+                r"stand\s+for)\b|\bwhy\s+(?:does\s+)?(?:everything|every\s*thing|all\s+prices?|it)"
+                r"\s+(?:cost|priced?|in|say|is\s+in)\s+usdt\b", re.I), (
+        "Bottom line: USDT (Tether) is a stablecoin — a token built to stay worth one US dollar, "
+        "so a price of \"85,000 USDT\" on Bitget means about $85,000.",
+        "Exchanges price coins in USDT because it moves on the same networks as the coins "
+        "themselves: you can swap between BTC and a dollar stand-in instantly, without a bank.",
+        "It is not a bank dollar: it is Tether's promise, backed by reserves Tether says it holds "
+        "and reports on quarterly. It has stayed close to $1, but ask \"is USDT safe to hold\" "
+        "for what happened when other stablecoins lost the peg.")),
+    (re.compile(r"\bhow\s+do\s+(?:people|traders|they|you|u)\s+(?:actually\s+|really\s+)?"
+                r"(?:make|earn)\s+money\b|\b(?:can|does)\s+(?:this|trading|crypto|it)\s+"
+                r"(?:actually\s+|really\s+)?(?:make|earn)\s+(?:real\s+)?money\b[^?]{0,40}\b"
+                r"(?:luck|lucky|gambl\w*)\b|\b(?:real\s+)?money\s+or\s+(?:is\s+it\s+)?(?:all\s+|"
+                r"just\s+)?luck\b", re.I), (
+        "Bottom line: three ways, and only one is reliable: holding something that grows in value "
+        "over years, earning a fee or yield for providing a service (exchanges and market makers "
+        "earn on every trade), and short-term trading — which most people lose at.",
+        "That last part is measured, not opinion: a study of Brazil's index-futures day traders "
+        "(Chague, De-Losso and Giovannetti, 2019) found 97% of those who kept at it for 300 days "
+        "or more lost money.",
+        "Short-term results are mostly luck until there are many trades; ask \"what is this "
+        "desk's track record\" to see how ARGUS's own paper desk is scored, and why a handful of "
+        "trades proves nothing either way.")),
+    (re.compile(r"\bbuy\s+(?:it\s+)?(?:all\s+)?(?:at\s+)?once\b[^?]{0,40}\b(?:every|each|monthly|"
+                r"weekly|over\s+time|bit\s+by\s+bit|little)\b|\b(?:all\s+at\s+once|lump\s+sum)\s+"
+                r"or\s+(?:a\s+little|monthly|bit\s+by\s+bit|every)\b", re.I), (
+        "Bottom line: neither is right for everyone — buying all at once has usually ended ahead "
+        "slightly more often in markets that mostly rise, and buying a little every month means "
+        "no single day's price decides the whole amount.",
+        "Monthly buying (dollar-cost averaging) suits money that arrives monthly anyway, and "
+        "anyone who would regret putting everything in on the worst possible day.",
+        "Either way, the amount matters more than the timing: ask \"how much could I lose on BTC "
+        "in a bad week with $X\" for the total you would end up holding.")),
+    (re.compile(r"\b(?:bitget|the\s+exchange|an\s+exchange|it)\s+(?:goes|go|went|going)\s+"
+                r"(?:bust|bankrupt|under|broke)\b|\bif\s+bitget\s+(?:fails|collapses|shuts\s+down|"
+                r"closes|disappears)\b|\bbitget\s+(?:goes|went)\s+(?:down|offline)\s+forever\b",
+                re.I), (
+        "Bottom line: your coins on Bitget are a claim on Bitget, not coins kept apart in your "
+        "name — its own terms say user assets are not segregated on-chain and it is not a "
+        "trustee of them (Terms of Use, 19.12). If it failed, you would be a creditor in line.",
+        "That has happened before: FTX customers waited about two years and were repaid at their "
+        "balances' dollar value on the day it collapsed, missing the rally since.",
+        "What to check and do: Bitget publishes proof-of-reserves reports and a protection fund "
+        "on its own site; keep there only what you are trading, and move what you hold long term "
+        "to a wallet only you control.")),
+    (re.compile(r"\b(?:use|download|get)\s+the\s+app\s+or\s+(?:the\s+)?(?:website|site|web|"
+                r"browser)\b|\b(?:app|website)\s+(?:or|vs\.?|versus)\s+(?:the\s+)?(?:app|website|"
+                r"site|web)\b", re.I), (
+        "Bottom line: either — the app and the website are the same Bitget account with the "
+        "same markets, balances and fees, so it is a question of where you like to read charts.",
+        "The app adds price alerts and quick logins; the website gives bigger charts.",
+        "The one rule that matters more: install the app only from the official App Store or "
+        "Google Play listing, and reach the website by typing the address yourself — fake "
+        "Bitget apps and look-alike sites exist to steal logins.")),
+    (re.compile(r"\bwhat(?:'?s|\s+is|\s+are)\s+(?:a\s+|the\s+)?candles?\b|\bcandles?\s+on\s+(?:the|a)"
+                r"\s+chart\b", re.I), (
+        "Bottom line: a candle is the price over one stretch of time — a minute, an hour, a "
+        "day: its body runs from where the price opened to where it closed, green if it closed "
+        "higher, red if lower.",
+        "The thin lines above and below are wicks: the highest and lowest prices reached in that "
+        "stretch, even if the price came back before it closed.",
+        "When this console says \"Bitget hourly candles\", it means one of these per hour.")),
+    (re.compile(r"\b(?:dad|mom|mum|father|mother|parents?|friends?|wife|husband|people)\s+"
+                r"(?:says?|said|thinks?|thought|tells?\s+me)\s+(?:that\s+)?(?:crypto|bitcoin|"
+                r"trading|this|it)\s+is\s+(?:a\s+|just\s+a\s+|all\s+a\s+)?(?:scam|fraud|ponzi|"
+                r"gambling|fake)\b", re.I), (
+        "Bottom line: partly right — Bitcoin itself is a real network that has run since 2009 "
+        "and trades in the open on regulated markets, but crypto is also full of scams, and "
+        "most of the money people lose to \"crypto\" goes to those.",
+        "What makes something a scam is the offer, not the coin: a guaranteed return, pressure "
+        "to buy now or recruit friends, or someone else holding your money for you.",
+        "And even the real coins are very risky: Bitcoin fell about 77% from its November 2021 "
+        "high to its November 2022 low. A fair answer to give back: \"it's not all a scam, but "
+        "it can lose most of its value\".")),
+    (re.compile(r"\bwhat(?:'?s|\s+is|\s+does)\s+(?:a\s+|an?\s+)?(?:short|shorting|short\s+"
+                r"(?:sell(?:ing)?|position))(?:\s+mean)?\s*[?.!]*\s*$|\bwhat\s+does\s+(?:it\s+mean\s+"
+                r"to\s+)?(?:go(?:ing)?\s+)?short\b|\bhow\s+(?:does|do)\s+(?:shorting|a\s+short)\s+"
+                r"work\b|\bexplain\s+(?:shorting|short\s+selling|going\s+short)\b", re.I), (
+        "Bottom line: a short is a bet that the price falls — you sell first and buy back later; "
+        "if the price has dropped, you keep the difference.",
+        "On Bitget it is done with perpetual futures: open a short, and it gains as the price "
+        "falls and loses as it rises.",
+        "The risk is the reverse of buying: a price can rise without limit, so a short with "
+        "leverage can be liquidated by a sharp jump. Ask \"what is liquidation\" next.")),
+    (re.compile(r"\b(?:explain|describe)\s+(?:leverage|margin|liquidation)\b[^?]{0,40}\b(?:pizza|"
+                r"food|cake|burgers?|like\s+i'?m\s+(?:5|five)|simple\s+analogy)\b", re.I), (
+        "Bottom line: leverage with pizza — you have $10, borrow $40, and buy $50 of pizza to "
+        "resell. That is 5x: you control five times the money you put in.",
+        "If pizza prices rise 10%, you sell for $55, repay the $40 and keep $15 — a 50% gain on "
+        "your $10. If they fall 20% to $40, repaying the $40 leaves you nothing: your $10 is "
+        "gone.",
+        "On an exchange that last part is liquidation — it closes the position for you before "
+        "the loss can eat into the borrowed part. Leverage multiplies wins and losses alike.")),
+    (re.compile(r"\bnever\s+(?:traded|invested|bought)\b[^?]{0,50}\b(?:where|how)\s+(?:do\s+i|to|"
+                r"should\s+i)\s+(?:even\s+)?(?:begin|start)\b|\b(?:where|how)\s+do\s+i\s+even\s+"
+                r"(?:begin|start)\b", re.I), (
+        "Bottom line: begin by learning with no money at risk — ask this console what a coin did "
+        "in its worst week, what a perpetual is, what liquidation is — then, if you go ahead, "
+        "start small on the spot market, where the most you can lose is what you paid.",
+        "The steps on Bitget: open an account, verify your identity (you must be 18 or older), "
+        "add a small amount, and buy on spot — no futures, no leverage.",
+        "Decide the size before you buy: ask \"how much could I lose on BTC in a bad week with "
+        "$100\" with the amount you have in mind.")),
+    (re.compile(r"\b(?:which|what)\s+coins?\s+(?:should|do|would|can)\s+(?:a\s+)?(?:total\s+|"
+                r"complete\s+)?(?:beginner|newbie|noob|new\s+person|i)\s+(?:even\s+)?(?:look\s+at|"
+                r"start\s+with|buy|pick|get)\b|\bbest\s+coins?\s+for\s+(?:a\s+)?(?:beginners?|"
+                r"newbies?)\b", re.I), (
+        "Bottom line: no pick from here — but most beginners who start look at the two largest, "
+        "Bitcoin and Ether, because they have the deepest markets and the longest histories.",
+        "Largest does not mean safe: Bitcoin fell about 77% from its November 2021 high to its "
+        "November 2022 low, and Ether fell further. Small coins have fallen 90% or more and many "
+        "never came back.",
+        "Ask \"how much could I lose on BTC in a bad week with $100\" for any name you are "
+        "considering, before you buy it.")),
+    (re.compile(r"\bhow\s+do\s+i\s+(?:actually\s+|even\s+|really\s+)?know\s+when\s+to\s+"
+                r"(?:buy|sell|get\s+in)\b|\bwhen\s+(?:is|'?s)\s+the\s+(?:right|best)\s+time\s+to\s+"
+                r"buy\b", re.I), (
+        "Bottom line: nobody knows the right moment in advance, and anyone who says they do is "
+        "guessing or selling something — so the useful question is how you will buy, not when.",
+        "Two plain approaches: buy a fixed amount on a schedule (every week or month), or write "
+        "down a rule before you buy (\"after a 10% fall\") and follow it, instead of deciding "
+        "on the day.",
+        "To see what a rule has done before, ask \"what happened after BTC fell 10% in a "
+        "week\" — that is past behaviour, not a promise.")),
+    (re.compile(r"\b(?:i\s+think\s+)?(?:i'?m|im|i\s+am)\s+ready\b[^?]{0,30}\b(?:first\s+step|"
+                r"what\s+(?:now|next|do\s+i\s+do))\b", re.I), (
+        "Bottom line: the first step is the account: open one on Bitget, verify your identity "
+        "(18 or older), and switch on two-factor login before you add money.",
+        "Then add only an amount you could lose in full, buy on spot (not futures), and write "
+        "down why you bought and the price at which you would sell.",
+        "Ask \"how much could I lose on BTC in a bad week with $X\" with your amount first.")),
+    (re.compile(r"\b(?:use|borrow|on|through|with)\s+(?:my\s+)?(?:mom'?s|mum'?s|dad'?s|"
+                r"parents?'?|mother'?s|father'?s|brother'?s|sister'?s|friend'?s|someone\s+"
+                r"else'?s)\s+(?:bitget\s+|exchange\s+)?account\b", re.I), (
+        "Bottom line: no — Bitget's terms say an account is used only by the person it belongs "
+        "to, not on behalf of anyone else (Terms of Use, 5.2), and that it is for adults 18 or "
+        "older (2.2).",
+        "Breaking that can get the account frozen, money included, and legally every coin in "
+        "it is your parent's, not yours.",
+        "What you can do now, free: ask this console how any coin has behaved — its worst week, "
+        "what leverage does — and keep your own money until you can open your own account.")),
+    # a bare "fomo" is left to the FOMO-and-rekt answers already here (round 34)
+    (re.compile(r"\b(?:scared|afraid|worried)\s+of\s+missing\s+out\b|\beveryone\s+"
+                r"(?:at\s+school\s+)?(?:is\s+)?(?:talks?|talking)\s+about\s+(?:crypto|bitcoin)\b|"
+                r"\bfriends?\b[^?]{0,40}\btalk\w*\s+about\s+(?:crypto|bitcoin)\b", re.I), (
+        "Bottom line: the fear of missing out is the feeling markets use against beginners — "
+        "by the time everyone around you is talking about a coin, it has usually already risen.",
+        "There is no last train: Bitcoin has been around since 2009 and will still be there "
+        "next year; what you can actually miss by waiting is a few weeks of gains, and what you "
+        "can avoid is buying at a top.",
+        "Learning costs nothing: ask what a coin did in its worst week, or what leverage does, "
+        "and decide later with your own money and your own reasons.")),
+    (re.compile(r"\b(?:youngest|minimum|min)\s+age\b[^?]{0,40}\b(?:trad\w*|invest\w*|crypto|"
+                r"bitget|start)\b|\bhow\s+old\s+(?:do\s+)?(?:you|i)\s+(?:have\s+to|need\s+to|must)"
+                r"\s+be\b", re.I), (
+        "Bottom line: on Bitget the youngest age to start trading is 18 — its terms require every "
+        "individual user to be at least 18 (Terms of Use, 2.2), and most exchanges and brokers "
+        "set the same age.",
+        "Before 18, investing is possible in other ways: in many countries a parent can open a "
+        "custodial account for a child at a regular broker, which the parent controls until the "
+        "child comes of age.",
+        "Learning needs no account: ask this console what a coin did in its worst week, or "
+        "what a perpetual is.")),
+    (re.compile(r"\bhow\s+much\s+(?:would|do|should)\s+i\s+(?:actually\s+)?(?:need\s+to\s+)?save"
+                r"\b[^?]{0,40}\b(?:month|week)\b[^?]{0,60}\bdown\s*payment\b", re.I), (
+        "Bottom line: divide the deposit by the months you have: 20% of a $300,000 home is "
+        "$60,000, and over 24 months that is $2,500 a month; for a $400,000 home it is $80,000, "
+        "about $3,333 a month.",
+        "Money saved in an insured savings account or short-term government bills earns a "
+        "little on top, which lowers that monthly figure slightly; money put in crypto could "
+        "fall a third or more in the meantime.",
+        "Say the price of the home and the months you have, and the same sum gives your own "
+        "monthly figure. Closing costs come on top of the deposit.")),
+    (re.compile(r"\b(?:is\s+it\s+)?safe\s+to\s+(?:put|keep|store|leave)\s+(?:my\s+)?(?:savings|"
+                r"life\s+savings|money|ipon)\s+(?:here|in\s+(?:here|this|crypto|bitget)|on\s+"
+                r"(?:here|bitget))\b", re.I), (
+        "Bottom line: savings — money you would need back — should not be put into crypto "
+        "trading. Prices here can fall a third in a week, and Bitget is an exchange, not an "
+        "insured bank.",
+        "If you do put money in, use only what you could lose in full, keep it on spot without "
+        "leverage, and keep the savings themselves in an insured bank account.",
+        "Ask \"how much could I lose on BTC in a bad week with $X\" with the amount you are "
+        "thinking of, to see it in your own money.")),
+    (re.compile(r"\b(?:is\s+it\s+)?safe\s+to\s+(?:use|start\s+with|learn\s+with|try\s+with)\s+"
+                r"(?:a\s+)?(?:small|little|tiny)\s+(?:amount|money|sum)\b|\bsmall\s+(?:amount\s+of\s+)?"
+                r"money\s+to\s+learn\b", re.I), (
+        "Bottom line: yes, a small amount you could lose in full is the sensible way to learn — "
+        "the lessons are real and the cost is capped.",
+        "Keep it on the spot market, where the most you can lose is what you put in, and avoid "
+        "futures and leverage until you know exactly how liquidation works.",
+        "Fees matter more on small sums: on Bitget spot a trade costs about 0.1% a side, so "
+        "buying and selling often eats into a small balance fastest.")),
     (re.compile(r"\b(?:get|put|move|send|transfer|deposit|add|load)\s+(?:my\s+)?(?:money|cash|"
                 r"funds|dollars|rupees|euros)\s+(?:on(?:to)?|in(?:to)?|to)\s+(?:bitget|the\s+"
                 r"exchange|(?:my\s+)?(?:bitget\s+)?account)\b|\bhow\s+(?:do\s+i|to|can\s+i)\s+"

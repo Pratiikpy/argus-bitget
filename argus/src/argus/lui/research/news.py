@@ -138,6 +138,75 @@ def _tone_lines(kept: Sequence[Any], ticker: str, tone: str,
                    "scored": len(scored)}
 
 
+_ITEM_HEAD = re.compile(r"^Item\s+\d\.\d\d\b", re.I)
+_DEFINED = re.compile(r"\s*\((?:the\s+)?“[^”]{1,40}”\)")
+_SENTENCE_END = re.compile(r"(?<=[a-z0-9)”])\.\s+(?=[A-Z])")
+
+
+def _what_it_says(ticker: str, accession: str) -> str | None:
+    """The first sentence under the 8-K's first item heading, defined-term brackets removed.
+
+    "AMD filed an 8-K (3.02 unregistered equity sale)" named the form's label and never what
+    happened: the same sentence of the filing says AMD is acquiring World Labs for about $8.2bn in
+    stock (round 39 judge, M-5). The label is the SEC's category; the first sentence under it is
+    the event. Only the filing the 8-K line names is read — matched by accession — so a newer
+    8-K cannot be quoted under an older one's date.
+    """
+    from argus.research.document_qa import EdgarDocuments
+
+    try:
+        read = EdgarDocuments().event_text(ticker, accession)
+    except Exception:
+        return None
+    if read is None:
+        return None
+    body, exhibit = read
+    lines = body.split("\n")
+    said = None
+    for i, line in enumerate(lines):
+        if _ITEM_HEAD.match(line):
+            # a heading's title can run onto its own long line ("Departure of Directors or
+            # Certain Officers; ...") and a title is capitalised word by word, where prose is not
+            said = next((_first_sentence(p) for p in lines[i + 1:i + 6]
+                         if len(p) > 80 and not _ITEM_HEAD.match(p) and not _is_title(p)), None)
+            break
+    # "Tesla published the press release attached as Exhibit 99.1" is the form's wrapper, not the
+    # news: the exhibit's own headline and opening sentence are.
+    if exhibit is not None and (said is None or _WRAPPER.search(said)):
+        rest = exhibit.split("\n")
+        at = next((k for k, x in enumerate(rest) if x.strip().lower() == "exhibit 99.1"), -1)
+        rest = [x for x in rest[at + 1:] if x.strip()]
+        opening = next((_first_sentence(p) for p in rest[1:8] if len(p) > 80), None)
+        if rest and opening:
+            said = f"{rest[0].rstrip('.')}: {opening}"
+    if said is None:
+        return None
+    return said if len(said) <= 420 else said[:417].rsplit(" ", 1)[0] + "…"
+
+
+_WRAPPER = re.compile(r"press release|exhibit 99", re.I)
+_ABBREVIATED = re.compile(r"\b(Inc|Corp|Co|Ltd|Corporation|N\.V|S\.A|plc)\.(?=\s)")
+
+
+def _is_title(line: str) -> bool:
+    words = [w for w in re.findall(r"[A-Za-z]+", line) if len(w) > 3]
+    return bool(words) and sum(w[0].isupper() for w in words) / len(words) > 0.6
+
+
+def _first_sentence(paragraph: str) -> str:
+    """The paragraph's first sentence, with the filing's defined-term brackets removed and a
+    company suffix ("Inc.") not taken for the sentence's end."""
+    text = _DEFINED.sub("", paragraph).replace("..", ".")
+    text = _ABBREVIATED.sub(lambda m: m.group(1) + "\x00", text)
+    text = re.sub(r"\s+\.(?=\s|$)", ".", text)
+    # a paragraph the HTML split mid-sentence opens on the tail of a bracket ("Form 8-K”)."):
+    # the first sentence whose brackets and quotes balance is the first whole one
+    sentences = _SENTENCE_END.split(text)
+    first = next((x for x in sentences if x.count("(") == x.count(")")
+                  and x.count("“") == x.count("”")), sentences[0]).rstrip(".")
+    return first.replace("\x00", ".")
+
+
 def _news(symbol: str, is_open: Any,
           tone: str | None = None) -> tuple[list[str], list[Source], dict[str, Any]]:
     """Headlines that name ``symbol``, its SEC filings this week, and its 24-hour move split into
@@ -164,8 +233,11 @@ def _news(symbol: str, is_open: Any,
     with ContextPool(max_workers=len(feeds) + 2) as pool:
         pending = [pool.submit(read, item) for item in feeds.items()]
         tickers_job = pool.submit(fetch_tickers)
+        # EDGAR dates a filing by day, so the window opens at midnight: an 8-K dated 28 Sep is
+        # inside "the last 7 days" all through 5 Oct, not dropped at the hour it was read
         filings_job = None if not files_with_sec else pool.submit(lambda: EdgarSource().filings(
-                ticker, since=now - _td(days=FILING_LOOKBACK_DAYS)))
+                ticker, since=(now - _td(days=FILING_LOOKBACK_DAYS)).replace(
+                    hour=0, minute=0, second=0, microsecond=0)))
         # bitget-signal's news-briefing Skill is asked beside the feeds read here, and the
         # receipt says which of the two the headlines came from (audit finding 109).
         skill_job = pool.submit(skill_route, "news_feed", "latest",
@@ -216,8 +288,10 @@ def _news(symbol: str, is_open: Any,
         lines.append(lead + split)
     if events:
         f = events[0]
+        said = _what_it_says(ticker, f.accession)
         lines.insert(0, f"Bottom line: {ticker} filed an 8-K on {f.filed:%d %b} ({f.item_summary}) "
-                        f"— a company event is on the record; read it before trading the move.")
+                        + (f"— it says: “{said}”" if said else
+                           "— a company event is on the record; read it before trading the move."))
     elif not market and kept:
         count = "1 headline names" if len(kept) == 1 else f"{len(kept)} headlines name"
         lines.insert(0, f"Bottom line: {count} {ticker} in {NEWS_LOOKBACK_HOURS}h"

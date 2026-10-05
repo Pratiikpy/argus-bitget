@@ -29,7 +29,9 @@ from typing import Final
 from argus.lui.trace import trace_module
 
 ROTATION: Final = re.compile(
-    r"\brotat\w*\b[^?]{0,80}\b(?:semi\w*|chip\w*|software|tech|sector)\b|\b(?:semi\w*|chip\w*)\b"
+    # semis or software named: "rotating out of tech and into energy or financials" got this
+    # semis-vs-software answer (round 39 judge, C-4) and belongs to `sector_rotation`
+    r"\brotat\w*\b[^?]{0,80}\b(?:semi\w*|chip\w*|software)\b|\b(?:semi\w*|chip\w*)\b"
     r"[^?]{0,60}\b(?:weaker|stronger|lagging|leading|outperform\w*|underperform\w*|losing\s+to|"
     r"beating|winning\s+against|trailing|ahead\s+of|behind)\b[^?]{0,40}"
     r"\bsoftware\b|\bsoftware\b[^?]{0,60}\b(?:weaker|stronger|lagging|leading|outperform\w*|"

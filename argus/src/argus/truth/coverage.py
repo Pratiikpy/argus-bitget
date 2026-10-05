@@ -120,6 +120,15 @@ class Record:
 _current: contextvars.ContextVar[Record | None] = contextvars.ContextVar("coverage", default=None)
 
 
+def noted(source: str, ok: bool) -> None:
+    """Record a source's answer on the current recording, if one is open: a Skill read through a
+    routed job that the HTTP observer does not see by name (round 39 judge, m-2: the answer cited
+    crypto_derivatives while its data line said bitget-signal had not answered)."""
+    record = _current.get()
+    if record is not None:
+        record.note(source, ok)
+
+
 @contextmanager
 def recording() -> Iterator[Record]:
     record = Record(parent=_current.get())
