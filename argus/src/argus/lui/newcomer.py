@@ -797,6 +797,225 @@ _FIRST: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
         "Savings are money you need back; if you want exposure, a small amount in the shares or "
         "the perpetual without leverage caps the loss at what you put in. Ask \"how much could I "
         "lose on NVDA in a bad week with $X\" with an amount you could lose in full.")),
+    # Round 41, a first-time user (round41_newcomer.md): each refused, misread as a ticker, or
+    # answered with something else.
+    (re.compile(r"\border\s*book\b|\bcarnet\s+d'?ordres\b|\bred\s+and\s+green\s+numbers\b", re.I), (
+        "Bottom line: the order book is the live list of everyone's waiting orders: green rows "
+        "are buyers (bids, the prices people will pay) and red rows are sellers (asks, the "
+        "prices people will sell at).",
+        "The gap between the best bid and the best ask is the spread; a market order takes the "
+        "best price on the other side straight away, and a big one eats through several rows.",
+        "Thick rows near the price mean you can trade a size without moving it much; thin ones "
+        "mean a big order pushes the price — ask \"how deep is the BTC order book\" for Bitget's "
+        "live book.")),
+    (re.compile(r"\bwhich\s+side\b[^?]{0,30}\b(?:buyers?|sellers?|bids?|asks?)\b|\b(?:buyers?|sellers?)"
+                r"\s+(?:side|are\s+(?:green|red))\b", re.I), (
+        "Bottom line: buyers are the bids — usually green, below the price — and sellers are the "
+        "asks — usually red, above it.",
+        "The price you see is where the best bid and best ask meet; when you buy at market you "
+        "take from the red (ask) side.")),
+    (re.compile(r"\bfdv\b|\bfully\s+diluted\b|\bmarket\s*cap\b[^?]{0,40}\b(?:vs\.?|versus|or)\b[^?]{0,20}"
+                r"\b(?:fdv|diluted)\b", re.I), (
+        "Bottom line: both are real, they count different things — market cap is the price times "
+        "the coins in circulation now; FDV (fully diluted value) is the price times every coin "
+        "that will ever exist.",
+        "A big gap (2B against 10B) means most coins are not out yet: as they unlock to the team, "
+        "investors or rewards, new supply arrives, and unlocks often weigh on the price.",
+        "Check the unlock schedule before buying; a coin whose FDV is several times its market "
+        "cap has a lot of selling still to come.")),
+    (re.compile(r"\b(?:low|small|tiny)\s+market\s*cap\b[^?]{0,30}\b(?:good|better|bad)\b|\bis\s+low\s+"
+                r"(?:market\s*)?cap\s+good\b", re.I), (
+        "Bottom line: not by itself — a low market cap means a small coin, which can rise faster "
+        "but also falls harder, trades thinly and fails more often.",
+        "Small coins are where most rug pulls and abandoned projects sit; a low price or a low "
+        "cap is not \"cheap\", it is smaller and riskier.",
+        "If you look at one, check its trading volume, its unlocks (FDV against market cap) and "
+        "who holds most of it.")),
+    (re.compile(r"\b(?:stablecoin|usdc|usdt)\s+(?:de-?pegs?|loses?\s+(?:its\s+)?peg)\b[^?]{0,40}\b(?:get|"
+                r"take|withdraw|sell)\b|\bde-?peg\w*\b[^?]{0,40}\b(?:get\s+my\s+money|withdraw|"
+                r"cash\s+out)\b", re.I), (
+        "Bottom line: yes, you can get your money out of a stablecoin that depegs by selling it — "
+        "but at the market price, so if it trades at $0.95 you get $0.95, not $1; the $1 "
+        "redemption is with the issuer, and that is open to large institutions, not to retail "
+        "accounts.",
+        "On Bitget you would swap it for another coin or sell it; withdrawals of the coin itself "
+        "usually keep working, but where you send it does not change its price.",
+        "Holding some money outside any one stablecoin means one depeg is not all of it.")),
+    (re.compile(r"\b(?:keeps?|kept)\s+(?:dipping|falling|dropping|going\s+down)\b[^?]{0,40}\b(?:buy\s+"
+                r"more|add)\b|\bshould\s+i\s+buy\s+the\s+dip\b|\bbuy\s+the\s+dip\b", re.I), (
+        "Bottom line: no call on whether to buy — \"buying the dip\" works only when the fall "
+        "turns out to be temporary, and nobody knows that in the moment; a dip can keep dipping "
+        "for months.",
+        "If you buy more, you lower your average price but raise how much you have on a bet "
+        "that is going against you — decide the total you could lose in full before adding, "
+        "and never add with leverage.",
+        "Ask \"how much could I lose on BTC in a bad month with $X\" with the total you would "
+        "hold after buying.")),
+    (re.compile(r"\bhow\s+(?:do|does)\s+withdraw\w*\s+work\b|\bhow\s+(?:do\s+i|to)\s+(?:withdraw|send)"
+                r"\b[^?]{0,40}\b(?:coins?|crypto|wallet)\b", re.I), (
+        "Bottom line: on Bitget, go to Assets, choose Withdraw, pick the coin, then the network, "
+        "paste your wallet's address for that same network, enter the amount, and confirm with "
+        "your security checks.",
+        "The network you pick must be one your wallet supports for that coin — the wallet shows "
+        "which; a small network fee is taken from the amount.",
+        "Send a small test amount first, check it arrives, then send the rest; a crypto transfer "
+        "cannot be reversed.")),
+    # before sending ("what if I pick the wrong network"); a transfer already sent ("i sent my
+    # usdt on the wrong network, is it gone") is the round-33 entry's, further down
+    (re.compile(r"\b(?:what\s+(?:happens\s+)?if|if)\s+(?:i|you)\s+(?:choose|pick|select|use|send\s+on)\s+(?:the\s+)?wrong\s+"
+                r"network\b|\b(?:choosing|picking|selecting)\s+(?:the\s+)?wrong\s+network\b",
+                re.I), (
+        "Bottom line: coins sent on a network the receiving address does not support can be "
+        "lost — sometimes they are recoverable by the receiving platform's support, for a fee and "
+        "after a wait, and sometimes not at all.",
+        "If you sent to an exchange, contact its support at once with the transaction hash; if "
+        "you sent to your own wallet on an EVM network (Ethereum, BSC, Arbitrum and the like) the "
+        "same address often works there and the coins can be reached by adding that network.",
+        "Before sending: the network chosen on Bitget must match the one shown by the wallet "
+        "you are sending to, and a small test transfer catches the mistake cheaply.")),
+    (re.compile(r"\b(?:what(?:'?s|\s+is)\s+(?:a\s+)?)?dca\s+bots?\b|\bauto[\s-]?invest\b", re.I), (
+        "Bottom line: a DCA bot buys a fixed amount of a coin on a schedule for you — say $20 of "
+        "BTC every week — so no single day's price decides your whole entry.",
+        "Exchanges, Bitget included, offer bots of this kind; they do not predict anything, they "
+        "only automate the buying, and they keep buying when the price falls.",
+        "Set an amount you could lose in full, and a stop for the whole plan, before you start "
+        "one.")),
+    (re.compile(r"\bgrid\s+bots?\b", re.I), (
+        "Bottom line: a grid bot places buy orders below the price and sell orders above it at "
+        "fixed steps, earning a little each time the price swings between them — not free money: "
+        "it only works while the price stays inside the range.",
+        "If the price falls out of the bottom, it is left holding coins bought on the way down; "
+        "if it breaks out of the top, it has sold early and misses the rise. Fees are paid on "
+        "every fill.",
+        "Pick the range and the amount as if the price could leave the range tomorrow.")),
+    (re.compile(r"\b(?:trader|person|leader)\s+(?:i|you)\s+cop(?:y|ied)\b[^?]{0,40}\b(?:blows?\s+up|"
+                r"loses?|liquidat\w*|crash\w*)\b|\bcopy\s+trad\w*\b[^?]{0,30}\b(?:safe|easy)\b",
+                re.I), (
+        "Bottom line: their losses become yours, in proportion — copy trading copies every trade, "
+        "the bad ones included, and a trader who blows up their account takes the copied money "
+        "down with it.",
+        "Protect yourself in the copy settings: copy a fixed amount you could lose, set a stop "
+        "or maximum loss for the copy, and avoid traders using high leverage.",
+        "A good record over a few weeks is often luck; look for months of history, the worst "
+        "drawdown, and how many followers lost money, not the top return.")),
+    (re.compile(r"\bhow\s+(?:do\s+i|to|can\s+i)\s+(?:spot|tell|avoid|check|detect|recogni[sz]e)\b[^?]{0,30}"
+                r"\b(?:rug|one|scam)\b|\brug\s*pull\s+ne\s+demek\b|"
+                r"\bnas[ıi]l\s+anlar[ıi]m\b", re.I), (  # noqa: RUF001
+        "Bottom line: check before buying — who the team is (named and known, or anonymous), "
+        "whether the trading liquidity is locked, whether the contract lets its owner change fees "
+        "or block selling, and whether a few wallets hold most of the supply.",
+        "Red flags: a coin only days old, promised returns, pressure to buy now, liquidity that "
+        "can be pulled, and selling that fails in small tests (a honeypot).",
+        "Contract checkers such as token scanners on block explorers flag the owner powers; "
+        "buying only coins listed on a major exchange removes most of the risk, though not all.")),
+    (re.compile(r"\b(?:bars|columns)\s+at\s+the\s+bottom\b|\bvolume\s+bars?\b", re.I), (
+        "Bottom line: those bars are volume — how much traded in each candle's time period; a "
+        "tall bar means a lot changed hands.",
+        "They are usually coloured like the candle above them: green when the price closed up "
+        "for that period, red when it closed down.",
+        "Volume says how much conviction is behind a move: a price move on high volume is backed "
+        "by more trading than the same move on thin volume.")),
+    (re.compile(r"\bvolume\s+(?:is\s+)?(?:high|huge|big|spik\w*)\b[^?]{0,40}\bprice\s+(?:dropp?\w*|fell|"
+                r"falls?|down)\b|\bhigh\s+volume\b[^?]{0,30}\b(?:drop|dump|fall)\b", re.I), (
+        "Bottom line: a lot of people were selling hard — high volume on a falling price means "
+        "the drop had many sellers behind it, not just a thin market drifting.",
+        "Sometimes that is the start of a bigger fall; sometimes it is a washout where the last "
+        "sellers give up and the price steadies. Volume alone does not tell which.",
+        "Read it with what comes next: whether the price holds over the following days, and on "
+        "what volume.")),
+    (re.compile(r"^\W*(?:what(?:'?s|\s+is)\s+(?:a\s+)?)?(?:max(?:imum)?\s+)?"
+                r"draw\s*-?downs?\W*$", re.I), (
+        "Bottom line: drawdown is how far something falls from its last high before it recovers "
+        "— if a coin goes from $100 to $60, that is a 40% drawdown.",
+        "The maximum drawdown is the worst such fall in a period, and it is the number that says "
+        "what holding it actually felt like.",
+        "Ask \"what was BTC's worst drawdown in the last year\" for a live figure.")),
+    (re.compile(r"\bwhy\b[^?]{0,40}\bnot\s+(?:financial\s+)?advice\b|\bnot\s+advice\b[^?]{0,40}\b"
+                r"useless\b", re.I), (
+        "Bottom line: because it does not know your money, your timeline or your limits — so it "
+        "measures and does not tell you what to do; advice is a judgement about your situation.",
+        "What it is useful for is the measuring: how far something has fallen before, what a "
+        "trade would cost, how risky your mix is, what the filings say — each with its source.",
+        "The decision stays yours, with the numbers in front of you.")),
+    (re.compile(r"\b(?:college|university|education|tuition)\b[^?]{0,80}\b(?:bitcoin|btc|crypto)\b|"
+                r"\b(?:bitcoin|btc|crypto)\b[^?]{0,80}\b(?:college|university|education|tuition)\b",
+                re.I), (
+        "Bottom line: money with a date on it — college in 12 years — should not depend on "
+        "crypto: Bitcoin has fallen more than 70% from a high several times and taken years to "
+        "come back, and the bill comes on its date either way.",
+        "Twelve years is long enough for broad, diversified investing; in the US a 529 plan is "
+        "built for exactly this and is tax-advantaged. Crypto, if any, would be a small slice you "
+        "could lose without missing the goal.",
+        "Not advice — a licensed adviser who knows your whole situation should set the mix.")),
+    (re.compile(r"\bhow\s+much\b[^?]{0,40}\b(?:should\s+be|in)\s+crypto\b|\bwhat\s+percent\w*\b[^?]{0,40}"
+                r"\bcrypto\b|\bpercent\w*\s+(?:of\s+)?(?:my\s+)?(?:savings|portfolio|money)\b[^?]{0,30}"
+                r"\bcrypto\b", re.I), (
+        "Bottom line: no number fits everyone, but where large managers have put one, it is "
+        "small — BlackRock's research in December 2024 suggested about 1% to 2% for bitcoin in a "
+        "portfolio.",
+        "The rule behind it: crypto can fall more than 70%, so the share should be one you could "
+        "lose most of without changing your plans.",
+        "Not advice — the right share depends on your goals and timeline.")),
+    (re.compile(r"\bgambl\w*\b[^?]{0,80}\b(?:quit|stop|trying|addict\w*|problem)\b|\b(?:quit|stop)\w*\s+"
+                r"gambl\w*\b", re.I), (
+        "Bottom line: then trading may not be safe for you right now — short-term trading and "
+        "gambling feel alike because the rush is the same, and that pull is exactly what you are "
+        "trying to step away from.",
+        "Free, confidential help: in the US the National Problem Gambling Helpline, "
+        "1-800-GAMBLER; in the UK the National Gambling Helpline (GamCare), 0808 8020 133. Many "
+        "exchanges also let you limit or lock your own account.",
+        "If you want to learn about markets, you can do it here with no money at risk.")),
+    (re.compile(r"\bponzi\b|\bpyramid\s+scheme\b", re.I), (
+        "Bottom line: Bitcoin itself is not a Ponzi scheme by definition — a Ponzi has an "
+        "operator paying earlier investors with new investors' money, and Bitcoin has no operator "
+        "and pays no returns; its price is simply what buyers will pay.",
+        "But many crypto products have been Ponzis — promised fixed returns paid from new "
+        "deposits (BitConnect, for one) — and the price of any coin can fall a long way when "
+        "buyers dry up.",
+        "The honest middle: a real, open network whose price is driven by demand and is very "
+        "volatile; anything promising a guaranteed return on top of it is the part to fear.")),
+    (re.compile(r"\b(?:what\s+(?:mean|means|is|is\s+the\s+meaning\s+of)|meaning\s+of)\s+liquidity\b|"
+                r"\bliquidity\b[^?]{0,30}\bsimple\b", re.I), (
+        "Bottom line: liquidity means how easy it is to buy or sell quickly without the price "
+        "moving.",
+        "Bitcoin has high liquidity: many people trade it all the time, so you get a fair price "
+        "at once. A tiny coin has low liquidity: few buyers, so selling can push the price down.",
+        "More liquidity is safer for you.")),
+    (re.compile(r"\bapa\s+itu\s+stablecoin\b|\bwhat\s+(?:is|are)\s+(?:a\s+)?stablecoins?\b[^?]{0,40}\b"
+                r"(?:safe|save|saving)\b", re.I), (
+        "Bottom line: a stablecoin is a crypto token built to stay worth one US dollar, such as "
+        "USDT or USDC — it does not rise in value, it is a dollar stand-in on the blockchain.",
+        "For saving it is steadier than other coins, but it is a promise by a company, not "
+        "insured money in a bank: USDC fell to about $0.88 in March 2023 before recovering.",
+        "Keep savings mostly in an insured bank; a stablecoin is fine for money you are about to "
+        "trade.")),
+    (re.compile(r"\b(?:cara|how\s+(?:do\s+i|to))\s+(?:beli|buy)\s+(?:bitcoin|btc)\b[^?]{0,30}\b(?:pertama|"
+                r"first)\b|\bcrypto\s+me\s+paisa\s+kaise\b|\bpaisa\s+kaise\s+lagaye\b", re.I), (
+        "Bottom line: the first purchase on Bitget is: open an account, verify your identity "
+        "(18 or older), add a small amount, then buy BTC on the spot market — no futures, no "
+        "leverage.",
+        "Start with an amount you could lose without it hurting; on spot the most you can lose "
+        "is what you paid.",
+        "Ask \"how much could I lose on BTC in a bad week with $100\" with your own amount before "
+        "you buy.")),
+    (re.compile(r"\bhangi\s+coin\b", re.I), (
+        "Bottom line: no pick from here — but most beginners start with the two largest, Bitcoin "
+        "and Ether, because they have the deepest markets and the longest histories.",
+        "Largest does not mean safe: Bitcoin fell about 77% from November 2021 to November 2022.",
+        "Ask \"how much could I lose on BTC in a bad week with $100\" for any coin you consider.")),
+    # "If I follow your signals exactly for 12 months, what is the minimum monthly return I can
+    # count on?" got the desk's record and never the answer, which is none (round 41 hostile, M11)
+    (re.compile(r"\b(?:minimum|guaranteed|assured|safe|certain)\s+(?:monthly\s+|yearly\s+|annual\s+)?"
+                r"(?:return|profit|income|gain)s?\b|\b(?:return|profit)\b[^?]{0,30}\bcount\s+on\b",
+                re.I), (
+        "Bottom line: none — no return is guaranteed, from this console or anyone; a minimum "
+        "that can be counted on does not exist in trading, and anyone promising one is selling "
+        "something.",
+        "This console also gives no buy or sell signals to follow: it measures risk and records "
+        "its own paper decisions, and its record is public — ask \"what is your track record\" "
+        "for it, losses included.",
+        "What can be stated is the range of what has happened: ask \"how much could I lose on "
+        "BTC in a bad month with $X\" for the downside in your own money.")),
     # Round 40, a first-time user, second half (round40_newcomer.md #9, #24, #31-#36, #39)
     (re.compile(r"\b(?:got|been|was|just\s+got)\s+liquidated\b|\bliquidated\b[^?]{0,80}\b(?:lost|"
                 r"what\s+(?:even\s+)?happened|everything)\b", re.I), (
@@ -1550,7 +1769,8 @@ _PLAIN: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
         "thing that matters most.")),
     # "oh no i think i sent my usdt using the wrong network to my other wallet, is it gone"
     # was refused outright (a first-time user, round 33)
-    (re.compile(r"\bsent\s+(?:my\s+)?(?:usdt|usdc|crypto|coins?|btc|eth)\s+(?:using\s+|on\s+)?"
+    (re.compile(r"\b(?:used|chose|picked|selected)\s+(?:the\s+)?wrong\s+network\b|"
+                r"\bsent\s+(?:my\s+)?(?:usdt|usdc|crypto|coins?|btc|eth)\s+(?:using\s+|on\s+)?"
                 r"(?:the\s+)?wrong\s+network\b|\bwrong\s+network\b[^?]{0,40}\b(?:sent|send|"
                 r"gone|lost)\b", re.I), (
         "Bottom line: not always gone — it depends on whether the address you sent to also "
@@ -2741,6 +2961,10 @@ _ALSO: Final = re.compile(r"[,.;]?\s*\b(?:and\s+)?also\b|,\s*and\s+(?=(?:is|are|
 
 def first_reply(text: str) -> list[str] | None:
     """The answer to one of :data:`_FIRST`, or None."""
+    from argus.lui.research import staking
+
+    if staking.asks(text):
+        return None
     for asked, answer in _FIRST:
         if asked.search(text):
             return list(_lead_by_question(text, answer))
@@ -2770,8 +2994,13 @@ def _reply_one(text: str, *, named: bool = False) -> Reply | None:
     could go wrong with NVDA", "is now a good time to buy TSLA") are that name's engines' to
     answer, and only their nameless forms are taken here (the round-8 first-user audit,
     2026-09-30: all five nameless forms were declined)."""
+    from argus.lui.research import staking
     from argus.lui.research.sizing import stated_capital
 
+    if staking.asks(text):
+        # "what is the total ETH staked?" is a figure read from the chain, not the Earn lock-up
+        # explainer it got (round 41 judge, C3)
+        return None
     bot_return = _scam_return_lines(text)
     if bot_return is not None:
         return Reply(lines=bot_return)

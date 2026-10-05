@@ -263,7 +263,9 @@ def _versus_estimates(ticker: str) -> tuple[str, Source] | None:
     last = max(dated, key=lambda r: raw(r["quarter"]))
     actual, estimate = float(raw(last["epsActual"])), float(raw(last["epsEstimate"]))
     when = datetime.fromtimestamp(int(raw(last["quarter"])), UTC).date()
-    gap = (actual / estimate - 1.0) if estimate else None
+    # measured against the size of the estimate: a loss of 1.36 against an expected 0.23 is a
+    # miss of 491%, which actual / estimate - 1 printed as "below it, by +487.5%" (round 41, m1)
+    gap = (actual - estimate) / abs(estimate) if estimate else None
     verdict = ("in line with" if gap is not None and abs(gap) < 0.01 else
                "above" if actual > estimate else "below")
     # Yahoo's figure is the adjusted EPS analysts forecast, dated to the calendar month's end; the
@@ -286,7 +288,7 @@ def _versus_estimates(ticker: str) -> tuple[str, Source] | None:
                        "filing's other-income and tax lines before extrapolating it.")
     return (f"Against analysts: the fiscal quarter Yahoo dates {when.isoformat()} reported "
             f"adjusted EPS {actual:.2f} against a consensus of {estimate:.2f} — {verdict} it"
-            + (f", by {gap:+.1%}" if gap is not None and verdict != "in line with" else "")
+            + (f", by {abs(gap):.1%}" if gap is not None and verdict != "in line with" else "")
             + " (Yahoo Finance's earnings history; adjusted EPS is the analysts' basis, and the "
               "SEC filing's GAAP diluted EPS differs)." + oneoff,
             # cited as the page a reader can open: the API address it is read from answers a
@@ -851,14 +853,39 @@ def _ownership_flow(ticker: str, positions: Any) -> tuple[list[str], list[Source
     return lines, sources
 
 
-_YEAR: Final = re.compile(r"\b(?:in|of|for|during|from|back\s+in)\s+(19[5-9]\d|20[0-4]\d)\b",
+_YEAR: Final = re.compile(r"\b(?:in|of|for|during|from|since|back\s+in|back\s+to)\s+"
+                          r"(?:(?:fiscal|fy)\s*(?:year\s+)?)?"
+                          r"(19[5-9]\d|20[0-4]\d)\b|\b(?:fiscal|fy)\s*(?:year\s+)?(19[5-9]\d|20[0-4]\d)\b",
                           re.I)
+_RENAMED: Final = {"FB": ("META", "9 June 2022", "Facebook's ticker FB changed to META (the "
+                                                   "company renamed itself Meta Platforms in "
+                                                   "October 2021)"),
+                   "TWTR": ("", "27 October 2022", "Twitter was taken private")}
+"""Tickers that changed or ended, said when asked by their old name (round 41 hostile, M10 and
+m6): "using ticker FB" got META's filings with no word that FB is now META."""
 
 
 def _past_year(text: str, this_year: int) -> int | None:
     """A calendar year the question asks about, when it is before last year; else None."""
     found = _YEAR.search(text)
-    return int(found.group(1)) if found and int(found.group(1)) < this_year - 1 else None
+    year = int(found.group(1) or found.group(2)) if found else None
+    return year if year is not None and year < this_year - 1 else None
+
+
+def renamed_note(text: str) -> str | None:
+    """The line saying a ticker the question uses has changed or ended, or None."""
+    for old, (new, when, what) in _RENAMED.items():
+        named = {"FB": r"\bFB\b|\bfacebook\b", "TWTR": r"\bTWTR\b|\btwitter\b"}[old]
+        if re.search(named, text, re.I if old == "TWTR" else 0) or (
+                old == "FB" and re.search(r"\bfacebook\b", text, re.I)):
+            if new:
+                # "...changed to META (the company renamed ...) on 9 June 2022": the date belongs
+                # to the ticker change, so it follows the ticker, not the parenthesis
+                head, _, aside = what.partition(" (")
+                return (f"{head} on {when}" + (f" ({aside}" if aside else "")
+                        + f"; {new} is what is read below.")
+            return f"{what} on {when}, and it has filed no 10-K or 10-Q since."
+    return None
 
 
 def _first_trade(ticker: str) -> date | None:
@@ -872,8 +899,73 @@ def _first_trade(ticker: str) -> date | None:
         stamp = body["chart"]["result"][0]["meta"]["firstTradeDate"]
     except Exception:
         return None
-    return datetime.fromtimestamp(int(stamp), UTC).date() if isinstance(stamp, int | float) \
-        else None
+    if not isinstance(stamp, int | float):
+        return None
+    # an epoch offset, not fromtimestamp: GE's first trade, in 1962, is a negative stamp, and
+    # Windows' fromtimestamp raises on it (round 41 hostile, m5 crashed the answer)
+    return (datetime(1970, 1, 1, tzinfo=UTC) + timedelta(seconds=int(stamp))).date()
+
+
+_FACTS: dict[str, tuple[float, dict[str, Any] | None]] = {}
+
+
+def _company_facts(ticker: str) -> dict[str, Any] | None:
+    """SEC's us-gaap company facts for ``ticker``, kept ten minutes: a pre-listing question scans
+    several years against the same document."""
+    import time
+
+    from argus.market.evidence import EdgarSource
+
+    hit = _FACTS.get(ticker)
+    if hit is not None and time.monotonic() - hit[0] < 600:
+        return hit[1]
+    try:
+        edgar = EdgarSource()
+        cik = edgar.cik_for(ticker)
+        facts = edgar._get(f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik:010d}.json")[
+            "facts"]["us-gaap"] if cik is not None else None
+    except Exception:
+        return None
+    _FACTS[ticker] = (time.monotonic(), facts)
+    return facts
+
+
+def _restated_year(ticker: str, year: int) -> tuple[list[str], list[Source]] | None:
+    """A year before the shares listed, read from the company's own later 10-K, which restates
+    earlier years as comparatives: GE Vernova first traded in March 2024, and its 10-K filed
+    6 Feb 2025 carries 2022 revenue of $29.654bn. "GE Vernova revenue for fiscal 2022" was
+    answered "not a public company in 2022" (round 41 hostile, m5) when the figure was on file."""
+    facts = _company_facts(ticker)
+    if facts is None:
+        return None
+    found: dict[str, tuple[float, str]] = {}
+    for label, tags in (("revenue", ("RevenueFromContractWithCustomerExcludingAssessedTax",
+                                     "Revenues")),
+                        ("net income", ("NetIncomeLoss",)),
+                        ("operating cash flow", ("NetCashProvidedByUsedInOperatingActivities",))):
+        for tag in tags:
+            rows = [r for r in (facts.get(tag) or {}).get("units", {}).get("USD", [])
+                    if r.get("form") == "10-K" and str(r.get("start", "")).startswith(str(year))
+                    and str(r.get("end", "")).startswith(str(year))]
+            if rows:
+                row = min(rows, key=lambda r: str(r.get("filed")))
+                found[label] = (float(row["val"]), str(row.get("filed")))
+                break
+    if "revenue" not in found:
+        return None
+    filed = found["revenue"][1]
+    parts = [f"{label} {'-' if value < 0 else ''}${abs(value) / 1e9:,.2f}bn"
+             for label, (value, _) in found.items()]
+    return ([f"Bottom line: {ticker} was not yet a separate listed company in {year} — it was "
+             f"part of its former parent, and its shares first traded in "
+             f"{_first_trade(ticker):%B %Y}" + " — but its own 10-K (filed "
+             f"{filed}) restates {year} as a comparative year: " + ", ".join(parts) + ".",
+             f"Those are carve-out figures: the business as it was run inside the parent, "
+             f"prepared after the separation. No 13F holding, analyst estimate or earnings call "
+             f"exists for {ticker} from {year}."],
+            [Source(kind="venue", ref=f"https://www.sec.gov/cgi-bin/browse-edgar?action="
+                    f"getcompany&CIK={ticker}&type=10-K",
+                    detail=f"{ticker} 10-K comparatives for {year} (XBRL company facts)")])
 
 
 def _fundamentals(symbol: str, raw_text: str = "", *,
@@ -914,6 +1006,20 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
     if year_said is not None:
         listed_on = _first_trade(ticker)
         if listed_on is not None and year_said < listed_on.year:
+            restated = _restated_year(ticker, year_said)
+            if restated is not None:
+                return restated
+            earliest = next((y for y in range(year_said + 1, listed_on.year + 1)
+                             if _restated_year(ticker, y) is not None), None)
+            if earliest is not None:
+                # GE Vernova from 2015: its 10-Ks restate 2022 on, nothing earlier
+                return ([f"Bottom line: {ticker} was not a separate company in {year_said} — its "
+                         f"shares first traded in {listed_on:%B %Y} — and its own 10-Ks restate "
+                         f"its figures back to {earliest} only; earlier years sit inside its "
+                         f"former parent's filings, not split out.",
+                         f"Ask for {ticker}'s {earliest} figures, or any year after."],
+                        [Source(kind="venue", ref="SEC EDGAR XBRL company facts",
+                                detail=f"{ticker} 10-K comparatives")])
             # "NVDA's 13F holdings in 1995" was answered with today's filings, the year dropped
             # (round 39 hostile, M4): NVDA first traded on 22 Jan 1999, so no filing of any kind
             # could report on it in 1995
@@ -1351,6 +1457,9 @@ def _fundamentals(symbol: str, raw_text: str = "", *,
             sources.append(Source(kind="venue", ref="Bitget v2 tickers",
                                   detail=f"{symbol} last price, live"))
     led = _compound_lead(_fundamentals_focus(lines, raw_text, ticker), raw_text, ticker)
+    renamed = renamed_note(raw_text)
+    if renamed and led:
+        led = [*led[:1], f"Note: {renamed}", *led[1:]]
     if year_said is not None and led:
         # a past year the company did exist in: these sources hold the latest filings and
         # estimates only, and the answer says so before it gives them

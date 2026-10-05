@@ -302,6 +302,14 @@ def reasons(text: str) -> tuple[Reason, ...]:
         part = _OPENER.sub("", part)
         if not part or _STANCE.match(part) or _ASKED.match(part) or PROFILE_PART.match(part):
             continue
+        if re.match(r"^(?:i\s+(?:hold|own|have)\s+)?\d{1,3}(?:\.\d+)?\s*%\s+(?:in\s+)?[A-Za-z]",
+                    part, re.I) and len(part.split()) <= 6:
+            # "I hold 60% BTC" is the book, not a reason; it was listed under "Your reasons,
+            # tested — not tested" (round 41 judge, M13)
+            continue
+        if re.search(r"\b\d{1,2}(?:\.\d+)?\s*%\s+(?:max(?:imum)?\s+)?(?:drawdown|loss)\s+"
+                     r"(?:limit|tolerance|cap)\b|\bmax(?:imum)?\s+(?:drawdown|loss)\b", part, re.I):
+            continue  # a limit is a constraint on the answer, not a claim to test
         kind = next((k for k, pattern in _KINDS if pattern.search(part)), None)
         if _CONSENSUS_CLAIM.search(part):
             # a report against the analysts' numbers is settled by the consensus record, whatever

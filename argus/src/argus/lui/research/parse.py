@@ -525,6 +525,9 @@ _FUNDAMENTALS = re.compile(
     # "what's the dividend yield on AAPL", "does COIN own bitcoin on its balance sheet", "is AAPL
     # overvalued" had no engine (2026-09-25 audit)
     r"dividends?|payout|balance\s+sheet|book\s+value|p/?b\b|ev/?ebitda|buybacks?|insiders?|"
+    # "the latest 10-K for GE Vernova's financials" was refused as no decision on record
+    # (round 41 hostile, m5): a filing's figures are a fundamentals question
+    r"10-?[kq]s?|financials|financial\s+statements?|income\s+statement|annual\s+report|"
     r"(?:over|under)[\s-]?valued)\b",
     re.I,
 )
@@ -1280,6 +1283,20 @@ def _model_name(name: str) -> str | None:
     return tokens[0][1] if tokens else None
 
 
+def two_word_company(match: re.Match[str]) -> str:
+    """"GE Vernova" as GEV, not GE: a company named by its parent's ticker and a word is its own
+    issuer in SEC's register, and "GE Vernova revenue for fiscal 2022" was read as GE (round 41
+    hostile, m5). The issuer's own ticker replaces the pair whether or not Bitget lists it, so an
+    unlisted one ("GE Healthcare", GEHC) is said to be unlisted rather than answered as GE. Kept
+    as written when the pair is no issuer's name."""
+    from argus.market.company_names import ticker_for_full_name
+
+    ticker = ticker_for_full_name(f"{match.group(1)} {match.group(2)}")
+    if ticker and ticker != match.group(1):
+        return str(ticker)
+    return match.group(0)
+
+
 def _read(text: str) -> dict[str, str]:
     """Every listed contract the text names, in the order named, each with the note on how it was
     read ("" when it was read literally)."""
@@ -1296,6 +1313,7 @@ def _read(text: str) -> dict[str, str]:
                   lambda m: (m.group(1) + m.group(2)
                              if resolve_name(m.group(1) + m.group(2)) is not None else m.group(0)),
                   text)
+    text = re.sub(r"\b([A-Z]{2,5})\s+([A-Z][a-z]{2,})\b", two_word_company, text)
     trust = not _shouting(text)
     found: dict[str, str] = {}
     for _, perp in rtokens_named(text):
@@ -1750,6 +1768,12 @@ def holding_pairs(text: str) -> list[tuple[int, str, float]]:
             upper = resolve_name(name.upper(), trust_case=True)
             symbol = upper[0] if upper is not None and upper[0] in named else None
         if symbol is None or value <= 0:
+            return
+        # "a 10% Nasdaq drop" is a shock to a name, not 10% held in it (round 41 judge, C2: it
+        # was read as a holding and the book "scaled to 100%")
+        if re.match(r"\s*(?:drops?|falls?|crash(?:es)?|declines?|sell-?offs?|"
+                    r"moves?|shock|rall(?:y|ies)|"
+                    r"rises?|jumps?|dips?)\b", text[span[1]:span[1] + 14], re.I):
             return
         if any(not (span[1] <= a or span[0] >= b) for a, b in taken):
             return

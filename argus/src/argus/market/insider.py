@@ -35,6 +35,7 @@ from __future__ import annotations
 
 import re
 import xml.etree.ElementTree as ET
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal, InvalidOperation
@@ -356,6 +357,19 @@ class InsiderSource:
         href = candidates[0]
         return f"https://www.sec.gov{href}" if href.startswith("/") else href
 
+    def _primary_url(self, cik: int, accession: str, primary: str) -> str | None:
+        """The raw XML named by the submissions index, without reading the directory.
+
+        ``primaryDocument`` names the rendered view, ``xslF345X06/wk-form4_….xml``; the raw XML is
+        the same file name one level up (NVDA accession ``0001696841-26-000014``, checked against
+        the directory listing on 2026-10-05). Anything that does not have that shape falls back to
+        :meth:`_document_url`, which reads the listing."""
+        name = primary.rsplit("/", 1)[-1]
+        if not name.lower().endswith(".xml") or ("/" in primary
+                                                 and not primary.lower().startswith("xsl")):
+            return None
+        return (self.ARCHIVE.format(cik=cik, accession=accession.replace("-", "")) + name)
+
     def trades(
         self, ticker: str, *, since: datetime, limit: int = 12
     ) -> tuple[list[InsiderTrade], list[str]]:
@@ -372,10 +386,9 @@ class InsiderSource:
 
         recent = submissions.get("filings", {}).get("recent", {})
         forms = recent.get("form", [])
-        out: list[InsiderTrade] = []
-        looked = 0
+        wanted: list[tuple[datetime, str, str]] = []
         for i, form in enumerate(forms):
-            if form != "4" or looked >= limit:
+            if form != "4" or len(wanted) >= limit:
                 continue
             try:
                 accepted = datetime.fromisoformat(
@@ -385,18 +398,30 @@ class InsiderSource:
                 continue
             if accepted < since:
                 continue
-            looked += 1
-            accession = recent["accessionNumber"][i]
+            primary = (recent.get("primaryDocument") or [""] * len(forms))[i] or ""
+            wanted.append((accepted, recent["accessionNumber"][i], primary))
+        looked = len(wanted)
+
+        def read(item: tuple[datetime, str, str]) -> tuple[list[InsiderTrade], str | None]:
+            accepted, accession, primary = item
             try:
-                url = self._document_url(cik, accession)
+                url = self._primary_url(cik, accession, primary) or self._document_url(
+                    cik, accession)
                 if url is None:
-                    status.append(f"insider:{accession}: no machine-readable document")
-                    continue
-                out.extend(
-                    parse_form4(self._fetch(url), accepted_at=accepted, accession=accession)
-                )
+                    return [], f"insider:{accession}: no machine-readable document"
+                return parse_form4(self._fetch(url), accepted_at=accepted,
+                                   accession=accession), None
             except Exception as exc:
-                status.append(f"insider:{accession}: unreadable ({type(exc).__name__})")
+                return [], f"insider:{accession}: unreadable ({type(exc).__name__})"
+
+        out: list[InsiderTrade] = []
+        # SEC asks for at most ten requests a second; four in flight stays well inside that while
+        # a 90-day window of a busy issuer (43 MSFT filings, 2026-10-05) reads in seconds
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            for found, problem in pool.map(read, wanted):
+                out.extend(found)
+                if problem:
+                    status.append(problem)
 
         out.sort(key=lambda t: t.accepted_at, reverse=True)
         status.append(f"insider:{ticker}: {looked} Form 4(s) read, {len(out)} transaction line(s)")

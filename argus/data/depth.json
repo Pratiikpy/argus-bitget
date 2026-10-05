@@ -1,566 +1,566 @@
 {
-  "generated_at": "2026-10-04T19:31:41.713258+00:00",
+  "generated_at": "2026-10-05T13:31:39.913925+00:00",
   "books": [
     {
       "symbol": "NVDAUSDT",
-      "fetched_at": "2026-10-04T19:31:38.067182+00:00",
-      "mid": "235.0350",
-      "spread_bps": 0.4255,
+      "fetched_at": "2026-10-05T13:31:36.288544+00:00",
+      "mid": "235.8600",
+      "spread_bps": 0.848,
       "bid_levels": 50,
       "ask_levels": 50,
-      "imbalance": 0.6522,
+      "imbalance": 0.4728,
       "sweeps": [
         {
           "side": "BUY",
           "requested_notional": "1000",
           "filled_notional": "1000.00",
-          "average_price": "235.0464",
-          "levels_consumed": 3,
-          "slippage_bps": 0.4856,
+          "average_price": "235.8773",
+          "levels_consumed": 2,
+          "slippage_bps": 0.732,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "5000",
           "filled_notional": "5000.00",
-          "average_price": "235.0622",
-          "levels_consumed": 4,
-          "slippage_bps": 1.1567,
+          "average_price": "235.8953",
+          "levels_consumed": 5,
+          "slippage_bps": 1.4966,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "25000",
           "filled_notional": "25000.00",
-          "average_price": "235.0895",
-          "levels_consumed": 9,
-          "slippage_bps": 2.3197,
+          "average_price": "235.9448",
+          "levels_consumed": 13,
+          "slippage_bps": 3.5973,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "100000",
           "filled_notional": "100000.00",
-          "average_price": "235.1240",
-          "levels_consumed": 11,
-          "slippage_bps": 3.7885,
+          "average_price": "236.1046",
+          "levels_consumed": 39,
+          "slippage_bps": 10.3686,
           "complete": true
         }
       ]
     },
     {
       "symbol": "TSLAUSDT",
-      "fetched_at": "2026-10-04T19:31:38.428692+00:00",
-      "mid": "372.8450",
-      "spread_bps": 0.2682,
+      "fetched_at": "2026-10-05T13:31:36.586381+00:00",
+      "mid": "367.4650",
+      "spread_bps": 2.4492,
       "bid_levels": 50,
       "ask_levels": 50,
-      "imbalance": 0.2645,
+      "imbalance": 0.4238,
       "sweeps": [
         {
           "side": "BUY",
           "requested_notional": "1000",
           "filled_notional": "1000.00",
-          "average_price": "372.8500",
-          "levels_consumed": 1,
-          "slippage_bps": 0.1341,
+          "average_price": "367.5243",
+          "levels_consumed": 3,
+          "slippage_bps": 1.6125,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "5000",
           "filled_notional": "5000.00",
-          "average_price": "372.8500",
-          "levels_consumed": 1,
-          "slippage_bps": 0.1341,
+          "average_price": "367.5958",
+          "levels_consumed": 8,
+          "slippage_bps": 3.5588,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "25000",
           "filled_notional": "25000.00",
-          "average_price": "372.8878",
-          "levels_consumed": 7,
-          "slippage_bps": 1.1478,
+          "average_price": "367.7326",
+          "levels_consumed": 21,
+          "slippage_bps": 7.2829,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "100000",
           "filled_notional": "100000.00",
-          "average_price": "372.9647",
-          "levels_consumed": 17,
-          "slippage_bps": 3.2105,
+          "average_price": "367.9291",
+          "levels_consumed": 47,
+          "slippage_bps": 12.6285,
           "complete": true
         }
       ]
     },
     {
       "symbol": "AAPLUSDT",
-      "fetched_at": "2026-10-04T19:31:38.721935+00:00",
-      "mid": "333.7050",
-      "spread_bps": 0.2997,
+      "fetched_at": "2026-10-05T13:31:36.898730+00:00",
+      "mid": "333.0350",
+      "spread_bps": 0.3003,
       "bid_levels": 50,
       "ask_levels": 50,
-      "imbalance": 0.3531,
+      "imbalance": 0.6784,
       "sweeps": [
         {
           "side": "BUY",
           "requested_notional": "1000",
           "filled_notional": "1000.00",
-          "average_price": "333.7161",
-          "levels_consumed": 3,
-          "slippage_bps": 0.3322,
+          "average_price": "333.0746",
+          "levels_consumed": 6,
+          "slippage_bps": 1.1881,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "5000",
           "filled_notional": "5000.00",
-          "average_price": "333.7424",
-          "levels_consumed": 6,
-          "slippage_bps": 1.1199,
+          "average_price": "333.1855",
+          "levels_consumed": 15,
+          "slippage_bps": 4.5191,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "25000",
           "filled_notional": "25000.00",
-          "average_price": "333.8658",
-          "levels_consumed": 25,
-          "slippage_bps": 4.8187,
+          "average_price": "333.5354",
+          "levels_consumed": 39,
+          "slippage_bps": 15.0246,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "100000",
-          "filled_notional": "100000.00",
-          "average_price": "334.2276",
-          "levels_consumed": 49,
-          "slippage_bps": 15.6613,
-          "complete": true
+          "filled_notional": "55873.94",
+          "average_price": "333.7351",
+          "levels_consumed": 50,
+          "slippage_bps": 21.0233,
+          "complete": false
         }
       ]
     },
     {
       "symbol": "MSFTUSDT",
-      "fetched_at": "2026-10-04T19:31:39.056297+00:00",
-      "mid": "518.4050",
-      "spread_bps": 2.1219,
+      "fetched_at": "2026-10-05T13:31:37.454032+00:00",
+      "mid": "528.2550",
+      "spread_bps": 5.4898,
       "bid_levels": 50,
       "ask_levels": 50,
-      "imbalance": 0.886,
+      "imbalance": 0.7384,
       "sweeps": [
         {
           "side": "BUY",
           "requested_notional": "1000",
           "filled_notional": "1000.00",
-          "average_price": "518.4744",
+          "average_price": "528.5015",
           "levels_consumed": 5,
-          "slippage_bps": 1.3395,
+          "slippage_bps": 4.6668,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "5000",
           "filled_notional": "5000.00",
-          "average_price": "518.5232",
-          "levels_consumed": 9,
-          "slippage_bps": 2.2795,
+          "average_price": "528.5899",
+          "levels_consumed": 10,
+          "slippage_bps": 6.3397,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "25000",
           "filled_notional": "25000.00",
-          "average_price": "518.5753",
-          "levels_consumed": 17,
-          "slippage_bps": 3.2848,
+          "average_price": "528.8168",
+          "levels_consumed": 19,
+          "slippage_bps": 10.6342,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "100000",
           "filled_notional": "100000.00",
-          "average_price": "518.6487",
-          "levels_consumed": 22,
-          "slippage_bps": 4.7004,
+          "average_price": "529.1995",
+          "levels_consumed": 50,
+          "slippage_bps": 17.8803,
           "complete": true
         }
       ]
     },
     {
       "symbol": "METAUSDT",
-      "fetched_at": "2026-10-04T19:31:39.377353+00:00",
-      "mid": "729.4850",
-      "spread_bps": 3.7012,
+      "fetched_at": "2026-10-05T13:31:37.770279+00:00",
+      "mid": "735.5800",
+      "spread_bps": 4.0784,
       "bid_levels": 50,
       "ask_levels": 50,
-      "imbalance": 0.3168,
+      "imbalance": 0.6,
       "sweeps": [
         {
           "side": "BUY",
           "requested_notional": "1000",
           "filled_notional": "1000.00",
-          "average_price": "729.7039",
-          "levels_consumed": 5,
-          "slippage_bps": 3.0014,
+          "average_price": "735.8934",
+          "levels_consumed": 7,
+          "slippage_bps": 4.2609,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "5000",
           "filled_notional": "5000.00",
-          "average_price": "729.7168",
-          "levels_consumed": 5,
-          "slippage_bps": 3.1774,
+          "average_price": "736.0744",
+          "levels_consumed": 12,
+          "slippage_bps": 6.7216,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "25000",
           "filled_notional": "25000.00",
-          "average_price": "729.7263",
-          "levels_consumed": 8,
-          "slippage_bps": 3.3081,
+          "average_price": "737.0347",
+          "levels_consumed": 48,
+          "slippage_bps": 19.7769,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "100000",
-          "filled_notional": "100000.00",
-          "average_price": "730.2388",
-          "levels_consumed": 31,
-          "slippage_bps": 10.3337,
-          "complete": true
+          "filled_notional": "36932.37",
+          "average_price": "737.3203",
+          "levels_consumed": 50,
+          "slippage_bps": 23.6584,
+          "complete": false
         }
       ]
     },
     {
       "symbol": "GOOGLUSDT",
-      "fetched_at": "2026-10-04T19:31:39.701723+00:00",
-      "mid": "344.5000",
-      "spread_bps": 1.1611,
+      "fetched_at": "2026-10-05T13:31:38.073305+00:00",
+      "mid": "344.3150",
+      "spread_bps": 3.7756,
       "bid_levels": 50,
       "ask_levels": 50,
-      "imbalance": 0.5736,
+      "imbalance": 0.374,
       "sweeps": [
         {
           "side": "BUY",
           "requested_notional": "1000",
           "filled_notional": "1000.00",
-          "average_price": "344.5304",
-          "levels_consumed": 3,
-          "slippage_bps": 0.8831,
+          "average_price": "344.4270",
+          "levels_consumed": 4,
+          "slippage_bps": 3.2543,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "5000",
           "filled_notional": "5000.00",
-          "average_price": "344.5607",
-          "levels_consumed": 7,
-          "slippage_bps": 1.7617,
+          "average_price": "344.4996",
+          "levels_consumed": 12,
+          "slippage_bps": 5.3616,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "25000",
           "filled_notional": "25000.00",
-          "average_price": "344.5997",
-          "levels_consumed": 11,
-          "slippage_bps": 2.895,
+          "average_price": "344.6304",
+          "levels_consumed": 26,
+          "slippage_bps": 9.1614,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "100000",
           "filled_notional": "100000.00",
-          "average_price": "344.6433",
-          "levels_consumed": 17,
-          "slippage_bps": 4.1593,
+          "average_price": "345.0401",
+          "levels_consumed": 44,
+          "slippage_bps": 21.0583,
           "complete": true
         }
       ]
     },
     {
       "symbol": "AMZNUSDT",
-      "fetched_at": "2026-10-04T19:31:40.031406+00:00",
-      "mid": "252.4250",
-      "spread_bps": 1.9808,
+      "fetched_at": "2026-10-05T13:31:38.355051+00:00",
+      "mid": "251.4300",
+      "spread_bps": 0.7955,
       "bid_levels": 50,
       "ask_levels": 50,
-      "imbalance": 0.4371,
+      "imbalance": 0.5809,
       "sweeps": [
         {
           "side": "BUY",
           "requested_notional": "1000",
           "filled_notional": "1000.00",
-          "average_price": "252.4500",
+          "average_price": "251.4400",
           "levels_consumed": 1,
-          "slippage_bps": 0.9904,
+          "slippage_bps": 0.3977,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "5000",
           "filled_notional": "5000.00",
-          "average_price": "252.4500",
-          "levels_consumed": 1,
-          "slippage_bps": 0.9904,
+          "average_price": "251.4700",
+          "levels_consumed": 5,
+          "slippage_bps": 1.5918,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "25000",
           "filled_notional": "25000.00",
-          "average_price": "252.4880",
-          "levels_consumed": 6,
-          "slippage_bps": 2.496,
+          "average_price": "251.5289",
+          "levels_consumed": 14,
+          "slippage_bps": 3.9332,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "100000",
           "filled_notional": "100000.00",
-          "average_price": "252.5303",
-          "levels_consumed": 17,
-          "slippage_bps": 4.1714,
+          "average_price": "251.8280",
+          "levels_consumed": 46,
+          "slippage_bps": 15.8301,
           "complete": true
         }
       ]
     },
     {
       "symbol": "COINUSDT",
-      "fetched_at": "2026-10-04T19:31:40.393396+00:00",
-      "mid": "185.4850",
-      "spread_bps": 2.6956,
+      "fetched_at": "2026-10-05T13:31:38.671987+00:00",
+      "mid": "188.1050",
+      "spread_bps": 6.911,
       "bid_levels": 50,
       "ask_levels": 50,
-      "imbalance": 0.5123,
+      "imbalance": 0.4422,
       "sweeps": [
         {
           "side": "BUY",
           "requested_notional": "1000",
           "filled_notional": "1000.00",
-          "average_price": "185.5163",
-          "levels_consumed": 2,
-          "slippage_bps": 1.6869,
+          "average_price": "188.2861",
+          "levels_consumed": 9,
+          "slippage_bps": 9.6249,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "5000",
           "filled_notional": "5000.00",
-          "average_price": "185.5301",
-          "levels_consumed": 4,
-          "slippage_bps": 2.4307,
+          "average_price": "188.3256",
+          "levels_consumed": 13,
+          "slippage_bps": 11.7299,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "25000",
           "filled_notional": "25000.00",
-          "average_price": "185.5531",
-          "levels_consumed": 6,
-          "slippage_bps": 3.6692,
+          "average_price": "188.5337",
+          "levels_consumed": 47,
+          "slippage_bps": 22.791,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "100000",
-          "filled_notional": "100000.00",
-          "average_price": "185.6923",
-          "levels_consumed": 25,
-          "slippage_bps": 11.1788,
-          "complete": true
+          "filled_notional": "33070.56",
+          "average_price": "188.5759",
+          "levels_consumed": 50,
+          "slippage_bps": 25.0352,
+          "complete": false
         }
       ]
     },
     {
       "symbol": "MSTRUSDT",
-      "fetched_at": "2026-10-04T19:31:40.740003+00:00",
-      "mid": "162.6150",
-      "spread_bps": 0.6149,
+      "fetched_at": "2026-10-05T13:31:38.998827+00:00",
+      "mid": "164.2700",
+      "spread_bps": 2.435,
       "bid_levels": 50,
       "ask_levels": 50,
-      "imbalance": 0.4763,
+      "imbalance": 0.6195,
       "sweeps": [
         {
           "side": "BUY",
           "requested_notional": "1000",
           "filled_notional": "1000.00",
-          "average_price": "162.6399",
-          "levels_consumed": 2,
-          "slippage_bps": 1.5294,
+          "average_price": "164.3054",
+          "levels_consumed": 4,
+          "slippage_bps": 2.1566,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "5000",
           "filled_notional": "5000.00",
-          "average_price": "162.6416",
-          "levels_consumed": 3,
-          "slippage_bps": 1.635,
+          "average_price": "164.3417",
+          "levels_consumed": 7,
+          "slippage_bps": 4.3651,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "25000",
           "filled_notional": "25000.00",
-          "average_price": "162.6659",
-          "levels_consumed": 6,
-          "slippage_bps": 3.1281,
+          "average_price": "164.4002",
+          "levels_consumed": 18,
+          "slippage_bps": 7.9264,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "100000",
           "filled_notional": "100000.00",
-          "average_price": "162.7355",
-          "levels_consumed": 20,
-          "slippage_bps": 7.4081,
+          "average_price": "164.5527",
+          "levels_consumed": 37,
+          "slippage_bps": 17.2095,
           "complete": true
         }
       ]
     },
     {
       "symbol": "QQQUSDT",
-      "fetched_at": "2026-10-04T19:31:41.049462+00:00",
-      "mid": "751.3150",
-      "spread_bps": 0.1331,
+      "fetched_at": "2026-10-05T13:31:39.305110+00:00",
+      "mid": "750.8450",
+      "spread_bps": 0.1332,
       "bid_levels": 50,
       "ask_levels": 50,
-      "imbalance": 0.9199,
+      "imbalance": 0.2822,
       "sweeps": [
         {
           "side": "BUY",
           "requested_notional": "1000",
           "filled_notional": "1000.00",
-          "average_price": "751.3388",
-          "levels_consumed": 3,
-          "slippage_bps": 0.3167,
+          "average_price": "750.8500",
+          "levels_consumed": 1,
+          "slippage_bps": 0.0666,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "5000",
           "filled_notional": "5000.00",
-          "average_price": "751.4175",
-          "levels_consumed": 13,
-          "slippage_bps": 1.3642,
+          "average_price": "750.8741",
+          "levels_consumed": 3,
+          "slippage_bps": 0.3881,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "25000",
           "filled_notional": "25000.00",
-          "average_price": "751.5235",
-          "levels_consumed": 18,
-          "slippage_bps": 2.7746,
+          "average_price": "750.9445",
+          "levels_consumed": 12,
+          "slippage_bps": 1.3248,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "100000",
           "filled_notional": "100000.00",
-          "average_price": "751.6041",
-          "levels_consumed": 29,
-          "slippage_bps": 3.8473,
+          "average_price": "751.0693",
+          "levels_consumed": 26,
+          "slippage_bps": 2.9873,
           "complete": true
         }
       ]
     },
     {
       "symbol": "TQQQUSDT",
-      "fetched_at": "2026-10-04T19:31:41.361990+00:00",
-      "mid": "81.4550",
-      "spread_bps": 1.2277,
+      "fetched_at": "2026-10-05T13:31:39.614594+00:00",
+      "mid": "81.3050",
+      "spread_bps": 1.2299,
       "bid_levels": 50,
       "ask_levels": 50,
-      "imbalance": 0.521,
+      "imbalance": 0.5317,
       "sweeps": [
         {
           "side": "BUY",
           "requested_notional": "1000",
           "filled_notional": "1000.00",
-          "average_price": "81.4686",
-          "levels_consumed": 3,
-          "slippage_bps": 1.6719,
+          "average_price": "81.3157",
+          "levels_consumed": 2,
+          "slippage_bps": 1.3108,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "5000",
           "filled_notional": "5000.00",
-          "average_price": "81.4899",
+          "average_price": "81.3304",
           "levels_consumed": 5,
-          "slippage_bps": 4.2894,
+          "slippage_bps": 3.1234,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "25000",
           "filled_notional": "25000.00",
-          "average_price": "81.5317",
-          "levels_consumed": 15,
-          "slippage_bps": 9.4134,
-          "complete": true
-        },
-        {
-          "side": "BUY",
-          "requested_notional": "100000",
-          "filled_notional": "99177.08",
-          "average_price": "81.7073",
-          "levels_consumed": 50,
-          "slippage_bps": 30.9683,
-          "complete": false
-        }
-      ]
-    },
-    {
-      "symbol": "SQQQUSDT",
-      "fetched_at": "2026-10-04T19:31:41.711120+00:00",
-      "mid": "32.9750",
-      "spread_bps": 3.0326,
-      "bid_levels": 50,
-      "ask_levels": 50,
-      "imbalance": 0.3824,
-      "sweeps": [
-        {
-          "side": "BUY",
-          "requested_notional": "1000",
-          "filled_notional": "1000.00",
-          "average_price": "32.9879",
-          "levels_consumed": 2,
-          "slippage_bps": 3.9066,
-          "complete": true
-        },
-        {
-          "side": "BUY",
-          "requested_notional": "5000",
-          "filled_notional": "5000.00",
-          "average_price": "32.9896",
-          "levels_consumed": 2,
-          "slippage_bps": 4.4204,
-          "complete": true
-        },
-        {
-          "side": "BUY",
-          "requested_notional": "25000",
-          "filled_notional": "25000.00",
-          "average_price": "33.0293",
-          "levels_consumed": 11,
-          "slippage_bps": 16.4673,
+          "average_price": "81.3848",
+          "levels_consumed": 14,
+          "slippage_bps": 9.8097,
           "complete": true
         },
         {
           "side": "BUY",
           "requested_notional": "100000",
           "filled_notional": "100000.00",
-          "average_price": "33.1371",
-          "levels_consumed": 21,
-          "slippage_bps": 49.1611,
+          "average_price": "81.4645",
+          "levels_consumed": 28,
+          "slippage_bps": 19.6164,
+          "complete": true
+        }
+      ]
+    },
+    {
+      "symbol": "SQQQUSDT",
+      "fetched_at": "2026-10-05T13:31:39.912888+00:00",
+      "mid": "33.0900",
+      "spread_bps": 6.0441,
+      "bid_levels": 50,
+      "ask_levels": 50,
+      "imbalance": 0.8532,
+      "sweeps": [
+        {
+          "side": "BUY",
+          "requested_notional": "1000",
+          "filled_notional": "1000.00",
+          "average_price": "33.1055",
+          "levels_consumed": 2,
+          "slippage_bps": 4.6765,
+          "complete": true
+        },
+        {
+          "side": "BUY",
+          "requested_notional": "5000",
+          "filled_notional": "5000.00",
+          "average_price": "33.1147",
+          "levels_consumed": 4,
+          "slippage_bps": 7.4606,
+          "complete": true
+        },
+        {
+          "side": "BUY",
+          "requested_notional": "25000",
+          "filled_notional": "25000.00",
+          "average_price": "33.1497",
+          "levels_consumed": 10,
+          "slippage_bps": 18.0416,
+          "complete": true
+        },
+        {
+          "side": "BUY",
+          "requested_notional": "100000",
+          "filled_notional": "100000.00",
+          "average_price": "33.2346",
+          "levels_consumed": 18,
+          "slippage_bps": 43.7034,
           "complete": true
         }
       ]

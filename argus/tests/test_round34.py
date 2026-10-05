@@ -147,10 +147,10 @@ class TestRoutes:
 
 class TestLiveReAskRound34:
     def test_an_age_is_not_a_weight(self) -> None:
-        from argus.lui.research.analogue import _ALL_IN_Q
+        from argus.lui.research.analogue import ALL_IN_Q
 
-        assert _ALL_IN_Q.search("I'm 58, planning to retire")
-        assert not _ALL_IN_Q.search("I'm 40/60 BTC/ETH - how did this book do on CPI days?")
+        assert ALL_IN_Q.search("I'm 58, planning to retire")
+        assert not ALL_IN_Q.search("I'm 40/60 BTC/ETH - how did this book do on CPI days?")
 
     def test_the_second_tax_lot_is_read(self, monkeypatch: pytest.MonkeyPatch) -> None:
         from argus.lui import position_math

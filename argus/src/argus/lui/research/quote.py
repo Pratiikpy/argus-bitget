@@ -817,8 +817,12 @@ defects 5 and 9)."""
 def other_currency(text: str) -> tuple[float, str] | None:
     """(US dollars, the line that says the conversion) for a sum in one of :data:`_OTHER_MONEY`,
     at Yahoo Finance's latest close for that currency against the dollar."""
+    # the rate a trader states ("1 USD = 83 INR") is not the sum: it is read below, not here
+    sums = re.sub(r"(?:\$\s?1\b|\b1\s*(?:usd|\$|dollars?))\s*=\s*\d[\d,]*(?:\.\d+)?\s*\S+", " ",
+                  text,
+                  flags=re.I)
     for pattern, code, sign in _OTHER_MONEY:
-        found = pattern.search(text)
+        found = pattern.search(sums)
         if found is None:
             continue
         said = found.group("n") or found.group("n2") or ""
@@ -827,15 +831,28 @@ def other_currency(text: str) -> tuple[float, str] | None:
         amount = float(said.replace(",", "").replace("'", "") or 0)
         if amount <= 0:
             return None
+        # "at 1 USD = 83 INR" is the trader's rate and is used, with the market's beside it
+        # (round 41 hostile, M3: 96.29 replaced the 83 given, with no word)
+        stated = re.search(rf"(?:\$\s?1\b|\b1\s*(?:usd|\$|dollars?))\s*=\s*"
+                           rf"(?P<r>\d[\d,]*(?:\.\d+)?)\s*"
+                           rf"(?:{code}|{re.escape(sign.strip())}|rupees?|reais|won)", text, re.I)
         from argus.market.equity_history import daily
 
         try:
             days = daily(f"{code}=X")
+            market = float(days[-1].close) if days and days[-1].close > 0 else None
         except Exception:
+            market = None
+        if stated is not None:
+            per_dollar = float(stated.group("r").replace(",", ""))
+            usd = amount / per_dollar
+            beside = (f"; at Yahoo Finance's latest close, {market:,.2f}, it would be about "
+                      f"${amount / market:,.0f}" if market else "")
+            return usd, (f"{sign}{amount:,.0f} = about ${usd:,.0f} at your rate of "
+                         f"{per_dollar:,.2f} to the dollar{beside}; ")
+        if market is None:
             return None
-        if not days or days[-1].close <= 0:
-            return None
-        per_dollar = float(days[-1].close)
+        per_dollar = market
         usd = amount / per_dollar
         return usd, (f"{sign}{amount:,.0f} = about ${usd:,.0f} at Yahoo Finance's latest "
                      f"{code}/USD close ({per_dollar:,.2f} to the dollar; Bitget lists no {code} "

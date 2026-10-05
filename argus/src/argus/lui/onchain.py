@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Callable, Mapping
+from datetime import UTC, datetime
 from typing import Any, Final
 
 from argus.lui.answer import Source
@@ -89,6 +90,74 @@ def _plain(value: float) -> str:
     return f"{value:.{digits}f}"
 
 
+_FEE_SLUGS: Final = {"uniswap": "uniswap", "aave": "aave", "lido": "lido",
+                     "pancakeswap": "pancakeswap", "hyperliquid": "hyperliquid",
+                     "jupiter": "jupiter", "raydium": "raydium", "curve": "curve-finance",
+                     "ethena": "ethena", "pump.fun": "pump", "pumpswap": "pumpswap",
+                     "morpho": "morpho", "eigenlayer": "eigenlayer", "gmx": "gmx",
+                     "sushiswap": "sushiswap", "aerodrome": "aerodrome"}
+"""Protocol names a fees question may use, and DeFiLlama's fees slug for each."""
+
+
+def _fees_line(text: str) -> str | None:
+    """A named protocol's fees over the last 24 hours and 7 days, from DeFiLlama's fees
+    summary: "and what were Uniswap's 24h fees?" was dropped from a TVL answer (round 41, m2)."""
+    if not re.search(r"\bfees?\b|\brevenue\b", text, re.I):
+        return None
+    from argus.truth import http
+
+    said = []
+    for word, slug in _FEE_SLUGS.items():
+        if not re.search(rf"\b{re.escape(word)}\b", text, re.I):
+            continue
+        try:
+            data = http.fetch_json(f"https://api.llama.fi/summary/fees/{slug}",
+                                   params={"dataType": "dailyFees"}, timeout=20.0)
+        except Exception:
+            said.append(f"{word.title()}'s fees could not be read from DeFiLlama just now")
+            continue
+        day, week = data.get("total24h"), data.get("total7d")
+        if day is None:
+            continue
+        said.append(f"{data.get('name') or word.title()} took ${float(day) / 1e6:,.2f}m in fees "
+                    "over the last 24 hours"
+                    + (f" and ${float(week) / 1e6:,.1f}m over 7 days" if week else ""))
+    if not said:
+        return None
+    return "Fees: " + "; ".join(said) + " (DeFiLlama fees, paid by users of the protocol)."
+
+
+def _one_step(mover: Mapping[str, Any]) -> str | None:
+    """Whether a week's TVL jump came in one day: a step like LayerZero V2's +$3.9bn on a single
+    day is a migration, a newly counted asset or a re-pricing, not a week of deposits, and the
+    +46% was given with no such flag (round 41 judge, m2). Read from DeFiLlama's daily TVL for the
+    protocol; the slug is its name in lower case with spaces as hyphens."""
+    from argus.truth import http
+
+    slug = re.sub(r"[^a-z0-9.]+", "-", str(mover.get("name") or "").lower()).strip("-")
+    try:
+        series = http.fetch_json(f"https://api.llama.fi/protocol/{slug}", timeout=20.0)["tvl"]
+    except Exception:
+        return None
+    days = [(int(r["date"]), float(r["totalLiquidityUSD"])) for r in series[-9:]]
+    if len(days) < 3:
+        return None
+    steps = [(days[i][0], days[i][1] - days[i - 1][1]) for i in range(1, len(days))]
+    total = days[-1][1] - days[0][1]
+    stamp, jump = max(steps, key=lambda x: x[1])
+    if total <= 0 or jump < 0.6 * total:
+        return None
+    when = datetime.fromtimestamp(stamp, UTC)
+    bridge = str(mover.get("category") or "").lower() == "bridge"
+    share = (f"more than the whole period's net rise of +${total / 1e9:,.1f}bn" if jump >= total
+             else f"of +${total / 1e9:,.1f}bn over the period")
+    return (f"Most of {mover.get('name')}'s rise came in one day: +${jump / 1e9:,.1f}bn on "
+            f"{when:%d %b}, {share} — a single step that size "
+            + ("is a migration of locked funds onto the bridge or a newly counted asset, "
+               if bridge else "is a newly counted asset, a migration or a re-pricing, ")
+            + "not a week of steady deposits (DeFiLlama's daily TVL).")
+
+
 def tvl(text: str, *, route: Route | None = None,
         tickers: Callable[[], Mapping[str, Any]] | None = None,
         direct: Callable[[Mapping[str, Any]], dict[str, Any]] | None = None,
@@ -146,6 +215,12 @@ def tvl(text: str, *, route: Route | None = None,
                               "deposits.")
             rest = lines[1].replace("Bottom line: ", "", 1)
             lines[1] = rest[:1].upper() + rest[1:]
+            step = _one_step(best)
+            if step:
+                lines.insert(1, step)
+    fees = _fees_line(text)
+    if fees:
+        lines.insert(1, fees)
     lines.append("Assumed: centralised exchanges are left out of the ranking, as DeFiLlama's own "
                  "DeFi view does; a ticker match is by symbol only, so check the contract before "
                  "trading it.")

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-05T07:46:20.409491+00:00",
+  "generated_at": "2026-10-05T13:01:32.324942+00:00",
   "source": "SoSoValue /etfs/summary-history and /btc-treasuries (US spot ETFs; creations less redemptions)",
   "funds": {
     "BTC": {
@@ -56,5 +56,224 @@
         "usd": -104730000.0
       }
     ]
+  },
+  "by_fund": {
+    "BTC": {
+      "funds": [
+        {
+          "ticker": "IBIT",
+          "name": "iShares Bitcoin Trust",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": 158154840.0,
+          "five_day_usd": 450182800.0,
+          "net_assets_usd": 67747435920.0
+        },
+        {
+          "ticker": "ARKB",
+          "name": "ARK 21Shares Bitcoin ETF",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": 0.0,
+          "five_day_usd": 25522244.45,
+          "net_assets_usd": 2902197292.425
+        },
+        {
+          "ticker": "BTC",
+          "name": "Grayscale Bitcoin Mini Trust",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": 0.0,
+          "five_day_usd": 24908004.0,
+          "net_assets_usd": 5332763683.464
+        },
+        {
+          "ticker": "MSBT",
+          "name": "Morgan Stanley Bitcoin Trust",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": 2411007.0,
+          "five_day_usd": 9446494.0,
+          "net_assets_usd": 887491676.7
+        },
+        {
+          "ticker": "BTCW",
+          "name": "WisdomTree Bitcoin Trust",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": 0.0,
+          "five_day_usd": 0.0,
+          "net_assets_usd": 172875406.365
+        },
+        {
+          "ticker": "BRRR",
+          "name": "Valkyrie Bitcoin Fund",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": 0.0,
+          "five_day_usd": 0.0,
+          "net_assets_usd": 480037293.0
+        },
+        {
+          "ticker": "EZBC",
+          "name": "Franklin Templeton Digital Holdings Trust",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": 0.0,
+          "five_day_usd": 0.0,
+          "net_assets_usd": 471483932.7
+        },
+        {
+          "ticker": "HODL",
+          "name": "VanEck Bitcoin ETF",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": 0.0,
+          "five_day_usd": -3591192.0,
+          "net_assets_usd": 1235387138.0
+        },
+        {
+          "ticker": "BTCO",
+          "name": "Invesco Galaxy Bitcoin ETF",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": 0.0,
+          "five_day_usd": -4208567.1,
+          "net_assets_usd": 425782628.24
+        },
+        {
+          "ticker": "BITB",
+          "name": "Bitwise Bitcoin ETF",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": 0.0,
+          "five_day_usd": -38654243.85,
+          "net_assets_usd": 3184157188.2999997
+        },
+        {
+          "ticker": "GBTC",
+          "name": "Grayscale Bitcoin Trust",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": 0.0,
+          "five_day_usd": -54577332.0,
+          "net_assets_usd": 10672957935.06
+        },
+        {
+          "ticker": "FBTC",
+          "name": "Fidelity Wise Origin Bitcoin Fund",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": 29278239.200000003,
+          "five_day_usd": -167936057.57500002,
+          "net_assets_usd": 15380479750.431042
+        }
+      ],
+      "missing": []
+    },
+    "ETH": {
+      "funds": [
+        {
+          "ticker": "TETH",
+          "name": "21Shares Ethereum ETF",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": 0.0,
+          "five_day_usd": 1742007.2799999998,
+          "net_assets_usd": 37516264.8
+        },
+        {
+          "ticker": "ETHW",
+          "name": "Bitwise Ethereum ETF",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": 0.0,
+          "five_day_usd": 0.0,
+          "net_assets_usd": 296510441.96000004
+        },
+        {
+          "ticker": "QETH",
+          "name": "Invesco Galaxy Ethereum ETF",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": 0.0,
+          "five_day_usd": 0.0,
+          "net_assets_usd": 25147765.692
+        },
+        {
+          "ticker": "ETHB",
+          "name": "iShares Staked Ethereum Trust ETF",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": 0.0,
+          "five_day_usd": 0.0,
+          "net_assets_usd": 1176139258.4
+        },
+        {
+          "ticker": "MSSE",
+          "name": "Morgan Stanley Ethereum Trust",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": 0.0,
+          "five_day_usd": 0.0,
+          "net_assets_usd": 53343235.739999995
+        },
+        {
+          "ticker": "EZET",
+          "name": "Franklin Ethereum Trust",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": 0.0,
+          "five_day_usd": -6130935.6,
+          "net_assets_usd": 53502190.900000006
+        },
+        {
+          "ticker": "ETHV",
+          "name": "VanEck Ethereum Trust",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": 0.0,
+          "five_day_usd": -6897516.5,
+          "net_assets_usd": 124600480.0
+        },
+        {
+          "ticker": "ETH",
+          "name": "Grayscale Ethereum Mini Trust",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": 0.0,
+          "five_day_usd": -11095616.0,
+          "net_assets_usd": 2482393208.907
+        },
+        {
+          "ticker": "ETHA",
+          "name": "iShares Ethereum Trust",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": -20101347.0,
+          "five_day_usd": -13688187.24,
+          "net_assets_usd": 9774883019.16
+        },
+        {
+          "ticker": "ETHE",
+          "name": "Grayscale Ethereum Trust",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": 0.0,
+          "five_day_usd": -27890976.0,
+          "net_assets_usd": 1925099082.6000001
+        },
+        {
+          "ticker": "FETH",
+          "name": "Fidelity Ethereum Fund",
+          "date": "2026-10-02",
+          "first": "2026-09-28",
+          "latest_usd": -17254459.3,
+          "five_day_usd": -74062424.175,
+          "net_assets_usd": 1515737886.2
+        }
+      ],
+      "missing": []
+    }
   }
 }

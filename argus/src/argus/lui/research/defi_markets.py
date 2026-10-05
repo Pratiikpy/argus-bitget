@@ -46,6 +46,91 @@ _LLAMA_CHAINS: Final = "https://api.llama.fi/v2/chains"
 _LLAMA_HISTORY: Final = "https://api.llama.fi/v2/historicalChainTvl/{chain}"
 
 
+_CHAIN_NAMED: Final = re.compile(r"\b(?:on\s+)?(?:the\s+)?(?P<n>[A-Z][A-Za-z0-9]{2,20})\s+"
+                                 r"(?i:chain|l2|l1|network|blockchain|rollup)\b")
+_COIN_NAMED: Final = re.compile(r"\bstablecoin\s+(?P<s>(?!TVL\b|APY\b|APR\b)[A-Z][A-Z0-9]{1,8}"
+                                r"(?:-[A-Z0-9]{1,4})?)\b")
+_PEG: Final = re.compile(r"\b(?P<s>USDT|USDC|DAI|USDE|FDUSD|PYUSD|USDS|TUSD|USDD|FRAX)\b[^?]{0,60}"
+                         r"\b(?:peg|depeg\w*|holding\s+(?:its\s+)?(?:peg|\$?1))\b|\b(?:peg|depeg\w*)"
+                         r"\b[^?]{0,40}\b(?P<s2>USDT|USDC|DAI|USDE|FDUSD|PYUSD|USDS|TUSD|USDD|FRAX)\b",
+                         re.I)
+
+
+def peg_lines(text: str) -> list[str] | None:
+    """Whether a named stablecoin holds its dollar peg now and over the last month, from
+    DeFiLlama's own price: "is the stablecoin USDC holding its peg?" got a comparison of issuers'
+    reserve reports (round 41 re-ask)."""
+    m = _PEG.search(text)
+    if m is None:
+        return None
+    symbol = (m.group("s") or m.group("s2")).upper()
+    try:
+        assets = _get(_LLAMA_STABLE, includePrices="true").get("peggedAssets", [])
+    except Exception:
+        return None
+    mine = max((a for a in assets if str(a.get("symbol", "")).upper() == symbol),
+               key=lambda a: float((a.get("circulating") or {}).get("peggedUSD") or 0),
+               default=None)
+    if mine is None or not mine.get("price"):
+        return None
+    price = float(mine["price"])
+    off = price - 1
+    now = float((mine.get("circulating") or {}).get("peggedUSD") or 0)
+    month = float((mine.get("circulatingPrevMonth") or {}).get("peggedUSD") or 0)
+    verdict = ("holding its peg" if abs(off) < 0.002 else
+               "slightly off its peg" if abs(off) < 0.01 else "off its peg")
+    meaning = []
+    if re.search(r"\bwhat\s+(?:is|does|'?s)\b[^?]{0,15}\bde-?peg|\bde-?peg\w*\s+mean", text, re.I):
+        # "what is depeg?? my friend said USDC lost its peg once" asks the word first (round 41
+        # newcomer, #5)
+        meaning = ["Bottom line: a depeg is a stablecoin trading away from the $1 it is meant to "
+                   "hold, because the market doubts it can be swapped for a dollar — USDC fell to "
+                   "about $0.88 in March 2023 when part of its reserves sat in a failed bank, and "
+                   "was back near $1 within days.",
+                   f"Today {symbol} is {verdict}: ${price:.4f}, {off:+.2%} from a dollar."]
+        return [*meaning, "Data: DeFiLlama stablecoins, read now. Not advice."]
+    return [f"Bottom line: {symbol} is {verdict} — ${price:.4f} now, {off:+.2%} from a dollar.",
+            f"Supply {_bn(now)}" + (f", {now / month - 1:+.1%} over the last month" if month
+                                     else "")
+            + (" — a fall that size is holders redeeming, the first sign of doubt"
+               if month and now / month - 1 < -0.05 else "") + ".",
+            "A peg is a promise to redeem for $1; the price above is where the market trades it. "
+            "Data: DeFiLlama stablecoins, read now. Not advice."]
+_NOT_CHAINS: Final = frozenset({"the", "this", "that", "which", "each", "every", "one", "any",
+                                "layer", "same", "main", "test", "new"})
+
+
+def unknown_lines(text: str) -> list[str] | None:
+    """A chain or stablecoin that DeFiLlama does not track, said as such before any answer about
+    others: "stablecoin TVL on the Atlantis chain and on Narnia L2" got Base, Arbitrum and OP, and
+    "the stablecoin USDQ-Z" got USDC and USDT (round 41 hostile, M6 and M7)."""
+    chains = [m.group("n") for m in _CHAIN_NAMED.finditer(text)
+              if m.group("n").lower() not in _NOT_CHAINS]
+    coins = [m.group("s") for m in _COIN_NAMED.finditer(text)]
+    if not chains and not coins:
+        return None
+    unknown: list[str] = []
+    try:
+        if chains:
+            known = {str(c.get("name", "")).lower() for c in _get(_LLAMA_CHAINS)}
+            known |= {k for k in _CHAINS}
+            unknown += [f"{c} (no chain by that name in DeFiLlama's {len(known)} tracked)"
+                        for c in chains if c.lower() not in known]
+        if coins:
+            listed = {str(a.get("symbol", "")).upper()
+                      for a in _get(_LLAMA_STABLE).get("peggedAssets", [])}
+            unknown += [f"{c} (not among DeFiLlama's {len(listed)} tracked stablecoins)"
+                        for c in coins if c.upper() not in listed]
+    except Exception:
+        return None
+    if not unknown:
+        return None
+    return [f"Bottom line: nothing can be read for {', '.join(unknown)} — check the name; no "
+            f"figure is given for something that is not tracked, and none is swapped in for it.",
+            "Ask again with a chain or coin DeFiLlama lists — for example \"stablecoin supply on "
+            "Base and Arbitrum\" or \"is USDC holding its peg\"."]
+
+
 def _get(url: str, **params: Any) -> Any:
     from argus.truth import http
 
@@ -59,7 +144,16 @@ def _bn(x: float) -> str:
 def lines(text: str) -> list[str] | None:
     """The answer to one of the three questions, or None when ``text`` asks none of them."""
     named = [_CHAINS[k] for k in _CHAINS if re.search(rf"\b{k}\b", text, re.I)]
+    if _DEX_ASKED.search(text):
+        out = _dex_lines(list(dict.fromkeys(named)))
+        if named and re.search(r"\bstablecoins?\b", text, re.I):
+            stable = _stable_by_chain(list(dict.fromkeys(named)))
+            out = [*out[:-1], stable[0].removeprefix("Bottom line: "), out[-1], stable[-1]]
+        return out
     layer2 = re.search(r"\bl2s?\b|\blayer[\s-]?2s?\b|\brollups?\b", text, re.I)
+    if named and re.search(r"\bstablecoins?\b", text, re.I) and re.search(
+            r"\b(?:tvl|supply|circulat\w*|how\s+much|biggest|largest|most)\b", text, re.I):
+        return _stable_by_chain(list(dict.fromkeys(named)))
     if (len(set(named)) >= 2 or layer2) and _CHAIN_ASKED.search(text):
         return _chain_lines(list(dict.fromkeys(named)) or list(_L2[:3]))
     if _STABLE_SPLIT.search(text) and not re.search(r"\byield|\bapy\b|\blend", text, re.I):
@@ -67,6 +161,99 @@ def lines(text: str) -> list[str] | None:
     if _STABLE_YIELD.search(text):
         return _yield_lines(text)
     return None
+
+
+_DEX_ASKED: Final = re.compile(
+    r"\bdexs?\b[^?]{0,40}\bvolumes?\b|\bvolumes?\b[^?]{0,40}\bdexs?\b|\bon[\s-]?chain\s+"
+    r"(?:trading\s+)?volumes?\b[^?]{0,30}\bchains?\b", re.I)
+_LLAMA_DEXS: Final = "https://api.llama.fi/overview/dexs"
+_LLAMA_KEYS: Final = {"OP Mainnet": "optimism", "BSC": "bsc", "zkSync Era": "era",
+                      "Avalanche": "avax"}
+"""DeFiLlama's per-chain keys in a protocol's ``breakdown24h`` where they differ from the display
+name lower-cased."""
+_LLAMA_NAMES: Final = {"bsc": "BSC", "avax": "Avalanche", "era": "zkSync Era",
+                       "optimism": "OP Mainnet", "robinhood": "Robinhood Chain",
+                       "hyperliquid": "Hyperliquid L1", "xdai": "Gnosis"}
+
+
+def _dex_lines(chains: list[str]) -> list[str]:
+    """Chains ranked by DEX volume over the last 24 hours, from DeFiLlama's DEX overview.
+
+    Each protocol's ``breakdown24h`` is summed by chain, leaving out the rows DeFiLlama marks
+    ``doublecounted`` (trading apps such as Axiom and fomo that route through DEXs already
+    counted). Checked 2026-10-05: the sums then match DeFiLlama's own per-chain endpoint
+    (``/overview/dexs/solana`` $1.708bn, Base $0.912bn, BSC $0.713bn) to the dollar; with the
+    double-counted rows in, Solana read $2.09bn. ``off_chain`` is not a chain and is left out."""
+    try:
+        data = _get(_LLAMA_DEXS, excludeTotalDataChart="true",
+                    excludeTotalDataChartBreakdown="true")
+    except Exception:
+        return ["Bottom line: DeFiLlama's DEX volumes did not answer just now; ask again in a "
+                "minute."]
+    totals: dict[str, float] = {}
+    for row in data.get("protocols") or []:
+        if row.get("doublecounted"):
+            continue
+        for chain, by_name in (row.get("breakdown24h") or {}).items():
+            if chain == "off_chain" or not isinstance(by_name, dict):
+                continue
+            totals[chain] = totals.get(chain, 0.0) + sum(
+                float(v) for v in by_name.values() if isinstance(v, int | float))
+    ranked = sorted(totals.items(), key=lambda r: -r[1])
+    whole = sum(totals.values())
+    if not ranked or whole <= 0:
+        return ["Bottom line: DeFiLlama returned no DEX volume by chain just now."]
+    place = {key: i for i, (key, _) in enumerate(ranked, 1)}
+    out = []
+    for chain in chains:
+        key = _LLAMA_KEYS.get(chain, chain.lower())
+        if key in place:
+            vol = totals[key]
+            out.append(f"{chain} ranks #{place[key]} of {len(ranked)} chains by DEX volume over "
+                       f"the last 24 hours: {_bn(vol)}, {vol / whole:.1%} of {_bn(whole)}.")
+        else:
+            out.append(f"{chain}: DeFiLlama lists no DEX volume for it in the last 24 hours.")
+    top = "; ".join(f"{i}. {_LLAMA_NAMES.get(k, k.title())} {_bn(v)}"
+                    for i, (k, v) in enumerate(ranked[:5], 1))
+    if not out:
+        lead, vol = ranked[0]
+        out.append(f"{_LLAMA_NAMES.get(lead, lead.title())} has the most DEX volume over the last "
+                   f"24 hours, {_bn(vol)} of {_bn(whole)} across {len(ranked)} chains.")
+    out.append(f"Top five by 24-hour DEX volume: {top}.")
+    out[0] = "Bottom line: " + out[0]
+    out.append("Data: DeFiLlama DEX overview (24-hour volume per protocol, summed by chain, "
+               "double-counted trading apps left out), read now. Analysis, not advice.")
+    return out
+
+
+def _stable_by_chain(chains: list[str]) -> list[str]:
+    """Dollar stablecoins circulating on each named chain, from DeFiLlama's stablecoin-chains
+    table — what "stablecoin TVL on Base" asks, rather than the chain's whole TVL."""
+    try:
+        rows = _get("https://stablecoins.llama.fi/stablecoinchains")
+    except Exception:
+        return ["Bottom line: DeFiLlama's stablecoin chains did not answer just now; ask again in "
+                "a minute."]
+    supply = {str(r.get("name")): float((r.get("totalCirculatingUSD") or {}).get("peggedUSD")
+                                        or 0) for r in rows}
+    found = sorted(((c, supply.get(c, 0.0)) for c in chains), key=lambda r: -r[1])
+    if not any(v for _, v in found):
+        return ["Bottom line: DeFiLlama listed no stablecoin supply for "
+                + " or ".join(chains) + " just now."]
+    if len(found) == 1:
+        # one chain named: "Solana carries the most" was said of a list of one (round 41)
+        order = sorted(supply.values(), reverse=True)
+        chain, value = found[0]
+        return [f"Bottom line: {chain} carries {_bn(value)} in dollar stablecoins, "
+                f"#{order.index(value) + 1} of {len(order)} chains "
+                f"({value / sum(order):.1%} of {_bn(sum(order))}).",
+                "Data: DeFiLlama stablecoin chains (circulating dollar stablecoins per chain), "
+                "read now. Analysis, not advice."]
+    return [f"Bottom line: {found[0][0]} carries the most dollar stablecoins, {_bn(found[0][1])}"
+            + (", against " + ", ".join(f"{_bn(v)} on {c}" for c, v in found[1:])
+               if len(found) > 1 else "") + ".",
+            "Data: DeFiLlama stablecoin chains (circulating dollar stablecoins per chain), read "
+            "now. Analysis, not advice."]
 
 
 def _split_lines(text: str) -> list[str]:

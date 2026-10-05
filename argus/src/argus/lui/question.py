@@ -643,6 +643,10 @@ def extract_symbols(text: str) -> tuple[tuple[str, ...], str]:
     lower case, and lower-case unknown words stay unknown rather than being called instruments.
     """
     text = coin_as_ticker(text)
+    from argus.lui.research.parse import two_word_company
+
+    # "GE Vernova" is GEV, not GE, on this path too (round 41 hostile, m5)
+    text = re.sub(r"\b([A-Z]{2,5})\s+([A-Z][a-z]{2,})\b", two_word_company, text)
     found: list[str] = []
     for raw in _WORD.findall(text):
         token = raw.upper()

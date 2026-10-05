@@ -273,6 +273,13 @@ def order_prefix(text: str) -> str | None:
         # "Never let me open a position larger than $8k unless I confirm" is a rule to keep, not
         # an order (a live re-ask, round 35)
         return None
+    from argus.lui.research import rule_test, signal_test
+
+    if re.search(r"\b(?:when|whenever|every\s+time|each\s+time|the\s+day\s+after|once)\b", raw,
+                 re.I) and (rule_test.read_rule(raw) is not None or signal_test.asks(raw)):
+        # "buy BTC when the funding rate is negative, sell when it turns positive" is a rule to
+        # backtest, and the backtest answers it; it was told "Nothing was sent" (round 41, C4)
+        return None
     if re.match(r"^\s*(?:please\s+|pls\s+)?hedge\b", raw, re.I):
         # a hedge request is answered as a hedge analysis (`research._IMPERATIVE_HEDGE`)
         return None
@@ -393,7 +400,10 @@ _OTHERS = re.compile(
     # fundamentals answer reads it; "which funds own TSLA" was refused (stranger QA, 2026-09-29).
     r"\bwhich\s+(?:bitget\s+|other\s+)?(?:users|traders|accounts|people|clients|customers|"
     r"whales)\s+(?:are|were|is|have|hold|own|bought|sold)\b"
+    # "who is selling NVDA — insiders or institutions?" is public (Form 4 and 13F) and the
+    # fundamentals answer reads both; it was refused here (round 41 audit)
     r"|\bwho\s+(?:is|are|was|were)\s+(?:long|short|buying|selling|holding)\b"
+    r"(?![^?]{0,60}\b(?:insiders?|institutions?|institutional|13f|form\s*4|funds?)\b)"
     r"|\b(?P<who>(?-i:[A-Z][\w&.-]+(?:\s+[A-Z][\w&.-]+){0,2}))(?:'s|’s)\s+(?:exact\s+|current\s+|live\s+|"
     r"latest\s+|real[\s-]time\s+|actual\s+)*(?:positions?|holdings|book|portfolio|trades|"
     r"orders)\b[^?.]{0,40}\b(?:today|right\s+now|now|live|currently|this\s+(?:morning|week))\b"

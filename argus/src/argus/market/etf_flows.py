@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import json
 import statistics
+import time
 from collections.abc import Callable, Mapping
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
@@ -42,6 +43,9 @@ LINKED = {"BTCUSDT": ("BTC",), "ETHUSDT": ("ETH",), "COINUSDT": ("BTC", "ETH"),
           "MSTRUSDT": ("BTC",)}
 """Which fund flows belong in which name's answer: the asset itself, and the two stocks whose
 price follows crypto (an exchange and a bitcoin treasury company)."""
+
+PACE = (2.0, 10.0, 30.0)
+"""Seconds to wait before each try of one fund's history: paced first, then backing off."""
 
 Get = Callable[[str, Mapping[str, Any] | None], Any]
 
@@ -111,7 +115,64 @@ def treasury(rows: list[Mapping[str, Any]]) -> dict[str, Any]:
             "recent": buys}
 
 
-def sweep(get: Get = get_live, now: datetime | None = None) -> dict[str, Any]:
+def _paced(get: Get, path: str, query: Mapping[str, Any],
+           pause: Callable[[float], None]) -> Any:
+    """One SoSoValue call, paced and retried with a longer wait each time it is rate-limited.
+
+    Only a refusal that can pass is retried — HTTP 429, a timeout — and a 403 or a missing
+    endpoint is raised at once: waiting 40 seconds on an error that will not change is waiting
+    for nothing."""
+    failure: FlowError | None = None
+    for wait in PACE:
+        pause(wait)
+        try:
+            return get(path, query)
+        except FlowError as exc:
+            failure = exc
+            said = str(exc).lower()
+            if not ("429" in said or "too many" in said or "timed out" in said
+                    or "timeout" in said):
+                raise
+    assert failure is not None
+    raise failure
+
+
+def by_fund(asset: str, get: Get,
+            pause: Callable[[float], None] = time.sleep) -> dict[str, Any]:
+    """Each US spot fund's last five reported days: net inflow, its sum, and net assets.
+
+    SoSoValue lists the funds at ``/etfs`` and keeps each one's daily row at
+    ``/etfs/{ticker}/history`` (probed 2026-10-05: ``net_inflow``, ``net_assets`` per date, newest
+    first). The per-fund sweep is about twenty calls and SoSoValue answers HTTP 429 ("Too many
+    requests") when they come back to back (seen 2026-10-05), so calls are paced and a refused one
+    is retried after a longer wait; a fund that still fails is named under ``missing`` rather than
+    read as zero, and the answer says the table is partial."""
+    funds: list[dict[str, Any]] = []
+    missing: list[str] = []
+    listed = _paced(get, "/etfs", {"symbol": asset, "country_code": "US"}, pause)
+    for row in list(listed or []):
+        ticker = str(row["ticker"])
+        try:
+            days = sorted(list(_paced(get, f"/etfs/{ticker}/history", {"limit": 5}, pause) or []),
+                          key=lambda r: str(r["date"]), reverse=True)[:5]
+        except FlowError:
+            days = []
+        if not days:
+            missing.append(ticker)
+            continue
+        funds.append({"ticker": ticker, "name": str(row.get("name") or ticker),
+                      "date": str(days[0]["date"]), "first": str(days[-1]["date"]),
+                      "latest_usd": float(days[0].get("net_inflow") or 0.0),
+                      "five_day_usd": sum(float(d.get("net_inflow") or 0.0) for d in days),
+                      "net_assets_usd": float(days[0].get("net_assets") or 0.0)})
+    if not funds:
+        raise FlowError(f"no {asset} fund rows")
+    ordered = sorted(funds, key=lambda f: f["five_day_usd"], reverse=True)
+    return {"funds": ordered, "missing": missing}
+
+
+def sweep(get: Get = get_live, now: datetime | None = None,
+          pause: Callable[[float], None] = time.sleep) -> dict[str, Any]:
     stamp = now or datetime.now(UTC)
     out: dict[str, Any] = {"generated_at": stamp.isoformat(),
                            "source": "SoSoValue /etfs/summary-history and /btc-treasuries "
@@ -131,6 +192,12 @@ def sweep(get: Get = get_live, now: datetime | None = None) -> dict[str, Any]:
                                             {"limit": 5}) or []))
     except (FlowError, KeyError, TypeError, ValueError) as exc:
         out["errors"].append(f"MSTR treasury: {exc}")
+    out["by_fund"] = {}
+    for asset in ("BTC", "ETH"):
+        try:
+            out["by_fund"][asset] = by_fund(asset, get, pause)
+        except (FlowError, KeyError, TypeError, ValueError) as exc:
+            out["errors"].append(f"{asset} funds: {exc}")
     return out
 
 
@@ -142,7 +209,7 @@ def load(path: Path = FLOWS_PATH) -> dict[str, Any] | None:
     return loaded if isinstance(loaded, dict) else None
 
 
-def _usd(value: float) -> str:
+def usd(value: float) -> str:
     sign = "+" if value > 0 else "-" if value < 0 else ""
     size = abs(value)
     return f"{sign}${size / 1e9:,.2f}bn" if size >= 1e9 else f"{sign}${size / 1e6:,.0f}m"
@@ -168,8 +235,8 @@ def lines_for(symbol: str, snapshot: dict[str, Any] | None,
         streak = fund.get("streak_days", 0)
         run = (f"; {streak} {'inflow' if fund['net_inflow_usd'] > 0 else 'outflow'} days running"
                if streak >= 3 else "")
-        out.append(f"US spot {asset} ETFs, {day:%d %b}: net {_usd(fund['net_inflow_usd'])} "
-                   f"(creations less redemptions){unusual}; five days {_usd(fund['five_day_usd'])}"
+        out.append(f"US spot {asset} ETFs, {day:%d %b}: net {usd(fund['net_inflow_usd'])} "
+                   f"(creations less redemptions){unusual}; five days {usd(fund['five_day_usd'])}"
                    f"{run}; ${fund['net_assets_usd'] / 1e9:,.0f}bn held"
                    + (" — stale" if stale else "") + " (SoSoValue).")
     held = snapshot.get("treasury") or {}
@@ -182,8 +249,76 @@ def lines_for(symbol: str, snapshot: dict[str, Any] | None,
     return out
 
 
+def fund_table_lines(asset: str, snapshot: dict[str, Any] | None, top: int = 3,
+                     today: date | None = None) -> list[str]:
+    """Which US spot funds took in and gave back the most over their last five reported days."""
+    table = ((snapshot or {}).get("by_fund") or {}).get(asset) or {}
+    funds, missing = table.get("funds") or [], table.get("missing") or []
+    if not funds:
+        return []
+    word = {"BTC": "bitcoin", "ETH": "ether"}.get(asset, asset)
+    first, last = min(f["first"] for f in funds), max(f["date"] for f in funds)
+    stale = (today or datetime.now(UTC).date()) - date.fromisoformat(last) > STALE_AFTER
+    ins = [f for f in funds if f["five_day_usd"] > 0][:top]
+    outs = [f for f in reversed(funds) if f["five_day_usd"] < 0][:top]
+    total = sum(f["five_day_usd"] for f in funds)
+    aum = sum(f["net_assets_usd"] for f in funds)
+
+    def name(f: dict[str, Any]) -> str:
+        return f"{f['ticker']} ({f['name']}) {usd(f['five_day_usd'])}"
+
+    out = [f"US spot {word} ETFs, five reported days {first} to {last} ({len(funds)} funds): "
+           f"net {usd(total)} in total, ${aum / 1e9:,.1f}bn held" + (" — stale" if stale else "")
+           + " (SoSoValue, creations less redemptions)."]
+    if missing:
+        out.append(f"Not in these sums: {', '.join(missing)} did not answer on the last sweep, so "
+                   "the totals are partial.")
+    out.append("Largest inflows: " + ("; ".join(name(f) for f in ins) if ins
+                                      else "none — no fund took money in net") + ".")
+    out.append("Largest outflows: " + ("; ".join(name(f) for f in outs) if outs
+                                       else "none — no fund gave money back net") + ".")
+    return out
+
+
+def aum_line(asset: str, snapshot: dict[str, Any] | None) -> str | None:
+    """Total net assets in the US spot funds for one coin, and the largest holder."""
+    table = ((snapshot or {}).get("by_fund") or {}).get(asset) or {}
+    funds = [] if table.get("missing") else table.get("funds") or []
+    fund = ((snapshot or {}).get("funds") or {}).get(asset)
+    word = {"BTC": "bitcoin", "ETH": "ether"}.get(asset, asset)
+    if funds:
+        aum = sum(f["net_assets_usd"] for f in funds)
+        big = max(funds, key=lambda f: f["net_assets_usd"])
+        return (f"US spot {word} ETF assets (AUM): ${aum / 1e9:,.1f}bn across {len(funds)} funds "
+                f"on {max(f['date'] for f in funds)}; the largest is {big['ticker']} "
+                f"({big['name']}) at ${big['net_assets_usd'] / 1e9:,.1f}bn (SoSoValue).")
+    if fund:
+        return (f"US spot {word} ETF assets (AUM): ${fund['net_assets_usd'] / 1e9:,.1f}bn on "
+                f"{fund['date']} (SoSoValue).")
+    return None
+
+
+def carry(snapshot: dict[str, Any], prior: dict[str, Any] | None) -> dict[str, Any]:
+    """Keep the last good reading of any part this sweep failed to fetch.
+
+    A refused call (SoSoValue rate-limits, 2026-10-05) must not wipe a reading the console was
+    serving. Every carried part keeps its own dates, so the answers still say how old it is and
+    mark it stale past ``STALE_AFTER``; the carry is named in ``errors``."""
+    if not prior:
+        return snapshot
+    for part in ("funds", "by_fund"):
+        for asset, value in (prior.get(part) or {}).items():
+            if asset not in snapshot.setdefault(part, {}):
+                snapshot[part][asset] = value
+                snapshot["errors"].append(f"{asset} {part}: kept from the previous sweep")
+    if "treasury" not in snapshot and prior.get("treasury"):
+        snapshot["treasury"] = prior["treasury"]
+        snapshot["errors"].append("MSTR treasury: kept from the previous sweep")
+    return snapshot
+
+
 def main(argv: list[str] | None = None) -> int:  # pragma: no cover - CLI, live network
-    snapshot = sweep()
+    snapshot = carry(sweep(), load())
     FLOWS_PATH.write_text(json.dumps(snapshot, indent=2), encoding="utf-8", newline="\n")
     for symbol in LINKED:
         for line in lines_for(symbol, snapshot):
@@ -196,4 +331,5 @@ if __name__ == "__main__":  # pragma: no cover
     raise SystemExit(main())
 
 
-__all__ = ["FLOWS_PATH", "FlowError", "fund_flows", "lines_for", "load", "sweep", "treasury"]
+__all__ = ["FLOWS_PATH", "FlowError", "aum_line", "by_fund", "carry", "fund_flows",
+           "fund_table_lines", "lines_for", "load", "sweep", "treasury", "usd"]

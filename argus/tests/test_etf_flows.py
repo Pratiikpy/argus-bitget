@@ -38,7 +38,7 @@ def test_no_rows_is_an_error_not_a_quiet_day() -> None:
 
 
 def _snapshot(fetch: Any) -> dict[str, Any]:
-    return ef.sweep(get=fetch, now=NOW)
+    return ef.sweep(get=fetch, now=NOW, pause=lambda seconds: None)
 
 
 def _fake(path: str, query: Any) -> Any:
@@ -70,5 +70,7 @@ def test_a_failing_endpoint_is_recorded_not_hidden() -> None:
         raise ef.FlowError("SoSoValue /etfs/summary-history unreachable: HTTP 403")
 
     snapshot = _snapshot(broken)
-    assert snapshot["funds"] == {} and len(snapshot["errors"]) == 3
+    # two aggregate series, the treasury, and each asset's fund table: all five failures named
+    assert snapshot["funds"] == {} and len(snapshot["errors"]) == 5
+    assert any(e.startswith("ETH funds:") for e in snapshot["errors"])
     assert ef.lines_for("BTCUSDT", snapshot) == []

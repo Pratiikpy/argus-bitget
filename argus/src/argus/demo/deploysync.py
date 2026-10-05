@@ -77,6 +77,9 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     "social_pulse.json",
     # Spot bitcoin/ether ETF flows and Strategy's buys (`market/etf_flows.py`, SoSoValue).
     "etf_flows.json",
+    # BTC and ETH 30-day 25-delta skew, one row a day rebuilt from Deribit's trades
+    # (`market/skew_history.py`): the "versus its 90-day average" half of a skew question.
+    "crypto_skew_history.json",
     # Does every figure a question states reach the analysis (`eval/figurecheck.py`), for /status.
     "figurecheck.json",
     "skill_reliability.json",
@@ -296,6 +299,13 @@ def sync(*, dry_run: bool = False, data_only: bool = False) -> SyncResult:
             from argus.lui.research import write_macro_snapshot
 
             write_macro_snapshot()
+        except Exception:
+            pass
+        # the skew history gains a row a day; a refresh fetches only the days it lacks
+        try:
+            from argus.market import skew_history
+
+            skew_history.update()
         except Exception:
             pass
     result.ledger_before = _count_lines(DEPLOY_DATA / "paper_ledger.jsonl")

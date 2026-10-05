@@ -54,6 +54,10 @@ def delta(forward: float, strike: float, years: float, vol: float, call: bool) -
 
 
 def _horizon_days(text: str, default: int) -> int:
+    # "versus its 90-day average" names the history's span, not the expiry: ETH's skew was read
+    # on an 81-day expiry for it (round 41 live pre-check)
+    text = re.sub(r"\b\d{1,3}[\s-]*(?:day|d)\b[^?]{0,20}\b(?:average|avg|mean|norm|history)\b",
+                  " ", text, flags=re.I)
     m = _DAYS.search(text)
     if m is None:
         return 30 if re.search(r"\bthis\s+month\b", text, re.I) else default
@@ -85,11 +89,11 @@ def lines(text: str) -> list[str] | None:
         return None
     from argus.market import deribit
 
-    currency = "ETH" if re.search(r"\beth\b|\bether(?:eum)?\b", text, re.I) and not re.search(
-        r"\bbtc\b|\bbitcoin\b", text, re.I) else "BTC"
+    currency = _subject(text)
     premium = _PREMIUM.search(text)
     wants_put = bool(re.search(r"\bputs?\b", text, re.I))
-    if not (_SKEW.search(text) or premium or re.search(
+    if not (_SKEW.search(text) or premium or _STRIKE.search(text) or _EXPIRY.search(text)
+            or _SPREAD.search(text) or re.search(
             r"\bimplied\s+vol\w*|\biv\b|\bdvol\b|\boptions\b|\bstrikes?\b", text, re.I)):
         return None
     try:
@@ -99,24 +103,183 @@ def lines(text: str) -> list[str] | None:
         return [f"Bottom line: Deribit's {currency} option book did not answer just now, so no "
                 f"implied volatility is given; ask again in a minute."]
     today = deribit.today()
+    named = _specific(text, book, spot, today, currency)
+    if named is not None:
+        return named
     if premium and wants_put:
         return _put_for_premium(text, book, spot, today, currency,
                                 float(premium.group("pct") or premium.group("pct2")))
+    spread = _put_spread(text, book, spot, today, currency)
     if _SKEW.search(text):
-        return _skew(text, book, today, currency)
+        said = _skew(text, book, today, currency)
+        return said if spread is None else [*said[:-1], *spread, said[-1]]
+    if spread is not None:
+        return [f"Bottom line: {spread[0][:1].lower()}{spread[0][1:]}", *spread[1:],
+                "Data: Deribit public option book, read now. Analysis, not advice."]
     return _atm(text, book, spot, today, currency, deribit.dvol(currency))
 
 
-def _atm(text: str, book: list[Any], spot: float, today: Any, currency: str,
-         dvol: float | None) -> list[str]:
-    days = _horizon_days(text, 30)
+_STRIKE: Final = re.compile(r"\bstrike\s+(?:of\s+|at\s+)?\$?\s?"
+                            r"(?P<a>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k)?\b|"
+                            r"\$?(?P<b>\d[\d,]*(?:\.\d+)?)\s*(?P<k2>k)?\s+(?:call|put)\b", re.I)
+_EXPIRY: Final = re.compile(r"\b(?:expir\w*|expiry|exp\.?)\s+(?:on\s+)?(?P<d>tomorrow|today|"
+                            r"\d{4}-\d{2}-\d{2}|\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4}|[A-Za-z]{3,9}\s+"
+                            r"\d{1,2},?\s+\d{4})", re.I)
+
+
+def _expiry_said(raw: str, today: Any) -> Any:
+    from datetime import datetime, timedelta
+
+    word = raw.lower()
+    if word == "tomorrow":
+        return today + timedelta(days=1)
+    if word == "today":
+        return today
+    for layout in ("%Y-%m-%d", "%d %B %Y", "%d %b %Y", "%B %d %Y", "%b %d %Y"):
+        try:
+            return datetime.strptime(raw.replace(",", ""), layout).date()
+        except ValueError:
+            continue
+    return None
+
+
+def _specific(text: str, book: list[Any], spot: float, today: Any,
+              currency: str) -> list[str] | None:
+    """A named strike or expiry, answered as named: "a BTC call at strike $1 expiring tomorrow",
+    "a put 60000 expiring 2019-03-01" and "strike 99,999,999" each got the at-the-money answer
+    for another expiry (round 41 hostile, M5)."""
+    s = _STRIKE.search(text)
+    e = _EXPIRY.search(text)
+    if s is None and e is None:
+        return None
+    expiry = _expiry_said(e.group("d"), today) if e else None
+    if e is not None and expiry is None:
+        return None
+    if expiry is not None and expiry < today:
+        return [f"Bottom line: an option expiring {expiry:%d %b %Y} has already expired, so it has "
+                f"no price or implied volatility now — Deribit lists live expiries only, from "
+                f"{min(o.expiry for o in book):%d %b %Y} out to "
+                f"{max(o.expiry for o in book):%d %b %Y}."]
+    listed = sorted({o.expiry for o in book})
+    on = (min(listed, key=lambda d: abs((d - expiry).days)) if expiry else
+          _expiry_near(book, today, _horizon_days(text, 30)))
+    leg = [o for o in book if o.expiry == on]
+    call = not re.search(r"\bputs?\b", text, re.I)
+    strikes = sorted({o.strike for o in leg})
+    out: list[str] = []
+    if expiry is not None and on != expiry:
+        out.append(f"Deribit lists no {currency} expiry on {expiry:%d %b %Y}; the nearest listed "
+                   f"is {on:%d %b %Y}.")
+    if s is not None:
+        asked = float((s.group("a") or s.group("b")).replace(",", "")) * (
+            1000 if (s.group("k") or s.group("k2")) else 1)
+        if not strikes or asked < strikes[0] * 0.5 or asked > strikes[-1] * 2:
+            out.insert(0, f"Bottom line: no {currency} option is listed at a strike of "
+                          f"{asked:,.0f} "
+                          f"for {on:%d %b %Y} — strikes there run from {strikes[0]:,.0f} to "
+                          f"{strikes[-1]:,.0f}, around a forward of {leg[0].forward:,.0f}, so "
+                          f"there is no price or delta to give for it.")
+            return out
+        pick = min((o for o in leg if o.call == call), key=lambda o: abs(o.strike - asked))
+    else:
+        pick = min((o for o in leg if o.call == call), key=lambda o: abs(o.strike - o.forward))
+    years = max((on - today).days, 1) / 365
+    d = delta(pick.forward, pick.strike, years, pick.iv, call)
+    price = pick.mark_btc * spot
+    near = "" if s is None or pick.strike == asked else f" (the listed strike nearest {asked:,.0f})"
+    out.insert(0, f"Bottom line: the {currency} {pick.strike:,.0f} {'call' if call else 'put'} "
+                  f"expiring {on:%d %b %Y}{near} is marked at "
+                  f"{pick.mark_btc:.4f} {currency} — about "
+                  f"${price:,.0f} — at {pick.iv:.1%} implied volatility, with a delta of {d:+.2f}.")
+    out.append(f"Data: Deribit public option book, read now ({currency} index {spot:,.0f}); delta "
+               f"is Black-76 on the expiry's forward. Not advice.")
+    return out
+
+
+_ETH: Final = re.compile(r"\beth\b|\bether(?:eum)?\b", re.I)
+_BTC: Final = re.compile(r"\bbtc\b|\bbitcoin\b", re.I)
+_VOL_WORD: Final = re.compile(r"\bimplied|\biv\b|\bvol\w*|\bskew|\boptions?\b|\bstrike|\bdvol\b",
+                              re.I)
+
+
+def _subject(text: str) -> str:
+    """The coin whose options are asked about: the one named nearest before the volatility words,
+    else the first named. "the ETH/BTC ratio and ETH 30-day implied vol" was answered for BTC
+    because BTC was named at all (round 41 judge, C1)."""
+    vol = _VOL_WORD.search(text)
+    at = vol.start() if vol else len(text)
+    before = [(m.start(), "ETH") for m in _ETH.finditer(text[:at])] + \
+        [(m.start(), "BTC") for m in _BTC.finditer(text[:at])]
+    if before:
+        return max(before)[1]
+    first = [(m.start(), "ETH") for m in _ETH.finditer(text)] + \
+        [(m.start(), "BTC") for m in _BTC.finditer(text)]
+    return min(first)[1] if first else "BTC"
+
+
+def _atm_iv(book: list[Any], today: Any, days: int) -> tuple[Any, Any, float]:
     expiry = _expiry_near(book, today, days)
     leg = [o for o in book if o.expiry == expiry]
     forward = leg[0].forward
     atm = min(leg, key=lambda o: (abs(o.strike - forward), not o.call))
+    return expiry, atm, forward
+
+
+def _realised(currency: str) -> float | None:
+    """Thirty-day realised volatility from Bitget's hourly closes, annualised over every hour."""
+    from argus.lui.research.data import load
+
+    try:
+        rets = list((load((f"{currency}USDT",)).raw.get(f"{currency}USDT") or {}).values())
+    except Exception:
+        return None
+    if len(rets) < 100:
+        return None
+    mu = sum(rets) / len(rets)
+    return float((sum((r - mu) ** 2 for r in rets) / (len(rets) - 1)) ** 0.5 * (24 * 365) ** 0.5)
+
+
+def _atm(text: str, book: list[Any], spot: float, today: Any, currency: str,
+         dvol: float | None) -> list[str]:
+    from argus.market import deribit
+
+    days = _horizon_days(text, 30)
+    expiry, atm, forward = _atm_iv(book, today, days)
     out = [f"Bottom line: {currency}'s at-the-money implied volatility is {atm.iv:.1%} a year for "
            f"the {expiry:%d %b} expiry ({(expiry - today).days} days, strike {atm.strike:,.0f} "
            f"against a forward of {forward:,.0f}), on Deribit's book."]
+    if re.search(r"\brealis|\brealiz|\bvol(?:atility)?\s+risk\s+premium\b|"
+                 r"\bvrp\b|\bhistoric\w*\s+vol",
+                 text, re.I):
+        realised = _realised(currency)
+        if realised is not None:
+            premium = atm.iv - realised
+            out.append(f"Realised over the last 30 days: {realised:.1%} a year (Bitget hourly "
+                       f"closes), so the volatility risk premium — implied less realised — is "
+                       f"{premium * 100:+.1f} points: options are "
+                       + ("priced above what the market has actually moved." if premium > 0 else
+                          "priced below what the market has actually moved."))
+    other = "BTC" if currency == "ETH" else "ETH"
+    other_named = (_BTC if other == "BTC" else _ETH).search(text)
+    if other_named and re.search(r"\bvs\.?|\bversus\b|\bcompare\w*|\bagainst\b|\bratio\b", text,
+                                 re.I):
+        try:
+            o_book = deribit.options(other)
+            o_exp, o_atm, _ = _atm_iv(o_book, today, days)
+            out.append(f"{other} beside it: {o_atm.iv:.1%} at the money for {o_exp:%d %b} — "
+                       f"{currency} is {atm.iv / o_atm.iv:.2f} times {other}'s implied "
+                       f"volatility.")
+        except Exception:
+            pass
+    if re.search(r"\bratio\b", text, re.I) and _ETH.search(text) and _BTC.search(text):
+        try:
+            from argus.market.bitget import fetch_tickers
+
+            board = fetch_tickers()
+            ratio = float(board["ETHUSDT"].last) / float(board["BTCUSDT"].last)
+            out.insert(1, f"The ETH/BTC ratio is {ratio:.5f} on Bitget's last prices.")
+        except Exception:
+            pass
     if dvol is not None:
         out.append(f"DVOL, Deribit's 30-day {currency} implied-volatility index, reads {dvol:.1f}.")
     if _VIX.search(text):
@@ -145,14 +308,103 @@ def _skew(text: str, book: list[Any], today: Any, currency: str) -> list[str]:
     read = ("puts cost more than calls: buyers are paying up for downside protection"
             if skew > 0.5 else "calls cost more than puts: the demand is for upside"
             if skew < -0.5 else "puts and calls are priced about evenly: no strong lean")
-    return [f"Bottom line: the 25-delta skew on {currency} options expiring {expiry:%d %b} "
-            f"({(expiry - today).days} days) is {skew:+.1f} vol points — {read}.",
-            f"25-delta put: strike {put.strike:,.0f} at {put.iv:.1%} implied volatility; "
-            f"25-delta call: strike {call.strike:,.0f} at {call.iv:.1%}; "
-            f"forward {leg[0].forward:,.0f}.",
+    out = [f"Bottom line: the 25-delta skew on {currency} options expiring {expiry:%d %b} "
+           f"({(expiry - today).days} days) is {skew:+.1f} vol points — {read}.",
+           f"25-delta put: strike {put.strike:,.0f} at {put.iv:.1%} implied volatility; "
+           f"25-delta call: strike {call.strike:,.0f} at {call.iv:.1%}; "
+           f"forward {leg[0].forward:,.0f}."]
+    history = _skew_history_line(text, currency)
+    if history:
+        out.append(history)
+        relative = re.search(r"— (puts cheaper than usual|puts dearer than usual|about its usual "
+                             r"level)", history)
+        if relative:
+            # the comparison asked for leads, not three lines down (round 41 judge, M11)
+            out[0] = out[0].rstrip(".") + (f"; against its own {_history_days(text)}-day "
+                                           f"history, {relative.group(1)}.")
+    return [*out,
             "Deltas are Black-76 on each expiry's forward from Deribit's mark implied "
             "volatility; the listed strike nearest each delta is used, not an interpolated one.",
             "Data: Deribit public option book, read now. Analysis, not advice."]
+
+
+_AVERAGE: Final = re.compile(r"\b(?P<n>\d{2,3})[\s-]*(?:day|d)\b[^?]{0,20}\b(?:average|avg|mean|"
+                             r"norm)\b|\b(?:average|avg|normal|usual|history|historical\w*|"
+                             r"percentile)\b", re.I)
+
+
+def _history_days(text: str) -> int:
+    m = _AVERAGE.search(text)
+    return int(m.group("n")) if m is not None and m.group("n") else 90
+
+
+def _skew_history_line(text: str, currency: str) -> str | None:
+    """Today's skew against its own average, both rebuilt the same way from Deribit's trades
+    (`market/skew_history.py`); None when the question does not ask for the comparison."""
+    m = _AVERAGE.search(text)
+    if m is None:
+        return None
+    from argus.lui.answer import desk_notes_path
+    from argus.market import skew_history
+
+    days = int(m.group("n")) if m.group("n") else 90
+    snapshot = skew_history.load(desk_notes_path().parent / "crypto_skew_history.json")
+    found = skew_history.average(currency, days, snapshot=snapshot)
+    if found is None:
+        return (f"Its {days}-day average is not on record here: the daily skew history rebuilt "
+                "from Deribit's trades does not cover enough of that span.")
+    mean, counted, latest = found
+    gap = (latest or 0.0) - mean
+    return (f"Against its own history: rebuilt from each day's Deribit trades the same way, the "
+            f"30-day 25-delta skew averaged {mean:+.1f} vol points over the last {days} days "
+            f"({counted} days with enough trades) and read {latest:+.1f} on the latest full day — "
+            + ("puts cheaper than usual" if gap < -0.5 else "puts dearer than usual"
+               if gap > 0.5 else "about its usual level")
+            + ". That series is printed from trades, not the book's marks, so set the history "
+              "against the history, not against the figure above.")
+
+
+_SPREAD: Final = re.compile(r"\bput\s+spread\b|\bbear\s+put\b|\bput\s+vertical\b", re.I)
+_OTM: Final = re.compile(r"(?P<a>\d{1,2}(?:\.\d+)?)\s*%\s*(?:otm|out[\s-]of[\s-]the[\s-]money|"
+                         r"below)"
+                         r"(?:[^?]{0,40}?(?P<b>\d{1,2}(?:\.\d+)?)\s*%\s*(?:otm|out[\s-]of[\s-]the"
+                         r"[\s-]money|below))?", re.I)
+
+
+def _put_spread(text: str, book: list[Any], spot: float, today: Any,
+                currency: str) -> list[str] | None:
+    """A put spread priced off the listed book: long the put about the stated distance below the
+    spot, short one further down (twice the distance when only one is said)."""
+    if not _SPREAD.search(text):
+        return None
+    m = _OTM.search(text)
+    near = float(m.group("a")) / 100 if m else 0.10
+    far = float(m.group("b")) / 100 if m and m.group("b") else near * 2
+    days = _horizon_days(text, 30)
+    expiry = _expiry_near(book, today, days)
+    puts = [o for o in book if o.expiry == expiry and not o.call]
+    if len(puts) < 2:
+        return None
+    long_leg = min(puts, key=lambda o: abs(o.strike - spot * (1 - near)))
+    short_leg = min((o for o in puts if o.strike < long_leg.strike),
+                    key=lambda o: abs(o.strike - spot * (1 - far)), default=None)
+    if short_leg is None:
+        return None
+    cost = (long_leg.mark_btc - short_leg.mark_btc) * spot
+    width = long_leg.strike - short_leg.strike
+    assumed = "" if m and m.group("b") else (f" (the short strike was not stated, so it is set "
+                                              f"{far:.0%} below spot)")
+    return [f"A {near:.0%}-out-of-the-money put spread to {expiry:%d %b} "
+            f"({(expiry - today).days} days): buy the {long_leg.strike:,.0f} put, sell the "
+            f"{short_leg.strike:,.0f} put{assumed} — it costs about ${cost:,.0f} per {currency} "
+            f"({cost / spot:.2%} of spot) and pays at most ${width - cost:,.0f} if {currency} is "
+            f"below {short_leg.strike:,.0f} at expiry, {(width - cost) / cost:.1f}x the cost.",
+            f"It starts paying below {long_leg.strike - cost:,.0f} "
+            f"({(long_leg.strike - cost) / spot - 1:+.1%} from {spot:,.0f}); "
+            f"the long put is marked "
+            f"at {long_leg.iv:.1%} implied volatility and the short at {short_leg.iv:.1%} — the "
+            "skew is what the short leg sells back. Marks are Deribit's; a fill sits between the "
+            "bid and the ask on each leg."]
 
 
 def _put_for_premium(text: str, book: list[Any], spot: float, today: Any, currency: str,

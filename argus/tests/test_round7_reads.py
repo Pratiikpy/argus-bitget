@@ -141,7 +141,9 @@ def test_the_desks_own_figure_is_not_a_definition(text: str) -> None:
     ("how do i buy crypto", "lines"),
     ("can i lose more money than i put in", "lines"),
     ("whats a good stock for beginners", "reask"),
-    ("should i buy the dip", "reask"),
+    # answered in plain words since the round-41 newcomer audit (finding 26) found the re-ask's
+    # BTC base rate jargon-heavy and read as a nudge to buy
+    ("should i buy the dip", "lines"),
 ])
 def test_the_questions_a_newcomer_asks_first_are_answered(text: str, kind: str) -> None:
     from argus.lui.newcomer import reply

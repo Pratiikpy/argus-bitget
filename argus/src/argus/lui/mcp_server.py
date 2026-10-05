@@ -629,6 +629,14 @@ def _research_task(question: str, book: str) -> tuple[str, bool]:
     # question about the whole position: the add-a-name template read "2x long BTC and -1x
     # inverse ETH" as 100% BTC, and a covered call's vol spike as a sentiment read (round 39
     # judge, C-8 and the leveraged book)
+    from argus.lui.research import plan as _plan
+
+    # "Write me a 3-step plan: 20k, AI capex peaking, defined-risk US stock trade" is a plan, not
+    # an add to a book (round 41 judge, M12); the console's plan is the same here
+    planned = _plan.lines(question[:500])
+    if planned:
+        return "\n".join(["Read as: a trade plan from a stated view, capital and constraint", "",
+                          *planned]), False
     whole = signed_book.lines(question[:500]) or option_shock.lines(question[:500])
     if whole:
         return "\n".join(["Read as: one question about the whole position, answered by the "

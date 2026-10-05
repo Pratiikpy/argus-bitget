@@ -75,8 +75,49 @@ def _exit(bars: list[Any], start: int, hours: int, long: bool, stop: float | Non
     return end, (float(bars[end].close) / entry - 1) * (1 if long else -1), "time"
 
 
+_SILLY: Final = (
+    (re.compile(r"\b(?:hold|exit|out)\b[^?.]{0,20}?(?:for\s+)?"
+                r"[-−]\s?\d+\s*(?:days?|hours?|h)\b",  # noqa: RUF001
+                re.I), "a negative holding period"),
+    (re.compile(r"\b(?P<x>\d{4,})\s*x\b", re.I), "leverage above Bitget's 125x maximum"),
+    (re.compile(r"\b0\s*(?:bps|bp|basis\s+points?|%)\s+(?:fees?|commission)\b|\bno\s+fees\b|"
+                r"\bfees?\s+(?:of\s+)?0\s*(?:bps|%)?\b", re.I),
+     "zero fees (Bitget charges about 6bps a side on a perpetual; a test without them overstates "
+     "every result)"),
+    (re.compile(r"[-−]\s?(?:[1-9]\d{2,})\s*%\s*"  # noqa: RUF001
+                r"(?:annuali[sz]ed|a\s+year|apr)?", re.I),
+     "a funding rate of hundreds of percent a year below zero"),
+)
+
+
+def silly_lines(text: str) -> list[str] | None:
+    """A funding backtest whose parameters cannot be run as stated, each one named: "long BTC
+    whenever funding is below -500% annualised, hold for -3 days, 0 bps fees, 10000x leverage"
+    was answered as a 72-hour funding-cost line with fees of 12bps (round 41 hostile, M8)."""
+    if not re.search(r"\bfunding\b", text, re.I) or not re.search(
+            r"\bbacktest\w*|\bwhenever\b|\bstrategy\b|\brule\b", text, re.I):
+        return None
+    wrong = []
+    for pattern, said in _SILLY:
+        m = pattern.search(text)
+        if m is None:
+            continue
+        if said.startswith("leverage") and int(m.group("x")) <= 125:
+            continue
+        wrong.append(said)
+    if not wrong:
+        return None
+    return [f"Bottom line: this backtest cannot be run as stated — {'; '.join(wrong)}.",
+            "A rule that can be tested reads like: \"long BTC whenever funding has been negative "
+            "for 3 straight periods, exit after 5 days or a 2% stop\" — fees are always charged at "
+            "Bitget's own rate."]
+
+
 def lines(text: str) -> list[str] | None:
     """The rule's record, or None when ``text`` is not a funding rule."""
+    silly = silly_lines(text)
+    if silly is not None:
+        return silly
     m = ASKED.search(text)
     if m is None:
         return None

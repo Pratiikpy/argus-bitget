@@ -1,13 +1,13 @@
 {
- "graded_at": "2026-10-04T19:55:14+00:00",
- "calls": 32,
+ "graded_at": "2026-10-05T13:56:44+00:00",
+ "calls": 36,
  "first_call": "2026-09-27T02:28:00+00:00",
  "risk_graded": 0,
  "mean_beta_error": null,
  "mean_risk_share_error": null,
- "direction_graded": 24,
- "brier": 0.253125,
- "brier_base_rate": 0.24481469032776493,
+ "direction_graded": 40,
+ "brier": 0.2614225000000001,
+ "brier_base_rate": 0.24251465924763674,
  "calls_graded": [
   {
    "recorded_at": "2026-09-27T02:28:00+00:00",
@@ -95,6 +95,12 @@
      "up": false,
      "brier": 0.24009999999999998,
      "brier_base": 0.26921606605020504
+    },
+    {
+     "days": 5,
+     "up": true,
+     "brier": 0.17640000000000003,
+     "brier_base": 0.2151348983157742
     }
    ]
   },
@@ -108,6 +114,12 @@
      "up": false,
      "brier": 0.30250000000000005,
      "brier_base": 0.22194567901234566
+    },
+    {
+     "days": 5,
+     "up": false,
+     "brier": 0.2116,
+     "brier_base": 0.2260839999205173
     }
    ]
   },
@@ -121,6 +133,12 @@
      "up": false,
      "brier": 0.22089999999999999,
      "brier_base": 0.2536246003261802
+    },
+    {
+     "days": 5,
+     "up": true,
+     "brier": 0.30250000000000005,
+     "brier_base": 0.2448022210791865
     }
    ]
   },
@@ -134,6 +152,12 @@
      "up": true,
      "brier": 0.30250000000000005,
      "brier_base": 0.2219423181468017
+    },
+    {
+     "days": 5,
+     "up": true,
+     "brier": 0.3844,
+     "brier_base": 0.19511678565151316
     }
    ]
   },
@@ -297,70 +321,178 @@
    "recorded_at": "2026-10-02T13:55:03+00:00",
    "question": "I hold 40% NVDA, 30% MSFT, 30% AAPL — should I add 15% TSLA?",
    "risk": null,
-   "direction": []
+   "direction": [
+    {
+     "days": 1,
+     "up": true,
+     "brier": 0.22089999999999999,
+     "brier_base": 0.2313096807442709
+    }
+   ]
   },
   {
    "recorded_at": "2026-10-02T13:55:03+00:00",
    "question": "I hold 50% NVDA, 50% AAPL — should I add 20% COIN?",
    "risk": null,
-   "direction": []
+   "direction": [
+    {
+     "days": 1,
+     "up": true,
+     "brier": 0.3481000000000001,
+     "brier_base": 0.2804148330129667
+    }
+   ]
   },
   {
    "recorded_at": "2026-10-02T13:55:03+00:00",
    "question": "I hold 60% QQQ, 40% MSFT — should I add 10% MSTR?",
    "risk": null,
-   "direction": []
+   "direction": [
+    {
+     "days": 1,
+     "up": true,
+     "brier": 0.25,
+     "brier_base": 0.2473994975743554
+    }
+   ]
   },
   {
    "recorded_at": "2026-10-02T13:55:03+00:00",
    "question": "I hold 40% TSLA, 30% META, 30% GOOGL — should I add 15% AMZN?",
    "risk": null,
-   "direction": []
+   "direction": [
+    {
+     "days": 1,
+     "up": true,
+     "brier": 0.25,
+     "brier_base": 0.22138666967871048
+    }
+   ]
   },
   {
    "recorded_at": "2026-10-03T13:56:30+00:00",
    "question": "I hold 40% NVDA, 30% MSFT, 30% AAPL — should I add 15% TSLA?",
    "risk": null,
-   "direction": []
+   "direction": [
+    {
+     "days": 1,
+     "up": true,
+     "brier": 0.27040000000000003,
+     "brier_base": 0.2313096807442709
+    }
+   ]
   },
   {
    "recorded_at": "2026-10-03T13:56:30+00:00",
    "question": "I hold 50% NVDA, 50% AAPL — should I add 20% COIN?",
    "risk": null,
-   "direction": []
+   "direction": [
+    {
+     "days": 1,
+     "up": true,
+     "brier": 0.39690000000000003,
+     "brier_base": 0.2811975676860945
+    }
+   ]
   },
   {
    "recorded_at": "2026-10-03T13:56:30+00:00",
    "question": "I hold 60% QQQ, 40% MSFT — should I add 10% MSTR?",
    "risk": null,
-   "direction": []
+   "direction": [
+    {
+     "days": 1,
+     "up": true,
+     "brier": 0.21159999999999995,
+     "brier_base": 0.24779868992183327
+    }
+   ]
   },
   {
    "recorded_at": "2026-10-03T13:56:30+00:00",
    "question": "I hold 40% TSLA, 30% META, 30% GOOGL — should I add 15% AMZN?",
    "risk": null,
-   "direction": []
+   "direction": [
+    {
+     "days": 1,
+     "up": true,
+     "brier": 0.24009999999999998,
+     "brier_base": 0.22138666967871048
+    }
+   ]
   },
   {
    "recorded_at": "2026-10-04T13:55:05+00:00",
    "question": "I hold 40% NVDA, 30% MSFT, 30% AAPL — should I add 15% TSLA?",
    "risk": null,
-   "direction": []
+   "direction": [
+    {
+     "days": 1,
+     "up": true,
+     "brier": 0.27040000000000003,
+     "brier_base": 0.2313096807442709
+    }
+   ]
   },
   {
    "recorded_at": "2026-10-04T13:55:05+00:00",
    "question": "I hold 50% NVDA, 50% AAPL — should I add 20% COIN?",
    "risk": null,
-   "direction": []
+   "direction": [
+    {
+     "days": 1,
+     "up": true,
+     "brier": 0.39690000000000003,
+     "brier_base": 0.2811975676860945
+    }
+   ]
   },
   {
    "recorded_at": "2026-10-04T13:55:05+00:00",
    "question": "I hold 60% QQQ, 40% MSFT — should I add 10% MSTR?",
    "risk": null,
-   "direction": []
+   "direction": [
+    {
+     "days": 1,
+     "up": true,
+     "brier": 0.21159999999999995,
+     "brier_base": 0.24779868992183327
+    }
+   ]
   },
   {
    "recorded_at": "2026-10-04T13:55:05+00:00",
+   "question": "I hold 40% TSLA, 30% META, 30% GOOGL — should I add 15% AMZN?",
+   "risk": null,
+   "direction": [
+    {
+     "days": 1,
+     "up": true,
+     "brier": 0.24009999999999998,
+     "brier_base": 0.22138666967871048
+    }
+   ]
+  },
+  {
+   "recorded_at": "2026-10-05T13:55:02+00:00",
+   "question": "I hold 40% NVDA, 30% MSFT, 30% AAPL — should I add 15% TSLA?",
+   "risk": null,
+   "direction": []
+  },
+  {
+   "recorded_at": "2026-10-05T13:55:02+00:00",
+   "question": "I hold 50% NVDA, 50% AAPL — should I add 20% COIN?",
+   "risk": null,
+   "direction": []
+  },
+  {
+   "recorded_at": "2026-10-05T13:55:02+00:00",
+   "question": "I hold 60% QQQ, 40% MSFT — should I add 10% MSTR?",
+   "risk": null,
+   "direction": []
+  },
+  {
+   "recorded_at": "2026-10-05T13:55:02+00:00",
    "question": "I hold 40% TSLA, 30% META, 30% GOOGL — should I add 15% AMZN?",
    "risk": null,
    "direction": []
@@ -368,10 +500,10 @@
  ],
  "weekend": {
   "recorded": 10,
-  "graded": 5,
-  "pending": 5,
-  "covered": 0.6,
-  "mean_pinball_bps": 41.11898361666804,
+  "graded": 10,
+  "pending": 0,
+  "covered": 0.8,
+  "mean_pinball_bps": 34.61239789405988,
   "bands": [
    {
     "ticker": "NVDA",
@@ -412,13 +544,53 @@
     "move": 0.005022785733552304,
     "inside": true,
     "pinball_bps": 32.32067484913472
+   },
+   {
+    "ticker": "NVDA",
+    "friday": "2026-10-02",
+    "reopened": "2026-10-05",
+    "move": 0.009061809803936782,
+    "inside": true,
+    "pinball_bps": 23.190619176879416
+   },
+   {
+    "ticker": "TSLA",
+    "friday": "2026-10-02",
+    "reopened": "2026-10-05",
+    "move": -0.004830158834859155,
+    "inside": true,
+    "pinball_bps": 25.374372579648472
+   },
+   {
+    "ticker": "AAPL",
+    "friday": "2026-10-02",
+    "reopened": "2026-10-05",
+    "move": -0.0026820971773915403,
+    "inside": true,
+    "pinball_bps": 11.864006510705247
+   },
+   {
+    "ticker": "MSFT",
+    "friday": "2026-10-02",
+    "reopened": "2026-10-05",
+    "move": 0.008279660893016905,
+    "inside": true,
+    "pinball_bps": 21.450557345217295
+   },
+   {
+    "ticker": "COIN",
+    "friday": "2026-10-02",
+    "reopened": "2026-10-05",
+    "move": 0.022622947484417733,
+    "inside": true,
+    "pinball_bps": 58.64950524480822
    }
   ]
  },
  "theses": {
-  "recorded": 6,
+  "recorded": 12,
   "graded": 0,
-  "pending": 6,
+  "pending": 12,
   "by_verdict": {
    "Supported": {
     "graded": 0,

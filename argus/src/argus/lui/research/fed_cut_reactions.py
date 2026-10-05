@@ -49,7 +49,11 @@ def cut_dates() -> list[date]:
 
 def lines(text: str) -> list[str] | None:
     """The base rate for each asset, or None when ``text`` does not ask it."""
-    if not ASKED.search(text):
+    if not ASKED.search(text) or re.search(
+            r"\becb\b|\beuropean\s+central\s+bank\b|\bboj\b|\bbank\s+of\s+(?:japan|england)\b|"
+            r"\bboe\b|\brba\b|\bsnb\b", text, re.I):
+        # another central bank's cuts are `rate_decisions`' or not answered here; "How has EURUSD
+        # reacted to ECB rate cuts?" got the Fed's (round 41 live pre-check)
         return None
     from argus.market.equity_history import daily
 

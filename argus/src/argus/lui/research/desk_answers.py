@@ -316,13 +316,101 @@ def market_cap_ratio_lines(text: str, prior: Sequence[str]) -> list[str] | None:
     return lines
 
 
+_OFF_VENUE: Final = (
+    (r"\bdollar\s+index\b|\bdxy\b|\bthe\s+(?:us\s+)?dollar\b|\busd\s+index\b",
+     "the dollar index (DXY)", "DX-Y.NYB"),
+    (r"\b10[\s-]?(?:year|yr|y)\s+(?:treasury\s+)?yields?\b|\btreasury\s+yields?\b",
+     "the 10-year Treasury yield", "^TNX"),
+    (r"\bvix\b", "the VIX", "^VIX"),
+)
+"""Series a correlation question names that Bitget lists no contract for, read from Yahoo."""
+
+
+def _pearson(ca: dict[Any, float], cb: dict[Any, float], days: Sequence[Any]
+             ) -> tuple[float | None, int]:
+    from itertools import pairwise
+
+    ra = [ca[y] / ca[x] - 1 for x, y in pairwise(days)]
+    rb = [cb[y] / cb[x] - 1 for x, y in pairwise(days)]
+    if len(ra) < 2:
+        return None, len(ra)
+    ma, mb = sum(ra) / len(ra), sum(rb) / len(rb)
+    sab = sum((x - ma) * (y - mb) for x, y in zip(ra, rb, strict=True))
+    saa = sum((x - ma) ** 2 for x in ra)
+    sbb = sum((y - mb) ** 2 for y in rb)
+    if saa <= 0 or sbb <= 0:
+        return None, len(ra)
+    return sab / (saa * sbb) ** 0.5, len(ra)
+
+
+def _correlation_matrix(named: Sequence[str], extra: Sequence[tuple[str, str]],
+                        period: Any) -> list[str] | None:
+    """Every pair among three or more series, Bitget's contracts and Yahoo's off-venue series
+    together, each pair on the days both have a close."""
+    from itertools import combinations
+
+    from argus.market import history
+    from argus.market.equity_history import daily
+
+    series: list[tuple[str, dict[Any, float], str]] = []
+    for symbol in named:
+        try:
+            candles = history.fetch_window(symbol, start=period.start - timedelta(days=1),
+                                           end=period.end, interval="1Dutc")
+            series.append((symbol.removesuffix("USDT"),
+                           {c.ts.date(): float(c.close) for c in candles}, "bitget"))
+        except Exception:
+            series.append((symbol.removesuffix("USDT"), {}, "bitget"))
+    for label, ticker in extra:
+        try:
+            first = (period.start - timedelta(days=1)).date()
+            series.append((label, {d.day: float(d.close) for d in daily(ticker)
+                                   if first <= d.day <= period.end.date()}, "yahoo"))
+        except Exception:
+            series.append((label, {}, "yahoo"))
+    missing = [name for name, closes, _ in series if len(closes) < 20]
+    usable = [x for x in series if len(x[1]) >= 20]
+    if len(usable) < 2:
+        return None
+    pairs = []
+    for (na, ca, sa), (nb, cb, sb) in combinations(usable, 2):
+        days = sorted(set(ca) & set(cb))
+        rho, count = _pearson(ca, cb, days) if len(days) >= 20 else (None, 0)
+        if rho is not None:
+            pairs.append((na, nb, rho, count, "yahoo" in (sa, sb)))
+    if not pairs:
+        return None
+    strongest = max(pairs, key=lambda r: abs(r[2]))
+    if len(pairs) == 1:
+        na, nb, rho, count, mixed = pairs[0]
+        word = ("strongly" if abs(rho) >= 0.7 else "moderately" if abs(rho) >= 0.4 else "weakly")
+        out = [f"Bottom line: {na} and {nb} moved {'together' if rho > 0 else 'opposite ways'} "
+               f"{word}, a correlation of {rho:+.2f} {period.said}, on {count} daily returns"
+               + (" (weekdays only)" if mixed else "") + "."]
+    else:
+        out = [f"Bottom line: {period.said}, the strongest link was {strongest[0]} with "
+               f"{strongest[1]}, a correlation of {strongest[2]:+.2f} on {strongest[3]} daily "
+               "returns; every pair is below."]
+        out += [f"{na} with {nb}: {rho:+.2f} ({count} daily returns"
+                + (", weekdays only" if mixed else "") + ")."
+                for na, nb, rho, count, mixed in pairs]
+    if missing:
+        out.append("Not read just now: " + ", ".join(missing) + ".")
+    out.append("Pearson correlation of daily close-to-close returns: Bitget USDT-futures daily "
+               "candles (UTC days)"
+               + (" and Yahoo Finance daily closes (New York close) for "
+                  + ", ".join(label for label, _ in extra) if extra else "")
+               + ", each pair on the days both have a close"
+               + ("; a crypto close at 00:00 UTC and a New York close are about four hours "
+                  "apart, which mutes a same-day link slightly" if extra else "") + ".")
+    return out
+
+
 def correlation_lines(text: str, prior: Sequence[str], now: datetime | None = None
                       ) -> list[str] | None:
     """"How correlated has BTC been with the Nasdaq over the past 3 months?" got a base rate, and
     "and with gold?" gold's risk profile (a judge, round 26): Pearson correlation of daily
     returns over the stated period, from Bitget daily closes."""
-    from itertools import pairwise
-
     from argus.lui.research import research_symbols
     from argus.lui.research.performance import asked_period
     from argus.market import history
@@ -354,8 +442,14 @@ def correlation_lines(text: str, prior: Sequence[str], now: datetime | None = No
         # a follow-up naming nothing new ("and over just the last 30 days?") keeps both names
         named = (before[:2] if not named else
                  [*before[:1], *[n for n in named if n not in before[:1]]])
-    if len(named) < 2 or period is None:
+    # "gold, the dollar index and BTC" returned gold-BTC alone and dropped the dollar without a
+    # word (round 41 judge, M2): series Bitget does not list are read from Yahoo Finance
+    extra = [(label, ticker) for pattern, label, ticker in _OFF_VENUE
+             if re.search(pattern, text, re.I)]
+    if period is None or len(named) + len(extra) < 2:
         return None
+    if extra or len(named) > 2:
+        return _correlation_matrix(named[:4], extra, period)
     a, b = named[0], named[1]
 
     def closes(symbol: str) -> dict[Any, float]:
@@ -370,19 +464,13 @@ def correlation_lines(text: str, prior: Sequence[str], now: datetime | None = No
     days = sorted(set(ca) & set(cb))
     if len(days) < 20:
         return None
-    ra = [ca[y] / ca[x] - 1 for x, y in pairwise(days)]
-    rb = [cb[y] / cb[x] - 1 for x, y in pairwise(days)]
-    ma, mb = sum(ra) / len(ra), sum(rb) / len(rb)
-    sab = sum((x - ma) * (y - mb) for x, y in zip(ra, rb, strict=True))
-    saa = sum((x - ma) ** 2 for x in ra)
-    sbb = sum((y - mb) ** 2 for y in rb)
-    if saa <= 0 or sbb <= 0:
+    rho, count = _pearson(ca, cb, days)
+    if rho is None:
         return None
-    rho = sab / (saa * sbb) ** 0.5
     word = ("strongly" if abs(rho) >= 0.7 else "moderately" if abs(rho) >= 0.4 else "weakly")
     na, nb = a.removesuffix("USDT"), b.removesuffix("USDT")
     return [f"Bottom line: {na} and {nb} moved together {word}, a correlation of {rho:+.2f} "
-            f"{period.said}, on {len(ra)} daily returns.",
+            f"{period.said}, on {count} daily returns.",
             f"So about {rho * rho:.0%} of {na}'s daily swings line up with {nb}'s; the rest is its "
             f"own. A correlation measured in calm weeks often rises in a selloff.",
             "Pearson correlation of daily close-to-close returns, Bitget USDT-futures daily "

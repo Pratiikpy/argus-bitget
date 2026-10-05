@@ -677,7 +677,7 @@ data line once said "Bitget live 24h ticker" under a technical-analysis answer."
 _LOAN_Q = re.compile(r"\b(?:loans?|borrow\w*|lend\w*|collateral\w*|ltv)\b", re.I)
 
 
-_ALL_IN_Q = re.compile(
+ALL_IN_Q = re.compile(
     r"\ball\s+(?:of\s+)?my\s+(?:savings|money|retirement|pension|net\s+worth|cash)|"
     r"\b(?:life|entire)\s+savings|\bretirement\s+(?:fund|money|savings|account)|"
     r"\b(?:put|invest|move)\s+every(?:thing|\s+penny)|\bmortgage\s+(?:my|the)\s+house|"
@@ -694,7 +694,7 @@ def _scope_lead(raw: str, symbol: str,
 
     Returns the lead lines and any source they read. ``lines`` is the answer below them."""
     ticker = _t(symbol) if symbol else "it"
-    if (not _ALL_IN_Q.search(raw) and _OPTIONS_Q.search(raw)
+    if (not ALL_IN_Q.search(raw) and _OPTIONS_Q.search(raw)
             and not re.search(r"\bmargin\s+call|\bcall\s+(?:me|it)\b", raw, re.I)):
         return _options_scope(raw, symbol, ticker, lines)
     return _other_scope(raw, symbol, ticker), []
@@ -733,7 +733,7 @@ def _options_scope(raw: str, symbol: str, ticker: str,
 
 
 def _other_scope(raw: str, symbol: str, ticker: str) -> list[str]:
-    if _ALL_IN_Q.search(raw):
+    if ALL_IN_Q.search(raw):
         from argus.lui.research.parse import _SHORT
 
         short = _SHORT.search(raw) is not None

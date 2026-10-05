@@ -160,6 +160,12 @@ def names_for(ticker: str) -> list[str]:
     return [word.title() for word, held in _names()["first"].items() if held == wanted]
 
 
+def ticker_for_full_name(name: str) -> str | None:
+    """The SEC ticker registered under a company's full name ("GE Vernova" is GEV), or None."""
+    found = _names()["full"].get(_clean(name))
+    return str(found) if found else None
+
+
 def listed_name(word: str) -> str | None:
     """A one-word company name ("Micron") as its Bitget contract, when Bitget lists the issuer."""
     from argus.market import universe

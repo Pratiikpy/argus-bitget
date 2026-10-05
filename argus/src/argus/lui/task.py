@@ -642,6 +642,24 @@ def verdict(task: Task) -> Verdict | None:
     """Add, add smaller, or do not add — from the IMPACT engine's sizing figures
     (``research.impact_sizing``) and the execution engine's plan. None when the IMPACT step did
     not answer: a verdict without its sizing would be a sentence with nothing under it."""
+    words = task.asked or task.question
+    from argus.lui.research import drawdown_sizing
+
+    if task.book and drawdown_sizing.read(words) is None:
+        # the book passed beside the question ("book": "60% BTC, 40% MSFT") is part of it
+        held = ", ".join(f"{w * 100:.0f}% {_t(s)}" for s, w in task.book.items()
+                         if _t(s) != _t(task.name))
+        words = f"I hold {held}. {words}"
+
+    if drawdown_sizing.read(words) is not None:
+        # "60% BTC, 40% MSFT, 15% max drawdown limit, add 20% COIN" was sized against a default
+        # 25% risk budget with the 15% limit ignored (round 41 judge, M13): a stated drawdown
+        # limit sizes the add against the book's own worst fall instead
+        said = drawdown_sizing.lines(words)
+        sized = drawdown_sizing.call(words)
+        if said and sized:
+            head = said[0].removeprefix("Bottom line: ")
+            return Verdict(call=sized, lines=(head[:1].upper() + head[1:], *said[1:]))
     impact = next((s for s in task.steps if s.title == IMPACT_TITLE), None)
     sizing = (impact.data.get("sizing") if impact is not None else None) or None
     if not sizing:
