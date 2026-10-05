@@ -799,7 +799,11 @@ _FIRST: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
         "lose on NVDA in a bad week with $X\" with an amount you could lose in full.")),
     # Round 41, a first-time user (round41_newcomer.md): each refused, misread as a ticker, or
     # answered with something else.
-    (re.compile(r"\border\s*book\b|\bcarnet\s+d'?ordres\b|\bred\s+and\s+green\s+numbers\b", re.I), (
+    # "How deep is the BTC order book within 1% of mid, and what slippage would a $5m market buy
+    # cost?" is the live book's question, not this explainer's (round 43 judge, M2)
+    (re.compile(r"^(?!.*\b(?:how\s+deep|depth|slippage|within\s+\d|\$\s?\d|\d+\s*[km]\b))"
+                r".*(?:\border\s*book\b|\bcarnet\s+d'?ordres\b|\bred\s+and\s+green\s+numbers\b)",
+                re.I | re.S), (
         "Bottom line: the order book is the live list of everyone's waiting orders: green rows "
         "are buyers (bids, the prices people will pay) and red rows are sellers (asks, the "
         "prices people will sell at).",

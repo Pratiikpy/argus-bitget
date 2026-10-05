@@ -288,11 +288,43 @@ def _depth_lines(symbol: str, notional: Decimal, adv: Decimal, plan: Any,
         return [f"Slice {s.index}: {s.fraction:.0%} as {s.style}, ~{s.expected_cost_bps:.1f}bps "
                 f"(the live order book did not answer, so size impact is not included)"
                 for s in plan.slices]
+    merged_at = ""
+    if not whole.complete:
+        # A $5m BTC buy "ran off the visible book" of 50 levels while the merged book held
+        # $169m of asks within 1% — two figures in one answer that contradicted each other
+        # (round 43 judge, M2). The merged book at the finest step that holds the order prices
+        # the sweep from what is resting; its levels are aggregated, which the line says.
+        from argus.market.depth import MAX_LEVELS, MERGED_PRECISIONS, fetch_merged_orderbook
+
+        try:
+            # the venue's full 200 unmerged levels first: exact prices, and a $5m BTC buy fits
+            # in them (1.7bps, 2026-10-06), where a coarse merged step overstated it tenfold
+            with _FETCH_SLOTS:
+                full_book = fetch_orderbook(symbol, limit=MAX_LEVELS)
+            full = full_book.sweep(notional, direction=side)
+            if full.complete:
+                whole, book = full, full_book
+        except Exception:
+            pass
+        for precision in MERGED_PRECISIONS if not whole.complete else ():
+            try:
+                with _FETCH_SLOTS:
+                    deeper_book = fetch_merged_orderbook(symbol, precision)
+                deeper = deeper_book.sweep(notional, direction=side)
+            except Exception:
+                continue
+            if deeper.complete:
+                whole, book, merged_at = deeper, deeper_book, precision
+                break
     lines: list[str] = []
     fee = float(plan.slices[0].expected_cost_bps) if plan.slices else 6.0
     reach = ("" if whole.complete else
              f" — the visible 50 levels hold only ${float(whole.filled_notional):,.0f}, so the "
              f"rest would fill beyond what can be seen")
+    if merged_at:
+        reach = (" — read from Bitget's merged book (price step " + merged_at + "), because the "
+                 "50 unmerged levels run out first; its levels are aggregated, so the slippage is "
+                 "close, not exact")
     lines.append(
         f"Order book ({side.lower()} side, live): taking all ${float(notional):,.0f} at once "
         f"walks {whole.levels_consumed} level(s) for {float(whole.slippage_bps):.1f}bps of "

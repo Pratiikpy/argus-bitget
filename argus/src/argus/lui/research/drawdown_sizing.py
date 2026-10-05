@@ -112,6 +112,11 @@ def _aligned(symbols: list[str]) -> tuple[list[datetime], dict[str, list[float]]
             {s: [series[s][d] for d in days] for s in symbols}, said)
 
 
+def aligned_closes(symbols: list[str]) -> tuple[list[datetime], dict[str, list[float]], list[str]]:
+    """:func:`_aligned` for other readers: daily closes on the dates every symbol traded."""
+    return _aligned(symbols)
+
+
 def max_drawdown(weights: dict[str, float], closes: dict[str, list[float]]
                  ) -> tuple[float, int, int]:
     """(worst fall, index of the peak, index of the trough) of the book rebalanced daily."""
@@ -472,5 +477,5 @@ def single_lines(text: str) -> list[str] | None:
     return out
 
 
-__all__ = ["DEFAULT_LIMIT", "Asked", "call", "lines", "max_drawdown", "period_lines", "read",
-           "single_limits", "single_lines"]
+__all__ = ["DEFAULT_LIMIT", "Asked", "aligned_closes", "call", "lines", "max_drawdown",
+           "period_lines", "read", "single_limits", "single_lines"]

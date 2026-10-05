@@ -2161,6 +2161,19 @@ def _stated_number_lines(text: str, prior: list[str]) -> list[str] | None:
                 "measured and how sure it is.",
                 "Preferences that change what is shown can be saved, for example \"remember I "
                 "hold 60% NVDA, 40% cash\" or \"remember my max drawdown is 10%\"."]
+    from argus.lui.research import unit_checks
+
+    for check in (unit_checks.funding_verdict, unit_checks.per_period, unit_checks.minor_units,
+                  unit_checks.stated_fee,
+                  unit_checks.stated_gas, unit_checks.wrong_side, unit_checks.fraction_or_percent,
+                  unit_checks.bps_versus_percent):
+        said = check(text)
+        if said is not None:
+            # round 43 hostile, M1-M4, M8-M12, M14-M15: the units and figures as stated
+            return said
+    stopped = unit_checks.stop_percent(text, prior)
+    if stopped is not None:
+        return stopped
     for reader in (stated_numbers.share_price_lines, stated_numbers.protection_lines):
         said = reader(text)
         if said is not None:
@@ -4758,6 +4771,98 @@ def _round27_follow_up(text: str, prior: list[str], *, now: datetime | None, vis
     single_said = drawdown_sizing.single_lines(text) if not book else None
     if single_said is not None:
         return engine_payload_like(single_said, prior, text, by="research")
+    if prior and re.search(r"\bwhich\s+(?:of\s+)?(?:those|these|them|the\s+above)\b[^?]{0,60}\b"
+                           r"(?:biggest|largest|greatest|main|most\s+(?:important|dangerous)|"
+                           r"single)\b[^?]{0,30}\b(?:risk|threat|event|danger)\b", text, re.I):
+        # "Which of those is the single biggest risk to the book and why?" after an event-risk
+        # watchlist was declined (round 43 judge, M9): the answer before ranks them, so it is
+        # asked again and its ranking leads
+        ranked_before = _handle_ask(prior[-1], prior[:-1], now=now, visitor=visitor, book=book)
+        ranked_lines = ranked_before.get("lines")
+        if isinstance(ranked_lines, list) and ranked_lines and not ranked_before.get("refused"):
+            first = str(ranked_before["lines"][0]).removeprefix("Bottom line: ")
+            ranked_before["lines"][0] = ("Bottom line: of those, " + first[:1].lower() + first[1:]
+                                   if not first.lower().startswith("the biggest") else
+                                   "Bottom line: " + first)
+            return ranked_before
+    from argus.lui.research import crypto_structure
+
+    structure_said = crypto_structure.lines(text, prior)
+    if structure_said is not None:
+        # dominance and its change, total and per-chain stablecoin moves, lending pools side by
+        # side with their hack record, perp against spot liquidity, the crypto event calendar
+        # and the live book within 1% (round 43 judge, M2, M11, M13, M16, M17, M22, M24)
+        return engine_payload_like(structure_said, prior, text, by="research")
+    from argus.lui.research import market_breadth
+
+    stated_position = re.search(r"\bi\s+(?:hold|own|bought|am\s+(?:long|short))\b|\bmy\s+\d",
+                                text, re.I)
+    breadth_said = None if stated_position else market_breadth.lines(text, prior)
+    if breadth_said is not None:
+        # sector rotation, the Magnificent Seven against equal weight, the 200-day regime from
+        # 1970s history, volatility regimes, valuation against history and an asset's drivers
+        # (round 43 judge, M3, M7, M10, M14, M20, C10)
+        return engine_payload_like(breadth_said, prior, text, by="research")
+    from argus.lui.research import shareholder_metrics, token_supply
+
+    holders_said = shareholder_metrics.lines(text)
+    if holders_said is not None:
+        # Chevron read as a DeFi pool, buybacks and forward P/E answered with price returns, a
+        # dividend ranking answered with "does Shell trade on Bitget" (round 43 judge, C1, C3,
+        # C6, M4, M5, M15, M21; hostile M17)
+        return engine_payload_like(holders_said, prior, text, by="research")
+    supply_said = token_supply.lines(text)
+    if supply_said is not None and re.search(r"\bstak\w*|\byields?\b", text, re.I):
+        # "Solana's current staking yield and inflation rate compared with Ethereum's" lost the
+        # inflation half to the yield reader (round 43 judge, M12): both are answered
+        from argus.lui.research.defi_markets import asset_yield_lines
+
+        coins = [s.removesuffix("USDT") for s in symbols_in(text)[0]]
+        if coins:
+            staked = asset_yield_lines(coins)
+            supply_said = [*supply_said[:-1],
+                           *(x.removeprefix("Bottom line: ") for x in staked[:-2]),
+                           supply_said[-1].rstrip(".") + "; DeFiLlama yields for staking."]
+    if supply_said is not None:
+        # circulating versus max supply read as arbitrage, the locked-supply ranking as an equity
+        # refusal, the unlock calendar declined (round 43 judge, C2, C5, M1, M12)
+        return engine_payload_like(supply_said, prior, text, by="research")
+    from argus.lui.research import diversifier
+
+    diversified = diversifier.lines(text, prior)
+    if diversified is not None:
+        # "what does that mean for using BTC as a diversifier in a 60/40 book?" got an
+        # unreconciled correlation and no conclusion (round 43 judge, M8)
+        return engine_payload_like(diversified, prior, text, by="research")
+    from argus.lui.research import pair_trade
+
+    pair_said = pair_trade.lines(text, prior)
+    if pair_said is not None:
+        # "a pair trade long NVDA short AMD — is the spread mean-reverting, and the hedge
+        # ratio?" got the bid-ask glossary; its sizing and falsifier follow-ups were lost (round 43
+        # judge, C8)
+        return engine_payload_like(pair_said, prior, text, by="research")
+    from argus.lui.research import futures_curve
+
+    curve_said = futures_curve.lines(text)
+    if curve_said is None and prior and re.search(
+            r"\b(?:contracts?|perps?|perpetuals?|futures|instruments?)\b", text, re.I
+    ) and re.search(r"\b(?:it|that|this|them)\b", text, re.I):
+        # "Which Bitget contracts could I use for it?" after an oil view: "it" is the commodity
+        # the turn before named
+        curve_said = futures_curve.lines(f"{text} ({prior[-1]})")
+    if curve_said is not None:
+        # "is crude in backwardation or contango and what does the curve say?" got the Treasury
+        # curve's correlation block (round 43 judge, C4); "Which Bitget contracts could I use for
+        # it?" got a risk profile (M23)
+        return engine_payload_like(curve_said, prior, text, by="research")
+    from argus.lui.research import view_expression
+
+    view_said = view_expression.lines(text, prior)
+    if view_said is not None:
+        # "I believe NVDA falls over the next 3 weeks — how should I trade it?" got the cost of
+        # a $50,000 market order (round 43 judge, C7): a view asked how to express is expressed
+        return engine_payload_like(view_said, prior, text, by="research")
     from argus.lui.research import option_spread
 
     spread_said = option_spread.lines(text, prior)
@@ -7167,6 +7272,16 @@ def handle_ask(
     text, locale_said = _locale_numbers(text)
     text, sign_said = _short_sign(text)
     stated = _stated_number_lines(text, prior)
+    if stated is None:
+        from argus.lui.research.unit_checks import risk_sizing
+
+        stated = risk_sizing(text, memory)
+    if stated is None:
+        from argus.lui.research import setup_check
+
+        # "Is SOL a good candidate this week?" from a stated swing trader got a seven-day return
+        # (round 43 judge, M19)
+        stated = setup_check.lines(text, prior, memory)
     text = _csv_fills_as_text(text)
     converted: list[str] = []
     # "3.5m JPY" carries a size letter between the number and the currency (round 42 hostile,
@@ -7228,6 +7343,23 @@ def handle_ask(
                          f"out; the rows themselves were read as data.")
     if bps_said and isinstance(payload.get("lines"), list):
         payload["lines"].insert(1 if payload["lines"] else 0, bps_said)
+    from argus.lui.research import unit_checks
+
+    premise = unit_checks.false_premise(text)
+    if premise and isinstance(payload.get("lines"), list) and not payload.get("refused"):
+        # "After the 2025 Bitcoin halving..." and "Since spot Bitcoin ETFs were banned..." were
+        # answered as if true (round 43 hostile, M5-M7): the premise leads, the rest follows
+        payload["lines"] = [f"Bottom line: {premise[0].removeprefix('Premise check: ')}",
+                            *premise[1:],
+                            *[str(x).removeprefix("Bottom line: ") for x in payload["lines"]]]
+    currency_said = unit_checks.in_currency(text, list(payload.get("lines") or []))
+    if currency_said and isinstance(payload.get("lines"), list):
+        payload["lines"].insert(1, currency_said)
+    if isinstance(payload.get("lines"), list) and payload["lines"] and not payload.get("refused"):
+        said_now = " ".join(map(str, payload["lines"]))
+        for extra in (unit_checks.sp500_beta(text), unit_checks.crypto_equity_note(text, said_now)):
+            if extra:
+                payload["lines"].insert(1, extra)
     if locale_said and isinstance(payload.get("lines"), list):
         payload["lines"].insert(1 if payload["lines"] else 0, locale_said)
     if sign_said and isinstance(payload.get("lines"), list):
@@ -7471,6 +7603,12 @@ def _handle_ask(
 
         critique = eth_yield.lines(text)
     if critique is None:
+        from argus.lui.research import crypto_structure
+
+        # the stablecoin, lending and liquidity questions the round-43 judge asked (M16, M17,
+        # M22, M24) are crypto_structure's before the broader DeFi reader's
+        critique = crypto_structure.lines(text, prior)
+    if critique is None:
         from argus.lui.research import defi_markets
 
         critique = defi_markets.lines(text)
@@ -7594,13 +7732,22 @@ def _handle_ask(
 
         code = _translate.target_language(text)
         minutes = max(1, allowance_back_in(visitor)) if visitor != "local" else 60
+        from argus.lui.beginner import declined_language
+
         said = (PAUSED[code][1].format(minutes=minutes) if code in PAUSED else
                 "Without the language model this question could not be read; ask it in English.")
-        return {**EMPTY_QUESTION, "refused": True, "reason": "unread language",
-                "classified_by": "declined-language",
-                "lines": [said, "Without the language model, a question in this language is read "
-                                "only when it asks a price; everything else is answered in "
-                                "English — e.g. \"what did TSLA's latest earnings report say\"."],
+        hint = ("Without the language model, a question in this language is read only when it "
+                "asks a price; everything else is answered in English — e.g. \"what did TSLA's "
+                "latest earnings report say\".")
+        local = declined_language(code, minutes)
+        if local is not None:
+            # Vietnamese, Turkish and Indonesian users were refused in English (round 43
+            # newcomer, M13, M14, C5)
+            _note, said, hint = local
+        # "error": "empty question" was sent for a question that was not empty (minor 8)
+        return {**EMPTY_QUESTION, "error": "unread language", "refused": True,
+                "reason": "unread language", "classified_by": "declined-language",
+                "lines": [said, hint],
                 "memory": memory, "remembered": [], "turns": [*prior, text][-12:]}
     if UNREAD_SCRIPT.search(text):
         english, why = _read_in_english(text)
@@ -12370,6 +12517,14 @@ def _multistep_payload(text: str, split: list[Any], prior: list[str], *, now: da
     remembered = list(_MEMORY.get())
 
     def run_part(part_text: str, request: Any) -> Any:
+        from argus.lui.research.crypto_structure import depth_lines
+
+        depth = (depth_lines(part_text, prior)
+                 if not re.search(r"\b(?:cost|slippage)\b", part_text, re.I) else None)
+        if depth is not None:
+            # "How deep is the BTC order book within 1% of mid" as one part of a two-part question
+            # was costed as a $50,000 order (round 43 judge, M2)
+            return SimpleNamespace(lines=depth, sources=[], refused=False)
         if request is None:
             # an item of a numbered list no research engine reads on its own: the console
             # answers it whole, as if it had been asked alone (a hostile review, round 30)
@@ -12377,6 +12532,16 @@ def _multistep_payload(text: str, split: list[Any], prior: list[str], *, now: da
             return SimpleNamespace(lines=[str(x) for x in whole.get("lines") or []]
                                    or ["no answer"], sources=[],
                                    refused=bool(whole.get("refused")))
+        from argus.lui.research import research_symbols as symbols_in
+
+        named_whole = symbols_in(text)[0]
+        if named_whole and not symbols_in(part_text)[0] and getattr(request, "symbols", None):
+            # "How deep is the BTC book ..., and what slippage would a $5m market buy cost?":
+            # the second part names no coin and was priced on the default example name, NVDA
+            # (round 43 judge, M2); a part that names nothing is about what the question named
+            from dataclasses import replace as _replace
+
+            request = _replace(request, symbols=(named_whole[0], *request.symbols[1:]))
         if remembered:
             request, _used = mem.apply(request, remembered, part_text)
         return run_research(part_text, request, ledger=ledger)

@@ -214,7 +214,9 @@ def perp_vs_spot_lines(text: str, prior: Sequence[str]) -> list[str] | None:
     # "basis points" is a unit, not the perp-spot basis (a hostile review, round 29)
     asks = re.search(r"\bperp\w*\b[^?]{0,40}\bspot\b|\bspot\b[^?]{0,40}\bperp\w*\b|\bpremium\b|"
                      r"\bbasis\b(?!\s+points?\b)", text, re.I)
-    if asks is None:
+    if asks is None or re.search(r"\bhedg\w*|\bprotect\w*|\binsur\w*", text, re.I):
+        # "how would I hedge the downside using perps without selling spot?" is a hedge of the
+        # stated book, not the perp-spot gap (round 43 judge, C9)
         return None
     named = research_symbols(text)[0] or next((research_symbols(q)[0] for q in reversed(prior[-2:])
                                                if research_symbols(q)[0]), ())

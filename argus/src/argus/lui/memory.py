@@ -1436,7 +1436,8 @@ _RECALL_ONE_FORMS = tuple(re.compile(p, re.I) for p in (
 """One remembered fact asked for by name: "what was my loss limit" went to a desk-decision reader
 and returned a stale decision (a first-user audit, round 17, 2026-10-01)."""
 _RECALL_KINDS = {"loss": ("loss_usd", "max_loss"), "drawdown": ("max_loss", "loss_usd"),
-                 "risk": ("budget",), "horizon": ("horizon",), "style": ("style",),
+                 "risk": ("trade_risk", "budget"), "horizon": ("horizon",),
+                 "style": ("style",),
                  "trading": ("style",), "account": ("capital", "book"), "capital": ("capital",),
                  "goal": ("goal",), "budget": ("capital", "loss_usd"),
                  "money": ("capital", "loss_usd"), "max": ("loss_usd", "max_loss"),
@@ -1473,8 +1474,16 @@ _VIEW_ASKED = re.compile(
     r"(?P<name2>[A-Za-z][A-Za-z.]{1,11})\b", re.I)
 
 
+_RECALL_GAVE = re.compile(
+    r"\b(?:remind|tell)\s+me\b[^?]{0,80}\b(?:i|we)\s+(?:told|gave|said|set|mentioned|stated)\b|"
+    r"\bwhat\s+(?:did|have)\s+(?:i|we)\s+(?:tell|told|give|gave|say|said)\s+you\b", re.I)
+"""Several of the trader's own facts asked back at once: "Remind me what account size and risk
+rule I gave you" was declined as unrecognised (round 43 judge, M18)."""
+
+
 def recall_asked(question: str) -> bool:
     return (bool(_RECALL.search(question)) or _recall_match(question) is not None
+            or bool(_RECALL_GAVE.search(question))
             or len(_RECALL_MANY.findall(question)) >= 2
             or bool(re.match(r"^\W*(?:what\s+do\s+i\s+(?:hold|own)|what(?:'s|\s+is|\s+are)\s+my\s+"
                              r"(?:positions?|holdings|book))\W*$", question, re.I))

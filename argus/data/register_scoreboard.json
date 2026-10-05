@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-10-05T18:13:15.586240+00:00",
-  "registered": 466,
-  "resolved": 275,
-  "pending": 189,
+  "generated_at": "2026-10-05T20:11:00.216905+00:00",
+  "registered": 471,
+  "resolved": 279,
+  "pending": 190,
   "unresolvable": 2,
   "claimants": [
     {
       "claimant": "argus",
-      "resolved": 275,
-      "correct": 188,
-      "hit_rate": 0.6836,
-      "brier": 0.2232,
-      "mean_confidence": 0.592
+      "resolved": 279,
+      "correct": 191,
+      "hit_rate": 0.6846,
+      "brier": 0.22301,
+      "mean_confidence": 0.5921
     }
   ],
   "wall": [
@@ -707,6 +707,15 @@
       "observed_shown": "|10.79| = 10.79",
       "resolved_at": "2026-10-05T16:12:56.123431+00:00",
       "hash": "c4aac165a74b565cc20651100c9854c30584f7ccc1e7371ba7f97aa435a300ae"
+    },
+    {
+      "claim": "\u2717 TSLAUSDT abs_move_above_bps 179.49 by 2026-10-05T18:17 (p=0.60) [2a64b4f473bc]",
+      "claimant": "argus",
+      "confidence": 0.6,
+      "observed": "139.3950679683966906972413610",
+      "observed_shown": "|139.40| = 139.40",
+      "resolved_at": "2026-10-05T20:10:55.389112+00:00",
+      "hash": "2a64b4f473bc1e89b1e67ef015a2144d56a46fad87d78f4bba93216d22324f21"
     },
     {
       "claim": "\u2717 NVDAUSDT return_over_below_bps 0 by 2026-09-15T09:21 (p=0.50) [7ffe510f62d0]",

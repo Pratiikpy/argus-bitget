@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-05T18:13:16.670754+00:00",
-  "log": "cycle_2026-10-05_2300.log",
+  "generated_at": "2026-10-05T20:11:02.532666+00:00",
+  "log": "cycle_2026-10-06_0100.log",
   "sound": false,
   "saw_price_discovery": true,
   "proposed_exposure": 0,
@@ -14,27 +14,27 @@
     {
       "check": "symbols_decided",
       "status": "FAIL",
-      "detail": "11 of 12 symbols produced a decision"
+      "detail": "10 of 12 symbols produced a decision"
     },
     {
       "check": "ran_to_completion",
       "status": "FAIL",
-      "detail": "stopped after 11 of 12 symbol(s): 12842 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them."
+      "detail": "stopped after 10 of 12 symbol(s): 24099 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them."
     },
     {
       "check": "token_budget",
       "status": "PASS",
-      "detail": "317,158 of 330,000 spent (96%)"
+      "detail": "305,901 of 330,000 spent (93%)"
     },
     {
       "check": "cumulative_tokens",
       "status": "PASS",
-      "detail": "26,607,596 token(s) across 90 recorded cycle(s), 295,640 per cycle \u2014 roughly 1,182,560/day at four cycles. The key's remaining balance is not observable from here; this is the burn rate, not a runway"
+      "detail": "26,913,497 token(s) across 91 recorded cycle(s), 295,753 per cycle \u2014 roughly 1,183,011/day at four cycles. The key's remaining balance is not observable from here; this is the burn rate, not a runway"
     },
     {
       "check": "budget_not_exhausted",
       "status": "FAIL",
-      "detail": "the budget ended the cycle before the guard had to \u2014 stopped after 11 of 12 symbol(s): 12842 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them."
+      "detail": "the budget ended the cycle before the guard had to \u2014 stopped after 10 of 12 symbol(s): 24099 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them."
     },
     {
       "check": "chain_intact",
@@ -44,12 +44,12 @@
     {
       "check": "leans_recorded",
       "status": "PASS",
-      "detail": "11 of 11 row(s) carry a lean and a lean_confidence"
+      "detail": "10 of 10 row(s) carry a lean and a lean_confidence"
     },
     {
       "check": "leans_gradeable",
       "status": "PASS",
-      "detail": "11 of 11 decision(s) state a direction (10 up, 1 down, 0 none)"
+      "detail": "10 of 10 decision(s) state a direction (9 up, 1 down, 0 none)"
     },
     {
       "check": "verdicts_parsed",
@@ -62,5 +62,5 @@
       "detail": "session phase(s) seen: rth  <-- price discovery"
     }
   ],
-  "verdict": "8/11 checks passed. FAILED \u2014 symbols_decided: 11 of 12 symbols produced a decision; ran_to_completion: stopped after 11 of 12 symbol(s): 12842 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them.; budget_not_exhausted: the budget ended the cycle before the guard had to \u2014 stopped after 11 of 12 symbol(s): 12842 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them.. **FALSIFIER FIRED**: this cycle had price discovery and the desk still proposed no exposure on any symbol. eval/autopsy.py named exactly this as the observation that moves the cause of the abstentions from the sampling to the desk. Its conclusion is now refuted and must be rewritten, not defended"
+  "verdict": "8/11 checks passed. FAILED \u2014 symbols_decided: 10 of 12 symbols produced a decision; ran_to_completion: stopped after 10 of 12 symbol(s): 24099 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them.; budget_not_exhausted: the budget ended the cycle before the guard had to \u2014 stopped after 10 of 12 symbol(s): 24099 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them.. **FALSIFIER FIRED**: this cycle had price discovery and the desk still proposed no exposure on any symbol. eval/autopsy.py named exactly this as the observation that moves the cause of the abstentions from the sampling to the desk. Its conclusion is now refuted and must be rewritten, not defended"
 }

@@ -274,6 +274,32 @@ def fetch_orderbook(
     )
 
 
+MERGED_PRECISIONS = ("scale0", "scale1", "scale2", "scale3")
+"""Bitget's merged-book price steps, finest first: each coarser step aggregates more of the book
+into each level, so the same 100-odd levels reach further from the mid (BTCUSDT scale2 reaches
+past 1% each side, checked 2026-10-06)."""
+
+
+def fetch_merged_orderbook(symbol: str, precision: str) -> OrderBook:
+    """The USDT perpetual's book merged to ``precision`` (``/api/v2/mix/market/merge-depth``):
+    coarser levels, but far deeper than the 200-level cap of the unmerged book, so a sweep of a
+    multi-million order can be priced from what is actually resting rather than said to run off
+    the visible book."""
+    payload = public_get(
+        "/api/v2/mix/market/merge-depth",
+        {"symbol": symbol.upper(), "productType": CATEGORY, "precision": precision,
+         "limit": "max"},
+    )
+    if not isinstance(payload, dict):
+        raise DepthError(f"{symbol} returned no merged order book")
+    return OrderBook(
+        symbol=symbol.upper(),
+        fetched_at=datetime.now(UTC),
+        bids=_levels(payload.get("bids"), descending=True),
+        asks=_levels(payload.get("asks"), descending=False),
+    )
+
+
 def measured_spread_bps(
     symbol: str, notional: Decimal, *, direction: str = "BUY", limit: int = DEFAULT_LEVELS,
 ) -> Decimal | None:
@@ -405,10 +431,12 @@ __all__ = [
     "CATEGORY",
     "DEFAULT_LEVELS",
     "MAX_LEVELS",
+    "MERGED_PRECISIONS",
     "DepthError",
     "Level",
     "OrderBook",
     "Sweep",
+    "fetch_merged_orderbook",
     "fetch_orderbook",
     "impact_check",
     "measured_spread_bps",

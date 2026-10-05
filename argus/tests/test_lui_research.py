@@ -1008,6 +1008,8 @@ class TestExecutionReadsTheBook:
         book = depth.OrderBook(symbol="PLTRUSDT", fetched_at=datetime.now(UTC), bids=bids,
                                asks=levels)
         monkeypatch.setattr(depth, "fetch_orderbook", lambda *a, **k: book)
+        # the merged book is tried when the unmerged one runs out; here it runs out too
+        monkeypatch.setattr(depth, "fetch_merged_orderbook", lambda *a, **k: book)
         plan = plan_execution(symbol="PLTRUSDT", notional=Decimal("2000000"),
                               adv_notional=Decimal("6000000"))
         lines = research.execution._depth_lines(

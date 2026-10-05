@@ -17,7 +17,9 @@ from typing import Any, Final
 from argus.lui.trace import trace_module
 
 ASKED: Final = re.compile(
-    r"\b(?:arbitrage|arb)\b|\b(?:price\s+)?(?:gap|difference|spread)\b[^?]{0,60}\b(?:other|"
+    # "arb" in lower case is arbitrage slang; "ARB" is Arbitrum's token, and "supply of SUI and
+    # ARB" was answered with an arbitrage gap (round 43 judge, C2)
+    r"\barbitrage\b|(?-i:\barbs?\b)|\b(?:price\s+)?(?:gap|difference|spread)\b[^?]{0,60}\b(?:other|"
     r"different|major)\s+exchanges?\b|\b(?:other|different)\s+exchanges?\b[^?]{0,60}\b(?:price|"
     r"gap|cheaper|higher)\b|\b(?:higher|lower|cheaper|more\s+expensive|different)\s+on\s+"
     r"(?:coinbase|binance|bybit|kraken|okx)\b|\bon\s+(?:coinbase|binance|bybit|kraken|okx)\s+than\s+"

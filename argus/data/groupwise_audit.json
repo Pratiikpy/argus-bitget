@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-05T20:19:20+00:00",
+  "generated_at": "2026-10-04T23:41:22+00:00",
   "method": "Mind2Web metric.py:236-259 (MIT): per-group mean and count, macro average, 0/1/2/3/>3 histogram; read by argus.eval.groupwise into four flags (carried_by_one_group, single_group, macro_disagrees, flips_across_halves)",
   "register_artefacts": [
     "data/abstention_comparison.json",
@@ -224,8 +224,8 @@
         "carried_by_one_group:phase=rth"
       ],
       "readings": [
-        "COINUSDT carries the headline: without it the other 11 symbol group(s) total -6136.8769, which does not point the same way",
-        "rth carries the headline: without it the other 2 phase group(s) total -6696.639, which does not point the same way"
+        "COINUSDT carries the headline: without it the other 11 symbol group(s) total -3546.9783, which does not point the same way",
+        "rth carries the headline: without it the other 2 phase group(s) total -4284.3938, which does not point the same way"
       ]
     },
     {
@@ -4020,7 +4020,7 @@
     "data/desk_notes.jsonl": {
       "status": "no_rows",
       "reason": "free-text notes per live cycle; the feedlist harness reduces them to one distinct-source count and no per-cycle value is recorded",
-      "sha256": "7f316c92a612252bdc19bd250875bde1b0b15198b6008bb3dae2ad8b207f57e9",
+      "sha256": "9956f208f80f0729fe27c3ad20d48a48683cbd72288171726c8a77c1b4ba6bf7",
       "flagged": false,
       "headlines": []
     },
@@ -4300,7 +4300,7 @@
     "data/event_reactions.json": {
       "status": "checked",
       "reason": "one row per (symbol, event kind) with enough events for an average; cells below the study's own minimum carry no average and are left out, as the study leaves them out",
-      "sha256": "2b49c928494190aaea48ef2d6eb8faa527fbefd52e561b511fe27ea37680304f",
+      "sha256": "cd8846c2bf63732529de7dadc3d76808c384d87d2fa8b68fe4080c27311cea2d",
       "flagged": false,
       "headlines": [
         {
@@ -16791,16 +16791,16 @@
     "data/paper_ledger.jsonl": {
       "status": "checked",
       "reason": "one row per graded abstention on the live paper ledger",
-      "sha256": "b010fff6a73352a0386abca5b0c5998a1f03365bcf701089ff319baeac0a66a3",
+      "sha256": "3b86afa03e222fc08947fa12913819966fb178995d9ff218be04c3d1e6efed3c",
       "flagged": true,
       "headlines": [
         {
           "name": "value of standing aside",
           "headline": "abstention value, bps net of the fee never paid (observatory.AbstentionOutcome.value_bps via scorecard.score_ledger)",
           "orientation": "positive = the abstention avoided a loss",
-          "items": 904,
-          "micro_mean": 4.836815,
-          "total": 4372.481,
+          "items": 863,
+          "micro_mean": 7.861792,
+          "total": 6784.7262,
           "broken_down": true,
           "flags": [
             "carried_by_one_group:symbol=COINUSDT",
@@ -16811,12 +16811,12 @@
             {
               "key": "symbol",
               "groups": 12,
-              "micro_mean": 4.836815,
-              "macro_mean": 4.132734,
+              "micro_mean": 7.861792,
+              "macro_mean": 6.997804,
               "direction": 1,
               "largest_contributor": "COINUSDT",
-              "largest_share_of_total": 2.4035,
-              "total_without_largest": -6136.8769,
+              "largest_share_of_total": 1.5228,
+              "total_without_largest": -3546.9783,
               "loss_histogram": {
                 "0": 0.0,
                 "1": 0.0,
@@ -16827,37 +16827,47 @@
               "carried_by_one_group": true,
               "single_group": false,
               "macro_disagrees": false,
-              "reading": "COINUSDT carries the headline: without it the other 11 symbol group(s) total -6136.8769, which does not point the same way",
+              "reading": "COINUSDT carries the headline: without it the other 11 symbol group(s) total -3546.9783, which does not point the same way",
               "per_group": [
                 {
                   "group": "COINUSDT",
-                  "rows": 80,
-                  "weight": 80.0,
-                  "total": 10509.3579,
-                  "mean": 131.366974,
-                  "mean_se": 51.94875,
-                  "share_of_total": 2.4035,
-                  "opposing": 29
+                  "rows": 76,
+                  "weight": 76.0,
+                  "total": 10331.7045,
+                  "mean": 135.94348,
+                  "mean_se": 54.492292,
+                  "share_of_total": 1.5228,
+                  "opposing": 27
                 },
                 {
                   "group": "GOOGLUSDT",
-                  "rows": 82,
-                  "weight": 82.0,
-                  "total": 2939.2745,
-                  "mean": 35.844811,
-                  "mean_se": 18.740775,
-                  "share_of_total": 0.6722,
-                  "opposing": 33
+                  "rows": 78,
+                  "weight": 78.0,
+                  "total": 3128.8666,
+                  "mean": 40.113674,
+                  "mean_se": 19.577201,
+                  "share_of_total": 0.4612,
+                  "opposing": 29
+                },
+                {
+                  "group": "MSFTUSDT",
+                  "rows": 79,
+                  "weight": 79.0,
+                  "total": 1565.9169,
+                  "mean": 19.821733,
+                  "mean_se": 16.895288,
+                  "share_of_total": 0.2308,
+                  "opposing": 29
                 },
                 {
                   "group": "AAPLUSDT",
-                  "rows": 84,
-                  "weight": 84.0,
-                  "total": 1462.1259,
-                  "mean": 17.406261,
-                  "mean_se": 12.010976,
-                  "share_of_total": 0.3344,
-                  "opposing": 31
+                  "rows": 80,
+                  "weight": 80.0,
+                  "total": 1492.0535,
+                  "mean": 18.650669,
+                  "mean_se": 12.57845,
+                  "share_of_total": 0.2199,
+                  "opposing": 30
                 },
                 {
                   "group": "SQQQUSDT",
@@ -16866,100 +16876,90 @@
                   "total": 954.7351,
                   "mean": 26.520419,
                   "mean_se": 55.533466,
-                  "share_of_total": 0.2184,
+                  "share_of_total": 0.1407,
                   "opposing": 15
                 },
                 {
-                  "group": "MSFTUSDT",
-                  "rows": 83,
-                  "weight": 83.0,
-                  "total": 905.6297,
-                  "mean": 10.911201,
-                  "mean_se": 16.683203,
-                  "share_of_total": 0.2071,
-                  "opposing": 33
-                },
-                {
                   "group": "AMZNUSDT",
-                  "rows": 82,
-                  "weight": 82.0,
-                  "total": 595.4946,
-                  "mean": 7.262129,
-                  "mean_se": 13.88693,
-                  "share_of_total": 0.1362,
-                  "opposing": 43
+                  "rows": 78,
+                  "weight": 78.0,
+                  "total": 624.7429,
+                  "mean": 8.009524,
+                  "mean_se": 14.575363,
+                  "share_of_total": 0.0921,
+                  "opposing": 41
                 },
                 {
                   "group": "QQQUSDT",
-                  "rows": 74,
-                  "weight": 74.0,
-                  "total": 386.188,
-                  "mean": 5.218757,
-                  "mean_se": 10.143055,
-                  "share_of_total": 0.0883,
-                  "opposing": 28
+                  "rows": 70,
+                  "weight": 70.0,
+                  "total": 495.3546,
+                  "mean": 7.076494,
+                  "mean_se": 10.666613,
+                  "share_of_total": 0.073,
+                  "opposing": 24
                 },
                 {
                   "group": "TSLAUSDT",
-                  "rows": 84,
-                  "weight": 84.0,
-                  "total": -1010.909,
-                  "mean": -12.034631,
-                  "mean_se": 19.37269,
-                  "share_of_total": -0.2312,
-                  "opposing": 42
+                  "rows": 80,
+                  "weight": 80.0,
+                  "total": -468.0743,
+                  "mean": -5.850929,
+                  "mean_se": 20.039869,
+                  "share_of_total": -0.069,
+                  "opposing": 38
                 },
                 {
                   "group": "METAUSDT",
-                  "rows": 82,
-                  "weight": 82.0,
-                  "total": -2381.381,
-                  "mean": -29.041232,
-                  "mean_se": 29.2112,
-                  "share_of_total": -0.5446,
-                  "opposing": 39
+                  "rows": 79,
+                  "weight": 79.0,
+                  "total": -2134.8448,
+                  "mean": -27.023352,
+                  "mean_se": 30.113215,
+                  "share_of_total": -0.3147,
+                  "opposing": 37
                 },
                 {
                   "group": "NVDAUSDT",
-                  "rows": 82,
-                  "weight": 82.0,
-                  "total": -3049.0307,
-                  "mean": -37.183301,
-                  "mean_se": 14.589306,
-                  "share_of_total": -0.6973,
-                  "opposing": 50
+                  "rows": 78,
+                  "weight": 78.0,
+                  "total": -2573.3977,
+                  "mean": -32.992278,
+                  "mean_se": 15.137205,
+                  "share_of_total": -0.3793,
+                  "opposing": 46
                 },
                 {
                   "group": "MSTRUSDT",
-                  "rows": 80,
-                  "weight": 80.0,
-                  "total": -3429.3836,
-                  "mean": -42.867295,
-                  "mean_se": 56.192081,
-                  "share_of_total": -0.7843,
-                  "opposing": 39
+                  "rows": 76,
+                  "weight": 76.0,
+                  "total": -3299.9023,
+                  "mean": -43.419767,
+                  "mean_se": 59.096151,
+                  "share_of_total": -0.4864,
+                  "opposing": 37
                 },
                 {
                   "group": "TQQQUSDT",
-                  "rows": 55,
-                  "weight": 55.0,
-                  "total": -3509.6204,
-                  "mean": -63.81128,
-                  "mean_se": 37.993455,
-                  "share_of_total": -0.8027,
-                  "opposing": 29
+                  "rows": 53,
+                  "weight": 53.0,
+                  "total": -3332.4288,
+                  "mean": -62.876015,
+                  "mean_se": 39.427194,
+                  "share_of_total": -0.4912,
+                  "opposing": 27
                 }
               ]
             },
             {
               "key": "phase",
               "groups": 3,
-              "micro_mean": 4.836815,
-              "macro_mean": 38.804164,
+              "micro_mean": 7.861792,
+              "macro_mean": 40.775789,
               "direction": 1,
               "largest_contributor": "rth",
-              "largest_share_of_total": 2.5315,
-              "total_without_largest": -6696.639,
+              "largest_share_of_total": 1.6315,
+              "total_without_largest": -4284.3938,
               "loss_histogram": {
                 "0": 0.3333,
                 "1": 0.0,
@@ -16970,7 +16970,7 @@
               "carried_by_one_group": true,
               "single_group": false,
               "macro_disagrees": false,
-              "reading": "rth carries the headline: without it the other 2 phase group(s) total -6696.639, which does not point the same way",
+              "reading": "rth carries the headline: without it the other 2 phase group(s) total -4284.3938, which does not point the same way",
               "per_group": [
                 {
                   "group": "rth",
@@ -16979,7 +16979,7 @@
                   "total": 11069.12,
                   "mean": 17.767448,
                   "mean_se": 10.852635,
-                  "share_of_total": 2.5315,
+                  "share_of_total": 1.6315,
                   "opposing": 289
                 },
                 {
@@ -16989,42 +16989,42 @@
                   "total": 123.0009,
                   "mean": 123.0009,
                   "mean_se": null,
-                  "share_of_total": 0.0281,
+                  "share_of_total": 0.0181,
                   "opposing": 0
                 },
                 {
                   "group": "weekend",
-                  "rows": 280,
-                  "weight": 280.0,
-                  "total": -6819.6399,
-                  "mean": -24.355857,
-                  "mean_se": 15.201392,
-                  "share_of_total": -1.5597,
-                  "opposing": 122
+                  "rows": 239,
+                  "weight": 239.0,
+                  "total": -4407.3947,
+                  "mean": -18.440982,
+                  "mean_se": 17.579023,
+                  "share_of_total": -0.6496,
+                  "opposing": 91
                 }
               ]
             }
           ],
           "split_half": {
             "label": "chronological halves",
-            "cut": "2026-09-23T19:41:00.806659+00:00",
-            "first_items": 446,
-            "second_items": 458,
-            "first_mean": 6.538249,
-            "second_mean": 3.17996,
-            "full_mean": 4.836815,
+            "cut": "2026-09-23T15:42:26.830491+00:00",
+            "first_items": 428,
+            "second_items": 435,
+            "first_mean": 8.014223,
+            "second_mean": 7.711814,
+            "full_mean": 7.861792,
             "flips_across_halves": false,
             "contradicts_full_sample": false,
-            "reading": "chronological halves: both halves point the same way as the full sample \u2014 first 6.538249, second 3.17996, full 4.836815"
+            "reading": "chronological halves: both halves point the same way as the full sample \u2014 first 8.014223, second 7.711814, full 7.861792"
           },
           "split_half_note": "",
           "notes": [],
           "interval": {
-            "low": -29.347485,
-            "high": 33.586954,
+            "low": -28.443982,
+            "high": 36.746623,
             "method": "stationary bootstrap over order values",
-            "units": 87,
-            "block_length": 4.034,
+            "units": 83,
+            "block_length": 3.969,
             "spans_zero": true,
             "resamples": 2000
           },
@@ -20490,7 +20490,7 @@
     "data/refusal_alpha.json": {
       "status": "aggregate_without_rows",
       "reason": "per-horizon aggregates bootstrapped over decision cycles; per-mark rows are not kept",
-      "sha256": "ffb0fc6e632f90da8da7c2695ea060ab50b83afafa02151b7b6c7b8c73e026d6",
+      "sha256": "cc824d2182c92b60db00b6089d83ff4abfe700a092937ae0c49f0fd7bb4e3174",
       "flagged": false,
       "headlines": []
     },
@@ -23669,7 +23669,7 @@
     "data/skill_matrix.json": {
       "status": "checked",
       "reason": "one row per tool",
-      "sha256": "f6a0f4c28273d5ec9cce3c5abd74956a1fe8a45d072c16400d978c6ee433bfde",
+      "sha256": "493c442af352fd00c61e1cf4c7eb3df983930a7e524db3f26332e2038a83aed8",
       "flagged": true,
       "headlines": [
         {

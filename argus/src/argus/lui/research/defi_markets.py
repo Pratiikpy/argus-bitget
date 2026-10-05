@@ -189,7 +189,9 @@ def lines(text: str) -> list[str] | None:
         return _chain_lines(list(dict.fromkeys(named)) or list(_L2[:3]))
     if _STABLE_SPLIT.search(text) and not re.search(r"\byield|\bapy\b|\blend", text, re.I):
         return _split_lines(text)
-    if _ASSET_YIELD.search(text):
+    if _ASSET_YIELD.search(text) and not re.search(r"\bdividend\w*|\binflation\w*|\bsupply\b",
+                                                   text, re.I):
+        # "dividend yields" of Exxon and Chevron read Chevron as a DeFi pool (round 43 judge, C1)
         assets = _yield_assets(text)
         if assets:
             return asset_yield_lines(assets)

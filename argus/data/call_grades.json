@@ -1,13 +1,13 @@
 {
- "graded_at": "2026-10-05T17:55:03+00:00",
+ "graded_at": "2026-10-05T19:55:02+00:00",
  "calls": 36,
  "first_call": "2026-09-27T02:28:00+00:00",
  "risk_graded": 0,
  "mean_beta_error": null,
  "mean_risk_share_error": null,
  "direction_graded": 40,
- "brier": 0.2614225000000001,
- "brier_base_rate": 0.24251465924763674,
+ "brier": 0.2624225000000001,
+ "brier_base_rate": 0.2469370419191169,
  "calls_graded": [
   {
    "recorded_at": "2026-09-27T02:28:00+00:00",
@@ -363,9 +363,9 @@
    "direction": [
     {
      "days": 1,
-     "up": true,
+     "up": false,
      "brier": 0.25,
-     "brier_base": 0.22138666967871048
+     "brier_base": 0.28035177196511246
     }
    ]
   },
@@ -415,9 +415,9 @@
    "direction": [
     {
      "days": 1,
-     "up": true,
-     "brier": 0.24009999999999998,
-     "brier_base": 0.22138666967871048
+     "up": false,
+     "brier": 0.2601,
+     "brier_base": 0.28035177196511246
     }
    ]
   },
@@ -467,9 +467,9 @@
    "direction": [
     {
      "days": 1,
-     "up": true,
-     "brier": 0.24009999999999998,
-     "brier_base": 0.22138666967871048
+     "up": false,
+     "brier": 0.2601,
+     "brier_base": 0.28035177196511246
     }
    ]
   },

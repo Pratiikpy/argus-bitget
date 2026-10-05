@@ -157,3 +157,484 @@ macro_exit=0
 
 60 measurement(s) written to argus\data\hedge_effectiveness.json
 effectiveness_exit=0
+{
+  "ran_at": "2026-10-05T19:40:26.232174+00:00",
+  "risk_policy": "68ceeadb52fc4ce0721006d8016744de7bc4d135ae75eb0aaca20e68f6460712",
+  "decisions_written": [
+    {
+      "seq": 1125,
+      "symbol": "NVDAUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.62,
+      "attests_llm_decided": true,
+      "notes_written": 24,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:conviction] sentiment (bullish) vs earnings (bullish), gap 0.27 \u2014 earnings dominates: confidence 0.72 against 0.45"
+      ],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    },
+    {
+      "seq": 1126,
+      "symbol": "TSLAUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.52,
+      "attests_llm_decided": true,
+      "notes_written": 28,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:conviction] event (bullish) vs sentiment (bullish), gap 0.10 \u2014 event dominates: confidence 0.55 against 0.45",
+        "[conflict:direction] event (bullish) vs earnings (bearish), gap 8.00 \u2014 earnings dominates: 8 distinct sources against 5",
+        "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 0.00 \u2014 earnings dominates: confidence 0.55 against 0.45",
+        "[debate] TSLAUSDT: 1 round(s), ended exhausted_budget, cost 2.0bps\n  [bull, round 1] up 120.0bps \u2014 TSLAUSDT at 380.19 is showing strong upward momentum across multiple dimensions. First, the underlying equity (TSLA) is up 2.45% today from prior close of 370.59 to 379.67 (mirror-global_assets-price), and the token is tracking slightly above at 380.19 with a 24h change of +1.97%. Second, Q3 deliveries of 486,532 beat consensus estimates of 463,761 by ~5% (twitter-2106008083453595667, twitter-2106007515607474511), reversing the narrative of declining demand. Third, revenue grew 26.1% QoQ and net income surged 133.5% QoQ in Q2 2026 (xbrl filings), showing accelerating profitability. Fourth, technicals are bullish: MACD positive with histogram expanding (3.19 vs signal 2.80), price above all key moving averages (MA7 373.71, MA25 369.09, MA99 368.98), trend labeled 'bull' (skill-technical_analysis-ma). Fifth, sentiment is supportive: Fear & Greed at 70 (Greed, up from 65), Nasdaq hitting record highs on AI rally (rss-yahoo-tsla-5195217471), and social media buzzing about a push toward $400 (twitter-2107164580212305992). Sixth, Tesla opened $30B in new credit facilities (twitter-2105036571326197905, edgar 8-K filing) signaling capital deployment for AI/Optimus/Cybercab scaling. Seventh, international sales are surging with France +62%, Taiwan +113%, Portugal +128% YoY in September (twitter-2105710427896472033). The combination of fundamental beat, technical breakout, and positive sentiment supports continued upside toward the $400 level.\n      concedes: RSI(14) on the 4h timeframe is at 70.51, flagged as overbought (skill-technical_analysis-rsi), and price is above the upper Bollinger Band (position: above_upper), suggesting the move is stretched and vulnerable to mean-reversion. Additionally, short volume was 44% of total prints on Oct 2 (finra-short-TSLA), indicating meaningful institutional skepticism, and the 10-year Treasury yield at 5.28% creates a high discount-rate headwind for a stock trading at extreme multiples. Q3 deliveries, while beating estimates, were still down 2% YoY, meaning growth has stalled on a year-over-year basis.\n  [bear, round 1] down 45.0bps \u2014 The bear case rests on mean-reversion from an overextended move combined with deteriorating fundamentals beneath the headline beat. First, RSI(14) at 70.51 is flagged overbought and price is above the upper Bollinger Band (position: above_upper, pct_b: -0.1281) on the 4h timeframe (skill-technical_analysis-rsi, skill-technical_analysis-bollinger). These are classic exhaustion signals that precede pullbacks, especially on a 0-hour horizon where the immediate next move is most likely a reversion toward the middle band at 372.70. Second, Q3 deliveries of 486,532 were down 2% YoY (twitter-2106015657833922561), meaning the 'beat' was against lowered expectations, not genuine growth acceleration. The bull narrative of 'reversing declining demand' is contradicted by the YoY decline itself. Third, FINRA short volume was 44% of total prints on Oct 2 (finra-short-TSLA-2026-10-02), indicating substantial institutional selling into strength. Fourth, the 10-year Treasury yield at 5.28% (ust-curve-2026-10-02) creates a punishing discount rate for a stock at ~340x PE (reddit-1vupvxg), and the yield curve remains elevated across the board. Fifth, the SUE metric is -0.06 standard deviations (xbrl-TSLA-sue-2026-06-30), meaning earnings have been slightly disappointing relative to the company's own historical surprise distribution. Sixth, consensus EPS revisions are mixed-to-negative: 1 up / 1 down for the current quarter and 2 up / 3 down for next quarter (consensus-TSLA-0q, consensus-TSLA-+1q), suggesting analysts are not chasing the stock higher. Seventh, the taker buy/sell ratio is 0.9076 (mirror-derivatives_sentiment-taker_ratio), showing net selling pressure in the derivatives market despite the price advance. The combination of overbought technicals, YoY delivery decline, high short interest, elevated rates, and negative taker flow supports a pullback toward the middle Bollinger band (~372.70), roughly 45-50bps from current levels.\n      concedes: The strongest argument against me is that momentum and sentiment are self-reinforcing at this stage: Nasdaq is at record highs on AI enthusiasm, Fear & Greed rose from 65 to 70, social media is actively discussing a $400 target, and the stock has broken above all major moving averages with MACD histogram still expanding. In strong trending markets, overbought conditions can persist for extended periods, and the Q3 delivery beat (even if YoY negative) may continue to attract flow from traders who only see the headline number. The 2.45% daily gain in the underlying equity shows real buying conviction that technical mean-reversion signals may not overcome on a 0-hour horizon.\n  final gap: 165.0bps\n  engagement: bull named the bear's best point 1 time(s), bear named the bull's 1 time(s). A side that never concedes a point has not argued, it has repeated.\n  Both seats share a model, so agreement here is self-consistency and NOT corroboration. Seat a second model to make this line go away.",
+        "[grounding] 1 of 10 figure(s) do not resolve to anything the desk was given: 234bps",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    },
+    {
+      "seq": 1127,
+      "symbol": "AAPLUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.42,
+      "attests_llm_decided": true,
+      "notes_written": 24,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:conviction] sentiment (insufficient_evidence) vs cross_asset (insufficient_evidence), gap 0.30 \u2014 sentiment dominates: confidence 0.30 against 0.00"
+      ],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    },
+    {
+      "seq": 1128,
+      "symbol": "MSFTUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.52,
+      "attests_llm_decided": true,
+      "notes_written": 29,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:conviction] event (bearish) vs sentiment (bearish), gap 0.13 \u2014 sentiment dominates: confidence 0.55 against 0.42",
+        "[conflict:direction] event (bearish) vs earnings (bullish), gap 10.00 \u2014 earnings dominates: confidence 0.62 against 0.42",
+        "[conflict:direction] sentiment (bearish) vs earnings (bullish), gap 10.00 \u2014 neither dominates: equally confident on equally many sources; the disagreement stands unresolved",
+        "[conflict] 1 disagreement(s) unresolved on the evidence; the decision is taken in spite of them, not because they were settled"
+      ],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    },
+    {
+      "seq": 1129,
+      "symbol": "METAUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.42,
+      "attests_llm_decided": true,
+      "notes_written": 25,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:direction] event (bullish) vs sentiment (bearish), gap 14.00 \u2014 event dominates: confidence 0.55 against 0.35",
+        "[conflict:direction] event (bullish) vs earnings (bearish), gap 10.00 \u2014 earnings dominates: 11 distinct sources against 3",
+        "[conflict:conviction] sentiment (bearish) vs earnings (bearish), gap 0.27 \u2014 earnings dominates: confidence 0.62 against 0.35"
+      ],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    },
+    {
+      "seq": 1130,
+      "symbol": "GOOGLUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.55,
+      "attests_llm_decided": true,
+      "notes_written": 25,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:direction] event (bearish) vs sentiment (bullish), gap 5.00 \u2014 sentiment dominates: 6 distinct sources against 3",
+        "[conflict:direction] event (bearish) vs earnings (bullish), gap 42.00 \u2014 earnings dominates: confidence 0.72 against 0.30",
+        "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 37.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+      ],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    },
+    {
+      "seq": 1131,
+      "symbol": "AMZNUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.55,
+      "attests_llm_decided": true,
+      "notes_written": 27,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:conviction] event (bullish) vs sentiment (bullish), gap 0.20 \u2014 event dominates: confidence 0.55 against 0.35",
+        "[conflict:magnitude] event (bullish) vs earnings (bullish), gap 73.00 \u2014 earnings dominates: confidence 0.78 against 0.55",
+        "[conflict:magnitude] sentiment (bullish) vs earnings (bullish), gap 81.00 \u2014 earnings dominates: confidence 0.78 against 0.35"
+      ],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    },
+    {
+      "seq": 1132,
+      "symbol": "COINUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.52,
+      "attests_llm_decided": true,
+      "notes_written": 28,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:direction] event (bullish) vs earnings (bearish), gap 10.00 \u2014 earnings dominates: confidence 0.72 against 0.42",
+        "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 14.00 \u2014 earnings dominates: confidence 0.72 against 0.35"
+      ],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    },
+    {
+      "seq": 1133,
+      "symbol": "MSTRUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.42,
+      "attests_llm_decided": true,
+      "notes_written": 31,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:conviction] event (bullish) vs sentiment (bullish), gap 0.27 \u2014 event dominates: confidence 0.62 against 0.35",
+        "[conflict:direction] event (bullish) vs earnings (bearish), gap 67.00 \u2014 earnings dominates: 8 distinct sources against 7",
+        "[conflict:direction] sentiment (bullish) vs earnings (bearish), gap 77.00 \u2014 earnings dominates: confidence 0.72 against 0.35",
+        "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: -85bps",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    },
+    {
+      "seq": 1134,
+      "symbol": "QQQUSDT",
+      "verdict": "no_trade",
+      "quantity": "0",
+      "confidence": 0.55,
+      "attests_llm_decided": true,
+      "notes_written": 29,
+      "protocol": {
+        "digest": "sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8",
+        "version": 3,
+        "reduced_this_decision": false
+      },
+      "flags": [
+        "[conflict:magnitude] event (bullish) vs sentiment (bullish), gap 41.00 \u2014 event dominates: confidence 0.55 against 0.30",
+        "[grounding] 1 of 6 figure(s) do not resolve to anything the desk was given: 0.43",
+        "[grounding] an unattributable number in a thesis is the easiest place for an unsupported fact to enter the record"
+      ],
+      "fill": "confirmed_unfilled",
+      "fill_alarm": false
+    }
+  ],
+  "settled_this_cycle": [
+    {
+      "seq": 1072,
+      "symbol": "NVDAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "212.3585"
+    },
+    {
+      "seq": 1073,
+      "symbol": "TSLAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "196.8620"
+    },
+    {
+      "seq": 1074,
+      "symbol": "AAPLUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "2.3982"
+    },
+    {
+      "seq": 1075,
+      "symbol": "MSFTUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "195.7076"
+    },
+    {
+      "seq": 1076,
+      "symbol": "METAUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "190.9920"
+    },
+    {
+      "seq": 1077,
+      "symbol": "GOOGLUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "90.5713"
+    },
+    {
+      "seq": 1078,
+      "symbol": "AMZNUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "43.5713"
+    },
+    {
+      "seq": 1079,
+      "symbol": "COINUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "195.8668"
+    },
+    {
+      "seq": 1080,
+      "symbol": "MSTRUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "179.6591"
+    },
+    {
+      "seq": 1081,
+      "symbol": "QQQUSDT",
+      "abstention": true,
+      "counterfactual_move_bps": "71.7433"
+    },
+    {
+      "causal_chains_graded": 6
+    }
+  ],
+  "postmortem": {
+    "at": "2026-10-05T19:40:26.232174+00:00",
+    "triggers": [
+      "10 settlements since the last postmortem"
+    ],
+    "gate_autopsy": {
+      "decisions": 1134,
+      "unreached": []
+    },
+    "diagnosis": {
+      "sample": 908,
+      "refused": "",
+      "causes": [],
+      "adopted_remedies_that_fired_again": []
+    }
+  },
+  "marked_this_cycle": [
+    {
+      "seq": 1114,
+      "symbol": "NVDAUSDT",
+      "horizon_hours": 1.9888,
+      "move_bps": "96.3480",
+      "lean": "up"
+    },
+    {
+      "seq": 1115,
+      "symbol": "TSLAUSDT",
+      "horizon_hours": 1.9888,
+      "move_bps": "-4.4694",
+      "lean": "up"
+    },
+    {
+      "seq": 1116,
+      "symbol": "AAPLUSDT",
+      "horizon_hours": 1.9888,
+      "move_bps": "5.0975",
+      "lean": "down"
+    },
+    {
+      "seq": 1117,
+      "symbol": "MSFTUSDT",
+      "horizon_hours": 1.9888,
+      "move_bps": "60.3706",
+      "lean": "up"
+    },
+    {
+      "seq": 1118,
+      "symbol": "METAUSDT",
+      "horizon_hours": 1.9888,
+      "move_bps": "-17.9958",
+      "lean": "up"
+    },
+    {
+      "seq": 1119,
+      "symbol": "GOOGLUSDT",
+      "horizon_hours": 1.9888,
+      "move_bps": "24.8024",
+      "lean": "up"
+    },
+    {
+      "seq": 1120,
+      "symbol": "AMZNUSDT",
+      "horizon_hours": 1.9888,
+      "move_bps": "-11.0306",
+      "lean": "up"
+    },
+    {
+      "seq": 1121,
+      "symbol": "COINUSDT",
+      "horizon_hours": 1.9888,
+      "move_bps": "162.4180",
+      "lean": "up"
+    },
+    {
+      "seq": 1122,
+      "symbol": "MSTRUSDT",
+      "horizon_hours": 1.9888,
+      "move_bps": "242.0453",
+      "lean": "up"
+    },
+    {
+      "seq": 1123,
+      "symbol": "QQQUSDT",
+      "horizon_hours": 1.9888,
+      "move_bps": "24.3760",
+      "lean": "up"
+    },
+    {
+      "seq": 1124,
+      "symbol": "TQQQUSDT",
+      "horizon_hours": 1.9888,
+      "move_bps": "76.2066",
+      "lean": "up"
+    }
+  ],
+  "tokens_spent": 305901,
+  "unreported_calls": 0,
+  "token_budget": 330000,
+  "stopped_early": "stopped after 10 of 12 symbol(s): 24099 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them.",
+  "chain": {
+    "entries": 1134,
+    "chain_intact": true,
+    "links_intact": true,
+    "first_break_at": null,
+    "truncated": false,
+    "anchor": "anchor agrees with the log",
+    "head_hash": "2260b248e7f88659",
+    "tampered_settlements": [],
+    "unsealed_settlements": []
+  },
+  "protocol": "argus-paper-v1 v3 (sha256:d403d741144df7513e4dbb69fd254b6b95f6a7aba3b7aeba26fd959fc26dbfb8)",
+  "resumed": [],
+  "fill_alarms": []
+}
+exit=0
+
+cycle 93: 5 claim(s) on QQQUSDT, head 9070b84fd351ba7b
+    resolves 2026-10-06T20:10
+    resolves 2026-10-08T20:10
+    resolves 2026-10-12T20:10
+    resolves 2026-10-19T20:10
+    resolves 2026-11-04T20:10
+
+  224 claim(s) resolve inside the window and 382 are still open when it starts
+cadence_exit=0
+4 claim(s) resolved this run
+  Γ£ù TSLAUSDT abs_move_above_bps 179.49 by 2026-10-05T18:17 (p=0.60) [2a64b4f473bc]  observed |139.40| = 139.40
+  Γ£ô METAUSDT abs_move_above_bps 161.83 by 2026-10-05T18:13 (p=0.60) [7e32eda3f977]  observed |291.37| = 291.37
+  Γ£ô MSTRUSDT abs_move_above_bps 245.59 by 2026-10-05T18:16 (p=0.60) [293788cd3578]  observed |482.89| = 482.89
+  Γ£ô METAUSDT abs_move_above_bps 51.24 by 2026-10-05T18:13 (p=0.60) [00c7491a01f0]  observed |192.19| = 192.19
+
+REGISTER ΓÇö 471 claim(s), 279 resolved, 190 pending, 2 unresolvable
+  argus                 279 resolved  Brier 0.2230  hit rate 68%
+
+  THE WALL ΓÇö 88 claim(s) we got wrong, most confident first:
+    Γ£ù NVDAUSDT abs_move_above_bps 45.46 by 2026-09-15T09:21 (p=0.60) [381cbc033f4b]  observed |12.25| = 12.25
+    Γ£ù TSLAUSDT abs_move_above_bps 50.23 by 2026-09-15T09:21 (p=0.60) [c387181dd2e6]  observed |-5.58| = 5.58
+    Γ£ù AAPLUSDT abs_move_above_bps 37.55 by 2026-09-15T09:21 (p=0.60) [2588c7bcd941]  observed |-12.37| = 12.37
+    Γ£ù AMZNUSDT abs_move_above_bps 40.7 by 2026-09-15T09:21 (p=0.60) [d71b10a405eb]  observed |-32.76| = 32.76
+    Γ£ù MSTRUSDT abs_move_above_bps 138.15 by 2026-09-15T09:21 (p=0.60) [919de6cb9750]  observed |-22.67| = 22.67
+    Γ£ù TSLAUSDT abs_move_above_bps 50.28 by 2026-09-16T18:14 (p=0.60) [5eec2201b2a4]  observed |-13.14| = 13.14
+    Γ£ù AAPLUSDT abs_move_above_bps 37.55 by 2026-09-16T20:11 (p=0.60) [4ae4dfa61cdf]  observed |33.15| = 33.15
+    Γ£ù METAUSDT abs_move_above_bps 66.48 by 2026-09-17T16:11 (p=0.60) [fe99a2216199]  observed |41.36| = 41.36
+    Γ£ù TQQQUSDT abs_move_above_bps 182.37 by 2026-09-17T18:17 (p=0.60) [394c43522a43]  observed |168.28| = 168.28
+    Γ£ù QQQUSDT abs_move_above_bps 31.84 by 2026-09-18T18:10 (p=0.60) [933c2db4e3a6]  observed |14.50| = 14.50
+
+written to argus\data\register_scoreboard.json
+register_exit=0
+CYCLE CHECK ΓÇö cycle_2026-10-06_0100.log
+
+  PASS     exit_code
+           process exited 0
+  FAIL     symbols_decided
+           10 of 12 symbols produced a decision
+  FAIL     ran_to_completion
+           stopped after 10 of 12 symbol(s): 24099 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them.
+  PASS     token_budget
+           305,901 of 330,000 spent (93%)
+  PASS     cumulative_tokens
+           26,913,497 token(s) across 91 recorded cycle(s), 295,753 per cycle ΓÇö roughly 1,183,011/day at four cycles. The key's remaining balance is not observable from here; this is the burn rate, not a runway
+  FAIL     budget_not_exhausted
+           the budget ended the cycle before the guard had to ΓÇö stopped after 10 of 12 symbol(s): 24099 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them.
+  PASS     chain_intact
+           the hash chain verified after the write
+  PASS     leans_recorded
+           10 of 10 row(s) carry a lean and a lean_confidence
+  PASS     leans_gradeable
+           10 of 10 decision(s) state a direction (9 up, 1 down, 0 none)
+  PASS     verdicts_parsed
+           every verdict parsed
+  PASS     session
+           session phase(s) seen: rth  <-- price discovery
+
+  8/11 checks passed. FAILED ΓÇö symbols_decided: 10 of 12 symbols produced a decision; ran_to_completion: stopped after 10 of 12 symbol(s): 24099 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them.; budget_not_exhausted: the budget ended the cycle before the guard had to ΓÇö stopped after 10 of 12 symbol(s): 24099 token(s) left of 330000, below the 25000 a symbol costs. The symbols not reached were not decided, and no decision was recorded for them.. **FALSIFIER FIRED**: this cycle had price discovery and the desk still proposed no exposure on any symbol. eval/autopsy.py named exactly this as the observation that moves the cause of the abstentions from the sampling to the desk. Its conclusion is now refuted and must be rewritten, not defended
+
+written to argus\data\cycle_check.json
+check_exit=1
+REFUSAL ALPHA ù 887 mark(s)
+
+  horizon              marks  directional  correct  coverage  accuracy  forgone
+  about_2h               664          660      365   99.4%   55.3%    -9.1
+  4h_to_12h                1            1        0  100.0%    0.0%   -51.7
+  overnight_12h_plus     222          217      106   97.7%   48.8%   -15.8
+
+  At the `about_2h` horizon: 365 of 660 directional calls went the right way. 95% interval (bootstrap over 61 decision cycles) 50.5% to 60.0%. It excludes a coin flip. But calling `up` every time was right 53.8% of the time, and cycle by cycle the lean beat that naive call 23 times and lost 25 (13 tied) ù so there is no evidence yet that the lean knows more than the direction of the tape. Median net edge forgone by standing aside: -9.1bps after a 12.0bps round trip ù refusing saved money on the typical decision.
+
+written to argus\data\refusal_alpha.json
+
+REASON AGAINST RECORD ù 1128 refusal(s) on record; 557 carried at least one reason the record can check. Of 1132 decision-time reason(s) graded, 1132 agreed with the record and 0 contradicted it. `move_too_small` claims were borne out by the next ~2h move 0 of 3 time(s) (0%), against 34% for every ~2h refusal mark (one-sided exact binomial p = 1.00); no evidence the stated reason says more than the base rate does. `moves_enough` claims were borne out by the next ~2h move 89 of 132 time(s) (67%), against 66% for every ~2h refusal mark (one-sided exact binomial p = 0.41); no evidence the stated reason says more than the base rate does.
+written to argus\data\refusal_reasons.json
+refusal_exit=0
+15 panel(s); 3 figure(s) not yet measurable
+  unavailable: Sharpe ╖ drawdown ╖ win rate ╖ Sharpe
+  unavailable: Sharpe ╖ drawdown ╖ win rate ╖ max drawdown
+  unavailable: Search bake-off ╖ stable winner
+written to argus\cockpit.html
+cockpit_exit=0
+recorded 5 probe(s) at 2026-10-05 20:11 UTC: 4 answered
+status_record_exit=0
+publish_skipped: cycle check exit 1

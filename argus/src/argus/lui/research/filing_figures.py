@@ -150,6 +150,54 @@ def company_facts(ticker: str) -> dict[str, Any] | None:
     return facts
 
 
+def company_document(ticker: str, extra_ciks: Sequence[int] = ()) -> dict[str, Any] | None:
+    """SEC's whole company-facts document for ``ticker`` (every taxonomy: ``us-gaap``,
+    ``ifrs-full``, ``dei``), as ``{taxonomy: {tag: {...}}}``. ``extra_ciks`` are predecessor
+    registrants whose filings are merged in: ExxonMobil Holdings Corp took the XOM ticker in
+    2026 under a new CIK whose own facts begin with the 2025 comparatives, so its earlier
+    quarters sit under the old Exxon Mobil Corporation CIK (34088)."""
+    from argus.market.evidence import EdgarSource
+
+    edgar = EdgarSource()
+    cik = edgar.cik_for(ticker)
+    if cik is None:
+        return None
+    merged: dict[str, Any] = {}
+    for number in (cik, *extra_ciks):
+        facts = edgar._get(
+            f"https://data.sec.gov/api/xbrl/companyfacts/CIK{number:010d}.json")["facts"]
+        for taxonomy, tags in facts.items():
+            into = merged.setdefault(taxonomy, {})
+            for tag, body in tags.items():
+                slot = into.setdefault(tag, {"units": {}})
+                for unit, rows in body.get("units", {}).items():
+                    slot["units"].setdefault(unit, []).extend(rows)
+    return merged
+
+
+def latest_periodic_report(ticker: str) -> tuple[str, date, date] | None:
+    """The newest 10-Q, 10-K, 20-F or 40-F the company has filed, from its EDGAR submissions
+    record: (form, period end, filing date). SEC's XBRL company-facts feed can trail it by weeks
+    (Ford's 10-Q filed on 29 Jul 2026 was not in the feed on 6 Oct 2026)."""
+    from argus.market.evidence import EdgarSource
+
+    edgar = EdgarSource()
+    cik = edgar.cik_for(ticker)
+    if cik is None:
+        return None
+    recent = edgar._get(edgar.SUBMISSIONS_URL.format(cik=cik))["filings"]["recent"]
+    for form, report, filed in zip(recent["form"], recent["reportDate"], recent["filingDate"],
+                                   strict=False):
+        if form in ("10-Q", "10-K", "20-F", "40-F") and report:
+            return str(form), date.fromisoformat(report), date.fromisoformat(filed)
+    return None
+
+
+def money(x: float) -> str:
+    """A dollar amount as the answers here say it ($1.23bn, $456m)."""
+    return _bn(x)
+
+
 def _company(ticker: str, wanted: Sequence[str],
              facts_of: Callable[[str], dict[str, Any] | None]) -> dict[str, Any]:
     """Every figure for the latest quarter and the year before, or an ``error``."""
@@ -311,4 +359,5 @@ def _compare(rows: list[dict[str, Any]], metrics: list[str]) -> str | None:
     return ("; ".join(said_all[:3]) + ".") if said_all else None
 
 
-__all__ = ["asked_metrics", "company_facts", "lines"]
+__all__ = ["asked_metrics", "company_document", "company_facts", "latest_periodic_report", "lines",
+           "money"]

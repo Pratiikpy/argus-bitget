@@ -498,6 +498,14 @@ def falsify(text: str, prior: list[str], *, book: str = "", memory: str = ""
         prior = [*prior, text]
     current = _standing(list(prior))
     if current is None:
+        from argus.lui.research import view_expression
+
+        # "I think oil is going higher into winter. How would I express it and what would prove
+        # me wrong?" was told there is no thesis in the conversation (round 43 judge, C7): a view
+        # with no reasons still has an expression, a stop and a base rate
+        expressed = view_expression.lines(text, [p for p in prior if p != text])
+        if expressed is not None:
+            return expressed, [], {"thesis": None, "view_expressed": True}
         view = next((t for t in reversed(prior) if _A_VIEW.search(t)), None)
         if view is not None:
             # A view with no reason in it is not nothing: saying "there is no thesis" straight

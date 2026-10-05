@@ -313,7 +313,8 @@ def _skew(text: str, book: list[Any], today: Any, currency: str) -> list[str]:
             if skew > 0.5 else "calls cost more than puts: the demand is for upside"
             if skew < -0.5 else "puts and calls are priced about evenly: no strong lean")
     out = [f"Bottom line: the 25-delta skew on {currency} options expiring {expiry:%d %b} "
-           f"({(expiry - today).days} days) is {skew:+.1f} vol points — {read}.",
+           f"({(expiry - today).days} days) is "
+           f"{'0.0' if abs(skew) < 0.05 else format(skew, '+.1f')} vol points — {read}.",
            f"25-delta put: strike {put.strike:,.0f} at {put.iv:.1%} implied volatility; "
            f"25-delta call: strike {call.strike:,.0f} at {call.iv:.1%}; "
            f"forward {leg[0].forward:,.0f}."]

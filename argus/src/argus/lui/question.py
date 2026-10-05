@@ -555,6 +555,7 @@ _NOT_A_TICKER = frozenset({
     "EUR", "JPY", "GBP", "CHF", "CNY", "CNH", "INR", "KRW", "AUD", "CAD", "HKD", "SGD",
     "NZD", "BRL", "MXN", "TRY", "ZAR", "SEK", "NOK", "BPS", "IV", "OTM", "ITM", "ATM",
     "APY", "APR", "TVL", "DEX", "CEX", "LST", "SEC", "EDGAR", "CIK",
+    "USDT", "USDC", "FDUSD", "BUSD",
     "I", "A", "AI", "PM", "AM", "ET", "UTC", "US", "USD", "EPS", "PE", "ROI", "NAV", "LLM", "VIP",
     "OK", "NO", "YES", "WHY", "HOW", "AND", "OR", "THE", "ARGUS", "IT", "WE", "Q", "FY",
     "FOMC", "FED", "CPI", "PPI", "GDP", "PCE", "NFP", "ECB", "BOJ", "PMI", "ETF", "IPO", "CEO",
