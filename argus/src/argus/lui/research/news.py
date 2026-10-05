@@ -381,3 +381,7 @@ def _skill_headlines(payload: Any, already: set[str]) -> list[str]:
 
 # Every engine here is a traced step from import on (lui/trace.py, trace_module).
 trace_module(globals())
+
+
+what_it_says = _what_it_says
+"""The public name of :func:`_what_it_says`, for the filings answer in `lui/server.py`."""

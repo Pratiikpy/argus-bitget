@@ -13621,6 +13621,19 @@ def _filing_answer(text: str, visitor: str, clock: datetime, conversation: Any, 
         lines, sources, data = ([f"The filings for {ticker} were read, but the model that answers "
                                  f"from them is unavailable ({type(exc).__name__}); nothing is "
                                  f"said rather than something unsupported."], [], {})
+    newest = max(cached[1], key=lambda d: d.filed)
+    if newest.form == "8-K" and re.search(r"\b(?:new|newest|latest|recent\w*|lately|this\s+week|"
+                                          r"anything)\b", text, re.I):
+        # "anything new from AMD in their SEC filings?" was answered from the 10-K while the
+        # newest filing was an 8-K on an $8.2bn acquisition (round 39 live re-ask): what is new
+        # leads, in the filing's own words
+        from argus.lui.research.news import what_it_says
+
+        said = what_it_says(ticker, newest.doc_id.removeprefix(f"{ticker.upper()}-8-K-"))
+        if said:
+            items = newest.title.partition("(")[2].rstrip(")") or "no items listed"
+            lines = [f"Bottom line: the newest filing is {ticker}'s 8-K of "
+                     f"{newest.filed:%d %b %Y} ({items}) — it says: “{said}”", *lines]
     unused = len(data.get("retrieved_sources") or [])
     lines = [*lines, f"Data: SEC EDGAR filings for {ticker}; {len(sources)} passage(s) cited, "
                      f"{unused} read and not used. Every sentence cites the passage it rests on; "
