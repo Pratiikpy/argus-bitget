@@ -223,10 +223,52 @@ def dominance_lines(text: str) -> list[str] | None:
         ratio = _stable_ratio(window)
         btc_supply_then = _btc_supply_then(window)
     except Exception:
-        return ["Bottom line: Bitcoin's market share could not be read just now (CoinGecko or "
-                "DeFiLlama did not answer); ask again in a minute.",
-                "Data: CoinGecko global and markets, DeFiLlama stablecoins. " + _ADVICE]
-    return _dominance_answer(glob, rows, stable_ids, ratio, btc_supply_then, asked, window, key)
+        # CoinGecko's free tier refuses the hosted console's address often (live re-ask, round
+        # 43): today's share from one lighter read, else CoinPaprika's, with the period's change
+        # said to be unread rather than the whole answer refused
+        return _dominance_now_only(text, asked)
+    out = _dominance_answer(glob, rows, stable_ids, ratio, btc_supply_then, asked, window, key)
+    if _MEANING.search(text) and out:
+        out.insert(1, _DOMINANCE_MEANS)
+    return out
+
+
+_MEANING: Final = re.compile(r"\bwhat\s+(?:does|is)\b[^?]{0,30}\bdominance\b[^?]{0,10}\b(?:mean|"
+                             r"measure)?|\bdominance\s+mean\w*", re.I)
+_DOMINANCE_MEANS: Final = (
+    "What it means: Bitcoin dominance is Bitcoin's market value as a share of the whole crypto "
+    "market's. It rises when Bitcoin gains more than other coins (or falls less), and falls when "
+    "the rest of the market outruns it — a falling share in a rising market is what traders call "
+    "an altcoin season.")
+
+
+def _dominance_now_only(text: str, asked: int) -> list[str]:
+    """Today's share when the period's rebuild could not be read: CoinGecko's global figure, else
+    CoinPaprika's (``api.coinpaprika.com/v1/global``, keyless; it counts more coins, so its share
+    runs about two points lower — 56.4% against CoinGecko's 58.7% on 2026-10-06)."""
+    share, source = None, ""
+    try:
+        share = _f(_gecko("/global")["data"]["market_cap_percentage"]["btc"])
+        source = "CoinGecko global"
+    except Exception:
+        try:
+            paprika = _get("https://api.coinpaprika.com/v1/global")
+            share = _f(paprika["bitcoin_dominance_percentage"])
+            source = ("CoinPaprika global (it counts more coins than CoinGecko, so its share runs "
+                      "lower)")
+        except Exception:
+            share = None
+    if share is None:
+        return ["Bottom line: Bitcoin's market share could not be read just now (CoinGecko and "
+                "CoinPaprika did not answer); ask again in a minute.",
+                "Data: CoinGecko and CoinPaprika global. " + _ADVICE]
+    out = [f"Bottom line: Bitcoin is {share:.1f}% of the crypto market's value now; its change "
+           f"over the last {asked} days could not be rebuilt just now (the coin-by-coin history "
+           "did not answer), so no trend is claimed."]
+    if _MEANING.search(text):
+        out.append(_DOMINANCE_MEANS)
+    out.append(f"Data: {source}, read now. " + _ADVICE)
+    return out
 
 
 def _dominance_answer(glob: dict[str, Any], rows: list[dict[str, Any]], stable_ids: set[str],

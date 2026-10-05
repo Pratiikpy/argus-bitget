@@ -777,7 +777,9 @@ _CHART_S: Final = (
 
 _SMALL_SUM: Final = re.compile(
     r"\b(?:can|could|is\s+it\s+(?:ok|okay|possible|worth)|do\s+i\s+need)\b[^?]{0,30}"
-    r"\b(?:invest\w*|start\w*|begin)\b[^?]{0,30}\b(?:(?:only|just)\s+|with\s+(?=\$?\d{1,3}\s*"
+    # "can i start with like 20 bucks" (round 43 live re-ask) carries a filler word
+    r"\b(?:invest\w*|start\w*|begin)\b[^?]{0,30}\b(?:(?:only|just)\s+|with\s+(?:like\s+|about\s+|"
+    r"around\s+|maybe\s+|roughly\s+)?(?=\$?\d{1,3}\s*"
     r"(?:dollars?|usd|bucks|\$)?\W*$))(?:\$\s?(?P<a>\d{1,3})\b(?!\s*(?:k|,\d|m\b|million|"
     r"billion|thousand))|(?P<b>\d{1,3})\s*(?:dollars?|usd|bucks)\b)", re.I)
 
@@ -1357,7 +1359,30 @@ def _phish(text: str) -> Lines | None:
     if (_PHISH_CHANNEL.search(text) and _PHISH_BAIT.search(text) and _PHISH_BRAND.search(text)
             and _PHISH_GOT.search(text) and not re.search(r"\bairdrops?\b", text, re.I)):
         return list(_PHISH_A)
+    if _FAKE_SUPPORT.search(text) and _SECRET_ASKED.search(text):
+        return list(_FAKE_SUPPORT_A)
     return None
+
+
+_FAKE_SUPPORT: Final = re.compile(
+    r"\b(?:support|admin|agent|staff|help\s*desk|customer\s+service|moderator|official)\b", re.I)
+_SECRET_ASKED: Final = re.compile(
+    r"\b(?:2fa|two[\s-]?factor|otp|one[\s-]?time|verification\s+code|code|password|seed|"
+    r"recovery\s+phrase|private\s+key|remote\s+access|anydesk|screen\s*share)\b", re.I)
+# "someone on telegram says they are bitget support and need my 2FA code" was declined (round 43
+# live re-ask). No product name for checking a contact is given: the verification page the site
+# links could not be read to confirm its name (2026-10-06), so the answer points to the app and
+# the official site only.
+_FAKE_SUPPORT_A: Final = (
+    "Bottom line: it is a scam — real Bitget support never asks for your 2FA code, password, "
+    "seed phrase or remote access to your phone, by Telegram, WhatsApp or anywhere else. Do not "
+    "send the code.",
+    "Anyone holding a fresh 2FA code can log in or approve a withdrawal as you. If you already "
+    "sent one, change your password and reset 2FA in the official app now, and check withdrawals "
+    "and API keys.",
+    "Reach support only through the official app's own help or live chat, or by typing the "
+    "exchange's address yourself — never through someone who messaged you first.",
+)
 
 
 _ROUND43: Final[tuple[Callable[[str], Lines | None], ...]] = (

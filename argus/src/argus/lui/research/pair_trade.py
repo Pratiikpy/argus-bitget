@@ -96,6 +96,11 @@ from argus.research.cointegration import (
 PAIR: Final = re.compile(
     r"\bpairs?[\s-]+trad\w*|\bpairs?[\s-]+(?:strategy|position|spread|setup|trade)\b|"
     r"\bcointegrat\w*|\bstat(?:istical)?[\s-]+arb\w*|"
+    # "Is there a tradeable mean-reverting relationship between MSFT and GOOGL? Give me the hedge
+    # ratio." went to the book-hedge reader (round 43 live re-ask)
+    r"\bmean[\s-]*revert\w*\b[^?]{0,60}\b(?:relationship|pair|spread|between)\b|"
+    r"\bhedge\s+ratio\b[^?]{0,40}\bbetween\b|\b(?:relationship|spread)\s+between\s+[A-Za-z$][\w.]"
+    r"{0,11}\s+and\s+[A-Za-z$][\w.]{0,11}\b[^?]{0,60}\bmean[\s-]*revert\w*|"
     r"\b(?:long|short)\s+[A-Za-z$][\w.]{0,11}\s*(?:,|\band\b|/)?\s*(?:short|long)\s+[A-Za-z$]"
     r"[\w.]{0,11}[^.?]{0,80}\b(?:spread|hedge\s+ratio|mean[\s-]*revert\w*|cointegrat\w*)", re.I)
 """A question that names a pair trade, or a long/short of two names with a spread cue."""

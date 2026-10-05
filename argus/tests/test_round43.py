@@ -259,3 +259,38 @@ class TestDeepOrders:
         said = execution._depth_lines("BTCUSDT", Decimal(100_000), Decimal(10_000_000), plan,
                                       "a $100k market buy")
         assert said and "beyond what can be seen" not in said[0]
+
+
+class TestLiveReAskFixes:
+    def test_mean_reversion_between_two_names_is_a_pair(self) -> None:
+        from argus.lui.research.pair_trade import PAIR
+
+        assert PAIR.search("Is there a tradeable mean-reverting relationship between MSFT and "
+                           "GOOGL? Give me the hedge ratio.")
+
+    def test_fake_support_asking_for_a_code(self) -> None:
+        from argus.lui.beginner import early
+
+        said = early("someone on telegram says they are bitget support and need my 2FA code", [])
+        assert said is not None and said[0].startswith("Bottom line: it is a scam")
+
+    def test_a_small_start_with_a_filler_word(self) -> None:
+        from argus.lui.beginner import early
+
+        said = early("can i start with like 20 bucks", [])
+        assert said is not None and "$20" in said[0]
+
+    def test_dominance_is_defined_and_survives_coingecko(self, monkeypatch: pytest.MonkeyPatch
+                                                         ) -> None:
+        from argus.lui.research import crypto_structure
+
+        def refused(path: str, **params: Any) -> Any:
+            raise RuntimeError("429")
+
+        monkeypatch.setattr(crypto_structure, "_gecko", refused)
+        monkeypatch.setattr(crypto_structure, "_get",
+                            lambda url, params=None, timeout=40.0: {
+                                "bitcoin_dominance_percentage": 56.38})
+        said = crypto_structure.dominance_lines("what does BTC dominance mean")
+        assert said is not None and "56.4%" in said[0]
+        assert any(line.startswith("What it means:") for line in said)
