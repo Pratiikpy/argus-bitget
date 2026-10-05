@@ -282,7 +282,44 @@ class Progress:
         }
 
 
-def progress(prior: Sequence[Position], current: Position) -> Progress | None:
+_SHOWN_ID = re.compile(r"^\s*\[(?P<id>[^\]]+)\]")
+
+
+def shown_ids(evidence: Sequence[str]) -> frozenset[str]:
+    """The evidence ids the seats were shown, read from the rendered lines ``[id] (source, ...)``.
+    A line with no leading id contributes none."""
+    return frozenset(m.group("id").lower() for line in evidence
+                     if (m := _SHOWN_ID.match(line)) is not None)
+
+
+def invented_ids(position: Position, shown: frozenset[str]) -> tuple[str, ...]:
+    """Evidence ids a seat cited that it was never shown (build-list 5.4, CEREBRA's evidence-id
+    reconciliation, rebuilt from behaviour: its repository carries no licence). A citation is a
+    claim that the item exists; one that names nothing in the frame is invented, however well it
+    reads, and is reported rather than counted.
+
+    **On the record, 2026-10-05.** Replayed over the 31 debates kept in ``data/desk_notes.jsonl``
+    (62 seat statements, 41 citing an id-shaped token): two invented ids. Decision 753's bull cited
+    ``twitter-2102567422503124718039545`` where the evidence held ``...503129263`` — a mangled id;
+    decision 945's bear cited ``form4-0001628280``, and no Form 4 with that accession was in the
+    evidence it was shown."""
+    text = f"{position.case}\n{position.strongest_opposing_point}"
+    families = {re.split(r"[-_]", s, maxsplit=1)[0] for s in shown}
+    out = set()
+    for cited in {m.group(0).lower() for m in _EVIDENCE_ID.finditer(text)}:
+        # Only a token of a family the frame carried can be a citation at all: "q2-2026" in prose
+        # is not an id. And the id pattern stops at its last run of three or more digits, so
+        # "xbrl-nvda-revenue-2026" is the start of the shown "xbrl-nvda-revenue-2026-07-26".
+        if re.split(r"[-_]", cited, maxsplit=1)[0] not in families:
+            continue
+        if any(s == cited or s.startswith((cited + "-", cited + "_")) for s in shown):
+            continue
+        out.add(cited)
+    return tuple(sorted(out))
+
+
+def progress(prior: Sequence[Position], current: Position,
+             shown: frozenset[str] | None = None) -> Progress | None:
     """Compare ``current`` with the same side's previous round, against everything said before.
 
     ``prior`` is the transcript before ``current`` — both sides. ``None`` when this side has no
@@ -298,7 +335,9 @@ def progress(prior: Sequence[Position], current: Position) -> Progress | None:
     seen: set[str] = set()
     for p in prior:
         seen |= _evidence_tokens(p.case) | _evidence_tokens(p.strongest_opposing_point)
-    new = sorted(_evidence_tokens(current.case) - seen)
+    # an invented id is not new evidence: citing something that does not exist is not progress
+    invented = set(invented_ids(current, shown)) if shown is not None else set()
+    new = sorted(_evidence_tokens(current.case) - seen - invented)
     return Progress(
         side=current.side,
         round_index=current.round_index,
@@ -308,13 +347,14 @@ def progress(prior: Sequence[Position], current: Position) -> Progress | None:
     )
 
 
-def round_progress(positions: Sequence[Position], round_index: int) -> tuple[Progress, ...]:
+def round_progress(positions: Sequence[Position], round_index: int,
+                   shown: frozenset[str] | None = None) -> tuple[Progress, ...]:
     """Both sides' progress readings for one round, in speaking order. Empty for round 0."""
     out: list[Progress] = []
     for i, position in enumerate(positions):
         if position.round_index != round_index:
             continue
-        reading = progress(positions[:i], position)
+        reading = progress(positions[:i], position, shown)
         if reading is not None:
             out.append(reading)
     return tuple(out)
@@ -372,6 +412,9 @@ class Debate:
 
     resets: int = 0
     """How many progress notices were issued. At most one; see :data:`STALL_NOTICE`."""
+
+    invented: tuple[tuple[str, int, str], ...] = ()
+    """``(side, round, id)`` for every evidence id a seat cited that was not in its evidence."""
 
     @property
     def rounds(self) -> int:
@@ -463,6 +506,12 @@ class Debate:
         )
         if self.note:
             lines.append(f"  {self.note}")
+        if self.invented:
+            lines.append(
+                "  INVENTED CITATIONS: " + "; ".join(
+                    f"{side} round {round_index + 1} cited {item}"
+                    for side, round_index, item in self.invented)
+                + ". Nothing with that id was in the evidence, so it carries no weight.")
         if self.ending is Ending.STALLED:
             lines.append(
                 "  STALLED: in the last round neither side moved, changed direction or cited "
@@ -497,6 +546,8 @@ class Debate:
             "note": self.note,
             "progress": [r.as_dict() for r in self.progress],
             "resets": self.resets,
+            "invented_citations": [{"side": s, "round": r, "id": i}
+                                   for s, r, i in self.invented],
         }
 
 
@@ -647,6 +698,7 @@ def hold(
 
     positions: list[Position] = []
     readings: list[Progress] = []
+    shown = shown_ids(evidence)
     ending = Ending.EXHAUSTED_ROUNDS
     stall_count = 0
     resets = 0
@@ -682,7 +734,7 @@ def hold(
             ending = Ending.CONVERGED
             break
         notice = ""
-        this_round = round_progress(positions, index)
+        this_round = round_progress(positions, index, shown)
         readings.extend(this_round)
         if not stall_detection or not this_round:
             continue
@@ -707,6 +759,8 @@ def hold(
         cost_bps=budget.spent(max(1, (len(positions) + 1) // 2)),
         progress=tuple(readings),
         resets=resets,
+        invented=tuple((p.side.value, p.round_index, item) for p in positions
+                       for item in invented_ids(p, shown)),
     )
 
 
@@ -725,8 +779,10 @@ __all__ = [
     "Side",
     "converged",
     "hold",
+    "invented_ids",
     "progress",
     "round_progress",
     "round_stalled",
+    "shown_ids",
     "signed",
 ]

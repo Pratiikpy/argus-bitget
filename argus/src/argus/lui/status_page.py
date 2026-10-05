@@ -308,61 +308,79 @@ def self_audit_lines(data: Path) -> list[tuple[str, str]]:
     from argus.agents.meta_pm import MODEL_KNOWLEDGE_BOUND
 
     out: list[tuple[str, str]] = []
-    ic = _load(data, "lean_ic.json")
-    head = ((ic or {}).get("horizons") or {}).get("about_2h") or {}
-    if head.get("ic_mean") is not None and head.get("t_stat") is not None:
-        out.append(("Self-audit: does the lean rank the move?",
-                    f"information coefficient {float(head['ic_mean']):+.3f} at ~2h over "
-                    f"{head['cycles_with_ic']} decision cycles (t {float(head['t_stat']):+.2f}, "
-                    f"p {float(head['p_value']):.2f}, alphalens's per-period method) — "
-                    + ("no evidence the confidence ranks the next move"
-                       if float(head["p_value"]) >= 0.05 else "a measurable ranking")
-                    + f"; generated {str(ic.get('generated_at', ''))[:10] if ic else ''}"))
-    refusal = _load(data, "refusal_alpha.json")
-    two = next((h for h in (refusal or {}).get("horizons", [])
-                if h.get("horizon") == "about_2h" and h.get("accuracy_pct") is not None), None)
-    if refusal and two:
-        low, high = two.get("accuracy_ci95") or (None, None)
-        out.append(("Self-audit: were the refusals' leans right?",
-                    f"{two['correct']} of {two['directional']} went the right way "
-                    f"({float(two['accuracy_pct']):.1f}%, {low}-{high}% over {two['cycles']} "
-                    f"cycles) against {float(two['naive_accuracy_pct']):.1f}% for always "
-                    f"\"{two['naive_lean']}\" — "
-                    + ("beats the naive call" if two.get("beats_the_naive_call")
-                       else "not better than the naive call")
-                    + f"; median forgone edge {float(two['median_forgone_bps']):+.1f}bps after "
-                      f"fees, as of {str(refusal.get('as_of', ''))[:10]}"))
-    perturbed = _load(data, "perturbation_robustness.json")
-    if perturbed and perturbed.get("score"):
-        action, lean = perturbed["score"], perturbed.get("lean_score") or {}
-        out.append(("Self-audit: does noise in the evidence flip it?",
-                    f"{action.get('snapshots')} snapshots re-decided under seeded evidence "
-                    f"perturbation (HELM's worst case): action held {float(action['worst']):.0%}, "
-                    + (f"lean held {float(lean['worst']):.0%} with every flip inside the "
-                       f"unperturbed runs' own disagreement" if lean.get("worst") is not None
-                       else "lean not measured")
-                    + f" — a small sample, {str(perturbed.get('generated_at', ''))[:10]}"))
-    consistent = _load(data, "consistency.json")
-    if consistent and consistent.get("replays"):
-        replays = consistent["replays"]
-        runs = sum(int(r.get("runs") or 0) for r in replays)
-        lean_ok = min(float(r.get("lean_agreement") or 0) for r in replays)
-        action_ok = min(float(r.get("action_agreement") or 0) for r in replays)
-        out.append(("Self-audit: same evidence, same answer?",
-                    f"{len(replays)} state{'s' if len(replays) != 1 else ''} replayed {runs} "
-                    f"times with the cache off: lean agreement {lean_ok:.0%}, action agreement "
-                    f"{action_ok:.0%} at worst"
-                    + (" — one state, so a spot check, not a rate" if len(replays) == 1 else "")
-                    + f" ({str(consistent.get('generated_at', ''))[:10]})"))
-    leak = _load(data, "leakage.json")
-    if leak and leak.get("overall"):
-        overall = leak["overall"]
-        out.append(("Self-audit: does the model already know the outcome?",
-                    f"Qwen recalled {overall['hits']} of {overall['probes']} dated facts "
-                    f"({float(overall['capacity']):.0%} against {float(overall['chance']):.0%} "
-                    f"chance), with no upper boundary found through {leak.get('boundary')} — so "
-                    f"the decision-maker refuses to decide any frame before "
-                    f"{MODEL_KNOWLEDGE_BOUND.date().isoformat()} (agents/meta_pm.py)"))
+    try:
+        ic = _load(data, "lean_ic.json")
+        head = ((ic or {}).get("horizons") or {}).get("about_2h") or {}
+        if head.get("ic_mean") is not None and head.get("t_stat") is not None:
+            out.append(("Self-audit: does the lean rank the move?",
+                        f"information coefficient {float(head['ic_mean']):+.3f} at ~2h over "
+                        f"{head['cycles_with_ic']} decision cycles "
+                        f"(t {float(head['t_stat']):+.2f}, "
+                        f"p {float(head['p_value']):.2f}, alphalens's per-period method) — "
+                        + ("no evidence the confidence ranks the next move"
+                           if float(head["p_value"]) >= 0.05 else "a measurable ranking")
+                        + f"; generated {str(ic.get('generated_at', ''))[:10] if ic else ''}"))
+    except (KeyError, TypeError, ValueError, ZeroDivisionError):
+        pass  # a malformed artefact drops its row, never the page
+    try:
+        refusal = _load(data, "refusal_alpha.json")
+        two = next((h for h in (refusal or {}).get("horizons", [])
+                    if h.get("horizon") == "about_2h" and h.get("accuracy_pct") is not None), None)
+        if refusal and two:
+            low, high = two.get("accuracy_ci95") or (None, None)
+            out.append(("Self-audit: were the refusals' leans right?",
+                        f"{two['correct']} of {two['directional']} went the right way "
+                        f"({float(two['accuracy_pct']):.1f}%, {low}-{high}% over {two['cycles']} "
+                        f"cycles) against {float(two['naive_accuracy_pct']):.1f}% for always "
+                        f"\"{two['naive_lean']}\" — "
+                        + ("beats the naive call" if two.get("beats_the_naive_call")
+                           else "not better than the naive call")
+                        + f"; median forgone edge {float(two['median_forgone_bps']):+.1f}bps after "
+                          f"fees, as of {str(refusal.get('as_of', ''))[:10]}"))
+    except (KeyError, TypeError, ValueError, ZeroDivisionError):
+        pass  # a malformed artefact drops its row, never the page
+    try:
+        perturbed = _load(data, "perturbation_robustness.json")
+        if perturbed and perturbed.get("score"):
+            action, lean = perturbed["score"], perturbed.get("lean_score") or {}
+            out.append(("Self-audit: does noise in the evidence flip it?",
+                        f"{action.get('snapshots')} snapshots re-decided under seeded evidence "
+                        f"perturbation (HELM's worst case): action held "
+                        f"{float(action['worst']):.0%}, "
+                        + (f"lean held {float(lean['worst']):.0%} with every flip inside the "
+                           f"unperturbed runs' own disagreement" if lean.get("worst") is not None
+                           else "lean not measured")
+                        + f" — a small sample, {str(perturbed.get('generated_at', ''))[:10]}"))
+    except (KeyError, TypeError, ValueError, ZeroDivisionError):
+        pass  # a malformed artefact drops its row, never the page
+    try:
+        consistent = _load(data, "consistency.json")
+        if consistent and consistent.get("replays"):
+            replays = consistent["replays"]
+            runs = sum(int(r.get("runs") or 0) for r in replays)
+            lean_ok = min(float(r.get("lean_agreement") or 0) for r in replays)
+            action_ok = min(float(r.get("action_agreement") or 0) for r in replays)
+            out.append(("Self-audit: same evidence, same answer?",
+                        f"{len(replays)} state{'s' if len(replays) != 1 else ''} replayed {runs} "
+                        f"times with the cache off: lean agreement {lean_ok:.0%}, action agreement "
+                        f"{action_ok:.0%} at worst"
+                        + (" — one state, so a spot check, not a rate" if len(replays) == 1 else "")
+                        + f" ({str(consistent.get('generated_at', ''))[:10]})"))
+    except (KeyError, TypeError, ValueError, ZeroDivisionError):
+        pass  # a malformed artefact drops its row, never the page
+    try:
+        leak = _load(data, "leakage.json")
+        if leak and leak.get("overall"):
+            overall = leak["overall"]
+            out.append(("Self-audit: does the model already know the outcome?",
+                        f"Qwen recalled {overall['hits']} of {overall['probes']} dated facts "
+                        f"({float(overall['capacity']):.0%} against {float(overall['chance']):.0%} "
+                        f"chance), with no upper boundary found through "
+                        f"{leak.get('boundary')} — so "
+                        f"the decision-maker refuses to decide any frame before "
+                        f"{MODEL_KNOWLEDGE_BOUND.date().isoformat()} (agents/meta_pm.py)"))
+    except (KeyError, TypeError, ValueError, ZeroDivisionError):
+        pass  # a malformed artefact drops its row, never the page
     return out
 
 

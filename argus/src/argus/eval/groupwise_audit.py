@@ -561,6 +561,26 @@ def _rotation(path: str) -> Entry:
                   source="baseline_reproduced.results + oos_wider_universe.results"),))
 
 
+def _nightwatch(path: str) -> Entry:
+    """The shared calls at eight hours: +1 where the desk was right and NIGHTWATCH wrong, -1 the
+    reverse, 0 where they agreed — the instants that decide which side is better."""
+    rows = [r for r in _load(path)["rows"]
+            if r.get("nightwatch") is not None and r.get("move_8h_bps") is not None
+            and abs(r["move_8h_bps"]) >= 20.0]
+    items = []
+    for order, r in enumerate(sorted(rows, key=lambda x: x["cycle"])):
+        ours = (r["argus"] == "up") == (r["move_8h_bps"] > 0)
+        theirs = (r["nightwatch"] == "up") == (r["move_8h_bps"] > 0)
+        items.append(Item(value=float(ours) - float(theirs), order=f"{order:05d}",
+                          groups={"symbol": str(r["symbol"]), "day": str(r["cycle"])[:10]}))
+    return Entry(path, CHECKED, "one row per shared call, with its symbol and decision day", (
+        _headline("the desk's lean against NIGHTWATCH AI on the same instants", items,
+                  ("symbol", "day"), headline="mean of right-minus-right over shared calls",
+                  orientation="+1 desk right and NIGHTWATCH wrong, -1 the reverse", role=VS_RIVAL,
+                  role_reason="the head-to-head the register entry claims",
+                  source="rows (nightwatch called, |8h move| >= 20 bps)"),))
+
+
 def _earnings(path: str) -> Entry:
     rows = _load(path)["baseline_reproduced"]["results"]
     items = [Item(value=1.0 if r["agree"] else -1.0, groups={"symbol": str(r["symbol"])})
@@ -1770,6 +1790,11 @@ ADAPTERS: dict[str, Callable[[str], Entry]] = {
         WITHOUT_ROWS, "about 1,320 daily net returns per coin and arm reduced to per-arm "
         "metrics on three coins; eval/vol_target_comparison.py would need to record each day's "
         "net return per arm for a chronological split"),
+    "data/exitcost_parity.json": _not_checkable(
+        WITHOUT_ROWS, "1,104 recorded books reduced to the median and largest slippage gap per "
+        "size; eval/exitcost_parity.py would need to keep each book's two slippages for a split "
+        "by symbol or half"),
+    "data/nightwatch_comparison.json": _nightwatch,
     "data/review_rivals.json": _review_rivals,
     "data/perception_breadth.json": _perception_breadth,
     "data/injection_classifier_rival.json": _injection_rival,

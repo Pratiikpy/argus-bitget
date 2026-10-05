@@ -5366,11 +5366,130 @@
         "reproducibility_proven"
       ],
       "conditions_unproven": []
+    },
+    {
+      "name": "Exit cost from the displayed book, vs. EGRESS's walk",
+      "subtheme": "t3-execution",
+      "module": "argus/market/depth.py,argus/eval/exitcost_parity.py",
+      "state": "tied",
+      "baseline": "Ritapossible/Egress egress/exitcost.py quote, run from its clone on the same 1,104 recorded Bitget order books (data/book_tape.jsonl) at $10,000 and $100,000",
+      "conditions_met": [
+        "best_implementation_studied",
+        "baseline_reproduced",
+        "same_input_comparison",
+        "reproducibility_proven"
+      ],
+      "conditions_missing": [
+        "best_method_studied",
+        "implementation_complete",
+        "statistically_valid_evaluation",
+        "costs_included",
+        "out_of_sample_test",
+        "ablation",
+        "adversarial_test",
+        "failure_cases_documented",
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [
+        {
+          "condition": "best_implementation_studied",
+          "how": "egress/exitcost.py read at source: walk, quote (mid reference, exhausted book reported, no extrapolation), sliced (full and no replenishment as bounds)",
+          "artefact": "data/exitcost_parity.json",
+          "test": ""
+        },
+        {
+          "condition": "baseline_reproduced",
+          "how": "EGRESS's quote imported from its clone and run unmodified on every recorded book",
+          "artefact": "data/exitcost_parity.json",
+          "test": ""
+        },
+        {
+          "condition": "same_input_comparison",
+          "how": "both on the same 1,104 books, the same two sizes, a sell of each",
+          "artefact": "data/exitcost_parity.json",
+          "test": ""
+        },
+        {
+          "condition": "reproducibility_proven",
+          "how": "python -m argus.eval.exitcost_parity regenerates the artefact from the tape",
+          "artefact": "data/exitcost_parity.json",
+          "test": ""
+        }
+      ],
+      "blockers": [
+        "TIED by construction, and measured: the same method. Slippage differs by a median 0.002 bps at $10,000 and 0.005 bps at $100,000 (largest 0.15 bps, from EGRESS walking a quantity fixed at the mid where ARGUS walks the notional), and both find the book too thin on the same 92 of 1,104 snapshots at $100,000.",
+        "A snapshot is not a fill for either side: neither predicts the book the order meets a minute later. EGRESS states this as bounds for a sliced order; ARGUS measures how levels change between snapshots (data/book_calibration.json) but does not yet turn it into an exit-cost interval. Neither is ahead on that."
+      ],
+      "note": "",
+      "measured_outcomes": [],
+      "conditions_claimed": [
+        "best_implementation_studied",
+        "baseline_reproduced",
+        "same_input_comparison",
+        "reproducibility_proven"
+      ],
+      "conditions_unproven": []
+    },
+    {
+      "name": "The desk's directional lean, vs. NIGHTWATCH AI's signal, on the same instants",
+      "subtheme": "t3-decisionstress",
+      "module": "argus/eval/refusal.py,argus/eval/nightwatch_comparison.py,argus/eval/baselines/nightwatch_signal.mjs",
+      "state": "tied",
+      "baseline": "drained69/nightwatchai LocalNightwatchEngine.research (five skill readers and synthesizeSignal), run unmodified from its clone on Bitget R-pair hourly candles closed before each instant and a Yahoo daily macro snapshot, with a fresh user's preferences",
+      "conditions_met": [
+        "best_implementation_studied",
+        "baseline_reproduced",
+        "same_input_comparison"
+      ],
+      "conditions_missing": [
+        "best_method_studied",
+        "implementation_complete",
+        "statistically_valid_evaluation",
+        "costs_included",
+        "out_of_sample_test",
+        "ablation",
+        "adversarial_test",
+        "failure_cases_documented",
+        "reproducibility_proven",
+        "no_specialist_capability_superior"
+      ],
+      "proofs": [
+        {
+          "condition": "best_implementation_studied",
+          "how": "NIGHTWATCH read at source: src/domain.js runSkillPack, synthesizeSignal, LocalNightwatchEngine.research; server/providers/bitget.mjs computeIndicators and mergeMarketRow; server/signal-history.mjs grading (8h, 20 bps flat band); server/live-enhance.mjs overlay",
+          "artefact": "data/nightwatch_comparison.json",
+          "test": ""
+        },
+        {
+          "condition": "baseline_reproduced",
+          "how": "its signal function imported from the clone by baselines/nightwatch_signal.mjs, unmodified",
+          "artefact": "data/nightwatch_comparison.json",
+          "test": ""
+        },
+        {
+          "condition": "same_input_comparison",
+          "how": "the same symbol-instants, graded on the same realised moves at the desk's mark and at 8h",
+          "artefact": "data/nightwatch_comparison.json",
+          "test": ""
+        }
+      ],
+      "blockers": [
+        "Ahead on the shared calls, not ahead of the tape. On the 133 instants where both called a direction, graded at NIGHTWATCH's own eight hours on its own R-pair: the desk 53.4% right, NIGHTWATCH 42.9%; where they disagreed the desk was right 21 times and NIGHTWATCH 7 (exact sign test p = 0.0125, which treats the 28 as independent; instants in one decision cycle share one market move, so it overstates the evidence). Calling \"up\" every time scored 51.1% on the same instants, and neither side's interval excludes it.",
+        "NIGHTWATCH is run without its news store and its live overlay (spot book depth and a market-intel snapshot), which exist only at the moment of a live call. Its own published live record, 15 of 38 non-flat calls right at eight hours (GET /signals/stats, 2026-10-05), is consistent with what the reproduction found."
+      ],
+      "note": "",
+      "measured_outcomes": [],
+      "conditions_claimed": [
+        "best_implementation_studied",
+        "baseline_reproduced",
+        "same_input_comparison"
+      ],
+      "conditions_unproven": []
     }
   ],
   "by_state": {
     "lost": 8,
-    "tied": 35,
+    "tied": 37,
     "implemented": 0,
     "owned": 6
   },
@@ -6001,6 +6120,18 @@
       "from": null,
       "to": "lost",
       "at": "2026-10-04T20:18:22+00:00"
+    },
+    {
+      "capability": "Exit cost from the displayed book, vs. EGRESS's walk",
+      "from": null,
+      "to": "tied",
+      "at": "2026-10-04T23:28:09+00:00"
+    },
+    {
+      "capability": "The desk's directional lean, vs. NIGHTWATCH AI's signal, on the same instants",
+      "from": null,
+      "to": "tied",
+      "at": "2026-10-04T23:41:26+00:00"
     }
   ]
 }

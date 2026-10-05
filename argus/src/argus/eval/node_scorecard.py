@@ -52,7 +52,7 @@ def _router(data: Path) -> dict[str, str] | None:
     return _row("supervisor", "supervisor routing to a sub-graph",
                 "the question classifier (patterns + kind model) and Qwen planner",
                 "questions routed to the right kind, blind 12-language set, classifier alone",
-                f"{alone['correct']}/{alone['rows']} ({alone['accuracy']:.1%})",
+                f"{alone['correct']}/{alone['rows']} ({alone['correct'] / alone['rows']:.1%})",
                 "lui_final_heldout_report.json", str(blob.get("measured_at", "")))
 
 
@@ -132,7 +132,17 @@ NODES: Final[tuple[Callable[[Path], dict[str, str] | None], ...]] = (
 
 
 def card(data: Path = DATA_DIR) -> list[dict[str, str]]:
-    return [row for build in NODES if (row := build(data)) is not None]
+    """Every node whose artefact is present and readable. An artefact missing a field drops its
+    row rather than the page: /status renders this, and a shape change must not take it down."""
+    rows = []
+    for build in NODES:
+        try:
+            row = build(data)
+        except (KeyError, TypeError, ValueError, ZeroDivisionError):
+            continue
+        if row is not None:
+            rows.append(row)
+    return rows
 
 
 def run(*, out: Path = OUT) -> dict[str, Any]:

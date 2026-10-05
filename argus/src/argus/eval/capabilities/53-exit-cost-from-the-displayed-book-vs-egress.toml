@@ -1,0 +1,47 @@
+name = "Exit cost from the displayed book, vs. EGRESS's walk"
+subtheme = "t3-execution"
+modules = [
+    "argus/market/depth.py",
+    "argus/eval/exitcost_parity.py",
+]
+# Added 2026-10-05 (build list item 5.4). EGRESS (MIT, Season 2 AI Trading Desk) prices leaving a
+# position by walking the displayed Bitget book at the mid; ARGUS's OrderBook.sweep does the same.
+# Run on every recorded book, EGRESS's own function imported from its clone.
+state = "tied"
+baseline = """\
+    Ritapossible/Egress egress/exitcost.py quote, run from its clone on the same 1,104 recorded \
+    Bitget order books (data/book_tape.jsonl) at $10,000 and $100,000"""
+blockers = [
+    """\
+        TIED by construction, and measured: the same method. Slippage differs by a median \
+        0.002 bps at $10,000 and 0.005 bps at $100,000 (largest 0.15 bps, from EGRESS walking a \
+        quantity fixed at the mid where ARGUS walks the notional), and both find the book too \
+        thin on the same 92 of 1,104 snapshots at $100,000.""",
+    """\
+        A snapshot is not a fill for either side: neither predicts the book the order meets a \
+        minute later. EGRESS states this as bounds for a sliced order; ARGUS measures how levels \
+        change between snapshots (data/book_calibration.json) but does not yet turn it into an \
+        exit-cost interval. Neither is ahead on that.""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    egress/exitcost.py read at source: walk, quote (mid reference, exhausted book reported, no \
+    extrapolation), sliced (full and no replenishment as bounds)"""
+artefact = "data/exitcost_parity.json"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = "EGRESS's quote imported from its clone and run unmodified on every recorded book"
+artefact = "data/exitcost_parity.json"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = "both on the same 1,104 books, the same two sizes, a sell of each"
+artefact = "data/exitcost_parity.json"
+
+[[proofs]]
+condition = "reproducibility_proven"
+how = "python -m argus.eval.exitcost_parity regenerates the artefact from the tape"
+artefact = "data/exitcost_parity.json"

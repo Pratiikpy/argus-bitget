@@ -33,3 +33,13 @@ def test_the_live_artefacts_fill_all_six_nodes() -> None:
                                          "unstructured documents", "analytics",
                                          "personalisation", "reflection"]
     assert all(r["value"] and "None" not in r["value"] for r in rows)
+
+
+def test_an_artefact_missing_a_field_drops_its_row_not_the_page(tmp_path: Path) -> None:
+    (tmp_path / "memory_comparison.json").write_text(json.dumps({"held_out_4": {}}),
+                                                     encoding="utf-8")
+    (tmp_path / "lui_final_heldout_report.json").write_text(json.dumps({
+        "measured_at": "2026-09-25", "kind_model_alone": {"correct": 219, "rows": 240}}),
+        encoding="utf-8")
+    assert [r["node"] for r in ns.card(tmp_path)] == ["supervisor"]
+    assert ns.card(tmp_path)[0]["value"] == "219/240 (91.2%)"

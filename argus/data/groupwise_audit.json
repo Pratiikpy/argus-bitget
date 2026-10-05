@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-04T23:22:09+00:00",
+  "generated_at": "2026-10-05T00:38:58+00:00",
   "method": "Mind2Web metric.py:236-259 (MIT): per-group mean and count, macro average, 0/1/2/3/>3 histogram; read by argus.eval.groupwise into four flags (carried_by_one_group, single_group, macro_disagrees, flips_across_halves)",
   "register_artefacts": [
     "data/abstention_comparison.json",
@@ -26,6 +26,7 @@
     "data/eventdriven_rivals.json",
     "data/execution_arena.json",
     "data/execution_comparison.json",
+    "data/exitcost_parity.json",
     "data/explainability_comparison.json",
     "data/factor_quality_rivals.json",
     "data/feedlist_comparison.json",
@@ -53,6 +54,7 @@
     "data/mandate_comparison.json",
     "data/memory_comparison.json",
     "data/nco_bakeoff.json",
+    "data/nightwatch_comparison.json",
     "data/openbb_breadth_raw.json",
     "data/overfit_gates.json",
     "data/overnight_comparison.json",
@@ -89,9 +91,9 @@
     "data/xa_arena.json"
   ],
   "counts": {
-    "checked": 55,
+    "checked": 56,
     "designed_cases": 32,
-    "aggregate_without_rows": 17,
+    "aggregate_without_rows": 18,
     "no_rows": 6
   },
   "flagged": [
@@ -5249,6 +5251,13 @@
           "claim_of": ""
         }
       ]
+    },
+    "data/exitcost_parity.json": {
+      "status": "aggregate_without_rows",
+      "reason": "1,104 recorded books reduced to the median and largest slippage gap per size; eval/exitcost_parity.py would need to keep each book's two slippages for a split by symbol or half",
+      "sha256": "fad840885271985d329a2a34d018395af70a18b1cf03dffc418c3f4dd4ea60d6",
+      "flagged": false,
+      "headlines": []
     },
     "data/explainability_comparison.json": {
       "status": "designed_cases",
@@ -11879,6 +11888,353 @@
           "role": "argus_vs_rival",
           "role_reason": "the bake-off's decisive comparison, picked on the selection period",
           "source": "holdout.results.*.oos_vol_bps",
+          "split_ran": true,
+          "favours": "argus",
+          "zero_is_no_effect": false,
+          "claim_of": ""
+        }
+      ]
+    },
+    "data/nightwatch_comparison.json": {
+      "status": "checked",
+      "reason": "one row per shared call, with its symbol and decision day",
+      "sha256": "d65672718143c6985d89bd622949bd0d94d43fef4c3c2b5309c2f7f5efe9caae",
+      "flagged": false,
+      "headlines": [
+        {
+          "name": "the desk's lean against NIGHTWATCH AI on the same instants",
+          "headline": "mean of right-minus-right over shared calls",
+          "orientation": "+1 desk right and NIGHTWATCH wrong, -1 the reverse",
+          "items": 133,
+          "micro_mean": 0.105263,
+          "total": 14.0,
+          "broken_down": true,
+          "flags": [],
+          "flagged": false,
+          "tables": [
+            {
+              "key": "symbol",
+              "groups": 8,
+              "micro_mean": 0.105263,
+              "macro_mean": 0.092452,
+              "direction": 1,
+              "largest_contributor": "META",
+              "largest_share_of_total": 0.5714,
+              "total_without_largest": 6.0,
+              "loss_histogram": {
+                "0": 0.625,
+                "1": 0.125,
+                "2": 0.0,
+                "3": 0.25,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single symbol carries the headline: without the largest contributor (META, 57.1% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "META",
+                  "rows": 20,
+                  "weight": 20.0,
+                  "total": 8.0,
+                  "mean": 0.4,
+                  "mean_se": 0.11239,
+                  "share_of_total": 0.5714,
+                  "opposing": 0
+                },
+                {
+                  "group": "TSLA",
+                  "rows": 13,
+                  "weight": 13.0,
+                  "total": 5.0,
+                  "mean": 0.384615,
+                  "mean_se": 0.140442,
+                  "share_of_total": 0.3571,
+                  "opposing": 0
+                },
+                {
+                  "group": "COIN",
+                  "rows": 25,
+                  "weight": 25.0,
+                  "total": 2.0,
+                  "mean": 0.08,
+                  "mean_se": 0.11431,
+                  "share_of_total": 0.1429,
+                  "opposing": 3
+                },
+                {
+                  "group": "AMZN",
+                  "rows": 11,
+                  "weight": 11.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "GOOGL",
+                  "rows": 10,
+                  "weight": 10.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSTR",
+                  "rows": 38,
+                  "weight": 38.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.065326,
+                  "share_of_total": 0.0,
+                  "opposing": 3
+                },
+                {
+                  "group": "NVDA",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "MSFT",
+                  "rows": 8,
+                  "weight": 8.0,
+                  "total": -1.0,
+                  "mean": -0.125,
+                  "mean_se": 0.125,
+                  "share_of_total": -0.0714,
+                  "opposing": 1
+                }
+              ]
+            },
+            {
+              "key": "day",
+              "groups": 17,
+              "micro_mean": 0.105263,
+              "macro_mean": 0.030584,
+              "direction": 1,
+              "largest_contributor": "2026-09-28",
+              "largest_share_of_total": 0.5,
+              "total_without_largest": 7.0,
+              "loss_histogram": {
+                "0": 0.7059,
+                "1": 0.2353,
+                "2": 0.0,
+                "3": 0.0588,
+                ">3": 0.0
+              },
+              "carried_by_one_group": false,
+              "single_group": false,
+              "macro_disagrees": false,
+              "reading": "no single day carries the headline: without the largest contributor (2026-09-28, 50.0% of the total) the rest still point the same way",
+              "per_group": [
+                {
+                  "group": "2026-09-28",
+                  "rows": 21,
+                  "weight": 21.0,
+                  "total": 7.0,
+                  "mean": 0.333333,
+                  "mean_se": 0.159364,
+                  "share_of_total": 0.5,
+                  "opposing": 3
+                },
+                {
+                  "group": "2026-09-23",
+                  "rows": 14,
+                  "weight": 14.0,
+                  "total": 4.0,
+                  "mean": 0.285714,
+                  "mean_se": 0.125294,
+                  "share_of_total": 0.2857,
+                  "opposing": 0
+                },
+                {
+                  "group": "2026-09-16",
+                  "rows": 9,
+                  "weight": 9.0,
+                  "total": 1.0,
+                  "mean": 0.111111,
+                  "mean_se": 0.111111,
+                  "share_of_total": 0.0714,
+                  "opposing": 0
+                },
+                {
+                  "group": "2026-09-18",
+                  "rows": 17,
+                  "weight": 17.0,
+                  "total": 1.0,
+                  "mean": 0.058824,
+                  "mean_se": 0.103986,
+                  "share_of_total": 0.0714,
+                  "opposing": 1
+                },
+                {
+                  "group": "2026-09-21",
+                  "rows": 14,
+                  "weight": 14.0,
+                  "total": 1.0,
+                  "mean": 0.071429,
+                  "mean_se": 0.071429,
+                  "share_of_total": 0.0714,
+                  "opposing": 0
+                },
+                {
+                  "group": "2026-09-25",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 1.0,
+                  "mean": 0.5,
+                  "mean_se": 0.5,
+                  "share_of_total": 0.0714,
+                  "opposing": 0
+                },
+                {
+                  "group": "2026-09-29",
+                  "rows": 7,
+                  "weight": 7.0,
+                  "total": 1.0,
+                  "mean": 0.142857,
+                  "mean_se": 0.142857,
+                  "share_of_total": 0.0714,
+                  "opposing": 0
+                },
+                {
+                  "group": "2026-09-30",
+                  "rows": 4,
+                  "weight": 4.0,
+                  "total": 1.0,
+                  "mean": 0.25,
+                  "mean_se": 0.25,
+                  "share_of_total": 0.0714,
+                  "opposing": 0
+                },
+                {
+                  "group": "2026-09-15",
+                  "rows": 4,
+                  "weight": 4.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "2026-09-19",
+                  "rows": 4,
+                  "weight": 4.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "2026-09-20",
+                  "rows": 2,
+                  "weight": 2.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "2026-09-24",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "2026-10-01",
+                  "rows": 3,
+                  "weight": 3.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "2026-10-02",
+                  "rows": 5,
+                  "weight": 5.0,
+                  "total": 0.0,
+                  "mean": 0.0,
+                  "mean_se": 0.0,
+                  "share_of_total": 0.0,
+                  "opposing": 0
+                },
+                {
+                  "group": "2026-09-17",
+                  "rows": 6,
+                  "weight": 6.0,
+                  "total": -1.0,
+                  "mean": -0.166667,
+                  "mean_se": 0.166667,
+                  "share_of_total": -0.0714,
+                  "opposing": 1
+                },
+                {
+                  "group": "2026-09-22",
+                  "rows": 15,
+                  "weight": 15.0,
+                  "total": -1.0,
+                  "mean": -0.066667,
+                  "mean_se": 0.066667,
+                  "share_of_total": -0.0714,
+                  "opposing": 1
+                },
+                {
+                  "group": "2026-10-04",
+                  "rows": 1,
+                  "weight": 1.0,
+                  "total": -1.0,
+                  "mean": -1.0,
+                  "mean_se": null,
+                  "share_of_total": -0.0714,
+                  "opposing": 1
+                }
+              ]
+            }
+          ],
+          "split_half": {
+            "label": "chronological halves",
+            "cut": "00066",
+            "first_items": 66,
+            "second_items": 67,
+            "first_mean": 0.015152,
+            "second_mean": 0.19403,
+            "full_mean": 0.105263,
+            "flips_across_halves": false,
+            "contradicts_full_sample": false,
+            "reading": "chronological halves: both halves point the same way as the full sample \u2014 first 0.015152, second 0.19403, full 0.105263"
+          },
+          "split_half_note": "",
+          "notes": [],
+          "interval": {
+            "low": 0.030075,
+            "high": 0.180451,
+            "method": "stationary bootstrap over order values",
+            "units": 133,
+            "block_length": 1.0,
+            "spans_zero": false,
+            "resamples": 2000
+          },
+          "role": "argus_vs_rival",
+          "role_reason": "the head-to-head the register entry claims",
+          "source": "rows (nightwatch called, |8h move| >= 20 bps)",
           "split_ran": true,
           "favours": "argus",
           "zero_is_no_effect": false,

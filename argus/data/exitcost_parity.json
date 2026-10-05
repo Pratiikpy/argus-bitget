@@ -1,0 +1,50 @@
+{
+  "rival": "Ritapossible/Egress egress/exitcost.py quote",
+  "tape": "data/book_tape.jsonl",
+  "symbols": [
+    "AAPLUSDT",
+    "AMZNUSDT",
+    "COINUSDT",
+    "GOOGLUSDT",
+    "METAUSDT",
+    "MSFTUSDT",
+    "MSTRUSDT",
+    "NVDAUSDT",
+    "QQQUSDT",
+    "SQQQUSDT",
+    "TQQQUSDT",
+    "TSLAUSDT"
+  ],
+  "reference": {
+    "repo": "Ritapossible/Egress",
+    "licence": "MIT",
+    "function": "egress/exitcost.py quote (walk at the mid)"
+  },
+  "parity": {
+    "10000": {
+      "books": 1104,
+      "compared": 1104,
+      "median_abs_gap_bps": 0.0024,
+      "largest_gap_bps": 0.0272,
+      "too_thin": {
+        "egress": 0,
+        "argus": 0
+      }
+    },
+    "100000": {
+      "books": 1104,
+      "compared": 1012,
+      "median_abs_gap_bps": 0.0053,
+      "largest_gap_bps": 0.153,
+      "too_thin": {
+        "egress": 92,
+        "argus": 92
+      }
+    }
+  },
+  "reproducibility": {
+    "command": "python -m argus.eval.exitcost_parity",
+    "deterministic": true,
+    "inputs": "the recorded book tape; no network, no model"
+  }
+}

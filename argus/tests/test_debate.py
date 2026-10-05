@@ -303,3 +303,45 @@ def test_a_debate_that_never_happened_still_serialises() -> None:
     # `gap_bps` is None, not 0.0: zero is the value that means the two sides agree exactly, and a
     # debate nobody attended must not be indistinguishable from perfect consensus.
     assert got["rounds"] == 0 and got["gap_bps"] is None
+
+
+class TestInventedCitations:
+    """CEREBRA's evidence-id reconciliation (build-list 5.4), rebuilt from behaviour: a seat that
+    cites an id it was never shown is reported, and the citation is not counted as progress."""
+
+    SHOWN = ("[rss-yahoo-nvda-6211995222] (news, credibility 0.70, available x) a headline",
+             "[xbrl-NVDA-revenue-2026-07-26] (filing, credibility 1.00, available x) revenue",
+             "a line with no id")
+
+    def test_the_ids_shown_are_read_from_the_rendered_lines(self) -> None:
+        from argus.agents.debate import shown_ids
+
+        assert shown_ids(self.SHOWN) == {"rss-yahoo-nvda-6211995222",
+                                         "xbrl-nvda-revenue-2026-07-26"}
+
+    def test_an_invented_id_is_named_and_a_real_or_partial_one_is_not(self) -> None:
+        from argus.agents.debate import invented_ids, shown_ids
+
+        shown = shown_ids(self.SHOWN)
+        case = ("rss-yahoo-nvda-6211995222 and xbrl-nvda-revenue-2026 support it, as does "
+                "rss-yahoo-nvda-9999999999; Q2-2026 guidance and form4-0001-000123 are prose")
+        position = Position(side=Side.BULL, round_index=0, direction="up", magnitude_bps=20.0,
+                            case=case, strongest_opposing_point="")
+        # the real id, its prefix as the pattern reads it, a family the frame never carried
+        # (form4) and prose are all let through; only the invented rss id is named
+        assert invented_ids(position, shown) == ("rss-yahoo-nvda-9999999999",)
+
+    def test_a_debate_records_the_invention_and_does_not_count_it_as_progress(self) -> None:
+        bull = ScriptedSeat([
+            {**_answer("up", 40.0), "case": "rss-yahoo-nvda-6211995222"},
+            {**_answer("up", 40.0), "case": "rss-yahoo-nvda-1234567890 changes everything"},
+        ])
+        bear = ScriptedSeat([_answer("down", 40.0), _answer("down", 40.0)])
+        debate = hold(symbol="NVDAUSDT", horizon_hours=10.0, evidence=self.SHOWN,
+                      bull_seat=bull, bear_seat=bear, budget=RICH, max_rounds=2,
+                      stall_detection=True)
+        assert debate.invented == (("bull", 1, "rss-yahoo-nvda-1234567890"),)
+        assert "INVENTED CITATIONS" in debate.render()
+        assert debate.as_dict()["invented_citations"][0]["id"] == "rss-yahoo-nvda-1234567890"
+        second = next(p for p in debate.progress if p.side is Side.BULL and p.round_index == 1)
+        assert "rss-yahoo-nvda-1234567890" not in second.new_evidence

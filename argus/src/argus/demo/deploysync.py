@@ -106,6 +106,12 @@ CONSOLE_ARTEFACTS: tuple[str, ...] = (
     "call_record.jsonl",
     # Read by /status's self-audit rows (`lui/status_page.self_audit_lines`, build-list 2.1).
     "lean_ic.json",
+    # Read by /status's per-part card (`eval/node_scorecard.py`, build-list 5.1).
+    "financebench_xbrl.json",
+    "document_qa_eval.json",
+    "memory_comparison.json",
+    "provenance_unseen.json",
+    "backtest_critic_comparison.json",
     "perturbation_robustness.json",
     "consistency.json",
     "leakage.json",

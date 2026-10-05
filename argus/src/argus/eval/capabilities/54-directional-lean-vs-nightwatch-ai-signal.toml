@@ -1,0 +1,49 @@
+name = "The desk's directional lean, vs. NIGHTWATCH AI's signal, on the same instants"
+subtheme = "t3-decisionstress"
+modules = [
+    "argus/eval/refusal.py",
+    "argus/eval/nightwatch_comparison.py",
+    "argus/eval/baselines/nightwatch_signal.mjs",
+]
+# Added 2026-10-05 (build list item 5.4). NIGHTWATCH AI (MIT, Season 2 AI Trading Desk) publishes a
+# directional signal and an eight-hour accuracy ledger. Its signal function is pure, so it was run
+# from its clone on every instant the desk stated a lean, fed the R-pair candles it reads.
+state = "tied"
+baseline = """\
+    drained69/nightwatchai LocalNightwatchEngine.research (five skill readers and \
+    synthesizeSignal), run unmodified from its clone on Bitget R-pair hourly candles closed \
+    before each instant and a Yahoo daily macro snapshot, with a fresh user's preferences"""
+blockers = [
+    """\
+        Ahead on the shared calls, not ahead of the tape. On the 133 instants where both called \
+        a direction, graded at NIGHTWATCH's own eight hours on its own R-pair: the desk 53.4% \
+        right, NIGHTWATCH 42.9%; where they disagreed the desk was right 21 times and \
+        NIGHTWATCH 7 (exact sign test p = 0.0125, which treats the 28 as independent; instants \
+        in one decision cycle share one market move, so it overstates the evidence). Calling \
+        "up" every time scored 51.1% on the same instants, and neither side's interval excludes \
+        it.""",
+    """\
+        NIGHTWATCH is run without its news store and its live overlay (spot book depth and a \
+        market-intel snapshot), which exist only at the moment of a live call. Its own published \
+        live record, 15 of 38 non-flat calls right at eight hours (GET /signals/stats, \
+        2026-10-05), is consistent with what the reproduction found.""",
+]
+
+[[proofs]]
+condition = "best_implementation_studied"
+how = """\
+    NIGHTWATCH read at source: src/domain.js runSkillPack, synthesizeSignal, \
+    LocalNightwatchEngine.research; server/providers/bitget.mjs computeIndicators and \
+    mergeMarketRow; server/signal-history.mjs grading (8h, 20 bps flat band); \
+    server/live-enhance.mjs overlay"""
+artefact = "data/nightwatch_comparison.json"
+
+[[proofs]]
+condition = "baseline_reproduced"
+how = "its signal function imported from the clone by baselines/nightwatch_signal.mjs, unmodified"
+artefact = "data/nightwatch_comparison.json"
+
+[[proofs]]
+condition = "same_input_comparison"
+how = "the same symbol-instants, graded on the same realised moves at the desk's mark and at 8h"
+artefact = "data/nightwatch_comparison.json"
