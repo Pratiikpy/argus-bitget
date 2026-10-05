@@ -87,6 +87,10 @@ def lines(text: str) -> list[str] | None:
     """The options answer ``text`` asks for, or None when it is not about BTC or ETH options."""
     if not ASKED.search(text):
         return None
+    if re.search(r"\bmax\s*pain\b|\bput[\s/-]*call\b|\bopen\s+interest\b", text, re.I):
+        # the positioning reader's (`crypto_positioning`): "put/call open interest ratio ... and
+        # max pain" got ATM implied vol here (round 42 judge, C1)
+        return None
     from argus.market import deribit
 
     currency = _subject(text)
@@ -313,6 +317,7 @@ def _skew(text: str, book: list[Any], today: Any, currency: str) -> list[str]:
            f"25-delta put: strike {put.strike:,.0f} at {put.iv:.1%} implied volatility; "
            f"25-delta call: strike {call.strike:,.0f} at {call.iv:.1%}; "
            f"forward {leg[0].forward:,.0f}."]
+    out.extend(_skew_asks_unmet(text))
     history = _skew_history_line(text, currency)
     if history:
         out.append(history)
@@ -331,6 +336,38 @@ def _skew(text: str, book: list[Any], today: Any, currency: str) -> list[str]:
 _AVERAGE: Final = re.compile(r"\b(?P<n>\d{2,3})[\s-]*(?:day|d)\b[^?]{0,20}\b(?:average|avg|mean|"
                              r"norm)\b|\b(?:average|avg|normal|usual|history|historical\w*|"
                              r"percentile)\b", re.I)
+
+
+_DELTA_ASKED: Final = re.compile(r"(?P<d>[-\u2212]?\d{1,4}(?:\.\d+)?)\s*[-\s]?delta\b", re.I)
+_YEARS_BACK: Final = re.compile(r"\b(?P<n>\d{1,3})\s*(?:years?|yrs?)\s*(?:back|ago|of\s+history|"
+                                r"history)\b|\b(?:last|past)\s+(?P<n2>\d{1,3})\s*(?:years?|yrs?)\b",
+                                re.I)
+
+
+def _skew_asks_unmet(text: str) -> list[str]:
+    """A delta or a lookback the question asks for that the skew reader cannot give, said rather
+    than silently replaced: "skew history ... -500 delta, 10 years back" got the 25-delta 30-day
+    skew with neither mentioned (round 42 hostile, minor 8)."""
+    from argus.market import skew_history
+
+    out: list[str] = []
+    for m in _DELTA_ASKED.finditer(text):
+        raw = float(m.group("d").replace("\u2212", "-"))
+        if abs(raw) == 25:
+            continue
+        if not 0 < abs(raw) < 100:
+            out.append(f"A delta runs from 0 to 100 (0 to 1 as a fraction), so {raw:g} is not one; "
+                       "the skew above is the standard 25-delta.")
+        else:
+            out.append(f"Only the 25-delta skew is computed here, not the {abs(raw):g}-delta.")
+        break
+    years = _YEARS_BACK.search(text)
+    if years is not None:
+        n = int(years.group("n") or years.group("n2"))
+        out.append(f"The skew history here is rebuilt from Deribit's own trades and kept for the "
+                   f"last {skew_history.DAYS} days, so {n} {'year' if n == 1 else 'years'} back is "
+                   "not on record; the history line below covers what is.")
+    return out
 
 
 def _history_days(text: str) -> int:

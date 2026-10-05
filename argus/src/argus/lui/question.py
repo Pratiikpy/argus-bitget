@@ -30,7 +30,7 @@ import re
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, timedelta
 from enum import StrEnum
-from typing import Any
+from typing import Any, Final
 
 from argus.lui.normalise import fold
 from argus.market.bitget import RTOKEN_SYMBOLS
@@ -550,6 +550,11 @@ prose is not. Case is read from the raw question deliberately: `GME` is a ticker
 typo, and calling the second an instrument would refuse real questions over a stray shift key."""
 
 _NOT_A_TICKER = frozenset({
+    # currencies and option or DeFi shorthand: "3.5m JPY of NVDA" had JPY named as an unknown
+    # ticker (round 42 hostile re-run)
+    "EUR", "JPY", "GBP", "CHF", "CNY", "CNH", "INR", "KRW", "AUD", "CAD", "HKD", "SGD",
+    "NZD", "BRL", "MXN", "TRY", "ZAR", "SEK", "NOK", "BPS", "IV", "OTM", "ITM", "ATM",
+    "APY", "APR", "TVL", "DEX", "CEX", "LST", "SEC", "EDGAR", "CIK",
     "I", "A", "AI", "PM", "AM", "ET", "UTC", "US", "USD", "EPS", "PE", "ROI", "NAV", "LLM", "VIP",
     "OK", "NO", "YES", "WHY", "HOW", "AND", "OR", "THE", "ARGUS", "IT", "WE", "Q", "FY",
     "FOMC", "FED", "CPI", "PPI", "GDP", "PCE", "NFP", "ECB", "BOJ", "PMI", "ETF", "IPO", "CEO",
@@ -628,6 +633,11 @@ def shouted(text: str) -> bool:
     return any(word.replace("'", "") in _PROSE_WORDS for word in words)
 
 
+_FILING_ASKED: Final = re.compile(
+    r"\bform\s*[34]\b|\b10-?[KQ]\b|\b8-?K\b|\b13[FDG]\b|\binsider\w*|\bsec\s+"
+    r"(?:filings?|edgar)\b|\bedgar\b|\bfilings?\b", re.I)
+
+
 def extract_symbols(text: str) -> tuple[tuple[str, ...], str]:
     """Find traded symbols, and report an off-venue instrument by name rather than as a miss.
 
@@ -685,6 +695,16 @@ def extract_symbols(text: str) -> tuple[tuple[str, ...], str]:
             names = (unlisted[0] if len(unlisted) == 1 else
                      ", ".join(unlisted[:-1]) + f" and {unlisted[-1]}")
             verb, them = ("is", "it") if len(unlisted) == 1 else ("are", "them")
+            from argus.market.company_names import sec_registered
+
+            if _FILING_ASKED.search(text) and not any(sec_registered(t) for t in unlisted):
+                # "Show Form 4 insider trades for ZZZZ" was told ZZZZ has no Bitget market:
+                # filings are SEC EDGAR's, so that is the register that decides (round 42
+                # hostile, minor 4)
+                return (), (
+                    f"{names} {verb} not a ticker in SEC EDGAR's company register, so there is "
+                    f"no filing to read for {them} — check the symbol; any US-listed company's "
+                    f"Form 4, 10-Q, 10-K or 8-K can be asked about (\"NVDA insider trades\")")
             return (), (
                 f"{names} {verb} not listed on Bitget — there is no perpetual or rToken for "
                 f"{them} in Bitget's contract list — so there is no Bitget order book to plan an "
@@ -702,6 +722,21 @@ def extract_symbols(text: str) -> tuple[tuple[str, ...], str]:
 def listed_on_bitget(token: str) -> bool:
     """Whether Bitget lists ``token`` as a perpetual; True when the list cannot be read."""
     return _listed_on_bitget(token)
+
+
+def unlisted_tokens(text: str) -> list[str]:
+    """Every ticker-shaped word in ``text`` that is not a known word, not a traded symbol and not
+    on Bitget's contract list, in order — the names :func:`extract_symbols` refuses on, for an
+    answer that went ahead on the other names to say which were left out."""
+    if shouted(text):
+        return []
+    text = coin_as_ticker(text)
+    shaped = [*_TICKER_SHAPED.findall(text),
+              *(m.group(1) or m.group(2) for m in _NAMED_CONTRACT.finditer(text))]
+    return list(dict.fromkeys(
+        t for t in shaped if t not in _NOT_A_TICKER and t not in TRADED_SYMBOLS
+        and t not in _TICKER_TO_SYMBOL and not (len(t) == 1 and t in ("I", "A"))
+        and not _listed_on_bitget(t)))
 
 
 def _listed_on_bitget(token: str) -> bool:
@@ -1475,4 +1510,5 @@ __all__ = [
     "listed_on_bitget",
     "resolve_symbol",
     "resolve_window",
+    "unlisted_tokens",
 ]

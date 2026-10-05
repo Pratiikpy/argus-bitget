@@ -146,6 +146,11 @@ def _ratio(num: float, den: float) -> float | None:
     return round(num / den, 3) if den > 0 else None
 
 
+def new_york(stamp: str) -> str:
+    """:func:`_new_york` for other packages: Cboe's UTC stamp as New York wall time."""
+    return _new_york(stamp)
+
+
 def _new_york(stamp: str) -> str:
     """Cboe's UTC ``YYYY-MM-DD HH:MM:SS`` as New York wall time; unparseable text is kept."""
     try:
@@ -255,6 +260,7 @@ __all__ = [
     "OptionsError",
     "OptionsSummary",
     "fetch_chain",
+    "new_york",
     "options_evidence",
     "options_summary",
     "parse_contract",

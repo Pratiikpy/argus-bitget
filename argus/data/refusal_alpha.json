@@ -1,33 +1,33 @@
 {
-  "as_of": "2026-10-05T14:21:00.602421+00:00",
+  "as_of": "2026-10-05T18:13:17.392163+00:00",
   "round_trip_bps": 12.0,
   "min_directional_for_a_rate": 30,
-  "total_marks": 855,
+  "total_marks": 876,
   "outside_buckets": 0,
   "horizons": [
     {
       "horizon": "about_2h",
-      "marks": 632,
-      "directional": 628,
-      "correct": 346,
+      "marks": 653,
+      "directional": 649,
+      "correct": 358,
       "coverage_pct": 99.4,
-      "accuracy_pct": 55.1,
+      "accuracy_pct": 55.2,
       "accuracy_ci95": [
-        50.2,
+        50.3,
         59.9
       ],
       "interval_method": "bootstrap over decision cycles",
-      "cycles": 58,
+      "cycles": 60,
       "beats_a_coin": true,
       "naive_lean": "up",
-      "naive_accuracy_pct": 53.3,
+      "naive_accuracy_pct": 53.5,
       "cycles_lean_beat_naive": 23,
       "cycles_naive_beat_lean": 24,
-      "cycles_tied": 11,
+      "cycles_tied": 13,
       "sign_test_p_vs_naive": 1.0,
       "beats_the_naive_call": false,
-      "hurdle_clearance_pct": 65.3,
-      "median_forgone_bps": -9.36,
+      "hurdle_clearance_pct": 66.0,
+      "median_forgone_bps": -9.23,
       "enough_for_a_rate": true
     },
     {
@@ -78,5 +78,5 @@
       "enough_for_a_rate": true
     }
   ],
-  "verdict": "At the `about_2h` horizon: 346 of 628 directional calls went the right way. 95% interval (bootstrap over 58 decision cycles) 50.2% to 59.9%. It excludes a coin flip. But calling `up` every time was right 53.3% of the time, and cycle by cycle the lean beat that naive call 23 times and lost 24 (11 tied) \u2014 so there is no evidence yet that the lean knows more than the direction of the tape. Median net edge forgone by standing aside: -9.4bps after a 12.0bps round trip \u2014 refusing saved money on the typical decision."
+  "verdict": "At the `about_2h` horizon: 358 of 649 directional calls went the right way. 95% interval (bootstrap over 60 decision cycles) 50.3% to 59.9%. It excludes a coin flip. But calling `up` every time was right 53.5% of the time, and cycle by cycle the lean beat that naive call 23 times and lost 24 (13 tied) \u2014 so there is no evidence yet that the lean knows more than the direction of the tape. Median net edge forgone by standing aside: -9.2bps after a 12.0bps round trip \u2014 refusing saved money on the typical decision."
 }

@@ -153,6 +153,11 @@ def us_ticker(text: str) -> tuple[str, str] | None:
     return None
 
 
+def sec_registered(ticker: str) -> bool:
+    """Whether ``ticker`` is in SEC's ``company_tickers.json`` register (the frozen copy)."""
+    return ticker.upper() in {str(t).upper() for t in _names()["full"].values()}
+
+
 def names_for(ticker: str) -> list[str]:
     """The one-word names a headline uses for ``ticker`` ("NVDA" -> ["Nvidia"]), from the same
     table :func:`us_ticker` reads the other way."""

@@ -8,11 +8,11 @@ that produced them.
 
 | | |
 |---|---|
-| Source | **664 source files**, 20 packages (measured 2026-09-27) |
+| Source | **674 source files**, 20 packages (measured 2026-09-27) |
 | Registered and importable at runtime | **152/152** (`python -m argus.status`) |
-| Tests | **12,306 tests collected**; CI runs every one that needs no network with each outbound connection refused, and the 238 that read a live venue, feed or model in a separate advisory job |
-| Static analysis | `ruff` clean; `mypy --strict` clean on the 661 files it checks (the three vendored files are excluded) |
-| Artefacts | **967** files under `argus/data/`; each one a document cites is written by a named command, and a test fails if a cited artefact has no writer |
+| Tests | **12,403 tests collected**; CI runs every one that needs no network with each outbound connection refused, and the 238 that read a live venue, feed or model in a separate advisory job |
+| Static analysis | `ruff` clean; `mypy --strict` clean on the 671 files it checks (the three vendored files are excluded) |
+| Artefacts | **979** files under `argus/data/`; each one a document cites is written by a named command, and a test fails if a cited artefact has no writer |
 | External systems torn down at code level | **57 code-level teardowns** under `research/architecture/`, each citing `file:line` |
 | Runtime dependencies | **two** — `pydantic`, `python-dateutil` |
 
@@ -183,7 +183,7 @@ window it was built to be watched during. `horizon_coverage()` measures exactly 
 **0 resolving inside the window, 0 still pending when it opens**; the cadence fixes it, and a test
 pins the failure shape so it cannot return unnoticed.
 
-**Live:** 456 claims across the twelve stock perpetuals (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — the head at the moment of that anchoring, so that proof covers the first 36 claims and not the 120 registered since; each scheduled cycle appends and re-anchors, and 38 of the 60 proofs carry a Bitcoin block-header attestation (`python -m argus.register.anchorcheck`). Anchored to
+**Live:** 466 claims across the twelve stock perpetuals (`data/register.jsonl`), chain intact. The opening anchored head `bc36478291a06bc3` is claim 36 of 156 — the head at the moment of that anchoring, so that proof covers the first 36 claims and not the 120 registered since; each scheduled cycle appends and re-anchors, and 38 of the 60 proofs carry a Bitcoin block-header attestation (`python -m argus.register.anchorcheck`). Anchored to
 `a.pool.opentimestamps.org`, `b.pool.opentimestamps.org`,
 `alice.btc.calendar.opentimestamps.org` and `finney.calendar.eternitywall.com`. The resolver runs on
 every scheduled cycle.

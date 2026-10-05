@@ -489,16 +489,49 @@ def levels_lines(text: str) -> list[str] | None:
             lines.append(f"{name}: {shown}, {float(change):+.2%} over 24 hours — {what}, last "
                          f"price and 24-hour change from Bitget's ticker just now.")
     if dxy:
-        dollar = _dollar_index()
-        lines.append("DXY (the ICE US dollar index): not read by this console — no source here "
-                     "carries it." + (f" The nearest series it does read is the Fed's broad "
-                                      f"trade-weighted dollar index (FRED DTWEXBGS), "
-                                      f"{dollar[1]:.2f} on {dollar[0]} — a different index, "
-                                      f"weighted across 26 economies, not six currencies."
-                                      if dollar else ""))
+        # the ICE dollar index from Yahoo Finance's daily closes (DX-Y.NYB), the series the
+        # correlation answer already reads; it was said to be unread here
+        try:
+            from argus.market.equity_history import daily
+
+            row = daily("DX-Y.NYB")[-1]
+            lines.append(f"DXY: {float(row.close):,.2f} on {row.day:%d %b %Y} — the ICE US "
+                         "dollar index, Yahoo Finance's daily close (DX-Y.NYB).")
+        except Exception:
+            dollar = _dollar_index()
+            lines.append("DXY (the ICE US dollar index): Yahoo Finance did not answer just now."
+                         + (f" The Fed's broad trade-weighted dollar index (FRED DTWEXBGS) was "
+                            f"{dollar[1]:.2f} on {dollar[0]} — a different index, weighted "
+                            f"across 26 economies." if dollar else ""))
     if not lines:
         return None
+    returns = _period_returns(text, named)
+    if returns:
+        return [returns[0], *lines, *returns[1:]]
     return [f"Bottom line: {len(lines)} levels, each with its own source below.", *lines]
+
+
+def _period_returns(text: str, named: list[str]) -> list[str] | None:
+    """The price and a period's return compared: "What is the current Solana price and how does
+    its 30-day return compare with ETH's?" got the two prices alone (round 42 judge, M6)."""
+    if not re.search(r"\breturns?\b|\bperform\w*|\bgain\w*|\bchange\w*\b|\bup\s+or\s+down\b",
+                     text, re.I):
+        return None
+    from argus.lui.research.performance import asked_period, record
+
+    period = asked_period(text)
+    if period is None:
+        return None
+    rows = [(s.removesuffix("USDT"), r) for s in named if (r := record(s, period)) is not None]
+    if len(rows) < 2:
+        return None
+    ranked = sorted(rows, key=lambda r: -r[1].change)
+    gap = (ranked[0][1].change - ranked[-1][1].change) * 100
+    lead = (f"Bottom line: {period.said}, {ranked[0][0]} returned {ranked[0][1].change:+.1%} "
+            f"against {ranked[-1][0]}'s {ranked[-1][1].change:+.1%} — {ranked[0][0]} ahead by "
+            f"{gap:.1f} points.")
+    return [lead, "Returns: Bitget daily candles (UTC days), first open to last price, the same "
+                  "window for both."]
 
 
 def _dollar_index() -> tuple[str, float] | None:

@@ -45,9 +45,16 @@ from argus.truth import http
 _FUNDING: Final = re.compile(r"\bfunding(?:\s+rates?)?\b[^?]{0,40}?\b(?:is|are|turns?|goes|flips?|"
                              r"gets?|falls?|drops?|becomes?)?\s*(?:below\s+zero|negative|<\s*0)",
                              re.I)
-_FG: Final = re.compile(r"\bfear\s*(?:and|&)\s*greed\b[^?]{0,40}?\b(?P<dir>below|under|falls?\s+"
+_FG: Final = re.compile(r"\bfear\s*(?:and|&|/|-)?\s*greed\b[^?]{0,40}?\b(?P<dir>below|under|"
+                        r"falls?\s+"
                         r"(?:below|under|to)|drops?\s+(?:below|under|to)|less\s+than|<|above|over|"
-                        r"rises?\s+(?:above|over|to)|greater\s+than|>)\s*(?P<lvl>\d{1,2})", re.I)
+                        r"rises?\s+(?:above|over|to)|greater\s+than|>)\s*(?P<lvl>[-\u2212]?\d{1,3}(?:\.\d+)?)",
+                        re.I)
+_FG_EXIT: Final = re.compile(
+    r"\b(?:sell\w*|exit\w*|close\w*|take\s+profits?)\s+(?:it\s+|out\s+)?(?:when\s+(?:it|the\s+"
+    r"index)\s+(?:is\s+|goes\s+|gets\s+|rises\s+|climbs\s+|falls\s+|drops\s+)?|once\s+(?:it\s+|"
+    r"the\s+index\s+)?(?:is\s+|goes\s+|gets\s+|rises\s+|climbs\s+|falls\s+|drops\s+)?|at\s+)?(?P<dir>above|over|>|greater\s+than|below|under|<|less\s+than)\s*"
+    r"(?P<lvl>[-\u2212]?\d{1,3}(?:\.\d+)?)", re.I)
 _BUY_WORDS: Final = re.compile(r"\b(?:buy\w*|bought|long|go\s+long|enter\w*|backtest\w*|"
                                r"test\w*)\b", re.I)
 _HOLD: Final = re.compile(r"\bhold(?:ing|s)?\s+(?:it\s+|for\s+)?(?P<n>\d{1,3})\s*(?P<unit>"
@@ -239,16 +246,35 @@ def fear_greed_lines(text: str, symbol: str, crypto: bool) -> list[str]:
 
     m = _FG.search(text)
     assert m is not None
-    level = int(m.group("lvl"))
+    level = float(m.group("lvl").replace("\u2212", "-"))
     below = not re.match(r"above|over|rises?|greater|>", m.group("dir"), re.I)
+    exit_m = _FG_EXIT.search(text, m.end())
+    exit_level = float(exit_m.group("lvl").replace("\u2212", "-")) if exit_m else None
     hold = _hold_days(text)
-    assumed = hold is None
+    assumed = hold is None and exit_level is None
     hold = hold or 20
     try:
         index = fear_greed(crypto)
     except Exception:
         return [f"Bottom line: the {'Crypto ' if crypto else 'CNN '}Fear & Greed history did not "
                 "answer just now, so the rule cannot be run; ask again in a minute."]
+    which = "Crypto Fear & Greed (alternative.me)" if crypto else "CNN's Fear & Greed index"
+    bad = [(what, x) for what, x in (("buy", level), ("sell", exit_level))
+           if x is not None and not 0 <= x <= 100]
+    if bad:
+        # "buy when index below -5 and sell above 150" got a current-reading paragraph with no
+        # remark that the index spans 0-100 (round 42 hostile, 8)
+        low, high = min(index.values()), max(index.values())
+        said = "; ".join(f"the {what} level {x:g} is outside the index's 0-100 scale, so it "
+                         f"never {'triggers' if what == 'buy' else 'fires'}" for what, x in bad)
+        return [f"Bottom line: that rule cannot be tested — {said}.",
+                f"{which} has read between {low:.0f} and {high:.0f} since {min(index):%b %Y}, so a "
+                f"level of {bad[0][1]:g} has never been reached.",
+                "A testable version: \"buy when the index is below 25 and sell when it is above "
+                "75\" — or any two levels between 0 and 100."]
+    if exit_level is not None:
+        return _fg_exit_lines(text, symbol, crypto, index, level, below, exit_level,
+                              _hold_days(text), which)
     stamps, closes, said = daily_closes(symbol)
     days = [t.date() for t in stamps]
     start = max(min(index), days[0])
@@ -275,10 +301,9 @@ def fear_greed_lines(text: str, symbol: str, crypto: bool) -> list[str]:
     base = [closes[i + hold] / closes[i] - 1 for i in range(first, len(closes) - hold)]
     name = symbol.removesuffix("USDT")
     unit = "days" if crypto else "trading days"
-    which = "Crypto Fear & Greed (alternative.me)" if crypto else "CNN's Fear & Greed index"
     word = "below" if below else "above"
     if not trades:
-        return [f"Bottom line: {which} never crossed {word} {level} with room to hold "
+        return [f"Bottom line: {which} never crossed {word} {level:g} with room to hold "
                 f"{hold} days between {start:%d %b %Y} and {days[-1]:%d %b %Y}, so the rule made "
                 "no trade to judge."]
     avg = statistics.fmean(r for _, r in trades)
@@ -303,7 +328,7 @@ def fear_greed_lines(text: str, symbol: str, crypto: bool) -> list[str]:
     else:
         edge = (f"a higher average, but not distinguishable from random timing with "
                 f"{len(trades)} trades (t = {t_stat:.1f}; about 2 is needed).")
-    out = [f"Bottom line: buying {name} the day after {which} fell {word} {level} and holding "
+    out = [f"Bottom line: buying {name} the day after {which} fell {word} {level:g} and holding "
            f"{hold} {unit} made {len(trades)} trades from {days[first]:%d %b %Y}; they "
            f"averaged {avg:+.2%} after fees against {base_avg:+.2%} for any {hold}-day hold in "
            f"the same span — " + edge,
@@ -316,8 +341,9 @@ def fear_greed_lines(text: str, symbol: str, crypto: bool) -> list[str]:
            + "."]
     if assumed:
         out.append(f"No holding period was stated, so {hold} {unit} was assumed.")
+    out.append(_index_choice(text, name, crypto))
     out.append(f"Data: {which} daily since {min(index):%b %Y}; {said}. A signal is the first "
-               f"day {word} {level} after a day on the other side; entry at the next close, exit "
+               f"day {word} {level:g} after a day on the other side; entry at the next close, exit "
                f"{hold} closes later, taker fee {FEE:.2%} a side, no overlapping trades. "
                f"{len(trades)} trades is "
                + ("a small sample" if len(trades) < 20 else "a modest sample")
@@ -325,9 +351,189 @@ def fear_greed_lines(text: str, symbol: str, crypto: bool) -> list[str]:
     return out
 
 
+def _index_choice(text: str, name: str, crypto: bool) -> str:
+    """Which index the asset was tested on and how to ask for the other, so the index never
+    changes silently with the asset named (round 42 hostile, 8)."""
+    if re.search(r"\bcnn\b|\bcrypto\s+fear\b", text, re.I):
+        return f"Index: {'Crypto' if crypto else 'CNN'} Fear & Greed, as asked."
+    if crypto:
+        return (f"Index: {name} is a crypto name, so it is tested on the Crypto Fear & Greed "
+                "index; say \"CNN Fear & Greed\" to use the stock-market one.")
+    return (f"Index: {name} is tested on CNN's stock-market Fear & Greed; say \"crypto Fear & "
+            "Greed\" to use the crypto one.")
+
+
+def _fg_exit_lines(text: str, symbol: str, crypto: bool, index: dict[date, float], level: float,
+                   below: bool, exit_level: float, cap: int | None, which: str) -> list[str]:
+    """Enter the close after the index crosses ``level``; leave the close after it crosses
+    ``exit_level`` (or after ``cap`` closes, whichever is first). "Buy below 25, sell above 75"
+    ran a fixed 20-day hold with the stated exit unmentioned (round 42 hostile, 8). A trade
+    still open is marked at the last close and said to be open."""
+    from argus.backtest.proportion import rate_phrase
+    from argus.lui.research.rule_test import FEE, daily_closes
+
+    stamps, closes, said = daily_closes(symbol)
+    days = [t.date() for t in stamps]
+    start = max(min(index), days[0])
+    span_days = _span_days(text, 0)
+    if span_days:
+        start = max(start, days[-1] - timedelta(days=span_days))
+    first = next((i for i, d in enumerate(days) if d >= start), len(days))
+    if len(days) - first < 60:
+        return ["Bottom line: the index and the price overlap too briefly to test that rule."]
+    ordered = sorted(d for d in index if d >= start)
+    exit_above = exit_level > level if below else exit_level >= level
+    trades: list[tuple[date, float, int, bool]] = []
+    k = 1
+    while k < len(ordered):
+        now, before = index[ordered[k]], index[ordered[k - 1]]
+        entered = (now < level <= before) if below else (now > level >= before)
+        j = bisect_right(days, ordered[k])
+        if not entered or j >= len(closes) - 1 or j < first:
+            k += 1
+            continue
+        out_at, still_open, resume = len(closes) - 1, True, len(ordered)
+        for e in range(k + 1, len(ordered)):
+            hit = index[ordered[e]] > exit_level if exit_above else index[ordered[e]] < exit_level
+            if hit:
+                out_at, still_open, resume = min(bisect_right(days, ordered[e]),
+                                                 len(closes) - 1), False, e
+                break
+        if cap is not None and out_at - j > cap:
+            out_at, still_open = j + cap, False
+            resume = bisect_right(ordered, days[out_at])
+        if out_at > j:
+            ret = closes[out_at] / closes[j] - 1 - (FEE if still_open else 2 * FEE)
+            trades.append((days[j], ret, out_at - j, still_open))
+        k = max(k + 1, resume)
+    name = symbol.removesuffix("USDT")
+    word = "below" if below else "above"
+    out_word = "above" if exit_above else "below"
+    if not trades:
+        return [f"Bottom line: {which} never crossed {word} {level:g} between {start:%d %b %Y} "
+                f"and {days[-1]:%d %b %Y}, so the rule made no trade to judge.",
+                _index_choice(text, name, crypto)]
+    compounded = 1.0
+    for _, r, _, _ in trades:
+        compounded *= 1 + r
+    whole = closes[-1] / closes[first] - 1
+    held = sum(n for _, _, n, _ in trades)
+    wins = sum(1 for _, r, _, _ in trades if r > 0)
+    avg = statistics.fmean(r for _, r, _, _ in trades)
+    verdict = "beat" if compounded - 1 > whole else "trailed"
+    out = [f"Bottom line: buying {name} the day after {which} fell {word} {level:g} and selling "
+           f"the day after it went {out_word} {exit_level:g} made {len(trades)} trades from "
+           f"{days[first]:%d %b %Y}, compounding to {compounded - 1:+.1%} after fees — it "
+           f"{verdict} holding {name} throughout, {whole:+.1%}, while in the market "
+           f"{held / max(1, len(closes) - 1 - first):.0%} of days.",
+           rate_phrase(wins, len(trades), noun="trades") + f" made money; the average trade "
+           f"returned {_pct(avg)} and lasted {held / len(trades):.0f} closes.",
+           "Trades: " + "; ".join(f"{d:%d %b %Y} {_pct(r)} ({n} closes"
+                                  + (", still open" if o else "") + ")"
+                                  for d, r, n, o in trades[-8:])
+           + (f" (latest 8 of {len(trades)})" if len(trades) > 8 else "") + "."]
+    if trades[-1][3]:
+        out.append(f"The last trade has not met the exit yet; it is marked at the latest close "
+                   f"({days[-1]:%d %b %Y}).")
+    if cap is not None:
+        out.append(f"Each trade was also closed after {cap} closes if the exit had not come.")
+    if len(trades) < MIN_TRADES:
+        out.append(f"{len(trades)} {'trade is' if len(trades) == 1 else 'trades are'} too few to "
+                   "tell a real edge from chance.")
+    out.append(_index_choice(text, name, crypto))
+    out.append(f"Data: {which} daily since {min(index):%b %Y}; {said}. Entry at the close after "
+               f"the first day {word} {level:g}, exit at the close after the first day "
+               f"{out_word} {exit_level:g}; taker fee {FEE:.2%} a side. A past test, not a "
+               "forecast; not advice.")
+    return out
+
+
 def asks(text: str) -> bool:
     """A funding or Fear & Greed rule to test — what :func:`lines` answers."""
-    return bool((_FG.search(text) or _FUNDING.search(text)) and _BUY_WORDS.search(text))
+    return bool((_FG.search(text) or _FUNDING.search(text) or _FUNDING_EVENT.search(text))
+                and _BUY_WORDS.search(text))
+
+
+_FUNDING_EVENT: Final = re.compile(
+    r"\bfunding(?:\s+rates?)?\b[^?]{0,40}?\b(?P<dir>above|over|greater\s+than|exceeds?|>|below|"
+    r"under|less\s+than|<)\s*(?P<lvl>-?\d+(?:\.\d+)?)\s*(?P<unit>%|percent|bps?|basis\s+points?)",
+    re.I)
+
+
+def funding_event_lines(text: str, symbol: str) -> list[str] | None:
+    """Buy the day after a funding settlement crosses a stated level, hold the stated days.
+
+    "Backtest: buy ETH the day after its Bitget perpetual funding rate is above 0.05 percent and
+    hold for 3 days. How often did it win?" got the funding cap and today's rate (round 42 judge,
+    C2). A day signals when any settlement in it is past the level; the trade enters at the next
+    close, holds the stated days, never overlapping, and each trade is set against every
+    same-length hold in the span — the base rate — as the Fear & Greed test is."""
+    from argus.backtest.proportion import rate_phrase
+    from argus.lui.research.rule_test import FEE, daily_closes
+
+    m = _FUNDING_EVENT.search(text)
+    if m is None:
+        return None
+    level = float(m.group("lvl"))
+    if m.group("unit").lower().startswith(("bp", "basis")):
+        level /= 100
+    level /= 100  # a percent per settlement, as a fraction
+    above = not re.match(r"below|under|less|<", m.group("dir"), re.I)
+    hold = _hold_days(text) or 1
+    stamps, closes, said = daily_closes(symbol)
+    span = _span_days(text, 730)
+    first = next((i for i, t in enumerate(stamps) if t >= stamps[-1] - timedelta(days=span)), 0)
+    stamps, closes = stamps[first:], closes[first:]
+    try:
+        settled, record = funding_history(symbol, stamps[0] - timedelta(days=1))
+    except Exception:
+        settled, record = [], ""
+    if not settled:
+        return [f"Bottom line: no funding settlement record for {symbol} could be read just now, "
+                "so the rule cannot be run."]
+    by_day: dict[date, list[float]] = {}
+    for when, rate in settled:
+        by_day.setdefault(when.date(), []).append(rate)
+    days = [t.date() for t in stamps]
+    signals = [i for i, d in enumerate(days)
+               if any((r > level) if above else (r < level) for r in by_day.get(d, []))]
+    trades: list[tuple[date, float]] = []
+    busy_until = -1
+    for i in signals:
+        j = i + 1
+        if j <= busy_until or j + hold >= len(closes):
+            continue
+        trades.append((days[j], closes[j + hold] / closes[j] - 1 - 2 * FEE))
+        busy_until = j + hold
+    name = symbol.removesuffix("USDT")
+    word = "above" if above else "below"
+    shown = f"{level * 100:g}%"
+    if not trades:
+        return [f"Bottom line: {name}'s funding was never {word} {shown} a settlement with room "
+                f"to hold {hold} days between {days[0]:%d %b %Y} and {days[-1]:%d %b %Y}, so the "
+                "rule made no trade to judge.",
+                f"Data: funding from {record}; {said}."]
+    wins = sum(1 for _, r in trades if r > 0)
+    base = [closes[i + hold] / closes[i] - 1 for i in range(len(closes) - hold)]
+    base_up = sum(1 for r in base if r > 0) / len(base)
+    avg = statistics.fmean(r for _, r in trades)
+    out = [f"Bottom line: buying {name} the day after a funding settlement {word} {shown} and "
+           f"holding {hold} days won {wins} of {len(trades)} "
+           f"{'trade' if len(trades) == 1 else 'trades'} ({wins / len(trades):.0%}) "
+           f"from {days[0]:%d %b %Y}, averaging {_pct(avg)} after fees — against "
+           f"{base_up:.0%} of all {hold}-day holds that rose in the same span.",
+           (rate_phrase(wins, len(trades), noun="trades") + " made money; " if len(trades) >= 3
+            else "") + f"the base rate for any {hold}-day hold averaged "
+           f"{_pct(statistics.fmean(base))}.",
+           "Trades: " + "; ".join(f"{d:%d %b %Y} {_pct(r)}" for d, r in trades[-8:])
+           + (f" (latest 8 of {len(trades)})" if len(trades) > 8 else "") + "."]
+    if len(trades) < MIN_TRADES:
+        out.append(f"{len(trades)} {'trade is' if len(trades) == 1 else 'trades are'} too few to "
+                   "tell a real edge from chance.")
+    out.append(f"Data: {said}; funding from {record}. A day signals when any settlement in it is "
+               f"{word} the level; entry at the next close, exit {hold} closes later, taker fee "
+               f"{FEE:.2%} a side, no overlapping trades. A past test, not a forecast; not advice.")
+    return out
 
 
 def lines(text: str, symbols: Sequence[str]) -> list[str] | None:
@@ -339,7 +545,13 @@ def lines(text: str, symbols: Sequence[str]) -> list[str] | None:
         crypto = not is_us_equity(symbol) and not symbol.startswith(("SPY", "QQQ"))
         if re.search(r"\bcrypto\s+fear\b", text, re.I):
             crypto = True
+        elif re.search(r"\bcnn\b", text, re.I):
+            crypto = False
         return fear_greed_lines(text, symbol, crypto)
+    if _FUNDING_EVENT.search(text) and _BUY_WORDS.search(text):
+        symbol = (list(symbols) or ["BTCUSDT"])[0]
+        if not is_us_equity(symbol):
+            return funding_event_lines(text, symbol)
     if _FUNDING.search(text) and _BUY_WORDS.search(text) and re.search(
             r"\bsell\w*|\bexit\w*|\bclose\w*|\bpositive\b|\bbacktest\w*|\bover\s+the\s+last\b|"
             r"\bwould\b", text, re.I):
@@ -350,4 +562,5 @@ def lines(text: str, symbols: Sequence[str]) -> list[str] | None:
     return None
 
 
-__all__ = ["fear_greed", "fear_greed_lines", "funding_history", "funding_lines", "lines"]
+__all__ = ["fear_greed", "fear_greed_lines", "funding_event_lines", "funding_history",
+           "funding_lines", "lines"]

@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-05T15:31:44.994627+00:00",
+  "generated_at": "2026-10-05T17:31:44.493796+00:00",
   "source": "https://api.bitget.com/api/v3/market/orderbook",
-  "snapshots": 1128,
+  "snapshots": 1140,
   "symbols": [
     "AAPLUSDT",
     "AMZNUSDT",
@@ -16,14 +16,14 @@
     "TQQQUSDT",
     "TSLAUSDT"
   ],
-  "spans_hours": 508.614,
+  "spans_hours": 510.614,
   "level_size": {
-    "count": 22560,
-    "median": 3.02,
+    "count": 22800,
+    "median": 3.03,
     "p10": 0.13,
-    "p90": 49.15
+    "p90": 49.43
   },
-  "paired_snapshots": 1116,
+  "paired_snapshots": 1128,
   "change_by_horizon": {
     "under_30s": {
       "gap_seconds": [
@@ -78,20 +78,20 @@
         3600.0,
         null
       ],
-      "observations": 2334,
-      "median_share_of_level": 0.87458,
+      "observations": 2350,
+      "median_share_of_level": 0.87368,
       "p90_share_of_level": 11.61857,
-      "grew": 1170,
-      "shrank": 1114,
-      "share_growing": 0.5123
+      "grew": 1177,
+      "shrank": 1123,
+      "share_growing": 0.5117
     }
   },
   "change_pooled": {
-    "observations": 3252,
-    "median_share_of_level": 0.82979,
-    "grew": 1575,
-    "shrank": 1539,
+    "observations": 3268,
+    "median_share_of_level": 0.82903,
+    "grew": 1582,
+    "shrank": 1548,
     "warning": "Pooled across every snapshot gap in the tape, which span 14s to 66296s. Read `change_by_horizon` instead: this figure averages observations taken over incommensurable elapsed times and is kept only so the earlier artefacts remain comparable."
   },
-  "verdict": "1128 snapshots over 508.614h: a near-touch level holds a median 3.02 contracts. **Change is reported per horizon, not pooled** \u2014 a level moves a very different share of itself over 30 seconds than over an hour, and one median over both is a number about the sampling schedule rather than about the book. The shortest horizon with at least 100 observations is `under_30s`, where a level moves a median 24.0% of itself \u2014 that is the figure the simulator should take, being nearest the per-event timescale it models. The attribution rule \u2014 which side of a resting order a decrease came from \u2014 is not in this data and cannot be, so it stays a swept assumption rather than a measurement."
+  "verdict": "1140 snapshots over 510.614h: a near-touch level holds a median 3.03 contracts. **Change is reported per horizon, not pooled** \u2014 a level moves a very different share of itself over 30 seconds than over an hour, and one median over both is a number about the sampling schedule rather than about the book. The shortest horizon with at least 100 observations is `under_30s`, where a level moves a median 24.0% of itself \u2014 that is the figure the simulator should take, being nearest the per-event timescale it models. The attribution rule \u2014 which side of a resting order a decrease came from \u2014 is not in this data and cannot be, so it stays a swept assumption rather than a measurement."
 }

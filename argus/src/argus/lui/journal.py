@@ -502,6 +502,12 @@ def _find_date(text: str, now: date, notes: set[str]) -> tuple[date | None, str]
     return found, text
 
 
+def find_date(text: str, now: date) -> date | None:
+    """The first date written in ``text`` (ISO, "2 Oct", "Oct 2", "10/2" or CJK), a year-less one
+    read as the most recent such day, or None."""
+    return _find_date(text, now, set())[0]
+
+
 def _leg_from(action: str, window: str, context_symbol: str | None, now: date,
               notes: set[str]) -> Leg:
     day, rest = _find_date(window, now, notes)
@@ -1962,6 +1968,11 @@ def position_and_pnl(text: str, *, now: datetime | None = None,
                      ) -> tuple[list[str], list[Source], dict[str, Any]] | None:
     """:func:`_position_and_pnl`, with a price the trader asserts as today's checked against the
     live one first (:func:`_premise`)."""
+    # "Is it above or below its 200-day moving average?" read 200 as the mark and valued 100
+    # AAPL shares at $20,000 (round 42 judge, C4): an indicator's window is not a price
+    from argus.lui.research.statement import INDICATOR_WINDOW
+
+    text = INDICATOR_WINDOW.sub(" ", text)
     got = _position_and_pnl(text, now=now, price=price)
     if got is None:
         return None
@@ -2383,6 +2394,7 @@ __all__ = [
     "check_trade",
     "daily_history",
     "earnings_releases",
+    "find_date",
     "find_patterns",
     "holidays",
     "next_report_date",

@@ -39,6 +39,9 @@ class Line:
     value: float
     start: date
     end: date
+    axis: str = ""
+    """The dimension the member belongs to (``srt:ProductOrServiceAxis``, a segment or a
+    geography axis), so a split is read one axis at a time."""
 
 
 def _label(member: str) -> str:
@@ -88,7 +91,8 @@ def revenue_lines(document: str, names: dict[str, str] | None = None) -> list[Li
         if context is None:
             continue
         start, end, members = context
-        if len(members) != 1 or not 80 <= (end - start).days <= 100:
+        days = (end - start).days
+        if len(members) != 1 or not (80 <= days <= 100 or 350 <= days <= 380):
             continue
         raw = re.sub(r"<[^>]+>", "", fact.group("value"))
         raw = html.unescape(raw).replace(",", "").strip()
@@ -100,9 +104,13 @@ def revenue_lines(document: str, names: dict[str, str] | None = None) -> list[Li
             value = -value
         member = members[0][1]
         found.append(Line(member=member, label=(names or {}).get(member) or _label(member),
-                          value=value, start=start, end=end))
+                          value=value, start=start, end=end, axis=members[0][0]))
     if not found:
         return []
+    # the quarter when the filing tags one; a 10-K that splits revenue for the year only (as
+    # Microsoft's does) gives the year, and the line's start says which
+    quarterly = [x for x in found if (x.end - x.start).days <= 100]
+    found = quarterly or found
     latest = max(x.end for x in found)
     seen: set[str] = set()
     out = []

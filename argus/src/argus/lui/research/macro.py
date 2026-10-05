@@ -106,7 +106,16 @@ def write_macro_snapshot(days: int = 120) -> int:
     Run by the desk cycle, so the hosted console's fallback is never more than a cycle old."""
     series = {sid: _fred_live(sid, days) for sid in FRED_SERIES}
     series.update({sid: _fred_live(sid, 480) for sid in FRED_MONTHLY})
-    series.update({sid: _fred_live(sid, days) for sid, days in FRED_HISTORY.items()})
+    from argus.lui.research.macro_indicators import SNAPSHOT_DAYS
+
+    wanted = dict(SNAPSHOT_DAYS)
+    for sid, days in FRED_HISTORY.items():
+        wanted[sid] = max(days, wanted.get(sid, 0))
+    series.update({sid: _fred_live(sid, days) for sid, days in wanted.items()
+                   if sid not in series})
+    from argus.lui.research import bund_yields
+
+    bund_yields.write_snapshot()  # the German curve, for the hosted console's fallback too
     FRED_SNAPSHOT.write_text(json.dumps({
         "generated_at": datetime.now(UTC).isoformat(),
         "source": "https://fred.stlouisfed.org (FRED, Federal Reserve Bank of St. Louis)",

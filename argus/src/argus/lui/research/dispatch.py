@@ -1833,6 +1833,19 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                                 f"is ${position / 100:,.2f}, {multiple_used:g}% of your margin, "
                                 f"and liquidation takes the whole ${posted:,.0f} on isolated "
                                 f"margin.")
+            elif lines and (sized := parse_notional(raw_text) or request.notional):
+                # "10x leveraged long of 3.5m JPY of NVDA" gave the liquidation distance with no
+                # money on it (round 42 hostile, minor 7): the sum stated is the position, and
+                # the margin behind it is the sum over the multiple
+                position = float(sized)
+                posted = position / multiple_used
+                lines.insert(1, f"On a ${position:,.0f} position at {multiple_used:g}x the margin "
+                                f"is ${posted:,.0f}: each 1% move in "
+                                f"{_t(request.symbols[0])} is ${position / 100:,.2f}, and "
+                                f"liquidation takes the whole ${posted:,.0f} on isolated margin. "
+                                "If the sum was the margin instead, the position is "
+                                f"${position * multiple_used:,.0f} and every figure scales by "
+                                f"{multiple_used:g}.")
             payload["leverage"] = lever_payload
             stake = next((m for note in request.notes if (m := re.match(
                 r"your holdings add up to (\d+(?:\.\d+)?)%, so they were scaled", note))), None)

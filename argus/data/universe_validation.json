@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-05T15:36:28.916866+00:00",
+  "generated_at": "2026-10-05T17:35:55.283879+00:00",
   "threshold": 2.5,
   "shipped": [
     "NVDAUSDT",
@@ -33,25 +33,25 @@
   "evidence": {
     "NVDAUSDT": {
       "symbol": "NVDAUSDT",
-      "last_index": 237.3641,
-      "rth_bps_per_hour": 31.79,
+      "last_index": 236.8982,
+      "rth_bps_per_hour": 31.33,
       "weekend_bps_per_hour": 4.12,
-      "attenuation": 7.71,
+      "attenuation": 7.6,
       "has_anchor": true,
       "observations": 2159
     },
     "TSLAUSDT": {
       "symbol": "TSLAUSDT",
-      "last_index": 376.5346,
-      "rth_bps_per_hour": 34.59,
+      "last_index": 378.614,
+      "rth_bps_per_hour": 34.47,
       "weekend_bps_per_hour": 5.08,
-      "attenuation": 6.81,
+      "attenuation": 6.79,
       "has_anchor": true,
       "observations": 2159
     },
     "AAPLUSDT": {
       "symbol": "AAPLUSDT",
-      "last_index": 333.6674,
+      "last_index": 334.6574,
       "rth_bps_per_hour": 22.21,
       "weekend_bps_per_hour": 3.46,
       "attenuation": 6.41,
@@ -60,25 +60,25 @@
     },
     "MSFTUSDT": {
       "symbol": "MSFTUSDT",
-      "last_index": 526.337,
-      "rth_bps_per_hour": 25.19,
+      "last_index": 525.8992,
+      "rth_bps_per_hour": 25.07,
       "weekend_bps_per_hour": 3.55,
-      "attenuation": 7.09,
+      "attenuation": 7.06,
       "has_anchor": true,
       "observations": 2159
     },
     "METAUSDT": {
       "symbol": "METAUSDT",
-      "last_index": 745.1625,
-      "rth_bps_per_hour": 36.69,
+      "last_index": 744.5921,
+      "rth_bps_per_hour": 36.25,
       "weekend_bps_per_hour": 4.94,
-      "attenuation": 7.43,
+      "attenuation": 7.34,
       "has_anchor": true,
       "observations": 2159
     },
     "GOOGLUSDT": {
       "symbol": "GOOGLUSDT",
-      "last_index": 344.1279,
+      "last_index": 345.3776,
       "rth_bps_per_hour": 24.51,
       "weekend_bps_per_hour": 4.99,
       "attenuation": 4.91,
@@ -87,7 +87,7 @@
     },
     "AMZNUSDT": {
       "symbol": "AMZNUSDT",
-      "last_index": 251.8063,
+      "last_index": 252.3535,
       "rth_bps_per_hour": 23.65,
       "weekend_bps_per_hour": 3.71,
       "attenuation": 6.37,
@@ -96,7 +96,7 @@
     },
     "COINUSDT": {
       "symbol": "COINUSDT",
-      "last_index": 187.4894,
+      "last_index": 185.5392,
       "rth_bps_per_hour": 59.94,
       "weekend_bps_per_hour": 11.08,
       "attenuation": 5.41,
@@ -105,37 +105,37 @@
     },
     "MSTRUSDT": {
       "symbol": "MSTRUSDT",
-      "last_index": 162.455,
-      "rth_bps_per_hour": 59.81,
+      "last_index": 160.7057,
+      "rth_bps_per_hour": 59.13,
       "weekend_bps_per_hour": 15.22,
-      "attenuation": 3.93,
+      "attenuation": 3.88,
       "has_anchor": true,
       "observations": 2159
     },
     "QQQUSDT": {
       "symbol": "QQQUSDT",
-      "last_index": 754.1703,
-      "rth_bps_per_hour": 14.04,
+      "last_index": 754.0817,
+      "rth_bps_per_hour": 13.91,
       "weekend_bps_per_hour": 3.04,
-      "attenuation": 4.62,
+      "attenuation": 4.57,
       "has_anchor": true,
       "observations": 2159
     },
     "TQQQUSDT": {
       "symbol": "TQQQUSDT",
-      "last_index": 82.4417,
-      "rth_bps_per_hour": 42.31,
+      "last_index": 82.4385,
+      "rth_bps_per_hour": 42.25,
       "weekend_bps_per_hour": 7.19,
-      "attenuation": 5.89,
+      "attenuation": 5.88,
       "has_anchor": true,
       "observations": 2159
     },
     "SQQQUSDT": {
       "symbol": "SQQQUSDT",
-      "last_index": 32.5681,
-      "rth_bps_per_hour": 43.18,
+      "last_index": 32.5573,
+      "rth_bps_per_hour": 42.56,
       "weekend_bps_per_hour": 6.06,
-      "attenuation": 7.13,
+      "attenuation": 7.02,
       "has_anchor": true,
       "observations": 2159
     }

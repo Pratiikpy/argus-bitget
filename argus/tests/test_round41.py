@@ -442,7 +442,7 @@ class TestPlan:
             def __init__(self, strike: float, iv: float) -> None:
                 self.strike, self.iv = strike, iv
 
-        monkeypatch.setattr(plan, "_spread", lambda t, b, d, budget=None: {
+        monkeypatch.setattr(plan, "_spread", lambda t, b, d, budget=None, days=None: {
             "spot": 237.05, "expiry": date(2026, 11, 20), "long": Leg(225, 0.37),
             "short": Leg(210, 0.41), "debit": 348.0, "width": 1500.0, "right": "P"})
         monkeypatch.setattr(watchlist, "earnings_date", lambda t, d: None)

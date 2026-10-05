@@ -35,7 +35,7 @@ LANGUAGES: dict[str, str] = {
     "zh": "Simplified Chinese", "es": "Spanish", "pt": "Portuguese", "fr": "French",
     "de": "German", "ja": "Japanese", "ko": "Korean", "vi": "Vietnamese", "hi": "Hindi",
     "ar": "Arabic", "ru": "Russian", "th": "Thai", "zh-Hant":
-    "Traditional Chinese",
+    "Traditional Chinese", "tr": "Turkish", "id": "Indonesian",
 }
 MAX_CHARS = 8000
 """An answer larger than this is not translated; none measured so far comes near it."""
@@ -119,6 +119,18 @@ _DEVANAGARI = re.compile(r"[\u0900-\u097f]")
 _ARABIC = re.compile(r"[\u0600-\u06ff]")
 _CYRILLIC = re.compile(r"[\u0400-\u04ff]")
 _THAI = re.compile(r"[\u0e00-\u0e7f]")
+_VIETNAMESE = re.compile("[\u0103\u0111\u01a1\u01b0\u1ea0-\u1ef9]", re.I)
+"""Letters only Vietnamese writes (a-breve, d-stroke, o-horn, u-horn and the stacked tone marks):
+"Minh moi bat dau, lam sao biet mot san co lua dao" in its own spelling was read as Portuguese
+(round 42 newcomer, 40)."""
+_TURKISH = re.compile("[\u011f\u0131\u015f\u0130]|\\b(?:nedir|nas\u0131l|m\u0131|mi|var|ve|"
+                      "i\u00e7in|kripto|para)\\b", re.I)
+_INDONESIAN: frozenset[str] = frozenset({
+    "apa", "itu", "saya", "aku", "bagaimana", "apakah", "sih", "buat", "untuk", "yang", "dan",
+    "tidak", "bisa", "aman", "takut", "ditipu", "pemula", "uang", "beli", "harga", "kenapa",
+    # "Berapa harga bitcoin hari ini?" carried one word of the set and was read as English
+    "berapa", "hari", "ini", "sekarang", "gimana", "mau", "kalau", "dengan", "sudah", "belum",
+    "rupiah", "investasi", "saham", "jual"})
 
 
 def target_language(text: str) -> str | None:
@@ -132,6 +144,12 @@ def target_language(text: str) -> str | None:
             return code
     if _HANGUL.search(text):
         return "ko"
+    if _VIETNAMESE.search(text):
+        return "vi"
+    if len(set(re.findall(r"[a-z]+", text.lower())) & _INDONESIAN) >= 3:
+        return "id"
+    if re.search("[\u011f\u0131\u015f\u0130]", text) and len(_TURKISH.findall(text)) >= 2:
+        return "tr"
     if _HAN.search(text):
         return "zh-Hant" if _TRADITIONAL.search(text) else "zh"
     lowered = f" {text.lower()} "

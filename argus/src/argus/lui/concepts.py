@@ -481,7 +481,8 @@ _ASK = re.compile(
 _MEANS = re.compile(r"\bdo\s*[?.!]*\s*$|"
                     r"\b(?:mean|means|meaning|explain\w*|define|definition|eli5|like\s+i'?m|"
                     r"beginner|new\s+to\s+trading|how\s+(?:does|do)\s+\S+\s+work|"
-                    r"difference\s+between|in\s+plain\s+(?:terms|english|words))\b", re.I)
+                    r"difference\s+between|in\s+(?:plain|simple|easy)\s+(?:terms|english|words|"
+                    r"language))\b", re.I)
 
 
 _OWNED = re.compile(r"\b(?:my|your|our|the\s+desk'?s?|this\s+book)\b", re.I)
@@ -586,8 +587,10 @@ def concept_asked(text: str, named_symbols: tuple[str, ...] = ()) -> Concept | N
             continue
         if _MEANS.search(text):
             return concept
-        bare = re.fullmatch(rf"\s*what(?:'s|\s+is|\s+are)\s+(?:an?\s+)?{term}s?\s*[?.!]*\s*",
-                            text, re.I)
+        # "what is a bull market and a bear market" names the concept's two halves (round 42
+        # newcomer, finding 31: declined)
+        bare = re.fullmatch(rf"\s*what(?:'s|\s+is|\s+are)\s+(?:an?\s+)?{term}s?(?:\s+(?:and|or|vs"
+                            rf"\.?|versus)\s+(?:an?\s+)?{term}s?)?\s*[?.!]*\s*", text, re.I)
         if bare is not None and (not named_symbols or concept.asset):
             return concept
         # "what is a stop loss and do i need one" (a first-time user, round 21): the term asked

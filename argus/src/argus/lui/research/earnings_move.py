@@ -44,6 +44,8 @@ ASKED: Final = re.compile(
     r"moves?\b|\b(?:implied|expected)\s+(?:vs\.?|versus|against|or)\s+(?:realis|realiz|actual)"
     r"\w*|\bearnings\s+(?:moves?|reactions?)\b[^?]{0,60}\b(?:implied|options|straddle|"
     r"realis|realiz|average|history|historically|past)\w*|"
+    # "Implied earnings move for NVDA" names the report before the move (round 42 hostile, 11)
+    r"\b(?:implied|expected|priced)\s+(?:earnings|report|results)\s+moves?\b|"
     r"(?:예상|내재)\s*(?:변동|움직임|변동폭)|实际波动|隐含波动|预期波动", re.I)
 LOOKBACK: Final = 8
 EARLY_DAYS: Final = 12

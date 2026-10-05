@@ -101,13 +101,21 @@ class TestVenueFacts:
         monkeypatch.setattr(bitget, "fetch_tickers",
                             lambda: {"SP500USDT": _T(7735.9), "BTCUSDT": _T(84950.5)})
         monkeypatch.setattr(venue_facts, "_dollar_index", lambda: ("2026-09-25", 120.33))
+        from argus.market import equity_history
+
+        def no_yahoo(ticker: str) -> Any:
+            raise RuntimeError("offline")
+
+        # DXY is read from Yahoo since round 42; when Yahoo does not answer, the Fed's broad
+        # index is named as the different index it is
+        monkeypatch.setattr(equity_history, "daily", no_yahoo)
         lines = venue_facts.levels_lines(
             "Give me the SPX futures level, the BTC price, and the DXY level right now")
         assert lines is not None and lines[0] == ("Bottom line: 3 levels, each with its own "
                                                   "source below.")
         assert lines[1].startswith("SP500: 7,735.90 — Bitget's S&P 500 index perpetual — not "
                                    "the CME futures contract")
-        assert "DXY (the ICE US dollar index): not read by this console" in lines[3]
+        assert "DXY (the ICE US dollar index): Yahoo Finance did not answer" in lines[3]
         assert "120.33 on 2026-09-25" in lines[3]
 
     def test_redemption_is_said_as_unverified(self) -> None:

@@ -681,6 +681,11 @@ ALL_IN_Q = re.compile(
     r"\ball\s+(?:of\s+)?my\s+(?:savings|money|retirement|pension|net\s+worth|cash)|"
     r"\b(?:life|entire)\s+savings|\bretirement\s+(?:fund|money|savings|account)|"
     r"\b(?:put|invest|move)\s+every(?:thing|\s+penny)|\bmortgage\s+(?:my|the)\s+house|"
+    # "i have 2000 dollars savings, should i put it all in crypto" built a BTC/ETH/SOL book
+    # (round 42 newcomer, critical finding 28)
+    r"\bsavings?\b[^?]{0,50}\b(?:put|invest|move|throw)\s+(?:it\s+)?all\b|"
+    r"\b(?:put|invest|move|throw)\s+(?:it\s+)?all\b[^?]{0,30}\b(?:savings?|in(?:to)?\s+"
+    r"(?:crypto|bitcoin|btc|one\s+coin))\b|"
     # an age, not "I'm 40/60 BTC/ETH" or "I'm 30% in cash" (a live re-ask, round 34)
     r"\bi\s*(?:'m|am)\s+\d{2}\b(?!\s*(?:/|%|x\b|percent))", re.I)
 

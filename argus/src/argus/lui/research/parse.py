@@ -151,8 +151,9 @@ mercado de acciones cae un 20%?"), declined until 2026-09-25 (`eval/figurecheck.
 
 
 _STRESS_BARE = re.compile(
-    r"\bstress[\s-]?test\w*\b|\bstress\s+(?:my|the|this|our)\s+(?:book|portfolio|holdings|"
-    r"positions?)\b|\bworst[\s-]case\b|\bbear\s+case\b|\bhow\s+bad\b|"
+    # "stress my 2m USD book" sized the book between the words (round 42 hostile, 9)
+    r"\bstress[\s-]?test\w*\b|\bstress\s+(?:my|the|this|our)\s+(?:[$\w.,]+\s+){0,3}?(?:book|"
+    r"portfolio|holdings|positions?)\b|\bworst[\s-]case\b|\bbear\s+case\b|\bhow\s+bad\b|"
     r"\bwhat'?s\s+the\s+damage\b|\bp\s?&\s?l\s+on\b|\bhow\s+exposed\b|\bhow\s+(?:bad|much)\s+"
     r"(?:would|could|will)\s+i\s+lose\b",
     re.I,
@@ -1933,6 +1934,14 @@ _BOOK_CASH_USD = re.compile(
 """"$10k cash", "10,000 USDT": cash held as an amount in a saved book."""
 
 
+_POSITION_IN = re.compile(
+    r"(?<![\w.,])\$?(?P<n>\d[\d,]*(?:\.\d+)?)\s*(?P<u>k|m)?\s+(?:usd\s+|dollars?\s+)?"
+    r"(?:long\s+)?position\s+(?:in|of|on)\s+(?:\$\s?(?P<p>\d[\d,]*(?:\.\d+)?)\s+)?"
+    r"(?P<name>[A-Za-z][A-Za-z0-9.]{1,15})\b(?:\s+(?:at|@)\s*\$\s?(?P<p2>\d[\d,]*(?:\.\d+)?))?",
+    re.I)
+""""a 1.5m position in gold": a holding stated as the size of a position."""
+
+
 _BOOK_USD = re.compile(
     # the unit letter must stand alone: "$25,000 META" read the M as millions and the name as
     # "ETA", and the book lost META (a live re-ask, round 32)
@@ -2053,6 +2062,7 @@ def priced_book(text: str) -> PricedBook | None:
 
 
 def _price_book(text: str) -> PricedBook | None:
+    original = text
     text = name_first_book(text)
     # The index as it is written in a sentence: "$5k in an S&P fund" (a first-user audit,
     # 2026-09-30).
@@ -2088,8 +2098,15 @@ def _price_book(text: str) -> PricedBook | None:
         return f"${value:.0f} {symbol.removesuffix('USDT')} "
 
     text = _NAME_THEN_AMOUNT.sub(lambda m: f"{m['side']} {m['amount']} {m['name']}", text)
+    thousands: list[tuple[str, float]] = []
+
     def thousand_units(m: re.Match[str]) -> str:
         count = float(m.group(1)) * 1000
+        name = re.match(r"\s*([A-Za-z]{2,6})(\s+(?:shares?|units?|coins?|contracts?)\b)?",
+                        m.string[m.end():])
+        if name is not None and not name.group(2):
+            # "40K NVDA shares" says shares; only a bare "40K NVDA" may be re-read as dollars
+            thousands.append((name.group(1), count))
         converted.append(f"{m.group(0).strip()} read as {count:,.0f} units, not dollars")
         return f"{count:g} "
 
@@ -2138,10 +2155,30 @@ def _price_book(text: str) -> PricedBook | None:
         return _resolve_any(name)
 
     cash_usd = 0.0
+    usd: dict[str, float] = {}
+    for match in _POSITION_IN.finditer(text):
+        # "a 1.5m position in gold" is $1.5m of gold; a sum written between "in" and the name
+        # ("in 2,000.50 EUR gold") is what it was bought at, not a second holding (round 42
+        # hostile, 9)
+        symbol = holding(match.group("name"))
+        if symbol is None:
+            continue
+        value = scaled(match.group("n"), match.group("u"))
+        usd[symbol] = usd.get(symbol, 0.0) + value
+        taken.append(match.span())
+        if match.group("p") or match.group("p2"):
+            written = _number(match.group("p") or match.group("p2"))
+            live = _last_price(symbol)
+            price_note = f"${written:,.2f} read as {match.group('name')}'s price, not a holding"
+            if live and abs(written / live - 1) > 0.10:
+                price_note += (f" — {_t(symbol)} is at ${live:,.2f} now, "
+                               f"{written / live - 1:+.0%} from that, so check the price written")
+            converted.append(price_note)
     for match in _BOOK_CASH_USD.finditer(text):
+        if not free(match.span()):
+            continue
         cash_usd += scaled(match.group(1) or match.group(3), match.group(2) or match.group(4))
         taken.append(match.span())
-    usd: dict[str, float] = {}
     for match in _BOOK_USD.finditer(text):
         symbol = holding(match.group(5))
         if symbol is None or not free(match.span()):
@@ -2190,7 +2227,32 @@ def _price_book(text: str) -> PricedBook | None:
         if symbol not in units:
             lines.append(f"{'short ' if value < 0 else ''}{_t(symbol)} ${abs(value):,.0f} "
                          f"as stated")
+    total = stated_total(original)
+    for name, count in thousands:
+        symbol = holding(name) if name else None
+        each = prices.get(symbol or "")
+        if symbol and each and total and symbol in units and count * each > total:
+            # "a 2m book of 40K NVDA": 40,000 shares would be $9.5m, more than the whole book,
+            # so the 40K is dollars
+            usd[symbol] = usd.get(symbol, 0.0) - units[symbol] * each + count
+            lines[:] = [x for x in lines if not x.startswith(f"{count:,.10g} {_t(symbol)} =")]
+            lines.append(f"{_t(symbol)} ${count:,.0f}: {count:,.0f} shares would be "
+                         f"${count * each:,.0f}, more than the ${total:,.0f} book, so the "
+                         f"{count / 1000:g}K is read as dollars")
+            converted[:] = [x for x in converted if "read as" not in x
+                            or not x.endswith("units, not dollars")]
     gross = sum(abs(v) for v in usd.values())
+    if total and gross:
+        # "Stress my 2m USD book of 40K NVDA" was valued at $4.04m: "2m USD" was read as cash on
+        # top of the holdings (round 42 hostile, 9). A stated book size is the whole book, so
+        # cash is what the holdings leave of it, and holdings past it are said, not hidden.
+        if cash_usd and abs(cash_usd - total) <= 0.01 * total:
+            cash_usd = max(0.0, total - gross)
+            lines.append(f"the ${total:,.0f} stated is the whole book, not cash on top of the "
+                         "holdings")
+        if gross > 1.05 * total:
+            lines.append(f"the holdings as read come to ${gross:,.0f}, more than the "
+                         f"${total:,.0f} book stated — restate the sizes if that is wrong")
     account = gross + cash_usd
     if cash_usd:
         lines.append(f"${cash_usd:,.0f} cash")
@@ -2686,8 +2748,11 @@ _CONSERVATIVE = re.compile(r"\b(?:conservative|cautious|careful|low[\s-]+risk|ri
                            r"retire\w*|capital\s+preservation|safe(?:ty)?[\s-]+first)\b", re.I)
 
 
-_AGGRESSIVE = re.compile(r"\b(?:aggressive|high[\s-]+risk|risk[\s-]+(?:taker|seeking|on)|yolo|"
-                         r"degen\w*|momentum\s+trader|day[\s-]*trader)\b", re.I)
+_AGGRESSIVE = re.compile(r"\b(?:aggressive|high[\s-]+risk|risk[\s-]+(?:taker|seeking)|yolo|"
+                         # "what's my risk on a bad day?" is not a risk-on trader (round 42
+                         # stranger pre-check): "on" followed by what the risk is on is a question
+                         r"risk[\s-]+on(?!\s+(?:a|an|the|my|this|that|it|each|every|any|days?|"
+                         r"weeks?)\b)|degen\w*|momentum\s+trader|day[\s-]*trader)\b", re.I)
 
 
 _MAX_POSITION = re.compile(
@@ -3009,9 +3074,9 @@ def detect(text: str) -> ResearchRequest | None:
     # "What weight of AMD would keep my volatility where it is?" asks for an add, and was read as
     # a comparison of five names (a round-23 re-ask)
     text = _WEIGHT_OF_ADD.sub(r"should I add \g<name> and ", text)
-    request = with_stated_amounts(with_estimates(with_named_shock(with_short_side(as_comparison(
-        _with_leverage_exposure(_with_stated_cash(read_request(text), text), text), text), text),
-        text), text), text)
+    request = with_share_notional(with_stated_amounts(with_estimates(with_named_shock(
+        with_short_side(as_comparison(_with_leverage_exposure(_with_stated_cash(
+            read_request(text), text), text), text), text), text), text), text), text)
     if request is not None and request.book and request.notional is None:
         # "I have $600 in SOL and $400 in TSLA, am I too risky?" was sized on the first amount,
         # $600, not the $1,000 the book holds (a first-time user, round 12): a book stated in
@@ -3026,6 +3091,29 @@ def detect(text: str) -> ResearchRequest | None:
     read_as = [n for s, n in _read(text).items() if n and s in request.symbols
                and n not in request.notes]
     return replace(request, notes=(*request.notes, *read_as)) if read_as else request
+
+
+_SHARES_OF: Final = re.compile(r"(?<![\w.])(?P<n>\d[\d,]*(?:\.\d+)?)\s+shares?\s+(?:of\s+)?"
+                               r"(?P<name>[A-Za-z][A-Za-z0-9.]{0,9})\b", re.I)
+
+
+def with_share_notional(request: ResearchRequest | None, text: str) -> ResearchRequest | None:
+    """One name's risk sized on the shares the question states, priced at Bitget's last price.
+    "shorting -50 shares of TSLA" was sized on a worked-example $10,000 with the 50 shares
+    unread (round 42 hostile, minor 10)."""
+    if (request is None or request.kind is not ResearchKind.IMPACT or request.book
+            or request.notional is not None or len(request.symbols) != 1):
+        return request
+    m = _SHARES_OF.search(text)
+    if m is None or _resolve_any(m.group("name")) != request.symbols[0]:
+        return request
+    price = _last_price(request.symbols[0])
+    count = _number(m.group("n"))
+    if price is None or count <= 0:
+        return request
+    return replace(request, notional=Decimal(str(round(count * price, 2))),
+                   notes=(*request.notes, f"{count:,.10g} {_t(request.symbols[0])} shares at "
+                                          f"Bitget's last {price:,.2f} = ${count * price:,.0f}"))
 
 
 def with_stated_amounts(request: ResearchRequest | None, text: str) -> ResearchRequest | None:
@@ -4168,6 +4256,18 @@ def read_request(text: str) -> ResearchRequest | None:
             down = (match.group(1).startswith("-") or said == -1
                     or (said is None and DOWN_WORDS.search(raw)))
             shock = -value if down else value
+        priced = None if book else priced_book(raw)
+        if priced is not None and priced.weights and priced.value:
+            # "Stress my 2m USD book of 40K NVDA" was stressed as $2m of NVDA, and with gold
+            # added as half NVDA, half gold (round 42 hostile, 9): sums stated are the book
+            return ResearchRequest(
+                kind=ResearchKind.STRESS, symbols=tuple(priced.weights),
+                # weights of the whole account, so the cash dilutes every figure
+                book={sym: w * (1.0 - priced.cash) for sym, w in priced.weights.items()},
+                cash=priced.cash, shock_pct=shock,
+                notional=Decimal(str(round(priced.value, 2))),
+                notes=(*notes, "the holdings are the amounts stated in the question: "
+                       + ", ".join(priced.lines)))
         return ResearchRequest(
             kind=ResearchKind.STRESS,
             symbols=tuple(book) or symbols,
@@ -4978,7 +5078,61 @@ compare it holds every name being compared."""
 MIN_PLAN_CONFIDENCE = 0.6
 
 
-def _value_holdings(raw: Mapping[str, Any], notes: list[str]) -> tuple[dict[str, float], float]:
+_PRICE_WRITTEN = re.compile(
+    r"(?:\bat|@|\bpriced\s+at|\bprice\s+(?:of\s+)?|\bentry\s+(?:of\s+)?)\s*[$€£]?\s*"
+    r"(\d[\d,]*(?:\.\d+)?)", re.I)
+
+
+def _prices_not_units(raw: Mapping[str, Any], text: str, notes: list[str]) -> Mapping[str, Any]:
+    """The model's unit holdings with any "units" that are a price written in the question
+    dropped. "Is 1.5m position in 2,000.50 EUR gold sensible?" reached the book as 2,000.5 ounces
+    of gold, $3.96m, in a book stated as $2m (round 42 hostile, 9): a number written after "at",
+    "@" or "price" is what the thing costs, not how much of it is held."""
+    units = raw.get("holdings_units")
+    if not isinstance(units, dict) or not units:
+        return raw
+    prices = set()
+    for m in _PRICE_WRITTEN.finditer(text):
+        try:
+            prices.add(round(float(m.group(1).replace(",", "")), 6))
+        except ValueError:
+            continue
+    kept: dict[str, Any] = {}
+    for name, value in units.items():
+        try:
+            amount = round(float(value), 6)
+        except (TypeError, ValueError):
+            kept[name] = value
+            continue
+        if amount in prices:
+            notes.append(f"{amount:,g} next to {name} is read as its price, not a quantity held")
+            continue
+        kept[name] = value
+    return {**raw, "holdings_units": kept}
+
+
+_BOOK_TOTAL = re.compile(
+    r"(?<![\w.,])\$?(\d+(?:,\d{3})*(?:\.\d+)?)\s*(k|m|mm|mn|bn|thousand|million)?\s*"
+    r"(?:usd|usdt|dollars?)?\s+(?:book|portfolio|account)\b|\b(?:book|portfolio|account)\s+"
+    r"(?:of|worth|is|=)\s*\$?(\d+(?:,\d{3})*(?:\.\d+)?)\s*(k|m|mm|mn|bn|thousand|million)?"
+    r"(?=\s*(?:usd|usdt|dollars?)?\b)(?!\s*(?:of\s+)?[A-Z]{2,6}\b)", re.I)
+
+
+def stated_total(text: str) -> float | None:
+    """The whole book's size when the text states one ("my 2m USD book", "a portfolio of
+    $250,000"), or None."""
+    m = _BOOK_TOTAL.search(text)
+    if m is None:
+        return None
+    digits = m.group(1) or m.group(3)
+    unit = (m.group(2) or m.group(4) or "").lower()
+    value = float(digits.replace(",", "")) * {"k": 1e3, "thousand": 1e3, "bn": 1e9}.get(
+        unit, 1e6 if unit else 1.0)
+    return value if value > 0 else None
+
+
+def _value_holdings(raw: Mapping[str, Any], notes: list[str],
+                    total_stated: float | None = None) -> tuple[dict[str, float], float]:
     """Holdings the model reported in dollars or units, as fractions of the whole account, and the
     cash fraction. Units are priced at Bitget's live last price; every conversion is written into
     ``notes`` so the reader sees the number it rests on. Empty when nothing was stated that way.
@@ -5013,7 +5167,20 @@ def _value_holdings(raw: Mapping[str, Any], notes: list[str]) -> tuple[dict[str,
         cash_usd = max(0.0, float(raw.get("cash_usd") or 0.0))
     except (TypeError, ValueError):
         cash_usd = 0.0
-    total = sum(usd.values()) + cash_usd
+    held_usd = sum(usd.values())
+    if total_stated and usd:
+        # "Stress my 2m USD book of 40K NVDA" was valued at $4.04m: the stated book size was
+        # read as cash on top of the holdings (round 42 hostile, 9). A stated total is the whole
+        # book; cash is what the holdings leave of it.
+        if cash_usd and abs(cash_usd - total_stated) <= 0.01 * total_stated:
+            cash_usd = max(0.0, total_stated - held_usd)
+            notes.append(f"the ${total_stated:,.0f} stated is the whole book, not cash on top of "
+                         f"the holdings, so cash is the ${cash_usd:,.0f} they leave")
+        if held_usd > 1.05 * total_stated:
+            notes.append(f"the holdings as read come to ${held_usd:,.0f}, more than the "
+                         f"${total_stated:,.0f} book stated — the figures use the holdings as "
+                         "read; restate the sizes if that is wrong")
+    total = held_usd + cash_usd
     if not usd or total <= 0:
         return {}, 0.0
     if cash_usd:
@@ -5100,6 +5267,13 @@ def _plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, di
         # explainer runs only when the words ask about the product
         audit["detail"] = "a venue reading with no word about Bitget's products was not applied"
         return None, audit
+    if (kind is ResearchKind.EXECUTION and not _EXECUTION.search(text)
+            and (_STRESS_BARE.search(text) or _STRESS.search(text))):
+        # "Stress my 2m USD book of 40K NVDA" was answered with the cost of a $2m NVDA order
+        # (round 42 hostile, 9): a stress question with no word about working an order is not
+        # an execution plan
+        audit["detail"] = "an execution reading of a stress question was not applied"
+        return None, audit
 
     notes: list[str] = []
     book: dict[str, float] = {}
@@ -5113,7 +5287,8 @@ def _plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, di
                 continue
             if symbol and weight > 0:
                 book[symbol] = book.get(symbol, 0.0) + weight
-    valued, cash = _value_holdings(raw, notes)
+    valued, cash = _value_holdings(_prices_not_units(raw, text, notes), notes,
+                                   stated_total(text))
     if valued:
         # Dollar or unit holdings were stated: the book is their live value over the whole
         # account, cash included, and is deliberately NOT rescaled to 100% — cash is part of it.
@@ -5247,17 +5422,30 @@ def _plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, di
         # nothing left the request goes out empty and is answered by asking for the holdings, or
         # filled from the visitor's saved book.
         subject = shock_subject(text, set(book)) if _NAMED_SHOCK.search(text) else None
-        if not book:
-            held = [s for s in symbols if s not in _SHOCK_SUBJECTS and s != subject]
-            if held:
-                book = {s: 1.0 / len(held) for s in held}
-                # one holding is the whole book, not "equal weight" (a hostile review, round 23)
-                notes.append("no weight was given, so the one holding is read as the whole book"
-                             if len(held) == 1 else
-                             "no weights were given for your holdings, so they were read as "
-                             "equal weight")
-        request = ResearchRequest(kind=kind, symbols=tuple(book), book=book, shock_pct=shock,
-                                  shock_on=subject, parsed_by="model", notes=tuple(notes))
+        priced = None if book else priced_book(text)
+        if priced is not None and priced.weights and priced.value:
+            # "my 500k USD portfolio holding 50k TSLA and a 300k position in gold" was stressed
+            # as half TSLA, half gold (round 42 stranger pre-check): the sums are the book
+            request = ResearchRequest(
+                kind=kind, symbols=tuple(priced.weights),
+                book={s: w * (1.0 - priced.cash) for s, w in priced.weights.items()},
+                cash=priced.cash, shock_pct=shock, shock_on=subject, parsed_by="model",
+                notional=Decimal(str(round(priced.value, 2))),
+                notes=(*notes, "the holdings are the amounts stated in the question: "
+                       + ", ".join(priced.lines)))
+        else:
+            if not book:
+                held = [s for s in symbols if s not in _SHOCK_SUBJECTS and s != subject]
+                if held:
+                    book = {s: 1.0 / len(held) for s in held}
+                    # one holding is the whole book, not "equal weight" (a hostile review,
+                    # round 23)
+                    notes.append("no weight was given, so the one holding is read as the whole "
+                                 "book" if len(held) == 1 else
+                                 "no weights were given for your holdings, so they were read as "
+                                 "equal weight")
+            request = ResearchRequest(kind=kind, symbols=tuple(book), book=book, shock_pct=shock,
+                                      shock_on=subject, parsed_by="model", notes=tuple(notes))
     elif kind is ResearchKind.QUOTE or (kind is ResearchKind.COMPARE and len(symbols) >= 2):
         cap = COMPARE_MAX if kind is ResearchKind.COMPARE else 4
         dropped = tuple(f"only the first {cap} of the {len(symbols)} names are covered: "
@@ -5305,7 +5493,7 @@ def _plan_with_model(text: str, client: Any) -> tuple[ResearchRequest | None, di
     if request is not None and request.book and _GROUP.search(text):
         request = replace(request, notes=(*request.notes, *_group_note(text)))
     request = as_comparison(request, text)
-    request = with_named_shock(with_short_side(request, text), text)
+    request = with_share_notional(with_named_shock(with_short_side(request, text), text), text)
     audit["applied"] = request is not None
     return request, audit
 

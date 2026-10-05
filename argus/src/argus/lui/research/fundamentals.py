@@ -888,6 +888,11 @@ def renamed_note(text: str) -> str | None:
     return None
 
 
+def first_trade(ticker: str) -> date | None:
+    """:func:`_first_trade` for other packages: the day ``ticker``'s shares first traded."""
+    return _first_trade(ticker)
+
+
 def _first_trade(ticker: str) -> date | None:
     """The day ``ticker``'s shares first traded, from Yahoo's chart metadata, or None."""
     from argus.truth import http

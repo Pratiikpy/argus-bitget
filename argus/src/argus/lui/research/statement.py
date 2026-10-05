@@ -436,9 +436,19 @@ def _group(symbol: str) -> str | None:
     return _INDEX_GROUP.get(symbol)
 
 
+INDICATOR_WINDOW = re.compile(
+    r"\b\d{1,3}[\s-]*(?:day|d|week|wk|month|hour|h|bar|period|session)s?\b[\s-]*(?:simple\s+|"
+    r"exponential\s+)?(?:moving\s+average|ma|sma|ema|average|high|low|rsi|range|vwap|"
+    r"breakout|volatility|vol)\b", re.I)
+"""An indicator named with its window ("200-day moving average", "20-day high"): "Is it above or
+below its 200-day moving average?" read 200 as the mark and valued 100 AAPL shares at $20,000
+(round 42 judge, C4). Taken out before any figure is read as a price."""
+
+
 def price_statement(text: str, *, price: Callable[[str], float | None] | None = None,
                     ) -> Statement | None:
     """The statement's P&L, or None when the text is not a statement this reads in full."""
+    text = INDICATOR_WINDOW.sub(" ", text)
     if _HYPOTHETICAL.search(text):
         return None
     events, rest = _events(text)
@@ -655,6 +665,7 @@ def is_statement(text: str) -> bool:
     """A statement this module should price before any other engine reads it: more than one fill,
     a later fill, an option or spread, or a single leg carrying what the older single-leg reader
     misses (scientific notation, a negative price, a fee or funding)."""
+    text = INDICATOR_WINDOW.sub(" ", text)
     if _HYPOTHETICAL.search(text):
         return False
     if re.search(r"\b\d+(?:\.\d+)?\s*x\b", text, re.I) and re.search(r"\bliquidat\w*|\bstop\b",

@@ -169,6 +169,108 @@ def call(text: str) -> str | None:
     return f"Add, at most {top:.0%} inside your {asked.limit:.0%} drawdown limit"
 
 
+_YEAR_ASKED: Final = re.compile(
+    r"\b(?:in|during|over|through|for|across)\s+(?:the\s+)?(?P<y>20[12]\d)\b|\bthe\s+(?P<y2>20[12]\d)"
+    r"\s+(?:bear\s+market|crash|sell[\s-]?off|drawdown|rate\s+shock)\b", re.I)
+_PEAK_ASKED: Final = re.compile(r"\bpeak[\s-]*to[\s-]*trough\b|\b(?:worst|deepest|max(?:imum)?)\s+"
+                                r"(?:fall|drop|drawdown|loss|decline)\b|\bbreach\w*\b", re.I)
+
+
+def _book(text: str) -> tuple[dict[str, float], float, tuple[str, ...]]:
+    """(risky weights by symbol, cash weight, proxy notes) from the holdings a text states."""
+    book: dict[str, float] = {}
+    cash = 0.0
+    notes: list[str] = []
+    for m in _HOLD.finditer(text):
+        if re.match(r"\s*(?:max|drawdown|loss)", text[m.end("w") + 1:], re.I):
+            continue
+        word = m.group("name").strip()
+        if re.fullmatch(r"cash|usd|usdt|usdc|t-?bills?|money\s+market", word, re.I):
+            cash += float(m.group("w")) / 100
+            continue
+        symbol, note = _symbol(word)
+        if symbol is None:
+            continue
+        book[symbol] = book.get(symbol, 0.0) + float(m.group("w")) / 100
+        if note:
+            notes.append(note)
+    return book, cash, tuple(notes)
+
+
+def period_lines(text: str) -> list[str] | None:
+    """A stated book's worst fall in a named year, against a stated limit.
+
+    "My book is $250k: 40% SPY, 30% BTC, 20% TLT, 10% cash, and my max drawdown limit is 15%. What
+    would my worst peak-to-trough have been in the 2022 bear market, and does it breach my limit?"
+    was told the book "stays inside it", from a hypothetical 10% Nasdaq drop on 30 days of hourly
+    bars (round 42 judge, C3). The year is replayed on daily closes, two ways — held untouched
+    from the year's first close, and rebalanced to the weights each day — because a book that is
+    left alone drifts, and both are honest readings of "my book in 2022"."""
+    when = _YEAR_ASKED.search(text)
+    if when is None or not _PEAK_ASKED.search(text):
+        return None
+    year = int(when.group("y") or when.group("y2"))
+    book, cash, notes = _book(text)
+    if not book:
+        return None
+    total = sum(book.values()) + cash
+    if total > 1.0001:
+        return [f"Bottom line: the parts of that book add up to {total:.0%}, not 100%, so it "
+                "cannot be replayed as stated — restate the weights."]
+    try:
+        days, closes, said = _aligned(list(book))
+    except Exception:
+        return ["Bottom line: the daily history for that book could not be read just now; ask "
+                "again in a minute."]
+    span = [i for i, d in enumerate(days) if d.year == year]
+    if len(span) < 20:
+        start = days[0] if days else None
+        return [f"Bottom line: the daily history here starts {start:%b %Y}" if start else
+                "Bottom line: no daily history covers that book",
+                f"so {year} cannot be replayed for it."]
+    window = {s: c[span[0]:span[-1] + 1] for s, c in closes.items()}
+    rebalanced, r_peak, r_trough = max_drawdown(book, window)
+    shares = {s: w / window[s][0] for s, w in book.items()}
+    held = [cash + sum(q * window[s][i] for s, q in shares.items())
+            for i in range(len(span))]
+    peak, worst, w_peak, w_trough, top = held[0], 0.0, 0, 0, 0
+    for i, value in enumerate(held):
+        if value > peak:
+            peak, top = value, i
+        if value / peak - 1 < worst:
+            worst, w_peak, w_trough = value / peak - 1, top, i
+    limit_m = _LIMIT.search(text)
+    limit = (float(next(v for v in limit_m.groupdict().values() if v)) / 100
+             if limit_m else None)
+    stamp = [days[i] for i in span]
+    money = re.search(r"\$\s?(\d[\d,.]*)\s*(k|m)?\b", text, re.I)
+    capital = None
+    if money:
+        capital = float(money.group(1).replace(",", "")) * {"k": 1e3, "m": 1e6}.get(
+            (money.group(2) or "").lower(), 1.0)
+    holding = ", ".join(f"{w:.0%} {_name(s)}" for s, w in book.items()) + (
+        f", {cash:.0%} cash" if cash > 0.005 else "")
+    verdict = ""
+    if limit is not None:
+        breach = worst < -limit or rebalanced < -limit
+        verdict = (f" — {'past' if breach else 'inside'} your {limit:.0%} limit"
+                   + (f", by {(-min(worst, rebalanced) - limit) * 100:.1f} points" if breach
+                      else ""))
+    out = [f"Bottom line: in {year} this book ({holding}) fell {-worst:.1%} at its worst, held "
+           f"untouched from the year's first close ({stamp[w_peak]:%d %b} to "
+           f"{stamp[w_trough]:%d %b}){verdict}."]
+    out.append(f"Rebalanced to those weights every day instead, the worst fall was "
+               f"{-rebalanced:.1%} ({stamp[r_peak]:%d %b} to {stamp[r_trough]:%d %b}).")
+    if capital:
+        out.append(f"On ${capital:,.0f} that is about ${capital * -worst:,.0f} at the low, held "
+                   "untouched.")
+    out.append(f"How: daily closes in {year} on the {len(span)} days every holding traded; cash "
+               "held flat. " + (" ".join(f"{n[:1].upper()}{n[1:]}." for n in notes) + " "
+                                if notes else "") + "Not advice.")
+    out.append("Data: " + "; ".join(said) + ".")
+    return out
+
+
 def lines(text: str) -> list[str] | None:
     """The drawdown-limited size, or None when the question states no book, add and limit."""
     asked = read(text)
@@ -257,4 +359,118 @@ def lines(text: str) -> list[str] | None:
     return out
 
 
-__all__ = ["Asked", "call", "lines", "max_drawdown", "read"]
+_SIZE_ASKED: Final = re.compile(
+    r"\bsiz(?:e|ing)\b|\bhow\s+(?:much|big|large)\b|\bposition\s+size\b|\ballocat\w*", re.I)
+_ANY_LIMIT: Final = re.compile(
+    r"(?P<a>[-\u2212]?\d+(?:\.\d+)?)\s*%\s+(?:max(?:imum)?\s+)?(?:drawdown|loss)(?:\s+(?:limit|"
+    r"tolerance|cap))?|\b(?:max(?:imum)?\s+)?(?:drawdown|loss)\s+(?:limit\s+|tolerance\s+|cap\s+)?"
+    r"(?:is\s+|of\s+|at\s+|[:=]\s*)?(?P<b>[-\u2212]?\d+(?:\.\d+)?)\s*%", re.I)
+_ACCOUNT: Final = re.compile(
+    r"(?:\$|\busd\s*)?(?P<n>\d+(?:,\d{3})*(?:\.\d+)?)\s*(?P<unit>k|m|mn|thousand|million)?\b\s*"
+    r"(?:usd|usdt|dollars?)?\s*(?:account|book|portfolio|capital|bankroll)\b|\b(?:account|book|"
+    r"portfolio|capital|bankroll)\s+(?:of|is|=|:)?\s*(?:\$|usd\s*)?(?P<n2>\d+(?:,\d{3})*"
+    r"(?:\.\d+)?)\s*(?P<unit2>k|m|mn|thousand|million)?\b|"
+    # "I've got 25k and my max loss tolerance is 12%" states the account too
+    r"\b(?:i(?:'ve|\s+have)?\s+got|i\s+have|with)\s+(?:\$|usd\s*)?(?P<n3>\d+(?:,\d{3})*"
+    r"(?:\.\d+)?)\s*(?P<unit3>k|m|mn|thousand|million)?\b", re.I)
+DEFAULT_LIMIT: Final = 0.10
+"""The limit a single-asset size is worked at when none usable is stated: a tenth of the account,
+the round figure a single-name risk budget is usually written as. It is said every time it is
+used, never applied silently."""
+
+
+def _account(text: str) -> float | None:
+    m = _ACCOUNT.search(text)
+    if m is None:
+        return None
+    n = float((m.group("n") or m.group("n2") or m.group("n3")).replace(",", ""))
+    unit = (m.group("unit") or m.group("unit2") or m.group("unit3") or "").lower()
+    return n * {"k": 1e3, "thousand": 1e3, "m": 1e6, "mn": 1e6, "million": 1e6}.get(unit, 1.0)
+
+
+def single_limits(text: str) -> tuple[float, list[str]]:
+    """The limit to size at and what was said about the ones stated. A 0% limit allows no
+    position (anything held can fall); one at or past 100% is not a limit (an unlevered position
+    cannot lose more than everything in it), so neither is sized at — the first limit inside
+    (0, 100) is, or :data:`DEFAULT_LIMIT` when none is, and that is said."""
+    said: list[str] = []
+    usable: list[float] = []
+    for m in _ANY_LIMIT.finditer(text):
+        raw = float((m.group("a") or m.group("b")).replace("\u2212", "-"))
+        if raw < 0:
+            said.append(f"A drawdown limit is the size of a fall, so {raw:g}% is read as "
+                        f"{-raw:g}%.")
+            raw = -raw
+        if raw == 0:
+            said.append("A 0% drawdown limit allows no position at all: anything held can fall, "
+                        "so only cash meets it.")
+        elif raw >= 100:
+            said.append(f"{raw:g}% is not a loss limit: an unlevered position cannot lose more "
+                        "than 100% of what is in it, so a limit at or past 100% allows losing "
+                        "the whole account.")
+        else:
+            usable.append(raw / 100)
+    if usable:
+        return usable[0], said
+    if said:
+        said.append(f"So the size above is worked at a {DEFAULT_LIMIT:.0%} limit — say your own "
+                    "and it is redone.")
+    return DEFAULT_LIMIT, said
+
+
+def single_lines(text: str) -> list[str] | None:
+    """How much of an account one asset may take so that a repeat of its worst fall costs the
+    account no more than the limit: size = limit / worst fall, the rest in cash. "Drawdown-limited
+    sizing: max drawdown 0% and 150% loss limit, 10k account, BTC" got BTC's earnings-calendar
+    note and Polymarket lines, and the same question with a valid 10% limit got "I could not
+    match your question" (round 42 hostile, 6). The book reader (:func:`lines`) keeps every
+    question that states holdings and an add; this one takes a single named asset."""
+    from argus.lui.research.parse import research_symbols
+
+    if not _SIZE_ASKED.search(text) or not re.search(r"\b(?:drawdown|loss)\b", text, re.I):
+        return None
+    if _ANY_LIMIT.search(text) is None or read(text) is not None:
+        return None
+    symbols = research_symbols(text)[0]
+    if len(symbols) != 1:
+        return None
+    if any(_symbol(m.group("name"))[0] not in (None, symbols[0]) for m in _HOLD.finditer(text)):
+        return None
+    symbol = symbols[0]
+    limit, said = single_limits(text)
+    account = _account(text)
+    try:
+        days, closes, data = _aligned([symbol])
+    except Exception:
+        return [f"Bottom line: {_name(symbol)}'s daily history could not be read just now, so it "
+                "cannot be sized against a drawdown limit; ask again in a minute.", *said]
+    if len(days) < 250:
+        return [f"Bottom line: {_name(symbol)} has under a year of daily history here — too "
+                "little to size against a drawdown limit.", *said]
+    name = _name(symbol)
+    worst, peak_at, trough_at = max_drawdown({symbol: 1.0}, closes)
+    share = min(1.0, limit / -worst) if worst < 0 else 1.0
+    money = f" (${account * share:,.0f} of ${account:,.0f})" if account else ""
+    out = [f"Bottom line: hold about {share:.0%} of the account in {name}{money}, the rest in "
+           f"cash — {name}'s worst fall here was {worst:.1%} ({days[peak_at]:%b %Y} to "
+           f"{days[trough_at]:%b %Y}), and {share:.0%} of a {-worst:.0%} fall is the "
+           f"{limit:.0%} limit."]
+    out.extend(said)
+    recent = [i for i, d in enumerate(days) if (days[-1] - d).days <= 365]
+    if len(recent) > 150:
+        r_worst = max_drawdown({symbol: 1.0}, {symbol: closes[symbol][recent[0]:]})[0]
+        r_share = min(1.0, limit / -r_worst) if r_worst < 0 else 1.0
+        out.append(f"On the last 12 months alone its worst fall was {r_worst:.1%}, which would "
+                   f"allow {r_share:.0%}"
+                   + (f" (${account * r_share:,.0f})" if account else "")
+                   + " — sizing on the shorter window bets that the last year's range holds.")
+    out.append(f"How: size = limit ÷ worst peak-to-trough fall of daily closes "
+               f"{days[0]:%b %Y} to {days[-1]:%b %Y}, no leverage; leverage multiplies the fall "
+               "and divides the size by the same factor. A past drawdown is not the worst "
+               "possible one. Not advice.")
+    out.append("Data: " + "; ".join(data) + ".")
+    return out
+
+
+__all__ = ["DEFAULT_LIMIT", "Asked", "call", "lines", "max_drawdown", "period_lines", "read",
+           "single_limits", "single_lines"]

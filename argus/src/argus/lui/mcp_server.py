@@ -410,12 +410,35 @@ def call_tool(name: str, args: Mapping[str, Any]) -> tuple[str, bool]:
         # for an answer (weighed and kept after the judge audit of 2026-09-29).
         return text, bool(payload.get("refused"))
     if name == "argus_quote":
-        symbols = [_symbol(s) for s in (args.get("symbols") or [])][:4]
-        if not symbols:
+        wanted = list(args.get("symbols") or [])
+        if not wanted:
             raise ToolError("symbols is required")
-        result = _run(ResearchRequest(kind=ResearchKind.QUOTE, symbols=tuple(symbols)),
-                      f"quote {' '.join(symbols)}")
-        return _answer_text(result), result["refused"]
+        # ["ZZZZ", "NVDA", "; DROP TABLE x", "BTCUSDT"] failed the whole batch on ZZZZ, with no
+        # quote for NVDA or BTCUSDT (round 42 hostile, minor 12): good names are quoted and the
+        # rest are named as not listed
+        quoted: list[str] = []
+        unlisted: list[str] = []
+        for raw in wanted:
+            try:
+                hit = _symbol(raw)
+            except ToolError:
+                unlisted.append(str(raw)[:40])
+                continue
+            if hit not in quoted:
+                quoted.append(hit)
+        if not quoted:
+            raise ToolError("none of " + ", ".join(repr(u) for u in unlisted)
+                            + " is a contract Bitget lists")
+        result = _run(ResearchRequest(kind=ResearchKind.QUOTE, symbols=tuple(quoted[:4])),
+                      f"quote {' '.join(quoted[:4])}")
+        text = _answer_text(result)
+        if unlisted:
+            text += ("\n\nNot quoted: " + ", ".join(repr(u) for u in unlisted)
+                     + (" is" if len(unlisted) == 1 else " are") + " not a contract Bitget lists.")
+        if quoted[4:]:
+            text += ("\n\nNot quoted: only the first four names are quoted in one call; ask again "
+                     "for " + ", ".join(quoted[4:]) + ".")
+        return text, result["refused"]
     if name == "argus_portfolio_impact":
         add = _symbol(str(args.get("add") or ""))
         book = _book(args.get("book"))

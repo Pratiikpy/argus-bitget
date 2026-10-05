@@ -63,7 +63,13 @@ _CROSS: Final = re.compile(r"\b(?P<fast>\d{1,3})\s*(?:/|and|-|vs\.?)\s*(?P<slow>
                            r"(?P<slow2>\d{1,3})\s*(?:day\s+)?(?P<kind2>e?ma|sma)?\s*(?:golden\s+|death\s+)?cross\w*|"
                            # "a golden cross on gold" names the 50/200 by its nickname (round 37
                            # judge, the Japanese question)
-                           r"\b(?P<nick>golden|death)\s+cross\w*", re.I)
+                           r"\b(?P<nick>golden|death)\s+cross\w*|"
+                           # "its 50-day moving average crosses above the 200-day" (round 42
+                           # judge, C2: read as a 50-day look-back window)
+                           r"\b(?P<fast3>\d{1,3})[\s-]*(?:day|d)\s+(?:simple\s+|exponential\s+)?"
+                           r"(?P<kind3>e?ma|sma|moving\s+averages?)\s+cross\w*\s+(?:above|over|"
+                           r"below|under)\s+(?:the\s+|its\s+)?(?P<slow3>\d{1,3})[\s-]*(?:day|d)\b",
+                           re.I)
 _ABOVE_MA: Final = re.compile(r"\babove\s+(?:its\s+|the\s+)?(?P<n>\d{1,4})[\s-]*(?:day|d|week)?"
                               r"[\s-]*(?P<kind>e?ma|sma|moving\s+average|average)\b", re.I)
 _MOVE: Final = re.compile(r"\b(?P<verb>fall(?:s|en|ing)?|fell|drop(?:s|ped|ping)?|dip(?:s|ped)?|"
@@ -135,12 +141,12 @@ def read_rule(text: str) -> Rule | None:
                     {"n": n, "lo": lo, "hi": hi, "days": days}, short, assumed)
     cross = _CROSS.search(text)
     if cross is not None:
-        fast = int(cross.group("fast") or cross.group("fast2") or 50)
-        slow = int(cross.group("slow") or cross.group("slow2") or 200)
+        fast = int(cross.group("fast") or cross.group("fast2") or cross.group("fast3") or 50)
+        slow = int(cross.group("slow") or cross.group("slow2") or cross.group("slow3") or 200)
         if cross.group("nick") and not (cross.group("fast") or cross.group("fast2")):
             assumed = ("50- and 200-day simple averages, the usual golden cross (not stated)",)
         fast, slow = min(fast, slow), max(fast, slow)
-        kind = (cross.group("kind") or cross.group("kind2") or "").lower()
+        kind = (cross.group("kind") or cross.group("kind2") or cross.group("kind3") or "").lower()
         ema = kind.startswith("e")
         name = "EMA" if ema else "simple moving average"
         return Rule("cross", f"long when the {fast}-day {name} is above the {slow}-day"
