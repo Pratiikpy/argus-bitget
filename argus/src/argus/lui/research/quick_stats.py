@@ -26,8 +26,12 @@ from argus.lui.trace import trace_module
 VOLUME_COMPARED: Final = re.compile(
     r"\b(?:24\s*h(?:our)?\s+)?(?:trading\s+)?volume\b[^?]{0,40}\b(?:compared|vs\.?|versus|against|"
     r"relative|next\s+to)\b|\b(?:compare|comparing)\b[^?]{0,40}\bvolumes?\b", re.I)
-REALISED_VOL: Final = re.compile(r"\breali[sz]ed\s+vol(?:atility)?\b|\bhistorical\s+vol(?:atility)?"
-                                 r"\b", re.I)
+REALISED_VOL: Final = re.compile(
+    r"\breali[sz]ed\s+vol(?:atility)?\b|\bhistorical\s+vol(?:atility)?\b|"
+    # "How volatile has SOL been over the past 14 days?" was answered over 30 (round 44 re-ask):
+    # a window named beside "how volatile" is the window measured
+    r"\bhow\s+(?:volatile|choppy|swingy|jumpy)\b[^?]{0,60}\b(?:last|past)\s+-?\s*\d+\s*"
+    r"(?:days?|weeks?|months?)\b", re.I)
 
 
 def _named(text: str, prior: list[str]) -> list[str]:
@@ -69,7 +73,7 @@ def volume_lines(text: str, prior: list[str]) -> list[str] | None:
 
 
 def _window(text: str) -> int:
-    m = re.search(r"\b(?:last|past)\s+(\d+)\s*(day|week|month)s?\b", text, re.I)
+    m = re.search(r"\b(?:last|past)\s+-?\s*(\d+)\s*(day|week|month)s?\b", text, re.I)
     if m is None:
         return 30
     n = int(m.group(1))
@@ -173,6 +177,10 @@ def realised_vol_lines(text: str, prior: list[str]) -> list[str] | None:
                    "norm.") if longer is not None else ".")]
     lines += [f"{n}: {v:.0%} a year over {days} days"
               + (f", {lv:.0%} over 90." if lv is not None else ".") for n, v, lv in rows[1:]]
+    if days < 20:
+        lines.append(f"{days} days is {days - 1 if days > 1 else 0} daily moves, a small sample: "
+                     f"one large day shifts this figure a lot, so the 90-day one is the steadier "
+                     f"guide.")
     lines.append("Method: the standard deviation of daily log returns from Bitget's 00:00 UTC "
                  "daily closes, times the square root of 365 (the perpetual trades every day). "
                  "Implied volatility needs an options market, which this console does not read.")

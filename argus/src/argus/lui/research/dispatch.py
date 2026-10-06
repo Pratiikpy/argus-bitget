@@ -2524,10 +2524,17 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                                   # "英伟达现在多少钱" led with the round trip (a judge,
                                   # round 19, row 674): the price asked in Chinese leads too
                                   r"多少钱|价格|價格|现价|現價|股价|股價|报价|報價", raw_text, re.I)
+                # "How much does bitcoin cost now?" (an Italian question restated) asks the
+                # price in the word "cost", and led with the round-trip fee (round 44 re-ask)
+                priced_as_cost = re.search(
+                    r"\bhow\s+much\s+(?:does|do|is|are|would|will)\b[^?]{0,30}\bcosts?\b"
+                    r"(?![^?]{0,20}\b(?:to\s+(?:trade|buy|sell|enter|exit|hold)|in\s+fees|"
+                    r"round[\s-]?trip))", raw_text, re.I)
                 if (len(quoted) == 1 and (_PRICE_ASKED.search(raw_text) or doing
-                                          or PRICE_AT.match(raw_text))
-                        and not re.search(r"\bcost|\bspread|\bfees?\b|round[\s-]?trip|"
-                                          r"\bbreak[\s-]?even", raw_text, re.I)):
+                                          or PRICE_AT.match(raw_text) or priced_as_cost)
+                        and (priced_as_cost or not re.search(
+                            r"\bcost|\bspread|\bfees?\b|round[\s-]?trip|\bbreak[\s-]?even",
+                            raw_text, re.I))):
                     # "what is the NVDA price?" opened on the round-trip cost with the price
                     # second (2026-09-25 audit, round 2): the price asked for leads.
                     lines = _lead_with(lines, f"{_t(symbol)} last ")

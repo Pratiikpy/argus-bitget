@@ -312,6 +312,21 @@ class TestReAskFixes:
         assert re.search(r"ETH trading at 26:15 UTC", source)
 
 
+class TestLiveReAskFixes:
+    def test_a_named_window_is_the_volatility_window(self) -> None:
+        from argus.lui.research.quick_stats import REALISED_VOL, _window
+
+        asked = "How volatile has SOL been over the past 14 days?"
+        assert REALISED_VOL.search(asked) and _window(asked) == 14
+        assert _window("How volatile has SOL been over the past -14 days?") == 14
+        assert REALISED_VOL.search("how volatile is SOL") is None
+
+    def test_how_much_does_it_cost_is_a_price(self) -> None:
+        source = (Path(__file__).resolve().parents[1] / "src" / "argus" / "lui" / "research"
+                  / "dispatch.py").read_text(encoding="utf-8")
+        assert "priced_as_cost" in source
+
+
 class TestLanguages:
     @pytest.mark.parametrize(("text", "code"), [
         ("Qual è il prezzo del bitcoin oggi?", "it"),
