@@ -85,6 +85,12 @@ def _px(value: float) -> str:
 
     return f"{value:.{min(12, 3 - floor(log10(value)))}f}"
 
+
+def price_text(value: float) -> str:
+    """A price as the answers write it: two decimals, or four significant figures under 1."""
+    return _px(value)
+
+
 def asked_period(text: str, now: datetime | None = None) -> Period | None:
     """The period a question names, or None when it names none."""
     now = now or datetime.now(UTC)
@@ -398,7 +404,7 @@ def _day_lines(symbols: tuple[str, ...], period: Period) -> list[str] | None:
     lead = rows[0]
     lines = [f"Bottom line: {lead[0]} moved {lead[5]:+.1%} {period.said}, open to close, and "
              f"travelled {lead[6]:.1%} from its low to its high."]
-    lines += [f"{n}: opened {o:,.4g}, closed {c:,.4g}, high {h:,.4g}, low {lo:,.4g} "
+    lines += [f"{n}: opened {_px(o)}, closed {_px(c)}, high {_px(h)}, low {_px(lo)} "
               f"({chg:+.1%} open to close; {rng:.1%} low to high)."
               for n, o, c, h, lo, chg, rng in rows]
     lines.append("Data: Bitget USDT-futures daily candle for that UTC day (00:00 to 24:00 UTC).")

@@ -577,6 +577,9 @@ def is_us_equity(symbol: str) -> bool:
 
 
 _NEWS = re.compile(
+    # "what's the latest on ON and NOW" was read as a rates question (round 44 hostile)
+    r"\b(?:the\s+)?latest\s+(?:on|with|about|for)\s+(?:\$?[A-Z]{1,5}\b|[A-Z][a-z]+)|"
+    r"\bwhat'?s\s+new\s+(?:with|on|at)\b|"
     r"\b(?:news|headlines?|catalysts?|press\s+release|8-k|what'?s\s+(?:going\s+on|happening)\s+"
     r"with|what\s+happened\s+(?:to|with)\s+\w+\s+(?:today|this\s+week|yesterday)|why\s+(?:is|did|"
     r"has|was|are|were)\s+(?:\S+\s+){1,4}?(?:drop|fall|fell|dump|crash|tank|rall|jump|pump|"
@@ -1344,6 +1347,12 @@ def _read(text: str) -> dict[str, str]:
             continue
         if hit is not None and hit[0] not in found:
             found[hit[0]] = hit[1]
+    for word in cued_word_tickers(text):
+        from argus.market import universe
+
+        cued = universe.resolve(word)
+        if cued is not None and cued[0] not in found:
+            found[cued[0]] = cued[1]
     return found
 
 
@@ -1377,6 +1386,55 @@ _CUE_AFTER = re.compile(
 _CUE_BEFORE = re.compile(
     r"(?:\$|\b(?:buy|sell|short|long|hold|own|about|of|on|price\s+of|chart\s+of|and|or|vs)\s+)$",
     re.I)
+
+
+def is_prose_word(ticker: str) -> bool:
+    """Whether ``ticker`` is also an ordinary capitalised word ("NOW", "ON", "ALL"), so a text
+    match on it must be case-sensitive."""
+    upper = ticker.upper()
+    return upper in _NOT_A_NAME or upper in PROSE_FIRST
+
+
+_WORD_TICKER_BEFORE = re.compile(
+    r"(?:\$|\b(?:latest\s+on|news\s+(?:on|for|about)|how\s+is|how'?s|price\s+of|chart\s+of|"
+    r"shares\s+of|stock\s+of|earnings\s+(?:for|of)|ticker)\s+)$", re.I)
+_WORD_TICKER_AFTER = re.compile(
+    r"\s*(?:stock|shares|earnings|ticker|'s\s+(?:stock|shares|earnings|price))\b"
+    # "the US stock market" is a country's market, not a ticker beside its stock
+    r"(?!\s+(?:market|exchange|index|futures|session|hours))", re.I)
+
+
+_NEVER_CUED: Final = frozenset({
+    "I", "A", "USD", "USDT", "ETF", "IPO", "SEC", "US", "UK", "EU", "HK", "ME", "MY", "IT", "IS",
+    "AT", "TO", "IN", "OF", "BE", "DO", "GO", "SO", "UP", "IF", "BY", "AN", "AS", "OR", "AND",
+    "THE", "WE", "NO", "YES", "OK"})
+"""Words a ticker's surroundings never make a ticker: "the US stock market" is a country."""
+
+
+def cued_word_tickers(text: str) -> list[str]:
+    """Capitalised words that are also tickers, written where only a ticker fits: "the latest on
+    ON and NOW", "How is ALL doing today?", "NOW stock". They are prose in :data:`_NOT_A_NAME`
+    ("buy NOW", "sell ALL of it"), so only a ticker's own surroundings make them names: NOW was
+    dropped from "the latest on ON and NOW" and ALL was answered with the desk's record (round 44
+    hostile, minors 1 and 8). Joined to a cued ticker by "and", a second word counts too."""
+    if _shouting(text):
+        return []
+    out: list[str] = []
+    for m in re.finditer(r"\b[A-Z]{2,5}\b", text):
+        word = m.group(0)
+        if word not in _NOT_A_NAME or word in _NEVER_CUED:
+            continue
+        before = text[max(0, m.start() - 24):m.start()]
+        joined = re.search(r"\b([A-Z]{2,5})\s+(?:and|or|&)\s+$", before)
+        if (_WORD_TICKER_BEFORE.search(before) or _WORD_TICKER_AFTER.match(text[m.end():])
+                or (joined is not None and (joined.group(1) in out
+                                            or joined.group(1) not in _NOT_A_NAME))):
+            from argus.lui.question import listed_on_bitget
+            from argus.market.company_names import names_for, sec_registered
+
+            if listed_on_bitget(word) or sec_registered(word) or names_for(word):
+                out.append(word)
+    return list(dict.fromkeys(out))
 
 
 def _ticker_cue(text: str, start: int, end: int) -> bool:
@@ -2952,17 +3010,23 @@ def _mandate_lines(symbol: str, size: float, raw_series: Mapping[str, Mapping[da
     return lines
 
 
-_SCIENTIFIC = re.compile(r"(?<![\w.])(\d+(?:\.\d+)?)[eE]\+?(\d{1,2})\b")
+_SCIENTIFIC = re.compile(r"(?<![\w.])(\d+(?:\.\d+)?)[eE]([+-]?\d{1,2})\b")
 
 
 def parse_notional(text: str) -> Decimal | None:
     # "5e4 USD" is 50,000 (a hostile review, round 36): written out before the reader below
-    text = _SCIENTIFIC.sub(lambda m: f"{Decimal(m.group(1)) * 10 ** int(m.group(2)):f}", text)
+    text = _SCIENTIFIC.sub(
+        lambda m: f"{Decimal(m.group(1)) * Decimal(10) ** int(m.group(2)):f}", text)
     best: Decimal | None = None
     for match in _NOTIONAL.finditer(text):
         digits, unit = match.group(1), (match.group(2) or "").lower()
         whole = match.group(0)
         if not unit and "$" not in whole and not re.search(r"usd|dollar", whole, re.I):
+            continue
+        if re.search(r"\b(?:goes|go|going|falls?|drops?|rises?|hits?|reach(?:es)?|trades?|"
+                     r"crash(?:es)?)\s+(?:to|at)\s+\$?\s*$", text[:match.start()], re.I):
+            # "what if BTC goes to 1e-12 dollars" is a price, not the position's size: it was
+            # priced as "your $12" (round 44 hostile, minor 12)
             continue
         try:
             value = Decimal(digits.replace(",", ""))
@@ -2974,7 +3038,7 @@ def parse_notional(text: str) -> Decimal | None:
             value *= 1_000_000
         elif unit in ("bn", "billion"):
             value *= 1_000_000_000
-        if value > 0 and (best is None or value > best):
+        if value >= 1 and (best is None or value > best):
             best = value
     return best
 
@@ -5123,8 +5187,10 @@ def _prices_not_units(raw: Mapping[str, Any], text: str, notes: list[str]) -> Ma
 _BOOK_TOTAL = re.compile(
     r"(?<![\w.,])\$?(\d+(?:,\d{3})*(?:\.\d+)?)\s*(k|m|mm|mn|bn|thousand|million)?\s*"
     r"(?:usd|usdt|dollars?)?\s+(?:book|portfolio|account)\b|\b(?:book|portfolio|account)\s+"
-    r"(?:of|worth|is|=)\s*\$?(\d+(?:,\d{3})*(?:\.\d+)?)\s*(k|m|mm|mn|bn|thousand|million)?"
-    r"(?=\s*(?:usd|usdt|dollars?)?\b)(?!\s*(?:of\s+)?[A-Z]{2,6}\b)", re.I)
+    # "but my portfolio is only $8,000" (round 44 hostile, M11)
+    r"(?:of|worth|is|=)\s*(?:only\s+|just\s+|about\s+)?\$?(\d+(?:,\d{3})*(?:\.\d+)?)\s*"
+    r"(k|m|mm|mn|bn|thousand|million)?"
+    r"(?=\s*(?:usd|usdt|dollars?)?\b)(?!\s*(?:of\s+)?(?-i:[A-Z]{2,6})\b)", re.I)
 
 
 def stated_total(text: str) -> float | None:

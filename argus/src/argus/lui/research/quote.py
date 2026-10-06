@@ -9,6 +9,7 @@ from decimal import Decimal
 from typing import Any, Final
 
 from argus.lui.answer import Source, plural, unlead
+from argus.lui.numbers import sig
 from argus.lui.question import (
     TRADED_SYMBOLS,
 )
@@ -246,10 +247,11 @@ def _ratio_over_time(a_sym: str, b_sym: str, days: int) -> str | None:
     low = min(series, key=lambda point: point[1])
     high = max(series, key=lambda point: point[1])
     name = f"{_t(a_sym)}/{_t(b_sym)}"
-    return (f"Over the last {plural(days, 'day')} the {name} ratio ran from {low[1]:.5g} "
+    return (f"Over the last {plural(days, 'day')} the {name} ratio ran from {sig(low[1], 5)} "
             f"({low[0]:%d %b}) "
-            f"to {high[1]:.5g} ({high[0]:%d %b}) on hourly closes; it started the window at "
-            f"{first[1]:.5g} and is {last[1]:.5g} now, {(last[1] / first[1] - 1) * 100:+.2f}%.")
+            f"to {sig(high[1], 5)} ({high[0]:%d %b}) on hourly closes; it started the window at "
+            f"{sig(first[1], 5)} and is {sig(last[1], 5)} now, "
+            f"{(last[1] / first[1] - 1) * 100:+.2f}%.")
 
 
 def _quote_extras(raw_text: str, quoted: list[tuple[str, Any]],
@@ -372,7 +374,7 @@ def _quote_extras(raw_text: str, quoted: list[tuple[str, Any]],
         if worth:
             units = worth / float(ticker.last)
             text = (f"{how}${worth:,.0f} of {base} at Bitget's last {ticker.last} is about "
-                    f"{units:,.4g} {base} — on the perpetual, where a size is a quantity of the "
+                    f"{sig(units, 4)} {base} — on the perpetual, where a size is a quantity of the "
                     f"underlying, not whole shares.")
         else:
             text = (f"{base} is {ticker.last} on Bitget; name the amount — \"how many {base} is "
@@ -414,7 +416,7 @@ def _quote_extras(raw_text: str, quoted: list[tuple[str, Any]],
     if len(quoted) >= 2 and _RATIO_Q.search(raw_text):
         (a_sym, a), (b_sym, b) = quoted[0], quoted[1]
         ratio = float(a.last) / float(b.last)
-        text = (f"The {_t(a_sym)}/{_t(b_sym)} ratio is {ratio:,.4g} on Bitget right now "
+        text = (f"The {_t(a_sym)}/{_t(b_sym)} ratio is {sig(ratio, 4)} on Bitget right now "
                 f"({a.last} over {b.last}).")
         lines.append(text)
         lead = lead or text
@@ -472,9 +474,10 @@ def _quote_extras(raw_text: str, quoted: list[tuple[str, Any]],
             span_label = "this year" if this_year else "the past year"
             if base_close:
                 move = (float(sub_ticker.last) / base_close - 1) * 100
-                text = (f"{_t(anchor)} made its high of {span_label}, {float(top.high):,.6g}, on "
+                high_said = sig(float(top.high), 6)
+                text = (f"{_t(anchor)} made its high of {span_label}, {high_said}, on "
                         f"{top.ts:%d %b %Y}; since then {_t(subject)} has moved {move:+.2f}%, from "
-                        f"{base_close:,.6g} to {sub_ticker.last} ({via}).")
+                        f"{sig(base_close, 6)} to {sub_ticker.last} ({via}).")
                 sources.append(Source(kind="venue", ref="bitget /api/v3/market/candles",
                                       detail=f"{anchor}, {subject} daily, one year"))
             else:

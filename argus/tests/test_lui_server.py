@@ -654,7 +654,11 @@ class TestAScriptThePatternsDoNotRead:
         monkeypatch.setattr(server, "_router", lambda: None)
         payload = server.handle_ask("अभी NVDA की कीमत क्या है?", [])
         assert payload["refused"] is True and payload["reason"] == "unread language"
-        assert "will not guess" in payload["lines"][0]
+        # the refusal in the question's own language leads (round 44 newcomer), the English
+        # follows, and neither guesses at the name
+        assert payload["lines"][0].startswith("भाषा")
+        assert "will not guess" in payload["lines"][1]
+        assert "NVDA" not in payload["lines"][0]
 
     def test_with_a_model_the_english_reading_is_answered_and_shown(
             self, monkeypatch: pytest.MonkeyPatch) -> None:

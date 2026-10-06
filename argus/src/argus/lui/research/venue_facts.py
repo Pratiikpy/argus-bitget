@@ -40,6 +40,7 @@ import re
 from collections.abc import Sequence
 from typing import Any, Final
 
+from argus.lui.numbers import sig
 from argus.lui.trace import trace_module
 
 FUNDING_Q: Final = re.compile(
@@ -475,7 +476,7 @@ def levels_lines(text: str) -> list[str] | None:
         if ticker is None:
             continue
         last = float(ticker.last)
-        shown = f"{last:,.2f}" if last >= 1 else f"{last:.4g}"
+        shown = f"{last:,.2f}" if last >= 1 else f"{sig(last, 4)}"
         name = symbol.removesuffix("USDT")
         what = ("Bitget's S&P 500 index perpetual — not the CME futures contract, which this "
                 "console does not read" if symbol == "SP500USDT" else

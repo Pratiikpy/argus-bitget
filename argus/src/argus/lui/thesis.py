@@ -57,6 +57,7 @@ from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from typing import Any
 
+from argus.lui.numbers import sig
 from argus.truth import http
 from argus.truth.endpoints import BITGET_API
 from argus.truth.failures import RpcError
@@ -584,8 +585,8 @@ def _ratio_extreme(reason: Reason) -> Tested:
     short = f" ({window} days is the most Bitget's daily history holds)" if asked > window else ""
     return Tested(
         reason.text, reason.kind, Result.SUPPORTED if near else Result.CONTRADICTED,
-        f"The {label} ratio is {now:.5g} now against a {window}-day range of {low:.5g} to "
-        f"{high:.5g}{short} — {place:.0%} of the way up that range, so it is "
+        f"The {label} ratio is {sig(now, 5)} now against a {window}-day range of {sig(low, 5)} to "
+        f"{sig(high, 5)}{short} — {place:.0%} of the way up that range, so it is "
         f"{'' if near else 'not '}near the {'low' if wants_low else 'high'} "
         f"(within 20% of it counts as near).",
         evidence=tuple(Finding(f"{s.removesuffix('USDT')} daily closes, Bitget",

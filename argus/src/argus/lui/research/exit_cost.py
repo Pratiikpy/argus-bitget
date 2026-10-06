@@ -25,6 +25,7 @@ import re
 from decimal import Decimal
 from typing import Final
 
+from argus.lui.numbers import sig
 from argus.lui.trace import trace_module
 
 ASKED: Final = re.compile(
@@ -76,7 +77,7 @@ def _size(text: str, book: str, symbol: str) -> tuple[Decimal, str] | None:
 
 
 def _px(value: Decimal) -> str:
-    return f"{value:,.2f}" if value >= 100 else f"{value:,.4g}"
+    return f"{value:,.2f}" if value >= 100 else f"{sig(float(value), 4)}"
 
 
 def lines(text: str, book: str = "") -> list[str] | None:

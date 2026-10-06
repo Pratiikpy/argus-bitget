@@ -60,6 +60,10 @@ ASKED_PUT: Final = re.compile(
     r"\d\s*%\s*(?:otm|out[\s-]of[\s-]the[\s-]money)\s+puts?\b|"
     r"\bputs?\b[^?]{0,40}\b(?:cost|price|premium)\b", re.I)
 ASKED_CALL: Final = re.compile(
+    # "I own 500 shares of AAPL. How can I generate income with options on it?" is the covered
+    # call, and got a straddle and a perpetual page (round 44 judge, M6)
+    r"\b(?:income|yield|premium)\b[^?]{0,40}\boptions?\b|\boptions?\b[^?]{0,40}\b(?:income|"
+    r"generate\s+(?:some\s+)?(?:cash|yield))\b|"
     r"\bcovered\s+calls?\b|\b(?:sell|selling|sold|write|writing|short)\s+(?:a\s+|an\s+)?"
     r"(?:[a-z-]+\s+)?calls?\b|"
     r"\bcalls?\b[^?]{0,30}\d\s*%\s*(?:above|over|otm|out[\s-]of[\s-]the[\s-]money)|"
@@ -437,6 +441,18 @@ def lines(text: str, prior: Sequence[str] = (), *, today: date | None = None) ->
     return out
 
 
+def atm_iv(chain: Chain, days: int = DEFAULT_DAYS) -> float | None:
+    """The at-the-money implied volatility at the listed expiry nearest ``days`` out, or None."""
+    today = datetime.now(UTC).astimezone(NEW_YORK).date()
+    expiries = sorted({c.expiry for c in chain.contracts if c.quoted and (c.expiry - today).days
+                       >= 1})
+    if not expiries:
+        return None
+    expiry = min(expiries, key=lambda e: abs((e - today).days - days))
+    found = _atm(chain, expiry)
+    return found[1] if found else None
+
+
 def load_chain(ticker: str) -> Chain:
     """The stock's delayed Cboe chain, for the spread reader; raises :class:`ChainUnavailable`."""
     return _load(ticker)
@@ -447,5 +463,5 @@ def ticker_asked(text: str, prior: Sequence[str] = ()) -> str | bool | None:
     return _ticker(text, prior)
 
 
-__all__ = ["ASKED_CALL", "ASKED_IV", "ASKED_PUT", "Chain", "ChainUnavailable", "lines",
+__all__ = ["ASKED_CALL", "ASKED_IV", "ASKED_PUT", "Chain", "ChainUnavailable", "atm_iv", "lines",
            "load_chain", "ticker_asked"]

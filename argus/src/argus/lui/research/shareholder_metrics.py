@@ -1136,6 +1136,13 @@ def asks(text: str) -> bool:
 def _plan(text: str) -> tuple[list[str], list[str], list[tuple[str, str]]] | None:
     if _WHY.search(text) or not CUE.search(text):
         return None
+    if re.search(r"\b(?:leverage[ds]?|\d+(?:\.\d+)?\s*x\b|liquidat\w*|isolated|cross\s+margin|"
+                 r"margin\s+(?:call|ratio|requirement|of\s+\$?\d)|\$?\d[\d,]*\s*(?:of\s+)?margin)",
+                 text, re.I):
+        # "10x leverage with 100% margin on my BTC long — liquidation price?" is trading margin,
+        # not a profit margin, and was answered "Bitcoin has no income statement" (round 44
+        # hostile, M2)
+        return None
     metrics = asked_metrics(text)
     if not metrics:
         return None

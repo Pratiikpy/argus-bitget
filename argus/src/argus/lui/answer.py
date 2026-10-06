@@ -376,6 +376,18 @@ def answer_performance(ledger: PaperLedger, question: Question) -> Answer:
             lines.insert(2 if grading else 1, reasons)
             sources.append(Source("artefact", "refusal_reasons.json",
                                   "refusal reasons checked against the record"))
+    asked = re.search(r"\b(?:last|past|over|in)\s+(?:the\s+)?(?:last\s+|past\s+)?(\d{1,4})\s*"
+                      r"(days?|weeks?|months?)\b", question.raw, re.I)
+    if asked is not None and lang == "en":
+        unit = asked.group(2).lower()
+        span = int(asked.group(1)) * (7 if unit.startswith("week") else
+                                      30 if unit.startswith("month") else 1)
+        if span > perf.window_days:
+            # "Sharpe and hit rate over the last 90 days" was answered over 24 without saying
+            # the 90 could not be met (round 44 hostile, minor 6)
+            lines.insert(1, f"The {asked.group(1)} {unit} asked cannot be met: the record is "
+                            f"{plural(perf.window_days, 'day')} long, so every figure here is over "
+                            f"those {perf.window_days} days, the whole record.")
     for entry in [e for e in ledger.entries if e.is_settled and not e.is_abstention][:3]:
         sources.append(_src(entry))
     elsewhere = t("perf.agent_elsewhere", lang)
@@ -1062,6 +1074,9 @@ def answer_risk_control(ledger: PaperLedger, question: Question) -> Answer:
             f"The model rewrote its own intent after {report.responded} of those interventions "
             f"rather than repeating it."
         )
+    lead = _risk_window_lead(question.raw, path, report) if lang == "en" else None
+    if lead:
+        lines = [*lead, *lines]
     violations = report.asymmetry_violations
     lines.append(
         f"Asymmetry: {len(violations)} case(s) where the layer increased exposure. "
@@ -1081,6 +1096,60 @@ def answer_risk_control(ledger: PaperLedger, question: Question) -> Answer:
         ],
         data=report.as_dict(),
     )
+
+
+_RISK_WINDOW = re.compile(
+    r"\b(?:last|past|this)\s+(?:(?P<n>\d{1,4})\s+)?(?P<u>days?|weeks?|months?)\b", re.I)
+
+
+def _risk_window_lead(raw: str, path: Any, report: Any) -> list[str] | None:
+    """The count asked for, over the window asked for: "What did the risk layer do last week,
+    and how many trades did it block in the last 90 days?" got the all-time audit with neither
+    window said (round 44 hostile, minor 13). Each window named is counted from the risk records'
+    own timestamps; one longer than the record says so."""
+    from datetime import UTC, datetime, timedelta
+
+    from argus.eval.riskaudit import read_records
+    from argus.paper.corrections import is_voided
+
+    if not (_RISK_WINDOW.search(raw) or re.search(r"\bhow\s+many\b|\bblock\w*\b|\bstopp?\w*\b",
+                                                   raw, re.I)):
+        return None
+    rows = read_records(path)
+    stamps = []
+    for row in rows:
+        try:
+            stamps.append((datetime.fromisoformat(str(row["at"])), row))
+        except (KeyError, ValueError):
+            continue
+    if not stamps:
+        return None
+    first, last = min(s for s, _ in stamps), max(s for s, _ in stamps)
+    record_days = max(1, (last - first).days + 1)
+    now = datetime.now(UTC)
+    said: list[str] = []
+    for m in _RISK_WINDOW.finditer(raw):
+        unit = m.group("u").lower()
+        n = int(m.group("n") or 1)
+        days = n * (7 if unit.startswith("week") else 30 if unit.startswith("month") else 1)
+        inside = [r for s, r in stamps if s >= now - timedelta(days=days)]
+        # a voided row is still a decision, but never offered a position (`eval/riskaudit.py`)
+        offered = sum(1 for r in inside if str(r.get("quantity_before", "0")) not in
+                      ("0", "0.0", "") and not is_voided(int(r.get("seq", 0))))
+        blocked = sum(1 for r in inside if r.get("intervened"))
+        span = f"the last {plural(n, unit.rstrip('s'))}" if m.group("n") else f"the last {unit}"
+        longer = (f" — longer than the risk records, which start {first:%d %b %Y} "
+                  f"({record_days} days), so this is all of them" if days > record_days else "")
+        said.append(f"over {span}{longer}: {len(inside)} decisions, {offered} proposing a "
+                    f"position, {blocked} blocked or shrunk")
+    if not said:
+        blocked_all = len(report.interventions)
+        said.append(f"over the whole record ({first:%d %b} to {last:%d %b %Y}): "
+                    f"{report.decisions} decisions, {report.positions_offered} proposing a "
+                    f"position, {blocked_all} blocked or shrunk")
+    return [f"Bottom line: the risk layer — {'; '.join(said)}. It had almost nothing to block "
+            f"because the desk proposed almost nothing: every other decision was already "
+            f"no trade before the risk layer saw it."]
 
 
 _ANSWERERS = {

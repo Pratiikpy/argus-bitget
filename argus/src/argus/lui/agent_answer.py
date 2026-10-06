@@ -17,6 +17,7 @@ from collections.abc import Callable, Mapping
 from typing import Any
 
 from argus.lui.agent_record import RECORD, fetch_json
+from argus.lui.numbers import sig
 from argus.lui.trace import trace_module
 from argus.truth.source import Source
 
@@ -92,7 +93,7 @@ def breaker_answer(fetch: Callable[[str], Any] = fetch_json
     draw, draw_limit = held.get("drawdown_pct"), limits.get("breaker_reduce_only_drawdown_pct")
     if draw is not None and draw_limit is not None:
         trips.append((abs(draw) >= draw_limit,
-                      f"a {abs(draw):.3g}% drawdown against its {draw_limit:g}% line"))
+                      f"a {sig(abs(draw), 3)}% drawdown against its {draw_limit:g}% line"))
     fired = [what for hit, what in trips if hit]
     clear = [what for hit, what in trips if not hit]
     lead = ("Bottom line: the Track 2 agent's breaker is on because of "

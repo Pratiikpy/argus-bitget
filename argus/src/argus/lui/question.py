@@ -560,6 +560,14 @@ _NOT_A_TICKER = frozenset({
     "OK", "NO", "YES", "WHY", "HOW", "AND", "OR", "THE", "ARGUS", "IT", "WE", "Q", "FY",
     "FOMC", "FED", "CPI", "PPI", "GDP", "PCE", "NFP", "ECB", "BOJ", "PMI", "ETF", "IPO", "CEO",
     "RSI", "MACD", "ATR", "DXY", "VIX", "YTD", "EOD", "ATH",
+    # exchanges: "BTC's close on the NYSE" listed NYSE as an unknown ticker (round 44 hostile)
+    "NYSE", "NASDAQ", "LSE", "TSX", "HKEX", "SSE", "SZSE", "JPX", "TSE",
+    # a newcomer's vocabulary: "what is an ICO" named ICO as an unknown ticker (round 44). NFT
+    # and RWA are Bitget spot tokens too, but in a question they are almost always the word;
+    # STO is left out because it is a listed perpetual.
+    "ICO", "IDO", "IEO", "NFT", "DAO", "KYC", "AML", "P2P", "DCA", "SIP", "FOMO", "FUD", "HODL",
+    "DYOR", "DEFI", "LP", "AMM", "MEV", "RWA", "OTC", "CBDC", "TPS", "OTP", "SMS", "API", "PIN",
+    "VPN", "IRA", "ISA", "FTC", "FBI", "FCA", "HMRC", "IRS", "CFTC", "EVM",
     "OWNED", "TIED", "LOST", "IMPLEMENTED", "PASS", "FAIL", "PENDING", "BLOCKED",
 })
 """Capitalised tokens that are words, units or our own vocabulary rather than instruments."""
@@ -905,6 +913,13 @@ def someone_elses_holdings(raw: str) -> str | None:
 
 
 _PATTERNS: tuple[tuple[str, Intent], ...] = (
+    # "How many trades did the risk layer block in the last 90 days?" names the risk layer and
+    # what it did; "how many trades" alone sent it to the track record (round 44 hostile, minor
+    # 13). The layer named beside a block, a stop or a refusal is its own question.
+    (r"\b(?:risk\s*(?:layer|gate|engine|controls?)|constitution|guardrails?)\b[^?]{0,60}"
+     r"\b(?:block\w*|stopp?\w*|refus\w*|reject\w*|interven\w*|do|did|does|veto\w*)\b|"
+     r"\b(?:block\w*|stopp?\w*|refus\w*|reject\w*|veto\w*)\b[^?]{0,40}\b(?:risk\s*(?:layer|gate|"
+     r"engine|controls?)|constitution|guardrails?)\b", Intent.RISK_CONTROL),
     # A track-record question is a performance question whatever else it asks: "What is your
     # track record? How many trades have you made?" was claimed by the decision-list pattern on
     # "how many trades" and answered with a count (a judge's probe, 2026-09-24).

@@ -28,6 +28,7 @@ from datetime import UTC, datetime
 from typing import Any, Final
 
 from argus.lui.answer import Source
+from argus.lui.numbers import sig
 
 _TVL = re.compile(r"\b(?:tvl|total\s+value\s+locked|top\s+defi|defi\s+(?:protocols?|ranking|"
                   r"leaders|rankings)|biggest\s+defi)\b", re.I)
@@ -265,8 +266,8 @@ def gas(text: str, *, route: Route | None = None,
         dollars = transfer_eth * float(eth.last)
         usd = (f" (about ${dollars:,.2f}" if dollars >= 0.01 else f" (under a cent, ${dollars:.4f}"
                ) + f" at Bitget's ETHUSDT {float(eth.last):,.0f})"
-    lines = [f"Bottom line: Ethereum's base fee is {base:,.3g} gwei and the median tip "
-             f"{median_tip:,.3g} gwei, so a plain ETH transfer costs about "
+    lines = [f"Bottom line: Ethereum's base fee is {sig(base, 3)} gwei and the median tip "
+             f"{sig(median_tip, 3)} gwei, so a plain ETH transfer costs about "
              f"{_plain(transfer_eth)} ETH{usd}; contract calls use several times that gas."]
     if tips:
         lines.append(f"Tips paid in the latest block: {float(tips.get('low') or 0):,.3g} gwei at "

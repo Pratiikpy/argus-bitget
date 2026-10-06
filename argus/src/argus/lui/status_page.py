@@ -405,7 +405,8 @@ def _uptime_rows(history: list[dict[str, Any]] | None, now: float) -> str:
                else f"{u[label]['uptime']}% of {u[label]['probes']}") + "</td>"
             for label, _ in WINDOWS) + "</tr>"
         for u in uptime(history, now=datetime.fromtimestamp(now, UTC)))
-    heads = "".join(f"<th scope='col'>{esc(label)}</th>" for label, _ in WINDOWS)
+    # numeric columns: the header sits over its right-aligned values (round 44 visual, minor 5)
+    heads = "".join(f"<th scope='col' class='n'>{esc(label)}</th>" for label, _ in WINDOWS)
     newest = esc(str(history[-1].get("at", ""))[:16].replace("T", " "))
     chain = ("the history's hash chain holds" if broken is None
              else f"the history's hash chain is BROKEN ({esc(broken)})")
@@ -468,6 +469,7 @@ def render(status: dict[str, Any], checks: list[Check], checked_at: float,
  tbody tr:first-child td {{ border-top:0 }}
  .ok {{ color:var(--good); font-weight:600 }} .bad {{ color:var(--bad); font-weight:600 }}
  .n {{ font-family:var(--mono); color:var(--dim); white-space:nowrap; text-align:right }}
+ th.n {{ text-align:right }}
  a {{ color:var(--accent) }}
  @media (max-width:640px) {{
    table, tbody, tr, td {{ display:block; width:100% }}
@@ -495,8 +497,8 @@ you do not need them to use the console.</p>
 </div>
 <h2>Checked now</h2>
 <div class="tbl"><table><thead><tr><th scope="col">Surface</th><th scope="col">Checked</th>
-<th scope="col">Result</th><th scope="col">Detail</th><th scope="col">Time</th></tr></thead>
-<tbody>{rows}</tbody></table></div>
+<th scope="col">Result</th><th scope="col">Detail</th><th scope="col" class="n">Time</th>
+</tr></thead><tbody>{rows}</tbody></table></div>
 <h2>Over time</h2>
 {_uptime_rows(history, checked_at)}
 <h2>Last full sweep</h2>

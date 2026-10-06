@@ -35,6 +35,8 @@ from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any, Final
 
+from argus.lui.numbers import sig
+
 ASKED: Final = re.compile(
     r"\b(?:compare|comparison|versus|vs\.?|or)\b[^?]{0,80}\b(?:spot|perp\w*|futures?|options?|"
     r"calls?|leverage[d]?)\b[^?]{0,60}\b(?:spot|perp\w*|futures?|options?|calls?|leverage[d]?)\b|"
@@ -219,7 +221,7 @@ def _crypto_call(name: str, notional: float, spot: float) -> tuple[Row, float] |
     up = max(up_price - strike, 0.0) * coins - cost
     row = Row(way=f"{name} call on Deribit, {strike:,.0f} strike, {expiry:%d %b}",
               capital=cost, carry=cost, fees=None, up=up, down=-cost,
-              note=f"loss capped at the premium; {coins:.3g} {name} of exposure; breakeven "
+              note=f"loss capped at the premium; {sig(coins, 3)} {name} of exposure; breakeven "
                    f"{strike + premium:,.0f} at expiry; Deribit mark price and implied "
                    f"volatility {iv:.0f}%, its fee not read here; this console reads no Bitget "
                    f"option chain")

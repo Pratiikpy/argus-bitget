@@ -51,13 +51,17 @@ _SPLIT = re.compile(
     r"(?<=[?.!;])\s+(?=\S)|\s*;\s*|\s+(?:and\s+)?then\s+(?=(?:what|how|is|are|should|can|tell|"
     r"show|give|split|hedge|compare|stress|check|run)\b)|\s+(?:and\s+)?also\s+(?=(?:what|how|is|"
     r"are|should|can|tell|show|give)\b)|,?\s+and\s+(?=(?:what|how|is|are|should|can|where|when|"
-    r"which|will|does|do)\b)", re.I)
+    r"which|will|does|do)\b)|"
+    # "compare NVDA and TSLA: which is riskier, when does each report earnings": questions in a
+    # list after a colon, each its own part (round 44 visual audit, major 1)
+    r"(?<=[a-z0-9]),\s+(?=(?:when|where|which|what|how)\s+(?:is|are|does|do|did|will|would|has|"
+    r"have|was)\b)", re.I)
 
 
 _HOLDINGS_ONLY = re.compile(
     # "I am short $50,000 of NVDA." split off and the move lost its dollars (round 22)
     r"^\s*(?:i\s+(?:hold|own|have)|i(?:'?m|\u2019m|\s+am)\s+(?:long|short)|my\s+(?:book|portfolio|"
-    r"holdings)\s+"
+    r"holdings|account)\s+"
     r"(?:is|are)|"
     # "I want to short TSLA." states the trade the next part asks about; split off, its side was
     # lost and a short got a long's liquidation price (a hostile review, round 19, row 646)
@@ -185,7 +189,19 @@ def parts(question: str, book: str = "") -> list[Part] | None:
     seen: set[tuple[Any, ...]] = set()
     earlier: list[str] = []
     for piece in pieces:
-        request = with_book(detect(piece) or detect(_formal(piece)), book, piece)
+        before = research_symbols(" ".join(earlier))[0] if earlier else ()
+        piece_book = book
+        if len(before) >= 2 and not research_symbols(piece)[0]:
+            # "…when does each report earnings, and what is the VaR of a 50/50 mix?" named NVDA
+            # and TSLA once, up front: "each" ran on NVDA alone and the 50/50 mix asked for
+            # holdings already given (round 44 visual audit, major 1)
+            a, b = (n.removesuffix("USDT") for n in before[:2])
+            mix = re.search(r"\b(\d{1,2})\s*/\s*(\d{1,2})\b", piece)
+            if mix and int(mix.group(1)) + int(mix.group(2)) == 100:
+                piece_book = f"{mix.group(1)}% {a}, {mix.group(2)}% {b}"
+            elif re.search(r"\b(?:each|both|they|them|their|the\s+two)\b", piece, re.I):
+                piece = f"{piece} ({a} and {b})"
+        request = with_book(detect(piece) or detect(_formal(piece)), piece_book, piece)
         console_only = bool(listed and _CONSOLE_ONLY.search(piece))
         if console_only:
             request = None  # a venue fact the console's own reader answers (see _CONSOLE_ONLY)
@@ -327,14 +343,20 @@ def answer(question: str, found: list[Part], run: Any) -> tuple[list[str], list[
         carried = (f" (read as {bare_symbol(part.inherited)})"
                    if part.inherited.endswith("USDT") else
                    f" (read with {part.inherited})" if part.inherited else "")
-        body.append(f"Part {number} — “{part.text}”{carried}:")
-        # one bold lead per answer: a part's own lead is already listed above, so it is plain here
-        shown = [LEAD.sub("", line, count=1) for line in lines if not line.startswith("Data:")]
+        # A part's lead is listed once, above; its block below carries only what supports it. The
+        # lead used to appear three times — in the summary, as item 1 and again in "Part 1" —
+        # a wall of repeated text (round 44 visual audit, major 1).
+        lead_line = next((line for line in lines if bool(LEAD.match(line))), lines[0] if lines
+                         else "")
+        shown = [line for line in lines if line != lead_line and not line.startswith("Data:")
+                 and LEAD.sub("", line, count=1) != lead]
         if len(budget) > FULL_PARTS:
-            # past four parts the answer would run to a hundred lines: each part keeps its lead
-            # and the next two lines, and the full answer is one ask away
-            shown = shown[1:3]
-        body.extend(shown)
+            # past four parts the answer would run to a hundred lines: each part keeps the two
+            # lines after its lead, and the full answer is one ask away
+            shown = shown[:2]
+        if shown:
+            body.append(f"Part {number} — “{part.text}”{carried}:")
+            body.extend(shown)
         sources.extend(result.sources)
     head = (f"Bottom line: your question has {len(budget)} parts, each answered by its own "
             f"engine below" + (f"; {unread} could not be answered and say why" if unread else "")

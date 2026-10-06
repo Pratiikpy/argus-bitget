@@ -465,6 +465,12 @@ def pattern_reading_wins(request: ResearchRequest | None, text: str) -> bool:
         return False
     if request.kind in (ResearchKind.EXECUTION, ResearchKind.HEDGE, ResearchKind.EVENT):
         return True
+    if request.kind is ResearchKind.NEWS and request.symbols and re.search(
+            r"\b(?:the\s+)?latest\s+(?:on|with|about|for)\b|\bwhat'?s\s+new\s+(?:with|on|at)\b|"
+            r"\bnews\s+(?:on|for|about)\b", text, re.I):
+        # "what's the latest on NOW" was read by the kind model as a rates question (round 44
+        # hostile): the latest on a named company is its news
+        return True
     if (request.kind is ResearchKind.IMPACT and _SHOULD_I_TRADE.search(text)
             and not _HOW_TO_EXECUTE.search(text)):
         return True

@@ -28,8 +28,11 @@ GBPUSD perpetuals through `parse.in_us_dollars`. Nothing here is a forecast.
 from __future__ import annotations
 
 import re
-from datetime import date
+from datetime import date, timedelta
+from decimal import Decimal
 from typing import Any, Final
+
+from argus.lui.numbers import sig
 
 _NUM: Final = r"(\d[\d,]*(?:\.\d+)?)"
 _PER_PERIOD: Final = re.compile(
@@ -301,6 +304,71 @@ _PCT_STOP_AT: Final = re.compile(r"\b(?P<p>\d+(?:\.\d+)?)\s*%\s+stop(?:[\s-]?los
                                  r"\bat\s+\$?(?P<at>\d[\d,]*(?:\.\d+)?)", re.I)
 
 
+_RR_ASKED: Final = re.compile(
+    r"\breward[\s-]*(?:to|/|vs\.?|versus)?[\s-]*risk\b|\brisk[\s-]*(?:to|/|vs\.?|versus)?[\s-]*"
+    r"reward\b|\br\s*:\s*r\b|\brr\b|\brisk[\s-]*reward\s+ratio\b", re.I)
+_RR_STOP: Final = re.compile(
+    r"\bstop(?:[\s-]*loss)?\b(?:\s+on\s+\w+)?\s+(?:at|@|to|of)\s+\$?(?P<v>\d[\d,]*(?:\.\d+)?)\s*"
+    r"(?P<pct>%)?(?:\s+(?:below|under|away|down))?", re.I)
+_RR_TARGET: Final = re.compile(
+    r"\b(?:take[\s-]*profit|target|tp|profit\s+target)\b\s*(?:at|@|to|of)?\s+\$?"
+    r"(?P<v>\d[\d,]*(?:\.\d+)?)\s*(?P<pct>%)?(?:\s+(?:above|over|away|up|from\s+entry))?", re.I)
+
+
+def stated_reward_risk(text: str) -> list[str] | None:
+    """Reward to risk on the stop and target the trader set, never on levels the console picked:
+    "Set my stop on SOL at 0 and take profit 1000% away, what is the reward to risk?" got a fresh
+    plan with its own stop and target (round 44 hostile, C3)."""
+    if _RR_ASKED.search(text) is None:
+        return None
+    stop_m, target_m = _RR_STOP.search(text), _RR_TARGET.search(text)
+    if stop_m is None or target_m is None:
+        return None
+    from argus.lui.research.parse import last_price, research_symbols
+
+    named = research_symbols(text)[0]
+    entry_m = re.search(r"\b(?:entry|entered|bought|in)\s+(?:at\s+|of\s+)?\$?(\d[\d,]*(?:\.\d+)?)",
+                        text, re.I)
+    entry = _n(entry_m.group(1)) if entry_m else None
+    if entry is None and named:
+        try:
+            entry = float(last_price(named[0]) or 0) or None
+        except Exception:
+            entry = None
+    if not entry:
+        return None
+    short = re.search(r"\bshort\b", text, re.I) is not None
+    sign = -1 if short else 1
+    stop_v, target_v = _n(stop_m.group("v")), _n(target_m.group("v"))
+    stop = entry * (1 - sign * stop_v / 100) if stop_m.group("pct") else stop_v
+    target = entry * (1 + sign * target_v / 100) if target_m.group("pct") else target_v
+    risk, reward = sign * (entry - stop), sign * (target - entry)
+    name = named[0].removesuffix("USDT") if named else "the position"
+    basis = f"{'entry' if entry_m else 'last price on Bitget'} of {entry:,.2f}"
+    if risk <= 0:
+        return [f"Bottom line: the stop at {stop:,.2f} is on the wrong side of the {basis} for a "
+                f"{'short' if short else 'long'} — it fires at a gain, so there is no risk to "
+                f"divide by and no reward-to-risk ratio.",
+                f"A {'short' if short else 'long'} stop sits {'above' if short else 'below'} "
+                f"entry."]
+    if reward <= 0:
+        return [f"Bottom line: the target at {target:,.2f} is on the losing side of the {basis}, "
+                f"so reaching it is a loss — there is no reward to set against the risk."]
+    ratio = reward / risk
+    lines = [f"Bottom line: reward to risk is {ratio:,.1f} to 1 on the levels you set — target "
+             f"{target:,.2f} ({reward / entry:+.1%}), stop {stop:,.2f} "
+             f"({-risk / entry:+.1%}), from the {basis}."]
+    if stop <= 0 and not short:
+        lines.append(f"A stop at 0 is no stop: {name} would have to become worthless to trigger "
+                     f"it, so the whole stake is the risk — the ratio is real arithmetic but the "
+                     f"protection is none.")
+    lines.append(f"The ratio says nothing about the odds of reaching either level; a "
+                 f"{reward / entry:+.0%} target is a question of how often {name} has moved that "
+                 f"far, which is a separate ask (\"how often has {name} risen "
+                 f"{reward / entry:.0%} in a year\").")
+    return lines
+
+
 def stop_percent(text: str, prior: list[str] | None = None) -> list[str] | None:
     """A stop stated as a percentage: "my stop is 5% above entry on that long ... 85,000 entry"
     kept neither the entry nor the side and showed a fresh plan (round 43 hostile, M10); "3% stop
@@ -455,6 +523,283 @@ def funding_verdict(text: str) -> list[str] | None:
             "Not advice."]
 
 
+_HOLDING_SAID: Final = re.compile(
+    r"\b(?P<q>\d[\d,]*(?:\.\d+)?)\s+(?:shares?\s+(?:of\s+)?)?(?P<sym>[A-Za-z]{2,6})\b"
+    r"(?:\s+shares?)?", re.I)
+_TOTAL_SAID: Final = re.compile(
+    r"\b(?:for|cost(?:\s+me)?|total(?:\s+(?:cost|outlay))?(?:\s+(?:of|is|was))?|worth|valued?\s+at|paid|"
+    r"outlay(?:\s+(?:of|is|was))?|spent|invested)\s+"
+    r"\$?(?P<t>\d[\d,]*(?:\.\d+)?)\s*(?P<u>k|m)?\b(?:\s+(?:total|in\s+total|all\s+in))?"
+    r"(?!\s*(?:each|a\s+(?:share|coin)|per))", re.I)
+_UNIT_PRICE_SAID: Final = re.compile(
+    r"\b(?:at|bought\s+at|@)\s+(?:a\s+)?\$?(?P<p>\d[\d,]*(?:\.\d+)?)\s*(?P<u>k)?\s*(?:each|a\s+"
+    r"(?:share|coin)|per\s+\w+|price)?\b", re.I)
+
+
+def _signed_usd(x: float) -> str:
+    """A dollar change with its sign before the dollar: -$102, +$1,500."""
+    return f"{'-' if x < 0 else '+'}${abs(x):,.0f}"
+
+
+def position_consistency(text: str) -> list[str] | None:
+    """A position whose stated figures disagree: "0.5 BTC for $100,000 total at today's price"
+    was read as a $100,000 entry per coin, and "100 NVDA bought at $50 each, total cost $100,000"
+    and "10 BTC worth $5,000 at a $68,000 price" passed with no word (round 43 hostile, C1, C2,
+    M1). Quantity x price, the stated total and the live price are set side by side, the
+    disagreement is said, and the loss asked for is worked on the stated cost and today's value
+    rather than on a misread figure."""
+    from argus.lui.research.parse import research_symbols
+
+    # "I paid $90,000 in total for 0.25 ETH": the first number-and-word is "000 in", not a
+    # holding; the first pair whose word is a listed name is (round 44 re-ask)
+    held = next((m for m in _HOLDING_SAID.finditer(text)
+                 if research_symbols(m.group("sym"))[0]), None)
+    if held is None:
+        return None
+    # "execute the trade for 500 NVDA": the number after "for" is the quantity itself, not a
+    # total beside it, and reading it as both fetched a price for every order (suite, round 44)
+    total_m = next((m for m in _TOTAL_SAID.finditer(text)
+                    if m.start("t") != held.start("q")), None)
+    if total_m is None:
+        return None
+    found = research_symbols(held.group("sym"))[0]
+    if not found:
+        return None
+    symbol = found[0]
+    qty = _n(held.group("q"))
+    total = _n(total_m.group("t")) * {"k": 1e3, "m": 1e6}.get((total_m.group("u") or "").lower(), 1)
+    if qty <= 0 or total <= 0:
+        return None
+    price_m = _UNIT_PRICE_SAID.search(text, total_m.end()) or _UNIT_PRICE_SAID.search(text)
+    unit_price = (_n(price_m.group("p")) * (1000 if price_m.group("u") else 1)
+                  if price_m and _n(price_m.group("p")) != total else None)
+    try:
+        ticker = _ticker(symbol)
+        live = float(ticker.last) if ticker is not None else None
+    except Exception:
+        live = None
+    name = symbol.removesuffix("USDT")
+    clashes: list[str] = []
+    implied = total / qty
+    if unit_price is not None and abs(qty * unit_price / total - 1) > 0.05:
+        clashes.append(f"{qty:,.10g} {name} at {unit_price:,.2f} is ${qty * unit_price:,.0f}, not "
+                       f"the ${total:,.0f} stated")
+    if live is not None and abs(implied / live - 1) > 0.10:
+        clashes.append(f"${total:,.0f} for {qty:,.10g} {name} is {implied:,.2f} a unit, while "
+                       f"{name} is {live:,.2f} on Bitget now, so {qty:,.10g} {name} is worth "
+                       f"${qty * live:,.0f} today")
+    if not clashes:
+        return None
+    said_as = ("was worth" if re.search(r"\bworth\b|\bvalued?\b", total_m.group(0), re.I)
+               else "cost")
+    out = ["Bottom line: these figures disagree — " + "; and ".join(clashes) + "."]
+    move = re.search(r"\b(?:falls?|drops?|declines?|rises?|gains?|moves?)\s+(?:by\s+)?"
+                     r"(?P<m>\d+(?:\.\d+)?)\s*%", text, re.I)
+    if move is not None and live is not None and not re.search(
+            r"\bnasdaq|\bs&p|\bmarket\b|\bindex\b|\bqqq\b|\bspy\b", text[:move.start()], re.I):
+        pct = float(move.group("m")) / 100 * (-1 if re.search(
+            r"\b(?:falls?|drops?|declines?)\b", move.group(0), re.I) else 1)
+        after = qty * live * (1 + pct)
+        out.append(f"Worked both ways: a {pct:+.0%} move from today's {live:,.2f} takes "
+                   f"{qty:,.10g} {name} to ${after:,.0f} — {_signed_usd(after - qty * live)} on "
+                   f"today's value, and {_signed_usd(after - total)} against the ${total:,.0f} you "
+                   f"said it "
+                   f"{said_as}.")
+    elif move is not None:
+        out.append("A market or index move reaches a stock through its beta, not one for one; "
+                   "restate the position and ask again, and the move is worked through the beta.")
+    out.append("Say which figure is right — the quantity, the price or the total — and the "
+               "answer is worked on that.")
+    return out
+
+
+_LEVERAGES: Final = re.compile(r"(?<![\w.])(\d+(?:\.\d+)?)\s*x\b", re.I)
+_MARGIN_PCT: Final = re.compile(r"\b(\d+(?:\.\d+)?)\s*%\s+(?:initial\s+)?margin\b|\bmargin\s+"
+                                r"(?:is\s+|of\s+)?(\d+(?:\.\d+)?)\s*%", re.I)
+
+
+def leverage_notes(text: str) -> str:
+    """A line saying where the leverage a question states disagrees with itself: "10x leverage
+    with 100% margin" (100% margin is 1x), "$1,000 margin on 5x to hold $20,000" ($20,000 on
+    $1,000 is 20x), "3x and 2x at once", and "open interest is 50x leverage" (open interest is a
+    count of contracts, not a leverage) all passed with one figure silently used (round 44
+    hostile, M2-M4)."""
+    if not re.search(r"\bleverag\w*|\bmargin\b|\bliquidat\w*", text, re.I):
+        return ""
+    said: list[str] = []
+    levels = [float(m.group(1)) for m in _LEVERAGES.finditer(text)]
+    used = levels[0] if levels else None
+    if len(set(levels)) > 1:
+        said.append(f"two leverages are stated ({' and '.join(f'{x:g}x' for x in levels)}); a "
+                    f"position has one, so {used:g}x, the first, is the one worked")
+    margin = _MARGIN_PCT.search(text)
+    if margin is not None and used:
+        pct = float(margin.group(1) or margin.group(2))
+        if pct > 0 and abs(100 / pct - used) / used > 0.1:
+            said.append(f"{pct:g}% margin means {sig(100 / pct, 2)}x leverage, not {used:g}x — the "
+                        f"margin is the share of the position you put up")
+    sums = re.search(r"\$?(\d[\d,]*)\s*(?:of\s+)?margin\b[^?.]{0,60}?\$?(\d[\d,]*)\s+(?:of|in|"
+                     r"worth)\b|\$(\d[\d,]*)[^?.]{0,40}\bmargin\b[^?.]{0,60}?\$(\d[\d,]*)", text,
+                     re.I)
+    if sums is not None and used:
+        posted = _n(sums.group(1) or sums.group(3))
+        position = _n(sums.group(2) or sums.group(4))
+        if posted > 0 and position > posted and abs(position / posted - used) / used > 0.1:
+            said.append(f"${position:,.0f} held on ${posted:,.0f} of margin is "
+                        f"{sig(position / posted, 3)}x, not {used:g}x")
+    if re.search(r"\bopen\s+interest\s+is\s+\d+(?:\.\d+)?\s*x\b", text, re.I):
+        said.append("open interest is the number of contracts open, not a leverage")
+    if not said:
+        return ""
+    return "Check: " + "; ".join(said) + "."
+
+
+def stop_versus_liquidation(text: str) -> list[str] | None:
+    """Whether a stop fires before liquidation: "long with 20x leverage and put my stop at 1%
+    below, will I be liquidated first?" got the liquidation price with the stop never compared
+    (round 44 hostile, M14). Isolated margin, Bitget's 0.40% maintenance margin as the leverage
+    reader uses; the stop as a market order that can slip in a gap."""
+    if not re.search(r"\bliquidat\w*\b[^?]{0,40}\b(?:first|before)\b|\bstop\b[^?]{0,60}\b(?:before|"
+                     r"first)\b[^?]{0,30}\bliquidat", text, re.I):
+        return None
+    lev = _LEVERAGES.search(text)
+    stop = re.search(r"\bstop\w*\b[^?.]{0,30}?(\d+(?:\.\d+)?)\s*%\s*(?:below|under|above|"
+                     r"over|away)?", text, re.I)
+    if lev is None or stop is None:
+        return None
+    leverage, stop_pct = float(lev.group(1)), float(stop.group(1)) / 100
+    short = bool(re.search(r"\bshort\b", text, re.I))
+    liq = 1 / leverage - 0.004
+    entry_m = re.search(r"\bat\s+\$?(\d[\d,]*(?:\.\d+)?)\b", text)
+    entry = _n(entry_m.group(1)) if entry_m else None
+    first = "the stop" if stop_pct < liq else "liquidation"
+    out = [f"Bottom line: {first} comes first — at {leverage:g}x a {'short' if short else 'long'} "
+           f"is liquidated about {liq:.1%} from entry, and your stop is {stop_pct:.1%} away"
+           + (f" ({entry * (1 + stop_pct if short else 1 - stop_pct):,.2f} against liquidation "
+              f"near {entry * (1 + liq if short else 1 - liq):,.2f})" if entry else "") + "."]
+    if first == "the stop":
+        out.append(f"Hitting the stop loses about {stop_pct * leverage:.0%} of the margin "
+                   f"({stop_pct:.1%} x {leverage:g}), before fees; a fast gap can fill a market "
+                   "stop past its level, and the closer it sits to liquidation the less room "
+                   "that leaves.")
+    else:
+        out.append("A stop past the liquidation line never fires: the exchange closes the "
+                   "position first and keeps the margin. Move the stop inside, or lower the "
+                   "leverage.")
+    out.append("Isolated margin with Bitget's 0.40% maintenance margin; cross margin moves the "
+               "liquidation line by whatever else the account holds. Not advice.")
+    return out
+
+
+_WEEKDAYS: Final = ("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
+
+
+def market_open_lines(text: str, today: date | None = None) -> list[str] | None:
+    """Whether the US stock market is open on the day asked, from NYSE's holiday calendar
+    (`market.rtoken_spot.holidays`, which matches nyse.com's 2026 table exactly, checked
+    2026-10-06): "Is the stock market open on Saturday 10 October 2026?" was answered "yes" because
+    Bitget's perpetual trades at weekends, and Columbus Day was left unanswered (round 44 hostile,
+    M8, M12). A price "then" on a future day does not exist yet, and is said."""
+    m = re.search(r"\b(?:is|are|will)\s+(?:the\s+)?(?:us\s+|u\.s\.\s+|stock\s+|nyse\s+|nasdaq\s+)*"
+                  r"(?:stock\s+)?(?:market|markets|exchange|nyse|nasdaq)\s+(?:be\s+)?open\b", text,
+                  re.I)
+    if m is None:
+        return None
+    from argus.lui.journal import find_date
+    from argus.market.rtoken_spot import holidays, is_trading_day
+
+    today = today or date.today()
+    day = find_date(text[m.end():], today) or find_date(text, today)
+    named = re.search(r"\b(" + "|".join(_WEEKDAYS) + r")\b", text, re.I)
+    if day is None and named is not None:
+        ahead = (_WEEKDAYS.index(named.group(1).lower()) - today.weekday()) % 7
+        day = today + timedelta(days=ahead)
+    if day is None:
+        return None
+    open_ = is_trading_day(day)
+    reason = ("a weekend" if day.weekday() >= 5 else
+              "an NYSE holiday" if day in holidays(day.year) else "a regular trading day")
+    out = [f"Bottom line: {'yes' if open_ else 'no'} — {day:%A %d %B %Y} is {reason}, so US stock "
+           f"exchanges are {'open' if open_ else 'closed'}"
+           + (" (9:30 to 16:00 New York time)" if open_ else "")
+           + ". Bitget's stock perpetuals trade around the clock, but that is not the stock "
+             "market being open."]
+    if re.search(r"\bcolumbus|\bindigenous", text, re.I) and open_:
+        out.append("Columbus Day is a bank and bond-market holiday, not an NYSE one: stocks trade, "
+                   "the Treasury market is closed.")
+    if day > today and re.search(r"\bprice\b|\bvolume\b|\bclose\b", text, re.I):
+        out.append(f"A price or volume for {day:%d %b %Y} does not exist yet — it is in the "
+                   "future; ask for today's.")
+    out.append("Data: NYSE's published holiday calendar. Not advice.")
+    return out
+
+
+_INTERVAL: Final = re.compile(r"\b(?P<n>-?\d+(?:\.\d+)?)[\s-]*(?P<u>seconds?|secs?|s|minutes?|"
+                              r"mins?|m|hours?|h)[\s-]+(?:chart|candles?|timeframe|bars?)\b", re.I)
+_CLOCK: Final = re.compile(r"\b(?P<h>\d{1,2}):(?P<m>\d{2})\b")
+
+
+def premise_notes(text: str, today: date | None = None) -> list[str]:
+    """Premises the question states that cannot hold, each said in a line the answer leads with
+    (round 44 hostile, M5, M6, M7, M9, M10, M15, M17)."""
+    today = today or date.today()
+    said: list[str] = []
+    iv = _INTERVAL.search(text)
+    if iv is not None and re.search(r"\bchart|\bcandle|\btechnical|\brsi\b|\bmacd\b", text, re.I):
+        n, unit = float(iv.group("n")), iv.group("u").lower()
+        if n <= 0:
+            said.append(f"a {iv.group('n')}-{unit} chart is not a timeframe; the standard 4-hour "
+                        "chart is used")
+        elif unit.startswith("s"):
+            said.append(f"{n:g}-second candles are not offered (the shortest is 1 minute); the "
+                        "standard 4-hour chart is used")
+    clock = _CLOCK.search(text)
+    if clock is not None and (int(clock.group("h")) > 23 or int(clock.group("m")) > 59):
+        said.append(f"{clock.group(0)} is not a time of day (hours run 00 to 23, minutes 00 to "
+                    "59), so no price at that time is given; the day's figures follow")
+    year = re.search(r"\b(?:in\s+(?:the\s+year\s+)?)?(?P<y>19\d\d|200\d|201[0-7])\b", text)
+    if year is not None and re.search(r"\bbitget\b|\bperpetual|\bperp\b", text, re.I):
+        said.append(f"Bitget's perpetuals did not exist in {year.group('y')} (the exchange "
+                    "launched in 2018), so there is no Bitget price for that year; today's "
+                    "figures follow")
+    if re.search(r"\bdominance\b[^?]{0,30}\b(?:1\d\d|[2-9]\d\d)\s*%|\b(?:1\d\d|[2-9]\d\d)\s*%\s+"
+                 r"dominance", text, re.I):
+        said.append("a market share cannot exceed 100% — a coin is one part of the market it is "
+                    "measured against")
+    look = re.search(r"\b(?:last|past|previous|prior)\s+-\s*(\d+)\s*(days?|weeks?|months?)",
+                     text, re.I)
+    if look is not None:
+        said.append(f"a look-back cannot be negative; the minus sign is dropped and "
+                    f"{look.group(1)} {look.group(2)} back is meant")
+    huge = re.search(r"\b10\s*\^\s*\$?(\d{2,})|\b1e\+?(\d{2,})\b", text, re.I)
+    if huge is not None and re.search(r"\bbtc\b|\bbitcoin\b", text, re.I) and re.search(
+            r"\bmarket\s+cap|\breach|\bif\b", text, re.I):
+        power = int(huge.group(1) or huge.group(2))
+        said.append(f"at 10^{power} dollars a coin, Bitcoin's roughly 20.1 million coins would be "
+                    f"worth about 2 x 10^{power + 7} dollars — a hypothetical with no market "
+                    "behind it; today's value follows")
+    to_tiny = re.search(r"\b(?:goes|go|falls?|drops?|crash(?:es)?|hits?|reach(?:es)?|trades?)\s+"
+                        r"(?:to|at)\s+\$?(?P<p>(?:\d+(?:\.\d+)?)?e-\d+|0\.0{5,}\d+)\s*(?:dollars?"
+                        r"|usd|\$)?", text, re.I)
+    if to_tiny is not None:
+        # "what if BTC goes to 1e-12 dollars" was refused as "a -100% move is not possible"
+        # (round 44 hostile, minor 12): the price is possible to write, and the fall to it is a
+        # total loss to any precision a book is kept in
+        written = Decimal(to_tiny.group("p"))
+        said.append(f"a price of {to_tiny.group('p')} dollars is ${format(written, 'f')} — a fall "
+                    "of more than 99.9999% from any price a coin trades at, so a position at it "
+                    "is worth nothing to the cent; the figures below are the real risk, not that "
+                    "price")
+    tiny = re.search(r"\b(?:drop(?:s|ped)?|fall(?:s|en)?|fell|los(?:e|es|t)|crash(?:es|ed)?)"
+                     r"\s+(?:by\s+)?(99\.9\d*)\s*%", text, re.I)
+    if tiny is not None:
+        # exact decimal arithmetic: 100 - 99.99999 in floats is 1.0000000003174137e-05
+        left = format(Decimal(100) - Decimal(tiny.group(1)), "f")
+        said.append(f"a {tiny.group(1)}% fall is not quite a total loss: {left}% of the value "
+                    "remains")
+    return said
+
+
 _EQUITY_METRIC: Final = re.compile(r"\bp\s*/\s*e\b|\bpe\s+ratio\b|\bprice[\s-]to[\s-]earnings\b|"
                                    r"\beps\b|\bearnings\s+per\s+share\b|\bdividend\w*|"
                                    r"\bpayout\s+ratio\b|\bbuybacks?\b", re.I)
@@ -607,6 +952,98 @@ def lines(text: str) -> list[str] | None:
     return None
 
 
+_SAME_TWICE: Final = re.compile(
+    r"\b([A-Z]{2,6})\s+(?:and|vs\.?|versus|or|with|against|to)\s+\1\b(?![-/])")
+_PAIR_FORM: Final = re.compile(
+    r"\b(?P<a>[A-Z]{2,6})\s+(?:and|vs\.?|versus|or|against)\s+(?P=a)[-/]?(?P<q>USD|USDT|USDC)\b|"
+    r"\b(?P<b>[A-Z]{2,6})[-/]?(?P<r>USD|USDT|USDC)\s+(?:and|vs\.?|versus|or|against)\s+(?P=b)\b")
+_STOCK_WORD: Final = re.compile(r"\b(?:the\s+)?(?:stock|shares?|equity|company|nyse|nasdaq)\b",
+                                re.I)
+
+
+def name_notes(text: str) -> list[str]:
+    """Lines on how the names asked about were read, when the question makes it ambiguous
+    (round 44 hostile, minors 3-5):
+
+    - "Compare BTC and BTC" got a one-name profile with no word that the two names are one;
+    - "What is SOL vs SOL-USD?" got a risk profile, where the answer is that they are the same
+      asset written two ways;
+    - "COMP price — same as the stock COMP?" and "UNI ... Uniswap or the stock?" got the coin with
+      the stock half unanswered: the token and the US-listed company sharing its ticker are two
+      different things, and only the token trades on Bitget."""
+    out: list[str] = []
+    twice = _SAME_TWICE.search(text)
+    if twice is not None:
+        name = twice.group(1)
+        out.append(f"Both names asked about are {name}: a market compared with itself moves "
+                   f"one for one, so there is no difference to show — this is {name} alone.")
+    pair = _PAIR_FORM.search(text)
+    if pair is not None:
+        base = pair.group("a") or pair.group("b")
+        quote = pair.group("q") or pair.group("r")
+        out.append(f"{base} and {base}-{quote} are the same asset: {base}-{quote} is the "
+                   f"{base}/{'US dollar' if quote == 'USD' else quote} pair as data sites and "
+                   f"exchanges write it, and Bitget quotes {base} against USDT ({base}USDT), "
+                   f"which tracks the dollar to within a fraction of a percent.")
+    if _STOCK_WORD.search(text):
+        from argus.lui.research.parse import is_us_equity, research_symbols
+        from argus.market.company_names import names_for, sec_registered
+
+        for symbol in research_symbols(text)[0]:
+            if is_us_equity(symbol):
+                continue
+            base = symbol.removesuffix("USDT")
+            if not re.search(rf"\b(?:stock|shares?|company|equity)\b[^?.]{{0,30}}\b{base}\b|"
+                             rf"\b{base}\b[^?.]{{0,30}}\b(?:stock|shares?)\b", text, re.I):
+                continue
+            company = names_for(base)
+            if company or sec_registered(base):
+                out.append(f"{base} here is the crypto token Bitget lists ({symbol}); the "
+                           f"US-listed stock with the ticker {base}"
+                           + (f" ({company[0]})" if company else "")
+                           + " is a different company, which Bitget does not list, so no figure "
+                             "here is about it.")
+            else:
+                out.append(f"{base} here is the crypto token Bitget lists ({symbol}); no US-listed "
+                           f"company trades under the ticker {base} in SEC's register, so there "
+                           f"is no stock of that name to confuse it with.")
+    return out
+
+
+_SAME_UNITS: Final = re.compile(
+    r"\b(?P<a>\d+(?:\.\d+)?)\s*(?P<s>[A-Za-z]{2,6})\s+(?:and|plus|\+|,)\s+(?:another\s+)?"
+    r"(?P<b>\d+(?:\.\d+)?)\s*(?P=s)\b", re.I)
+
+
+def same_units_lines(text: str) -> list[str] | None:
+    """"I hold 3 ETH and 2 ETH, how much ETH do I have" was summed into a $13,581 book with "5 ETH"
+    never said and the question unanswered (round 44 hostile, minor 10): two amounts of one coin
+    asked as a total are added and valued."""
+    m = _SAME_UNITS.search(text)
+    if m is None or not re.search(r"\bhow\s+(?:much|many)\b|\btotal\b|\ball\s+together\b|"
+                                  r"\bin\s+all\b|\bsum\b", text, re.I):
+        return None
+    from argus.lui.research.parse import last_price, research_symbols
+
+    named = research_symbols(m.group("s").upper())[0]
+    if not named:
+        return None
+    a, b = float(m.group("a")), float(m.group("b"))
+    total = a + b
+    base = named[0].removesuffix("USDT")
+    try:
+        px = float(last_price(named[0]) or 0)
+    except Exception:
+        px = 0.0
+    lines = [f"Bottom line: {m.group('a')} + {m.group('b')} = {total:g} {base}"
+             + (f", worth about ${total * px:,.0f} at Bitget's last price of {px:,.2f}." if px > 0
+                else ".")]
+    if px > 0:
+        lines.append(f"Each part: {a:g} {base} is ${a * px:,.0f}; {b:g} {base} is ${b * px:,.0f}.")
+    lines.append("Data: Bitget's live ticker; the value moves with the price.")
+    return lines
+
+
 __all__ = [
     "READERS",
     "bps_versus_percent",
@@ -616,7 +1053,9 @@ __all__ = [
     "in_currency",
     "lines",
     "minor_units",
+    "name_notes",
     "per_period",
+    "same_units_lines",
     "sp500_beta",
     "stated_fee",
     "stated_gas",

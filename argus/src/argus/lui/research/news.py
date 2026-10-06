@@ -58,6 +58,18 @@ def _news_feeds(symbol: str) -> tuple[dict[str, tuple[str, str]], set[str], re.P
     feeds = ({k: v for k, v in RSS_FEEDS.items() if k in MARKET_FEEDS} if symbol == BENCHMARK
              else {**RSS_FEEDS, f"yahoo-{ticker.lower()}": (
                  YAHOO_SYMBOL_FEED.format(ticker=ticker), "news")})
+    from argus.lui.research.parse import is_prose_word
+    from argus.market.company_names import names_for
+
+    names |= {n.lower() for n in names_for(ticker) if len(n) > 3}
+    if is_prose_word(ticker):
+        # ServiceNow's ticker is the word "now": "Brazilian stocks jump as Bolsonaro now seen as
+        # favorite" was counted as news on NOW (round 44 hostile). A ticker that is a word is
+        # matched only in capitals; its company name still matches in any case.
+        named = sorted(n for n in names if n != ticker.lower())
+        pattern = re.compile(r"\b(" + "|".join([f"(?-i:{re.escape(ticker)})",
+                                                 *(re.escape(n) for n in named)]) + r")\b", re.I)
+        return feeds, names, pattern
     pattern = re.compile(r"\b(" + "|".join(re.escape(n) for n in sorted(names)) + r")\b", re.I)
     return feeds, names, pattern
 

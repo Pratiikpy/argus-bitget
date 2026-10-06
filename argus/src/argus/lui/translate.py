@@ -35,7 +35,8 @@ LANGUAGES: dict[str, str] = {
     "zh": "Simplified Chinese", "es": "Spanish", "pt": "Portuguese", "fr": "French",
     "de": "German", "ja": "Japanese", "ko": "Korean", "vi": "Vietnamese", "hi": "Hindi",
     "ar": "Arabic", "ru": "Russian", "th": "Thai", "zh-Hant":
-    "Traditional Chinese", "tr": "Turkish", "id": "Indonesian",
+    "Traditional Chinese", "tr": "Turkish", "id": "Indonesian", "it": "Italian",
+    "pl": "Polish", "sw": "Swahili",
 }
 MAX_CHARS = 8000
 """An answer larger than this is not translated; none measured so far comes near it."""
@@ -123,6 +124,18 @@ _VIETNAMESE = re.compile("[\u0103\u0111\u01a1\u01b0\u1ea0-\u1ef9]", re.I)
 """Letters only Vietnamese writes (a-breve, d-stroke, o-horn, u-horn and the stacked tone marks):
 "Minh moi bat dau, lam sao biet mot san co lua dao" in its own spelling was read as Portuguese
 (round 42 newcomer, 40)."""
+_POLISH: frozenset[str] = frozenset({
+    "jak", "czy", "jest", "ile", "dlaczego", "cena", "kupić", "kupic", "powinienem", "się",
+    "sie", "nie", "mój", "moj", "moje", "moja", "teraz", "pieniądze", "pieniadze", "bezpieczne",
+    "kryptowaluty", "giełda", "gielda", "dzisiaj", "warto"})
+_SWAHILI: frozenset[str] = frozenset({
+    "nini", "je", "bei", "kwa", "ni", "nina", "nifanye", "gani", "sasa", "kununua", "pesa",
+    "nataka", "salama", "leo", "hii", "hiyo", "vipi", "kwanini", "sarafu", "fedha", "mimi",
+    "wangu", "yangu", "naweza", "jinsi"})
+_ITALIAN: frozenset[str] = frozenset({
+    "che", "come", "perché", "perche", "quanto", "sono", "della", "dovrei", "mio", "mia",
+    "questo", "questa", "prezzo", "oggi", "comprare", "vendere", "sicuro", "soldi", "cosa",
+    "posso", "il", "gli", "una", "non", "adesso", "conviene"})
 _TURKISH = re.compile("[\u011f\u0131\u015f\u0130]|\\b(?:nedir|nas\u0131l|m\u0131|mi|var|ve|"
                       "i\u00e7in|kripto|para)\\b", re.I)
 _INDONESIAN: frozenset[str] = frozenset({
@@ -152,6 +165,18 @@ def target_language(text: str) -> str | None:
         return "tr"
     if _HAN.search(text):
         return "zh-Hant" if _TRADITIONAL.search(text) else "zh"
+    latin_words = set(re.findall(r"[a-ząćęłńóśźżàèéìòù]+", text.lower()))
+    if re.search("[ąćęłńśźż]", text, re.I) or len(
+            latin_words & _POLISH) >= 2:
+        # Polish, Italian and Swahili were refused in English (round 44 newcomer): Polish's own
+        # letters decide it, or two of its common words, as Indonesian's three do
+        return "pl"
+    if len(latin_words & _SWAHILI) >= 3:
+        return "sw"
+    italian = len(latin_words & _ITALIAN)
+    if italian >= 2 and italian > len(latin_words & _COMMON["en"]) and not (
+            latin_words & {"qué", "cómo", "você", "minha", "pourquoi", "warum"}):
+        return "it"
     lowered = f" {text.lower()} "
     # Hindi written in Latin letters shares "mein" with German: "Bitcoin pichle 7 din mein kitna
     # upar gaya?" was told in German that the model was paused (a judge, round 25). Two Hinglish

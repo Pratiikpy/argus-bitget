@@ -30,6 +30,7 @@ from typing import Any
 
 from argus.cost.model import CostModel
 from argus.lui.answer import Source
+from argus.lui.numbers import sig
 from argus.lui.trace import trace_module
 
 SIZING_Q = re.compile(
@@ -375,8 +376,8 @@ def _answer(text: str, symbol: str | None = None, *,
             reference = entry or rows[-1][2]
             stop_frac = abs(level / reference - 1.0)
             notes.append(f"the stop is {symbol.removesuffix('USDT')}'s {days}-day "
-                         f"{'low' if low_side else 'high'}, {level:,.4g}, {stop_frac:.2%} from "
-                         f"{reference:,.4g} (Bitget daily candles)")
+                         f"{'low' if low_side else 'high'}, {sig(level, 4)}, {stop_frac:.2%} from "
+                         f"{sig(reference, 4)} (Bitget daily candles)")
     if stop_frac is None and symbol and atr is not None:
         # A named name has an honest default distance — its own volatility — so the trader gets a
         # size and the stop it assumes rather than a request for one (a judge, round 18, row 614).
@@ -415,7 +416,8 @@ def _answer(text: str, symbol: str | None = None, *,
         f"${gross * (stop_frac + ROUND_TRIP):,.0f}, {ROUND_TRIP / stop_frac:.1%} over the budget.",
     ]
     if entry:
-        lines.append(f"At {entry:,.2f} that is {net / entry:,.4g} units ({gross / entry:,.4g} "
+        lines.append(f"At {entry:,.2f} that is {sig(net / entry, 4)} units "
+                     f"({sig(gross / entry, 4)} "
                      f"without costs).")
     planned = _PLANNED_POSITION.search(text)
     if planned is not None:
@@ -611,8 +613,8 @@ def _stop_from_structure(text: str, symbol: str, loss: float, account: float | N
     name = symbol.removesuffix("USDT")
     edge = "highest high" if short else "lowest low"
     lines = [f"Bottom line: put the stop at {name}'s {edge} of the last {len(rows)} daily bars, "
-             f"{level:,.4g} ({distance:.1%} {'above' if short else 'below'} the last price of "
-             f"{float(last):,.4g}) — the level a close beyond would show the trade wrong; with "
+             f"{sig(level, 4)} ({distance:.1%} {'above' if short else 'below'} the last price of "
+             f"{sig(float(last), 4)}) — the level a close beyond would show the trade wrong; with "
              f"${loss:,.0f} at risk that allows a ${position:,.0f} position, the 0.12% taker "
              f"round trip included."]
     if account:

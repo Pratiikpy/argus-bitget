@@ -197,9 +197,31 @@ def the_stated_amounts_are_the_book(text: str, book: str, planned: ResearchReque
     return fixed, {**audit, "detail": "the holdings stated in amounts kept as the book"}
 
 
+def an_unlisted_subject_is_said(text: str, book: str, planned: ResearchRequest | None,
+                                patterned: ResearchRequest | None,
+                                audit: dict[str, Any]) -> tuple[ResearchRequest | None,
+                                                                dict[str, Any]]:
+    """The news on a name Bitget does not list is not the rates backdrop.
+
+    "What is the latest on ON" was answered with Treasury yields and a note that ON was left out
+    (round 44 hostile): when the only name asked about is unlisted and the question asks for its
+    news, no planner reading stands, and the patterns' "not listed on Bitget" answers it."""
+    if planned is None or planned.symbols or (patterned is not None and patterned.symbols):
+        return planned, audit
+    if not re.search(r"\b(?:the\s+)?latest\s+(?:on|with|about|for)\b|\bwhat'?s\s+new\s+(?:with|"
+                     r"on|at)\b|\bnews\s+(?:on|for|about)\b|"
+                     r"\bhow(?:\s+is|'?s)\s+[A-Z]{2,5}\s+doing\b", text, re.I):
+        return planned, audit
+    from argus.lui.question import unlisted_tokens
+
+    if not unlisted_tokens(text):
+        return planned, audit
+    return None, {**audit, "detail": "an unlisted name's news; said as not listed"}
+
+
 RULES: tuple[Rule, ...] = (leverage_needs_leverage, the_add_is_not_a_holding,
                            the_specific_reading_stands, a_price_shock_is_a_stress,
-                           the_stated_amounts_are_the_book)
+                           the_stated_amounts_are_the_book, an_unlisted_subject_is_said)
 """Applied in this order to the planner's reading; each may replace it with the patterns'."""
 
 
@@ -310,6 +332,12 @@ the n-gram layer answering chit-chat, not to judge a trading question."""
 def in_domain(text: str) -> bool:
     if research_symbols(text)[0]:
         return True
+    from argus.lui.research.parse import cued_word_tickers
+
+    if cued_word_tickers(text):
+        # "How is ALL doing today?" names a ticker Bitget does not list; it is still a market
+        # question, answered by saying so (round 44 hostile, minor 1)
+        return True
     hit = _DOMAIN.search(text)
     if hit is None:
         return False
@@ -349,7 +377,10 @@ _RECORD_INTENTS: frozenset[Intent] = frozenset({
 _ABOUT_THE_DESK_WORDS = re.compile(
     r"\b(?:you|your|yours|you'?ve|you'?re|argus|the\s+desk|desk'?s?|we|our|us|the\s+agent|"
     r"paper\s+(?:desk|trades?|trading|ledger)|ledger|track\s+record|decisions?|abstentions?|"
-    r"abstain\w*|seq\s*\d+|the\s+record|sharpe|calibrat\w*|brier)\b|"
+    r"abstain\w*|seq\s*\d+|the\s+record|sharpe|calibrat\w*|brier|"
+    # "how many trades did the risk layer block in the last 90 days?" was declined as not the
+    # record (round 44 hostile, minor 13): the risk layer is the desk's own
+    r"risk\s+(?:layer|gate|engine|controls?)|guardrails?|circuit\s+breakers?|kill\s+switch)\b|"
     r"我们|你们|账本|决策|持仓|仓位|业绩|操作|观望|交易记录", re.I)
 """Words that make a question about the desk: "how are you doing", "why did we pass on NVDA",
 "what's your Sharpe", "show the decision log"."""

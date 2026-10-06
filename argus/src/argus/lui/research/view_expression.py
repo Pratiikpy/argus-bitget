@@ -36,6 +36,8 @@ from collections.abc import Sequence
 from datetime import date, datetime
 from typing import Final
 
+from argus.lui.numbers import sig
+
 _VIEW: Final = re.compile(r"\bi\s+(?:think|believe|feel|expect|reckon|bet)\b|\bmy\s+(?:view|"
                           r"thesis|bet|take|call)\s+is\b", re.I)
 _EXPRESS: Final = re.compile(
@@ -237,7 +239,7 @@ def _relative(pair: tuple[str, str], days: int, horizon: str, budget: float, sta
         f"correlate {corr:+.2f} over the last year, so the trade is mostly a bet on the "
         "difference, not on the market's direction.",
         f"Wrong if: the ratio closes below that 20-day low; or the horizon passes with the ratio "
-        f"at or below today's {ratio[-1]:,.4g} — {w} has not beaten {lo}; or one leg's funding "
+        f"at or below today's {sig(ratio[-1], 4)} — {w} has not beaten {lo}; or one leg's funding "
         "eats the edge (each perpetual charges or pays funding every period).",
     ]
 

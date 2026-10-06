@@ -24,6 +24,7 @@ from argus.desk.portfolio import (
     variance,
 )
 from argus.lui.answer import LEAD, Answer, Source, unlead
+from argus.lui.numbers import sig
 from argus.lui.question import (
     TRADED_SYMBOLS,
     Question,
@@ -417,7 +418,7 @@ def _standalone_lead(lines: list[str], add: str, raw: Mapping[str, Mapping[Any, 
                     from argus.market.bitget import fetch_tickers
 
                     last = float(fetch_tickers()[add].last)
-                    shown = f"{last:,.2f}" if last >= 1 else f"{last:.4g}"
+                    shown = f"{last:,.2f}" if last >= 1 else f"{sig(last, 4)}"
                     price_first = f"{name} last {shown} USDT on Bitget; "
                 except Exception:
                     price_first = ""
@@ -1906,7 +1907,15 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                     span = period_move(request.symbols[0], asked_days, last) if last else None
                     if span is not None:
                         top = f"{span.split('; its range')[0]}. {top}"
-                lines = [f"Bottom line: {top} On the news: {head[:1].lower() + head[1:]}",
+                # "On the news: tSLA fi..." lowered a ticker (round 44): a lead that starts
+                # with a name or an acronym keeps its capital
+                first_word = head.split(" ", 1)[0]
+                keep = first_word[:1].isdigit() or (
+                    first_word[:1].isupper() and first_word.lower() not in (
+                        "the", "a", "an", "no", "its", "it", "this", "there", "news",
+                        "headlines", "one", "nothing", "none", "both", "all"))
+                said_head = head if keep else head[:1].lower() + head[1:]
+                lines = [f"Bottom line: {top} On the news: {said_head}",
                          *(line for i, line in enumerate(lines) if i not in (0, moved))]
 
         elif request.kind is ResearchKind.BOOK:
@@ -2664,6 +2673,18 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                                                            r"days?)", unlead(str(x)))), None)
                 expected = next((x for x in lines if "Analyst consensus for the next report"
                                  in str(x)), None)
+                dates = [m for x in lines if (m := re.match(
+                    r"(?:Bottom line \(\w+\): )?(\w+) — Next report: (\d{4}-\d{2}-\d{2}) — "
+                    r"(\d+) days? away", str(x)))]
+                if len(request.symbols) > 1 and len(dates) > 1:
+                    # "when does each report earnings" for NVDA and TSLA led with NVDA's date
+                    # alone (round 44 visual audit, major 1): every name's date leads, soonest
+                    # first
+                    soonest = sorted(dates, key=lambda m: int(m.group(3)))
+                    lines = ["Bottom line: " + "; ".join(
+                        f"{m.group(1)} reports on {m.group(2)} ({m.group(3)} days)"
+                        for m in soonest) + ".", *(unlead(str(x)) for x in lines)]
+                    dated = None
                 if dated is not None:
                     date_text = unlead(str(dated)).rstrip(".")
                     opening = (date_text if re.match(r"[A-Z]{2}", date_text)

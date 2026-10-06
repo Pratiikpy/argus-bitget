@@ -12,6 +12,7 @@ another engine's.
 
 from __future__ import annotations
 
+import math
 import re
 from collections.abc import Sequence
 from datetime import UTC, datetime, timedelta
@@ -213,7 +214,11 @@ def perp_vs_spot_lines(text: str, prior: Sequence[str]) -> list[str] | None:
 
     # "basis points" is a unit, not the perp-spot basis (a hostile review, round 29)
     asks = re.search(r"\bperp\w*\b[^?]{0,40}\bspot\b|\bspot\b[^?]{0,40}\bperp\w*\b|\bpremium\b|"
-                     r"\bbasis\b(?!\s+points?\b)", text, re.I)
+                     r"\bbasis\b(?!\s+points?\b)|"
+                     # "Assuming a risk-free rate of 5%, what should a one-year BTC future trade
+                     # at relative to spot?" got a price card (round 44 re-ask)
+                     r"\brisk[-\s]*free\b[^?]{0,80}\b(?:futures?|forwards?)\b|\b(?:futures?|forwards?)\b"
+                     r"[^?]{0,60}\brelative\s+to\s+spot\b", text, re.I)
     if asks is None or re.search(r"\bhedg\w*|\bprotect\w*|\binsur\w*", text, re.I):
         # "how would I hedge the downside using perps without selling spot?" is a hedge of the
         # stated book, not the perp-spot gap (round 43 judge, C9)
@@ -238,7 +243,32 @@ def perp_vs_spot_lines(text: str, prior: Sequence[str]) -> list[str] | None:
             f"A perpetual has no expiry, so this gap is not annualised like a dated future's "
             f"basis: funding pulls the two together instead, at {rate:+.4%} per settlement now, "
             f"about {rate * 3 * 365:+.1%} a year if it held at three settlements a day.",
+            *_stated_rate_lines(text),
             "Prices: Bitget's public perpetual and spot tickers, read together."]
+
+
+def _stated_rate_lines(text: str) -> list[str]:
+    """A risk-free rate the question states, carried through cost of carry: "If the risk-free
+    rate is -3%, what is the BTC futures basis over one year?" got the perpetual's spread with the
+    rate and the year ignored (round 44 hostile, minor 2). A dated future's fair basis is the
+    financing rate less any yield the asset pays; bitcoin pays none, so it is the rate itself."""
+    m = re.search(r"\brisk[\s-]*free\s+(?:rate\s+)?(?:is|of|at|=)?\s*"
+                  r"(?P<r>[-\u2212+]?\d+(?:\.\d+)?)\s*%", text, re.I)
+    if m is None:
+        return []
+    rate = float(m.group("r").replace("\u2212", "-")) / 100
+    years = re.search(r"\b(?:over|for|in)\s+(?:one|1|a)\s+year\b|\b(?:1|one)[\s-]*year\b", text,
+                      re.I)
+    out = [f"At the stated risk-free rate of {rate:+.1%}, a dated one-year future on a coin that "
+           f"pays no yield would fairly sit {rate:+.1%} from spot (cost of carry: forward = spot x "
+           f"(1 + r)), so {'below' if rate < 0 else 'above'} it"
+           + (" — over the year asked" if years else "") + "; a market basis away from that is "
+           "demand, not financing."]
+    if rate < 0:
+        out.append("A negative risk-free rate is a premise, not today's market: US Treasury bills "
+                   "pay a positive rate now, and the perpetual above has no expiry, so funding, "
+                   "not this carry, sets its gap.")
+    return out
 
 
 def _coingecko(path: str, params: dict[str, str] | None = None) -> Any:
@@ -320,6 +350,21 @@ def market_cap_ratio_lines(text: str, prior: Sequence[str]) -> list[str] | None:
         lines = [f"Bottom line: {a} is worth about ${cap / 1e9:,.1f}bn"
                  + (f" at ${price:,.2f} a coin" if price > 0 and re.search(r"\bprice\b", text,
                                                                            re.I) else "") + "."]
+        power = re.search(r"\b10\s*\^\s*\$?(\d{1,3})\b|\b1e\+?(\d{1,3})\b", text, re.I)
+        if power is not None and price > 0 and re.search(r"\bif\b|\breach|\bhits?\b|\bwere\b",
+                                                         text, re.I):
+            # "If ETH hits 10^15 dollars what's its market cap?" got today's cap alone (round 44
+            # re-ask): the hypothetical is answered on today's supply, and called hypothetical
+            exponent = int(power.group(1) or power.group(2))
+            supply = cap / price
+            magnitude = math.floor(math.log10(supply)) + exponent
+            mantissa = supply / 10 ** math.floor(math.log10(supply))
+            lines[0] = (f"Bottom line: at 10^{exponent} dollars a coin, {a}'s "
+                        f"{supply / 1e6:,.1f} million coins would be worth about "
+                        f"{mantissa:.1f} x 10^{magnitude} dollars — a hypothetical with no market "
+                        f"behind it (all the world's private wealth is about 4.5 x 10^14 "
+                        f"dollars, UBS's 2024 estimate); today {a} is worth about "
+                        f"${cap / 1e9:,.1f}bn at ${price:,.2f} a coin.")
     lines.append("Source: CoinGecko's market capitalisation (price x circulating supply), read "
                  "now.")
     return lines

@@ -64,8 +64,10 @@ TOKENS_CSS = """
     --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
     color-scheme: light;
   }
+  /* The system's theme unless the reader chose one with the toggle in the bar (round 44 visual
+     audit, minor 6: the page followed the system only, with no way to override it). */
   @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme="light"]) {
       --paper:#0A0A0A; --halo:#111113; --veil:#17181B; --stone:#E7E7E4; --fog:#6B7280;
       --graphite:#A1A1AA; --proof:#A5B4FC; --proof-soft:#1B1D3A; --redline:#FB923C;
       --redline-soft:#2A1509;
@@ -74,6 +76,15 @@ TOKENS_CSS = """
       --good:#A5B4FC;
       color-scheme: dark;
     }
+  }
+  :root[data-theme="dark"] {
+    --paper:#0A0A0A; --halo:#111113; --veil:#17181B; --stone:#E7E7E4; --fog:#6B7280;
+    --graphite:#A1A1AA; --proof:#A5B4FC; --proof-soft:#1B1D3A; --redline:#FB923C;
+    --redline-soft:#2A1509;
+    --ink:#F2F2EF; --dim:#A1A1AA; --line:#26272B; --bg:#0A0A0A; --panel:#111113;
+    --accent:#A5B4FC; --on-accent:#0A0A0A; --warn:#FB923C; --bad:#FB923C; --ok:#A5B4FC;
+    --good:#A5B4FC;
+    color-scheme: dark;
   }
 """
 
@@ -122,6 +133,11 @@ BASE_CSS = """
     letter-spacing:.1em; text-transform:uppercase; padding:8px 10px; border-radius:8px }
   .nav .links a:hover { color:var(--ink); background:var(--veil) }
   .nav .links a.on { color:var(--ink); background:var(--veil) }
+  .nav .right { display:flex; align-items:center; gap:8px }
+  .nav .theme { padding:0; width:34px; height:34px; display:grid; place-items:center;
+    background:none; color:var(--dim); border:1px solid var(--line); border-radius:8px;
+    font:600 15px/1 var(--sans) }
+  .nav .theme:hover { color:var(--ink); background:var(--veil); border-color:var(--line) }
   /* The phone menu: absent on desktop, where every link fits in the bar. */
   .nav .menu { display:none }
   @media (max-width: 720px) {
@@ -155,6 +171,13 @@ BASE_CSS = """
   .skip { position:absolute; left:-9999px; top:8px; z-index:50; padding:8px 12px;
     background:var(--ink); color:var(--paper); border-radius:8px; font:600 13px/1 var(--sans) }
   .skip:focus { left:16px }
+  /* Back to the top from anywhere on a long page (round 44 visual audit, major 3: /proof, /wrong
+     and /research ran to dozens of phone screens with no way back but scrolling). */
+  .totop { position:fixed; right:16px; bottom:16px; z-index:30; padding:10px 14px;
+    border:1px solid var(--line); border-radius:999px; background:var(--panel); color:var(--ink);
+    font:600 13px/1 var(--sans); text-decoration:none;
+    box-shadow:0 6px 18px color-mix(in srgb, var(--ink) 14%, transparent) }
+  .totop:hover { border-color:var(--accent) }
 """
 
 LINKS: tuple[tuple[str, str], ...] = (
@@ -187,6 +210,21 @@ def favicon() -> str:
             "r='7' fill='%23FFFFFF'/%3E%3C/svg%3E")
 
 
+THEME_INIT = ("<script>(function(){try{var t=localStorage.getItem('argus.theme');"
+              "if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;}"
+              "catch(e){}})();</script>")
+"""Runs in the head, before the body paints, so a chosen theme never flashes the other one."""
+
+THEME_BUTTON = (
+    '<button type="button" class="theme" id="theme" aria-label="Switch between light and dark" '
+    'title="Switch between light and dark">&#9680;</button>'
+    "<script>(function(){var b=document.getElementById('theme'),r=document.documentElement;"
+    "b.addEventListener('click',function(){var dark=r.dataset.theme?r.dataset.theme==='dark':"
+    "window.matchMedia('(prefers-color-scheme: dark)').matches;var t=dark?'light':'dark';"
+    "r.dataset.theme=t;try{localStorage.setItem('argus.theme',t);}catch(e){}});})();</script>")
+"""The light/dark toggle in the bar: the reader's choice is kept in this browser only."""
+
+
 def nav(active: str = "/") -> str:
     """The top bar every page opens with. ``active`` is the current path.
 
@@ -198,11 +236,12 @@ def nav(active: str = "/") -> str:
                     for href, label in LINKS)
     return (f'<a class="skip" href="#main">Skip to content</a>'
             f'<nav class="nav" aria-label="Primary"><a class="brand" href="/" aria-label="ARGUS '
-            f'home">{mark_svg(22)}<span>ARGUS</span></a><div class="links-wrap"><div class="links">'
+            f'home">{mark_svg(22)}<span>ARGUS</span></a><div class="right"><div class="links-wrap">'
+            f'<div class="links">'
             f'{links}<a href="https://github.com/Pratiikpy/argus-bitget">GitHub</a></div></div>'
             f'<details class="menu"><summary>Menu</summary><div class="menu-list">{links}'
-            f'<a href="https://github.com/Pratiikpy/argus-bitget">GitHub</a></div></details></nav>'
-            f'<span id="main" tabindex="-1"></span>')
+            f'<a href="https://github.com/Pratiikpy/argus-bitget">GitHub</a></div></details>'
+            f'{THEME_BUTTON}</div></nav><span id="main" tabindex="-1"></span>')
 
 
 def footer() -> str:
@@ -213,7 +252,9 @@ def footer() -> str:
             'public news. <a href="/architecture">Architecture</a> · <a href="/policy">Risk '
             'policy</a> · <a href="/factors">Factors</a> · '
             '<a href="/agent">Trading agent (separate project)</a> · '
-            '<a href="/brand">Brand</a></span></footer>')
+            '<a href="/brand">Brand</a></span></footer>'
+            '<a class="totop" href="#main" aria-label="Back to the top of the page">Top '
+            '&uarr;</a>')
 
 
 PUBLIC_URL = "https://deploy-topaz-seven-64.vercel.app"
@@ -236,11 +277,11 @@ def head(title: str, description: str, path: str = "/") -> str:
             f'<meta property="og:image" content="{OG_IMAGE}"><meta property="og:image:width" '
             f'content="1200"><meta property="og:image:height" content="630">'
             f'<meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" '
-            f'content="{OG_IMAGE}"><link rel="icon" href="{favicon()}">{FONTS}')
+            f'content="{OG_IMAGE}"><link rel="icon" href="{favicon()}">{FONTS}{THEME_INIT}')
 
 
-__all__ = ["BASE_CSS", "FONTS", "LINKS", "PALETTE", "TOKENS_CSS", "favicon", "footer", "head",
-           "mark_svg", "nav"]
+__all__ = ["BASE_CSS", "FONTS", "LINKS", "PALETTE", "THEME_BUTTON", "THEME_INIT", "TOKENS_CSS",
+           "favicon", "footer", "head", "mark_svg", "nav"]
 
 
 _URL = re.compile(r"https?://[^\s<>\"']*[^\s<>\"'.,;:!?)\]]")

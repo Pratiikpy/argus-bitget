@@ -357,20 +357,24 @@ def _card(win: Win) -> str:
             reason = reason[:900].rsplit(" ", 1)[0] + "…"
         tested += (f"<p class='why'><span class='lbl'>Why not OWNED</span>"
                    f"{_linked(esc(reason))}</p>")
+    # Each card folds to its state, name and rival, and opens on a tap: /proof ran to 44,000px on
+    # a phone, about fifty screens (round 44 visual audit, major 3). OWNED cards stay open — they
+    # are what the page exists to show; the rest are one tap away and named in the summary.
+    opened = " open" if win.state == "owned" else ""
     return (
-        f"<article class='w {esc(win.state)}' id='{_anchor(win.name)}'>"
+        f"<details class='w {esc(win.state)}' id='{_anchor(win.name)}'{opened}><summary>"
         f"<div class='head'><span class='st {esc(win.state)}'>{esc(win.state.upper())}</span>"
         f"<span class='cn'>{win.conditions} of 13 conditions"
         + (" — against a rival that does not lead the sub-theme"
            if win.state != "owned" and win.conditions == 13 else "")
         + "</span></div>"
-        f"<h3>{esc(win.name)}</h3>"
+        f"<h3>{esc(win.name)}</h3></summary>"
         f"<p><span class='lbl'>Rival</span>{esc(win.rival)}</p>"
         + (f"<p><span class='lbl'>Scope</span>{esc(SCOPE[win.name])}</p>"
            if win.name in SCOPE else "") + f"{tested}"
         f"<div class='links'>{' '.join(links)}</div>{rerun}"
         f"<details><summary>Every condition and its evidence</summary><ul>{proofs}</ul>"
-        f"{note}</details></article>"
+        f"{note}</details></details>"
     )
 
 
@@ -473,7 +477,7 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
  .w h3 {{ font-size:15.5px; margin:6px 0 8px; line-height:1.35 }}
  .w p {{ margin:0 0 8px; font-size:14px }}
  .head {{ display:flex; gap:10px; align-items:center; flex-wrap:wrap }}
- .st {{ font:600 10.5px var(--mono); letter-spacing:.08em; padding:2px 7px; border-radius:4px;
+ .st {{ font:600 12px var(--mono); letter-spacing:.08em; padding:2px 7px; border-radius:4px;
    border:1px solid currentColor }}
  /* Four states, four looks: OWNED is the one filled proof pill; TIED is outlined ink; IMPLEMENTED
     is graphite and dashed (unproven, not a failure); only LOST wears Redline. Until 2026-09-26
@@ -482,8 +486,14 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
  .st.tied {{ color:var(--ink); border-color:var(--ink) }}
  .st.implemented {{ color:var(--graphite); border-style:dashed }}
  .st.lost {{ color:var(--redline); background:var(--redline-soft); border-color:var(--redline) }}
- .cn {{ font:11px var(--mono); color:var(--dim) }}
- .lbl {{ display:inline-block; min-width:118px; font:11px var(--mono); color:var(--dim);
+ .cn {{ font:12px var(--mono); color:var(--dim) }}
+ /* a folded card: its summary is the card's head, with a marker saying it opens */
+ details.w > summary {{ list-style:none; cursor:pointer; color:var(--ink) }}
+ details.w > summary::-webkit-details-marker {{ display:none }}
+ details.w > summary h3::after {{ content:"  +"; color:var(--accent); font-weight:600 }}
+ details.w[open] > summary h3::after {{ content:"  \u2212" }}
+ details.w {{ font-size:15px; color:var(--ink) }}
+ .lbl {{ display:inline-block; min-width:118px; font:12px var(--mono); color:var(--dim);
    text-transform:uppercase; letter-spacing:.06em }}
  .links {{ display:flex; gap:6px 14px; flex-wrap:wrap; font-size:13px; margin:4px 0 6px }}
  .links a {{ color:var(--accent); overflow-wrap:anywhere }}

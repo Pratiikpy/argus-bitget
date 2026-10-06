@@ -37,7 +37,18 @@ _TYPOS: Final = ((r"\bhw\b", "how"), (r"\bwat\b|\bwut\b|\bwht\b", "what"), (r"\b
                  (r"\bshud\b", "should"), (r"\b2l8\b|\btoo\s*l8\b", "too late"),
                  (r"\binve+sting\b", "investing"), (r"\bhlp\b", "help"), (r"\bsum\b", "some"),
                  (r"\bdo\s+i\s+no\b", "do i know"), (r"\bpls\b|\bplz\b", "please"),
-                 (r"\bwaht\b", "what"), (r"\brugpull", "rug pull"))
+                 (r"\bwaht\b", "what"), (r"\brugpull", "rug pull"),
+                 # round 44: slang and typos that kept a clean question from its answer
+                 (r"\bev(?:e)?ry?thin\b|\bevrything\b", "everything"), (r"\bevry\b", "every"),
+                 (r"\brn\b", "right now"), (r"\bpayd\b", "paid"),
+                 (r"\bhap+ens?\b|\bhapen\b", "happens"),
+                 (r"\bliqi?dat(\w*)", r"liquidat\1"),
+                 (r"\bdivid[ae]nts?\b|\bdividen\b|\bdivdends?\b", "dividend"),
+                 (r"\bcand[ae]ls?\s*sti?c?ks?\b|\bcandlestiks?\b", "candlestick"),
+                 (r"\bwrng\b|\brong\b", "wrong"), (r"\badd?ress\b|\badres{1,2}\b", "address"),
+                 (r"\b2\b(?=\s+(?:the\s+)?(?:wrong|another|different|diff|other)\b)", "to"),
+                 (r"\by\b(?=\s+(?:are|is|do|does|did|not|would|should|can|my|the|so|some)\b)",
+                  "why"))
 
 
 def _plain(text: str) -> str:
@@ -609,8 +620,8 @@ def _scam_coin(text: str) -> Lines | None:
 _RUG: Final = re.compile(r"\brug\s*-?\s*pull\w*|\brugged\b", re.I)
 _RUG_A: Final = (
     "Bottom line: a rug pull is when the people behind a coin or project take the money and "
-    "vanish — they drain the funds from the trading pool, or sell their huge holdings all at "
-    "once — so the price falls to nearly zero and you cannot get out.",
+    "vanish — they drain the funds from the trading pool and abandon the project — so the "
+    "price falls to nearly zero and you cannot get out.",
     "Warning signs: an anonymous team; most of the supply held by a few wallets; no independent "
     "audit; a promised or guaranteed return; pressure to buy now; and a contract that lets "
     "buyers in but blocks selling (a \"honeypot\").",
@@ -1423,8 +1434,462 @@ _ROUND43: Final[tuple[Callable[[str], Lines | None], ...]] = (
 one of these falls through to the rest of the console."""
 
 
+# --- round 44: emergencies, scams and the basics a first-time investor asks ----------------------
+#
+# Round 44's newcomer audit (Activity/audits/round44_newcomer.md) found one critical miss (a user
+# who had just sent ETH to the wrong network was told to wait out a "paper loss") and fourteen
+# major ones. Facts below, each read from its source on 2026-10-06:
+#
+# - Wrong network or address: Bitget Help Center, "How to Deal with Wrong Coin or Wrong
+#   Blockchain Deposits?" (bitget.com/support/articles/12560603820594): stop further transfers;
+#   prepare the transaction hash (TxID), the deposit address, the coin and the amount; submit the
+#   deposit-recovery form; Bitget checks whether recovery is feasible, tells the user about fees
+#   "if applicable", and complex cases may take 10 business days or longer; "not all networks
+#   support refunds or fund recovery". US Federal Trade Commission, "What To Know About
+#   Cryptocurrency and Scams" (consumer.ftc.gov): if you send crypto to the wrong person "no one
+#   can step in to help you recover your funds". One address works on every EVM network (Ethereum,
+#   BNB Chain, Polygon, Arbitrum, Base) because they share the address format.
+# - Recovery services: FTC consumer alert, "Worried about crypto exchange losses? Don't pay money
+#   for help recovering money" (Nov 2022): "Don't pay anyone who contacts you, offering to
+#   recover money you lost to a scam"; recovery scammers buy lists of earlier victims and ask a
+#   "retainer" or "processing fee"; report at ReportFraud.ftc.gov.
+# - Fake apps and sites: FTC, "What To Know About Cryptocurrency and Scams": fake investment
+#   sites let you deposit and then block withdrawals or charge high fees; never click links in an
+#   unexpected message; search the name with "review", "scam" or "complaint".
+# - One exchange or several: FTX halted withdrawals and filed for bankruptcy in November 2022.
+#   Bitget publishes proof-of-reserves reports (stated earlier in this file).
+# - Rug pull versus dump: a rug pull is the insiders removing the liquidity or abandoning a
+#   project after taking the money; a dump is heavy selling that pushes a price down, a pump and
+#   dump being the planned version (Sumsub, "Pump-and-Dump vs Rug Pull"; Britannica Money, "Pump-
+#   and-Dump Schemes & Crypto Rug Pulls Explained").
+# - HODL: from a Bitcointalk post titled "I AM HODLING" (18 Dec 2013), a misspelling of "hold".
+#   Bitcoin's 2022 fall (47,216 to 16,558 USDT, Bitget's daily closes) is the figure used above.
+# - Index fund and stock split: SEC Investor.gov glossary definitions (an index fund tracks a
+#   market index; a split changes the number of shares and the price per share, not the value
+#   held). The S&P 500 price index fell about 19% in 2022 (S&P Dow Jones Indices: -19.44%).
+# - Benefits: no rule is stated; the answer names what to check, because benefit rules differ by
+#   country and by programme.
+# - Fees: Bitget spot standard 0.10% a side (stated earlier in this file).
+
+_NO_TICKER: Final = re.compile(r"\b[A-Z]{2,5}\b")
+
+
+_WRONG_BAD: Final = (r"(?:(?:wr[oi]ng|incorrect|mistaken)\s+(?:network|chain|blockchain|address|"
+                     r"addy|wallet|coin|token|memo|tag)|(?:different|another|other|diff)\s+"
+                     r"(?:network|chain|blockchain))")
+_WRONG_SEND: Final = re.compile(
+    r"\b(?:sent|send|sending|transferr?ed|transfer|withdr[ae]w|withdrawn|deposit(?:ed)?|paid|"
+    r"moved|bridged|put)\b[^?]{0,70}\b(?:to\s+)?(?:the\s+|a\s+)?" + _WRONG_BAD + r"\b|"
+    r"\b" + _WRONG_BAD + r"\b[^?]{0,40}\b(?:sent|send|transfer\w*|withdr\w*|deposit\w*)\b|"
+    r"\bnetwork\s+mismatch\b|\bmismatched\s+network\b|\b(?:erc-?20|trc-?20|bep-?20|bsc|polygon|"
+    r"solana|tron)\b[^?]{0,40}\b(?:instead\s+of|rather\s+than)\b[^?]{0,20}\b(?:erc-?20|trc-?20|"
+    r"bep-?20|bsc|polygon|solana|tron|ethereum)\b", re.I)
+_WRONG_NOT: Final = re.compile(r"\b(?:avoid|prevent|make\s+sure|how\s+to\s+not)\b", re.I)
+_WRONG_SEND_A: Final = (
+    "Bottom line: stop and do not send anything else yet — whether you can get it back depends on "
+    "where it went, and sometimes a blockchain transfer cannot be reversed.",
+    "1. Open the transaction by its hash (the long ID) on the block explorer of the network you "
+    "used and read the address it went to. Is that your own wallet? Then the coins are often "
+    "still there: on Ethereum-style networks one address works on all of them, so add that "
+    "network to the wallet, or open the same recovery phrase in an official wallet app that "
+    "supports it (never on a website).",
+    "2. Did it go to an exchange's deposit address? Contact that exchange's support with the "
+    "hash, the address, the coin and the amount. Bitget, for example, has a deposit-recovery "
+    "form, may charge a fee, and says not every network can be recovered.",
+    "3. A smart-contract address or a stranger's wallet is usually not recoverable: nobody can "
+    "reverse a blockchain transfer.",
+    "Beware: anyone who messages you offering to \"recover\" it for a fee is a scammer (US FTC). "
+    "Real help is the receiving platform's own support, reached through its official app.",
+)
+_WRONG_SEND_S: Final = (
+    "Bottom line: stop sending. Whether you get it back depends on where it went.",
+    "Look up the transaction hash. Your own wallet: the coins are often still there. An exchange: "
+    "contact its support with the hash. A stranger or a contract: usually gone.",
+    "Anyone offering to recover it for a fee is a scammer.",
+)
+_WRONG_BACK: Final = re.compile(
+    r"\b(?:get|got|have|bring|win|take)\s+(?:it|them|that|this|my\s+\w+|the\s+\w+)\s+back\b|"
+    r"\b(?:recover\w*|retriev\w*|revers\w*|undo|refund\w*|any\s+hope|is\s+it\s+gone|gone\s+"
+    r"forever|lost\s+forever)\b", re.I)
+_WRONG_BACK_A: Final = (
+    "Bottom line: sometimes — it depends on who controls the address it went to, and the sooner "
+    "you act the better.",
+    "Your own wallet on another network: usually yes, you still own it. An exchange deposit "
+    "address: maybe, if that exchange supports the network and agrees to recover it, which can "
+    "take days and cost a fee. A contract or a stranger's wallet: almost never.",
+    "Next: write down the transaction hash and the address, then contact the receiving platform's "
+    "support through its official app. Do not send the coins again, and do not pay anyone who "
+    "contacts you offering to get them back.",
+)
+
+
+def _wrong_send(text: str) -> Lines | None:
+    if not _WRONG_SEND.search(text) or _WRONG_NOT.search(text):
+        return None
+    return list(_WRONG_SEND_A)
+
+
+_RECOVERY: Final = re.compile(
+    r"\brecovery\s+(?:service|company|agency|expert|specialist|firm|agent|team|hacker)s?\b|"
+    r"\b(?:recover|retrieve|get\s+back|trace|return)\w*\b[^?]{0,50}\b(?:for\s+a\s+(?:small\s+)?fee|"
+    r"upfront|up\s+front|if\s+i\s+pay|charge[sd]?|deposit\s+first|percent|%)|"
+    r"\b(?:says?|claims?|offers?|offered|contacted|messaged|dm'?d)\b[^?]{0,60}\b(?:recover|get\s+"
+    r"(?:my|your|the)\b[^?]{0,20}\bback|retrieve)\b", re.I)
+_RECOVERY_A: Final = (
+    "Bottom line: it is almost certainly a scam — do not pay, and do not give them your recovery "
+    "phrase, passwords or remote access to your device.",
+    "Scammers buy lists of people who were already scammed and then charge a \"retainer\", a "
+    "\"processing fee\" or a \"tax\" to get the money back; the US FTC says no legitimate company "
+    "will contact you and offer to recover your money for a fee.",
+    "Signs: they contacted you first, ask for money or crypto up front, promise a percentage back "
+    "or a guaranteed result, and push you to hurry or keep it secret.",
+    "What to do: report the original theft to the exchange you used and to the police (US: "
+    "reportfraud.ftc.gov and ic3.gov), keep every record, and ignore unsolicited help.",
+)
+
+
+def _recovery_scam(text: str) -> Lines | None:
+    if not _RECOVERY.search(text):
+        return None
+    return list(_RECOVERY_A)
+
+
+_FAKE_APP: Final = re.compile(
+    r"\b(?:fake|scam|counterfeit|clone[sd]?|malicious|phishing|spoof\w*)\s+(?:crypto(?:currency)?"
+    r"\s+|wallet\s+|exchange\s+|trading\s+|investment\s+)*(?:apps?|applications?)\b|\b(?:is|are)"
+    r"\s+(?:this|that|the)\s+(?:crypto(?:currency)?\s+|trading\s+|wallet\s+|exchange\s+)*app\s+"
+    r"(?:real|legit|fake|safe|a\s+scam|genuine|official)\b", re.I)
+_FAKE_APP_ASK: Final = re.compile(r"\b(?:spot|tell|know|identify|avoid|detect|check|recogni[sz]e|"
+                                  r"verify|sure|real|legit|genuine|how|is)\b", re.I)
+_FAKE_APP_DONE: Final = re.compile(r"\b(?:downloaded|installed|already|lost|drained|used)\b", re.I)
+_FAKE_APP_A: Final = (
+    "Bottom line: check where you got the app and who published it before you open it — most "
+    "fakes copy a real app's name and logo.",
+    "1. Get it only from a link on the company's own website, typed by you, or from the official "
+    "store listing that site points to — never from a link in a message or an ad, or a file "
+    "sent to you (an APK, or a \"test version\" invite).",
+    "2. In the store, check the publisher name matches the company, that the app has a long "
+    "history with many reviews and downloads, and read the one-star reviews: \"could not "
+    "withdraw\" is the warning.",
+    "3. Test small: deposit a little and withdraw it before more. A fake shows balances and gains "
+    "but finds reasons you cannot take money out (US FTC).",
+    "4. A real app never asks for your recovery phrase and never guarantees a return.",
+)
+_FAKE_APP_DONE_A: Final = (
+    "If you already installed it: delete the app, change the passwords you used, and contact the "
+    "real exchange from its official app. If a wallet app held your coins, move what is left to "
+    "a new wallet with a new recovery phrase, made on a clean device.",
+)
+
+
+def _fake_app(text: str) -> Lines | None:
+    if not (_FAKE_APP.search(text) and _FAKE_APP_ASK.search(text)):
+        return None
+    if _FAKE_APP_DONE.search(text):
+        return [*_FAKE_APP_A[:3], *_FAKE_APP_DONE_A, _FAKE_APP_A[4]]
+    return list(_FAKE_APP_A)
+
+
+_CUSTODY: Final = re.compile(
+    r"\b(?:keep|store|hold|leave|put|spread|split|have)\w*\b[^?]{0,40}\b(?:crypto\w*|coins?|"
+    r"bitcoin|funds|money|assets?|all)\b[^?]{0,50}\b(?:(?:on\s+)?(?:one|a\s+single|single|just\s+"
+    r"one|1)\s+(?:exchange|platform)|(?:several|multiple|many|more\s+than\s+one|different|two|"
+    r"few)\s+(?:exchanges?|platforms?))\b|\bone\s+exchange\b[^?]{0,30}\b(?:or|vs\.?|versus)\b"
+    r"[^?]{0,20}\b(?:several|multiple|many|more|two|spread)\b", re.I)
+_CUSTODY_A: Final = (
+    "Bottom line: neither is automatically safer — one exchange is a single point of failure, but "
+    "several accounts mean more passwords to protect and more places to be phished.",
+    "What spreading does: if one exchange fails, freezes withdrawals or is hacked, not everything "
+    "is stuck — customers of FTX could not withdraw when it collapsed in November 2022. What it "
+    "costs: more logins, more 2FA, more places to withdraw from.",
+    "A middle path many people use: keep on an exchange only what you trade or may sell soon, on "
+    "a large, regulated one that publishes proof-of-reserves (Bitget does), and move long-term "
+    "holdings to a wallet you control once you understand the recovery phrase.",
+    "Either way: an authenticator app for 2FA, a unique password, a withdrawal whitelist, and "
+    "only an amount you could lose.",
+)
+
+_BENEFIT_WORD: Final = (r"(?:benefits?|welfare|universal\s+credit|ssi|ssdi|snap|medicaid|food\s+"
+                        r"stamps?|unemployment|dole|pension\s+credit|housing\s+benefit|"
+                        r"centrelink)")
+_BENEFITS: Final = re.compile(
+    r"\b(?:claim\w*|receiv\w*|collect\w*|on|my|get\w*|lose|affect\w*|apply\w*\s+for)\s+(?:\w+\s+)"
+    r"{0,2}" + _BENEFIT_WORD + r"\b|\b(?:universal\s+credit|ssi|ssdi|medicaid|food\s+stamps?|"
+    r"centrelink|dole)\b", re.I)
+_BENEFITS_NOT: Final = re.compile(r"\bbenefits?\s+of\b|\bbenefits?\s+and\s+(?:risks?|downsides?)",
+                                  re.I)
+_BENEFITS_A: Final = (
+    "Bottom line: it depends on your country's benefit rules, and they differ by benefit — so do "
+    "not guess; check before you trade.",
+    "What usually matters: many means-tested benefits look at both your income and your savings "
+    "or assets, and a sale, a gain, or simply holding crypto can fall under either; some "
+    "programmes set a savings limit above which payments are reduced or stopped.",
+    "What to check: the official guidance for your own benefit (search its name with \"capital\", "
+    "\"savings\" or \"income\"), and ask the benefit office directly, in writing if you can, "
+    "whether crypto holdings and gains must be reported, and when.",
+    "Tax is a separate question from benefits: a gain can be taxable and also affect a benefit. "
+    "Not legal or tax advice.",
+)
+
+
+def _benefits(text: str) -> Lines | None:
+    if not (_BENEFITS.search(text) and _CRYPTO_WORD.search(text)) or _BENEFITS_NOT.search(text):
+        return None
+    return list(_BENEFITS_A)
+
+
+_HARDWARE: Final = re.compile(r"\bhardware\s+wallets?\b|\bcold\s+(?:wallet|storage)\b|\b(?:ledger"
+                              r"\s+(?:nano|wallet|device|stax|flex)|trezor)\b", re.I)
+_HARDWARE_A: Final = (
+    "Bottom line: a hardware wallet is a small physical device that keeps your crypto's private "
+    "keys offline and signs transactions on the device itself, so malware on your phone or "
+    "computer cannot take the keys.",
+    "It suits people holding coins for a long time, or in amounts they would hate to lose; for "
+    "a small amount you trade often, an exchange account with strong security is simpler.",
+    "It does not remove every risk: you still must keep the recovery phrase it gives you (anyone "
+    "with it can empty the wallet, and if you lose it and the device breaks, the coins are "
+    "gone), buy it only from the maker or an authorised reseller — never used or pre-opened — "
+    "and check the address on its own screen before you confirm.",
+)
+
+_STOCK_SPLIT: Final = re.compile(
+    r"\b(?:stock|share)s?\s+splits?\b|\bsplit\s+(?:of\s+)?(?:a\s+|the\s+)?(?:stock|shares?)\b|"
+    r"\b\d+[\s-]*(?:for|-for-)[\s-]*\d+\s+(?:stock\s+)?split\b|\breverse\s+(?:stock\s+)?split\b",
+    re.I)
+_STOCK_SPLIT_ASK: Final = re.compile(r"\b(?:what|mean\w*|explain|how|why|happen\w*|should|does|"
+                                     r"affect|change\w*|good|bad)\b", re.I)
+_STOCK_SPLIT_A: Final = (
+    "Bottom line: a stock split divides each share into several, with the price cut by the same "
+    "factor, so the value of what you own does not change — in a 2-for-1 split, 10 shares at "
+    "$100 ($1,000) become 20 shares at $50 ($1,000).",
+    "The company is the same size; only the number of pieces changed, like cutting a pizza into "
+    "more slices. Companies usually split to make one share cheaper to buy; the split itself "
+    "adds no value, so any later move comes from the news and the buyers.",
+    "A reverse split does the opposite (say 1-for-10): fewer shares at a higher price, again "
+    "with the same total value. It is often used by companies whose price has fallen very low, "
+    "so read why it was done.",
+)
+
+_INDEX_FUND: Final = re.compile(r"\bindex\s+funds?\b", re.I)
+_INDEX_FUND_NOT: Final = re.compile(r"\b(?:vs\.?|versus|compared?|better\s+than|or)\b[^?]{0,30}"
+                                    r"\b(?:bitcoin|btc|crypto\w*|eth)\b|\b(?:bitcoin|btc|crypto"
+                                    r"\w*)\b[^?]{0,30}\b(?:vs\.?|versus|or|better\s+than)\b",
+                                    re.I)
+_INDEX_FUND_A: Final = (
+    "Bottom line: an index fund is a fund that holds all, or a large sample, of the companies in "
+    "a market index such as the S&P 500, so one purchase gives you a small slice of hundreds of "
+    "companies instead of a bet on one.",
+    "It simply follows the index with no manager picking winners, which is why its yearly fee "
+    "is usually low; compare the fee (the expense ratio) and what the index holds. Both ETFs "
+    "and mutual funds can be index funds, and they are bought through a regular broker.",
+    "It is diversified, not safe: if the whole market falls the fund falls with it (the S&P 500 "
+    "index lost about 19% in 2022). Only money you can leave alone for years belongs in it.",
+)
+
+_BUY_SHARES: Final = re.compile(
+    r"\b(?:buy|buying|purchase|purchasing|get|getting)\s+(?:some\s+|my\s+first\s+|a\s+few\s+)?"
+    r"(?:shares?|stocks?)\b|\bfirst[\s-]time\b[^?]{0,30}\b(?:shares?|stocks?)\b|\b(?:invest\w*\s+"
+    r"in\s+)(?:shares?|stocks?)\b", re.I)
+_BUY_SHARES_ASK: Final = re.compile(r"\bfirst\b|\bstart\w*|\bbegin\w*|\bwhere\b|\bnew\s+to\b|"
+                                    r"\bbeginner\b|\bhow\s+(?:do|can|to|should)\b", re.I)
+_BUY_SHARES_NOT: Final = re.compile(
+    r"\bcrypto\w*|\bbitcoin\b|\bcoins?\b|\btokeni[sz]ed\b|\brtokens?\b|\bipo\b|\b(?:shares?|"
+    r"stocks?)\s+(?:of|in)\s+[A-Z]{2,5}\b", re.I)
+_BUY_SHARES_A: Final = (
+    "Bottom line: a share is a small ownership stake in a company, and you buy one through a "
+    "broker — a firm licensed in your country to place stock orders for you — not through a "
+    "crypto exchange.",
+    "First steps: pick a broker that your country's financial regulator lists as registered (look "
+    "the name up on the regulator's own site), open and verify an account, put in money you will "
+    "not need soon, then place an order; a limit order lets you set the most you will pay.",
+    "Many brokers sell fractions of a share, so you can start small; check the fees and any "
+    "minimum. A fund that holds many companies (an index fund) spreads the risk more than one "
+    "share does.",
+    "On Bitget, some US stocks are available as tokenised stocks (rTokens): they track the share's "
+    "price, but you do not own the share and have no vote, and they trade around the clock. If "
+    "owning the actual share matters, use a broker.",
+)
+
+
+def _buy_shares(text: str) -> Lines | None:
+    if not (_BUY_SHARES.search(text) and _BUY_SHARES_ASK.search(text)):
+        return None
+    if _BUY_SHARES_NOT.search(text) and not re.search(r"\bbitget\b", text, re.I):
+        return None
+    if _NO_TICKER.search(text) and not re.search(r"\b(?:I|A|US|UK|ETF)\b", text):
+        return None
+    return list(_BUY_SHARES_A)
+
+
+_BALANCE_FX: Final = re.compile(
+    r"\b(?:balance|portfolio|holdings?|total|account\s+value|value)\b[^?]{0,40}\b(?:differ\w*|"
+    r"different|changes?|not\s+the\s+same|doesn'?t\s+match|mismatch\w*|two\s+numbers|bigger|"
+    r"smaller|higher|lower)\b[^?]{0,40}\b(?:usd|eur|gbp|inr|dollars?|euros?|pounds?|currenc\w*)\b|"
+    r"\b(?:usd|dollars?)\b[^?]{0,20}\b(?:and|vs\.?|versus|or)\b[^?]{0,10}\b(?:eur|euros?|gbp|inr)"
+    r"\b[^?]{0,40}\b(?:different|differ\w*|not\s+the\s+same)\b", re.I)
+_BALANCE_FX_A: Final = (
+    "Bottom line: the amount of coin you hold has not changed — only its estimated value in each "
+    "currency, which is the coin's price converted at the current exchange rate between the two "
+    "currencies.",
+    "For example, if one dollar is worth 0.90 euro at the moment, a balance of 1,000 USD shows as "
+    "900 EUR: a different number for the same holding.",
+    "The rate moves through the day, and apps use different rate sources and update times, so "
+    "two screens can differ a little even in the same currency. This console cannot see your "
+    "account; the rate your app uses is shown in its settings or details.",
+)
+
+_ALL_IN: Final = re.compile(
+    r"\b(?:put|invest|throw|pour|go|move|stick|dump|bet|buy)\w*\s+(?:all|everything|my\s+(?:whole|"
+    r"entire)|all\s+of|the\s+whole)\b[^?]{0,40}\b(?:in|into|on|to)\s+(?:the\s+|some\s+)?(?:btc|"
+    r"bitcoin|eth|ethereum|sol|solana|crypto\w*|coins?|doge\w*|xrp|alts?|memecoins?|[a-z]{2,6}"
+    r"coin)\b|\ball[\s-]in\b[^?]{0,20}\b(?:btc|bitcoin|eth|crypto\w*|coins?)\b", re.I)
+_ALL_IN_A: Final = (
+    "Bottom line: no, not everything — put in only an amount you could lose without it changing "
+    "your life, because Bitcoin can fall by more than half and has done so more than once (about "
+    "65% in 2022: 47,216 to 16,558 USDT, Bitget's daily closes).",
+    "FOMO (fear of missing out) is the feeling that makes people buy at the worst time: when "
+    "everyone is excited, much of the rise has often already happened. A rush to put it all in "
+    "is the pattern to distrust.",
+    "If you still want in: a small amount you could lose, then more later in equal steps if you "
+    "still want to; an emergency fund in cash first; no leverage and no borrowed money.",
+    "Wait an hour, or a day, before you click: a good reason to buy will still be there "
+    "tomorrow.",
+)
+
+_SLIPPAGE: Final = re.compile(
+    r"\bwhat\s+(?:is|does|do|are)\b[^?]{0,40}\bslip(?:page|ped|s|ping)?\b|\b(?:my|the)\b[^?]{0,30}"
+    r"\bslipped\b|\bwhy\b[^?]{0,30}\bslipp(?:ed|age)\b", re.I)
+_SLIPPAGE_NOT: Final = re.compile(r"\$\s?\d|\b\d+\s*[km]\b|\bdepth\b|\bwould\b|\bback-?test\w*|"
+                                  r"\bbook\b", re.I)
+_SLIPPAGE_A: Final = (
+    "Bottom line: slippage is the gap between the price you expected when you pressed buy or "
+    "sell and the price you actually got — \"my order slipped\" means it filled at a worse price "
+    "than the one on screen.",
+    "It happens with market orders because the price moves between your click and the fill, or "
+    "because your order is bigger than what is offered at the best price and takes the next, "
+    "worse prices in the order book. It is larger in thin, fast markets and for big orders.",
+    "To limit it: use a limit order (you set the worst price you accept, so it fills there or "
+    "better, or not at all), trade smaller sizes, avoid thin small coins and the minutes around "
+    "big news, and read the estimated price on the order screen before confirming.",
+)
+
+_RUG_DUMP: Final = re.compile(
+    r"\brug\w*\b[^?]{0,40}\b(?:vs\.?|versus|or|and|from|different\w*|difference)\b[^?]{0,20}\b"
+    r"dump\w*|\bdump\w*\b[^?]{0,40}\b(?:vs\.?|versus|or|and|from|different\w*|difference)\b"
+    r"[^?]{0,20}\brug\w*", re.I)
+_RUG_DUMP_A: Final = (
+    "Bottom line: a rug pull is theft by the people who run a project — they drain the money "
+    "from the trading pool or abandon the project after taking it — while a dump is just a sharp "
+    "fall in price caused by heavy selling, which is not always a crime.",
+    "Rug pull: insiders build a token that looks real, draw in money, then remove the liquidity "
+    "or vanish; the price goes to near zero and you often cannot sell at all.",
+    "Dump: a large holder, or many holders at once, sell fast and push the price down; the coin "
+    "can still be traded and may bounce. It becomes a scam when it is planned (a pump and dump: "
+    "hype the price up, then sell to the late buyers).",
+    "Both look alike on a chart. Check who holds most of the supply, whether liquidity is locked "
+    "and whether the team is known, and never put in more than you could lose.",
+)
+
+_DIVIDEND: Final = re.compile(r"\bwhat\s+(?:is|are|does)\s+(?:a\s+|an\s+)?dividends?\b|\bdividends?"
+                              r"\b[^?]{0,40}\b(?:every\s+month|monthly|how\s+often|get\s+paid|"
+                              r"paid\s+every)\b", re.I)
+_DIVIDEND_PAY: Final = re.compile(r"\bpaid\b|\bpay\w*\b|\bevery\s+month\b|\bmonthly\b|"
+                                  r"\bhow\s+often\b", re.I)
+_DIVIDEND_A: Final = (
+    "Bottom line: a dividend is a share of a company's profit paid to its shareholders, usually "
+    "in cash — and not necessarily every month: most US companies pay four times a year, many "
+    "European ones once or twice, and a few pay monthly.",
+    "You receive it only if you own the share before the ex-dividend date (the first day a "
+    "buyer no longer gets the next payment); the share price usually drops by about the dividend "
+    "that day, so it is not free money.",
+    "Dividends are not guaranteed: a company can cut or stop them, and many growth companies pay "
+    "none. Bitcoin pays no dividend; staking rewards are a different thing, and a tokenised "
+    "stock is not the share itself, so check how it treats dividends before assuming you get one.",
+)
+
+_LIQ_HAPPENS: Final = re.compile(r"\bwhat\s+(?:happens?|will\s+happen|would\s+happen)\b[^?]{0,30}"
+                                 r"\bliquidat\w*\b", re.I)
+_LIQ_HAPPENS_A: Final = (
+    "Bottom line: if you are liquidated, the exchange closes your leveraged position by force "
+    "because its losses have used up the margin behind it — you lose that margin and the "
+    "position is gone (with cross margin, the whole futures balance can be drawn on first).",
+    "It is automatic: when the price reaches your liquidation price the close happens, a fee may "
+    "be charged, and you cannot get that position back, only open a new one.",
+    "Before it happens: your liquidation price is shown on the position screen, and the higher "
+    "the leverage the closer it is (at 10x, a move of a little under 10% against you). Lower "
+    "leverage, a smaller size and a stop-loss placed before the liquidation price reduce the "
+    "risk; buying on spot cannot be liquidated.",
+)
+
+_HODL: Final = re.compile(r"\bhodl\w*\b", re.I)
+_HODL_ASK: Final = re.compile(r"\b(?:is|real|thing|works?|strategy|mean\w*|copium|cope|good|"
+                              r"worth|actually|even|legit|what)\b", re.I)
+_HODL_NOT: Final = re.compile(r"\b(?:fomo|fud|rekt|ngmi|wagmi|dyor|degen|ath|diamond)\b", re.I)
+_HODL_A: Final = (
+    "Bottom line: HODL began as a misspelling of \"hold\" in a 2013 Bitcoin forum post and now "
+    "means buying and holding through the swings instead of selling — a real strategy, but it "
+    "only works if what you hold comes back, and \"copium\" (coping with losses) is what it "
+    "becomes when it does not.",
+    "The evidence cuts both ways: Bitcoin fell about 65% in 2022 (47,216 to 16,558 USDT, "
+    "Bitget's daily closes) and later set new highs, but many smaller coins that fell never came "
+    "back, so holding one coin is not the same as holding the market.",
+    "If you hold: only money you can leave alone for years, no leverage (a liquidation forces a "
+    "sale), and a decision beforehand about when you would sell — or buy small regular amounts "
+    "instead of one big bet.",
+)
+
+_CAUTION_ASK: Final = re.compile(
+    r"\b(?:watch\s+(?:out\s+)?for|look\s+out\s+for|careful|beware|mistakes?|pitfalls?|know\s+"
+    r"before|should\s+i\s+know|things\s+to\s+(?:know|watch|check)|what\s+to\s+(?:watch|know|"
+    r"check|avoid))\b", re.I)
+_CAUTION_FIRST: Final = re.compile(r"\bfirst[\s-]time\b|\bfor\s+the\s+first\b|\bbeginner\b|"
+                                   r"\bnew\s+to\b|\bjust\s+start\w*\b|\bnever\s+(?:bought|"
+                                   r"invested)\b", re.I)
+_CAUTION_BUY: Final = re.compile(r"\b(?:buy\w*|purchas\w*|invest\w*)\b[^?]{0,40}\b(?:bitcoin|btc|"
+                                 r"crypto\w*|ethereum|eth)\b|\b(?:bitcoin|btc|crypto\w*)\b[^?]{0,"
+                                 r"40}\b(?:buy\w*|purchas\w*|invest\w*)\b", re.I)
+_CAUTION_A: Final = (
+    "Bottom line: for a first purchase, start small — an amount you could lose without it "
+    "hurting — and treat the first weeks as learning, not earning.",
+    "Watch for: price swings (Bitcoin has fallen more than half more than once, about 65% in "
+    "2022), fees on the buy and on any withdrawal, and where you buy: a large regulated "
+    "exchange you reached yourself, not a link from a message.",
+    "Protect the account: a unique password, two-factor authentication with an authenticator app, "
+    "and never share a code or recovery phrase; no real support team asks for them.",
+    "Avoid: leverage and borrowed money, anyone promising guaranteed returns, and buying in a "
+    "rush because the price is rising. Bitget's standard spot fee is 0.10% a side, about $0.10 "
+    "on $100.",
+)
+
+
+def _first_caution(text: str) -> Lines | None:
+    if _CAUTION_ASK.search(text) and _CAUTION_FIRST.search(text) and _CAUTION_BUY.search(text):
+        return list(_CAUTION_A)
+    return None
+
+
+_ROUND44: Final[tuple[Callable[[str], Lines | None], ...]] = (
+    _recovery_scam, _wrong_send, _fake_app,
+    _fixed(_HARDWARE, _HARDWARE_A),
+    _fixed(_STOCK_SPLIT, _STOCK_SPLIT_A, also=_STOCK_SPLIT_ASK, never=_NO_TICKER),
+    _fixed(_INDEX_FUND, _INDEX_FUND_A, never=_INDEX_FUND_NOT),
+    _buy_shares, _benefits,
+    _fixed(_CUSTODY, _CUSTODY_A),
+    _fixed(_BALANCE_FX, _BALANCE_FX_A),
+    _fixed(_ALL_IN, _ALL_IN_A),
+    _fixed(_SLIPPAGE, _SLIPPAGE_A, never=_SLIPPAGE_NOT),
+    _fixed(_RUG_DUMP, _RUG_DUMP_A),
+    _fixed(_DIVIDEND, _DIVIDEND_A, also=_DIVIDEND_PAY, never=_NO_TICKER),
+    _fixed(_LIQ_HAPPENS, _LIQ_HAPPENS_A),
+    _fixed(_HODL, _HODL_A, also=_HODL_ASK, never=_HODL_NOT),
+    _first_caution,
+)
+"""The round-44 readers, tried before the round-43 ones: an emergency or a scam question must
+never be read as a price dip or as chasing a loss."""
+
+
 _FIRSTS: Final[tuple[Callable[[str], Lines | None], ...]] = (
-    _seed, *_ROUND43, _wallet, _loss_felt, _win_back, _scam_double, _friend_leverage,
+    _seed, *_ROUND44, *_ROUND43, _wallet, _loss_felt, _win_back, _scam_double, _friend_leverage,
     _emergency, _gas, _tokenised,
     _first_buy, _sip, _exchange_scam, _kyc_why, _bitcoin_safe, _hacked, _fx, _fomo)
 
@@ -1573,7 +2038,11 @@ def _follow_scammer(text: str, before: str) -> Lines | None:
 _SIMPLER: Final = re.compile(
     r"\b(?:explain|say|put|tell)\b[^?]{0,30}\b(?:simpler|simply|plainer|plain|easier|shorter|"
     r"like\s+i'?m\s+(?:5|five|a\s+kid))\b|^\W*(?:simpler|simplify|eli5)\W*$|\bin\s+simple\s+"
-    r"(?:words|terms|english)\b|\bdumb\s+it\s+down\b|\beli5\b", re.I)
+    r"(?:words|terms|english)\b|\bdumb\s+it\s+down\b|\beli5\b|"
+    # round 44: "say it shorter", "shorter please", "make it shorter", "tl;dr", "too long"
+    r"^\W*(?:(?:ok(?:ay)?|so|can\s+you|please|pls)\W+){0,2}(?:make\s+it\s+|say\s+it\s+|be\s+)?"
+    r"(?:shorter|short|briefer|brief)(?:\s+(?:please|pls))?\W*$|\btl;?\s*dr\b|"
+    r"\b(?:that'?s|that\s+is|too)\s+(?:too\s+)?long\b", re.I)
 _WITHDRAWING: Final = re.compile(r"\bwithdraw\w*|\bcash\s*(?:it\s+)?out\b|\bget\s+(?:my\s+)?"
                                  r"(?:money|funds|cash)\s+(?:back\s+)?out\b|\btake\s+(?:my\s+)?"
                                  r"(?:money|funds)\s+out\b", re.I)
@@ -1599,8 +2068,96 @@ def _follow_simpler(text: str, before: str) -> Lines | None:
     list, not the same sentences with a prefix (round 43 newcomer, minor 1)."""
     if not _SIMPLER.search(text):
         return None
-    earlier = _plain(before)
-    topics: tuple[tuple[re.Pattern[str], tuple[str, ...]], ...] = (
+    questions = [_plain(q) for q in before.split("\n") if q.strip()]
+    for asked in reversed(questions):
+        said = _shorter_for(asked, " ".join(questions))
+        if said:
+            return said
+    return None
+
+
+_PRESALE: Final = re.compile(r"\bpre-?sales?\b|\bico\b|\bido\b|\bieo\b|\btoken\s+sale\b", re.I)
+_BORROW: Final = re.compile(r"\bborrow\w*|\bloans?\b|\bcredit\s+card\b", re.I)
+_LEVERAGE: Final = re.compile(r"\b\d{1,3}\s*x\b|\bleverage\w*|\bfutures\b|\bmargin\b|\bperps?\b",
+                              re.I)
+_PRESALE_S: Final = (
+    "Bottom line: a presale is riskier than buying a listed coin: nothing trades yet, so there "
+    "is no way to sell.",
+    "The team can vanish with the money, and early buyers' tokens often unlock after listing "
+    "and get sold.",
+    "Most presales list below their presale price or never list. Use only money you could lose "
+    "entirely.",
+)
+_BORROW_S: Final = (
+    "Bottom line: no, do not borrow to buy. The loan must be repaid whatever the price does, "
+    "and the interest costs you every month.",
+    "\"It always comes back\" is not a promise: ETH stayed more than half below its 2021 high "
+    "for most of 2022 and all of 2023 (Yahoo Finance daily closes), and some coins never "
+    "come back.",
+    "If you buy, use money you could leave alone through a bad year.",
+)
+_NEW_TOPICS: Final[tuple[tuple[re.Pattern[str], tuple[str, ...] | None], ...]] = (
+    (_PRESALE, _PRESALE_S), (_BORROW, _BORROW_S), (_LEVERAGE, None), (_RECOVERY, None),
+    (_FAKE_APP, None),
+    (_CUSTODY, None), (_BENEFITS, None), (_HARDWARE, None), (_STOCK_SPLIT, None),
+    (_INDEX_FUND, None), (_BUY_SHARES, None), (_BALANCE_FX, None), (_ALL_IN, None),
+    (_SLIPPAGE, None), (_RUG_DUMP, None), (_DIVIDEND, None), (_LIQ_HAPPENS, None), (_HODL, None),
+    (_CAUTION_BUY, None), (_WRONG_SEND, _WRONG_SEND_S))
+
+
+def _clause(line: str) -> str:
+    """The first clause of one line of an answer: its point, without the support."""
+    body = line.removeprefix("Bottom line: ")
+    cuts = [m.start() for m in re.finditer(r"(?<=[.!?])\s+(?=[A-Z\"0-9])|;\s| — | \(", body)]
+    first = body[:next((c for c in cuts if c >= 45), len(body))].strip()
+    if len(first) > 170:
+        cut = first[:170]
+        first = cut.rsplit(",", 1)[0] if "," in cut[60:] else cut.rsplit(" ", 1)[0]
+    first = first.rstrip(" ,:")
+    if not first.endswith((".", "!", "?", '"')):
+        first += "."
+    return ("Bottom line: " if line.startswith("Bottom line: ") else "") + first
+
+
+def _shorten(lines: Lines) -> Lines | None:
+    """A genuinely shorter version of ``lines``: every line keeps its first clause, so no point
+    is dropped. None when that is not shorter than the original."""
+    short = [_clause(line) for line in lines[:5]]
+    if len(" ".join(short)) >= 0.8 * len(" ".join(lines)):
+        return None
+    return short
+
+
+def _answer_for(question: str) -> Lines | None:
+    found = _first_of(question)
+    return found[0] if found is not None else _first(question)
+
+
+def _shorter_for(asked: str, whole: str) -> Lines | None:
+    """The shorter version of the answer to one earlier question: this layer's own plain words
+    where it has them, otherwise the answer cut to the first clause of each line."""
+    if _WRONG_SEND.search(asked) and not _WRONG_NOT.search(asked):
+        return list(_WRONG_SEND_S)
+    if _RECOVERY.search(asked):
+        full = _answer_for(asked)
+        return _shorten(full) if full else None
+    best: tuple[int, tuple[str, ...] | None] | None = None
+    for pattern, simple in (*_SIMPLE_TOPICS, *_NEW_TOPICS):
+        hits = list(pattern.finditer(asked))
+        if hits and (best is None or hits[-1].end() >= best[0]):
+            best = (hits[-1].end(), simple)
+    if best is None:
+        full = _answer_for(asked)
+        return _shorten(full) if full else None
+    if best[1] is _WHAT_NOW_S and _WITHDRAWING.search(whole):
+        return list(_WITHDRAW_S)
+    if best[1] is not None:
+        return list(best[1])
+    full = _answer_for(asked)
+    return _shorten(full) if full else None
+
+
+_SIMPLE_TOPICS: Final[tuple[tuple[re.Pattern[str], tuple[str, ...]], ...]] = (
         (_P2P, _P2P_S), (_SIGNAL_GROUP, _SIGNAL_S), (_PHISH_BAIT, _PHISH_S),
         (_FORGOT_2FA, _FORGOT_2FA_S), (_RUG, _RUG_S), (_ATM, _ATM_S), (_SIM_SWAP, _SIM_SWAP_S),
         (_REPORT_SCAM, _REPORT_SCAM_S), (_PUMP, _PUMP_S), (_CHART, _CHART_S),
@@ -1612,16 +2169,6 @@ def _follow_simpler(text: str, before: str) -> Lines | None:
         (_WHALE, _WHALE_S), (_MARKET_CAP, _MARKET_CAP_S), (_STABLE, _STABLE_S),
         (_STAKING, _STAKING_S), (_TAX_Q, _TAX_S), (_WITHDRAWING, _WITHDRAW_S),
         (_WHAT_NEXT_ANY, _WHAT_NOW_S))
-    best: tuple[int, tuple[str, ...]] | None = None
-    for pattern, simple in topics:
-        hits = list(pattern.finditer(earlier))
-        if hits and (best is None or hits[-1].end() >= best[0]):
-            best = (hits[-1].end(), simple)
-    if best is None:
-        return None
-    if best[1] is _WHAT_NOW_S and _WITHDRAWING.search(earlier):
-        return list(_WITHDRAW_S)
-    return list(best[1])
 
 
 def _follow_if_down(text: str, before: str) -> Lines | None:
@@ -1697,6 +2244,54 @@ DECLINED_LANGUAGE: Final[dict[str, tuple[str, str, str]]] = {
            "Tanpa model bahasa, pertanyaan dalam bahasa ini hanya dibaca bila menanyakan harga; "
            "selebihnya dijawab dalam bahasa Inggris, misalnya \"what did TSLA's latest earnings "
            "report say\"."),
+    # round 44: Italian, Polish and Swahili got the English refusal, Russian and Hindi (which
+    # `translate.target_language` detects) had no fixed text at all, and neither had Arabic or Thai
+    "it": ("Risposta in inglese: il modello linguistico è in pausa per la tua rete per al "
+           "massimo {minutes} minuti (quota oraria esaurita). I numeri sono comunque calcolati "
+           "in tempo reale.",
+           "Senza il modello linguistico, in pausa per la tua rete per al massimo {minutes} "
+           "minuti, non è stato possibile leggere questa domanda. Falla in inglese, oppure "
+           "riprova più tardi.",
+           "Senza il modello linguistico, una domanda in questa lingua viene letta solo se "
+           "chiede un prezzo; tutto il resto riceve risposta in inglese, per esempio \"what did "
+           "TSLA's latest earnings report say\"."),
+    "pl": ("Odpowiedź po angielsku: model językowy jest wstrzymany dla Twojej sieci na "
+           "maksymalnie {minutes} min (wyczerpany limit godzinowy). Liczby nadal są liczone "
+           "na żywo.",
+           "Bez modelu językowego, wstrzymanego dla Twojej sieci na maksymalnie {minutes} min, "
+           "nie udało się odczytać tego pytania. Zadaj je po angielsku lub spróbuj ponownie "
+           "później.",
+           "Bez modelu językowego pytanie w tym języku jest odczytywane tylko wtedy, gdy "
+           "dotyczy ceny; na resztę odpowiadamy po angielsku, na przykład \"what did TSLA's "
+           "latest earnings report say\"."),
+    "sw": ("Jibu kwa Kiingereza: modeli ya lugha imesitishwa kwa mtandao wako kwa hadi dakika "
+           "{minutes} (kikomo cha saa kimeisha). Namba bado zinahesabiwa moja kwa moja.",
+           "Bila modeli ya lugha, iliyositishwa kwa mtandao wako kwa hadi dakika {minutes}, "
+           "swali hili halikuweza kusomwa. Uliza kwa Kiingereza, au jaribu tena baadaye.",
+           "Bila modeli ya lugha, swali katika lugha hii husomwa tu linapouliza bei; mengine "
+           "hujibiwa kwa Kiingereza, kwa mfano \"what did TSLA's latest earnings report say\"."),
+    "ru": ("Ответ на английском: языковая модель приостановлена для вашей сети не более "
+           "чем на {minutes} мин. (часовой лимит исчерпан). Числа по-прежнему считаются "
+           "в реальном времени.",
+           "Без языковой модели, приостановленной для вашей сети не более чем на {minutes} "
+           "мин., этот вопрос прочитать не удалось. Задайте его по-английски или повторите "  # noqa: RUF001
+           "позже.",
+           "Задайте вопрос по-английски, например \"what is NVDA's price right now\"."),
+    "hi": ("अंग्रेज़ी में जवाब: भाषा मॉडल आपके नेटवर्क के लिए अधिकतम {minutes} मिनट के लिए रुका "
+           "हुआ है (घंटे की सीमा पूरी हो गई)। आँकड़े अब भी लाइव गणना से आते हैं।",
+           "भाषा मॉडल के बिना, जो आपके नेटवर्क के लिए अधिकतम {minutes} मिनट के लिए रुका हुआ है, यह "
+           "प्रश्न पढ़ा नहीं जा सका। कृपया इसे अंग्रेज़ी में पूछें या बाद में दोबारा कोशिश करें।",
+           "कृपया अंग्रेज़ी में पूछें, उदाहरण के लिए \"what is NVDA's price right now\"।"),
+    "ar": ("الرد بالإنجليزية: نموذج اللغة متوقف مؤقتًا لشبكتك لمدة أقصاها {minutes} دقيقة "
+           "(استُنفدت الحصة الساعية). الأرقام ما زالت تُحسب مباشرة.",
+           "بدون نموذج اللغة، المتوقف مؤقتًا لشبكتك لمدة أقصاها {minutes} دقيقة، تعذّرت قراءة "
+           "هذا السؤال. اطرحه بالإنجليزية أو حاول مرة أخرى لاحقًا.",
+           "اطرح سؤالك بالإنجليزية، مثل \"what is NVDA's price right now\"."),
+    "th": ("ตอบเป็นภาษาอังกฤษ: โมเดลภาษาหยุดชั่วคราวสำหรับเครือข่ายของคุณนานสูงสุด {minutes} นาที "
+           "(โควตารายชั่วโมงหมด) ตัวเลขยังคำนวณสดอยู่",
+           "หากไม่มีโมเดลภาษา ซึ่งหยุดชั่วคราวสำหรับเครือข่ายของคุณนานสูงสุด {minutes} นาที "
+           "จึงอ่านคำถามนี้ไม่ได้ กรุณาถามเป็นภาษาอังกฤษ หรือลองใหม่ภายหลัง",
+           "กรุณาถามเป็นภาษาอังกฤษ เช่น \"what is NVDA's price right now\""),
 }
 """Per language code (as `translate.target_language` returns it): the note above an English answer,
 the refusal, and the line after it, each with ``{minutes}`` where the wait is said (the third has
@@ -1712,17 +2307,359 @@ def declined_language(code: str | None, minutes: int) -> tuple[str, str, str] | 
     return note.format(minutes=minutes), refusal.format(minutes=minutes), hint
 
 
+# --- round 44 follow-ups: "so is it safe", "what should I check first", "so can I get it back" ---
+#
+# Read with the question before them. The audit found all three answered about the console, or
+# declined, because the follow-up lost its subject.
+
+_SAFE_FOLLOW: Final = re.compile(
+    r"^\W*(?:(?:so|ok(?:ay)?|but|and|then|well|hmm+)\W+){0,3}(?:is\s+(?:it|that|this|they|he|"
+    r"she)|are\s+(?:they|these|those)|would\s+(?:it|that)\s+be|can\s+i\s+trust\s+(?:it|them|"
+    r"that)|should\s+i\s+trust\s+(?:it|them|that))\s*(?:really\s+|actually\s+|even\s+|all\s+)?"
+    r"(?:safe|legit|legitimate|risky|ok|okay|a\s+scam|dangerous|trustworthy|secure|fine|"
+    r"worth\s+it)(?:\s+or\s+not|\s+though|\s+then)?\W*$", re.I)
+_CHECK_FOLLOW: Final = re.compile(
+    r"^\W*(?:(?:so|ok(?:ay)?|but|and|then|well|hmm+)\W+){0,3}(?:what\s+(?:should|do|can|must|"
+    r"shall)\s+i\s+(?:check|verify|look\s+(?:at|for|into)|confirm|do)\s+first|what\s+(?:should|"
+    r"do)\s+i\s+(?:check|verify)|what\s+to\s+(?:check|verify)(?:\s+first)?|how\s+(?:do|can)\s+i\s+"
+    r"(?:check|verify)\s+(?:it|that|this)|where\s+(?:do|should)\s+i\s+start|what\s+first|"
+    r"checklist|what'?s\s+the\s+first\s+thing\s+(?:i\s+)?(?:should\s+)?(?:check|do))\W*$", re.I)
+
+_TOPIC_TABLE: Final[tuple[tuple[re.Pattern[str], str], ...]] = (
+    (_SIM_SWAP, "other"), (_FORGOT_2FA, "other"), (_CHART, "other"), (_SMALL_SUM, "other"),
+    (_BULL_TRAP, "other"), (_BUBBLE, "other"), (_INFLATION, "other"), (_WD_LIMIT, "other"),
+    (_NOW_OR_WAIT, "other"), (_PAPER_LOSS, "other"), (_BOUGHT_TOP, "other"),
+    (_TOO_LATE, "other"), (_WEN_MOON, "other"), (_PRICE_DIFF, "other"), (_FRACTION, "other"),
+    (_FAST, "other"), (_WHALE, "other"), (_MARKET_CAP, "other"), (_SEED, "wallet"),
+    (_GAS, "other"), (_KYC_WHY, "kyc"), (_BITCOIN_SAFE, "other"), (_HACKED, "other"),
+    (_FX, "other"), (_EMERGENCY, "other"), (_SCAM_DOUBLE, "other"), (_FRIEND_LEVERAGE, "leverage"),
+    (_LOSS_FELT, "other"), (_REPORT_SCAM, "other"), (_PHISH_BAIT, "other"),
+    (_P2P, "p2p"), (_SIGNAL_GROUP, "signal"), (_ATM, "atm"), (_STABLE_ANY, "stable"),
+    (_RUG, "rug"), (_PUMP, "rug"), (_SCAM_COIN, "rug"), (_EXCHANGE_SCAM, "fake_app"),
+    (_EXCH_WALLET, "wallet"), (_WALLET, "wallet"), (_TOKENISED, "shares"), (_DCA, "dca"),
+    (_SIP, "dca"), (_STAKING, "staking"), (_TAX_Q, "tax"),
+    (_PRESALE, "presale"), (_BORROW, "borrow"), (_LEVERAGE, "leverage"),
+    (_RECOVERY, "recovery"), (_FAKE_APP, "fake_app"), (_CUSTODY, "wallet"),
+    (_BENEFITS, "benefits"), (_HARDWARE, "wallet"), (_STOCK_SPLIT, "split"),
+    (_INDEX_FUND, "index"), (_BUY_SHARES, "shares"), (_BALANCE_FX, "other"),
+    (_ALL_IN, "all_in"), (_SLIPPAGE, "other"), (_RUG_DUMP, "rug"), (_DIVIDEND, "dividend"),
+    (_LIQ_HAPPENS, "leverage"), (_HODL, "hodl"), (_CAUTION_BUY, "first_buy"),
+    (_WRONG_SEND, "wrong_send"))
+"""Every topic this layer answers, to the key its follow-ups are looked up under; ``other`` takes
+the general safe and check answers."""
+
+
+def _topic(before: str) -> str | None:
+    """The topic of the latest question in ``before`` that is one of this layer's."""
+    best: tuple[int, int, str] | None = None
+    for index, asked in enumerate(q for q in before.split("\n") if q.strip()):
+        plain = _plain(asked)
+        for pattern, key in _TOPIC_TABLE:
+            ends = [m.end() + (100000 if key in ("wrong_send", "recovery") else 0)
+                    for m in pattern.finditer(plain)]
+            if ends and (best is None or (index, max(ends)) >= best[:2]):
+                best = (index, max(ends), key)
+    return best[2] if best is not None else None
+
+
+_SAFE_BY_TOPIC: Final[dict[str, tuple[str, ...]]] = {
+    "presale": (
+        "Bottom line: no — a presale is among the riskier things you can buy: the token often has "
+        "no working product yet, nobody independent checks the claims, and many never list or "
+        "list far below the presale price.",
+        "An anonymous team, a promised return, or \"last chance\" pressure are warnings. Only an "
+        "amount you could lose entirely belongs in one, bought from the project's official site "
+        "that you reached yourself."),
+    "borrow": (
+        "Bottom line: no — borrowing to invest is not safe: the loan must be repaid whatever the "
+        "price does, and the interest is a cost every month.",
+        "A fall then loses money you do not have, and a lender can force you to sell at the "
+        "worst moment. Invest only money you could lose, never borrowed money."),
+    "index": (
+        "Bottom line: safer than one stock or coin, because it spreads your money over many "
+        "companies, but not safe — if the whole market falls the fund falls with it (the S&P 500 "
+        "index lost about 19% in 2022).",
+        "Markets have tended to recover over long periods, but that is a record, not a promise; "
+        "only money you can leave alone for years belongs in it."),
+    "staking": (
+        "Bottom line: not risk-free — the reward is paid in the coin, whose price can fall by "
+        "more than the reward, and locked coins may not be sellable until the lock ends.",
+        "Check who holds the coins while they are staked, and be wary of an unusually high rate: "
+        "it usually pays for higher risk."),
+    "leverage": (
+        "Bottom line: for a beginner, no — leverage multiplies losses as well as gains, and a "
+        "small move against you can liquidate the position.",
+        "On spot with no leverage the most you can lose is what you paid; if you ever use "
+        "leverage, keep it low and set a stop-loss first."),
+    "p2p": (
+        "Bottom line: it can be, if you release coins only after the money is in your own bank "
+        "app and keep everything inside the platform's order and chat.",
+        "The risk is the other person: fake payment screenshots and bank payments that are "
+        "reversed later are the usual losses."),
+    "signal": (
+        "Bottom line: no — treat any signal group as unsafe until proven otherwise; many are "
+        "pump-and-dump schemes or lead to fake platforms.",
+        "Never pay to join, never send money to an admin, and never log in through a link from "
+        "the group."),
+    "atm": (
+        "Bottom line: not for paying anyone else — if someone told you to use a crypto ATM to pay "
+        "a fine or a tax, or to \"protect\" your money, it is a scam.",
+        "Even for your own purchase the fees are high and the transfer cannot be reversed."),
+    "stable": (
+        "Bottom line: safer than a volatile coin, not safe like a bank deposit — TerraUSD lost "
+        "its peg in May 2022 and USDC dipped to about $0.87 in March 2023.",
+        "It is not insured; hold only what you need, and spread it across more than one large "
+        "issuer."),
+    "wallet": (
+        "Bottom line: each has a different risk — an exchange can be hacked or freeze "
+        "withdrawals, and a wallet you control puts the whole risk on you, because nobody can "
+        "recover a lost recovery phrase.",
+        "Whichever you use: a unique password, an authenticator app, the recovery phrase on paper "
+        "and offline, and only an amount you could lose."),
+    "shares": (
+        "Bottom line: it is a different risk from owning the thing itself — a tokenised stock "
+        "tracks the price but you are not a shareholder, and it trades around the clock so its "
+        "price can drift from the stock's.",
+        "The price still moves like the stock, so you can lose money on it; a regulated broker is "
+        "the place to own actual shares."),
+    "dca": (
+        "Bottom line: it reduces the risk of one bad entry day, not the risk of the asset itself "
+        "— regular buys into something that falls 70% still fall 70%.",
+        "Keep the monthly amount to what you could lose without it hurting."),
+    "rug": (
+        "Bottom line: no coin can be called safe from a rug pull or a pump and dump, but there "
+        "are ways to lower the risk.",
+        "Stay with coins listed on a large exchange, check who holds most of the supply and "
+        "whether liquidity is locked, and never put in more than you could lose."),
+    "recovery": (
+        "Bottom line: no — a recovery service that contacts you and asks for a fee is not safe; "
+        "it is a second scam.",
+        "Do not pay, and give no recovery phrase, password or remote access. Report to the "
+        "exchange you used and to the police."),
+    "fake_app": (
+        "Bottom line: only if it comes from the company's own website or the official store "
+        "listing that site links to, and the publisher name matches.",
+        "Test with a small deposit and withdraw it before more; an app that blocks withdrawals "
+        "is a fake."),
+    "wrong_send": (
+        "Bottom line: sending it again is not safe until you know where the first transfer went "
+        "— a second mistake costs a second amount.",
+        "Look up the transaction hash first, then ask the receiving platform's support; ignore "
+        "anyone who offers to recover it for a fee."),
+    "all_in": (
+        "Bottom line: no — putting everything in one coin is not safe: it can lose more than half "
+        "its value, as Bitcoin did in 2022 (about 65%).",
+        "A small amount you could lose, bought in steps, is a much safer way in."),
+    "dividend": (
+        "Bottom line: a dividend is never guaranteed: a company can cut or stop it, and the share "
+        "price drops by about the dividend on the ex-dividend date.",
+        "It is a payment out of the company's own value, not extra money; reinvested or not, the "
+        "share can still fall."),
+    "split": (
+        "Bottom line: a split itself is neutral: you own more shares at a lower price each, with "
+        "the same total value.",
+        "What can still hurt you is the price move that follows for other reasons, and a reverse "
+        "split by a company whose price had collapsed."),
+    "hodl": (
+        "Bottom line: holding is not safe in itself: it only works if what you hold recovers, and "
+        "Bitcoin fell about 65% in 2022 while many smaller coins never came back.",
+        "Only money you can leave alone for years, no leverage, and a loss level decided in "
+        "advance make it a plan rather than a hope."),
+    "first_buy": (
+        "Bottom line: a first buy is a limited risk only if it is small: Bitcoin can lose more "
+        "than half its value, and has.",
+        "On a large regulated exchange you reached yourself, with no leverage and money you could "
+        "lose, the risk is the price itself rather than a scam or a forced sale."),
+    "kyc": (
+        "Bottom line: giving ID to a large, regulated exchange through its official app is "
+        "normal and required by law, but no company's data is perfectly safe.",
+        "Give it only there, never to someone who messages you, and turn on 2FA."),
+}
+_SAFE_GENERIC: Final = (
+    "Bottom line: nothing in crypto is safe in every case, so the honest answer is: it depends "
+    "on who runs it, whether you can get your money out, and how much you put in.",
+    "Safer: a large regulated exchange you reached yourself, a small amount you could lose, no "
+    "leverage or borrowed money, and a test withdrawal before more.",
+    "Unsafe signs: guaranteed returns, pressure to hurry, a stranger who contacted you first, or "
+    "being asked for a code, a password or a recovery phrase.",
+)
+_CHECK_BY_TOPIC: Final[dict[str, tuple[str, ...]]] = {
+    "presale": (
+        "Bottom line: check five things first: who is behind it, whether there is an independent "
+        "audit, how the tokens are split, what is promised, and where the link came from.",
+        "1. Named people with a record you can verify, not an anonymous team. 2. A security audit "
+        "you can read. 3. How much the team and early buyers hold, and when they may sell. 4. Any "
+        "promised return or \"last chance\" is a warning. 5. The official site, reached by you, "
+        "never a link sent to you.",
+        "Then only an amount you could lose entirely."),
+    "borrow": (
+        "Bottom line: check four things before borrowing for any investment — and if one fails, "
+        "do not borrow.",
+        "1. The interest rate against what the investment could realistically earn. 2. Whether "
+        "you could repay from your income if it went to zero. 3. Whether the lender can demand "
+        "repayment or sell your assets. 4. Whether you already have an emergency fund."),
+    "index": (
+        "Bottom line: check what it follows, what it costs, and where you buy it.",
+        "1. The index it tracks and what that holds. 2. The yearly fee (the expense ratio): lower "
+        "is better. 3. A broker regulated in your country. 4. Whether you can leave the money "
+        "alone for five years or more."),
+    "staking": (
+        "Bottom line: check the lock-up, who holds the coins, and where the reward comes from.",
+        "1. How long coins are locked and how long unstaking takes. 2. Whether the platform or "
+        "the network holds them. 3. A rate far above the rest is a warning. 4. The coin's price "
+        "can still fall by more than the reward."),
+    "leverage": (
+        "Bottom line: check your liquidation price, your size and your stop-loss before you open "
+        "anything.",
+        "1. The liquidation price on the order screen. 2. That the position is small enough to "
+        "lose entirely. 3. A stop-loss set before the liquidation price. 4. The fees and funding "
+        "you will pay while it is open."),
+    "p2p": (
+        "Bottom line: check the money in your own bank app before you release anything.",
+        "1. The payment really arrived, in your own banking app. 2. The payer's name matches their "
+        "verified name. 3. The chat stayed inside the platform. 4. Release only then; never "
+        "because of a screenshot."),
+    "signal": (
+        "Bottom line: check whether anyone has actually withdrawn profit, and who asks for money.",
+        "1. Ask a member whether they have withdrawn profit to their own bank. 2. Any request to "
+        "pay, or to send money to an admin, is a stop. 3. Never log in through a link from the "
+        "group."),
+    "atm": (
+        "Bottom line: check who told you to use it — if someone else did, stop.",
+        "1. A fine, tax or \"safe locker\" demand is a scam. 2. Compare the ATM's price and fee "
+        "with an exchange. 3. Send only to a wallet you control, a small amount first."),
+    "stable": (
+        "Bottom line: check who issues it, what backs it and whether it has held its peg.",
+        "1. The issuer, and whether it publishes reserve reports. 2. Its past dips below $1. "
+        "3. That you are not putting everything in one stablecoin."),
+    "wallet": (
+        "Bottom line: check where the recovery phrase is, where you got the app or device, and "
+        "the address on every transfer.",
+        "1. The phrase is written on paper, offline. 2. The wallet is from the maker's own site or "
+        "official store. 3. A small test transfer first. 4. Address and network checked twice."),
+    "shares": (
+        "Bottom line: check whether you are buying the share or a token that tracks it, and who "
+        "runs the place you buy.",
+        "1. Owning the share needs a regulated broker; a tokenised stock tracks the price only. "
+        "2. The fees. 3. The trading hours. 4. Your country's regulator lists the broker."),
+    "dca": (
+        "Bottom line: check the amount, the fee on each buy and whether you can stick to it.",
+        "1. A monthly sum you could lose without it hurting. 2. The fee per purchase. 3. That "
+        "you will keep going when the price falls."),
+    "rug": (
+        "Bottom line: check who holds the supply, whether liquidity is locked and whether the "
+        "team is known.",
+        "1. Holders on a block explorer: a few wallets with most of it is a warning. 2. Liquidity "
+        "locked, and for how long. 3. An independent audit. 4. Is it listed on a large exchange. "
+        "5. No promised returns."),
+    "recovery": (
+        "Bottom line: check who contacted whom — if they came to you, stop.",
+        "1. Did they message you first? 2. Do they want money or crypto up front? 3. Do they "
+        "promise a result? Any yes is a scam. Report the theft to the exchange and the police."),
+    "fake_app": (
+        "Bottom line: check the publisher, the source of the link and a small withdrawal.",
+        "1. The publisher name matches the company. 2. The link came from the company's own "
+        "website, typed by you. 3. Reviews and download history are long. 4. A small deposit "
+        "can be withdrawn."),
+    "wrong_send": (
+        "Bottom line: check three things in order: the transaction hash, the address it went to, "
+        "and the network you used.",
+        "1. Find the hash in your wallet or exchange history and open it on that network's block "
+        "explorer. 2. Is the address yours, an exchange's deposit address, or a contract? 3. Does "
+        "the receiver support the network you used? Then contact the receiving platform's "
+        "support through its official app.",
+        "Do not send again, and ignore anyone offering to recover it for a fee."),
+    "all_in": (
+        "Bottom line: check four things before any of it goes in.",
+        "1. That it is money you could lose without changing your life. 2. That you have an "
+        "emergency fund in cash first. 3. That none of it is borrowed and none is leveraged. 4. "
+        "That you still want it after waiting a day."),
+    "tax": (
+        "Bottom line: check your country's rules and your records before you sell.",
+        "1. Your tax authority's page on crypto. 2. The date, amount and price of each buy and "
+        "sale. 3. Whether swaps and spending count as sales where you live. Not tax advice."),
+    "benefits": (
+        "Bottom line: check your benefit's own rules on savings, assets and income, and ask the "
+        "office in writing.",
+        "1. The official guidance for your benefit. 2. Whether holdings or only gains count. "
+        "3. When a change must be reported."),
+    "dividend": (
+        "Bottom line: check when it is paid, whether the company can afford it, and what the "
+        "share is worth without it.",
+        "1. The ex-dividend date: you must own the share before it. 2. Whether the company has "
+        "paid steadily and earns more than it pays out. 3. That the price drops by about the "
+        "dividend on that date. 4. Any tax on it in your country."),
+    "split": (
+        "Bottom line: check what kind of split it is and why it was done.",
+        "1. The ratio (2-for-1 doubles the shares and halves the price) or a reverse split. 2. "
+        "That your total value is unchanged on the day. 3. The company's reason: a reverse split "
+        "after a collapse is a warning."),
+    "hodl": (
+        "Bottom line: check the amount, the time you can wait, and your exit rule.",
+        "1. Money you could leave alone for years. 2. No leverage, so you cannot be forced out. "
+        "3. The loss at which you would sell, decided now. 4. One coin or several: single coins "
+        "can fail."),
+    "first_buy": (
+        "Bottom line: check the exchange, the amount and the account's security before the "
+        "first buy.",
+        "1. A large regulated exchange you reached yourself. 2. An amount you could lose without "
+        "it hurting. 3. 2FA with an authenticator app and a unique password. 4. The fees on the "
+        "buy and on withdrawal."),
+    "kyc": (
+        "Bottom line: check that you are in the official app or on the address you typed.",
+        "1. Never upload ID from a link in a message. 2. Turn on 2FA first. 3. Use a unique "
+        "password."),
+}
+_CHECK_GENERIC: Final = (
+    "Bottom line: check three things first: who is behind it, whether you can get your money out, "
+    "and how much you could lose.",
+    "1. Who runs it, and can you verify that outside their own message or site? 2. Try a small "
+    "amount and withdraw it before more. 3. Put in only what you could lose entirely, with no "
+    "leverage or borrowed money.",
+    "Anyone who promises a return, rushes you, or asks for a code or recovery phrase fails the "
+    "check.",
+)
+
+
+def _follow_safe(text: str, before: str) -> Lines | None:
+    """"so is it safe or not" read with the subject of the question before it."""
+    if not _SAFE_FOLLOW.search(text):
+        return None
+    key = _topic(before)
+    if key is None:
+        return None
+    return list(_SAFE_BY_TOPIC.get(key, _SAFE_GENERIC))
+
+
+def _follow_checklist(text: str, before: str) -> Lines | None:
+    """"what should I check first" read with the subject of the question before it."""
+    if not _CHECK_FOLLOW.search(text):
+        return None
+    key = _topic(before)
+    if key is None:
+        return None
+    return list(_CHECK_BY_TOPIC.get(key, _CHECK_GENERIC))
+
+
+def _follow_get_back(text: str, before: str) -> Lines | None:
+    """"so can I get it back" after a wrong-network or wrong-address send: the recovery answer,
+    not the chasing-losses one (round 44 newcomer, major 5)."""
+    if not _WRONG_BACK.search(text) or _topic(before) != "wrong_send":
+        return None
+    return list(_WRONG_BACK_A)
+
+
 _FOLLOWS: Final[tuple[Callable[[str, str], Lines | None], ...]] = (
-    _follow_simpler, _follow_if_down, _follow_withdraw_steps, _follow_tax_country,
-    _follow_seed, _follow_fees, _follow_leverage_move, _follow_order_type, _follow_tax,
-    _follow_kyc, _follow_scammer)
+    _follow_get_back, _follow_simpler, _follow_if_down, _follow_withdraw_steps,
+    _follow_tax_country, _follow_seed, _follow_fees, _follow_leverage_move, _follow_order_type,
+    _follow_tax, _follow_kyc, _follow_scammer, _follow_checklist, _follow_safe)
 
 
 def early(text: str, prior: Sequence[str]) -> Lines | None:
     """A beginner's answer, or None to let the rest of the console read the question."""
     plain = _plain(text)
     if prior and _short(plain):
-        before = " ".join(prior[-2:])
+        before = "\n".join(prior[-2:])
         for follow in _FOLLOWS:
             said = follow(plain, before)
             if said:
@@ -1760,7 +2697,7 @@ def _first_of(text: str) -> tuple[Lines, Callable[[str], Lines | None]] | None:
     return None
 
 
-_WHOLE: Final = frozenset({*_ROUND43, _seed, _wallet, _bitcoin_safe, _first_buy, _gas,
+_WHOLE: Final = frozenset({*_ROUND44, *_ROUND43, _seed, _wallet, _bitcoin_safe, _first_buy, _gas,
                            _kyc_why, _fx, _loss_felt, _win_back, _scam_double,
                            _friend_leverage, _tokenised,
                            _sip, _exchange_scam, _fomo})

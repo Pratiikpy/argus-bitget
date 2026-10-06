@@ -15,6 +15,7 @@ import re
 from typing import Any
 
 from argus.lui.answer import Source
+from argus.lui.numbers import sig
 from argus.lui.trace import emit, trace_module
 
 THESIS_ASK = re.compile(
@@ -608,8 +609,9 @@ def falsify(text: str, prior: list[str], *, book: str = "", memory: str = ""
             level = min(r[1] for r in rows) if case == "bull" else max(r[0] for r in rows)
             away = (level / last - 1) * 100
             stop = (f"Stop level: the {'lowest low' if case == 'bull' else 'highest high'} of the "
-                    f"last {len(rows)} daily bars is {level:,.4g}, {away:+.1f}% from the last "
-                    f"close of {last:,.4g} — a daily close beyond it breaks the trade whatever the "
+                    f"last {len(rows)} daily bars is {sig(level, 4)}, {away:+.1f}% from the last "
+                    f"close of {sig(last, 4)} — a daily close beyond it breaks the trade whatever "
+                    f"the "
                     f"reasons say.")
     except Exception:
         stop = ""

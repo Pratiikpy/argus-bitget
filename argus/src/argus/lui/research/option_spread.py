@@ -91,6 +91,55 @@ def legs(text: str) -> tuple[list[Leg], str]:
     return [Leg(buy_high, k2, side), Leg(not buy_high, k1, side)], note
 
 
+_VIEW_SPREAD: Final = re.compile(
+    r"\b(?:defined|limited|capped)[\s-]+risk\b|\brisk\s+(?:is\s+)?(?:defined|limited|capped)\b|"
+    r"\blimit(?:ed)?\s+(?:my\s+)?(?:risk|downside|loss)\b", re.I)
+_BULL: Final = re.compile(r"\bbull\w*|\bupside\b|\brise\b|\bgo(?:es|ing)?\s+up\b|\brall\w*", re.I)
+_BEAR: Final = re.compile(r"\bbear\w*|\bdownside\s+view\b|\bfall\b|\bgo(?:es|ing)?\s+down\b|"
+                          r"\bdecline\b", re.I)
+
+
+def _from_view(text: str, prior: Sequence[str] = ()) -> tuple[list[Leg], str]:
+    """A vertical built from a stated view when no strikes are given: "moderately bullish on MSFT
+    for two months with limited risk — what defined-risk structure fits?" got a funding and dark-
+    pool dump (round 44 judge, M6). Bullish: buy the call nearest the money and sell the call
+    about one standard deviation of the horizon higher (the move the chain's own implied
+    volatility prices); bearish: the mirror put spread. Strikes are rounded to the chain's
+    listing later, and the reading is said."""
+    if not _VIEW_SPREAD.search(text) or not re.search(r"\boptions?\b|\bstructure\b|\bspread\b|"
+                                                      r"\bdefined[\s-]+risk\b", text, re.I):
+        return [], ""
+    bull, bear = bool(_BULL.search(text)), bool(_BEAR.search(text))
+    if bull == bear:
+        return [], ""
+    from argus.lui.research.equity_options import (
+        ChainUnavailable,
+        atm_iv,
+        load_chain,
+        ticker_asked,
+    )
+
+    ticker = ticker_asked(text, prior)
+    if not isinstance(ticker, str):
+        return [], ""
+    try:
+        chain = load_chain(ticker)
+    except ChainUnavailable:
+        return [], ""
+    days = _expiry_asked(text, date.today())[1] or DEFAULT_DAYS
+    vol = atm_iv(chain, days) or 0.30
+    step = chain.spot * vol * (days / 365) ** 0.5
+    near = round(chain.spot)
+    far = round(chain.spot + step) if bull else round(chain.spot - step)
+    side = "C" if bull else "P"
+    spread = [Leg(True, float(near), side), Leg(False, float(far), side)]
+    note = (f"Built from your view: a {'call' if bull else 'put'} debit spread, buying the strike "
+            f"nearest {ticker}'s {chain.spot:,.2f} and selling one about one standard deviation "
+            f"{'higher' if bull else 'lower'} over {days} days ({vol:.0%} implied volatility, so "
+            f"about {step:,.2f}); the most it can lose is what it costs.")
+    return spread, note
+
+
 def payoff(spread: Sequence[Leg], price: float, net: float) -> float:
     """Per-share value at expiry less the net paid (``net`` < 0 is a credit received)."""
     total = 0.0
@@ -135,6 +184,12 @@ def _expiry_asked(text: str, today: date) -> tuple[date | None, int | None]:
     if m is not None:
         unit = m.group("unit").lower()
         return None, int(m.group("n")) * (7 if unit == "week" else 30 if unit == "month" else 1)
+    # "for two months" is a horizon written out (round 44 judge, M6)
+    w = re.search(r"\b(one|a|two|three|four|five|six|nine|twelve)\s+(week|month)s?\b", text, re.I)
+    if w is not None:
+        n = {"one": 1, "a": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "nine": 9,
+             "twelve": 12}[w.group(1).lower()]
+        return None, n * (7 if w.group(2).lower() == "week" else 30)
     return None, None
 
 
@@ -280,6 +335,8 @@ def lines(text: str, prior: Sequence[str] = (), *, today: date | None = None) ->
     from argus.lui.research.equity_options import ticker_asked
 
     spread, note = legs(text)
+    if not spread:
+        spread, note = _from_view(text, prior)
     if not spread:
         return None
     ticker = ticker_asked(text, prior)

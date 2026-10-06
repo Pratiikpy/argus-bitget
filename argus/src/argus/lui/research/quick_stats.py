@@ -354,6 +354,99 @@ def ath_lines(text: str, prior: list[str]) -> list[str] | None:
     return lines
 
 
+# --- a period's high and low ------------------------------------------------------------------
+
+RANGE_ASKED: Final = re.compile(
+    r"\b(?P<w>52|fifty[\s-]two)[\s-]*(?:weeks?|wks?)\s+(?P<k>high|low|range)s?\b|"
+    r"\b(?:1|one)[\s-]*(?:year|yr)\s+(?P<k2>high|low|range)s?\b|"
+    r"\b(?P<d>\d{1,3})[\s-]*days?\s+(?P<k3>high|low|range)s?\b|"
+    r"\b(?:year[\s-]to[\s-]date|ytd)\s+(?P<k4>high|low|range)s?\b", re.I)
+_SHOCK: Final = re.compile(
+    r"\b(?:drop(?:s|ped)?|fall(?:s|en)?|fell|crash(?:es|ed)?|los(?:e|es|t)|rose|rises?|"
+    r"jump(?:s|ed)?|ris(?:e|en))\s+(?:by\s+)?(?P<pct>\d+(?:\.\d+)?)\s*%", re.I)
+
+
+def range_lines(text: str, prior: list[str]) -> list[str] | None:
+    """A name's high and low over a stated window — 52 weeks, one year, N days or the year to
+    date — from Bitget's daily candles, with where the price sits in that range.
+
+    "What is the 52-week high of BTC?" got the 52-week return, and "...if it dropped 99.99999%
+    today?" a book stress at -100% (round 44 hostile, 17): a fall today cannot lower a high
+    already made, so the answer is the high, with the hypothetical price beside it."""
+    asked = RANGE_ASKED.search(text)
+    if asked is None:
+        return None
+    named = _named(text, prior)
+    if not named:
+        return None
+    symbol = named[0]
+    now_utc = datetime.now(UTC)
+    if asked.group("d"):
+        days, label = int(asked.group("d")), f"{int(asked.group('d'))}-day"
+    elif asked.group("k4"):
+        days = (now_utc.date() - now_utc.date().replace(month=1, day=1)).days + 1
+        label = "year-to-date"
+    else:
+        days, label = 365, "52-week" if asked.group("w") else "one-year"
+    if not 1 <= days <= 1500:
+        return None
+    from argus.market import history
+
+    try:
+        candles = history.fetch_range(symbol, days=days, interval="1Dutc")
+    except Exception:
+        return None
+    start = now_utc.date() - timedelta(days=days - 1)
+    inside = [c for c in candles if c.ts.date() >= start and float(c.low) > 0]
+    if not inside:
+        return None
+    top = max(inside, key=lambda c: float(c.high))
+    bottom = min(inside, key=lambda c: float(c.low))
+    high, low = float(top.high), float(bottom.low)
+    from argus.lui.research.parse import last_price
+
+    try:
+        now = float(last_price(symbol) or inside[-1].close)
+    except Exception:
+        now = float(inside[-1].close)
+    name = symbol.removesuffix("USDT")
+    kind = (asked.group("k") or asked.group("k2") or asked.group("k3") or asked.group("k4")
+            or "range").lower()
+    place = (now - low) / (high - low) if high > low else 1.0
+    said_high = f"{label} high is {high:,.2f}, set on {top.ts:%d %b %Y}"
+    said_low = f"{label} low is {low:,.2f}, set on {bottom.ts:%d %b %Y}"
+    lead = (said_low if kind == "low" else said_high)
+    other = (said_high if kind == "low" else said_low)
+    lines = [f"Bottom line: {name}'s {lead}; it trades at {now:,.2f} now, "
+             f"{now / high - 1:+.1%} from the high and {now / low - 1:+.1%} from the low.",
+             f"Its {other}; the price sits {place:.0%} of the way up that range."]
+    shock = _SHOCK.search(text)
+    if shock is not None and re.search(r"\bif\b|\bwere\s+to\b|\bsay\b", text, re.I):
+        pct = shock.group("pct")
+        down = re.match(r"(?:drop|fall|fell|crash|los)", shock.group(0), re.I) is not None
+        from decimal import Decimal
+
+        factor = (Decimal(1) - Decimal(pct) / 100) if down else (Decimal(1) + Decimal(pct) / 100)
+        moved = float(Decimal(str(now)) * factor)
+        shown = f"{moved:,.2f}" if moved >= 1 else f"{moved:.10f}".rstrip("0").rstrip(".")
+        if down:
+            lines.append(f"If it fell {pct}% today it would trade near "
+                         f"{shown}; the {label} high stays {high:,.2f}, because a fall cannot "
+                         f"undo a high already made" + (", and that price would be a new "
+                         f"{label} low." if moved < low else "."))
+        else:
+            lines.append(f"If it rose {pct}% today it would trade near {shown}"
+                         + (f", a new {label} high above {high:,.2f}." if moved > high else
+                            f"; the {label} high stays {high:,.2f}."))
+    first = inside[0].ts.date()
+    if first > start + timedelta(days=3):
+        lines.append(f"Bitget's daily candles for {name} start on {first:%d %b %Y}, so the window "
+                     f"is shorter than {days} days.")
+    lines.append("Data: Bitget USDT-futures daily candles (UTC days), intraday highs and lows; "
+                 "the price now is Bitget's last.")
+    return lines
+
+
 BEAR_ASKED: Final = re.compile(
     r"\b(?:in|into|entering|enter|entered|officially\s+in)\s+(?:a\s+|an\s+)?(?P<kind>bear|bull)\s+"
     r"market\b|\b(?P<kind2>bear|bull)\s+market\s+(?:yet|now|already|territory)\b", re.I)
@@ -417,7 +510,7 @@ def bear_market_lines(text: str, prior: list[str]) -> list[str] | None:
 
 
 __all__ = ["ATH_ASKED", "BACK_TO_LEVEL", "BEAR_ASKED", "DEPTH_ASKED", "MOMENTUM_ASKED",
-           "REALISED_VOL", "VOLUME_COMPARED", "ath_lines", "bear_market_lines", "depth_lines",
-           "momentum_lines", "realised_vol_lines", "volume_lines"]
+           "RANGE_ASKED", "REALISED_VOL", "VOLUME_COMPARED", "ath_lines", "bear_market_lines",
+           "depth_lines", "momentum_lines", "range_lines", "realised_vol_lines", "volume_lines"]
 
 trace_module(globals())

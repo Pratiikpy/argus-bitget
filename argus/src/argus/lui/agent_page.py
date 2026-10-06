@@ -28,6 +28,7 @@ from argus.lui.agent_record import (  # noqa: F401 — re-exported for the page'
     fetch_json,
     rejections,
 )
+from argus.lui.numbers import sig
 
 
 def _num(value: Any, fmt: str, missing: str = "n/a") -> str:
@@ -162,7 +163,7 @@ def narration_check(row: Mapping[str, Any]) -> str | None:
     if actual >= claimed:
         return None
     return (f"Narration check: the summary says the drawdown is beyond {claimed:g}%, but the "
-            f"book's own record for this decision holds {actual:.3g}% — under that line. The "
+            f"book's own record for this decision holds {sig(actual, 3)}% — under that line. The "
             f"breaker's other trip, the losing streak, is what the record supports.")
 
 

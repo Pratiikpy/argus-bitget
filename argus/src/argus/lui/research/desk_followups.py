@@ -24,6 +24,7 @@ from datetime import UTC, datetime, timedelta
 from itertools import pairwise
 from typing import Any, Final
 
+from argus.lui.numbers import sig
 from argus.lui.trace import trace_module
 
 _CRYPTO_SHOCK = re.compile(
@@ -113,11 +114,64 @@ def earnings_lines(text: str, prior: Sequence[str]) -> list[str] | None:
         return [f"Bottom line: {ticker} {verdict} — {line[:1].lower()}{line[1:]}",
                 "Adjusted EPS against the analysts' consensus for the same quarter, from Yahoo "
                 "Finance's earnings history; GAAP EPS can differ."]
+    past = _past_year(text)
+    if past is not None and beat is None:
+        return _past_reports(ticker, past, next_report_line(ticker))
     said = next_report_line(ticker)
     if said is None:
         return [f"Bottom line: no upcoming date for {ticker} is on Yahoo Finance's earnings "
                 f"calendar yet."]
     return [f"Bottom line: {said}"]
+
+
+_PAST_REPORTS_ASKED: Final = re.compile(
+    r"\bwhen\s+did\b[^?]{0,40}\breport\w*\b|\b(?:earnings|results|report)\s+(?:dates?|days?)\b|"
+    r"\breport(?:ed|s)?\s+(?:its\s+|their\s+)?(?:earnings|results|quarterly\s+results)\b|"
+    r"\bwhen\s+(?:were|was)\b[^?]{0,30}\b(?:earnings|results)\b", re.I)
+
+
+def past_report_lines(text: str, prior: Sequence[str]) -> list[str] | None:
+    """Report dates in a past year, read before any period engine: "When did Microsoft report
+    earnings during 2025?" was answered with MSFT's 2025 price move (round 44 re-ask)."""
+    year = _past_year(text)
+    if year is None or _PAST_REPORTS_ASKED.search(text) is None:
+        return None
+    from argus.lui.research.earnings_moves import next_report_line
+    from argus.lui.research.parse import is_us_equity
+
+    named = [s for s in _named_before(text, prior) if is_us_equity(s)]
+    if not named:
+        return None
+    ticker = named[0].removesuffix("USDT").removesuffix("STOCK")
+    return _past_reports(ticker, year, next_report_line(ticker))
+
+
+def _past_year(text: str) -> int | None:
+    """A calendar year before this one, named in the question, or None."""
+    this_year = datetime.now(UTC).year
+    years = [int(y) for y in re.findall(r"\b((?:19|20)\d\d)\b", text)]
+    return next((y for y in years if 1990 <= y < this_year), None)
+
+
+def _past_reports(ticker: str, year: int, upcoming: str | None) -> list[str]:
+    """The days ``ticker`` reported in a past ``year``, from its EDGAR results 8-Ks: "What is the
+    earnings date for AAPL in 2024?" got the next report, the year silently dropped (round 44
+    hostile, 13)."""
+    from argus.lui.research.earnings_move import report_history
+
+    try:
+        history = report_history(ticker)
+    except Exception:
+        history = []
+    days = sorted(day for day, _after in history if day.year == year)
+    nxt = [f"Next: {upcoming}"] if upcoming else []
+    if not days:
+        return [f"Bottom line: no {year} results filing for {ticker} is in the SEC's recent "
+                f"filings list, so I cannot give its {year} report dates.", *nxt]
+    said = ", ".join(f"{d:%d %b}" for d in days)
+    return [f"Bottom line: {ticker} reported {len(days)} time{'s' if len(days) != 1 else ''} in "
+            f"{year}: {said}.",
+            "Dates of its results filings (8-K item 2.02) on SEC EDGAR, New York time.", *nxt]
 
 
 def _hourly_returns(symbol: str, days: int = 30) -> dict[datetime, float]:
@@ -318,9 +372,10 @@ def ratio_lines(text: str, now: datetime | None = None) -> list[str] | None:
     na, nb = a[0].removesuffix("USDT"), b[0].removesuffix("USDT")
     high, low = max(ratio), min(ratio)
     return [f"Bottom line: {na}/{nb} {'rose' if change >= 0 else 'fell'} {abs(change):.1%} "
-            f"{period.said} — from {ratio[0]:.5g} to {ratio[-1]:.5g} {nb} per {na}, so {na} "
+            f"{period.said} — from {sig(ratio[0], 5)} to {sig(ratio[-1], 5)} {nb} per {na}, "
+            f"so {na} "
             f"{'out' if change >= 0 else 'under'}performed {nb} by that much.",
-            f"Range over the period: {low:.5g} to {high:.5g}.",
+            f"Range over the period: {sig(low, 5)} to {sig(high, 5)}.",
             "The ratio of the two daily closes, Bitget USDT-futures candles (UTC days)."]
 
 
@@ -630,9 +685,9 @@ def rotate_conditions_lines(text: str, prior: Sequence[str]) -> list[str] | None
     na, nb = a[0].removesuffix("USDT"), b[0].removesuffix("USDT")
     met = [now_r > avg50, avg20 > avg50, change30 > 0]
     checks = [f"{nb}/{na} above its 50-day average — {'yes' if met[0] else 'no'} "
-              f"({now_r:.5g} against {avg50:.5g})",
+              f"({sig(now_r, 5)} against {sig(avg50, 5)})",
               f"the 20-day average above the 50-day, the trend turning {nb}'s way — "
-              f"{'yes' if met[1] else 'no'} ({avg20:.5g})",
+              f"{'yes' if met[1] else 'no'} ({sig(avg20, 5)})",
               f"{nb} ahead of {na} over the last 30 days — {'yes' if met[2] else 'no'} "
               f"({change30:+.1%})"]
     return [f"Bottom line: {sum(met)} of the 3 trend conditions a rotation from {na} to {nb} is "

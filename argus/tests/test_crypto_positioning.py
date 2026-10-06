@@ -168,6 +168,9 @@ def test_every_venue_failing_gives_a_named_bottom_line_and_no_figure(
 
 def test_lines_for_the_judge_open_interest_question(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(http, "fetch_json", _venues(bybit=None))
+    # the fixtures' histories are stamped around NOW: the clock is held there, or the 7-day
+    # window walks off them a day after they were written
+    monkeypatch.setattr(crypto_oi.time, "time", lambda: NOW / 1000)
     said = crypto_positioning.lines(JUDGE_OI)
     assert said is not None and said[-1] == "Not advice."
     assert said[0].startswith("Bottom line: BTC perpetual open interest is about $400.0m")
