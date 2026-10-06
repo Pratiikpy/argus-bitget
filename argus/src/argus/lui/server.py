@@ -230,8 +230,13 @@ PAGE = """<!doctype html>
     padding-bottom:2px }
   .jump a:hover { border-color:var(--ink) }
 __BASE__</style></head><body>__NAV__<div class="wrap">
-<p class="kicker">ARGUS · research workbench for Bitget</p>
+<p class="kicker">ARGUS · a portfolio copilot for a market that never closes</p>
 <h1>Ask the desk. Every number comes with its source.</h1>
+<p class="sub"><strong>Why it exists:</strong> Bitget's stock perpetuals trade around the clock;
+82.5% of their hours fall while the US market is shut. On all 9 single-stock perpetuals, beta is
+higher while the market is open than while it is shut (NVDA 1.74 against 1.28), so one beta over
+all hours understates the risk in the session that prices the stock. ARGUS measures your book
+session by session.</p>
 <p class="sub">Ask about anything Bitget lists — stocks, ETFs, gold, oil, crypto. The desk's own
 engines compute every figure from live data and name the source; the language model only reads your
 question and never writes a number. No source, no answer: you get a refusal and the reason.</p>

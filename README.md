@@ -341,7 +341,7 @@ python -m argus.lui.server      # the console on http://127.0.0.1:8765
 pytest -q                       # 13,569 tests collected
 ```
 
-Nothing above needs a credential. On 2026-10-06, with every outbound connection refused, 13,249
+Nothing above needs a credential. On 2026-10-06, with every outbound connection refused, 13,250
 passed, 77 skipped and 0 failed of the 13,569 tests collected; the other 240 read a live
 venue, feed or model and run apart
 (`pytest -m network`). Tests that need a rival's source cloned beside the repository skip

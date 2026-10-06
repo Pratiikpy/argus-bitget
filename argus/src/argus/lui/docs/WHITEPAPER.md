@@ -419,7 +419,7 @@ The 81.7% figure is the honest headline for a visitor on the public console once
 | Check | Result |
 |---|---|
 | Tests collected | 13,569, collected on 6 October 2026 with outbound network blocked |
-| Tests passing | 13,249 passed, 77 skipped, 0 failed of 13,569 collected on 6 October 2026 in a clean checkout with every outbound connection refused, the 240 network tests run apart |
+| Tests passing | 13,250 passed, 77 skipped, 0 failed of 13,569 collected on 6 October 2026 in a clean checkout with every outbound connection refused, the 240 network tests run apart |
 | Static types | `mypy --strict` clean on 690 source files |
 | Modules | 152/152 registered modules importable; 18/18 named sub-themes resolve to a module and a test file, which is coverage, not a claim to lead them |
 | Quoted figures | `python -m argus.eval.docclaims` checked all 112 figures quoted in the public documents against their artefacts on 6 October 2026: 0 stale, 0 lagging, 0 unchecked |
