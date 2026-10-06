@@ -16920,12 +16920,13 @@ class Handler(BaseHTTPRequestHandler):
                 self._send(render_policy(*load_policy(_ledger_path().parent)).encode(),
                            "text/html; charset=utf-8")
                 return
-            if path in ("/whitepaper", "/deck"):
-                # The whitepaper and the proof deck, on the site in the console's own tokens, so a
-                # judge reads them where the product is (2026-10-06)
-                from argus.lui.whitepaper_page import render_deck, render_whitepaper
+            if path in ("/whitepaper", "/deck", "/video"):
+                # The whitepaper, the proof deck and the demo video, on the site in the console's
+                # own tokens, so a judge reads them where the product is (2026-10-06)
+                from argus.lui.whitepaper_page import render_deck, render_video, render_whitepaper
 
-                page = render_whitepaper() if path == "/whitepaper" else render_deck()
+                page = (render_whitepaper() if path == "/whitepaper" else
+                        render_video() if path == "/video" else render_deck())
                 self._send(page.encode(), "text/html; charset=utf-8")
                 return
             if path == "/architecture":

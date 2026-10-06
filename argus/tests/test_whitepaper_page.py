@@ -44,3 +44,8 @@ def test_both_are_linked_from_the_site() -> None:
 
     assert ("/whitepaper", "Whitepaper") in design.LINKS
     assert 'href="/deck"' in wp.render_whitepaper()
+
+
+def test_the_video_page_plays_the_served_file() -> None:
+    page = wp.render_video()
+    assert f'src="{wp.VIDEO_SRC}"' in page and "<video" in page and "controls" in page

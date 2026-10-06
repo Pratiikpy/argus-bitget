@@ -180,6 +180,34 @@ def render_whitepaper() -> str:
 </div>{design.footer()}</body></html>"""
 
 
+VIDEO_SRC = "/media/argus-demo.mp4"
+"""Served by the host's CDN beside the console (`deploy/media/`), not by the Python handler."""
+
+
+def render_video() -> str:
+    """The demo video on the site in the console's own tokens: a judge needs no other account to
+    watch it."""
+    head = design.head("ARGUS — demo video",
+                       "The console recorded end to end on the live site: a research task, a "
+                       "stress, premise checks, a newcomer's questions, the register.", "/video")
+    return f"""<!doctype html><html lang="en"><head>{head}
+<style>{design.TOKENS_CSS}
+ body {{ margin:0; background:var(--bg); color:var(--ink); font:16px/1.6 system-ui,sans-serif }}
+ .film {{ width:100%; aspect-ratio:16/9; background:#000; border:1px solid var(--line);
+   border-radius:10px }}
+ .sub {{ color:var(--dim); margin:0 0 18px }}
+ a {{ color:var(--accent) }}
+{design.BASE_CSS}</style></head><body>{design.nav('/video')}<div class="wrap">
+<h1>Demo video</h1>
+<p class="sub">Every frame is the live console, recorded by a script rather than by hand, with
+captions and no voice. About three and a half minutes.</p>
+<video class="film" controls preload="metadata" playsinline src="{VIDEO_SRC}">
+<a href="{VIDEO_SRC}">Download the video</a></video>
+<p class="sub">Read the same ground in the <a href="/whitepaper">whitepaper</a> or the
+<a href="/deck">proof deck</a>; everything else is on <a href="/materials">one page</a>.</p>
+</div>{design.footer()}</body></html>"""
+
+
 def render_deck() -> str:
     try:
         return DECK.read_text(encoding="utf-8")
@@ -187,4 +215,5 @@ def render_deck() -> str:
         return render_markdown("# Proof deck\n\nThe deck could not be read on this server.")[0]
 
 
-__all__ = ["DECK", "WHITEPAPER", "render_deck", "render_markdown", "render_whitepaper"]
+__all__ = ["DECK", "VIDEO_SRC", "WHITEPAPER", "render_deck", "render_markdown", "render_video",
+           "render_whitepaper"]
