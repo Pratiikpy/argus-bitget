@@ -23,12 +23,17 @@ from argus.truth.source import Source
 
 AGENT_Q = re.compile(
     r"\b(?:track\s*2|t2|trading\s+agent|sentiment\s+agent|the\s+agent'?s?|agent\s+page|your\s+agent|"
-    r"run\s*2|paper[\s-]+trading\s+(?:agent|run|account))\b", re.I)
+    r"run\s*2|paper[\s-]+trading\s+(?:agent|run|account)|"
+    # "compared with a no-edge book" and "the venue refuses the same protective exit 72 times"
+    # name the Track 2 agent's own record and went to other readers (round 45 judge, M16)
+    r"no[\s-]edge\s+(?:book|baseline|envelope|benchmark)|protective\s+exits?|"
+    r"venue\s+refus\w*|refused\s+exits?)\b", re.I)
 """A question about the Track 2 agent rather than about the research desk or a market."""
 
 _ABOUT_ITS_RECORD = re.compile(
     r"\b(?:sharpe|sortino|win\s+rate|drawdown|return|trades?|fills?|orders?|record|performance|"
-    r"results?|doing|pnl|p&l|profit|loss|metrics?|numbers?|rejected|how\s+(?:is|has)\s+it)\b", re.I)
+    r"results?|doing|pnl|p&l|profit|loss|metrics?|numbers?|rejected|refus\w*|exits?|handle\w*|"
+    r"how\s+(?:is|has)\s+it)\b", re.I)
 
 
 def asks_about_the_agent(text: str) -> bool:

@@ -56,6 +56,13 @@ _PEOPLE: Final = {
     "do kwon": "Do Kwon", "michael saylor": "Michael Saylor", "saylor": "Michael Saylor",
     "elon musk": "Elon Musk", "elon": "Elon Musk", "satoshi": "Satoshi Nakamoto",
 }
+_LAUNCHED: Final = {
+    "BTC": ("January 2009 (the genesis block, 3 Jan 2009)", "2009"),
+    "ETH": ("July 2015 (mainnet, 30 Jul 2015)", "2015"),
+    "DOGE": ("December 2013", "2013"),
+}
+"""When a network went live, for a launch year a question states wrongly ("Bitcoin was created in
+2012", round 45 hostile, M16)."""
 _PERSON: Final = re.compile(r"\b(" + "|".join(sorted((re.escape(p) for p in _PEOPLE),
                                                      key=len, reverse=True)) + r")\b", re.I)
 _FOUNDED: Final = re.compile(r"\b(?:found\w*|created|creator|invent\w*|launched|built|"
@@ -100,9 +107,14 @@ def founder_line(text: str, symbols: tuple[str, ...]) -> str | None:
         window = text[max(0, person.start() - 60):person.end() + 60]
         if not re.search(rf"\b{re.escape(base)}\b|\b{re.escape(project[0])}\b", window, re.I):
             continue
+        year = re.search(r"\b(?:created|founded|launched|invented|made|started)\s+(?:back\s+)?in\s+"
+                         r"((?:19|20)\d\d)\b", text, re.I)
+        began = _LAUNCHED.get(base)
+        when = (f", and it launched in {began[0]}, not {year.group(1)}"
+                if year is not None and began is not None and year.group(1) != began[1] else "")
         return (f"Premise check: {project[0]} ({base}) was founded by {project[1]}, not {who}"
                 + (" — Sam Bankman-Fried founded FTX and Alameda Research" if who ==
-                   "Sam Bankman-Fried" else "") + "; the figures below do not depend on it.")
+                   "Sam Bankman-Fried" else "") + when + "; the figures below do not depend on it.")
     return None
 
 
@@ -322,6 +334,31 @@ _SPOT_LEVERAGE: Final = re.compile(
     r"\bspot\s+market\b", re.I)
 
 
+_BANNED: Final = re.compile(
+    r"\b(?P<who>(?:the\s+)?(?:fed|federal\s+reserve|sec|cftc|government|us|u\.s\.|treasury|"
+    r"congress|white\s+house|china|eu|imf))\s+(?:has\s+|just\s+|officially\s+)?(?:banned|outlawed|"
+    r"made\s+\w*\s*illegal|prohibited)\b", re.I)
+
+
+def ban_line(text: str, symbols: tuple[str, ...]) -> str | None:
+    """A ban stated as news: "Ethereum fell to $3 yesterday after the Fed banned it" had the
+    price corrected and the ban left standing (round 45 hostile, M3). The Federal Reserve sets
+    rates and supervises banks; it bans no asset. Any other ban is said to be unchecked here,
+    beside the fact the console can check — that the name trades on Bitget now."""
+    m = _BANNED.search(text)
+    if m is None:
+        return None
+    coin = next((s.removesuffix("USDT") for s in symbols), "it")
+    who = m.group("who").lower().removeprefix("the ").strip()
+    if who in ("fed", "federal reserve"):
+        return (f"Premise check: the Federal Reserve does not ban assets — it sets US interest "
+                f"rates and supervises banks — so no Fed ban of {coin} exists; {coin} is trading "
+                f"on Bitget now, as the figures below show.")
+    return (f"Premise check: a ban by the {m.group('who').strip()} is not something this console "
+            f"can confirm from its sources; what it can check is that {coin} is trading on Bitget "
+            f"now, as the figures below show.")
+
+
 def spot_leverage_line(text: str) -> str | None:
     """Leverage asked on the spot market ("buy 1 BTC on the Bitget spot market using 20x — my
     liquidation price?" was priced as a perpetual without a word, a hostile review, round 34)."""
@@ -443,7 +480,7 @@ def lines(text: str, symbols: tuple[str, ...]) -> list[str]:
     """Each premise line that applies, in order; empty when the question claims nothing here."""
     said = [halving_line(text), founder_line(text, symbols), usdt_line(text), spot_line(text),
             ceo_line(text), share_class_line(text), weekend_close_line(text, symbols),
-            corporate_event_line(text, symbols), spot_leverage_line(text),
+            corporate_event_line(text, symbols), spot_leverage_line(text), ban_line(text, symbols),
             consensus_line(text, symbols), pe_claim_line(text, symbols)]
     out = [x for x in said if x]
     if not out:

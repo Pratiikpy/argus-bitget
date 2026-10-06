@@ -14,6 +14,7 @@ import re
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Final
 
+from argus.lui.numbers import sig
 from argus.lui.trace import trace_module
 
 ASKED: Final = re.compile(
@@ -76,7 +77,7 @@ def lines(text: str, symbols: tuple[str, ...]) -> list[str] | None:
     there = {v: p for v, p in found.items() if p}
     if not there:
         return [f"Bottom line: no other exchange's price answered just now, so the gap for {base} "
-                f"cannot be measured; Bitget's spot price is {here:,.2f}."]
+                f"cannot be measured; Bitget's spot price is {sig(here, 6)}."]
     gaps = {v: (p / here - 1) * 1e4 for v, p in there.items()}
     widest = max(gaps, key=lambda v: abs(gaps[v]))
     cost = 10 + 10 + 2
@@ -88,8 +89,8 @@ def lines(text: str, symbols: tuple[str, ...]) -> list[str] | None:
              f"{'higher' if gaps[widest] > 0 else 'lower'} on {widest} than on Bitget — above "
              f"the roughly {cost}bps two taker fees and spread cost, but only if it lasts while "
              f"the coins move.",
-             f"Bitget spot {here:,.2f}; " + "; ".join(
-                 f"{v} {p:,.2f} ({gaps[v]:+.1f}bps)" for v, p in there.items()) + "."]
+             f"Bitget spot {sig(here, 6)}; " + "; ".join(
+                 f"{v} {sig(p, 6)} ({gaps[v]:+.1f}bps)" for v, p in there.items()) + "."]
     lines.append("Capturing a gap means buying where it is cheap and selling where it is dear at "
                  "once, which needs balances already on both exchanges; moving coins between them "
                  "takes from minutes to an hour or more (network confirmations plus each "

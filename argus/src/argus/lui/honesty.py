@@ -1380,6 +1380,15 @@ def honest_answer(text: str, *, prior: list[str], book: str,
     if found.cause == HORIZON and found.detail == "desk":
         ledger = _ledger_span()
         return (HORIZON, _desk_horizon_lines(found.years * 365.25, ledger)) if ledger else None
+    if (found.cause == BEFORE_DATA and found.span is not None and re.search(
+            r"\b(?:created|founded|invented|launched|made|born|started|began|released)\s+(?:back\s+)?"
+            r"in\s+(?:19|20)\d\d\b", text, re.I) and re.search(
+            r"\b(?:what'?s|what\s+is|how\s+much\s+is)\s+(?:its|the|it'?s)?\s*(?:current\s+)?price\b|"
+            r"\bprice\s+(?:now|today)\b", text, re.I)):
+        # "Bitcoin was created in 2012 by Vitalik. What's its price?" names a year in a claim
+        # about the coin's origin and asks today's price; it got "no price for 2012" (round 45
+        # hostile, M16). The year is the premise, checked elsewhere, not the date asked about
+        return None
     if found.cause == BEFORE_DATA and found.span is not None:
         return _past_price_lines(found.symbol, found.span, text, now)
     if found.cause == HORIZON:

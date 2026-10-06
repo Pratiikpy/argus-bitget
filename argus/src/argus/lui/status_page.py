@@ -464,7 +464,7 @@ def render(status: dict[str, Any], checks: list[Check], checked_at: float,
    border-radius:10px }}
  table {{ border-collapse:collapse; width:100%; font-size:13.5px }}
  td {{ padding:8px 10px; border-top:1px solid var(--line); vertical-align:top }}
- th {{ padding:6px 10px; text-align:left; font:600 11px/1.3 var(--mono); letter-spacing:.08em;
+ th {{ padding:6px 10px; text-align:left; font:600 12px/1.3 var(--mono); letter-spacing:.08em;
    text-transform:uppercase; color:var(--dim); border-bottom:1px solid var(--line) }}
  tbody tr:first-child td {{ border-top:0 }}
  .ok {{ color:var(--good); font-weight:600 }} .bad {{ color:var(--bad); font-weight:600 }}
@@ -476,7 +476,7 @@ def render(status: dict[str, Any], checks: list[Check], checked_at: float,
    thead {{ position:absolute; left:-9999px }}
    tr {{ border-top:1px solid var(--line); padding:8px 0 }} tr:first-child {{ border-top:0 }}
    td {{ border:0; padding:2px 12px }} .n {{ text-align:left }}
-   td::before {{ content:attr(data-label) " · "; color:var(--dim); font:11px var(--mono) }}
+   td::before {{ content:attr(data-label) " · "; color:var(--dim); font:12px var(--mono) }}
  }}
 {design.BASE_CSS}</style></head><body>{design.nav('/status')}<div class="wrap">
 <h1>Status — the record and its sources</h1>

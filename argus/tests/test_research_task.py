@@ -309,7 +309,7 @@ class TestThePageTakesAQuestion:
         status, body = _post(f"{base_url}/research", {"q": ASKED, "book": ""})
         assert status == 200
         assert "Read as:</b> add 15% TSLA to 40% NVDA / 30% MSFT / 30% AAPL" in body
-        assert finished(body).count("<article") == 8
+        assert finished(body).count("<details class='s") == 8
         assert '<form method="post" action="/research">' in body
         assert '<textarea name="q"' in body
 
@@ -593,3 +593,21 @@ class TestAQuestionAboutNoSingleNameRunsAsATask:
 
         assert question_task("hello there", ask=lambda text, **_: {
             "lines": ["I did not recognise that question."], "refused": True}) is None
+
+
+class TestRound45Minors:
+    """Round 45 visual audit: minor 4 (fold each engine behind its Bottom line) and minor 14 (an
+    engine's development note is not part of the answer)."""
+
+    def test_a_card_folds_to_its_bottom_line_and_drops_the_corrected_note(self) -> None:
+        from argus.lui.task import Step
+        from argus.lui.task_page import _card
+
+        step = Step("The technical picture", "bitget-signal", lines=[
+            "Corrected: bitget-signal returns MACD's signal line in the wrong field",
+            "RSI 71 on 4h candles.", "Bottom line: RSI is overbought."], seconds=1.0)
+        card = _card(2, step)
+        assert card.startswith("<details class='s'><summary>")
+        assert "Corrected:" not in card
+        assert card.index("Bottom line: RSI is overbought.") < card.index("</summary>")
+        assert card.index("RSI 71") > card.index("</summary>")

@@ -280,6 +280,6 @@ def weigh(data: Mapping[str, Mapping[str, Any]], *, name: str, side: str = "long
                else "")
             + (f" worst 24 hours in the data{' with it added' if book_given else ''} was "
                f"{worst:+.1f}%" if worst is not None else "")
-            + " — an exit decided now is one a move cannot talk you out of.")
+            + " — decide the exit now, while no move is pushing you either way.")
     return Weighing(call=call, reason=reason, disagreements=tuple(disagreements),
                     triggers=tuple(triggers), questions=tuple(questions), figures=figures)

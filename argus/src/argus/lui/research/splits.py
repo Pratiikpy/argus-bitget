@@ -25,6 +25,18 @@ SPLIT_CLAIM = re.compile(
     r"(?P<den2>\d+)\b", re.I)
 """A split with its ratio: "3-for-1 split", "a 10:1 stock split", "split 2 for 1"."""
 
+_SPLIT_SAID = re.compile(
+    r"\b(?:stock\s+)?split\b[^?.]{0,40}\b(?:happened|took\s+effect|went\s+through|last\s+(?:week|"
+    r"month)|yesterday|recently|this\s+(?:week|month)|just)\b|\b(?:just|recently)\s+split\b",
+    re.I)
+"""A split said to have happened, with no ratio: "Stock split for MSFT happened last week"."""
+
+
+def claimed(text: str) -> bool:
+    """Whether ``text`` states a split, with or without its ratio."""
+    return bool(SPLIT_CLAIM.search(text) or _SPLIT_SAID.search(text))
+
+
 _SHARES = re.compile(r"\b(\d[\d,]*(?:\.\d+)?)\s*(?:-\s*)?shares?\b", re.I)
 """A share count: "my 30 share position", "30 shares"."""
 
@@ -59,14 +71,31 @@ def check(text: str, symbol: str, *, price: Callable[[str], float] | None = None
           today: date | None = None) -> tuple[list[str], list[Source], dict[str, Any]] | None:
     """The stated split against the record, and the stated shares valued at the live price."""
     claim = SPLIT_CLAIM.search(text)
-    if claim is None:
+    if claim is None and not _SPLIT_SAID.search(text):
         return None
-    num = float(claim.group("num") or claim.group("num2"))
-    den = float(claim.group("den") or claim.group("den2"))
     ticker = symbol.removesuffix("USDT")
     now = today or datetime.now(UTC).date()
     record = _splits(ticker, (rows or _service_rows)(ticker), now)
+    source = "Bitget's data service (bitget-mcp-server)"
+    if not record and rows is None:
+        # the service returned no row at all for NVDA's 10-for-1 of June 2024 (2026-10-06), and
+        # "holds no split" read as "never split": Yahoo's split events are the second source
+        from argus.market.equity_history import HistoryError, split_events
+
+        try:
+            record = [s for s in split_events(ticker) if s[0] <= now]
+            source = "Yahoo Finance's split events (Bitget's data service returned none)"
+        except HistoryError:
+            source = "neither Bitget's data service nor Yahoo Finance answered"
     recent = [s for s in record if s[0] >= now - timedelta(days=RECENT_DAYS)]
+    if claim is None:
+        # "Stock split for MSFT happened last week so what is MSFT trading at?" named no ratio
+        # and got a weekly performance with no word on the split (round 45 re-ask): any split in
+        # the window confirms it, none denies it
+        num, den = (recent[-1][1], recent[-1][2]) if recent else (0.0, 0.0)
+    else:
+        num = float(claim.group("num") or claim.group("num2"))
+        den = float(claim.group("den") or claim.group("den2"))
     same = [s for s in recent if (s[1], s[2]) == (num, den)]
     if same:
         ex, a, b = same[-1]
@@ -75,14 +104,16 @@ def check(text: str, symbol: str, *, price: Callable[[str], float] | None = None
     elif record:
         ex, a, b = record[-1]
         lead = (f"Bottom line: that premise is not on the record — {ticker}'s last split was "
-                f"{a:g}-for-{b:g} on {ex:%d %b %Y}, and there is no {num:g}-for-{den:g} split "
-                f"in the last {RECENT_DAYS} days, so nothing below assumes one.")
+                f"{a:g}-for-{b:g} on {ex:%d %b %Y}, and there is no "
+                + (f"{num:g}-for-{den:g} split" if num else "split")
+                + f" in the last {RECENT_DAYS} days, so nothing below assumes one.")
     else:
-        lead = (f"Bottom line: that premise is not on the record — Bitget's data service holds no "
-                f"split for {ticker}, so nothing below assumes one.")
+        lead = (f"Bottom line: that premise is not on the record — {source}"
+                + ("" if source.startswith("neither") else f" shows no split for {ticker}")
+                + ", so nothing below assumes one.")
     lines = [lead]
     shares = _SHARES.search(text)
-    data: dict[str, Any] = {"claimed": [num, den],
+    data: dict[str, Any] = {"claimed": [num, den] if num else None,
                             "last_split": [str(record[-1][0]), *record[-1][1:]] if record else None}
     if shares is not None and price is not None:
         count = float(shares.group(1).replace(",", ""))
@@ -96,8 +127,18 @@ def check(text: str, symbol: str, *, price: Callable[[str], float] | None = None
                          f" — if the {count:g} were counted before the split, they are now "
                          f"{count * num / den:g} shares, worth ${count * num / den * last:,.2f}."))
             data["value"] = count * last
-    lines.append("Data: corporate actions from Bitget's data service (bitget-mcp-server); the "
-                 "price is Bitget's live ticker.")
+    elif price is not None and re.search(r"\bprice\b|\bwhere\s+is\b|\btrading\s+at\b|\bquote\b",
+                                         text, re.I):
+        # "Apple's stock split 10-for-1 last week, so what's the AAPL price now?" corrected the
+        # split and never gave the price (round 45 hostile, m3)
+        try:
+            last = price(symbol)
+        except Exception:
+            last = None
+        if last is not None:
+            lines.append(f"{ticker} is {last:,.2f} on Bitget now"
+                         + (" — no split adjustment applies." if not same else "."))
+    lines.append(f"Data: corporate actions from {source}; the price is Bitget's live ticker.")
     sources = [Source("venue", "bitget-mcp-server equity_fundamental_dividends",
                       f"{ticker} splits on record"),
                Source("venue", "bitget /api/v2/mix/market/tickers", f"{symbol} last price")]

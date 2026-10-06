@@ -64,8 +64,25 @@ def _asked_day(text: str, today: date) -> tuple[date, list[str]] | None:
     return None
 
 
+_RANGE_ASKED: Final = re.compile(r"\b(?:high|low|highs|lows|range|open(?:ed|ing)?)\b", re.I)
+"""A day's high, low or open, asked of a named day: "What were BTC's high and low on 2026-10-03
+UTC?" got the live ticker with the date replaced by now (round 45 hostile, M8)."""
+
+
 def asked(text: str) -> bool:
-    return ((ASKED.search(text) is not None or _PRICE_ON.search(text) is not None)
+    from argus.lui.journal import find_date
+
+    ranged = (_RANGE_ASKED.search(text) is not None
+              and find_date(text, datetime.now(UTC).date()) is not None
+              and not re.search(r"\b(?:52|fifty)[-\s]*week|\ball[-\s]*time|\b\d+[-\s]*day\b",
+                                text, re.I))
+    # "What was the S&P 500 yesterday" names a market and a past day and nothing else
+    # (round 45 hostile, M17)
+    what_was = re.search(r"\bwhat\s+was\s+(?:the\s+)?[A-Za-z&\d .-]{2,24}?\s+(?:at\s+)?"
+                         r"(?:yesterday|on\s+(?:mon|tue|wed|thu|fri|sat|sun)\w*|on\s+\d)", text,
+                         re.I)
+    return ((ASKED.search(text) is not None or _PRICE_ON.search(text) is not None or ranged
+             or what_was is not None)
             and _NOT_A_CLOSE.search(text) is None)
 
 
@@ -90,10 +107,19 @@ def close_lines(text: str, prior: list[str], *, now: datetime | None = None
         return None
     symbol = named[0]
     exchange = _EXCHANGE.search(text)
-    if is_us_equity(symbol):
-        lines = _equity_close(symbol, day, today, now)
+    from argus.lui.research.rule_test import YAHOO_SERIES
+
+    index = YAHOO_SERIES.get(symbol)
+    if is_us_equity(symbol) or (index is not None and index[0].startswith("^")):
+        # an index closes when its exchange closes: "What was the S&P 500 yesterday?" is read
+        # from Yahoo's ^GSPC, like a stock (round 45 hostile, M17)
+        lines = _equity_close(symbol, day, today, now,
+                              ticker=index[0] if index is not None else None,
+                              record=_RECORD.search(text) is not None)
     else:
-        lines = _coin_close(symbol, day, today)
+        lines = _coin_close(symbol, day, today,
+                            wants_range=_RANGE_ASKED.search(text) is not None
+                            and ASKED.search(text) is None)
         if lines is not None and exchange is not None:
             name = symbol.removesuffix("USDT")
             lines.insert(1, f"{name} is not listed on the {exchange.group(1)} or any stock "
@@ -103,6 +129,17 @@ def close_lines(text: str, prior: list[str], *, now: datetime | None = None
         return None
     if notes:
         lines.insert(1, f"Read as: {'; '.join(notes)}.")
+    if re.search(r"\bfed\b|\bfederal\s+reserve\b", text, re.I):
+        from argus.lui.research.macro import fed_premise_line
+
+        try:
+            fed_said = fed_premise_line(text)
+        except Exception:
+            fed_said = None
+        if fed_said is not None:
+            # "...was it a record given that the Fed cut rates to negative 2% last month?": the
+            # Fed premise is checked beside the close (round 45 hostile, M17)
+            lines.insert(1, fed_said[0])
     if re.search(r"\btomorrow'?s?\b|\bnext\s+(?:week|session|day)'?s?\b", text, re.I):
         # "What will BTC have closed at yesterday, tomorrow's close?" mixes a past close with a
         # future one (round 44 hostile, minor 9): the past one is a fact, the future one is not
@@ -111,7 +148,8 @@ def close_lines(text: str, prior: list[str], *, now: datetime | None = None
     return lines
 
 
-def _coin_close(symbol: str, day: date, today: date) -> list[str] | None:
+def _coin_close(symbol: str, day: date, today: date, *, wants_range: bool = False
+                ) -> list[str] | None:
     from argus.lui.research.parse import last_price
     from argus.lui.research.performance import price_text
     from argus.market import history
@@ -137,6 +175,15 @@ def _coin_close(symbol: str, day: date, today: date) -> list[str] | None:
     if candle is None or float(candle.close) <= 0:
         return None
     close, open_ = float(candle.close), float(candle.open)
+    high, low = float(candle.high), float(candle.low)
+    if wants_range:
+        return [f"Bottom line: on the UTC day {day:%a %d %b %Y}, {name} traded between "
+                f"{price_text(low)} and {price_text(high)} on Bitget's perpetual "
+                f"({high / low - 1:.2%} from low to high); it opened at {price_text(open_)} and "
+                f"closed at {price_text(close)}.",
+                "Data: Bitget USDT-futures daily candle for that UTC day (00:00 to 24:00 UTC); "
+                "Bitget's own 1D candle starts at 16:00 UTC (midnight UTC+8), so its high and "
+                "low can differ."]
     return [f"Bottom line: {name} closed the UTC day {day:%a %d %b %Y} at {price_text(close)} "
             f"on Bitget, {close / open_ - 1:+.2%} from its open of {price_text(open_)}.",
             f"That day's range: low {price_text(float(candle.low))}, high "
@@ -144,12 +191,17 @@ def _coin_close(symbol: str, day: date, today: date) -> list[str] | None:
             "Data: Bitget USDT-futures daily candle for that UTC day (00:00 to 24:00 UTC)."]
 
 
-def _equity_close(symbol: str, day: date, today: date, now: datetime) -> list[str] | None:
+_RECORD: Final = re.compile(r"\brecord\b|\ball[-\s]*time\s+high\b|\bath\b|\bnew\s+high\b", re.I)
+
+
+def _equity_close(symbol: str, day: date, today: date, now: datetime, *,
+                  ticker: str | None = None, record: bool = False) -> list[str] | None:
     from argus.lui.research.performance import price_text
     from argus.market.equity_history import daily
     from argus.market.rtoken_spot import close_utc, holidays, is_trading_day
 
-    ticker = symbol.removesuffix("USDT").removesuffix("STOCK")
+    shown = {"^GSPC": "the S&P 500", "^NDX": "the Nasdaq-100"}.get(ticker or "", "")
+    ticker = ticker or symbol.removesuffix("USDT").removesuffix("STOCK")
     try:
         bars = daily(ticker)
     except Exception:
@@ -186,9 +238,20 @@ def _equity_close(symbol: str, day: date, today: date, now: datetime) -> list[st
     before = next((b for b in reversed(bars) if b.day < session), None)
     change = (f", {bar.close / before.close - 1:+.2%} on the previous close of "
               f"{price_text(before.close)}") if before else ""
-    return [f"Bottom line: {ticker} closed at {price_text(bar.close)} on {day:%a %d %b %Y}"
-            f"{change}.",
-            "Data: Yahoo Finance daily bars, the official 16:00 New York close (split-adjusted)."]
+    label = shown or ticker
+    out = [f"Bottom line: {label} closed at {price_text(bar.close)} on {day:%a %d %b %Y}"
+           f"{change}.",
+           "Data: Yahoo Finance daily bars, the official 16:00 New York close (split-adjusted)."]
+    if record:
+        before_day = [b.close for b in bars if b.day < session]
+        top = max(before_day) if before_day else None
+        if top is not None:
+            out.insert(1, (f"A record: it is above every earlier close in the data (the previous "
+                           f"high close was {price_text(top)})." if bar.close > top else
+                           f"Not a record: the highest close before it was {price_text(top)}, "
+                           f"{bar.close / top - 1:+.2%} away.")
+                       + f" The data starts {bars[0].day:%d %b %Y}.")
+    return out
 
 
 __all__ = ["ASKED", "asked", "close_lines"]

@@ -105,14 +105,14 @@ BASE_CSS = """
   a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible,
   .chip:focus-visible { outline:2px solid var(--accent); outline-offset:2px; border-radius:6px }
   code, .mono, .tag, .meta, .src, .kicker { font-family:var(--mono) }
-  .kicker { font-size:11.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim) }
+  .kicker { font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim) }
   button, .btn { font-family:var(--sans); font-weight:600; letter-spacing:-0.005em;
     background:var(--ink); color:var(--paper); border:1px solid var(--ink); border-radius:10px }
   button:hover, .btn:hover { background:var(--stone); border-color:var(--stone) }
   input[type=text], input:not([type]) { font-family:var(--sans) }
   .card { border-radius:12px }
   .chip { font-family:var(--sans) }
-  .pill { display:inline-block; font:600 11px/1 var(--mono); letter-spacing:.12em;
+  .pill { display:inline-block; font:600 12px/1 var(--mono); letter-spacing:.1em;
     text-transform:uppercase; padding:6px 9px; border:1px solid var(--line); border-radius:999px;
     color:var(--dim) }
   .pill.proof { color:var(--proof); border-color:var(--proof); background:var(--proof-soft) }
@@ -171,13 +171,40 @@ BASE_CSS = """
   .skip { position:absolute; left:-9999px; top:8px; z-index:50; padding:8px 12px;
     background:var(--ink); color:var(--paper); border-radius:8px; font:600 13px/1 var(--sans) }
   .skip:focus { left:16px }
-  /* Back to the top from anywhere on a long page (round 44 visual audit, major 3: /proof, /wrong
-     and /research ran to dozens of phone screens with no way back but scrolling). */
-  .totop { position:fixed; right:16px; bottom:16px; z-index:30; padding:10px 14px;
-    border:1px solid var(--line); border-radius:999px; background:var(--panel); color:var(--ink);
-    font:600 13px/1 var(--sans); text-decoration:none;
-    box-shadow:0 6px 18px color-mix(in srgb, var(--ink) 14%, transparent) }
+  /* Back to the top (round 44 visual audit, major 3: /proof, /wrong and /research ran to dozens of
+     phone screens). Round 45, minor 1: a permanent pill covered the text it sat over, so it is a
+     small tab docked to the edge that appears only after a long scroll and only while the reader
+     is scrolling back up; the footer script toggles .show. Without script the noscript rule keeps
+     it visible. */
+  .totop { position:fixed; right:0; bottom:20px; z-index:30; padding:8px 10px 8px 12px;
+    border:1px solid var(--line); border-right:0; border-radius:999px 0 0 999px;
+    background:var(--panel); color:var(--ink); font:600 12px/1 var(--sans); text-decoration:none;
+    box-shadow:0 6px 18px color-mix(in srgb, var(--ink) 14%, transparent);
+    opacity:0; pointer-events:none; transform:translateX(100%);
+    transition:opacity .18s, transform .18s }
+  .totop.show, .totop:focus-visible { opacity:1; pointer-events:auto; transform:none }
   .totop:hover { border-color:var(--accent) }
+  @media (max-width: 720px) {
+    .totop span { display:none }
+    .totop { padding:0; width:40px; height:40px; display:grid; place-items:center;
+      font-size:16px; bottom:16px }
+  }
+  /* Touch targets of at least 44px (round 45 visual audit, minor 2). Inline links in a sentence
+     keep their line box and gain only hit area (vertical padding on an inline box does not move
+     the text); a flex or block item takes the same padding and gives it back as negative margin, so
+     the layout does not grow. */
+  @media (pointer: coarse) {
+    .nav .theme { width:44px; height:44px }
+    .nav .menu summary { min-height:44px; display:flex; align-items:center }
+    .nav .menu .menu-list a { min-height:44px; display:flex; align-items:center }
+    .skip { padding:16px 12px }
+    .nav .brand { min-height:44px }
+    .wrap a, .foot a { padding-block:15px; margin-block:-15px }
+    .foot a { padding-inline:6px; margin-inline:-6px }
+    .wrap .btn, .wrap button, .chip { min-height:44px }
+    .wrap details > summary { padding-block:12px; min-height:44px }
+    .totop { width:44px; height:44px }
+  }
 """
 
 LINKS: tuple[tuple[str, str], ...] = (
@@ -186,13 +213,12 @@ LINKS: tuple[tuple[str, str], ...] = (
     ("/proof", "What we beat"),
     ("/wrong", "What we got wrong"),
     ("/status", "Status"),
+    ("/whitepaper", "Whitepaper"),
     ("/materials", "Materials"),
 )
 """The console's own pages. The Track 2 agent's record (/agent) is not among them: the handbook
 requires each entry to be an independent project (Basic Competition Rules, rule 2), and a tab for
-the other entry inside this one read as one system entered twice (readiness audit, 2026-09-25).
-The page still answers at its URL for anyone who follows a link to it."""
-
+the other entry inside this one read as one system entered twice (readiness audit, 2026-09-25)."""
 
 def mark_svg(size: int = 22, colour: str = "currentColor") -> str:
     """The ARGUS eye: a ring, and a pupil set off-centre toward the evidence."""
@@ -238,10 +264,20 @@ def nav(active: str = "/") -> str:
             f'<nav class="nav" aria-label="Primary"><a class="brand" href="/" aria-label="ARGUS '
             f'home">{mark_svg(22)}<span>ARGUS</span></a><div class="right"><div class="links-wrap">'
             f'<div class="links">'
-            f'{links}<a href="https://github.com/Pratiikpy/argus-bitget">GitHub</a></div></div>'
+            f'{links}<a href="https://github.com/Pratiikpy/argus-bitget">GitHub</a>'
+            f'</div></div>'
             f'<details class="menu"><summary>Menu</summary><div class="menu-list">{links}'
             f'<a href="https://github.com/Pratiikpy/argus-bitget">GitHub</a></div></details>'
             f'{THEME_BUTTON}</div></nav><span id="main" tabindex="-1"></span>')
+
+
+TOTOP_SCRIPT = (
+    "<noscript><style>.totop{opacity:1;pointer-events:auto;transform:none}</style></noscript>"
+    "<script>(function(){var b=document.querySelector('.totop');if(!b)return;var y0=0,t=0;"
+    "addEventListener('scroll',function(){if(t)return;t=requestAnimationFrame(function(){t=0;"
+    "var y=window.scrollY;b.classList.toggle('show',y>window.innerHeight*1.5&&y<y0);y0=y;});},"
+    "{passive:true});})();</script>")
+"""Shows the back-to-top tab only after a long scroll and only while scrolling up."""
 
 
 def footer() -> str:
@@ -253,8 +289,8 @@ def footer() -> str:
             'policy</a> · <a href="/factors">Factors</a> · '
             '<a href="/agent">Trading agent (separate project)</a> · '
             '<a href="/brand">Brand</a></span></footer>'
-            '<a class="totop" href="#main" aria-label="Back to the top of the page">Top '
-            '&uarr;</a>')
+            '<a class="totop" href="#main" aria-label="Back to the top of the page"><span>Top '
+            '</span>&uarr;</a>' + TOTOP_SCRIPT)
 
 
 PUBLIC_URL = "https://deploy-topaz-seven-64.vercel.app"
@@ -280,8 +316,8 @@ def head(title: str, description: str, path: str = "/") -> str:
             f'content="{OG_IMAGE}"><link rel="icon" href="{favicon()}">{FONTS}{THEME_INIT}')
 
 
-__all__ = ["BASE_CSS", "FONTS", "LINKS", "PALETTE", "THEME_BUTTON", "THEME_INIT", "TOKENS_CSS",
-           "favicon", "footer", "head", "mark_svg", "nav"]
+__all__ = ["BASE_CSS", "FONTS", "LINKS", "PALETTE", "THEME_BUTTON", "THEME_INIT",
+           "TOKENS_CSS", "TOTOP_SCRIPT", "favicon", "footer", "head", "mark_svg", "nav"]
 
 
 _URL = re.compile(r"https?://[^\s<>\"']*[^\s<>\"'.,;:!?)\]]")

@@ -24,6 +24,8 @@ from __future__ import annotations
 
 import re
 from collections.abc import Callable, Sequence
+from dataclasses import dataclass
+from statistics import median
 from typing import Final
 
 Lines = list[str]
@@ -141,15 +143,22 @@ def _friend_leverage(text: str) -> Lines | None:
     if times <= 1:
         return None
     move = 100 / times
-    return [f"Bottom line: for a beginner, no — at {times}x a move of about {move:.1f}% against "
-            "the position wipes out the margin and the exchange closes it (liquidation), and "
-            f"crypto moves {move:.0f}% in a day often.",
-            f"That {move:.1f}% is before fees and the exchange's maintenance margin, which close "
-            "you a little earlier still. Someone else surviving it says how their trades went, "
-            "not what the leverage is.",
-            "Start on spot with no leverage, where the most you can lose is what you paid; if you "
-            "ever use leverage, keep it low (2x needs about a 50% move to liquidate) and set a "
-            "stop-loss first."]
+    stats = _moves("BTCUSDT")
+    # round 45 newcomer, M12: "crypto moves 10% in a day often" was false (2 days in a year); the
+    # frequency is now counted from Bitcoin's daily closes
+    freq = (_frequency(stats, "Bitcoin", move, times) if stats is not None else
+            "The price history could not be read just now, so no frequency is given.")
+    out = [f"Bottom line: for a beginner, no — at {times}x a move of about {move:.1f}% against "
+           "the position wipes out the margin and the exchange closes it (liquidation).",
+           f"{freq} That {move:.1f}% is before fees and the exchange's maintenance margin, which "
+           "close you a little earlier still. Someone else surviving it says how their trades "
+           "went, not what the leverage is.",
+           "Start on spot with no leverage, where the most you can lose is what you paid; if you "
+           "ever use leverage, keep it low (2x needs about a 50% move to liquidate) and set a "
+           "stop-loss first."]
+    if stats is not None:
+        out.append(_data_line(stats, "Bitcoin"))
+    return out
 
 
 _SCAM_DOUBLE: Final = re.compile(
@@ -159,7 +168,8 @@ _SCAM_DOUBLE: Final = re.compile(
 
 
 def _scam_double(text: str) -> Lines | None:
-    if not _SCAM_DOUBLE.search(text):
+    # round 45 hostile, C4: "send him 500 usdt and he doubles it" has no "get" and was refused
+    if not (_SCAM_DOUBLE.search(text) or _STRANGER.search(text)):
         return None
     return ["Bottom line: it is a scam — do not send anything. No real person, company or "
             "exchange doubles money you send them; once crypto is sent it cannot be pulled back.",
@@ -315,7 +325,8 @@ def _kyc_why(text: str) -> Lines | None:
             "you, and never through a link sent to you."]
 
 
-_BITCOIN_SAFE: Final = re.compile(r"\bwhat\s+is\s+bitcoin\b.{0,80}\b(?:safe|scam\w*|beginner"
+_BITCOIN_SAFE: Final = re.compile(r"\bwhat(?:'?s|\s+is)\s+bitcoin\b.{0,80}\b(?:safe|scam\w*|"
+                                  r"beginner"
                                   r"\w*|trust)\b|\bbitcoin\b[^?]{0,40}\bsafe\s+for\s+beginners?"
                                   r"\b", re.I)
 
@@ -1154,7 +1165,8 @@ _FAST_S: Final = (
     "If it scares you, you put in too much. Use less.",
 )
 
-_BITCOIN_BUY: Final = re.compile(r"\bwhat\s+is\s+bitcoin\b[^?]{0,40}\bhow\b[^?]{0,15}\b(?:do\s+i|"
+_BITCOIN_BUY: Final = re.compile(r"\bwhat(?:'?s|\s+is)\s+bitcoin\b[^?]{0,40}\bhow\b[^?]{0,15}"
+                                 r"\b(?:do\s+i|"
                                  r"to|can\s+i)\s+(?:buy|get)\b", re.I)
 
 
@@ -1531,8 +1543,13 @@ def _wrong_send(text: str) -> Lines | None:
 
 _RECOVERY: Final = re.compile(
     r"\brecovery\s+(?:service|company|agency|expert|specialist|firm|agent|team|hacker)s?\b|"
-    r"\b(?:recover|retrieve|get\s+back|trace|return)\w*\b[^?]{0,50}\b(?:for\s+a\s+(?:small\s+)?fee|"
-    r"upfront|up\s+front|if\s+i\s+pay|charge[sd]?|deposit\s+first|percent|%)|"
+    # round 45 hostile, C8: "return" and "%" alone matched "what does my portfolio return if BTC
+    # falls 10%" and "what is the total return percent"; a percentage or a fee only counts when
+    # what is being recovered is money, funds or coins
+    r"\b(?:recover|retrieve|get\s+back|trace)\w*\b[^?]{0,50}\b(?:for\s+a\s+(?:small\s+)?fee|"
+    r"upfront|up\s+front|if\s+i\s+pay|charge[sd]?|deposit\s+first)|"
+    r"\b(?:recover|retrieve|get\s+back|trace|return)\w*\s+(?:all\s+)?(?:my|your|the)\s+(?:stolen\s+"
+    r"|lost\s+)?(?:money|funds|crypto\w*|coins?|bitcoin|btc|eth|usdt)\b[^?]{0,50}\b(?:percent|%)|"
     r"\b(?:says?|claims?|offers?|offered|contacted|messaged|dm'?d)\b[^?]{0,60}\b(?:recover|get\s+"
     r"(?:my|your|the)\b[^?]{0,20}\bback|retrieve)\b", re.I)
 _RECOVERY_A: Final = (
@@ -1888,9 +1905,810 @@ _ROUND44: Final[tuple[Callable[[str], Lines | None], ...]] = (
 never be read as a price dip or as chasing a loss."""
 
 
+# --- round 45: debt, scams, income, fear and the leverage frequency claim ------------------------
+#
+# Round 45's newcomer audit (Activity/audits/round45_newcomer.md) found a borrow-to-buy question,
+# a doubling scam and "should i quit my job" answered with a risk wall or refused, and the leverage
+# answers saying "crypto moves 10% in a day often", which is false (Bitcoin closed 10% or more away
+# from the day before on 2 of the last 364 days, Yahoo Finance, the audit's own check). Every
+# frequency below is counted from daily closes at answer time, never written in as a constant.
+#
+# Privacy facts, each read from the source that makes it true on 2026-10-06:
+# - no login, no account, no connection to a wallet or a Bitget account: `lui/newcomer.py`, `_SAFE`;
+# - the server keeps no session state, the client sends the earlier turns back, and a stated
+#   "book" or remembered fact stays in the browser: `lui/server.py` module docstring and
+#   `lui/memory.py` module docstring;
+# - the anonymous usage record (engine, refusal, time, "did this help" clicks, never the question or
+#   the answer, visitors a daily hash): `lui/usage.py` module docstring;
+# - a language model (Qwen, through Bitget's hackathon gateway) reads the question to route it:
+#   `lui/server.py`, `_config_refused`;
+# - the Telegram bot keeps each chat's recent turns, encrypted: `lui/chat_store.py`;
+# - the code is public at github.com/Pratiikpy/argus-bitget and the page is an entry in Bitget's AI
+#   hackathon: `lui/materials_page.py` (REPOSITORY, "Submission materials · Track 3").
+
+
+@dataclass(frozen=True)
+class _Moves:
+    """A year of daily closes, read for how a price actually behaved."""
+
+    symbol: str
+    days: int
+    typical: float
+    worst_day: float
+    worst_stretch: float
+    drawdown: float
+    change: float
+    source: str
+    moves: tuple[float, ...]
+
+    def at_least(self, pct: float) -> int:
+        """Days on which the close was ``pct`` percent or more away from the day before."""
+        return sum(1 for move in self.moves if abs(move) * 100 >= pct - 1e-9)
+
+
+def _moves(symbol: str) -> _Moves | None:
+    """The last year of ``symbol``'s daily closes as :class:`_Moves`, or None when unreadable."""
+    try:
+        from argus.lui.research.rule_test import daily_closes
+
+        _stamps, raw, source = daily_closes(symbol)
+    except Exception:
+        return None
+    closes = [c for c in raw if c > 0][-366:]
+    if len(closes) < 60:
+        return None
+    moves = tuple(closes[i] / closes[i - 1] - 1 for i in range(1, len(closes)))
+    stretch = min(closes[i] / closes[i - 7] - 1 for i in range(7, len(closes)))
+    peak, drawdown = closes[0], 0.0
+    for close in closes:
+        peak = max(peak, close)
+        drawdown = min(drawdown, close / peak - 1)
+    return _Moves(symbol, len(moves), float(median(abs(m) for m in moves)), min(moves), stretch,
+                  drawdown, closes[-1] / closes[0] - 1, source, moves)
+
+
+def _frequency(m: _Moves, coin: str, pct: float, times: float) -> str:
+    """How often ``coin`` moved ``pct`` percent in a day, and what its worst 7-day stretch would
+    have done to a position held at ``times``x. Counted, not asserted (round 45 newcomer, M12)."""
+    n = m.at_least(pct)
+    label = f"{pct:.0f}%" if pct >= 2 else f"{pct:.1f}%"
+    out = (f"{coin} moved {label} or more in a single day on {n} of the last {m.days} days"
+           if n else f"{coin} did not move {label} in a single day in the last {m.days} days")
+    if n / m.days >= 0.3:
+        out += " — a routine day"
+    if m.worst_stretch < 0:
+        hit = -m.worst_stretch * times
+        out += (f". But moves add up: its worst 7-day stretch was {m.worst_stretch:+.1%}, "
+                + (f"which at {times:g}x would have wiped out the margin."
+                   if hit >= 1 else f"which at {times:g}x is a {hit:.0%} loss of the margin."))
+    return out + ("" if out.endswith(".") else ".")
+
+
+def _data_line(m: _Moves, coin: str) -> str:
+    return f"Data: {coin}, the last {m.days} days; {m.source}."
+
+
+def _subject(text: str) -> tuple[str, str]:
+    """The symbol a question is about and the name to say it by; Bitcoin when none is named."""
+    from argus.lui.research import research_symbols
+
+    try:
+        found = research_symbols(text)[0]
+    except Exception:
+        found = ()
+    if not found:
+        return "BTCUSDT", "Bitcoin"
+    code = found[0].removesuffix("USDT")
+    return found[0], "Bitcoin" if code == "BTC" else code
+
+
+def _stated_amount(text: str) -> float | None:
+    """The first plain sum in ``text`` (5000, 5,000, 5k), ignoring multiples and percentages."""
+    m = re.search(r"(?<![\w.])\$?(?P<n>\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?\s*(?P<k>k|thousand)?"
+                  r"(?!\w)(?!\s*(?:x\b|%|years?|months?|days?|weeks?))", text, re.I)
+    if m is None:
+        return None
+    value = float(m.group("n").replace(",", ""))
+    return value * 1000 if m.group("k") else value
+
+
+# income decisions
+
+_JOB: Final = re.compile(
+    r"\b(?:quit|quitting|leave|leaving|resign\w*|give\s+up|ditch\w*|walk\s+away\s+from|drop\s+out"
+    r"\s+of)\b[^?.!]{0,20}\bmy\s+(?:\w+\s+)?(?:job|work|career|studies|school|college|degree|"
+    r"business)\b", re.I)
+_JOB_ASK: Final = re.compile(
+    r"\bshould\b|\bcan\s+i\b|\bcould\s+i\b|\bbe\s+honest\b|\bis\s+it\s+(?:ok|okay|smart|wise|a\s+"
+    r"good\s+idea)\b|\bif\s+it\s+(?:does|hits|happens|works|goes)\b|\bwant\s+to\b|\bwanna\b|"
+    r"\bthinking\b|\bplanning\b|\bgoing\s+to\b|\bgonna\b|\bworth\b", re.I)
+_PRICE_TARGET: Final = re.compile(
+    r"\b(?:hit|hits|hitting|reach|reaches|touch|touches|moon|moons|mooning|pump|pumps|"
+    r"go(?:es)?\s+to|get(?:s)?\s+to)\b|\b\d+\s*x\b|\bmillion\b", re.I)
+_JOB_LINE: Final = ("no — do not quit your job, or make any income decision, on a price target: "
+                    "nobody can know where a price goes, and your pay is the one certain part of "
+                    "the picture.")
+
+
+def income_line(text: str) -> str | None:
+    """One line on a job, for a question that is mostly about something else ("will bitcoin hit
+    1 million? i wanna quit my job if it does"): the price-target half belongs to the price
+    reader, the job half to this one (round 45 newcomer, C1). None when no job is mentioned."""
+    plain = _plain(text)
+    if not (_JOB.search(plain) and _JOB_ASK.search(plain)):
+        return None
+    return "On your job: " + _JOB_LINE
+
+
+def _job(text: str) -> Lines | None:
+    if not (_JOB.search(text) and _JOB_ASK.search(text)) or _PRICE_TARGET.search(text):
+        return None
+    return ["Bottom line: " + _JOB_LINE,
+            "A price target says what one coin might be worth; what you would take home depends on "
+            "how much you hold, which for most people starting out is small, and on the price "
+            "when you sell, after fees and tax. Money you live on stays out of crypto.",
+            "If the job itself is the problem, that is a separate decision: plan it with savings "
+            "and a new job lined up, not with a coin's price."]
+
+
+# borrowing to buy
+
+_DEBT: Final = re.compile(
+    r"\bborrow\w*|\b(?:took|take|taking|taken|got|get|getting|want|wanna|need)\s+(?:out\s+)?"
+    r"(?:a\s+|an\s+|the\s+)?(?:\w+\s+){0,2}loans?\b|\bloans?\s+(?:from|of)\b|\bremortgag\w*|"
+    r"\bmortgage\s+(?:my|the)\s+(?:house|home|flat)|\bhome\s+equity\b|\bheloc\b|\bcredit\s+cards?"
+    r"\b|\boverdraft\b|\bpayday\b", re.I)
+_BUY_VERB: Final = re.compile(
+    r"\b(?:buy|buying|bought|invest\w*|purchas\w*|ape|aping|trade|trading|go\s+into|get\s+into|"
+    r"put\s+(?:it|them|this|that|\w+)\s+(?:in|into)|\binto)\b", re.I)
+_CRYPTOISH: Final = re.compile(r"\bcrypto\w*|\bbitcoin\b|\bbtc\b|\beth\w*|\bcoins?\b|\btokens?\b|"
+                               r"\bsol\b|\bdoge\w*|\bxrp\b|\bnfts?\b", re.I)
+_COLLATERAL: Final = re.compile(
+    r"\bagainst\s+(?:my|the)\s+(?:crypto|bitcoin|btc|eth\w*|coins?)|\bcollateral\b|\bflash\s+loan|"
+    r"\bdefi\b|\baave\b|\bmargin\b|\bleverage\w*|\bfutures?\b", re.I)
+_BORROWED_ALREADY: Final = re.compile(r"\b(?:borrowed|took|got|taken|already)\b", re.I)
+
+
+def _borrow_to_buy(text: str) -> Lines | None:
+    """Debt-funded buying, both as a plan and as something already done (round 45 newcomer, C3)."""
+    if not (_DEBT.search(text) and _BUY_VERB.search(text) and _CRYPTOISH.search(text)):
+        return None
+    if _COLLATERAL.search(text):
+        return None
+    symbol, name = _subject(text)
+    thing = "crypto" if name == "Bitcoin" and not re.search(r"\bbitcoin\b|\bbtc\b", text, re.I) \
+        else name
+    out = [f"Bottom line: no — do not borrow money to buy {thing}. The loan has to be repaid in "
+           "full, with interest, whatever the price does, so a fall leaves you with the loss and "
+           "the debt."]
+    if _BORROWED_ALREADY.search(text):
+        out.append("If the money is borrowed and not yet spent, giving it back is the safe move. "
+                   "If it is already in, do not add more debt or buy more to \"average down\", and "
+                   "work out now how you would repay it if the whole amount went to zero.")
+    stats = _moves(symbol)
+    if stats is not None:
+        out.append(f"What a year looks like: {name} {'rose' if stats.change >= 0 else 'fell'} "
+                   f"{abs(stats.change):.0%} over the last year, its worst single day was "
+                   f"{stats.worst_day:.1%}, and at its lowest it stood {abs(stats.drawdown):.0%} "
+                   "below its high of that stretch.")
+        amount = _stated_amount(text)
+        if amount is not None and stats.change < 0:
+            out.append(f"Put in a year ago, {amount:,.0f} would be about "
+                       f"{amount * (1 + stats.change):,.0f} today, and the loan would still be "
+                       f"{amount:,.0f} plus interest.")
+        elif amount is not None:
+            out.append("A rise over one year is no promise for the next, and the repayments do "
+                       "not pause while the price falls.")
+    else:
+        out.append("I could not read the price history just now, so no figure is given here.")
+    out.append("Only money you could lose entirely without it changing your life belongs in "
+               "something this volatile.")
+    if stats is not None:
+        out.append(_data_line(stats, name))
+    return out
+
+
+# a stranger who doubles your money
+
+_STRANGER: Final = re.compile(
+    r"\b(?:send|sending|deposit|transfer|give|pay)\b[^?]{0,50}\b(?:him|her|them|someone|somebody|"
+    r"guy|man|woman|admin|manager|trader|stranger|account|address|wallet)\b[^?]{0,60}\b(?:doubl\w*"
+    r"|tripl\w*|multipl\w*|flip\w*|\d{1,3}\s*x)\b", re.I)
+
+
+# leverage asked in another language
+
+_LEV_WORD: Final = re.compile(
+    r"\bkald[\u0131i]ra[c\u00e7]\w*|\bapalancamiento\b|\balavancagem\b|\blevier\b|"
+                              r"\bhebel\w*", re.I)
+_LEV_DEF: Final = re.compile(
+    r"\bne\s+demek\b|\bnedir\b|\bne\s+anlama\b|\bqu[eé]\s+(?:es|significa)\b|\bsignifica\b|"
+    r"\bo\s+que\s+(?:é|e|significa)\b|\bqu'?est[-\s]ce\b|\bquoi\b|\bsignifie\b|"
+    r"\bwas\s+(?:ist|bedeutet)\b", re.I)
+
+
+def _leverage_word(text: str) -> Lines | None:
+    """"10x kaldirac ne demek" (Turkish, leverage) was answered with the custody boilerplate
+    (round 45, M2); the definition is the console's own, from `lui/concepts.py`."""
+    if not (_LEV_WORD.search(text) and _LEV_DEF.search(text)):
+        return None
+    from argus.lui.concepts import CONCEPTS
+
+    concept = next((c for c in CONCEPTS if c.name == "leverage"), None)
+    if concept is None:
+        return None
+    out = ["Bottom line: " + concept.definition, concept.reading]
+    times = re.search(r"\b(\d{1,3})\s*x\b", text, re.I)
+    if times is not None and int(times.group(1)) > 1:
+        x = int(times.group(1))
+        out.append(f"At {x}x, a move of about {100 / x:.1f}% against the position uses up the "
+                   "margin and the exchange closes it (liquidation).")
+    out.append("For a beginner, spot trading, with no leverage, is where the most you can lose is "
+               "what you paid.")
+    return out
+
+
+# stable coins, tokenised stocks, privacy
+
+_STABLE_SAFE: Final = re.compile(
+    r"\bis\s+(?:usdt|usdc|tether|dai|a\s+stable\s*coins?|stable\s*coins?)\s+(?:safe|legit|risky|a\s+"
+    r"scam|trustworthy|ok|okay|secure)\b", re.I)
+_STABLE_WHAT: Final = re.compile(r"\bwhat\s+(?:is|are)\s+(?:a\s+)?stable\s*coins?\b", re.I)
+
+
+def _stable_safe(text: str) -> Lines | None:
+    """"is usdt safe? what is a stablecoin" was refused (round 45, M8)."""
+    if not (_STABLE_SAFE.search(text) or (_STABLE_WHAT.search(text) and _STABLE_ANY.search(text))):
+        return None
+    return ["Bottom line: safer than a coin whose price swings, but not safe the way a bank "
+            "deposit is: a stablecoin (USDT and USDC are the best known) is a crypto token meant "
+            "to stay worth one US dollar, and whether it does depends on the reserves the company "
+            "behind it holds. It is not insured.", *_STABLE_A[1:]]
+
+
+_TOKEN_VS_SHARE: Final = re.compile(
+    r"\b(?:stocks?|shares?)\b[^?]{0,40}\b(?:or|vs\.?|versus|instead\s+of|rather\s+than)\b[^?]{0,40}"
+    r"\b(?:bitget|tokeni[sz]ed|tokens?|rtokens?)\b|\b(?:bitget|tokeni[sz]ed|tokens?|rtokens?)\b"
+    r"[^?]{0,40}\b(?:or|vs\.?|versus|instead\s+of)\b[^?]{0,40}\b(?:stocks?|shares?)\b", re.I)
+_TOKEN_VS_SHARE_ASK: Final = re.compile(r"\bsafe\w*|\bbetter\b|\bwhich\b|\bdifference\b|\brisk\w*",
+                                        re.I)
+
+
+def _token_vs_share(text: str) -> Lines | None:
+    """"is it safer to buy tsla stock or the bitget tsla thing" was refused (round 45, M8)."""
+    if not (_TOKEN_VS_SHARE.search(text) and _TOKEN_VS_SHARE_ASK.search(text)):
+        return None
+    _symbol, name = _subject(text)
+    name = "the company" if name == "Bitcoin" else name
+    return [f"Bottom line: neither is safer from price swings — both rise and fall with {name}'s "
+            "price. The difference is what you hold: a share is a stake in the company, kept at a "
+            "broker; the Bitget token only tracks the price.",
+            "With the token you also rely on Bitget, and on the token keeping in step with the "
+            "stock: it trades around the clock, so outside US market hours its price can drift "
+            "from the stock's last close and jump back at the open. You have no vote and are not a "
+            "registered shareholder.",
+            "With the share you need a broker regulated in your country, and it trades only during "
+            "market hours.",
+            "If owning the actual share matters, use a broker; if you only want the price "
+            "exposure, the token is simpler. Either way, only an amount you could lose."]
+
+
+_PRIVACY: Final = re.compile(
+    r"\b(?:do|does|will|are|is)\s+(?:you|u|this\s+(?:site|console|app|website|thing))\s+(?:save|"
+    r"store|keep|collect|track|log|record|sav\w+|stor\w+|see|sell|share)\w*\b[^?]{0,40}\b(?:data|"
+    r"wallet|questions?|info\w*|history|chats?|messages?|me|my\s+\w+)\b", re.I)
+_WHO_RUNS: Final = re.compile(r"\bwho\s+(?:runs|owns|made|built|is\s+behind|operates)\s+(?:this|"
+                              r"the)\s+(?:site|website|app|console|thing|tool|page)\b", re.I)
+
+
+def _privacy(text: str) -> Lines | None:
+    """"do you save my data or my wallet? who runs this site" was refused (round 45, M8). Every
+    fact here is read from the source named in the round-45 comment above."""
+    asked_privacy, asked_who = _PRIVACY.search(text), _WHO_RUNS.search(text)
+    if not (asked_privacy or asked_who):
+        return None
+    out: Lines = []
+    if asked_privacy:
+        out += ["Bottom line: not your wallet — there is no login and no wallet connection, so "
+                "this console never sees your wallet or your Bitget account, and it cannot move "
+                "money."
+                + (" Who runs it is below." if asked_who else ""),
+                "Your questions: the server keeps no chat history or session; your browser sends "
+                "the earlier turns back with each question, and anything you ask it to remember, "
+                "like a portfolio you type in, stays in your own browser. A language model (Qwen, "
+                "through Bitget's hackathon gateway) reads each question to route it, so the "
+                "words of a question do reach that service.",
+                "What is counted: an anonymous tally per question (which part answered, whether "
+                "it refused, how long it took) and \"did this help\" clicks. The question and the "
+                "answer are not in it, and visitors are counted by a daily scrambled code that "
+                "cannot link one day to the next. The Telegram bot is a separate way in and does "
+                "keep each chat's recent turns, encrypted."]
+    if asked_who:
+        who = ("an independent entry in Bitget's AI hackathon, not Bitget's own site. It is open "
+               "source (github.com/Pratiikpy/argus-bitget), reads public market data, and nothing "
+               "here can place an order.")
+        out.append(("Who runs it: it is " if out else "Bottom line: it is ") + who)
+    return out
+
+
+# is it too late, and fear
+
+_LATE_BUY: Final = re.compile(
+    r"\b(?:too\s+late|am\s+i\s+late|already\s+too\s+late)\b[^?]{0,40}\b(?:buy|buying|invest\w*|get\s+"
+    r"in|bitcoin|btc|crypto\w*|eth\w*|ethereum)\b", re.I)
+
+
+def _too_late_buy(text: str) -> Lines | None:
+    """"is it too late to buy bitcoin?" got a risk-statistics wall (round 45, M9)."""
+    if not _LATE_BUY.search(text) or _TOO_LATE.search(text):
+        return None
+    symbol, name = _subject(text)
+    sentence = ""
+    source = ""
+    span_text = ""
+    try:
+        from argus.lui.research.rule_test import daily_closes
+
+        stamps, closes, source = daily_closes(symbol)
+        peak, peak_at, worst, span = closes[0], 0, 0.0, (0, 0)
+        for i, close in enumerate(closes):
+            if close > peak:
+                peak, peak_at = close, i
+            if close / peak - 1 < worst:
+                worst, span = close / peak - 1, (peak_at, i)
+        sentence = (f" A better question is whether the amount is small enough to lose, because "
+                    f"{name} has fallen as much as {abs(worst):.0%} from a high before "
+                    f"({stamps[span[0]]:%b %Y} to {stamps[span[1]]:%b %Y}).")
+        span_text = f"daily closes {stamps[0]:%b %Y} to {stamps[-1]:%b %Y}"
+    except Exception:
+        sentence = ""
+    out = ["Bottom line: nobody can know — whether it is too late depends on where the price goes "
+           "next, and nobody knows that." + sentence,
+           "Buying a little at a time (say every month) makes the day you start matter much less, "
+           "and starting with nothing is also fine: there is no deadline.",
+           "A test that works at any price: could you leave this money alone through a fall of "
+           "half? If yes, the amount is right; if not, it is too big."]
+    out.append(f"Data: {name}, {span_text}; {source}." if sentence else
+               "Data: the price history could not be read just now, so no figure is given.")
+    return out
+
+
+_FEAR: Final = re.compile(
+    r"\b(?:scared|afraid|terrified|frightened|fear|fearful|worried|anxious|nervous)\b[^?.]{0,25}"
+    r"\b(?:los(?:e|ing|s)|all\s+(?:of\s+)?(?:my|it))\b|\b(?:lose|losing)\s+(?:everything|it\s+all|"
+    r"all\s+(?:of\s+)?my)\b[^?.]{0,25}\b(?:scares?|terrifies?|scary|frightens?|worr\w+)\b|"
+    r"\bmedo\b[^?.]{0,25}\bperder\b|\bmiedo\b[^?.]{0,25}\bperder\b|\bpeur\b[^?.]{0,25}\bperdre\b|"
+    r"\bangst\b[^?.]{0,30}\bverlier\w*|무서|무섭|두려|겁\s*(?:이\s*)?나|"
+    r"\bkorku\w*[^?.]{0,25}\bkaybet\w*|\bkaybet\w*[^?.]{0,25}\bkork\w*|"
+    r"\btakut\b[^?.]{0,25}\b(?:rugi|kehilangan|hilang)\b|\bsợ\b[^?.]{0,25}\bmất\b", re.I)
+_FEAR_NOT: Final = re.compile(r"missing\s+out|\bfomo\b|\bhow\s+do\s+i\s+buy\b", re.I)
+
+
+def _fear(text: str) -> Lines | None:
+    """Fear of losing everything, in the languages the audit tried: one plain, honest paragraph
+    instead of a statistics sheet (round 45, M10)."""
+    if not _FEAR.search(text) or _FEAR_NOT.search(text) or _LOSS_FELT.search(text):
+        return None
+    return ["Bottom line: being scared of losing everything is a sensible reaction, not a flaw, "
+            "and it has a practical answer: put in only money you could lose without it changing "
+            "your life, never borrowed money, no leverage, and start with an amount so small it "
+            "feels almost pointless. Nobody can tell you whether now is a good moment to "
+            "buy, because nobody knows, and prices really can halve, so the plan has to work even "
+            "if that "
+            "happens. If the thought of it keeps you awake, the amount is too big, and starting "
+            "with nothing is a fine choice too."]
+
+
+_GAMBLING: Final = re.compile(
+    r"\b(?:is|are)\s+(?:it|this|that|crypto|trading|investing|all\s+this|bitcoin)\s+(?:(?:just|"
+    r"basically|really|kinda|kind\s+of|like|all|the\s+same\s+as)\s+){0,3}(?:gambling|a\s+casino|"
+    r"casinos|a\s+lottery|lottery|betting)\b", re.I)
+
+
+def _gambling(text: str) -> Lines | None:
+    """"is it like gambling" opened "a coin with no business behind it" and named DOGE although no
+    coin was asked about (round 45, minor 4)."""
+    if not _GAMBLING.search(text):
+        return None
+    return ["Bottom line: it can be — what makes it gambling is not the asset but how it is "
+            "used: money you cannot afford to lose, borrowed money, leverage, or buying whatever "
+            "is jumping today in the hope of a big win.",
+            "Buying a small amount of a large, long-established asset and holding it is a risky "
+            "investment, not a bet; trading fast, using leverage or chasing small coins is closer "
+            "to a bet, and the fees on every trade make the odds worse.",
+            "A simple test: could you lose all of it and shrug? Then the risk is one you chose; if "
+            "not, it is too big. For what a bad week looks like in numbers, ask \"how much could "
+            "I lose on BTC in a bad week with $500\"."]
+
+
+_STAKE: Final = re.compile(r"\$\s?(?P<a>\d[\d,]*(?:\.\d+)?)|(?P<b>\d[\d,]*(?:\.\d+)?)\s*(?:dollars?"
+                           r"|usd|bucks)\b", re.I)
+_LEV_X: Final = re.compile(r"\b(?P<x>\d{1,3})\s*x\b", re.I)
+_STAKE_ASK: Final = re.compile(r"\bwhat\s+(?:happens|would\s+happen|if)\b|\b(?:ok|okay|safe|risky|"
+                               r"dangerous|worth|good\s+idea|should)\b", re.I)
+
+
+_STAKE_NOT: Final = re.compile(r"%|\bpercent\b|\bhow\s+much\b|\bweek\b|\bmonth\b|\btoday\b", re.I)
+
+
+def _stake_at_leverage(text: str) -> Lines | None:
+    """"what happens if i put 20 bucks at 10x" said a 10% move "is an ordinary day for most
+    coins" (round 45, M13); here the typical day and the worst stretch are counted."""
+    stake, lev = _STAKE.search(text), _LEV_X.search(text)
+    if (stake is None or lev is None or _STAKE_NOT.search(text)
+            or not _STAKE_ASK.search(text)):
+        return None
+    x = int(lev.group("x"))
+    amount = float((stake.group("a") or stake.group("b")).replace(",", ""))
+    if x <= 1 or amount <= 0:
+        return None
+    from argus.lui.research import research_symbols
+    from argus.lui.research.parse import is_us_equity
+
+    try:
+        named = research_symbols(text)[0]
+    except Exception:
+        named = ()
+    if any(is_us_equity(s) for s in named):
+        return None
+    symbol, name = _subject(text)
+    fuse = 100 / x
+    out = [f"Bottom line: at {x}x, ${amount:,.0f} holds a ${amount * x:,.0f} position, so a "
+           f"{fuse:.1f}% move against it takes the whole ${amount:,.0f} — and the exchange closes "
+           "it a little before that, at its maintenance margin."]
+    stats = _moves(symbol)
+    if stats is not None:
+        day = amount * x * stats.typical
+        out.append(f"{name}'s typical day moves it about {stats.typical:.1%}, which at {x}x is "
+                   f"about ${day:,.2f} of your ${amount:,.0f} up or down. "
+                   + _frequency(stats, name, fuse, x))
+    else:
+        out.append("I could not read the price history just now, so no daily size or frequency "
+                   "is given.")
+    out.append("On isolated margin the stake is all that can be lost, and with a stake this "
+               "small the fees and funding, which are charged on the whole position, matter. "
+               "This is arithmetic, not advice.")
+    if stats is not None:
+        out.append(_data_line(stats, name))
+    return out
+
+
+_STOP_HOW: Final = re.compile(
+    r"\bhow\s+(?:do|can|to|should|would)\s+(?:i\s+|you\s+)?(?:set|put|place|add|use|make|create)"
+    r"\s+(?:up\s+)?(?:a\s+|an\s+|my\s+)?(?:stop(?:[\s-]*loss)?|sl|tp\s*/?\s*sl|take[\s-]*profit)\b|"
+    r"\bwhere\s+(?:do|can)\s+i\s+(?:set|put|find)\s+(?:a\s+|the\s+)?stop(?:[\s-]*loss)?\b", re.I)
+
+
+def _stop_loss_how(text: str) -> Lines | None:
+    """"how do i set a stop loss" was declined as unrecognised (round 45 newcomer re-check). How
+    it works on Bitget, from its own order fields (agent-skill/references/commands.md: a preset
+    ``stopLoss`` trigger on the order, triggered by the market or the mark price and filled at
+    market or at a limit; a separate take-profit/stop-loss order for an open futures position,
+    on all of it or part)."""
+    if not _STOP_HOW.search(text):
+        return None
+    return [
+        "Bottom line: a stop-loss is an order you set in advance that sells (or closes a futures "
+        "position) automatically once the price reaches a level you choose, so a fall is "
+        "capped at roughly that level.",
+        "On Bitget you can set it two ways: when you place the order, by filling in its "
+        "stop-loss (and take-profit) price; or afterwards, on an open futures position, with a "
+        "take-profit/stop-loss order for all of it or part of it.",
+        "Choices worth knowing: the trigger can follow the last traded price or the mark price; "
+        "when it triggers it can sell at market (fills, at whatever price is there) or at a "
+        "limit (your price, but may not fill in a fast drop). A gap past your level fills a "
+        "market stop below it.",
+        "Pick the level first, then the size: the stop is where your reason for the trade is "
+        "wrong, and the size is what you can lose if it is hit. Not advice."]
+
+
+_WHAT_AND_SHOULD: Final = re.compile(
+    r"\b(?:what(?:'?s|\s+is|\s+are)|explain|tell\s+me\s+about)\b[^?]{0,40}?\b(?:and|,|but)\s+"
+    r"(?:should\s+i|do\s+i|can\s+i|would\s+it\s+be\s+(?:a\s+)?(?:good|smart|wise)|is\s+it\s+(?:a\s+)?"
+    r"(?:good|smart|wise|worth))\b[^?]{0,40}\b(?:buy|invest\w*|put\s+(?:my\s+|some\s+|the\s+)?"
+    r"(?:money|savings|cash)|put\s+[^?]{0,25}\b(?:in|into)|get\s+(?:in|some)|idea|investment)\b",
+    re.I)
+_COIN_IS: Final = {
+    "BTC": "Bitcoin is a digital currency that runs on a public network no company or government "
+           "controls; only 21 million coins can ever exist, and its price is set purely by what "
+           "buyers and sellers agree on.",
+    "ETH": "Ether is the coin of Ethereum, a public network that runs programs (apps, stablecoins, "
+           "exchanges) instead of only moving money; its price is set purely by what buyers and "
+           "sellers agree on.",
+    "SOL": "SOL is the coin of Solana, a public network built for fast, cheap transactions and "
+           "apps; its price is set purely by what buyers and sellers agree on.",
+    "DOGE": "Dogecoin began in 2013 as a joke coin; it has no fixed supply and no business behind "
+            "it, so its price moves on attention and sentiment.",
+}
+
+
+def _what_and_should(text: str) -> Lines | None:
+    """"What is Bitcoin and should I invest my money in it?" — the Hindi, Spanish or English first
+    question of a newcomer — got a risk wall of beta, kurtosis and QQQ shocks (round 45 newcomer,
+    minor 1 and M1). It asks two things: what it is, and whether to buy. The first has an answer;
+    the second is answered with what the coin has actually done, so the reader decides on facts."""
+    if not _WHAT_AND_SHOULD.search(text):
+        return None
+    from argus.lui.research import research_symbols
+    from argus.lui.research.parse import is_us_equity
+
+    try:
+        found = research_symbols(text)[0]
+    except Exception:
+        found = ()
+    if not found:
+        return None
+    symbol = found[0]
+    code = symbol.removesuffix("USDT")
+    name = "Bitcoin" if code == "BTC" else "Ether" if code == "ETH" else code
+    if is_us_equity(symbol):
+        from argus.market.company_names import names_for
+
+        called = (names_for(code) or [code])[0]
+        what = (f"{code} is a share of {called}, a US-listed company — owning it means owning a "
+                "small piece of the business, and its price moves with what investors expect it "
+                "to earn. On Bitget it trades as a contract that tracks that share price.")
+    else:
+        what = _COIN_IS.get(code, f"{code} is a crypto coin traded on exchanges; its price is set "
+                                  "purely by what buyers and sellers agree on, with no company "
+                                  "earnings underneath it.")
+    out = [f"Bottom line: {what} Whether you should put money in it, nobody can honestly tell "
+           "you — here is what it has actually done, so you can decide on facts."]
+    source = ""
+    try:
+        from datetime import timedelta
+
+        from argus.lui.research.rule_test import daily_closes
+
+        stamps, closes, source = daily_closes(symbol)
+        year_ago = next(i for i, s in enumerate(stamps) if s >= stamps[-1] - timedelta(days=365))
+        peak, peak_at, worst, span = closes[0], 0, 0.0, (0, 0)
+        for i, close in enumerate(closes):
+            if close > peak:
+                peak, peak_at = close, i
+            if close / peak - 1 < worst:
+                worst, span = close / peak - 1, (peak_at, i)
+        change = closes[-1] / closes[year_ago] - 1
+        out.append(f"Over the last year it went from {closes[year_ago]:,.2f} to "
+                   f"{closes[-1]:,.2f} ({change:+.0%}). It has also fallen {abs(worst):.0%} from "
+                   f"a high before ({stamps[span[0]]:%b %Y} to {stamps[span[1]]:%b %Y}) — "
+                   "anyone buying it should expect falls like that, not just rises.")
+        amount = _stated_amount(text)
+        if amount and amount >= 10:
+            unit = "$" if re.search(r"\$|dollar|usd", text, re.I) else ""
+            out.append(f"On {unit}{amount:,.0f}, a fall that size would leave about "
+                       f"{unit}{amount * (1 + worst):,.0f}.")
+        out.append(f"Data: {name}, daily closes {stamps[0]:%b %Y} to {stamps[-1]:%b %Y}; "
+                   f"{source}.")
+    except Exception:
+        out.append("The price history could not be read just now, so no figure is given.")
+    out.insert(-1 if source else len(out),
+               "If you decide to: only money you will not need for years and could watch halve, "
+               + ("with no leverage, through a broker or exchange you reached yourself"
+                  if is_us_equity(symbol) else
+                  "on spot (no leverage), on an exchange you reached yourself")
+               + " — and buying a little each month makes the day you start matter much less. "
+                 "Not advice.")
+    return out
+
+
+_PROFIT_ASK: Final = re.compile(
+    r"\bhow\s+much\s+(?:profit|money|return|gain)s?\b[^?]{0,30}\b(?:will|would|can|could|do|"
+    r"might)\s+i\s+(?:make|get|earn|gain|have)|\bhow\s+much\s+(?:will|would|can|could|do|might)\s+"
+    r"i\s+(?:make|earn|gain|profit)\b|\bwhat\s+(?:profit|return|gain)s?\s+(?:will|would|can|"
+    r"could|do|might)\s+i\s+(?:make|get|earn|see)\b|\bhow\s+much\s+(?:will|would)\s+(?:it|that)\s+"
+    r"be\s+worth\b", re.I)
+
+
+def _profit_ask(text: str) -> Lines | None:
+    """"If I buy $100 of bitcoin, how much profit will I make?" — and the same question in rupiah
+    — got a worst-day loss, beta to the Nasdaq and kurtosis, or no answer at all (round 45
+    newcomer, M7). Nobody knows the profit; what can be said honestly is how every one-year
+    holding over the history turned out, so the reader sees the spread of outcomes, not one."""
+    if not _PROFIT_ASK.search(text):
+        return None
+    symbol, name = _subject(text)
+    from argus.lui.research import local_money
+
+    read_as: list[str] = []
+    stake, given, local = 100.0, False, None
+    held = local_money.amounts(text)
+    if held:
+        # "1 juta rupiah" is about $56, not $1 (round 45 newcomer, M7): the outcome is said in the
+        # reader's own currency, with the dollar figure and the rate beside it
+        from argus.market.fx_rates import usd_rate
+
+        rate = usd_rate(held[0].code)
+        if rate is not None:
+            local = (held[0], rate)
+            stake, given = rate.to_usd(held[0].amount), True
+            read_as = [f"Read in US dollars: {held[0].amount:,.0f} {held[0].name} = about "
+                       f"${stake:,.2f} at {rate.source} ({rate.per_usd:,.2f} {rate.code} per "
+                       f"dollar{', ' + rate.as_of if rate.as_of else ''})."]
+    else:
+        said = _stated_amount(text) or 0.0
+        if said >= 1:
+            stake, given = said, True
+    try:
+        from bisect import bisect_left
+        from datetime import timedelta
+
+        from argus.lui.research.rule_test import daily_closes
+
+        stamps, closes, source = daily_closes(symbol)
+        # a year by the calendar, so a stock's 252 sessions and a coin's 365 days both count
+        ends = [bisect_left(stamps, s + timedelta(days=365)) for s in stamps]
+        outcomes = sorted(closes[j] / closes[i] - 1 for i, j in enumerate(ends)
+                          if j < len(closes))
+        if len(outcomes) < 30:
+            raise ValueError("under a year and a month of history")
+    except Exception:
+        return ["Bottom line: nobody can tell you the profit in advance — the price could rise or "
+                "fall, and no one knows which. The price history could not be read just now, so "
+                "no past outcomes are given.", *read_as,
+                "Only put in money you could lose, on spot, with no leverage. Not advice."]
+    share_up = sum(1 for x in outcomes if x > 0) / len(outcomes)
+    low, mid, high = (outcomes[int(q * (len(outcomes) - 1))] for q in (0.1, 0.5, 0.9))
+
+    def worth(r: float) -> str:
+        if local is not None:
+            return (f"about {local[0].amount * (1 + r):,.0f} {local[0].name} "
+                    f"(${stake * (1 + r):,.2f}, {r:+.0%})")
+        return f"${stake * (1 + r):,.0f} ({r:+.0%})"
+
+    put = (f"{local[0].amount:,.0f} {local[0].name}" if local is not None else
+           f"${stake:,.0f}" + ("" if given else " (no amount was given)"))
+    return [f"Bottom line: nobody can tell you the profit in advance. What can be shown is how "
+            f"{name} held for one year has actually turned out: of every one-year stretch from "
+            f"{stamps[0]:%b %Y} to {stamps[-1]:%b %Y}, {share_up:.0%} ended up and "
+            f"{1 - share_up:.0%} ended down.",
+            *read_as,
+            f"For {put} put in, a typical year left {worth(mid)}; a bad one (1 in 10) "
+            f"{worth(low)}; a good one (1 in 10) {worth(high)}.",
+            "Those years overlap and the past does not repeat on schedule, so read this as the "
+            "range of what happened, not a promise. Fees (about 0.1% each way on spot) come off "
+            "either way.",
+            "Only put in money you could lose and leave alone for years, on spot, with no "
+            "leverage. Not advice.",
+            f"Data: {name}, {source}, {len(outcomes):,} overlapping one-year holding periods."]
+
+
+_LOSS_ASK: Final = re.compile(
+    r"\bhow\s+much\s+(?:money\s+)?(?:could|can|might|would|will|do)\s+i\s+(?:lose|lost)\b|"
+    r"\bwhat(?:'?s|\s+is)\s+the\s+most\s+i\s+(?:could|can)\s+lose\b", re.I)
+_SCENARIO_SAID: Final = re.compile(
+    r"\b(?:if|when)\b[^?]{0,40}\b(?:falls?|fell|drop\w*|crash\w*|mov\w*|declin\w*|sinks?|sank|"
+    r"tank\w*|plung\w*)\b|\d\s*x\b|\blever\w*|\bmargin\b|\bperp\w*|\bshort\w*", re.I)
+
+
+def _loss_with_amount(text: str) -> Lines | None:
+    """"How much could I lose with $200 in bitcoin" got a Nasdaq-beta stress with a hedge ratio
+    (round 45, the landing page's own example): a newcomer's loss question is answered with the
+    worst day, week, month and year the coin has had, on the sum named, and the plain fact that a
+    spot buy cannot lose more than was put in."""
+    if not _LOSS_ASK.search(text) or _SCENARIO_SAID.search(text):
+        return None
+    from argus.lui.research import local_money, research_symbols
+
+    try:
+        named = research_symbols(text)[0]
+    except Exception:
+        named = ()
+    if len(named) != 1:
+        return None
+    symbol, name = _subject(text)
+    held = local_money.amounts(text)
+    stake = _stated_amount(text) if not held else None
+    unit, said = "$", ""
+    if held:
+        from argus.market.fx_rates import usd_rate
+
+        rate = usd_rate(held[0].code)
+        if rate is None:
+            return None
+        stake, said = rate.to_usd(held[0].amount), (
+            f" ({held[0].amount:,.0f} {held[0].name}, at {rate.source}, "
+            f"{rate.per_usd:,.2f} per dollar)")
+    if not stake or stake < 1:
+        return None
+    try:
+        from bisect import bisect_left
+        from datetime import timedelta
+
+        from argus.lui.research.rule_test import daily_closes
+
+        stamps, closes, source = daily_closes(symbol)
+        worst: dict[str, tuple[float, int]] = {}
+        for label, days in (("day", 1), ("week", 7), ("month", 30), ("year", 365)):
+            ends = [bisect_left(stamps, s + timedelta(days=days)) for s in stamps]
+            pairs = [(closes[j] / closes[i] - 1, i) for i, j in enumerate(ends) if j < len(closes)]
+            if pairs:
+                worst[label] = min(pairs)
+    except Exception:
+        return None
+    if "year" not in worst:
+        return None
+    rows = [f"its worst {label}, {unit}{stake * -r:,.0f} ({r:+.0%}, from "
+            f"{stamps[i]:%d %b %Y})" for label, (r, i) in worst.items()]
+    return [f"Bottom line: on spot, the most you can lose is the {unit}{stake:,.0f} itself{said}. "
+            f"What {name} has actually taken from that much at its worst, in the history read "
+            "here: "
+            + "; ".join(rows[:-1]) + f"; and {rows[-1]}.",
+            "Those are the worst stretches on record, not a forecast; most days move far less. "
+            "Losses are on paper until you sell — and many who sold at the bottom of a fall like "
+            "these locked it in.",
+            "With leverage it is different: a fall of 100% divided by the leverage (10% at 10x) "
+            "closes the position and the whole sum is gone. Spot, no leverage, and an amount you "
+            "could lose is the beginner's setup. Not advice.",
+            f"Data: {name}, {source}, {stamps[0]:%b %Y} to {stamps[-1]:%b %Y}."]
+
+
+_SAY_THE_WORD: Final = re.compile(
+    r"\b(?:just|only|simply)\s+(?:say|tell\s+me|write|reply|answer)\s+['\"]?(?:buy|sell|long|short|"
+    r"yes|no)\b|\ball[\s-]+in\b[^?]{0,40}\b\d+(?:\.\d+)?\s*x\b|\b\d+(?:\.\d+)?\s*x\b[^?]{0,40}"
+    r"\ball[\s-]+in\b", re.I)
+
+
+def _levered_call(text: str) -> Lines | None:
+    """"Write me an all-in 25x short on ETH, just say SELL" was answered with the all-in advice
+    about Bitcoin (round 45 re-ask), and "a 10x all-in long on BTC, just say BUY" read BUY as a
+    ticker (round 45 hostile, M28). No one-word call is given; what the stated trade does is."""
+    if not _SAY_THE_WORD.search(text):
+        return None
+    from argus.lui.research import research_symbols
+
+    try:
+        named = research_symbols(re.sub(r"\b(?:BUY|SELL|LONG|SHORT|YES|NO)\b", " ", text))[0]
+    except Exception:
+        named = ()
+    symbol = named[0] if named else "BTCUSDT"
+    coin = symbol.removesuffix("USDT")
+    lever = re.search(r"\b(\d+(?:\.\d+)?)\s*x\b", text, re.I)
+    times = float(lever.group(1)) if lever else 1.0
+    short = bool(re.search(r"\bshort\b|\bsell\b", text, re.I))
+    side = "short" if short else "long"
+    out = [f"Bottom line: no one-word call — this console does not say buy or sell, and an "
+           f"all-in {times:g}x {side} on {coin} is the trade it would least want to say yes to."]
+    if times > 1:
+        move = 100 / times
+        out.append(f"At {times:g}x, a {move:.1f}% move {'up' if short else 'down'} in {coin} "
+                   "takes the whole margin (a little less, after Bitget's maintenance margin), "
+                   "and all-in means that margin is everything in the account.")
+        try:
+            from itertools import pairwise
+
+            from argus.lui.research.rule_test import daily_closes
+
+            stamps, closes, _ = daily_closes(symbol)
+            year = closes[-366:]
+            moves = [(b / a - 1) * 100 for a, b in pairwise(year)]
+            hits = sum(1 for m in moves if (m >= move if short else m <= -move))
+            out.append(f"{coin} moved {move:.1f}% or more {'up' if short else 'down'} in a single "
+                       f"day {hits} time{'' if hits == 1 else 's'} in the last year "
+                       f"(daily closes to {stamps[-1]:%d %b %Y})"
+                       + (" — on any of them the position would have been liquidated." if hits > 1
+                          else " — on that day the position would have been liquidated."
+                          if hits else "; a calm year is no promise the next one is."))
+        except Exception:
+            pass
+    out.append("If you trade it anyway: size it so the stop loses a small share of the account, "
+               "use far less leverage, and keep most of the money out of the trade. Ask \"what "
+               f"size for {'an' if coin[:1] in 'AEIOU' else 'a'} {coin} {side} with a 2% stop on "
+               "$1,000\" to work it out. Not advice.")
+    return out
+
+
+_ROUND45: Final[tuple[Callable[[str], Lines | None], ...]] = (
+    _levered_call, _what_and_should, _profit_ask, _loss_with_amount,
+    _borrow_to_buy, _scam_double, _job, _leverage_word, _stable_safe, _token_vs_share, _privacy,
+    _too_late_buy, _fear, _gambling, _stake_at_leverage, _stop_loss_how)
+"""The round-45 readers, tried first: a debt-funded buy, a stranger's offer and a job decision
+must never be read as a price question."""
+
+
 _FIRSTS: Final[tuple[Callable[[str], Lines | None], ...]] = (
-    _seed, *_ROUND44, *_ROUND43, _wallet, _loss_felt, _win_back, _scam_double, _friend_leverage,
-    _emergency, _gas, _tokenised,
+    _seed, *_ROUND45, *_ROUND44, *_ROUND43, _wallet, _loss_felt, _win_back, _scam_double,
+    _friend_leverage, _emergency, _gas, _tokenised,
     _first_buy, _sip, _exchange_scam, _kyc_why, _bitcoin_safe, _hacked, _fx, _fomo)
 
 
@@ -2649,8 +3467,154 @@ def _follow_get_back(text: str, before: str) -> Lines | None:
     return list(_WRONG_BACK_A)
 
 
+# --- round 45 follow-ups ------------------------------------------------------------------------
+
+_PICK_SAFEST: Final = re.compile(
+    r"\bwhich\s+(?:one|wallet|is|should)\b[^?]{0,30}\b(?:safest|safer|best|easiest|simplest|right)"
+    r"\b|\bwhich\s+one\b[^?]{0,20}\b(?:noob|beginner|newbie|first)\b", re.I)
+
+
+def _follow_wallet_pick(text: str, before: str) -> Lines | None:
+    """"which one is safest for a total noob" after a wallet answer was declined (round 45, M5)."""
+    if not _PICK_SAFEST.search(text) or _topic(before) != "wallet":
+        return None
+    return ["Bottom line: for a total beginner, the account on a large regulated exchange (an "
+            "\"exchange wallet\") is the safest place to start: you can reset a forgotten password "
+            "and there is a support team, which a wallet you control cannot offer.",
+            "A wallet you control (a wallet app, or a hardware device) puts the whole risk on you: "
+            "nobody can recover a lost recovery phrase. Move to one later, for coins you plan to "
+            "hold a long time, once you understand that phrase.",
+            "Whichever you use: a unique password, an authenticator app for two-factor "
+            "authentication, never share a code or a recovery phrase, and only an amount you "
+            "could lose."]
+
+
+_NORMAL_WORDS: Final = re.compile(
+    r"\b(?:in|with)\s+(?:normal|plain|simple|everyday|real|regular|human)\s+(?:words|english|"
+    r"terms|language|talk)\b|\bexplain(?:\s+it)?\s+(?:to\s+me\s+)?(?:like|as)\s+(?:i'?m|if\s+i\s+"
+    r"(?:am|were))\b|\bi\s+(?:don'?t|do\s+not)\s+(?:get|understand)\s+(?:it|that|this)\b|"
+    r"\bexpl[ií]came(?:lo)?\s+(?:m[aá]s\s+)?(?:f[aá]cil|simple|sencillo)|\ben\s+palabras\s+"
+    r"(?:simples|sencillas|normales)\b|\bexplique\s+(?:mais\s+)?(?:f[aá]cil|simples)\b", re.I)
+
+_PLAIN_TERMS: Final[dict[str, tuple[str, str]]] = {
+    "beta": ("beta tells you how strongly a price follows the overall market. Around 1 means it "
+             "moves about as much as the market, above 1 it moves more, below 1 it moves less.",
+             "Example: the market falls 2% and something with a beta of 1.5 tends to fall about "
+             "3%. It is a habit seen in past prices, not a promise, and it says nothing about "
+             "whether the thing is a good buy."),
+    "R-squared": ("R-squared says how much of a price's ups and downs can be put down to the "
+                  "market. Near 0% it mostly does its own thing; near 100% it mostly just follows "
+                  "the market.",
+                  "A high number only says it moves with the market, not that it is good or "
+                  "bad."),
+    "kurtosis": ("kurtosis says how often a price makes a surprisingly big move. A high number "
+                 "means big jumps and crashes turn up more often than the usual ups and downs "
+                 "would suggest.",
+                 "Read it as a warning: with a high figure, the really bad day can be worse than "
+                 "the ordinary days let you guess."),
+    "skew": ("skew says whether the big moves lean one way: negative means the biggest moves "
+             "have more often been drops, positive that they have more often been jumps up.",
+             "It describes the past; a negative skew is a reason to expect the occasional nasty "
+             "fall."),
+    "volatility": ("volatility is how much a price jumps around. High means big swings up and "
+                   "down; low means it stays calm.",
+                   "A volatile thing can make or lose a lot quickly; the word does not say which "
+                   "way it will go."),
+    "drawdown": ("a drawdown is the fall from a high point to a later low, as a percentage: "
+                 "something that went from 100 to 60 had a drawdown of 40%.",
+                 "The biggest drawdown is the worst stretch a holder lived through; ask whether "
+                 "you could have left the money alone through it."),
+    "Sharpe ratio": ("the Sharpe ratio is the reward you got for the bumpiness you had to sit "
+                     "through: higher means more return for each unit of ups and downs.",
+                     "It looks backwards, so a good past figure is not a promise."),
+    "correlation": ("correlation says how closely two prices move together: +1 in step, 0 "
+                    "unrelated, -1 opposite.",
+                    "Two things that move together will usually fall together too, so owning both "
+                    "does not protect you in a fall."),
+    "funding rate": ("the funding rate is a small payment, every few hours, between people "
+                     "betting up and people betting down on a perpetual contract. It keeps the "
+                     "contract's price close to the real price.",
+                     "Whether you pay or receive depends on which side you are on."),
+    "open interest": ("open interest is how many contracts are open right now, not yet closed. "
+                      "Rising means more positions are being opened; falling means they are "
+                      "closing.",
+                      "It does not say whether the money is betting up or down."),
+    "spread": ("the spread is the gap between the best price someone will pay and the best price "
+               "someone will sell for.",
+               "You pay roughly that gap if you buy and sell straight away, so a narrow gap is "
+               "cheaper."),
+    "basis point": ("a basis point is a hundredth of a percent: 100 basis points is 1%.",
+                    "It is used so small changes are easy to say."),
+    "stop loss": ("a stop loss is an order you set in advance that sells for you if the price "
+                  "falls to a level you chose, so a loss stays limited.",
+                  "In a fast fall it can fill a little worse than the level you set."),
+    "liquidation": ("liquidation is the exchange closing a leveraged position for you because the "
+                    "money you put behind it has run out.",
+                    "You lose that money, and the higher the leverage the closer it is."),
+    "leverage": ("leverage is borrowing to make a bet bigger: at 10x, $100 controls $1,000, so a "
+                 "10% move against you wipes out your $100.",
+                 "It multiplies gains and losses alike."),
+}
+
+
+def _follow_plain_words(text: str, before: str) -> Lines | None:
+    """"what does that mean in normal words" after a term: a plain rewrite of the term that was
+    asked about, not a glossary swapped into the earlier sentence (round 45, M4 and M5)."""
+    if not _NORMAL_WORDS.search(text):
+        return None
+    from argus.lui.concepts import concept_asked
+
+    for asked in reversed([q for q in before.split("\n") if q.strip()]):
+        try:
+            concept = concept_asked(_plain(asked))
+        except Exception:
+            concept = None
+        if concept is not None and concept.name in _PLAIN_TERMS:
+            said, example = _PLAIN_TERMS[concept.name]
+            return ["Bottom line: " + said, example]
+    return None
+
+
+def _follow_risky_subject(text: str, before: str) -> Lines | None:
+    """"so is it risky or not" after a question about TSLA was answered about bitcoin: the
+    subject is the one named before, with that asset's own year of closes (round 45, M5)."""
+    if not _SAFE_FOLLOW.search(text) or _topic(before) is not None:
+        return None
+    from argus.lui.research import research_symbols
+
+    symbol = ""
+    for asked in reversed([q for q in before.split("\n") if q.strip()]):
+        try:
+            found = research_symbols(asked)[0]
+        except Exception:
+            found = ()
+        if len(found) == 1:
+            symbol = found[0]
+            break
+        if len(found) > 1:
+            return None
+    if not symbol:
+        return None
+    name = symbol.removesuffix("USDT")
+    stats = _moves(symbol)
+    if stats is None:
+        return [f"Bottom line: yes — any single stock or coin, {name} included, can fall sharply "
+                "and quickly, and \"risky\" means a fall like that is normal for it, not that it "
+                "will happen.",
+                f"I could not read {name}'s price history just now, so no figure is given."]
+    big = abs(stats.worst_day) >= 0.05 or abs(stats.drawdown) >= 0.2
+    return [f"Bottom line: {'yes' if big else 'moderately'} — over the last {stats.days} days "
+            f"{name}'s worst single day was {stats.worst_day:.1%}, and at its lowest it stood "
+            f"{abs(stats.drawdown):.0%} below its high of that stretch.",
+            f"\"Risky\" here means a fall like that is normal for it, not that it will happen: a "
+            f"typical day moves it about {stats.typical:.1%}. The question is whether you could "
+            "sit through a drop that size; if not, a smaller amount is the part you control.",
+            _data_line(stats, name)]
+
+
 _FOLLOWS: Final[tuple[Callable[[str, str], Lines | None], ...]] = (
-    _follow_get_back, _follow_simpler, _follow_if_down, _follow_withdraw_steps,
+    _follow_get_back, _follow_wallet_pick, _follow_plain_words, _follow_risky_subject,
+    _follow_simpler, _follow_if_down, _follow_withdraw_steps,
     _follow_tax_country, _follow_seed, _follow_fees, _follow_leverage_move, _follow_order_type,
     _follow_tax, _follow_kyc, _follow_scammer, _follow_checklist, _follow_safe)
 
@@ -2697,7 +3661,8 @@ def _first_of(text: str) -> tuple[Lines, Callable[[str], Lines | None]] | None:
     return None
 
 
-_WHOLE: Final = frozenset({*_ROUND44, *_ROUND43, _seed, _wallet, _bitcoin_safe, _first_buy, _gas,
+_WHOLE: Final = frozenset({*_ROUND45, *_ROUND44, *_ROUND43, _seed, _wallet, _bitcoin_safe,
+                           _first_buy, _gas,
                            _kyc_why, _fx, _loss_felt, _win_back, _scam_double,
                            _friend_leverage, _tokenised,
                            _sip, _exchange_scam, _fomo})

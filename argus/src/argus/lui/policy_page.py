@@ -101,10 +101,10 @@ enforced by
  .tbl {{ overflow-x:auto }}
  table {{ border-collapse:collapse; width:100%; font-size:14px }}
  th, td {{ text-align:left; padding:8px; border-bottom:1px solid var(--line); vertical-align:top }}
- th {{ font:600 11px var(--mono); text-transform:uppercase; letter-spacing:.06em;
+ th {{ font:600 12px var(--mono); text-transform:uppercase; letter-spacing:.06em;
       color:var(--dim) }}
  td.n {{ font-family:var(--mono); white-space:nowrap }}
- .st {{ font:10.5px var(--mono); text-transform:uppercase; letter-spacing:.08em;
+ .st {{ font:12px var(--mono); text-transform:uppercase; letter-spacing:.08em;
        color:var(--dim) }}
  .st.on {{ color:var(--good) }} .st.off {{ color:var(--bad) }}
  .why {{ color:var(--dim); font-size:13px; margin-top:2px }}

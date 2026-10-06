@@ -6,7 +6,7 @@ from __future__ import annotations
 import re
 from collections.abc import Sequence
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, Final
 
 from argus.desk.portfolio import (
     beta,
@@ -115,6 +115,43 @@ that side: every headline is scored and the ones on the asked side lead. Before 
 the same list as any news question (stranger QA)."""
 
 
+_WIRES: Final = ("prnewswire.", "globenewswire.", "businesswire.", "accesswire.", "newsfile",
+                  "einpresswire.", "cryptoprowl.", "chainwire.", "newsbtc.com/press-releases")
+_ESTABLISHED: Final = ("reuters.", "bloomberg.", "wsj.", "ft.com", "cnbc.", "apnews.", "nytimes.",
+                       "coindesk.", "theblock.co", "cointelegraph.", "decrypt.co", "fortune.",
+                       "barrons.", "marketwatch.", "finance.yahoo.", "axios.", "forbes.")
+
+
+def _host(link: str) -> str:
+    from urllib.parse import urlparse
+
+    return (urlparse(link).hostname or "").removeprefix("www.")
+
+
+def outlet_of(feed: str, link: str) -> str:
+    """The feed a headline came through and, when the link leaves it, who actually published it:
+    a cryptoprowl.com press release reached the page labelled "Yahoo Finance" (round 45 judge,
+    m5)."""
+    via = "Yahoo Finance" if feed.startswith("yahoo") else feed
+    host = _host(link)
+    if via == "Yahoo Finance" and host and "yahoo." not in host:
+        return f"{host}, via Yahoo Finance"
+    return via
+
+
+def credibility(link: str) -> str:
+    """How much weight a headline's source carries, from its address alone: a press-release wire
+    is the company's own paid text, a large newsroom has editors and corrections, anything else
+    is unchecked here. It says nothing about whether the story is true."""
+    lowered = link.lower()
+    if any(w in lowered for w in _WIRES) or re.search(r"/(?:press-)?releases?/", lowered):
+        return "press release — the issuer's own words, published for a fee, not reporting"
+    host = _host(link)
+    if any(e in host + "/" for e in _ESTABLISHED):
+        return "established newsroom — edited, issues corrections"
+    return "smaller or unknown outlet — not checked here"
+
+
 def tone_asked(text: str) -> str | None:
     return next((tone for tone, pattern in TONE_ASKED if pattern.search(text)), None)
 
@@ -143,7 +180,7 @@ def _tone_lines(kept: Sequence[Any], ticker: str, tone: str,
     lines = [head]
     for h, v in side[:5]:
         hours = (now - h.published).total_seconds() / 3600
-        outlet = "Yahoo Finance" if h.feed.startswith("yahoo") else h.feed
+        outlet = outlet_of(h.feed, h.link)
         lines.append(f"{tone.capitalize()} ({v:+.2f}), {hours:.0f}h ago — {h.title} ({outlet}) "
                      f"{h.link}")
     return lines, {"asked": tone, "scorer": "VADER compound", "on_side": len(side),
@@ -219,8 +256,8 @@ def _first_sentence(paragraph: str) -> str:
     return first.replace("\x00", ".")
 
 
-def _news(symbol: str, is_open: Any,
-          tone: str | None = None) -> tuple[list[str], list[Source], dict[str, Any]]:
+def _news(symbol: str, is_open: Any, tone: str | None = None,
+          weigh: bool = False) -> tuple[list[str], list[Source], dict[str, Any]]:
     """Headlines that name ``symbol``, its SEC filings this week, and its 24-hour move split into
     the market's part and its own. For QQQ, the market-wide headlines instead."""
     from datetime import timedelta as _td
@@ -329,12 +366,31 @@ def _news(symbol: str, is_open: Any,
         lines[at:at] = toned[0]
     listed = {line.split(" — ", 1)[1] for line in (toned[0][1:] if toned else [])
               if " — " in line}
+    shown = []
     for h in kept[:5]:
         hours = (now - h.published).total_seconds() / 3600
-        outlet = "Yahoo Finance" if h.feed.startswith("yahoo") else h.feed
+        outlet = outlet_of(h.feed, h.link)
         if f"{h.title} ({outlet}) {h.link}" in listed:
             continue
-        lines.append(f"{hours:.0f}h ago — {h.title} ({outlet}) {h.link}")
+        shown.append(h)
+        lines.append(f"{hours:.0f}h ago — {h.title} ({outlet}) {h.link}"
+                     + (f" [{credibility(h.link).split(' — ')[0]}]" if weigh else ""))
+    if weigh and shown:
+        # "Top news ... are any credible?" listed headlines with no word on credibility (round 45
+        # judge, m5): each is weighed by its source, and the answer says what that can and cannot
+        # tell
+        kinds = [credibility(h.link) for h in shown]
+        releases = sum(1 for k in kinds if k.startswith("press release"))
+        established = sum(1 for k in kinds if k.startswith("established"))
+        lines[0] = unlead(lines[0])
+        lines.insert(0, f"Bottom line: by source, of the {len(shown)} listed, {established} "
+                        f"{'is' if established == 1 else 'are'} from an established newsroom, "
+                        f"{releases} "
+                        f"{'is a press release' if releases == 1 else 'are press releases'} "
+                        "(the company's own paid text, not reporting) and "
+                        f"{len(shown) - established - releases} from smaller outlets not checked "
+                        "here. A source's standing is not proof a story is true: confirm a claim "
+                        "against a filing or a second newsroom before trading on it.")
     for f in filings[:2]:
         lines.append(f"SEC filing: {f.form} filed {f.filed:%Y-%m-%d} — "
                      f"{f.item_summary if f.is_event else f.description or f.form}.")

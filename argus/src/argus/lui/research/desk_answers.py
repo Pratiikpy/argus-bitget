@@ -49,6 +49,11 @@ def fees_lines(text: str) -> list[str] | None:
         return None
     if re.search(r"\$\s?\d|\d+\s*(?:btc|eth|sol|shares?)\b", text, re.I):
         return None  # a fee on a stated order is the order-cost engine's
+    if re.search(r"\bliq\w*\b", text, re.I) and re.search(r"\d+(?:\.\d+)?\s*x\b|\blever", text,
+                                                          re.I):
+        # "Bitget maker and taker fee, and my liq price for 10x ETH long at 2700?" got the fee
+        # schedule and no liquidation (round 45 re-ask): the liquidation reader states both
+        return None
     if not re.search(r"\bbitget\b|\bspot\b|\bfutures?\b|\bperps?\b|\bmaker\b|\btaker\b|\bnormal\b|"
                      r"\bregular\b|\bstandard\b", text, re.I):
         return None
@@ -457,6 +462,13 @@ def _correlation_matrix(named: Sequence[str], extra: Sequence[tuple[str, str]],
                + ", each pair on the days both have a close"
                + ("; a crypto close at 00:00 UTC and a New York close are about four hours "
                   "apart, which mutes a same-day link slightly" if extra else "") + ".")
+    if any(mixed for *_, mixed in pairs):
+        # "+0.43 over the last 90 days" then "+0.40 over the last 90 days" for the same names on
+        # the next turn, with no word that the second read a different series (round 45 judge,
+        # m2): a pair measured against a Yahoo series is on fewer days, and says so
+        out.append("A pair marked weekdays only is measured on the days both markets closed, "
+                   "not every Bitget day, so it can differ by a few hundredths from the same "
+                   "names measured on Bitget alone.")
     return out
 
 

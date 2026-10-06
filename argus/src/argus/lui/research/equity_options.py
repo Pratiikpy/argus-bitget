@@ -57,7 +57,8 @@ ASKED_PUT: Final = re.compile(
     r"\bputs?\b|\bputs?\b[^?]{0,60}\b(?:insure|hedge|protect)\w*|"
     r"\b(?:buy|buying|bought|long)\s+(?:a\s+)?puts?\b|"
     r"\bputs?\b[^?]{0,30}\d\s*%\s*(?:below|under|otm|out[\s-]of[\s-]the[\s-]money)|"
-    r"\d\s*%\s*(?:otm|out[\s-]of[\s-]the[\s-]money)\s+puts?\b|"
+    # "a 10% out of the money 3 month QQQ put" puts words between (round 45 re-ask)
+    r"\d\s*%\s*(?:otm|out[\s-]of[\s-]the[\s-]money)\s+(?:[\w-]+\s+){0,4}puts?\b|"
     r"\bputs?\b[^?]{0,40}\b(?:cost|price|premium)\b", re.I)
 ASKED_CALL: Final = re.compile(
     # "I own 500 shares of AAPL. How can I generate income with options on it?" is the covered
@@ -266,6 +267,16 @@ def _put(text: str, chain: Chain, pos: Position | None, today: date) -> list[str
     elif pos is not None:
         out.append(f"Your {pos.shares:,.0f} shares are worth ${chain.spot * pos.shares:,.0f} at "
                    f"{chain.spot:,.2f}.")
+    if re.search(r"\bsell[\s-]?off\b|\bcrash\b|\bcorrection\b|\bdrawdown\b|\blast\s+(?:fall|drop|"
+                 r"decline|dip)\b", text, re.I):
+        past = _last_selloff(chain.symbol, dist, held, mid / chain.spot)
+        if past and re.search(r"\bwould\s+(?:it|that|they)\s+have\b|\bhad\s+(?:bought|held|"
+                              r"owned)\b|\bwould\s+have\s+(?:paid|covered)\b", text, re.I):
+            # asked in the past tense, the selloff is the answer and today's price the context
+            out = [f"Bottom line: {past[0]}", *past[1:-1],
+                   "Today: " + out[0].removeprefix("Bottom line: "), *out[1:], past[-1]]
+        else:
+            out.extend(past)
     if pos is not None and pos.shares % SHARES_PER_CONTRACT:
         out.append("Options trade in 100-share contracts, so "
                    f"{pos.shares:,.0f} shares are not covered evenly: "
@@ -315,6 +326,72 @@ def _call(text: str, chain: Chain, pos: Position | None, today: date) -> list[st
                    f"({(call.strike + mid - pos.entry) * pos.shares:+,.0f} on "
                    f"{pos.shares:,.0f} shares).")
     return out
+
+
+def _last_selloff(ticker: str, dist: float, days: int, cost: float) -> list[str]:
+    """What the same put would have paid in the last selloff: "How much of my downside would a
+    3-month 10% OTM put on SPY have covered in the last selloff" got today's price only (round 45
+    judge, m5).
+
+    The last selloff is the most recent fall of at least 10% from a high in the daily closes, or
+    the deepest fall of the last year when none reached 10%. The put is struck ``dist`` below the
+    close at that high and runs ``days`` from it; it pays the strike less the lowest close inside
+    that life. Its premium then is not on record (no historical chain is read), so today's, as a
+    share of the price, stands in for it and is said to."""
+    from datetime import timedelta
+
+    from argus.lui.research import rule_test
+
+    try:
+        stamps, closes, source = rule_test.daily_closes(f"{ticker}USDT")
+    except Exception:
+        return ["The last selloff could not be measured: the price history did not answer just "
+                "now."]
+    if len(closes) < 60:
+        return []
+    episodes: list[tuple[int, int, float]] = []
+    peak_at, trough_at = 0, 0
+    for i, close in enumerate(closes):
+        if close >= closes[peak_at]:
+            if closes[trough_at] / closes[peak_at] - 1 <= -0.10:
+                episodes.append((peak_at, trough_at, closes[trough_at] / closes[peak_at] - 1))
+            peak_at = trough_at = i
+        elif close < closes[trough_at]:
+            trough_at = i
+    if closes[trough_at] / closes[peak_at] - 1 <= -0.10:
+        episodes.append((peak_at, trough_at, closes[trough_at] / closes[peak_at] - 1))
+    if episodes:
+        start, low_at, fall = episodes[-1]
+        which = "the last fall of 10% or more"
+    else:
+        year = [i for i, s in enumerate(stamps) if s >= stamps[-1] - timedelta(days=365)]
+        start, low_at, fall = 0, 0, 0.0
+        best = 0
+        for i in year:
+            if closes[i] > closes[best] or best < year[0]:
+                best = i
+            if closes[i] / closes[best] - 1 < fall:
+                start, low_at, fall = best, i, closes[i] / closes[best] - 1
+        which = "the deepest fall of the last year (none reached 10%)"
+    strike = closes[start] * (1 - dist)
+    expires = stamps[start] + timedelta(days=days)
+    alive = [c for s, c in zip(stamps, closes, strict=True) if stamps[start] <= s <= expires]
+    lowest = min(alive)
+    paid = max(0.0, strike - lowest) / closes[start]
+    deepest = lowest / closes[start] - 1
+    return [f"In the last selloff — {which}: {ticker} fell {abs(fall):.1%} from "
+            f"{closes[start]:,.2f} ({stamps[start]:%d %b %Y}) to {closes[low_at]:,.2f} "
+            f"({stamps[low_at]:%d %b %Y}). A put struck {dist:.0%} below that high "
+            f"({strike:,.2f}) and running {days} days from it would have paid "
+            + (f"{paid:.1%} of the position at the lowest close in its life "
+               f"({deepest:+.1%}) — it covered the fall beyond the first {dist:.0%}, and the first "
+               f"{dist:.0%} was yours." if paid > 0 else
+               f"nothing: the lowest close in its life was {deepest:+.1%}, never below the strike, "
+               f"so the whole fall was yours."),
+            f"Its premium then is not on record; at today's {cost:.2%} of the price, it would "
+            + (f"have netted about {paid - cost:+.1%} of the position." if paid > 0 else
+               "have been a cost of that much for no payout."),
+            f"Data for the selloff: {source}, daily closes."]
 
 
 def _realised(ticker: str) -> float | None:

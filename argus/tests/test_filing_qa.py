@@ -147,7 +147,7 @@ class TestTheConsoleRoute:
         assert "$1,577.00 (USD millions)" in lines[0] and "no model wrote the figure" in lines[0]
         filed = [ln for ln in lines if ln.startswith("Filed: ")]
         assert filed and "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment" in filed[0]
-        assert labels(filed) == ["live"] * len(filed)
+        assert labels(filed) == ["filed"] * len(filed)  # dated filings, read now (round 45)
 
     def test_an_abstention_takes_the_usual_route(self) -> None:
         from argus.lui import server

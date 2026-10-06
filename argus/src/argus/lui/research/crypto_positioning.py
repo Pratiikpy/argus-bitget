@@ -245,5 +245,30 @@ def lines(text: str) -> list[str] | None:
         out.extend(x for x in block if x != NOT_ADVICE)
     if not out:
         return None
+    if perp and re.search(r"\bfunding\b|\bcrowd\w*\b|\bsqueez\w*\b", text, re.I):
+        funding = _funding_line(coin, crowd=bool(re.search(r"\bcrowd\w*\b", text, re.I)))
+        if funding:
+            out.insert(1, funding)
     out.append(NOT_ADVICE)
     return out
+
+
+def _funding_line(coin: str, *, crowd: bool) -> str | None:
+    """Bitget's funding beside the open interest, with a plain crowding reading: "Give me BTC
+    perpetual funding rate and open interest ... whether longs look crowded" gave open interest
+    alone (round 45 judge, m1)."""
+    from argus.market.bitget import fetch_tickers
+
+    try:
+        ticker = fetch_tickers().get(f"{coin}USDT")
+        rate = float(ticker.funding_rate) if ticker is not None else None
+    except Exception:
+        rate = None
+    if rate is None:
+        return None
+    reading = ("longs are paying up — the sign of crowded longs" if rate >= 0.0003 else
+               "shorts are paying up — the sign of crowded shorts" if rate <= -0.0003 else
+               "close to flat — neither side is paying up, so funding shows no crowding")
+    return (f"Funding on Bitget's {coin} perpetual: {rate:+.4%} per settlement now "
+            f"({rate * 3 * 365:+.1%} a year if it held at three a day)"
+            + (f"; {reading}, against the usual +0.01% baseline." if crowd else "."))

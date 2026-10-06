@@ -70,8 +70,10 @@ def labels(linkbase: str) -> dict[str, str]:
     return {k: v for k, (_, v) in found.items()}
 
 
-def revenue_lines(document: str, names: dict[str, str] | None = None) -> list[Line]:
-    """Revenue facts with one dimension member, for the latest quarter in ``document``."""
+def dimensioned_revenue(document: str, names: dict[str, str] | None = None) -> list[Line]:
+    """Every revenue fact in ``document`` with one dimension member and a quarter's or a year's
+    period, each period kept: a 10-Q tags the same quarter a year earlier beside the latest, which
+    is what a segment's year-on-year growth is read from."""
     contexts: dict[str, tuple[date, date, list[tuple[str, str]]]] = {}
     for m in _CONTEXT.finditer(document):
         body = m.group("body")
@@ -105,6 +107,12 @@ def revenue_lines(document: str, names: dict[str, str] | None = None) -> list[Li
         member = members[0][1]
         found.append(Line(member=member, label=(names or {}).get(member) or _label(member),
                           value=value, start=start, end=end, axis=members[0][0]))
+    return found
+
+
+def revenue_lines(document: str, names: dict[str, str] | None = None) -> list[Line]:
+    """Revenue facts with one dimension member, for the latest quarter in ``document``."""
+    found = dimensioned_revenue(document, names)
     if not found:
         return []
     # the quarter when the filing tags one; a 10-K that splits revenue for the year only (as

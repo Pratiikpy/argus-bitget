@@ -645,6 +645,51 @@ def _missing_tenor(text: str) -> list[str] | None:
     return out
 
 
+_STATED: Final = re.compile(
+    r"\b(?:came\s+in\s+at|printed|is|was|at|it'?s|its|of|hit|reached)\s+(?:about\s+|around\s+)?"
+    r"(?P<v>-?\d+(?:\.\d+)?)\s*%", re.I)
+
+
+def _stated_figure(text: str) -> float | None:
+    """A figure the question states for the indicator and asks to have checked ("came in at 12%
+    right?", "I think it's 7.5%"), or None when no figure is put forward as fact."""
+    m = _STATED.search(text)
+    if m is None or not re.search(r"\bright\b|\bcorrect\b|\bi\s+think\b|\bisn'?t\s+it\b|"
+                                  r"\bcame\s+in\b|\btrue\b|\?\s*$", text, re.I):
+        return None
+    return float(m.group("v"))
+
+
+def _asset_half(text: str, inds: Sequence[Indicator]) -> str | None:
+    """What the print meant for the asset the question names, from the last release's own move:
+    "...What does that mean for BTC?" was left unanswered (round 45 hostile, M15)."""
+    if not any("cpi" in i.series.lower() or "inflation" in i.label.lower() for i in inds):
+        return None
+    if not re.search(r"\b(?:mean|means|do|does|did)\b[^?]{0,20}\bfor\b|\bimpact\b|\baffect",
+                     text, re.I):
+        return None
+    from argus.lui.research.parse import research_symbols
+
+    named = research_symbols(text)[0]
+    if not named:
+        return None
+    try:
+        from argus.lui.research.macro_moves import moves
+
+        found, _typical = moves(named[0], "CPI")
+    except Exception:
+        return None
+    if not found:
+        return None
+    last = found[0]
+    name = named[0].removesuffix("USDT")
+    return (f"For {name}: on the last CPI release ({last.at:%d %b %Y}, 08:30 New York) it moved "
+            f"{last.hour:+.2%} in the hour after"
+            + (f" and {last.day:+.1%} over the next 24 hours" if last.day is not None else "")
+            + f" — one release, not a rule; ask \"how does {name} usually react on CPI day\" for "
+              f"every release over the last year.")
+
+
 def lines(text: str, prior: Sequence[str] = ()) -> list[str] | None:
     """The answer to a question about US macro indicators, or None when it asks for none.
 
@@ -661,10 +706,20 @@ def lines(text: str, prior: Sequence[str] = ()) -> list[str] | None:
         # "why did the desk sit out the CPI print" is the desk's record, not CPI's value (the
         # round-42 suite caught this reader reaching FRED on it)
         return None
+    if re.search(r"\bcorrelat\w*|\bmove\s+together\b", text, re.I):
+        # "Correlation of BTC with gold and the dollar index, last 90 days" got the dollar
+        # index's level (round 45 re-ask): a correlation is the correlation reader's
+        return None
     missing = _missing_tenor(text)
     if missing is not None:
         return missing
     inds, masked = _indicators(text, bool(prior))
+    by_key = {i.key: i for i in INDICATORS}
+    if (any(i.key == "cpi" for i in inds) and not any(i.key == "core_cpi" for i in inds)
+            and re.search(r"\bcore\b", text, re.I)):
+        # "How did CPI come in: core vs headline vs consensus?" got the headline only (round 45
+        # judge, m4): "core" said beside CPI is core CPI
+        inds = [*inds, by_key["core_cpi"]]
     wins: list[Window]
     if inds:
         wins = _windows(masked, not any(i.kind == "yoy" for i in inds))
@@ -677,6 +732,41 @@ def lines(text: str, prior: Sequence[str] = ()) -> list[str] | None:
     wins = wins or list(_DEFAULT_WINDOWS)
     body = [_sentence(ind, wins) + "." for ind in inds]
     out = ["Bottom line: " + body[0], *body[1:]]
+    stated = _stated_figure(text)
+    actual = re.search(r"(-?\d+(?:\.\d+)?)%", body[0])
+    if stated is not None and actual is not None and len(inds) == 1:
+        real = float(actual.group(1))
+        if abs(stated - real) >= 0.25 and abs(stated - real) >= 0.1 * abs(real):
+            # "US CPI came in at 12% last month right?" and "I think it's 7.5%" got the true
+            # figure with no "no" (round 45 hostile, M15, M18): the stated one is answered
+            label = inds[0].label
+            label = label[:1].lower() + label[1:] if label[1:2].islower() else label
+            out = [f"Bottom line: no — {label} is {real:g}%, not the {stated:g}% stated.",
+                   body[0], *body[1:]]
+    if re.search(r"\bconsensus\b|\bexpect\w*|\bforecast\w*|\bestimates?\b|\bvs\.?\s+(?:the\s+)?"
+                 r"(?:street|economists)", text, re.I):
+        # the consensus is quoted month on month: the prints are stated that way beside it, and
+        # the forecast itself is said not read rather than invented (round 45 judge, m4)
+        monthly = []
+        for ind in inds:
+            if ind.kind != "yoy" or ind.freq != "monthly":
+                continue
+            rows = sorted((date.fromisoformat(d), v) for d, v in _fetch(ind.series))
+            if len(rows) >= 2 and rows[-2][1]:
+                name = ind.label.split(" inflation")[0]
+                monthly.append(f"{name} {(rows[-1][1] / rows[-2][1] - 1) * 100:+.1f}% "
+                               f"month on month ({rows[-1][0]:%b %Y})")
+        if monthly:
+            out.insert(len(body), "Month on month, as forecasts are quoted: "
+                       + "; ".join(monthly) + ".")
+        out.insert(len(body) + (1 if monthly else 0),
+                   "Consensus: not read — the economists' forecast is published by survey "
+                   "vendors (Bloomberg, Reuters, Dow Jones), none with a free official feed, so "
+                   "no beat or miss is claimed here; compare the month-on-month figures with "
+                   "the forecast your news source quotes.")
+    asset = _asset_half(text, inds)
+    if asset:
+        out.insert(len(body) + (1 if out[0].startswith("Bottom line: no") else 0), asset)
     notes = list(dict.fromkeys(i.note for i in inds if i.note))
     out.extend(f"Note: {n}" for n in notes)
     snapshots = {ind.series: _snapshot_date(ind.series) for ind in inds}

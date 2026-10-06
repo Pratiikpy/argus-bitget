@@ -374,6 +374,25 @@ _WEEK_WINDOW = re.compile(
 _WEEK_ASKED = re.compile(r"\bweek\b|\b7\s+days\b", re.I)
 
 
+def _spot_lead(symbol: str) -> str | None:
+    """Bitget's spot price for ``symbol`` as a lead line, or None when its spot market does not
+    answer or the name has no spot pair."""
+    from argus.market.bitget import public_get
+
+    try:
+        rows = public_get("/api/v2/spot/market/tickers", {"symbol": symbol}) or []
+        row = rows[0] if rows else None
+        last = float(row["lastPr"]) if row else 0.0
+        change = float(row.get("change24h") or 0) if row else 0.0
+        quote_volume = float(row.get("quoteVolume") or 0) if row else 0.0
+    except Exception:
+        return None
+    if last <= 0:
+        return None
+    return (f"Bottom line: {_t(symbol)} last {sig(last, 6)} USDT on Bitget spot ({change:+.2%} "
+            f"over 24h; spot 24h volume about ${quote_volume:,.0f}).")
+
+
 def _asks_for_the_move(raw_text: str) -> bool:
     """Whether a comparison asks how the names moved rather than how risky they are: "BTC vs ETH
     over the last month" led on volatility and never said which rose (a first-user audit,
@@ -1879,8 +1898,10 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                                      "liquidation odds cannot be measured. Try again shortly."])
 
         elif request.kind is ResearchKind.NEWS:
-            lines, extra, news_payload = _news(request.symbols[0], is_open,
-                                               tone=tone_asked(raw_text))
+            lines, extra, news_payload = _news(
+                request.symbols[0], is_open, tone=tone_asked(raw_text),
+                weigh=bool(re.search(r"\bcredib\w*|\btrust\w*|\breliab\w*|\blegit\w*|"
+                                     r"\bfake\b|\bbelieve\b", raw_text, re.I)))
             sources.extend(extra)
             payload["news"] = news_payload
             moved = next((i for i, line in enumerate(lines)
@@ -2084,6 +2105,16 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
 
             stated_value = (getattr(priced_book(raw_text), "value", 0.0) or stated_capital(raw_text)
                             or request.book_value or 0.0)
+            held_sum = re.search(r"\b(?:hold|holding|have|own|got|bought|position\s+(?:of|is))\s+"
+                                 r"(?:about\s+|around\s+)?\$\s?(?P<v>\d[\d,]*(?:\.\d+)?)\s*"
+                                 r"(?P<k>k|thousand)?\b", raw_text, re.I)
+            if not stated_value and held_sum is not None and len(request.book) == 1:
+                # "how much would I lose if NVDA fell 10% and I hold $5k" — the console's own
+                # suggested question — came back in percent only (round 45): a sum held in the one
+                # name asked about is that position's value
+                stated_value = float(held_sum.group("v").replace(",", "")) * (
+                    1000 if held_sum.group("k") else 1)
+            itself = set(request.book) == {shocked}
             for outcome in outcomes:
                 if outcome.portfolio_move_pct is None:
                     lines.append(f"{outcome.shock}: unavailable — {outcome.reason}")
@@ -2109,7 +2140,9 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                        # one holding is the whole book: "smallest gain TSLA" of a book of
                        # TSLA alone read as a comparison with nothing (a round-23 re-ask)
                        if worst and len(request.book) > 1 else "")
-                    + " (market-driven part only, through each beta)."
+                    # a book of the shocked name alone moves with it one for one; "through each
+                    # beta" read as a model where there is only arithmetic (round 45)
+                    + ("." if itself else " (market-driven part only, through each beta).")
                 )
                 if (lead_here and shocked in request.book and len(request.book) > 1
                         and outcome is outcomes[0]):
@@ -2538,6 +2571,17 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                     # "what is the NVDA price?" opened on the round-trip cost with the price
                     # second (2026-09-25 audit, round 2): the price asked for leads.
                     lines = _lead_with(lines, f"{_t(symbol)} last ")
+                if len(quoted) == 1 and re.search(r"\bspot\b", raw_text, re.I) and not re.search(
+                        r"\bperp\w*|\bfutures?\b|\bcontract\b|\bvs\.?\s+spot|\bversus\s+spot|"
+                        r"\bbasis\b|\bpremium\b", raw_text, re.I):
+                    spot_said = _spot_lead(symbol)
+                    if spot_said is not None:
+                        # "the price of BTC right now in USDT on Bitget spot" got the perpetual's
+                        # quote (round 45 hostile, M1): the spot market asked for leads, and the
+                        # perpetual follows, labelled as such
+                        lines = [spot_said, *(
+                            "The perpetual: " + str(x).removeprefix("Bottom line: ")
+                            if i == 0 else x for i, x in enumerate(lines))]
                 premium = _premium_line(symbol, ticker.last, anchor_open)
                 if premium is None:
                     data = _no_candles("Bitget live ticker", "bitget /api/v2/mix/market/tickers",

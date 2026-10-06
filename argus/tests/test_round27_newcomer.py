@@ -450,7 +450,7 @@ class TestRound28Newcomer:
 
     def test_the_pause_belongs_to_the_instance(self) -> None:
         note = server.allowance_note("203.0.113.77")
-        assert "the server instance that answered" in note and "at most" not in note
+        assert "this server instance's" in note and "at most" not in note
 
     def test_a_loss_question_leaning_on_the_name_before(self) -> None:
         assert server._LOSE_HOW_MUCH.search("how many percent can i realistically lose doing this")

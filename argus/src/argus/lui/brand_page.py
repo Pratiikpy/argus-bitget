@@ -84,7 +84,7 @@ def render() -> str:
 <style>{design.TOKENS_CSS}
   .sec {{ display:grid; grid-template-columns:190px minmax(0,1fr); gap:52px; padding:64px 0;
     border-bottom:1px solid var(--line) }}
-  .meta {{ font:500 11.5px/1.6 var(--mono); letter-spacing:.14em; text-transform:uppercase;
+  .meta {{ font:500 12px/1.6 var(--mono); letter-spacing:.14em; text-transform:uppercase;
     color:var(--dim); padding-top:10px }}
   .sec h2 {{ font-size:clamp(28px,4vw,52px); line-height:1; margin:0 0 14px;
     letter-spacing:-0.03em }}
@@ -95,7 +95,7 @@ def render() -> str:
   .tiles {{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px;
     margin-top:14px }}
   .tile {{ border:1px solid var(--line); border-radius:14px; padding:28px; display:flex;
-    flex-direction:column; align-items:flex-start; gap:14px; font:500 11px/1 var(--mono);
+    flex-direction:column; align-items:flex-start; gap:14px; font:500 12px/1 var(--mono);
     letter-spacing:.12em; text-transform:uppercase; color:var(--dim) }}
   .tile svg {{ color:var(--ink) }}
   .tile.ink {{ background:#0A0A0A; color:#A1A1AA }} .tile.ink svg {{ color:#FFFFFF }}
@@ -105,21 +105,21 @@ def render() -> str:
     display:flex; flex-direction:column; justify-content:space-between }}
   /* Full opacity: at .85 the loss swatch's label read 4.17:1 on #c2410c, under WCAG AA's
      4.5:1 (accessibility audit, 2026-09-29). */
-  .sw span, .sw code, .sw small {{ font:500 11px/1.4 var(--mono); letter-spacing:.1em;
+  .sw span, .sw code, .sw small {{ font:500 12px/1.4 var(--mono); letter-spacing:.1em;
     text-transform:uppercase }}
   .sw strong {{ font:700 22px/1 var(--sans) }}
   .type {{ border:1px solid var(--line); border-radius:14px; overflow:hidden }}
   .row {{ display:grid; grid-template-columns:150px 1fr; gap:24px; padding:20px 24px;
     border-bottom:1px solid var(--line); align-items:baseline }}
   .row:last-child {{ border-bottom:0 }}
-  .row span {{ font:500 11px/1.5 var(--mono); letter-spacing:.12em; text-transform:uppercase;
+  .row span {{ font:500 12px/1.5 var(--mono); letter-spacing:.12em; text-transform:uppercase;
     color:var(--dim) }}
   .rc {{ max-width:420px; border:1px solid var(--line); border-radius:14px; padding:22px;
     background:var(--halo) }}
   .rc strong {{ display:block; font:700 28px/1 var(--sans); color:var(--proof); margin:12px 0 }}
   .rc dl {{ display:grid; grid-template-columns:90px 1fr; gap:8px 12px; margin:0;
     font:12.5px/1.4 var(--mono) }}
-  .rc dt {{ color:var(--dim); text-transform:uppercase; letter-spacing:.08em; font-size:11px }}
+  .rc dt {{ color:var(--dim); text-transform:uppercase; letter-spacing:.08em; font-size:12px }}
   .rc dd {{ margin:0 }}
   .voice {{ display:grid; grid-template-columns:1fr 1fr; gap:14px }}
   .voice div {{ border:1px solid var(--line); border-radius:14px; padding:22px }}

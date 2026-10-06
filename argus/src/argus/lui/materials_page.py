@@ -86,6 +86,11 @@ def collect(data_dir: Path, base: str = "", *, tools: Sequence[str] = ()) -> lis
              "Check it"),
         Item("Status", f"{base}/status", "Bitget's toolkit and every data source, checked live "
              "when the page loads, with the desk's record and its age.", "Check it"),
+        Item("Whitepaper", f"{base}/whitepaper", "How ARGUS works, every problem it takes on and "
+             "how, the architecture, and the measurement against named rivals with every loss.",
+             "Read it"),
+        Item("Proof deck", f"{base}/deck", "The evidence in slides: the research task, the "
+             "register, the wins and the losses, the toolkit sweep.", "Read it"),
         Item("Source code", REPOSITORY, "Public, MIT. `python -m argus.eval.standing` re-derives "
              "the register from its artefacts; `python -m argus.eval.docclaims` checks every "
              "figure the documents quote.", "Check it"),

@@ -35,16 +35,40 @@ def _artefact(path: str) -> str:
     return f"<code>{shown}</code>"
 
 
+_CODE = re.compile(r"`([^`]+)`")
+
+
+def _prose(text: str) -> str:
+    """Escaped text with `inline code` set as code, so a path or a command reads as one rather
+    than between literal backticks (round 45 visual audit, minor 7)."""
+    return _CODE.sub(lambda m: f"<code>{m.group(1)}</code>", html.escape(text))
+
+
+def _whole(text: str) -> str:
+    """``text`` with a cut-off tail made whole. The collector shortens long findings to a fixed
+    length and appends "..." (`lui/corrections.py`), which left words such as "day-clustere..."
+    on the page. The tail is taken back to the last sentence end when that keeps most of the text,
+    else to the last whole word, and closed with an ellipsis."""
+    if not text.endswith("..."):
+        return text
+    body = text[:-3]
+    sentence = max(body.rfind(". "), body.rfind("; "))
+    if sentence >= len(body) * 0.6:
+        return body[:sentence + 1].rstrip() + " …"
+    cut = body.rsplit(" ", 1)[0] if " " in body else body
+    return cut.rstrip(" ,;:-") + "…"
+
+
 def render(corrections: list[Correction]) -> str:
     """The page. Deliberately plain — this is a record, not a pitch."""
     esc = html.escape
     label = {"bug": "we shipped it broken", "loss": "a baseline beat us",
              "withdrawn": "claim withdrawn", "open": "still open"}
     rows = "".join(
-        f"<article class='c {esc(c.kind)}'>"
+        f"<details class='c {esc(c.kind)}'><summary>"
         f"<span class='k'>{esc(label.get(c.kind, c.kind))}</span>"
-        f"<h2>{esc(c.headline)}</h2><p>{esc(c.detail)}</p>"
-        f"{_artefact(c.artefact)}</article>"
+        f"<h2>{_prose(_whole(c.headline))}</h2></summary><p>{_prose(_whole(c.detail))}</p>"
+        f"{_artefact(c.artefact)}</details>"
         for c in corrections
     )
     # Plain language, positioned directly above the first entry rather than after the intro above
@@ -79,11 +103,20 @@ def render(corrections: list[Correction]) -> str:
  .c.loss {{ border-left-color:var(--warn) }}
  .c.withdrawn {{ border-left-color:var(--graphite) }}  /* Proof indigo is for what is verified */
  .c.open {{ border-left-color:var(--dim) }}
- .k {{ font:10.5px var(--mono); text-transform:uppercase; letter-spacing:.1em;
+ .k {{ font:12px var(--mono); text-transform:uppercase; letter-spacing:.1em;
    color:var(--dim); display:block; margin-bottom:6px }}
- .c h2 {{ font-size:16px; margin:0 0 8px; line-height:1.35 }}
+ .c h2 {{ font-size:16px; margin:0 0 8px; line-height:1.35; display:block }}
  .c p {{ margin:0 0 10px; color:var(--dim); font-size:14.5px }}
- code {{ font:11.5px var(--mono); color:var(--dim) }}
+ code {{ font:12px var(--mono); color:var(--dim) }}
+ /* Each entry folds to its kind and headline and opens on a tap, as the cards on /proof do: the
+    page ran to fifteen phone screens (round 45 visual audit, minor 4). */
+ .c > summary {{ list-style:none; cursor:pointer }}
+ .c > summary::-webkit-details-marker {{ display:none }}
+ .c > summary h2::after {{ content:"  +"; color:var(--accent); font-weight:600 }}
+ .c[open] > summary h2::after {{ content:"  \u2212" }}
+ .c > summary h2 {{ margin:0 }}
+ .c[open] > summary h2 {{ margin:0 0 8px }}
+ .c p code {{ color:var(--ink) }}
  a {{ color:var(--accent) }}
  .plain {{ background:var(--panel); border:1px solid var(--line); border-radius:10px;
    padding:14px 16px; margin:0 0 16px }}

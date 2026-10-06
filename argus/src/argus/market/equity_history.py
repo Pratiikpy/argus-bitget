@@ -76,6 +76,34 @@ def _fetch(ticker: str, *, timeout: float = 20.0) -> dict[str, Any]:
     return payload
 
 
+SPLITS = ("https://query1.finance.yahoo.com/v8/finance/chart/{ticker}"
+          "?range=max&interval=1mo&events=split")
+
+
+def split_events(ticker: str, *, timeout: float = 15.0) -> list[tuple[date, float, float]]:
+    """Every split Yahoo records for ``ticker`` as (ex-date, numerator, denominator), oldest
+    first: the second source for a split premise when Bitget's data service returns nothing
+    (it returned no row for NVDA's 10-for-1 of June 2024 on 2026-10-06). Raises
+    :class:`HistoryError` when Yahoo does not answer."""
+    try:
+        payload: dict[str, Any] = http.fetch_json(
+            SPLITS.format(ticker=ticker), timeout=timeout,
+            headers={"User-Agent": "Mozilla/5.0 argus-research"})
+    except http.RpcError as exc:
+        raise HistoryError(f"Yahoo split events for {ticker} did not arrive: "
+                           f"{type(exc).__name__}") from exc
+    results = (payload.get("chart") or {}).get("result") or [{}]
+    events = ((results[0] or {}).get("events") or {}).get("splits") or {}
+    out = []
+    for row in events.values():
+        try:
+            out.append((datetime.fromtimestamp(int(row["date"]), UTC).date(),
+                        float(row["numerator"]), float(row["denominator"])))
+        except (KeyError, TypeError, ValueError):
+            continue
+    return sorted(out)
+
+
 def parse(payload: dict[str, Any]) -> list[Day]:
     """Adjusted daily bars from a chart payload, oldest first; rows with a missing field dropped."""
     try:

@@ -48,7 +48,7 @@ def test_a_filing_question_is_answered_from_the_filing_and_an_invented_cite_is_r
     assert "$89.0 billion" in text and "Margins will double" not in text
     assert len(payload["sources"]) == 1
     tags = labels(payload["lines"])
-    assert tags[payload["lines"].index(next(x for x in payload["lines"] if "$89.0" in x))] == "live"
+    assert tags[payload["lines"].index(next(x for x in payload["lines"] if "$89.0" in x))] == "filed"
 
 
 def test_a_coin_with_no_filings_takes_the_usual_route(filings: None) -> None:

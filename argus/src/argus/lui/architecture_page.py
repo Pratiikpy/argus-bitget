@@ -121,7 +121,7 @@ the public CI runs on every push; the artefact is
  table.num td.n, table.num th:nth-child(n+2) {{ font-family:var(--mono); text-align:right }}
  table.text td.n {{ font-family:var(--mono); width:4em }}
  .cyc {{ padding-left:18px; font-size:14px }} .cyc li {{ margin:4px 0 }}
- .tag {{ font:10.5px var(--mono); text-transform:uppercase; letter-spacing:.08em;
+ .tag {{ font:12px var(--mono); text-transform:uppercase; letter-spacing:.08em;
    padding:1px 6px; border-radius:4px; border:1px solid var(--line) }}
  .tag.ok {{ color:var(--good) }} .tag.bad {{ color:var(--bad) }}
  code {{ font:12px var(--mono) }} a {{ color:var(--accent) }}

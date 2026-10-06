@@ -100,13 +100,24 @@ def _line_class(line: str) -> str:
 
 
 def _card(n: int, step: Step, chart: str = "") -> str:
+    """One engine's step, folded to its header and its Bottom line; the chart and every other
+    line open on a tap (round 45 visual audit, minor 4: eight expanded sections ran /research to
+    fifteen phone screens). The engine's own "Corrected:" note is a development record of a
+    provider bug, not part of the answer, so it is left out here and kept in the JSON."""
     esc = html.escape
-    body = "".join(f"<p class='{_line_class(line)}'>{design.linked(line)}</p>"
-                   for line in step.lines)
+    lines = [line for line in step.lines if not line.startswith("Corrected:")]
+    lead = next((line for line in lines if LEAD.match(line)), None)
+    rest = [line for line in lines if line is not lead]
+    # with no Bottom line the first line stands in for it, so a folded card still says something
+    shown = lead if lead is not None else (rest.pop(0) if rest else None)
+    top = (f"<p class='{_line_class(shown)}'>{design.linked(shown)}</p>" if shown else "")
+    body = "".join(f"<p class='{_line_class(line)}'>{design.linked(line)}</p>" for line in rest)
     classes = "s" + (" r" if step.refused else "") + ("" if step.applicable else " na")
-    return (f"<article class='{classes}'><div class='h'><span class='n'>{n}"
+    inner = chart + body
+    more = (f"<div class='more'>{inner}</div>" if inner else "")
+    return (f"<details class='{classes}'><summary><div class='h'><span class='n'>{n}"
             f"</span><h2>{esc(step.title)}</h2><span class='e'>{esc(step.engine)} · "
-            f"{step.seconds:.1f}s</span></div>{chart}{body}</article>")
+            f"{step.seconds:.1f}s</span></div>{top}</summary>{more}</details>")
 
 
 def _top(asked: str, name: str, size_pct: float, book_text: str) -> str:
@@ -125,8 +136,8 @@ def _top(asked: str, name: str, size_pct: float, book_text: str) -> str:
    background:var(--panel); color:var(--ink); font:15px/1.45 system-ui,sans-serif }}
  form textarea {{ flex:1 1 320px; min-width:0; resize:vertical; min-height:44px;
    box-sizing:border-box }}
- details {{ margin-top:8px; font-size:13.5px; color:var(--dim) }}
- details summary {{ cursor:pointer }}
+ form details {{ margin-top:8px; font-size:13.5px; color:var(--dim) }}
+ form details summary {{ cursor:pointer }}
  .edit {{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px }}
  .edit label {{ display:flex; flex-direction:column; gap:3px; font-size:12px }}
  form .name {{ width:110px }} form .size {{ width:90px }}
@@ -173,8 +184,13 @@ def _top(asked: str, name: str, size_pct: float, book_text: str) -> str:
  .h {{ display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; margin-bottom:6px }}
  .n {{ font:12px var(--mono); color:var(--dim) }}
  .h h2 {{ font-size:15.5px; margin:0 }}
- .e {{ font:11.5px var(--mono); color:var(--dim); margin-left:auto }}
+ .e {{ font:12px var(--mono); color:var(--dim); margin-left:auto }}
  .s p {{ margin:4px 0; overflow-wrap:anywhere }}
+ details.s > summary {{ list-style:none; cursor:pointer }}
+ details.s > summary::-webkit-details-marker {{ display:none }}
+ details.s > summary .h h2::after {{ content:"  +"; color:var(--accent); font-weight:600 }}
+ details.s[open] > summary .h h2::after {{ content:"  -" }}
+ details.s .more {{ margin-top:6px }}
  .act {{ font-weight:600; color:var(--accent) }} .fine {{ color:var(--dim); font-size:13px }}
  a {{ color:var(--accent) }}
  .chart {{ margin:6px 0 10px }} .chart svg {{ width:100%; height:auto; display:block }}

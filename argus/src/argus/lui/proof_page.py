@@ -346,7 +346,8 @@ def _card(win: Win) -> str:
     proofs = "".join(f"<li><b>{esc(c.replace('_', ' '))}</b> — {_linked(esc(h))}</li>"
                      for c, h in win.proofs)
     note = f"<p class='note'>{esc(win.note)}</p>" if win.note else ""
-    tested = (f"<p><span class='lbl'>Same-input test</span>{_linked(esc(win.tested))}</p>"
+    tested = (f"<p class='kv'><span class='lbl'>Same-input test</span>"
+              f"<span>{_linked(esc(win.tested))}</span></p>"
               if win.tested else "")
     if win.measured:
         tested += ("<p><span class='lbl'>Measured</span></p><ul class='measured'>"
@@ -355,8 +356,8 @@ def _card(win: Win) -> str:
         reason = win.blockers[0]
         if len(reason) > 900:
             reason = reason[:900].rsplit(" ", 1)[0] + "…"
-        tested += (f"<p class='why'><span class='lbl'>Why not OWNED</span>"
-                   f"{_linked(esc(reason))}</p>")
+        tested += (f"<p class='why kv'><span class='lbl'>Why not OWNED</span>"
+                   f"<span>{_linked(esc(reason))}</span></p>")
     # Each card folds to its state, name and rival, and opens on a tap: /proof ran to 44,000px on
     # a phone, about fifty screens (round 44 visual audit, major 3). OWNED cards stay open — they
     # are what the page exists to show; the rest are one tap away and named in the summary.
@@ -369,8 +370,8 @@ def _card(win: Win) -> str:
            if win.state != "owned" and win.conditions == 13 else "")
         + "</span></div>"
         f"<h3>{esc(win.name)}</h3></summary>"
-        f"<p><span class='lbl'>Rival</span>{esc(win.rival)}</p>"
-        + (f"<p><span class='lbl'>Scope</span>{esc(SCOPE[win.name])}</p>"
+        f"<p class='kv'><span class='lbl'>Rival</span><span>{esc(win.rival)}</span></p>"
+        + (f"<p class='kv'><span class='lbl'>Scope</span><span>{esc(SCOPE[win.name])}</span></p>"
            if win.name in SCOPE else "") + f"{tested}"
         f"<div class='links'>{' '.join(links)}</div>{rerun}"
         f"<details><summary>Every condition and its evidence</summary><ul>{proofs}</ul>"
@@ -493,8 +494,14 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
  details.w > summary h3::after {{ content:"  +"; color:var(--accent); font-weight:600 }}
  details.w[open] > summary h3::after {{ content:"  \u2212" }}
  details.w {{ font-size:15px; color:var(--ink) }}
- .lbl {{ display:inline-block; min-width:118px; font:12px var(--mono); color:var(--dim);
-   text-transform:uppercase; letter-spacing:.06em }}
+ /* A label column and a value column: "SAME-INPUT TEST" was wider than the old 118px label and
+    ran into its value, and a wrapped value returned under the label (round 45 visual audit,
+    minor 5) */
+ .lbl {{ display:inline-block; min-width:150px; margin-right:12px; font:12px var(--mono);
+   color:var(--dim); text-transform:uppercase; letter-spacing:.06em }}
+ .kv {{ display:grid; grid-template-columns:150px minmax(0,1fr); gap:0 12px;
+   align-items:baseline }}
+ .kv .lbl {{ min-width:0; margin:0 }}
  .links {{ display:flex; gap:6px 14px; flex-wrap:wrap; font-size:13px; margin:4px 0 6px }}
  .links a {{ color:var(--accent); overflow-wrap:anywhere }}
  .links a.live {{ font-weight:600 }}
@@ -520,7 +527,8 @@ def render(wins: list[Win], counts: dict[str, int]) -> str:
  .toc li {{ margin:3px 0 }}
  [id] {{ scroll-margin-top:84px }}
  a:focus-visible, summary:focus-visible {{ outline:2px solid var(--accent); outline-offset:2px }}
- @media (max-width:520px) {{ .lbl {{ display:block; min-width:0 }} }}
+ @media (max-width:520px) {{ .lbl {{ display:block; min-width:0; margin:0 0 2px }}
+   .kv {{ grid-template-columns:1fr; gap:0 }} }}
 {design.BASE_CSS}</style></head><body>{design.nav('/proof')}<div class="wrap">
 <h1>What ARGUS beats, and what beats it</h1>
 {plain}

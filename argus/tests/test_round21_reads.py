@@ -15,7 +15,10 @@ class TestNewcomers:
 
         stop = concepts.concept_asked("what is a stop loss and do i need one")
         assert stop is not None and stop.name == "stop loss"
+        # the case asked about first: no leverage was mentioned (round 45, newcomer minor 3)
         assert (concepts.for_you(stop, "what is a stop loss and do i need one") or "").startswith(
+            "For you: buying without leverage, a stop is optional")
+        assert (concepts.for_you(stop, "do i need a stop loss on a 10x perp") or "").startswith(
             "For you: with leverage, yes")
         lever = concepts.concept_asked("is 10x leverage ok for small acount")
         assert lever is not None and lever.name == "leverage"

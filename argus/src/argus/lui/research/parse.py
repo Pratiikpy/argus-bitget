@@ -1301,6 +1301,13 @@ def two_word_company(match: re.Match[str]) -> str:
     return match.group(0)
 
 
+_TWO_WORD_COINS: Final = {
+    r"\bbitcoin\s+cash\b": "BCH", r"\bbitcoin\s+sv\b": "BSV", r"\bethereum\s+classic\b": "ETC",
+    r"\bshiba\s+inu\b": "SHIB", r"\bbinance\s+coin\b": "BNB", r"\bbitcoin\s+gold\b": "BTG",
+}
+"""Coin names of two words whose first word is another coin's name."""
+
+
 def _read(text: str) -> dict[str, str]:
     """Every listed contract the text names, in the order named, each with the note on how it was
     read ("" when it was read literally)."""
@@ -1308,6 +1315,10 @@ def _read(text: str) -> dict[str, str]:
     from argus.market.universe import CJK_ALIASES
 
     text = coin_as_ticker(text)
+    # "Bitcoin Cash" is BCH, not bitcoin and cash: "Price of Bitcoin Cash, BCH" added BTC to the
+    # answer (round 45 hostile, M9); each two-word coin name is read as its ticker first
+    for phrase, ticker in _TWO_WORD_COINS.items():
+        text = re.sub(phrase, ticker, text, flags=re.I)
     # "S&P 500" and "the S&P" are the index, written as its name: both were declined or answered
     # "not a contract Bitget lists" while "sp500" and "SPX" resolved (2026-09-30).
     text = re.sub(r"\bS\s*&\s*P(?:\s*500)?(?![\w&])", "SP500", text, flags=re.I)
@@ -1694,7 +1705,13 @@ def in_us_dollars(text: str) -> tuple[str, list[str]]:
                     f"{pair.removesuffix('USDT')} {rate:,.4f}" + (f"; {how}" if how else ""))
         return f"${usd:.2f} "
 
-    return _FOREIGN_MONEY.sub(restate, text), said
+    restated = _FOREIGN_MONEY.sub(restate, text)
+    # rupiah, dong, rupees, naira and the rest, at the ECB's or ExchangeRate-API's rate: "1 juta
+    # rupiah" was read as a million dollars (round 45 newcomer, M7)
+    from argus.lui.research.local_money import in_dollars
+
+    restated, local = in_dollars(restated)
+    return restated, [*said, *local]
 
 
 def _resolve_any(name: str) -> str | None:
@@ -4914,6 +4931,15 @@ def follow_up(text: str, prior: list[str], book_text: str = "") -> ResearchReque
             return None  # a book question does not take a single name
         else:
             symbols = (new, *base.symbols[1:]) if base.kind is ResearchKind.COMPARE else (new,)
+        carried = (base.target, base.level)
+        if (any(x is not None for x in carried) and base.symbols and base.symbols[0] != new
+                and base.kind is not ResearchKind.COMPARE):
+            # "and gold" after "what's the chance BTC is above 90000" asked whether gold reaches
+            # 90,000 (round 45 re-ask): a price level belongs to the name it was said of, so the
+            # new name is read without it
+            return replace(base, symbols=symbols, target=None, level=None, notes=(
+                *base.notes, f"read as the previous question — \"{earlier[:60]}\" — asked of "
+                             f"{_t(new)}, without the level, which was {_t(base.symbols[0])}'s"))
         return replace(base, symbols=symbols, notes=(
             *base.notes, f"read as the previous question — \"{earlier[:60]}\" — asked of "
                          f"{_t(new)}"))

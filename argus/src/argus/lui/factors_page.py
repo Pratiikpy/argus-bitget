@@ -116,10 +116,10 @@ the record is <a href="{REPOSITORY}data/factor_lab.json"><code>data/factor_lab.j
  .tbl {{ overflow-x:auto }}
  table {{ border-collapse:collapse; width:100%; font-size:14px }}
  th, td {{ text-align:left; padding:8px; border-bottom:1px solid var(--line); vertical-align:top }}
- th {{ font:600 11px var(--mono); text-transform:uppercase; letter-spacing:.06em;
+ th {{ font:600 12px var(--mono); text-transform:uppercase; letter-spacing:.06em;
       color:var(--dim) }}
  td.n {{ font-family:var(--mono); text-align:right; white-space:nowrap }}
- .st {{ font:10.5px var(--mono); text-transform:uppercase; letter-spacing:.08em }}
+ .st {{ font:12px var(--mono); text-transform:uppercase; letter-spacing:.08em }}
  .st.rejected {{ color:var(--bad) }} .st.certified {{ color:var(--good) }}
  .why {{ color:var(--dim); font-size:13px; margin-top:2px }}
  @media (max-width:640px) {{
@@ -129,7 +129,7 @@ the record is <a href="{REPOSITORY}data/factor_lab.json"><code>data/factor_lab.j
   td {{ border:0; padding:2px 0 }}
   td.name, td.stop {{ grid-column:1 / -1 }}
   td.n {{ text-align:left }}
-  td.n::before {{ content:attr(data-label); display:block; font:10px var(--mono);
+  td.n::before {{ content:attr(data-label); display:block; font:12px var(--mono);
                   text-transform:uppercase; letter-spacing:.06em; color:var(--dim) }}
  }}
  code {{ font:12px var(--mono); color:var(--dim) }} a {{ color:var(--accent) }}

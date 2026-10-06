@@ -10,6 +10,9 @@ a price read a second ago from a figure computed on it or from a record measured
 
 * ``live`` — read from a source just now and stated as read: a quote, a funding rate, open
   interest, a headline, a macro series value, a prediction-market price.
+* ``filed`` — quoted from a dated filing or document, fetched just now: the passage is as of its
+  filing date, not today. A sentence from an August 10-Q tagged ``live`` read as if the company
+  had said it this morning (round 45 visual, minor 12).
 * ``computed`` — arithmetic on live data done for this answer: costs, beta, stress, VaR, the
   implied open, a hedge ratio, a premise verdict.
 * ``record`` — a measured track record: a backtest, a held-out test, a head-to-head against a named
@@ -48,7 +51,8 @@ import re
 from collections.abc import Mapping, Sequence
 from typing import Any
 
-LABELS = ("live", "computed", "record", "desk", "assumed", "missing", "memory", "explained")
+LABELS = ("live", "filed", "computed", "record", "desk", "assumed", "missing", "memory",
+          "explained")
 
 _EXPLAINED: set[str] = set()
 """Fixed text written into the console — a definition, how the risk layer works, how buying on
@@ -82,15 +86,16 @@ label."""
 # line that says it could not read something must never be labelled as if it had.
 _RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
     # A sentence from a filing answer (`research/document_qa.py`) ends with the number of the
-    # passage it cites, and a sentence without one never reaches the page: read from EDGAR now.
-    ("live", re.compile(r"\.\s*(?:\[\d{1,2}\])+\s*$")),
+    # passage it cites, and a sentence without one never reaches the page: read from EDGAR now,
+    # said as of its filing.
+    ("filed", re.compile(r"\.\s*(?:\[\d{1,2}\])+\s*$")),
     # the past states an analogue answer was matched to: worked out from the candles just read
     ("computed", re.compile(r"^Closest past states: ")),
     # a saved book written as amounts, priced at Bitget's last price for this answer
     ("live", re.compile(r"^Priced at Bitget's last price: ")),
     # an XBRL answer (`research/filing_qa.py`): the filed lines are read from SEC now, the
     # formula is what was computed from them
-    ("live", re.compile(r"^(?:Filed|Anchor filing): ")),
+    ("filed", re.compile(r"^(?:Filed|Anchor filing): ")),
     ("computed", re.compile(r"^Formula: ")),
     # the stress answer's scenario tree (`desk/stress_tree.py`) and its loss-share line: every
     # figure worked out for this answer from the candles it just read
@@ -248,7 +253,7 @@ def label(line: str) -> str | None:
             # could not be measured ..." answers with a figure and notes one gap (seen live)
             first = re.split(r";\s|\.\s", rest, maxsplit=1)[0]
             return "missing" if label(first) == "missing" else "computed"
-        return inner if inner in ("record", "desk", "memory") else "computed"
+        return inner if inner in ("record", "desk", "memory", "filed") else "computed"
     for name, pattern in _RULES:
         if pattern.search(text):
             return name

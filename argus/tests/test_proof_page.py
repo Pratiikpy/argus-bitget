@@ -70,10 +70,12 @@ def test_the_page_renders_every_state_and_the_gap_it_admits() -> None:
         if win.console:
             assert "Ask the console" in page
             break
-    # the page reads with no script; the only scripts are the shared light/dark toggle's
+    # the page reads with no script; the only scripts are the shared light/dark toggle's and the
+    # back-to-top tab's, both progressive enhancement
     from argus.lui import design
 
-    assert "<script" not in page.replace(design.THEME_INIT, "").replace(design.THEME_BUTTON, "")
+    bare = page.replace(design.THEME_INIT, "").replace(design.THEME_BUTTON, "")
+    assert "<script" not in bare.replace(design.TOTOP_SCRIPT, "")
 
 
 def test_an_unreadable_register_shows_nothing_rather_than_something(tmp_path: Path) -> None:

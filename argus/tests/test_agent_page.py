@@ -65,7 +65,9 @@ def test_no_decisions_yet_explains_the_heartbeats() -> None:
 
 def test_the_track3_nav_does_not_carry_the_track2_entry() -> None:
     """Each entry is an independent project (handbook, Basic Competition Rules 2): the page stays
-    at its URL, but the Track 3 console's own navigation does not link the Track 2 agent."""
+    at its URL, but the Track 3 console's own navigation does not link the Track 2 agent. Round 45
+    (visual, minor 14) asked for the link; the rule wins, and the Track 2 entry carries its own
+    links in its own submission."""
     from argus.lui import design
 
     assert all(path != "/agent" for path, _ in design.LINKS)
@@ -83,7 +85,7 @@ def test_the_page_says_plainly_it_is_a_separate_project_before_the_reader_can_co
     assert "Bitget's Demo (paper) environment" in html
     assert "no real money" in html
     assert "ARGUS" in html and "places no order on any venue" in html
-    assert html.index("The agent that trades.") < html.index("separate project")
+    assert html.index("The agent that trades.") < html.index("<b>This is a separate project")
 
 
 def test_the_no_edge_envelope_is_shown_in_the_agent_columns_units() -> None:
@@ -110,3 +112,17 @@ def test_refused_orders_are_counted_and_explained() -> None:
     html = agent_page.render(_fetch({"summary.json": SUMMARY, "decisions.json": DECISIONS,
                                      "orders.json": orders}))
     assert "refused by the venue" in html and "The venue refused 4 of the 4 orders" in html
+
+
+def test_a_stale_record_is_a_calm_note_under_the_header_not_a_red_alert() -> None:
+    """Round 45 (minor 6): the first thing read on the page was a red pill. The age is still said,
+    as one dim line after the header facts and before the figures."""
+    from datetime import UTC, datetime, timedelta
+
+    old = {**SUMMARY, "generated_at": (datetime.now(UTC) - timedelta(hours=20)).isoformat()}
+    html = agent_page.render(_fetch({"summary.json": old, "decisions.json": DECISIONS}))
+    assert "pill red'>20 hours old" not in html
+    note = html.index("Published record is 20 hours old")
+    assert html.index("class='facts'") < note < html.index("Scored so far")
+    fresh = {**SUMMARY, "generated_at": datetime.now(UTC).isoformat()}
+    assert "hours old" not in agent_page.render(_fetch({"summary.json": fresh}))

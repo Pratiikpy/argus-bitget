@@ -376,6 +376,21 @@ def answer_performance(ledger: PaperLedger, question: Question) -> Answer:
             lines.insert(2 if grading else 1, reasons)
             sources.append(Source("artefact", "refusal_reasons.json",
                                   "refusal reasons checked against the record"))
+    if re.search(r"\bworst\s+(?:loss|trade|losing\s+trade)\b|\bbiggest\s+loss\b|\blargest\s+loss\b|"
+                 r"\blost\s+money\s+on\s+(?:a|any)\s+(?:single\s+)?trade\b", question.raw, re.I):
+        # "Has the desk ever lost money on a single trade, and what was the worst loss?" got the
+        # aggregate only (round 45 judge, M16): the worst settled trade, named
+        settled = [e for e in ledger.entries if e.is_settled and not e.is_abstention
+                   and e.net_pnl is not None]
+        if settled:
+            worst = min(settled, key=lambda e: float(e.net_pnl or 0))
+            losers = sum(1 for e in settled if float(e.net_pnl or 0) < 0)
+            lines.insert(0, f"Bottom line: {'yes' if losers else 'no'} — {losers} of "
+                            f"{len(settled)} settled trades lost money; the worst was seq "
+                            f"{worst.seq}, {worst.symbol} {worst.verdict} decided "
+                            f"{str(worst.decided_at)[:10]}, net "
+                            f"{_dollars(float(worst.net_pnl or 0))}.")
+            sources.append(_src(worst))
     asked = re.search(r"\b(?:last|past|over|in)\s+(?:the\s+)?(?:last\s+|past\s+)?(\d{1,4})\s*"
                       r"(days?|weeks?|months?)\b", question.raw, re.I)
     if asked is not None and lang == "en":
@@ -643,8 +658,37 @@ def answer_abstention_why(ledger: PaperLedger, question: Question) -> Answer:
     )
     # For one name, how its latest decision was reached; across several, the rows speak for it.
     lines.extend(_how_it_was_reached(rows[-1].seq) if len(symbols) == 1 else [])
+    if lang == "en" and re.search(r"\b(?:what|which)\s+rule\b|\bwhat\s+stopped\b|\bwhat\s+"
+                                  r"(?:blocked|prevented)\b", question.raw, re.I):
+        rule_said = _rule_behind(rows)
+        if rule_said:
+            lines.insert(1, rule_said)
     return Answer(question=question, lines=lines, sources=[_src(e) for e in rows[-3:]],
                   data={"abstentions": len(rows), "symbols": symbols})
+
+
+def _rule_behind(rows: list[Entry]) -> str | None:
+    """Whether a rule of the risk layer stopped the abstentions asked about, from its own records:
+    "...what rule stopped it from opening US stock positions?" listed reasons and named no rule
+    (round 45 judge, M15). When the model proposed nothing, no rule had anything to stop."""
+    from argus.eval.riskaudit import read_records
+
+    path = _risk_records_path()
+    if not path.exists():
+        return None
+    wanted = {e.seq for e in rows}
+    records = [r for r in read_records(path) if int(r.get("seq", 0)) in wanted]
+    if not records:
+        return None
+    blocked = sum(1 for r in records if r.get("intervened"))
+    proposed = sum(1 for r in records if str(r.get("quantity_before", "0")) not in ("0", "0.0", ""))
+    if blocked == 0 and proposed == 0:
+        return (f"No rule stopped them: in all {len(records)} of these decisions the model itself "
+                f"proposed no position, so the risk layer had nothing to block (its records read "
+                f"\"no exposure proposed\"). The abstentions are the model's own judgement, with "
+                f"the reasons it wrote below.")
+    return (f"The risk layer blocked or shrank {blocked} of the {proposed} positions proposed "
+            f"among these {len(records)} decisions; the rest were the model's own no-trade.")
 
 
 @traced("desk")
@@ -1042,6 +1086,14 @@ def answer_risk_control(ledger: PaperLedger, question: Question) -> Answer:
     """
     from argus.eval.riskaudit import audit as risk_audit
 
+    limits = _risk_limits_lines(question.raw)
+    if limits is not None:
+        return Answer(question=question, lines=limits,
+                      sources=[Source("computation", "argus.risk.constitution:ConstitutionPolicy",
+                                      "the caps the risk layer applies, read from its defaults"),
+                               Source("computation",
+                                      "argus.decision.escalation:DEFAULT_UNATTENDED_FRACTION",
+                                      "the share of the book a machine may take unattended")])
     path = _risk_records_path()
     if not path.exists():
         return _refuse(
@@ -1096,6 +1148,34 @@ def answer_risk_control(ledger: PaperLedger, question: Question) -> Answer:
         ],
         data=report.as_dict(),
     )
+
+
+def _risk_limits_lines(raw: str) -> list[str] | None:
+    """The caps themselves, and who can change them: "What is the maximum position size the risk
+    kernel allows per name, and who can override it?" got the audit's counts and no limit (round 45
+    judge, M15). Read from the policy's own defaults, so the answer cannot drift from the code."""
+    if not re.search(r"\b(?:max(?:imum)?|largest|biggest|how\s+(?:big|large))\b[^?]{0,30}"
+                     r"\b(?:position|size|notional|exposure|order)\b|\b(?:position|size|notional)\s+"
+                     r"(?:limit|cap|ceiling)s?\b|\bwho\s+can\s+overr\w*|\boverride\b", raw, re.I):
+        return None
+    from argus.decision.escalation import DEFAULT_UNATTENDED_FRACTION
+    from argus.risk.constitution import ConstitutionPolicy
+
+    policy = ConstitutionPolicy()
+    return [f"Bottom line: the risk layer caps any one position at "
+            f"${policy.max_position_notional:,.0f} of notional, and no human or model can raise "
+            f"that while it runs: the layer can only shrink or stop a trade, never enlarge it.",
+            f"The other caps: ${policy.max_gross_exposure_notional:,.0f} gross across the book, "
+            f"${policy.max_signed_exposure_notional:,.0f} net long or short, "
+            f"${policy.max_unhedged_notional:,.0f} carried with no hedge available, margin usage "
+            f"under {policy.max_margin_usage_ratio:.0%} of Bitget's own liquidation trigger, and "
+            f"no trade below {policy.min_confidence_to_trade:.0%} confidence.",
+            f"The one human step: a trade taking more than "
+            f"{DEFAULT_UNATTENDED_FRACTION:.0%} of the book is held for a person instead of being "
+            f"placed (the desk records it as human review, with size zero). The caps themselves "
+            f"change only by a change to the code (`risk/constitution.py`), which the hash-chained "
+            f"record would show.",
+            "Ask \"how does your risk layer work\" for its eight checks in order."]
 
 
 _RISK_WINDOW = re.compile(

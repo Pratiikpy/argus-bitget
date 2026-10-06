@@ -568,6 +568,15 @@ _NOT_A_TICKER = frozenset({
     "ICO", "IDO", "IEO", "NFT", "DAO", "KYC", "AML", "P2P", "DCA", "SIP", "FOMO", "FUD", "HODL",
     "DYOR", "DEFI", "LP", "AMM", "MEV", "RWA", "OTC", "CBDC", "TPS", "OTP", "SMS", "API", "PIN",
     "VPN", "IRA", "ISA", "FTC", "FBI", "FCA", "HMRC", "IRS", "CFTC", "EVM",
+    # trading verbs and shouted words: "just say BUY" was told "BUY is not a ticker" (round 45
+    # hostile, M28)
+    # (PUMP and NOT are listed perpetuals, and NOW and ALL are read by their surroundings in
+    # `research/parse.cued_word_tickers`, so none of the four is here)
+    "BUY", "SELL", "HOLD", "LONG", "SHORT", "STOP", "EXIT", "PWNED", "HACKED", "YOLO", "MOON",
+    "DUMP", "NEVER", "ALWAYS", "ONLY", "JUST", "SAY",
+    # finance abbreviations: "Report CAGR, max drawdown" left CAGR out as an unknown ticker
+    # (round 45 judge, M1)
+    "CAGR", "FCF", "EBITDA", "WACC", "ROE", "ROA", "MDD", "CAPM", "TTM", "QOQ", "YOY", "DCF",
     "OWNED", "TIED", "LOST", "IMPLEMENTED", "PASS", "FAIL", "PENDING", "BLOCKED",
 })
 """Capitalised tokens that are words, units or our own vocabulary rather than instruments."""
@@ -584,8 +593,10 @@ _COIN_THE_WORD = re.compile(
     r"favourite|next|single|native|base|utility|governance|crypto|"
     # "my friend made bank on some dog coin thing" was read as Coinbase (a first-time user,
     # round 28)
-    r"dog|doge|frog|cat|joke|pump|scam|random|tiny|cheap|penny|hyped|trending|new-ish|that\s+one)"
-    r"\s+coin\b", re.I)
+    r"dog|doge|frog|cat|joke|pump|scam|random|tiny|cheap|penny|hyped|trending|new-ish|that\s+one|"
+    # "Compare ETH vs ETC, are they the same coin?" added Coinbase to the comparison (round 45)
+    r"same|different|separate|real|fake|original|older|newer|second|first|forked?)"
+    r"\s+coins?\b", re.I)
 _NAMED_COIN = re.compile(r"\b[A-Z][A-Z0-9]{1,11}\s+coin\b")
 """A coin named by its ticker ("what's the price of QWXZ coin") uses "coin" as the word. Case
 matters: the ticker is written in capitals, the word after it is not. Read as Coinbase, that
@@ -741,7 +752,10 @@ def unlisted_tokens(text: str) -> list[str]:
         return []
     text = coin_as_ticker(text)
     shaped = [*_TICKER_SHAPED.findall(text),
-              *(m.group(1) or m.group(2) for m in _NAMED_CONTRACT.finditer(text))]
+              *(m.group(1) or m.group(2) for m in _NAMED_CONTRACT.finditer(text)),
+              # a quoted name of six to ten capitals ("the Bitget listing 'BCHABC'") is a ticker
+              # the question puts forward, and was dropped without a word (round 45 hostile, M9)
+              *re.findall("['\"‘“]([A-Z]{6,10})['\"’”]", text)]
     return list(dict.fromkeys(
         t for t in shaped if t not in _NOT_A_TICKER and t not in TRADED_SYMBOLS
         and t not in _TICKER_TO_SYMBOL and not (len(t) == 1 and t in ("I", "A"))

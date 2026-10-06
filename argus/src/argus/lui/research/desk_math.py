@@ -161,11 +161,24 @@ def funding_rate_lines(text: str) -> list[str] | None:
                  re.I):
         simple = per_day * 365
         compound = (1 + rate) ** (365 * 24 / every) - 1
-        return [f"Bottom line: {rate:+.4%} every {every} hours is {per_day:+.3%} a day, "
-                f"{simple:+.2%} a year simple ({rate:+.4%} x {24 // every} x 365) and "
-                f"{compound:+.2%} compounded.",
-                "Paid by longs to shorts while positive; the rate resets every settlement, so "
-                "a year at one rate is an illustration, not a forecast."]
+        out = [f"Bottom line: {rate:+.4%} every {every} hours is {per_day:+.3%} a day, "
+               f"{simple:+.2%} a year simple ({rate:+.4%} x {24 // every} x 365) and "
+               f"{compound:+.2%} compounded.",
+               "Paid by longs to shorts while positive; the rate resets every settlement, so "
+               "a year at one rate is an illustration, not a forecast."]
+        n = _NOTIONAL.search(text)
+        if n is not None:
+            notional = _n(n.group("v") or n.group("v2") or n.group("v3") or n.group("v4"))
+            if notional >= 10:
+                # "What does it cost to hold a 10,000 USDT BTC long for a year ... My exchange
+                # says it's free" got percentages only (round 45 hostile, M14)
+                free = re.search(r"\bfree\b", text, re.I) is not None
+                out[0] = (f"Bottom line: about ${abs(simple) * notional:,.0f} a year on "
+                          f"${notional:,.0f} — {rate:+.4%} every {every} hours is "
+                          f"{simple:+.2%} a year simple ({compound:+.2%} compounded)"
+                          + (", so holding it is not free: funding is paid between traders "
+                             "every settlement, on top of trading fees." if free else "."))
+        return out
     return None
 
 

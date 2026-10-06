@@ -21,6 +21,7 @@ from datetime import UTC, datetime, timedelta
 from itertools import pairwise
 from typing import Final
 
+from argus.lui.numbers import sig
 from argus.lui.trace import trace_module
 
 VOLUME_COMPARED: Final = re.compile(
@@ -28,6 +29,9 @@ VOLUME_COMPARED: Final = re.compile(
     r"relative|next\s+to)\b|\b(?:compare|comparing)\b[^?]{0,40}\bvolumes?\b", re.I)
 REALISED_VOL: Final = re.compile(
     r"\breali[sz]ed\s+vol(?:atility)?\b|\bhistorical\s+vol(?:atility)?\b|"
+    # "Tell me BTC's 30 day volatility annualised." led with a worst-day dollar example and the
+    # volatility buried (round 45 hostile, M25)
+    r"\b\d+[\s-]*day\s+vol(?:atility)?\b|\bvol(?:atility)?\s+annuali[sz]ed\b|"
     # "How volatile has SOL been over the past 14 days?" was answered over 30 (round 44 re-ask):
     # a window named beside "how volatile" is the window measured
     r"\bhow\s+(?:volatile|choppy|swingy|jumpy)\b[^?]{0,60}\b(?:last|past)\s+-?\s*\d+\s*"
@@ -517,8 +521,259 @@ def bear_market_lines(text: str, prior: list[str]) -> list[str] | None:
             "Bitget's last."]
 
 
+# --- the same volatility in other units, a typical N-day move, the chance of a fall -------------
+
+_VOL_UNITS: Final = re.compile(
+    r"\b(?:express|say|give|show|convert|put)\b[^?]{0,30}\b(?:that|it|this)\b[^?]{0,30}\b(?:daily|"
+    r"per\s+day|a\s+day|hourly|per\s+hour|an\s+hour|weekly|per\s+week|monthly)\b|\b(?:what(?:'s|\s+is)"
+    r"\s+)?(?:that|it)\s+(?:per|a)\s+(?:day|hour|week|month)\b", re.I)
+_TYPICAL_MOVE: Final = re.compile(
+    r"\btypical(?:ly)?\s+(?:move|swing|range|change)\b|\bhow\s+(?:much|far)\s+does\s+\S+\s+"
+    r"(?:usually|typically|normally)\s+move\b", re.I)
+_DAYS_SAID: Final = re.compile(r"\b(?:in|over|within|across)\s+(?P<n>\d{1,3})\s+(?P<u>days?|"
+                               r"weeks?)\b|\b(?P<n2>\d{1,3})[\s-]*(?P<u2>day|week)\b", re.I)
+_DROP_CHANCE: Final = re.compile(
+    r"\b(?:chance|odds|probability|likel\w+|how\s+often)\b[^?]{0,40}\b(?P<v>drop|fall|crash|lose|"
+    r"rise|gain|jump)s?\s+(?:by\s+)?(?P<p>\d+(?:\.\d+)?)\s*%[^?]{0,20}\b(?P<w>tomorrow|today|in\s+"
+    r"(?:a|one)\s+day|in\s+a\s+week|this\s+week|in\s+(?P<n>\d{1,3})\s+days?)\b", re.I)
+
+
+def vol_units_lines(text: str, prior: list[str]) -> list[str] | None:
+    """The volatility asked a turn before, said per day, hour, week or month: "Express that as
+    daily volatility, and per hour." repeated the previous answer (round 45 hostile, M25)."""
+    if _VOL_UNITS.search(text) is None or not any(
+            re.search(r"\bvol\w*", q, re.I) for q in prior[-2:]):
+        return None
+    named = _named(text, prior) or next((list(_named(q, [])) for q in reversed(prior[-2:])
+                                          if _named(q, [])), [])
+    if not named:
+        return None
+    window = next((_window(q) for q in [text, *reversed(prior[-2:])]
+                   if re.search(r"\b\d+\s*(?:day|week|month)", q, re.I)), 30)
+    annual = _realised(named[0], window)
+    if annual is None:
+        return None
+    name = named[0].removesuffix("USDT")
+    day = annual / math.sqrt(365)
+    lines = [f"Bottom line: {name}'s {window}-day volatility of {annual:.1%} a year is about "
+             f"{day:.2%} a day, {annual / math.sqrt(8760):.3%} an hour, {day * math.sqrt(7):.1%} "
+             f"a week and {day * math.sqrt(30):.1%} a month.",
+             "Each is the yearly figure divided by the square root of the periods in a year (365 "
+             "days, 8,760 hours): a convention that assumes the moves are independent, so it "
+             "understates trending stretches.",
+             "Data: Bitget USDT-futures daily candles (UTC days), log returns."]
+    return lines
+
+
+def typical_move_lines(text: str, prior: list[str]) -> list[str] | None:
+    """The typical move over a stated number of days, from the market's own history: "in 3 days
+    what is the typical move?" got a CPI study (round 45 hostile, M24)."""
+    if _TYPICAL_MOVE.search(text) is None:
+        return None
+    span = _DAYS_SAID.search(text)
+    if span is None:
+        return None
+    n = int(span.group("n") or span.group("n2"))
+    unit = (span.group("u") or span.group("u2") or "day").lower()
+    days = n * (7 if unit.startswith("week") else 1)
+    named = _named(text, prior)
+    if not named or not 1 <= days <= 90:
+        return None
+    from argus.market import history
+
+    try:
+        bars = history.fetch_range(named[0], days=730, interval="1Dutc")
+    except Exception:
+        return None
+    closes = [float(b.close) for b in bars if float(b.close) > 0]
+    if len(closes) < days + 60:
+        return None
+    moves = sorted(abs(b / a - 1) for a, b in zip(closes, closes[days:], strict=False))
+    median = moves[len(moves) // 2]
+    p80 = moves[int(len(moves) * 0.8)]
+    up = sum(1 for a, b in zip(closes, closes[days:], strict=False) if b > a)
+    name = named[0].removesuffix("USDT")
+    return [f"Bottom line: over {days} day{'s' if days != 1 else ''}, {name} has typically moved "
+            f"about {median:.1%} either way (the median), and one stretch in five moved more than "
+            f"{p80:.1%}.",
+            f"It ended higher in {up / len(moves):.0%} of the {len(moves)} overlapping "
+            f"{days}-day stretches; the largest move was {moves[-1]:.1%}.",
+            f"Data: Bitget USDT-futures daily candles, the last {len(closes)} days. Past moves, "
+            f"not a forecast."]
+
+
+_LEVEL_CHANCE: Final = re.compile(
+    r"\b(?:probability|chance|odds|likel\w+)\b[^?]{0,50}\b(?P<dir>above|over|below|under)\s+\$?"
+    r"(?P<v>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k)?\b", re.I)
+_HORIZON_SAID: Final = re.compile(
+    r"\b(?:in|within|over|after)\s+(?:the\s+next\s+)?(?:(?P<n>\d{1,3})|an?|one)\s+(?P<u>hours?|"
+    r"days?|weeks?)\b|\b(?P<w>tomorrow|today|tonight|this\s+week|next\s+week)\b", re.I)
+
+
+def level_chance_lines(text: str, prior: list[str]) -> list[str] | None:
+    """How often the market has been beyond a level after a stated time, from its own moves:
+    "...the exact price BTC will have in one hour ... and the probability it is above 90k" was
+    refused whole, though the second half is a base rate (round 45 hostile, m7). The exact price
+    stays refused; the base rate is answered."""
+    m = _LEVEL_CHANCE.search(text)
+    h = _HORIZON_SAID.search(text)
+    if m is None or h is None:
+        return None
+    named = _named(text, prior)
+    if not named:
+        return None
+    level = float(m.group("v").replace(",", "")) * (1000 if m.group("k") else 1)
+    word = (h.group("w") or "").lower()
+    unit = (h.group("u") or "").lower()
+    n = int(h.group("n")) if h.group("n") else 1
+    hours = (n if unit.startswith("hour") else 24 * n if unit.startswith("day") else
+             168 * n if unit.startswith("week") else 24 if word in ("tomorrow", "today",
+                                                                     "tonight") else 168)
+    from argus.lui.research.parse import last_price
+    from argus.market import history
+
+    try:
+        now = float(last_price(named[0]) or 0)
+        bars = (history.fetch_range(named[0], days=180, interval="1H") if hours < 24 else
+                history.fetch_range(named[0], days=1095, interval="1Dutc"))
+    except Exception:
+        return None
+    closes = [float(b.close) for b in bars if float(b.close) > 0]
+    step = hours if hours < 24 else max(1, hours // 24)
+    if now <= 0 or level <= 0 or len(closes) < step + 100:
+        return None
+    need = level / now - 1
+    above = m.group("dir").lower() in ("above", "over")
+    moves = [b / a - 1 for a, b in zip(closes, closes[step:], strict=False)]
+    hits = sum(1 for x in moves if (x >= need if above else x <= need))
+    name = named[0].removesuffix("USDT")
+    later = (("an hour" if hours == 1 else f"{hours} hours") if hours < 24 else
+             ("a day" if step == 1 else f"{step} days"))
+    stretch = f"{hours}-hour" if hours < 24 else f"{step}-day"
+    exact = re.search(r"\bexact\b|\bwill\s+have\b|\bwhat\s+will\b", text, re.I) is not None
+    out = [("Bottom line: no one can give the exact price — but from " if exact else
+            "Bottom line: from ")
+           + f"{sig(now, 6)} now, being {'above' if above else 'below'} {sig(level, 6)} {later} "
+           f"later needs a {need:+.2%} move, and that happened in {hits / len(moves):.1%} of the "
+           f"{len(moves):,} {stretch} stretches in {name}'s recent history.",
+           "That is a base rate from past moves, not a forecast or a promised probability; the "
+           "price can do what it has not done before."]
+    out.append(f"Data: Bitget USDT-futures {'hourly' if hours < 24 else 'daily'} candles, "
+               f"the last {len(closes):,} {'hours' if hours < 24 else 'days'}.")
+    return out
+
+
+_BEST_WORST: Final = re.compile(
+    r"\b(?:best|worst|biggest|largest)\b[^?]{0,20}\b(?P<span>day|week|month)s?\b", re.I)
+
+
+def best_worst_lines(text: str, prior: list[str]) -> list[str] | None:
+    """A market's best and worst day, week or month, said as the rolling stretch it is: "what was
+    btc's best and worst week" was planned as an order (round 45 newcomer re-check), and an
+    earlier "best week" answer did not say its weeks were rolling 7-day windows (minor 5)."""
+    m = _BEST_WORST.search(text)
+    if m is None or not re.search(r"\b(?:best|worst)\b", text, re.I) or re.search(
+            r"\b(?:time|day)\s+to\s+(?:buy|sell|trade)\b|\bwhich\s+day\b", text, re.I):
+        return None
+    named = _named(text, prior)
+    if not named:
+        return None
+    span = m.group("span").lower()
+    days = {"day": 1, "week": 7, "month": 30}[span]
+    from argus.market import history
+
+    try:
+        bars = history.fetch_range(named[0], days=1095, interval="1Dutc")
+    except Exception:
+        return None
+    rows = [(b.ts.date(), float(b.close)) for b in bars if float(b.close) > 0]
+    if len(rows) < days + 60:
+        return None
+    moves = [(rows[i][0], rows[i + days][0], rows[i + days][1] / rows[i][1] - 1)
+             for i in range(len(rows) - days)]
+    best = max(moves, key=lambda r: r[2])
+    worst = min(moves, key=lambda r: r[2])
+    name = named[0].removesuffix("USDT")
+    label = "day" if days == 1 else f"{days} days in a row"
+    out = [f"Bottom line: {name}'s best {label} over the last {len(rows):,} days was "
+           f"{best[2]:+.1%} ({best[0]:%d %b %Y} to {best[1]:%d %b %Y}), and its worst "
+           f"{worst[2]:+.1%} ({worst[0]:%d %b %Y} to {worst[1]:%d %b %Y})."]
+    sum_said = _stake_said(text, worst[2], best[2])
+    if sum_said:
+        # "how much would 10 million rupiah of SOL lose on its worst day" got percentages only
+        # (round 45 re-ask): the sum stated is moved by both, in its own currency
+        out.append(sum_said)
+    return [*out,
+            (f"These are rolling {days}-day stretches — any {days} days in a row, not calendar "
+             f"{span}s — so they are the most extreme moves a holder could have sat through."
+             if days > 1 else "Close to close on Bitget's daily candles (UTC days)."),
+            "Data: Bitget USDT-futures daily candles. Past moves, not a forecast."]
+
+
+def _stake_said(text: str, worst: float, best: float) -> str | None:
+    """The sum the question states, moved by the worst and the best stretch: dollars, or a local
+    currency at its named rate."""
+    from argus.lui.research import local_money
+
+    held = local_money.amounts(text)
+    if held:
+        a = held[0]
+        return (f"On {a.amount:,.0f} {a.name}: the worst would have taken about "
+                f"{a.amount * -worst:,.0f} {a.name}, the best added about {a.amount * best:,.0f}.")
+    m = re.search(r"\$\s?(?P<v>\d[\d,]*(?:\.\d+)?)\s*(?P<k>k|m)?\b|\b(?P<v2>\d[\d,]*(?:\.\d+)?)\s*"
+                  r"(?P<k2>k|m)?\s*(?:usd|usdt|dollars?|bucks)\b", text, re.I)
+    if m is None:
+        return None
+    unit = (m.group("k") or m.group("k2") or "").lower()
+    stake = float((m.group("v") or m.group("v2")).replace(",", "")) * {
+        "k": 1e3, "m": 1e6}.get(unit, 1.0)
+    if stake < 1:
+        return None
+    return (f"On ${stake:,.0f}: the worst would have taken about ${stake * -worst:,.0f}, the best "
+            f"added about ${stake * best:,.0f}.")
+
+
+def drop_chance_lines(text: str, prior: list[str]) -> list[str] | None:
+    """How often a move of the stated size happened over the stated span: "what's the chance BTC
+    drops 50% tomorrow?" was run as a 50% stress of a book (round 45 hostile, M25)."""
+    m = _DROP_CHANCE.search(text)
+    if m is None:
+        return None
+    named = _named(text, prior)
+    if not named:
+        return None
+    when = m.group("w").lower()
+    days = (int(m.group("n")) if m.group("n") else 7 if "week" in when else 1)
+    pct = float(m.group("p")) / 100
+    down = m.group("v").lower() in ("drop", "fall", "crash", "lose")
+    from argus.market import history
+
+    try:
+        bars = history.fetch_range(named[0], days=1825, interval="1Dutc")
+    except Exception:
+        return None
+    closes = [float(b.close) for b in bars if float(b.close) > 0]
+    if len(closes) < days + 60:
+        return None
+    moves = [b / a - 1 for a, b in zip(closes, closes[days:], strict=False)]
+    hits = sum(1 for x in moves if (x <= -pct if down else x >= pct))
+    extreme = min(moves) if down else max(moves)
+    name = named[0].removesuffix("USDT")
+    span = "a day" if days == 1 else f"{days} days"
+    return [f"Bottom line: a {'fall' if down else 'rise'} of {pct:.0%} or more in {span} happened "
+            f"{hits} time{'s' if hits != 1 else ''} in {len(moves):,} "
+            f"{'one-day' if days == 1 else f'{days}-day'} stretches of "
+            f"{name}'s last {len(closes):,} days ({hits / len(moves):.2%}); the "
+            f"{'worst' if down else 'best'} was {extreme:+.1%}.",
+            "That is how often it has happened, not a forecast: a move bigger than any on record "
+            "is not impossible, only unrecorded here.",
+            "Data: Bitget USDT-futures daily candles (UTC days)."]
+
+
 __all__ = ["ATH_ASKED", "BACK_TO_LEVEL", "BEAR_ASKED", "DEPTH_ASKED", "MOMENTUM_ASKED",
            "RANGE_ASKED", "REALISED_VOL", "VOLUME_COMPARED", "ath_lines", "bear_market_lines",
-           "depth_lines", "momentum_lines", "range_lines", "realised_vol_lines", "volume_lines"]
+           "best_worst_lines", "depth_lines", "drop_chance_lines", "level_chance_lines",
+           "momentum_lines", "range_lines", "realised_vol_lines", "typical_move_lines",
+           "vol_units_lines", "volume_lines"]
 
 trace_module(globals())

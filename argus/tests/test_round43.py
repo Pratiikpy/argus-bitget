@@ -21,10 +21,11 @@ def _ticker(last: float, bid: float | None = None, ask: float | None = None,
 
 
 class TestUnitsAsStated:
-    def test_a_rate_per_hour_is_annualised_per_hour(self) -> None:
-        from argus.lui.research.unit_checks import per_period
+    def test_a_rate_per_hour_is_annualised_per_hour(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui.research import unit_checks
 
-        said = per_period("Funding is 0.01% per hour on BTC. What is that per year?")
+        monkeypatch.setattr(unit_checks, "_ticker", lambda s: None)  # no live funding read
+        said = unit_checks.per_period("Funding is 0.01% per hour on BTC. What is that per year?")
         assert said is not None and "87.60% a year simple" in said[0]
         assert "eight-hour" in said[1]
 

@@ -132,9 +132,11 @@ STALE_AFTER_HOURS = 2
 
 
 def _staleness(summary: Mapping[str, Any], now: Any = None) -> str:
-    """A pill saying how old the published record is, when it is older than the publisher's
-    hourly cycle: the page said "recomputed hourly" beside a record five hours old (a judge, round
-    21; the publisher had stopped while the disk was full)."""
+    """A calm one-line note saying how old the published record is, when it is older than the
+    publisher's hourly cycle. The page said "recomputed hourly" beside a record five hours old (a
+    judge, round 21; the publisher had stopped while the disk was full). Round 45, minor 6: as a
+    red pill beside the header it was the first thing a judge read, so it is now a note under
+    the header and still said."""
     from datetime import UTC, datetime
 
     try:
@@ -144,8 +146,9 @@ def _staleness(summary: Mapping[str, Any], now: Any = None) -> str:
     hours = ((now or datetime.now(UTC)) - made).total_seconds() / 3600
     if hours < STALE_AFTER_HOURS:
         return ""
-    return (f"<span class='pill red'>{hours:.0f} hours old — the hourly publish has not run "
-            f"since; the agent's own log keeps running</span>")
+    return (f"<p class='dim stale' role='note'>Published record is {hours:.0f} hours old: the "
+            f"hourly publish has not run since. The agent's own log keeps running, so the figures "
+            f"below lag it.</p>")
 
 
 def narration_check(row: Mapping[str, Any]) -> str | None:
@@ -231,7 +234,7 @@ def render(fetch: Fetch = fetch_json) -> str:
             f"<span class='mono'>genesis {escape(genesis[:12])}… · "
             f"{escape(str(ledger.get('first_ts', ''))[:16])}Z</span>"
             f"<span class='mono dim'>published {escape(str(summary.get('generated_at', ''))[:16])}"
-            f"Z</span>{_staleness(summary)}</div>"
+            f"Z</span></div>{_staleness(summary)}"
             f"<h2>Scored so far</h2>"
             f"{_metrics(summary.get('metrics') or {}, summary.get('expected_envelope') or {})}"
             f"<p class='dim'>The right-hand column was committed in the genesis event before the "
@@ -247,9 +250,10 @@ def render(fetch: Fetch = fetch_json) -> str:
 <style>{design.TOKENS_CSS}
   .facts {{ display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; margin:18px 0 8px }}
   .mono {{ font:12.5px/1.4 var(--mono) }} .dim {{ color:var(--dim) }}
+  .stale {{ margin:0 0 4px; font-size:13px }}
   h2 {{ font-size:18px; margin:34px 0 10px }}
   table.m {{ width:100%; border-collapse:collapse; font-size:14.5px }}
-  table.m th {{ text-align:left; font:600 11px/1.4 var(--mono); letter-spacing:.1em;
+  table.m th {{ text-align:left; font:600 12px/1.4 var(--mono); letter-spacing:.1em;
     text-transform:uppercase; color:var(--dim); padding:8px 10px;
     border-bottom:1px solid var(--line) }}
   table.m td {{ padding:10px; border-bottom:1px solid var(--line); vertical-align:top }}

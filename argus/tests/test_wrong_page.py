@@ -89,7 +89,7 @@ class TestTheLivePageKeepsItsPromises:
         found = collect(DATA)
         page = render(found)
         plain_at = page.index("<div class='plain'>")
-        first_entry_at = page.index("<article class='c ")
+        first_entry_at = page.index("<details class='c ")
         assert plain_at < first_entry_at
         box = page[plain_at:page.index("</div>", plain_at)]
         assert "trading tool that only tells you what went right" in box
@@ -117,3 +117,29 @@ def test_a_removed_capability_is_listed_with_its_reason() -> None:
     assert out[0].headline == "Removed from the register on 2026-09-29 (IMPLEMENTED): A row"
     assert "It serves no flow." in out[0].detail and "a flow that uses it" in out[0].detail
     assert out[0].kind == "withdrawn"
+
+
+class TestRound45Minors:
+    """Round 45 visual audit, minors 4 and 7."""
+
+    def test_backticks_become_code_and_none_is_left_literal(self) -> None:
+        from argus.lui.corrections_page import _prose
+
+        said = _prose("`paper/runner.py` recorded <b>")
+        assert said == "<code>paper/runner.py</code> recorded &lt;b&gt;"
+
+    def test_a_cut_tail_is_taken_back_to_a_whole_word_or_sentence(self) -> None:
+        from argus.lui.corrections_page import _whole
+
+        assert _whole("A day-clustere...") == "A…"
+        assert _whole("Whole text.") == "Whole text."
+        long = "First sentence ends here. second sentence runs on until it is cut mid-wor..."
+        assert _whole(long).endswith("cut…")
+        sentence = "One full sentence of some length that matters. Tail frag..."
+        assert _whole(sentence) == "One full sentence of some length that matters. …"
+        assert "..." not in _whole(long)
+
+    def test_every_entry_folds_behind_its_headline(self) -> None:
+        page = render(collect(DATA))
+        assert page.count("<details class='c ") == len(collect(DATA))
+        assert "<article" not in page

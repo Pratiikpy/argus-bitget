@@ -516,11 +516,21 @@ def for_you(concept: Concept, text: str) -> str | None:
                   f"Ask \"how much BTC can I lose in a day\" to see how often moves that size "
                   f"have happened.")
     if concept.name == "stop loss" and re.search(r"\b(?:do|should|would)\s+i\s+(?:need|use|"
-                                                   r"want|get|set)\b", text, re.I):
-        return ("For you: with leverage, yes — a stop is what turns a bad move into a capped loss "
-                "instead of a liquidation. Without leverage it is a choice: it caps the loss at a "
-                "level you decide in advance, at the cost of sometimes being stopped out by "
-                "ordinary noise before the price recovers. Ask \"where should my stop go on "
+                                                   r"want|get|set)\b|\bnecessary\b|\bneeded\b|"
+                                                   r"\bmust\s+i\b|\bhave\s+to\s+(?:use|set|have)\b"
+                                                   r"|\brequired\b", text, re.I):
+        # "For you: with leverage, yes" opened the answer to a question that never mentioned
+        # leverage (a first-time user, round 45): the case asked about comes first.
+        levered = bool(re.search(r"\blever|\bmargin\b|\b\d+(?:\.\d+)?\s*x\b|\bperp", text, re.I))
+        bought = ("with leverage, yes — a stop is what turns a bad move into a capped loss "
+                  "instead of a liquidation. Without leverage it is a choice")
+        plain = "buying without leverage, a stop is optional"
+        tail = ((": " if levered else " — ")
+                + "it caps the loss at a level you decide in advance, at the cost of sometimes "
+                "being stopped out by ordinary noise before the price recovers"
+                + ("." if levered else "; with leverage it stops being optional — it is what "
+                   "turns a bad move into a capped loss instead of a liquidation."))
+        return (f"For you: {bought if levered else plain}{tail} Ask \"where should my stop go on "
                 "NVDA\" for one placed outside its usual swing.")
     return None
 
@@ -541,6 +551,7 @@ def concept_asked(text: str, named_symbols: tuple[str, ...] = ()) -> Concept | N
     text = re.sub(r"\b(what\s+(?:does|do|is)\s+.+?\s+)(?:men|meen|mena|mea|maen)\b", r"\1mean",
                   text, flags=re.I)
     text = re.sub(r"\bdiff\b", "difference", text, flags=re.I)
+    text = re.sub(r"\bwhat\s+(?:even|exactly)\s+(is|are)\b", r"what \1", text, flags=re.I)
     if not re.search(r"\bleverag", text, re.I):
         # "is 50x safe if i only put $20" was declined: a bare multiple is leverage (round 23)
         text = re.sub(r"\b(\d+(?:\.\d+)?)\s*x\b", r"\1x leverage", text, count=1, flags=re.I)
@@ -598,6 +609,13 @@ def concept_asked(text: str, named_symbols: tuple[str, ...] = ()) -> Concept | N
         needs = re.match(rf"\s*what(?:'s|\s+is|\s+are)\s+(?:an?\s+)?{term}s?\b[^?]{{0,40}}\b(?:do|"
                          rf"should|would)\s+i\s+(?:need|use|want|get|set)\b", text, re.I)
         if needs is not None and not named_symbols:
+            return concept
+        # "is a stop loss necessary for me? what even is it" and "stop loss, what is it" name the
+        # term first and ask what "it" is after (round 45 re-ask: declined)
+        pointed = re.search(rf"\b{term}s?\b[^?]{{0,60}}?[?.!,:\s-]+\s*(?:so\s+|and\s+|but\s+)?"
+                            r"what\s+(?:even\s+|exactly\s+)?(?:is|are)\s+(?:it|that|they|those|"
+                            r"this)\b", text, re.I)
+        if pointed is not None and not named_symbols:
             return concept
     return None
 

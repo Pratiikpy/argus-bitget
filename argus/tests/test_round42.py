@@ -315,8 +315,13 @@ class TestAnswersThatWereMissing:
 
 
 class TestEarlierRound42Readers:
-    def test_a_newcomer_safety_question_is_answered_first(self) -> None:
+    def test_a_newcomer_safety_question_is_answered_first(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
         from argus.lui.beginner import early
+
+        # the leverage answer counts how often Bitcoin moved from its daily closes (round 45)
+        monkeypatch.setattr("argus.lui.research.rule_test.daily_closes",
+                            lambda symbol: ([], [], ""))
 
         said = early("what is a seed phrase and should I share it", [])
         assert said is not None and "seed phrase" in said[0]

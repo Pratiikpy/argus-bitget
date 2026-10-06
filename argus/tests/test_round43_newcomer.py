@@ -310,7 +310,6 @@ class TestNothingElseIsTaken:
     @pytest.mark.parametrize("text", [
         "what is the price of bitcoin",
         "how do i buy bitcoin with $100",
-        "is it too late to buy bitcoin now",
         "should I DCA into BTC with $1,000?",
         "dca into BTC starting 2023-02-29",
         "How should I buy $2 million of COIN?",

@@ -1218,15 +1218,31 @@ def _impact_lines(report: CopilotReport, request: ResearchRequest,
             # round alike are said to a tenth of a point
             close = f"{ceiling:.0%}" == f"{request.size:.0%}"
             places = ".1%" if close else ".0%"
-            lines.append(
-                f"Bottom line: to keep {add} under {request.budget:.0%} of book risk"
-                + (" (your budget)" if request.budget_stated else _default_budget(request))
-                + ", size it at no "
-                f"more than {ceiling:{places}} — the {request.size:{places}} "
-                + ("proposed" if request.size_stated else "worked here as a default (no size was "
-                   "given)")
-                + f" is {verdict} that budget."
-            )
+            b0, b1 = impact.beta_before, impact.beta_after
+            if request.size_stated and share is not None and request.target is None:
+                # "what does adding 20% TSLA do to my risk?" led with a 45-word sizing rule and
+                # the effect three lines down (round 45 visual, M4): the effect leads, the rule
+                # follows in a clause
+                lines.insert(0, (
+                    f"Bottom line: adding {request.size:.0%} {add} "
+                    + (f"takes the book's beta from {b0:.2f} to {b1:.2f}, and " if b0 is not None
+                       and b1 is not None else "")
+                    + f"{add} would carry {share:.0%} of your total risk — {verdict} "
+                    + (f"your budget of {request.budget:.0%}" if request.budget_stated else
+                       f"the {request.budget:.0%} budget used by default")
+                    + f"; the most it could take within it is {ceiling:{places}}."))
+                lines[:] = [lines[0], *[x for x in lines[1:]
+                                        if not x.startswith(f"At {final:.0%} of the book")]]
+            else:
+                lines.append(
+                    f"Bottom line: to keep {add} under {request.budget:.0%} of book risk"
+                    + (" (your budget)" if request.budget_stated else _default_budget(request))
+                    + ", size it at no "
+                    f"more than {ceiling:{places}} — the {request.size:{places}} "
+                    + ("proposed" if request.size_stated else "worked here as a default (no size "
+                       "was given)")
+                    + f" is {verdict} that budget."
+                )
         elif share is not None and held:
             # Already held and already over budget, so no add fits; the useful number is the
             # weight to trim to (`desk/portfolio.resize`), not "even a 1% position".

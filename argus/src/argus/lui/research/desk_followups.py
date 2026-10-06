@@ -50,6 +50,14 @@ def earnings_lines(text: str, prior: Sequence[str]) -> list[str] | None:
     from argus.lui.research.earnings_moves import next_report_line
     from argus.lui.research.parse import is_us_equity
 
+    if re.search(r",?\s+and\s+(?:is|are|what|where|how|which|does|do)\b|\?\s+\S", text, re.I):
+        from argus.lui.multistep import parts
+
+        if parts(text):
+            # "where is NVDA trading and when does it report earnings, and is TSLA riskier than
+            # NVDA" came back as the earnings date alone (round 45 visual, M3): a question of
+            # several parts belongs to the multi-part reader, which answers each
+            return None
     beat = re.search(r"\b(?:did|does)\s+[^?]{0,20}\bbeat\s+(?:earnings|estimates|expectations|"
                      r"consensus|the\s+street|eps)\b|\b(?:earnings|eps)\s+(?:beat|miss)|"
                      r"\bbeat\s+(?:estimates|expectations|consensus)|\beps\b[^?]{0,30}\b(?:last|"
@@ -493,7 +501,30 @@ def book_vol_lines(text: str, prior: Sequence[str], book: str) -> list[str] | No
     if not (asks and (source is not None or re.search(r"\bmy\s+(?:book|portfolio)\b", text,
                                                        re.I))) and not (alone and vol_before):
         return None
-    weights = parse_book(source) if source is not None else parse_book(book)
+    added = re.search(r"\badd(?:ing)?\s+(?P<w>\d+(?:\.\d+)?)\s*%\s*(?:of\s+)?"
+                      r"(?P<n>\$?[A-Za-z]{2,10})\b[^?]{0,20}\b(?:to|into)\s+(?:my\s+|the\s+)?"
+                      r"(?:book|portfolio)\b", text, re.I)
+    added_note = ""
+    before: dict[str, float] = {}
+    if added is not None and book.strip():
+        # "Add 20% SOL to my book" with a book of 50% BTC, 70% ETH was measured as SOL alone
+        # (round 45 hostile, C7): the book given, plus the addition, at the weights as stated
+        weights: dict[str, float] = {}
+        for pct, name in re.findall(r"(\d+(?:\.\d+)?)\s*%\s*\$?([A-Za-z]{2,10})\b",
+                                    f"{book}, {added.group('w')}% {added.group('n')}"):
+            found = parse_book(f"100% {name}") or {}
+            for s in found:
+                weights[s] = weights.get(s, 0.0) + float(pct) / 100
+        for pct, name in re.findall(r"(\d+(?:\.\d+)?)\s*%\s*\$?([A-Za-z]{2,10})\b", book):
+            for s in parse_book(f"100% {name}") or {}:
+                before[s] = before.get(s, 0.0) + float(pct) / 100
+        gross = sum(weights.values())
+        if gross > 1.0001:
+            added_note = (f"Read as stated: the book given plus {added.group('w')}% "
+                          f"{added.group('n').upper()} is {gross:.0%} of your money in positions, "
+                          f"so {gross - 1:.0%} borrowed; restate it if that is not what you hold.")
+    else:
+        weights = parse_book(source) if source is not None else parse_book(book)
     if not weights:
         return None
     # "60% BTC, 25% ETH, 15% USDT" is 15% cash: the stated stablecoin share scales the rest down,
@@ -520,6 +551,12 @@ def book_vol_lines(text: str, prior: Sequence[str], book: str) -> list[str] | No
     names = ", ".join(f"{s.removesuffix('USDT')} {w:.0%}" for s, w in weights.items())
     lines = [f"Bottom line: your book's volatility over the last {days} days is about "
              f"{book_vol:.0%} a year ({book_vol / 365 ** 0.5:.1%} on a typical day)."]
+    if before and all(sym in series for sym in before):
+        before_vol = _vol([sum(w * series[sym][d] for sym, w in before.items()) for d in common])
+        lines = [f"Bottom line: with {added.group('w') if added else ''}% "
+                 f"{added.group('n').upper() if added else ''} added, your book's volatility over "
+                 f"the last {days} days is about {book_vol:.0%} a year, against {before_vol:.0%} "
+                 f"before the addition ({book_vol / 365 ** 0.5:.1%} on a typical day)."]
     other = _names((alone.group("n") or alone.group("n2")) if alone else "")
     if other:
         alone_vol = _vol([r for d, r in _daily_returns(other[0], days).items() if d in common])
@@ -532,6 +569,8 @@ def book_vol_lines(text: str, prior: Sequence[str], book: str) -> list[str] | No
                     else "") + "."]
     lines.append(f"Book: {names}" + (f", {cash:.0%} cash at zero" if cash > 0.01 else "")
                  + f"; {len(common)} daily returns, Bitget daily candles, weights held fixed.")
+    if added_note:
+        lines.insert(1, added_note)
     lines.append("Volatility is the standard deviation of the book's daily returns times the "
                  "square root of 365; it measures the size of the swings, not their direction.")
     return lines
