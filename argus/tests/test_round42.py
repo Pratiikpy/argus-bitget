@@ -506,3 +506,14 @@ class TestBookSizeWords:
         assert priced is not None and priced.value == pytest.approx(1_000_000)
         assert priced.cash == pytest.approx(0.7)
         assert any("read as cash, as stated" in line for line in priced.lines)
+
+
+def test_a_weight_to_add_is_the_trade_not_a_holding() -> None:
+    """The README's first question, "I hold 40% NVDA, 30% MSFT, 30% AAPL — should I add 15%
+    TSLA?", was told its weights summed to 115% beside the add engine's own after-trade weights."""
+    from argus.lui.server import _weights_over
+
+    assert _weights_over("I hold 40% NVDA, 30% MSFT, 30% AAPL — should I add 15% TSLA?") is None
+    assert _weights_over("I hold 50% NVDA, 50% AAPL, what if I'm adding 10% XOM") is None
+    over = _weights_over("I hold 70% NVDA, 60% MSFT — should I add 15% TSLA?")
+    assert over is not None and over[0] == 130.0

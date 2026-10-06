@@ -711,7 +711,7 @@ python -m argus.market.skills --symbol NVDAUSDT
 And to check the whole thing is what this document says it is:
 
 ```bash
-pytest                    # 13,568 tests
+pytest                    # 13,569 tests
 python -m argus.status    # 152/152 modules importable, 18/18 sub-themes, artefacts on disk
 ```
 
@@ -1371,8 +1371,8 @@ route to it — is now what the layer sees.
 
 ## Part 13 — What we cannot do on Track 2, said plainly
 
-- **Two settled trades, both losses.** Seq 797 closed on 2026-09-29 at a 1.78 USDT loss and seq 884
-  on 2026-10-01 at 4.45 USDT; the scored half of the track needs many more before a Sharpe, a drawdown or a win rate means anything.
+- **4 settled trades, all losses, -7.27 USDT net.** Seq 797 closed on 2026-09-29 at a 1.78 USDT
+  loss, seq 884 on 2026-10-01 at 4.45 USDT, and seqs 975 and 984 on 2026-10-03 at 0.88 and 0.16 USDT; the scored half of the track needs many more before a Sharpe, a drawdown or a win rate means anything.
 - **Zero certified factors.** The lab found none worth trading and says so.
 - **Analysts run one after another**, and the record labels their agreement as possible contagion.
 - **No checkpoint and resume** of an interrupted cycle.
@@ -1767,7 +1767,7 @@ takes, and every artefact the system writes.
 |---|---|
 | Source modules | **694** files across **20 packages** (2026-09-27) |
 | Registered and importable | **152/152** (`python -m argus.status` checks this at runtime) |
-| Test files / tests | **458 files**, **13,568 tests collected** |
+| Test files / tests | **526 files**, **13,569 tests collected** |
 | Type and lint | `ruff` clean, `mypy --strict` clean on **691 source files** |
 | Artefacts written | **980** files under `argus/data/` |
 | Code-level teardowns of other people's systems | **56** under `research/architecture/` |
@@ -2416,7 +2416,7 @@ source is a build failure, not a typo.
 | Source modules | 694 files, 20 packages; `mypy --strict` clean on 691 source files |
 | Runtime dependencies | **two** — pydantic, python-dateutil. No numpy, pandas or scipy |
 | Modules registered and importable | 152/152 modules importable |
-| Tests | 13,568 tests collected, `ruff` clean |
+| Tests | 13,569 tests collected, `ruff` clean |
 | Sub-themes resolving at runtime | 18/18 sub-themes |
 | Artefacts on disk | 980 files under `argus/data/`, every one produced by running something |
 | Code-level teardowns of other systems | 62, each citing file and line |
@@ -3364,6 +3364,6 @@ UNREACHED stays a fact about this proposal rather than about the code.
    at a 5% false-discovery rate. The single result that survived the softer gate is the one the
    overfitting test condemns hardest, at 0.77. The pre-registered explanation for having no trades
    was refuted by our own replay harness, and the measurement that replaced it says the binding
-   constraint is the desk's confidence, not its costs. Two trades have settled, both losses. Every one of those
+   constraint is the desk's confidence, not its costs. Four trades have settled, all losses. Every one of those
    is in a file on disk, next to the machinery that found it — and that is the reason to believe
    the rest.

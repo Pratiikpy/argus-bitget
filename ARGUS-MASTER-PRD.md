@@ -170,7 +170,7 @@ Invalid submission: missing a compliant X post, the project description, or acce
 
 Rule 3 forbids porting an S1 entry with only renaming or minor edits, and requires describing **substantive new additions**, with judging evaluating the new content.
 
-NightDesk (the author's S1 entry, featured on the official S2 landing page) graded *decisions* against the NYSE open with Ed25519 signing and 15 hard gates. ARGUS is not that. ARGUS decomposes *edge* across a closed window into information / timing / execution / luck, and feeds that decomposition back into how much authority an agent holds. Studying our own prior architecture, reusing our own code, and carrying forward what we learned is entirely legitimate; the submission will state plainly what is new. That statement is a scoring asset, not a liability.
+NightDesk (the author's S1 entry, featured on the official S2 landing page) graded *decisions* against the NYSE open with Ed25519 signing and 15 hard gates. ARGUS is not that. ARGUS decomposes *edge* across a closed window into information / timing / execution / luck, and feeds that decomposition back into how much authority an agent holds. Studying our own prior architecture and carrying forward what we learned is entirely legitimate; ARGUS is a new codebase and carries none of NightDesk's code; the submission will state plainly what is new. That statement is a scoring asset, not a liability.
 
 ---
 

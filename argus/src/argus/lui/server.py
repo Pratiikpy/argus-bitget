@@ -2364,14 +2364,23 @@ def _names_left_out(text: str, payload: dict[str, Any]) -> str:
             "contract list — so the answer covers the rest; check the spelling.")
 
 
+_ADD_VERB_BEFORE: Final = re.compile(
+    r"\b(?:add(?:ing)?|buy(?:ing)?|put(?:ting)?\s+in|allocat(?:e|ing)|throw\s+in)\s+(?:an?\s+)?"
+    r"(?:extra\s+|another\s+|more\s+)?$", re.I)
+
+
 def _weights_over(text: str) -> tuple[float, list[tuple[str, float]]] | None:
     """(sum, parts) when the holdings a question states add to more than 100% with no cash or
     borrowing line making them add up; None otherwise. Leveraged books written with signs or a
-    negative cash line ("150% NVDA, -50% cash") are the signed-book reader's, and add up."""
+    negative cash line ("150% NVDA, -50% cash") are the signed-book reader's, and add up. A weight
+    the question proposes to add ("should I add 15% TSLA?") is the trade, not a holding: the add
+    engine already reads it as the new name's share of the book after the trade, and counting it
+    here told a 100% book it summed to 115% beside that engine's own after-trade weights."""
     parts = [(m.group(2).rstrip("."), float(m.group(1))) for m in re.finditer(
         r"(?<![\d.-])(\d{1,3}(?:\.\d+)?)\s*%\s*(?:of\s+(?:my\s+)?(?:book|portfolio)\s+(?:in\s+)?)?"
         r"([A-Za-z][\w.]{0,9})", text)
-        if m.group(2).lower() not in _NOT_A_HOLDING]
+        if m.group(2).lower() not in _NOT_A_HOLDING
+        and not _ADD_VERB_BEFORE.search(text[max(0, m.start() - 24):m.start()])]
     parts += [(m.group(1), float(m.group(2)) * 100) for m in re.finditer(
         r'"([A-Z][A-Z0-9.]{0,9})"\s*:\s*(0?\.\d+|1(?:\.0+)?)\b', text)]
     if len(parts) < 2 or re.search(r"-\s*\d{1,3}(?:\.\d+)?\s*%|\bshort\b|\bborrow\w*|\bmargin\b|"

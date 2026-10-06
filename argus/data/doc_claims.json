@@ -1,10 +1,10 @@
 {
-  "total": 111,
-  "checked": 111,
-  "ok": 111,
+  "total": 112,
+  "checked": 112,
+  "ok": 112,
   "lagging": 0,
   "stale": 0,
-  "absent": 61,
+  "absent": 60,
   "deleted": 0,
   "unchecked": 0,
   "findings": [
@@ -13,52 +13,52 @@
       "doc": "readme",
       "line": 55,
       "quoted": [
-        "13,568"
+        "13,569"
       ],
       "live": [
-        13568
+        13569
       ],
       "status": "OK",
-      "excerpt": "13,568 tests collected"
+      "excerpt": "13,569 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 289,
       "quoted": [
-        "13,568"
+        "13,569"
       ],
       "live": [
-        13568
+        13569
       ],
       "status": "OK",
-      "excerpt": "13,568 tests collected"
+      "excerpt": "13,569 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 293,
       "quoted": [
-        "13,568"
+        "13,569"
       ],
       "live": [
-        13568
+        13569
       ],
       "status": "OK",
-      "excerpt": "13,568 tests collected"
+      "excerpt": "13,569 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "public-readme",
       "line": 313,
       "quoted": [
-        "13,568"
+        "13,569"
       ],
       "live": [
-        13568
+        13569
       ],
       "status": "OK",
-      "excerpt": "13,568 tests collected"
+      "excerpt": "13,569 tests collected"
     },
     {
       "claim": "tests_passing",
@@ -66,7 +66,7 @@
       "line": null,
       "quoted": [],
       "live": [
-        13568
+        13569
       ],
       "status": "ABSENT",
       "excerpt": "document not found"
@@ -76,52 +76,52 @@
       "doc": "explained",
       "line": 714,
       "quoted": [
-        "13,568"
+        "13,569"
       ],
       "live": [
-        13568
+        13569
       ],
       "status": "OK",
-      "excerpt": "13,568 tests"
+      "excerpt": "13,569 tests"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 1770,
       "quoted": [
-        "13,568"
+        "13,569"
       ],
       "live": [
-        13568
+        13569
       ],
       "status": "OK",
-      "excerpt": "13,568 tests collected"
+      "excerpt": "13,569 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "explained",
       "line": 2419,
       "quoted": [
-        "13,568"
+        "13,569"
       ],
       "live": [
-        13568
+        13569
       ],
       "status": "OK",
-      "excerpt": "13,568 tests collected"
+      "excerpt": "13,569 tests collected"
     },
     {
       "claim": "tests_passing",
       "doc": "architecture",
       "line": 13,
       "quoted": [
-        "13,568"
+        "13,569"
       ],
       "live": [
-        13568
+        13569
       ],
       "status": "OK",
-      "excerpt": "13,568 tests collected"
+      "excerpt": "13,569 tests collected"
     },
     {
       "claim": "source_files",
@@ -510,7 +510,7 @@
     {
       "claim": "refusal_accuracy_2h",
       "doc": "public-readme",
-      "line": 349,
+      "line": 350,
       "quoted": [
         "365",
         "660"
@@ -538,7 +538,7 @@
     {
       "claim": "refusal_forgone_2h",
       "doc": "public-readme",
-      "line": 350,
+      "line": 351,
       "quoted": [
         "-9.11"
       ],
@@ -1046,7 +1046,7 @@
     {
       "claim": "standing_total_zh",
       "doc": "public-readme",
-      "line": 365,
+      "line": 366,
       "quoted": [
         "51"
       ],
@@ -1073,7 +1073,7 @@
     {
       "claim": "standing_states_zh",
       "doc": "public-readme",
-      "line": 365,
+      "line": 366,
       "quoted": [
         "6",
         "37",
@@ -1242,13 +1242,15 @@
     {
       "claim": "settled_trades",
       "doc": "explained",
-      "line": null,
-      "quoted": [],
+      "line": 1374,
+      "quoted": [
+        "4"
+      ],
       "live": [
         4
       ],
-      "status": "ABSENT",
-      "excerpt": ""
+      "status": "OK",
+      "excerpt": "4 settled trades"
     },
     {
       "claim": "anchors_confirmed",

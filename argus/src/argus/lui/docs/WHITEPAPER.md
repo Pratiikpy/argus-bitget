@@ -416,11 +416,11 @@ The 81.7% figure is the honest headline for a visitor on the public console once
 
 | Check | Result |
 |---|---|
-| Tests collected | 13,567, collected on 6 October 2026 with outbound network blocked |
-| Tests passing | 13,249 passed, 77 skipped, 0 failed of 13,567 collected on 6 October 2026 in a clean checkout with every outbound connection refused, the 240 network tests run apart |
+| Tests collected | 13,569, collected on 6 October 2026 with outbound network blocked |
+| Tests passing | 13,249 passed, 77 skipped, 0 failed of 13,569 collected on 6 October 2026 in a clean checkout with every outbound connection refused, the 240 network tests run apart |
 | Static types | `mypy --strict` clean on 690 source files |
 | Modules | 152/152 registered modules importable; 18/18 named sub-themes resolve to a module and a test file, which is coverage, not a claim to lead them |
-| Quoted figures | `python -m argus.eval.docclaims` checked 103 of 111 figures quoted in the public documents against their artefacts on 6 October 2026: 0 stale, 0 lagging, 8 unchecked |
+| Quoted figures | `python -m argus.eval.docclaims` checked all 112 figures quoted in the public documents against their artefacts on 6 October 2026: 0 stale, 0 lagging, 0 unchecked |
 | Code-level teardowns of external systems | 56, each citing `file:line` |
 
 ## 7. Safety and honesty
@@ -454,7 +454,7 @@ From the engine underneath (`README.md`, "What the code will not let happen"): a
 - **Understanding is imperfect.** 81.7% of blind questions are read correctly without a model; questions about the desk's own record are weakest at 73.5%, and Arabic is the kind model's weakest language.
 - **Bitget's toolkit answers poorly from this network.** 2 of 19 `bitget-signal` tools were reliable in the latest three-attempt sweep, and `bitget-mcp-server`'s equity quote was not answering on 6 October 2026. The console falls back to the public source a Skill names and says so.
 - **No certified alpha.** All 8 vetted factor primitives are indistinguishable from shuffled data over 2,159 NVDA bars, none clears a single gate, and all 8 lose money after the 12bps round trip (`argus/data/overfit_gates.json`). The console says "no measured edge" when nothing it measured favours entering.
-- **The paper desk is not a track record.** It has settled two valid trades, both losses (two further rows are void because they record fills the risk layer had refused); Sharpe, drawdown and win rate are undefined at that sample and printed as undefined. It is not offered as evidence for this entry.
+- **The paper desk is not a track record.** It has settled four valid trades, all losses, -7.27 USDT net (two further rows are void because they record fills the risk layer had refused); Sharpe, drawdown and win rate are undefined at that sample and printed as undefined. It is not offered as evidence for this entry.
 - **Eight capabilities are LOST** and 52 register conditions are claimed without evidence on TIED and LOST rows.
 - **Options, macro and the newcomer layer** have no same-input rival comparison in the register.
 - **Translation fidelity** is checked line by line in production (numbers must match), but no systematic benchmark of translation quality exists.
