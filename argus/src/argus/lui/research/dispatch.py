@@ -2115,24 +2115,37 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                 stated_value = float(held_sum.group("v").replace(",", "")) * (
                     1000 if held_sum.group("k") else 1)
             itself = set(request.book) == {shocked}
+            # "I keep 40% in AAPL — what if AAPL drops 8%? I hold $10k" was read as a book of
+            # AAPL alone and moved 8% (round 45 live re-ask): one name held at a stated share
+            # leaves the rest in cash, which does not move
+            held_share = 1.0
+            if len(request.book) == 1:
+                only = re.escape(next(iter(request.book)).removesuffix("USDT"))
+                said_share = re.search(rf"\b(\d+(?:\.\d+)?)\s*%\s*(?:in|of|into)?\s*{only}\b|"
+                                       rf"\b{only}\b\s*[:=]?\s*(\d+(?:\.\d+)?)\s*%(?!\s*"
+                                       rf"(?:drop|fall|crash|move|rise|gain))", raw_text, re.I)
+                if said_share is not None:
+                    pct = float(said_share.group(1) or said_share.group(2)) / 100
+                    held_share = pct if 0 < pct < 1 else 1.0
             for outcome in outcomes:
                 if outcome.portfolio_move_pct is None:
                     lines.append(f"{outcome.shock}: unavailable — {outcome.reason}")
                     continue
                 worst = outcome.worst_position
                 lead_here = stated_leads and outcome is outcomes[0]
+                book_move = outcome.portfolio_move_pct * held_share
                 # said as a loss or a gain: "(about $5,627 of $46,894)" read the same either way
-                in_money = (f" (a {'loss' if outcome.portfolio_move_pct < 0 else 'gain'} of about "
-                            f"${abs(outcome.portfolio_move_pct) / 100 * stated_value:,.0f}"
+                in_money = (f" (a {'loss' if book_move < 0 else 'gain'} of about "
+                            f"${abs(book_move) / 100 * stated_value:,.0f}"
                             + (f", {local}" if (local := asked_currency_amount(
-                                raw_text, abs(outcome.portfolio_move_pct) / 100 * stated_value))
+                                raw_text, abs(book_move) / 100 * stated_value))
                                else "")
                             + f" on ${stated_value:,.0f})" if stated_value else "")
                 lines.append(
                     ("Bottom line: " if lead_here else "")
                     + f"If {shocked_name} moves {outcome.shock.removeprefix('benchmark ')}: your "
                     f"book moves "
-                    f"about {outcome.portfolio_move_pct:+.2f}%{in_money}"
+                    f"about {book_move:+.2f}%{in_money}"
                     # the stress engine keeps the lowest move: under a rally that is the
                     # smallest gain, and "biggest move" named it (a hostile review, row 645)
                     + (f", {'hardest hit' if worst[1] < 0 else 'smallest gain'} "
@@ -2144,6 +2157,10 @@ def _run(raw_text: str, request: ResearchRequest, *, ledger: Any = None) -> Answ
                     # beta" read as a model where there is only arithmetic (round 45)
                     + ("." if itself else " (market-driven part only, through each beta).")
                 )
+                if held_share < 1 and outcome is outcomes[0]:
+                    lines.append(f"Read as {held_share:.0%} of the money in "
+                                 f"{next(iter(request.book)).removesuffix('USDT')} and the other "
+                                 f"{1 - held_share:.0%} in cash, which does not move.")
                 if (lead_here and shocked in request.book and len(request.book) > 1
                         and outcome is outcomes[0]):
                     # "if bitcoin halves, how much do I lose?" on $40k gold and $10k bitcoin was

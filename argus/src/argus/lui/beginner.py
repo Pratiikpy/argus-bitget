@@ -2406,7 +2406,11 @@ _WHAT_AND_SHOULD: Final = re.compile(
     r"\b(?:what(?:'?s|\s+is|\s+are)|explain|tell\s+me\s+about)\b[^?]{0,40}?\b(?:and|,|but)\s+"
     r"(?:should\s+i|do\s+i|can\s+i|would\s+it\s+be\s+(?:a\s+)?(?:good|smart|wise)|is\s+it\s+(?:a\s+)?"
     r"(?:good|smart|wise|worth))\b[^?]{0,40}\b(?:buy|invest\w*|put\s+(?:my\s+|some\s+|the\s+)?"
-    r"(?:money|savings|cash)|put\s+[^?]{0,25}\b(?:in|into)|get\s+(?:in|some)|idea|investment)\b",
+    r"(?:money|savings|cash)|put\s+[^?]{0,25}\b(?:in|into)|get\s+(?:in|some)|idea|investment)\b|"
+    # the Hindi "मुझे बिटकॉइन खरीदना चाहिए क्या? यह क्या है?" restated as "Should I buy Bitcoin?
+    # What is it?" — the same two questions the other way round (round 45 live re-ask)
+    r"\bshould\s+i\s+(?:buy|invest\s+in|get)\b[^?]{0,30}[?.!,]?\s*(?:and\s+)?what(?:'?s|\s+is)\s+"
+    r"(?:it|that|this)\b",
     re.I)
 _COIN_IS: Final = {
     "BTC": "Bitcoin is a digital currency that runs on a public network no company or government "

@@ -406,3 +406,9 @@ class TestEverythingStillReachesItsOwnAnswer:
     ])
     def test_price_and_risk_questions_fall_through(self, text: str) -> None:
         assert beginner.early(text, []) is None
+
+
+def test_should_i_buy_then_what_is_it() -> None:
+    # the Hindi question restated by the model put the two questions the other way round
+    said = " ".join(beginner._what_and_should("Should I buy Bitcoin? What is it?") or [])
+    assert said.startswith("Bottom line: Bitcoin is a digital currency")

@@ -1,7 +1,7 @@
 # ARGUS
 
 [![CI](https://github.com/Pratiikpy/argus-bitget/actions/workflows/ci.yml/badge.svg)](https://github.com/Pratiikpy/argus-bitget/actions/workflows/ci.yml)
-![tests](https://img.shields.io/badge/tests-13%2C558%20collected-2ea44f)
+![tests](https://img.shields.io/badge/tests-13%2C566%20collected-2ea44f)
 ![mypy](https://img.shields.io/badge/mypy-strict%20clean-2ea44f)
 ![register](https://img.shields.io/badge/register-6%20owned%20%C2%B7%2037%20tied%20%C2%B7%208%20lost-555)
 ![languages](https://img.shields.io/badge/answers%20in-8%20languages-555)
@@ -282,11 +282,11 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 13,564 tests collected
+pytest -q                       # 13,566 tests collected
 ```
 
-Nothing above needs a credential. On 2026-10-06, with every outbound connection refused, 13,247
-passed, 77 skipped and 0 failed of the 13,564 tests collected; the other 240 read a live
+Nothing above needs a credential. On 2026-10-06, with every outbound connection refused, 13,249
+passed, 77 skipped and 0 failed of the 13,566 tests collected; the other 240 read a live
 venue, feed or model and run apart
 (`pytest -m network`). Tests that need a rival's source cloned beside the repository skip
 and say which. `ARGUS_BLOCK_NETWORK=1` refuses every outbound connection, so
@@ -306,7 +306,7 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **13,564 tests collected** — `pytest -q` |
+| Tests | **13,566 tests collected** — `pytest -q` |
 | Types | **`mypy --strict` clean on 691 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |

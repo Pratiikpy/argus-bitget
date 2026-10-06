@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-06T01:26:50.115723+00:00",
+ "generated_at": "2026-10-06T04:43:54.486719+00:00",
  "source": "Deribit trade history (history.deribit.com), six one-hour windows a day; 30-day 25-delta skew rebuilt from each trade's printed IV",
  "series": {
   "BTC": {

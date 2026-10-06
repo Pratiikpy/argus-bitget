@@ -26,11 +26,12 @@ from __future__ import annotations
 
 import filecmp
 import json
+import re
 import shutil
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Final
 
 ARGUS = Path(__file__).resolve().parents[3]
 WORKSPACE = ARGUS.parent
@@ -280,6 +281,46 @@ def _copy_tree(source: Path, target: Path, *, dry_run: bool) -> tuple[int, int]:
     return seen, changed
 
 
+SERVED: Final = ("lui", "market", "truth", "cost")
+"""The packages the hosted console imports at request time."""
+
+
+def undeclared_imports(package: Path, requirements: Path) -> list[str]:
+    """Module-level imports in the served packages that are neither the standard library, argus,
+    nor a line of the deployment's ``requirements.txt``, as ``module.py: name``.
+
+    ``lui/research/portfolio_lab.py`` imported numpy at load and every /ask answered HTTP 500 on
+    the hosted console, which installs only what ``requirements.txt`` lists (2026-10-06); a deploy
+    now stops before that can ship."""
+    import ast
+    import sys
+
+    declared = {"argus", "__future__"}
+    try:
+        for line in requirements.read_text(encoding="utf-8").splitlines():
+            name = re.split(r"[<>=!~\[;\s]", line.strip(), maxsplit=1)[0]
+            if name and not name.startswith("#"):
+                declared.add(name.lower().replace("-", "_"))
+    except OSError:
+        pass
+    found: list[str] = []
+    for sub in SERVED:
+        for path in sorted((package / sub).rglob("*.py")):
+            try:
+                tree = ast.parse(path.read_text(encoding="utf-8"))
+            except (OSError, SyntaxError):
+                continue
+            for node in tree.body:
+                names = ([a.name for a in node.names] if isinstance(node, ast.Import) else
+                         [node.module or ""] if isinstance(node, ast.ImportFrom) and not node.level
+                         else [])
+                for name in names:
+                    top = name.split(".")[0]
+                    if top and top not in sys.stdlib_module_names and top.lower() not in declared:
+                        found.append(f"{path.relative_to(package).as_posix()}: {top}")
+    return sorted(set(found))
+
+
 def sync(*, dry_run: bool = False, data_only: bool = False) -> SyncResult:
     """Refresh the bundle from the working tree, and report what was behind.
 
@@ -293,6 +334,11 @@ def sync(*, dry_run: bool = False, data_only: bool = False) -> SyncResult:
     if not SOURCE_PACKAGE.exists():
         raise SyncError(f"no package to copy at {SOURCE_PACKAGE}")
 
+    if not data_only:
+        missing = undeclared_imports(SOURCE_PACKAGE, DEPLOY / "requirements.txt")
+        if missing:
+            raise SyncError("the hosted console would fail to import these; add each to "
+                            "deploy/requirements.txt or import it lazily: " + "; ".join(missing))
     result = SyncResult(dry_run=dry_run)
     if not dry_run:
         # The hosted console cannot reach FRED, so it answers rates and inflation from the
