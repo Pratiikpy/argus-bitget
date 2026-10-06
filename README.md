@@ -7,64 +7,93 @@
 ![languages](https://img.shields.io/badge/answers%20in-8%20languages-555)
 ![MCP](https://img.shields.io/badge/MCP-10%20tools-555)
 
-**Bitget's stock perpetuals never close. The stocks they track do. ARGUS shows what that gap does
-to your book: a full research desk for Bitget's tokenized US stocks, crypto, indices and
-commodities, in plain language, new to trading or not. Every number is computed from live data
-and names its source. Every capability is graded against a named rival, and every loss is
-published.**
+### A portfolio copilot for a market that never closes.
 
-**Live console: https://deploy-topaz-seven-64.vercel.app** · [one research task, run
-live](https://deploy-topaz-seven-64.vercel.app/research) · [what we beat](https://deploy-topaz-seven-64.vercel.app/proof)
-· [what we got wrong](https://deploy-topaz-seven-64.vercel.app/wrong)
-· [status](https://deploy-topaz-seven-64.vercel.app/status)
+**Bitget's stock perpetuals trade 24/7. The stocks they track do not. ARGUS shows what a trade
+does to *your* book across that gap — risk, beta, exposure, stress, hedge and cost — in plain
+language, with every number computed from live data and naming its source. The model reads the
+question; it never writes a number.**
 
-**Read the full story:** [whitepaper](https://deploy-topaz-seven-64.vercel.app/whitepaper), every problem ARGUS takes on and how it solves it · [proof deck](https://deploy-topaz-seven-64.vercel.app/deck), the evidence in sixteen slides
+**▶ [Watch the 3-minute demo](https://deploy-topaz-seven-64.vercel.app/video)** ·
+**[Open the live console](https://deploy-topaz-seven-64.vercel.app)** — no account, no key ·
+[one research task, run live](https://deploy-topaz-seven-64.vercel.app/research) ·
+[whitepaper](https://deploy-topaz-seven-64.vercel.app/whitepaper) ·
+[proof deck](https://deploy-topaz-seven-64.vercel.app/deck)
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/console-answer-dark.png">
   <img alt="The ARGUS console answering 'I hold 40% NVDA, 30% MSFT, 30% AAPL — should I add 15% TSLA?': a sized, actionable answer, the risk it adds, a hedge, stress cases, how far to trust the beta against a named rival, and a receipt naming every source." src="docs/img/console-answer-light.png">
 </picture>
 
-Built for Bitget AI Base Camp / Genesis Hackathon Season 2. Nothing on this page needs an account
-or a key to try.
-
-> **Read this before judging.**
-> - ARGUS is this team's **Track 3 — AI Trading Desk** entry, a natural-language research
->   workbench. The team's Track 2 entry is a **separate project**,
->   [t2-sentiment-agent](https://github.com/Pratiikpy/t2-sentiment-agent), with its own code,
->   paper-trading ledger, demo and form (Basic Competition Rules, rule 2). Nothing here is part of it.
-> - It is **not a signal service**. No strategy in it has cleared its own deflation gate, and the
->   console says so; the trader makes every call.
-> - Every capability is measured against a named rival on the same input, and the losses are
->   published beside the wins: [the full register](#what-we-beat-and-what-beat-us) and
->   [`/wrong`](https://deploy-topaz-seven-64.vercel.app/wrong).
+Bitget AI Base Camp S2 · **Track 3, AI Trading Desk · Open Theme: a portfolio-aware research
+copilot.** It is not a signal service: it places no orders, and the trader makes every call. The
+team's Track 2 entry, [t2-sentiment-agent](https://github.com/Pratiikpy/t2-sentiment-agent), is a
+separate project with its own code, ledger and form.
 
 ---
 
-## Head to head with Season 2
+## The finding it is built on
 
-Every rival below was cloned or called and run on the same input as ARGUS. Ties and losses are
-kept; the full table, rival by rival, is on [`/proof`](https://deploy-topaz-seven-64.vercel.app/proof).
+A stock perpetual on Bitget spends most of its life trading while its stock cannot. On 30 days of
+hourly candles, **82.5% of hours fell while the US market was shut** — and the perpetual moves
+differently in those hours. Measured against QQQ, its beta while the US market was open was
+**higher than while it was shut on all 9 single-stock perpetuals**:
 
-| Rival | What it does | Result |
-|---|---|---|
-| gloaming (S2) | estimates the open while the US market is shut | missed by 81bps over 113 nights and 8 stocks against 30bps for ARGUS (93% of directions right) and 90bps for no gap; ahead on all 8 stocks, narrowest on QQQ (12.5 against 14.3bps). The stock's own pre-market price at 09:00, the general tool, missed by 36bps; ARGUS is ahead of it on all 8 stocks |
-| Rook (S2) | ends each thesis with an invalidation price | its stops, 0.1-1.7% away, were reached on 62% of held-out days against 11% for ARGUS's fitted stop: ahead on that measure, six names, one run |
-| baserate (S2) | prices a leveraged weekend hold | ARGUS rebuilt to read every NVDA weekend since 1999 (1,444 as of October 2026) and Bitget's live margin tier; its regime match scored worse than ARGUS's volatility-scaled band over 17,044 weekends, but baserate's own forecasts are not yet scored on the same weekends: a tie |
-| MirrorLine (S2) | checks a trader's claims about the tape | first run 18 of 38 verdicts to its 38; fixed the same morning, re-run tied at 30 of 30 gradable claims |
-| optic-bitget (S2) | debates a thesis with a model judge | abstained on two of three theses for want of earnings and positioning data ARGUS answered; still gives one synthesised call ARGUS does not: a tie |
-| Ballast (S2) | hedges an rToken holder's nights | beat ARGUS's index hedge on 2026-09-24; now a tie |
-| nocturne (S2) | fades the rToken's weekend move | level on its own question (1.92% against 2.07%); on the stock's real Monday open the weekend move carried through (slope +0.83, 160 stock-weekends) |
-| Bitget's 60-second TWAP | slices an order | beat the console's schedule (6.9 against 12.2bps on $100k) on 2026-09-24; now a tie |
+| Perpetual | Beta, US market open | Beta, US market shut | One beta over all hours |
+|---|---|---|---|
+| NVDA | **1.74** | 1.28 | 1.40 |
+| TSLA | **1.47** | 0.89 | 1.06 |
+| META | **1.28** | 0.51 | 0.73 |
+| AAPL | **0.68** | 0.11 | 0.27 |
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/img/proof-dark.png">
-  <img alt="The /proof page: 51 capabilities measured against a named rival — 6 OWNED, 37 TIED, 0 IMPLEMENTED, 8 LOST — each linked to its evidence." src="docs/img/proof-light.png" width="720">
-</picture>
+A single beta fitted over every hour — what a general tool computes — is dominated by the hours
+with no price discovery, so it **understates the risk in the one session that actually prices the
+stock**. The control holds: TQQQ and SQQQ, whose ±3x leverage on QQQ is fixed by construction,
+read about ±2.9 in both sessions, so the gap is the stocks, not the method. That is why ARGUS
+measures a book session by session, and why a research tool built for a market that closes is the
+wrong tool here (`argus/data/session_beta.json`, written by
+`python -m argus.research.session_beta_study`).
+
+## One question, start to finish
+
+> *I hold 40% NVDA, 30% MSFT, 30% AAPL — should I add 15% TSLA?*
+
+The live console, 6 October 2026, abridged:
+
+```
+Bottom line: adding 15% TSLA takes the book's beta from 0.88 to 0.90, and TSLA would carry 14%
+  of your total risk — inside the 25% budget used by default; the most it could take is 22%.
+Risk spread across 2.8 → 3.5 effective positions by share of risk
+Most correlated with NVDA at +0.28; largely a different bet from what you already own
+Hedge: short QQQ worth about 90% of the book's value neutralises its market exposure; it does
+  nothing for single-name news risk.
+If QQQ falls 10%, the book moves about -9.0% through beta alone.
+Sectors after the trade: Information Technology 100% → 85%, Consumer Discretionary 0% → 15%.
+Data: live Bitget hourly candles, last 30 days, fetched just now. This is analysis, not advice.
+```
+
+Tell it your limits once — *I can't lose more than 10%* — and the same trade is re-sized to fit;
+an income mandate with a 3% limit gets a no, with the reason. Ask *test my thesis* and each reason
+you give is checked against its own measurement.
+
+## Why the numbers can be trusted
+
+- **The model never writes a number.** Qwen reads the question and translates the answer; every
+  figure is computed by code, and every line is tagged **live**, **computed**, **record**,
+  **assumed** or **missing**. No source, no answer — a refusal with the reason instead.
+- **Where a shut stock will open:** the perpetual-implied open missed by **30bps** over 113 nights
+  and 8 stocks, against 36bps for the stock's own pre-market price, 81bps for gloaming (an S2
+  entry, best-fit variant) and 90bps for assuming no gap.
+- **What a weekend can do to you:** Monday-open bands scaled to today's volatility covered **79%
+  of 17,044 weekends** out of sample, against an 80% target.
+- **Every capability graded against a named rival, losses included:** 6 of 51 won, 37 tied, 8
+  lost — all 8 on [`/wrong`](https://deploy-topaz-seven-64.vercel.app/wrong), full register on
+  [`/proof`](https://deploy-topaz-seven-64.vercel.app/proof).
 
 ---
 
 ## Where each judging line is answered
+
 
 | Track 3 judges | Where to look | What to check |
 |---|---|---|
@@ -209,6 +238,29 @@ on the Nasdaq or on any instrument, long or short book), `argus_execution_plan`,
 `argus_scoreboard`, `argus_research_task` (the eight-engine report), `argus_week_ahead`,
 `argus_exposures` and `argus_review_trades`. They run the same engines as the page; none of them
 writes or trades.
+
+---
+
+## Head to head with Season 2
+
+Every rival below was cloned or called and run on the same input as ARGUS. Ties and losses are
+kept; the full table, rival by rival, is on [`/proof`](https://deploy-topaz-seven-64.vercel.app/proof).
+
+| Rival | What it does | Result |
+|---|---|---|
+| gloaming (S2) | estimates the open while the US market is shut | missed by 81bps over 113 nights and 8 stocks against 30bps for ARGUS (93% of directions right) and 90bps for no gap; ahead on all 8 stocks, narrowest on QQQ (12.5 against 14.3bps). The stock's own pre-market price at 09:00, the general tool, missed by 36bps; ARGUS is ahead of it on all 8 stocks |
+| Rook (S2) | ends each thesis with an invalidation price | its stops, 0.1-1.7% away, were reached on 62% of held-out days against 11% for ARGUS's fitted stop: ahead on that measure, six names, one run |
+| baserate (S2) | prices a leveraged weekend hold | ARGUS rebuilt to read every NVDA weekend since 1999 (1,444 as of October 2026) and Bitget's live margin tier; its regime match scored worse than ARGUS's volatility-scaled band over 17,044 weekends, but baserate's own forecasts are not yet scored on the same weekends: a tie |
+| MirrorLine (S2) | checks a trader's claims about the tape | first run 18 of 38 verdicts to its 38; fixed the same morning, re-run tied at 30 of 30 gradable claims |
+| optic-bitget (S2) | debates a thesis with a model judge | abstained on two of three theses for want of earnings and positioning data ARGUS answered; still gives one synthesised call ARGUS does not: a tie |
+| Ballast (S2) | hedges an rToken holder's nights | beat ARGUS's index hedge on 2026-09-24; now a tie |
+| nocturne (S2) | fades the rToken's weekend move | level on its own question (1.92% against 2.07%); on the stock's real Monday open the weekend move carried through (slope +0.83, 160 stock-weekends) |
+| Bitget's 60-second TWAP | slices an order | beat the console's schedule (6.9 against 12.2bps on $100k) on 2026-09-24; now a tie |
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/proof-dark.png">
+  <img alt="The /proof page: 51 capabilities measured against a named rival — 6 OWNED, 37 TIED, 0 IMPLEMENTED, 8 LOST — each linked to its evidence." src="docs/img/proof-light.png" width="720">
+</picture>
 
 ---
 
