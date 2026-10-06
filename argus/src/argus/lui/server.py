@@ -2304,6 +2304,23 @@ def _stated_number_lines(text: str, prior: list[str]) -> list[str] | None:
         said = reader(text)
         if said is not None:
             return said
+    if (stated_numbers.split_lines(text, prior) is not None
+            and re.search(r"\b(?:did|had|just\s+did|happened|completed|announced|went\s+through|"
+                          r"last\s+(?:week|month)|yesterday|recently|this\s+week|since|after)\b",
+                          text, re.I)
+            and not re.search(r"\b(?:what\s+if|if\s+(?:a|an|the|it|\w+)\s+(?:\w+\s+){0,3}"
+                              r"(?:splits?|does|did\s+a)|suppose|hypothetical|would)\b", text,
+                              re.I)):
+        # "Since TSLA did a 10-for-1 split last week, is it cheap now?" was answered with the
+        # split's arithmetic and never said there was no such split (round 45 final audit): a
+        # split said to have happened is checked against the record first
+        from argus.lui.research import splits
+
+        named = research_symbols(text)[0]
+        if named and splits.claimed(text):
+            checked = splits.check(text, named[0], price=_price_now)
+            if checked is not None:
+                return checked[0]
     return stated_numbers.split_lines(text, prior)
 
 
@@ -16450,11 +16467,13 @@ def _status() -> dict[str, Any]:
 def _model_reader_state() -> dict[str, Any]:
     """Whether this instance's language-model reader is paused by its breaker (`lui/router.py`),
     so a spent or failing key shows on /status instead of only in slower, plainer answers."""
-    client = _ROUTER if _ROUTER_BUILT else None
+    # built here when this instance has not yet needed it: /status said "no model on this
+    # instance yet" on a cold instance whose key was set, while the answers named Qwen (round 45
+    # final audit). Building the router makes no network call.
+    client = _router()
     if client is None:
         return {"configured": False, "paused": False, "reason": "",
-                "since": None, "seconds_left": 0,
-                "note": "not built on this instance yet" if not _ROUTER_BUILT else "no key"}
+                "since": None, "seconds_left": 0, "note": "no key"}
     state = getattr(client, "state", None)
     return {"configured": True, **(state() if callable(state) else {"paused": False})}
 

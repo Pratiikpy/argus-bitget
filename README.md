@@ -7,14 +7,18 @@
 ![languages](https://img.shields.io/badge/answers%20in-8%20languages-555)
 ![MCP](https://img.shields.io/badge/MCP-10%20tools-555)
 
-**A research desk for Bitget's tokenized US stocks, and its crypto, indices and commodities too.
-Ask in plain language, new to trading or not; every number is computed from live data and names
-its source.**
+**Bitget's stock perpetuals never close. The stocks they track do. ARGUS shows what that gap does
+to your book: a full research desk for Bitget's tokenized US stocks, crypto, indices and
+commodities, in plain language, new to trading or not. Every number is computed from live data
+and names its source. Every capability is graded against a named rival, and every loss is
+published.**
 
 **Live console: https://deploy-topaz-seven-64.vercel.app** · [one research task, run
 live](https://deploy-topaz-seven-64.vercel.app/research) · [what we beat](https://deploy-topaz-seven-64.vercel.app/proof)
 · [what we got wrong](https://deploy-topaz-seven-64.vercel.app/wrong)
 · [status](https://deploy-topaz-seven-64.vercel.app/status)
+
+**Read the full story:** [whitepaper](https://deploy-topaz-seven-64.vercel.app/whitepaper), every problem ARGUS takes on and how it solves it · [proof deck](https://deploy-topaz-seven-64.vercel.app/deck), the evidence in sixteen slides
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/console-answer-dark.png">
@@ -282,11 +286,11 @@ cd argus
 pip install -e ".[dev]"
 python -m argus.status          # module and sub-theme coverage, resolved by import
 python -m argus.lui.server      # the console on http://127.0.0.1:8765
-pytest -q                       # 13,567 tests collected
+pytest -q                       # 13,568 tests collected
 ```
 
 Nothing above needs a credential. On 2026-10-06, with every outbound connection refused, 13,249
-passed, 77 skipped and 0 failed of the 13,567 tests collected; the other 240 read a live
+passed, 77 skipped and 0 failed of the 13,568 tests collected; the other 240 read a live
 venue, feed or model and run apart
 (`pytest -m network`). Tests that need a rival's source cloned beside the repository skip
 and say which. `ARGUS_BLOCK_NETWORK=1` refuses every outbound connection, so
@@ -306,7 +310,7 @@ a test that reaches the network shows itself.
 
 | | |
 |---|---|
-| Tests | **13,567 tests collected** — `pytest -q` |
+| Tests | **13,568 tests collected** — `pytest -q` |
 | Types | **`mypy --strict` clean on 691 source files** |
 | Lint | `ruff` clean |
 | Modules | **152/152 modules importable**, checked by `python -m argus.status` |

@@ -248,3 +248,26 @@ class TestReAskMisses:
         asked = server._leaning_follow_up(
             "and gold", ["what's the chance BTC is above 90000 in one hour?"])
         assert asked == "what's the chance XAU is above 4500 in one hour?"
+
+
+class TestSplitPremiseFirst:
+    def test_a_split_said_to_have_happened_is_checked_not_computed(
+            self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from argus.lui import server
+        from argus.lui.research import splits
+
+        calls: list[str] = []
+
+        def fake_check(text: str, symbol: str, **_: Any) -> tuple[list[str], list[Any], dict]:
+            calls.append(symbol)
+            return (["Bottom line: that premise is not on the record"], [], {})
+
+        monkeypatch.setattr(splits, "check", fake_check)
+        monkeypatch.setattr(server, "_price_now", lambda s: 380.0)
+        monkeypatch.setattr("argus.lui.research.parse.last_price", lambda s: 380.0)
+        said = server._stated_number_lines(
+            "Since TSLA did a 10-for-1 split last week, is it cheap?", [])
+        assert said == ["Bottom line: that premise is not on the record"] and calls
+        hypo = server._stated_number_lines("What if TSLA does a 10-for-1 split, my 50 shares?", [])
+        assert hypo is not None and "turns your 50 TSLA shares into 500" in hypo[0]
+        assert len(calls) == 1
