@@ -4,7 +4,7 @@
 
 ## 1. Abstract
 
-ARGUS is a natural-language research workbench for Bitget's US-stock perpetuals, tokenized US stocks, crypto, indices and commodities. A trader asks a question in plain words, in any of eight languages, and the console answers with figures computed for that answer from live market data, company filings and public macro series. Every line of the answer is labelled with where it came from. The language model in the system reads the question and translates the answer; it never writes a figure the trader sees.
+ARGUS is a natural-language research workbench for Bitget's US-stock perpetuals, tokenized US stocks, crypto, indices and commodities. A trader asks a question in plain words, in twelve languages that it reads and eight that it answers in, and the console answers with figures computed for that answer from live market data, company filings and public macro series. Every line of the answer is labelled with where it came from. The language model in the system reads the question and translates the answer; it never writes a figure the trader sees.
 
 The design rests on one constraint: no source, no answer. Where a figure cannot be read or computed, the console says so on the line where the figure would have been, and where a question cannot honestly be answered as asked, it declines and gives the true reason. Before a trade, it shows what that trade does to the trader's own book: the share of risk the new position would carry, its beta in the session that actually prices the stock, sector and factor exposure, correlation, concentration, a scenario tree of stresses, a sized hedge, and an execution schedule priced on the live order book.
 
@@ -416,8 +416,8 @@ The 81.7% figure is the honest headline for a visitor on the public console once
 
 | Check | Result |
 |---|---|
-| Tests collected | 13,558, collected on 6 October 2026 with outbound network blocked |
-| Tests passing | As reported in the README for 6 October 2026: 12,830 passed, 77 skipped, 0 failed of 13,557 collected with every outbound connection refused, the 240 network tests run apart. Not re-run for this paper |
+| Tests collected | 13,567, collected on 6 October 2026 with outbound network blocked |
+| Tests passing | 13,249 passed, 77 skipped, 0 failed of 13,567 collected on 6 October 2026 in a clean checkout with every outbound connection refused, the 240 network tests run apart |
 | Static types | `mypy --strict` clean on 690 source files |
 | Modules | 152/152 registered modules importable; 18/18 named sub-themes resolve to a module and a test file, which is coverage, not a claim to lead them |
 | Quoted figures | `python -m argus.eval.docclaims` checked 103 of 111 figures quoted in the public documents against their artefacts on 6 October 2026: 0 stale, 0 lagging, 8 unchecked |
@@ -461,6 +461,8 @@ From the engine underneath (`README.md`, "What the code will not let happen"): a
 - **The hosted console's own model calls** are not in the local Qwen meter. The local meter records 4,477 calls (4,372 answered) and 16.5 million tokens between 25 September and 5 October 2026, 69% of completion tokens spent reasoning, most of them by the paper desk's analysts (`argus/data/qwen_cost_ledger.jsonl`).
 - **No live order path, by design** (section 7.3).
 - **Known architectural debt** is listed in `ARGUS-ARCHITECTURE.md` section 9, including duplicated statistics that can disagree (four z-normalisation implementations split between population and sample variance).
+
+**Relationship to Season 1.** The author's Season 1 entry, NightDesk, priced one tokenized stock overnight and let a model council decide behind fifteen gates. None of its code is in ARGUS. ARGUS asks a different question, what a trade does to the trader's own book, and no decision of its model is ever sent to an exchange. Everything described in this paper, from the book-level copilot to the register, is new for Season 2.
 
 ## 9. Roadmap
 
